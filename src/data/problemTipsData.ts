@@ -6,46 +6,46 @@ import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from "@/constants/b
 
 type StatIcon = LucideIcon | ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
-// Resposta em menos de 10 minutos em todas as categorias e no restante site.
+// Resposta em menos de 5 minutos em todas as categorias e no restante site.
 export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: StatIcon }[]> = {
   manchas: [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   odores: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "24-48h", label: "Resultado permanente", icon: ShieldCheck },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   saude: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   materiais: [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   animais: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   preco: [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: `${REVIEW_COUNT}+`, label: "Avaliações verificadas", icon: ShieldCheck },
-    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
+    { value: "<5min", label: "Resposta ao pedido", icon: Clock },
     { value: "Grátis", label: "Orçamento sem compromisso", icon: CheckCircle2 },
   ],
   urgencia: [
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: "24h", label: "Disponibilidade", icon: ShieldCheck },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },

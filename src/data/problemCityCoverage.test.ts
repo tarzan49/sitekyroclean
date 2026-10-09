@@ -99,7 +99,7 @@ describe('páginas problema × cidade: o React e o HTML estático dizem o mesmo'
     expect(problemCityMeta(problem, 'Porto').title).toBe(`${problem.h1} no Porto | Kyro Clean Solutions`);
     expect(problemCityMeta(problem, 'Amadora').title).toContain(' na Amadora ');
     expect(problemCityMeta(problem, 'Braga').description).toContain(`${problem.h1} em Braga:`);
-    expect(problemCityMeta(problem, 'Braga').description).toMatch(/Resposta em menos de 10 minutos\.$/);
+    expect(problemCityMeta(problem, 'Braga').description).toMatch(/Resposta em menos de 5 minutos\.$/);
   });
 
   it('numa pergunta, a cidade entra antes do ponto de interrogação', () => {
@@ -181,7 +181,7 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
     // Texto escolhido pelo dono a 30/09/2026.
     expect(problemCityMeta(domicilio, 'Lisboa')).toEqual({
       title: 'Limpeza de Sofá ao Domicílio em Lisboa | Kyro Clean Solutions',
-      description: 'Limpeza de Sofá ao Domicílio em Lisboa: serviço profissional ao domicílio. Levamos o equipamento de extração profissional à sua casa. Resposta em menos de 10 minutos.',
+      description: 'Limpeza de Sofá ao Domicílio em Lisboa: serviço profissional ao domicílio. Levamos o equipamento de extração profissional à sua casa. Resposta em menos de 5 minutos.',
     });
     expect(problemCityMeta(domicilio, 'Porto').title).toBe('Limpeza de Sofá ao Domicílio no Porto | Kyro Clean Solutions');
     const lisboa = cities.find(c => c.slug === 'lisboa')!;
@@ -214,11 +214,11 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
 
     const urgente = getProblemBySlug('limpeza-sofa-urgente')!;
     expect(urgente.metaDescription).toMatch(/^Limpeza urgente de sofá no Porto\. /);
-    expect(problemCityMeta(urgente, 'Lisboa').description).toBe('Limpeza Urgente de Sofá: Resposta Rápida em Lisboa: serviço profissional ao domicílio. Agendamento prioritário para derrames e manchas recentes. Resposta em menos de 10 minutos.');
+    expect(problemCityMeta(urgente, 'Lisboa').description).toBe('Limpeza Urgente de Sofá: Resposta Rápida em Lisboa: serviço profissional ao domicílio. Agendamento prioritário para derrames e manchas recentes. Resposta em menos de 5 minutos.');
 
     const empresa = getProblemBySlug('empresa-limpeza-estofos')!;
     expect(empresa.metaDescription).toMatch(/^Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto\. /);
-    expect(problemCityMeta(empresa, 'Lisboa').description).toBe(`Empresa Profissional de Limpeza de Estofos em Lisboa: serviço profissional ao domicílio. Sofás, colchões, cadeiras e tapetes, com avaliação de ${REVIEW_RATING} no Google. Resposta em menos de 10 minutos.`);
+    expect(problemCityMeta(empresa, 'Lisboa').description).toBe(`Empresa Profissional de Limpeza de Estofos em Lisboa: serviço profissional ao domicílio. Sofás, colchões, cadeiras e tapetes, com avaliação de ${REVIEW_RATING} no Google. Resposta em menos de 5 minutos.`);
     expect(problemCityBenefits(empresa, 'Lisboa')).toBe(empresa.benefits);
   });
 

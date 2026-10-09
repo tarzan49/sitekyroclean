@@ -344,7 +344,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
                 <MessageCircle className="h-5 w-5 shrink-0" />Confirmar o meu orçamento
               </a>
             : <p role="status" className="mt-3 rounded-[10px] bg-white/[0.06] p-3 text-xs text-white/75">Escolha a localidade e complete quantidades e medidas válidas para pedir a confirmação.</p>}
-          <p className="mt-1.5 text-center text-[11px] leading-snug text-white/60">Resposta em menos de 10 minutos · Uma só deslocação</p>
+          <p className="mt-1.5 text-center text-[11px] leading-snug text-white/60">Resposta em menos de 5 minutos · Uma só deslocação</p>
         </div>
       </section>
     </div>

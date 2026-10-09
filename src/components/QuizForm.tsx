@@ -892,7 +892,7 @@ ${formData.description || 'Sem observações adicionais'}
               </Button>
             </div>
             <p className="text-center text-sm text-white/80 font-medium -mt-0.5">
-              Sem compromisso · Grátis · Respondemos em menos de 10 min
+              Sem compromisso · Grátis · Respondemos em menos de 5 min
             </p>
             {/* O selo flutuante do reCAPTCHA fica escondido por CSS (tapava a
                 barra de WhatsApp); a Google só o permite com esta atribuição
@@ -960,7 +960,7 @@ ${formData.description || 'Sem observações adicionais'}
             Vamos terminar o seu orçamento?
           </h3>
           <p className="text-base text-white/80 mb-2 leading-relaxed">
-            Ainda pode receber uma proposta à medida, sem compromisso. Termine o pedido e respondemos em menos de 10 minutos.
+            Ainda pode receber uma proposta à medida, sem compromisso. Termine o pedido e respondemos em menos de 5 minutos.
           </p>
           <div className="flex flex-col gap-3 mt-5">
             <Button

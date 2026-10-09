@@ -1,7 +1,7 @@
 import { PRICE_TABLE } from './locationPriceTestimonialsData';
 import { pickReviewSubset } from './reviewsPool';
 import { getTrustPointsForSeed } from '../constants/serviceTrustPool';
-import { commercialHeroPriceLine, commercialHeroStats } from './commercialHeroCopy';
+import { commercialHeroPriceLine, commercialHeroFacts } from './commercialHeroCopy';
 import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE, PRICE_PROMISE, TREATMENT_EXTRAS, COVERAGE_PROMISE, AVAILABILITY_PROMISE } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
@@ -59,7 +59,7 @@ export function getResourceCommercial(post: BlogPost) {
   return {
     serviceSlug,
     priceLine: commercialHeroPriceLine(serviceSlug),
-    stats: commercialHeroStats(serviceSlug),
+    stats: commercialHeroFacts(serviceSlug),
     priceRows: PRICE_TABLE[serviceSlug] ?? [],
     trustPoints: getTrustPointsForSeed(serviceSlug, `${serviceSlug}:0:default`) ?? [],
     reviews: pickReviewSubset(serviceSlug, `/blog/${post.slug}:blog-${post.slug}`, 6),

@@ -1,7 +1,7 @@
 import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
-import { commercialHeroSubtitle, commercialHeroPriceLine, commercialHeroStats, type HeroStat } from '../src/data/commercialHeroCopy';
+import { commercialHeroSubtitle, commercialHeroPriceLine, commercialHeroFacts, type HeroStat } from '../src/data/commercialHeroCopy';
 import { PILLAR_PAGES, type PillarSlug } from '../src/data/pillarPages';
 import { SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM } from '../src/data/enginePrices';
 import { SOFA_PROCESS_STEPS } from '../src/data/sofaProcessGuide';
@@ -1025,7 +1025,7 @@ export function prerenderRoutes(outDir: string): number {
         emit(route.path, copy.title, copy.description, {
           h1: copy.h1,
           intro: commercialHeroSubtitle(copy.serviceSlug, data.city.name),
-          heroFacts: { priceLine: commercialHeroPriceLine(copy.serviceSlug, data.city.name, copy.priceFrom), stats: commercialHeroStats(copy.serviceSlug) },
+          heroFacts: { priceLine: commercialHeroPriceLine(copy.serviceSlug, data.city.name, copy.priceFrom), stats: commercialHeroFacts(copy.serviceSlug) },
           localSection: `${data.marca.materialDescription} ${data.marca.material}.`,
           benefits: [...data.marca.doNots, ...data.marca.doThis],
           howItWorks: data.marca.cleaningProcess,
@@ -1127,7 +1127,7 @@ export function prerenderRoutes(outDir: string): number {
         breadcrumb: [{ label: 'Início', href: '/' }, { label: pillar.breadcrumbLabel }],
         h1: pillar.h1,
         intro: commercialHeroSubtitle(pillar.serviceSlug),
-        heroFacts: { priceLine: commercialHeroPriceLine(pillar.serviceSlug), stats: commercialHeroStats(pillar.serviceSlug) },
+        heroFacts: { priceLine: commercialHeroPriceLine(pillar.serviceSlug), stats: commercialHeroFacts(pillar.serviceSlug) },
         serviceExamples: getServiceExamples(pillar.serviceSlug),
         processSteps: pillarProcess(pillar.serviceSlug).map((step, index) => ({ step: index + 1, title: step.title, description: step.description, alt: step.alt })),
         benefits: PILLAR_BENEFITS[pillar.serviceSlug],

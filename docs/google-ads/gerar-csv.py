@@ -72,7 +72,7 @@ def limpeza(city):
         # anúncios de limpeza ficaram iguais, só muda a equipa.
         headlines=[f"Limpeza de Sofás {cidade(city)}", f"Higienização de Sofás {cidade(city)}",
                    AVAL_TITULO, RATING_TITULO,
-                   f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
+                   f"{CLIENTES} Clientes Servidos", "Resposta em 5 Minutos",
                    "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
                    "Garantia de Repetição", "Limpeza de Sofás ao Domicílio",
                    "Secagem Média de 3 a 6 Horas", "Manchas, Pelos e Odores",
@@ -181,7 +181,7 @@ ANTI_ACAROS_COLCHAO = str(int(le("src/components/quiz/QuizTypes.ts", r"id: 'solt
                           - int(COLCHAO_DESDE))
 
 BASE_TITULOS = [AVAL_TITULO, RATING_TITULO, f"{CLIENTES} Clientes Servidos",
-                "Resposta em 10 Minutos", "Orçamento Grátis no WhatsApp",
+                "Resposta em 5 Minutos", "Orçamento Grátis no WhatsApp",
                 "Preço Fechado Antes de Marcar", "Garantia de Repetição"]
 DESC_AVAL = (f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações e mais de "
              f"{CLIENTES.lstrip('+')} clientes servidos.")

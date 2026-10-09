@@ -333,7 +333,7 @@ function calculateCustomPack(items, city) {
 }
 
 // src/constants/commercialPolicy.ts
-var RESPONSE_PROMISE = "Resposta em menos de 10 minutos";
+var RESPONSE_PROMISE = "Resposta em menos de 5 minutos";
 var DRYING_PROMISE = "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço.";
 var SOFA_DRYING_RANGE = "2 a 5 horas";
 var SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;

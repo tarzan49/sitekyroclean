@@ -26,7 +26,7 @@ function buildEnWaMessage(page: EnPageData): string {
 function getGuestStats(page: EnPageData): SnapshotStat[] {
   return [
     { value: `${REVIEW_RATING}★`, label: "Google Rating", icon: Star },
-    { value: "<10 min", label: "Response Time", icon: Clock },
+    { value: "<5 min", label: "Response Time", icon: Clock },
     { value: "English", label: "Speaking Team", icon: Languages },
     { value: CLIENTS_SERVED_LABEL, label: "Clients Served", icon: Users },
   ];
@@ -35,7 +35,7 @@ function getGuestStats(page: EnPageData): SnapshotStat[] {
 function getHostStats(): SnapshotStat[] {
   return [
     { value: `${REVIEW_RATING}★`, label: "Google Rating", icon: Star },
-    { value: "<10 min", label: "Response Time", icon: Clock },
+    { value: "<5 min", label: "Response Time", icon: Clock },
     { value: "Photo", label: "Documentation", icon: Camera },
     { value: "English", label: "Speaking Team", icon: Languages },
   ];

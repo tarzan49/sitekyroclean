@@ -21,7 +21,7 @@ describe('problem hero content', () => {
       expect(url.searchParams.get('text')).toContain(PROBLEM_WA_REQUESTS[item.slug].request);
       expect(url.searchParams.get('text')).toContain('em Lisboa');
       expect(hero.intro).not.toMatch(/99%|garantimos|bactérias|benefícios clínicos|—/i);
-      expect(hero.response).toContain('menos de 10 minutos');
+      expect(hero.response).toContain('menos de 5 minutos');
     }
   });
   it('uses the actual travel table and correct Portuguese prepositions', () => {

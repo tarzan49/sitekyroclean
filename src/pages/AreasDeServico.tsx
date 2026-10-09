@@ -126,7 +126,7 @@ const AreasDeServico = () => {
               overline="Comece já"
               heading="Precisa de limpeza profissional na sua"
               goldWord="cidade?"
-              subtitle="Peça o seu orçamento gratuito: resposta em menos de 10 minutos."
+              subtitle="Peça o seu orçamento gratuito: resposta em menos de 5 minutos."
               light={false}
             />
             <QuizButton />

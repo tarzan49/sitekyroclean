@@ -77,15 +77,29 @@ export const commercialHeroPaidPriceLine = (serviceSlug: string, price?: string)
   return /orçamento/i.test(value) ? 'Sob orçamento' : startingPriceLabel(serviceSlug, value);
 };
 
-export interface HeroStat { value: string; label: string }
+export interface HeroStat { key: 'rating' | 'duration' | 'response' | 'drying'; value: string; label: string }
 
+/** A avaliação Google, que o hero mostra ao lado do preço, por cima do botão. */
+export const commercialHeroRating = (): HeroStat => ({ key: 'rating', value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google` });
+
+/** Duração média de uma limpeza no local (dono, 09/10/2026: "mais ou menos uma hora de limpeza", sem "cerca de"). */
+export const ON_SITE_DURATION = '± 1 h';
+
+/**
+ * A faixa por baixo do hero. A avaliação subiu para junto do preço (dono,
+ * 09/10/2026) e o seu lugar passou a ser a duração da limpeza. Os rótulos são
+ * de uma palavra para caberem numa linha no telemóvel.
+ */
 export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
-  { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google` },
-  { value: '<10 min', label: 'Resposta' },
+  { key: 'duration', value: ON_SITE_DURATION, label: 'Limpeza' },
+  { key: 'response', value: '<5 min', label: 'Resposta' },
   // A impermeabilização não seca, ativa: o tratamento precisa de até 24 h para
   // ficar operacional, ao contrário da limpeza, que devolve o artigo em 3 a 6 h
   // (sofás: 2 a 5 h, dono 06/10/2026).
   serviceSlug === 'impermeabilizacao'
-    ? { value: 'Até 24 h', label: 'Ativação da proteção' }
-    : { value: serviceSlug === 'limpeza-sofas' ? '2 a 5 h' : '3 a 6 h', label: 'Secagem média' },
+    ? { key: 'drying', value: 'Até 24 h', label: 'Ativação' }
+    : { key: 'drying', value: serviceSlug === 'limpeza-sofas' ? '2 a 5 h' : '3 a 6 h', label: 'Secagem' },
 ];
+
+/** O que o HTML estático lista por baixo do preço: a avaliação e a faixa, sem repetir. */
+export const commercialHeroFacts = (serviceSlug: string): HeroStat[] => [commercialHeroRating(), ...commercialHeroStats(serviceSlug)];

@@ -47,7 +47,7 @@ A contagem é feita por esse texto.
 3. +125 Avaliações de Clientes  `(27)`
 4. Avaliação Média de 4,9  `(22)`
 5. +1100 Clientes Servidos  `(23)`
-6. Resposta em 10 Minutos  `(22)`
+6. Resposta em 5 Minutos  `(22)`
 7. Orçamento Grátis no WhatsApp  `(28)`
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
@@ -111,7 +111,7 @@ A contagem é feita por esse texto.
 3. +125 Avaliações de Clientes  `(27)`
 4. Avaliação Média de 4,9  `(22)`
 5. +1100 Clientes Servidos  `(23)`
-6. Resposta em 10 Minutos  `(22)`
+6. Resposta em 5 Minutos  `(22)`
 7. Orçamento Grátis no WhatsApp  `(28)`
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
@@ -182,7 +182,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 3. +125 Avaliações de Clientes  `(27)`
 4. Avaliação Média de 4,9  `(22)`
 5. +1100 Clientes Servidos  `(23)`
-6. Resposta em 10 Minutos  `(22)`
+6. Resposta em 5 Minutos  `(22)`
 7. Orçamento Grátis no WhatsApp  `(28)`
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
@@ -213,7 +213,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 4. +125 Avaliações de Clientes  `(27)`
 5. Avaliação Média de 4,9  `(22)`
 6. +1100 Clientes Servidos  `(23)`
-7. Resposta em 10 Minutos  `(22)`
+7. Resposta em 5 Minutos  `(22)`
 8. Orçamento Grátis no WhatsApp  `(28)`
 9. Preço Fechado Antes de Marcar  `(29)`
 10. Garantia de Repetição  `(21)`
@@ -242,7 +242,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 3. +125 Avaliações de Clientes  `(27)`
 4. Avaliação Média de 4,9  `(22)`
 5. +1100 Clientes Servidos  `(23)`
-6. Resposta em 10 Minutos  `(22)`
+6. Resposta em 5 Minutos  `(22)`
 7. Orçamento Grátis no WhatsApp  `(28)`
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
@@ -273,7 +273,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 4. +125 Avaliações de Clientes  `(27)`
 5. Avaliação Média de 4,9  `(22)`
 6. +1100 Clientes Servidos  `(23)`
-7. Resposta em 10 Minutos  `(22)`
+7. Resposta em 5 Minutos  `(22)`
 8. Orçamento Grátis no WhatsApp  `(28)`
 9. Preço Fechado Antes de Marcar  `(29)`
 10. Garantia de Repetição  `(21)`

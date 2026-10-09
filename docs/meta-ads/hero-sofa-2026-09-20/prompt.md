@@ -22,7 +22,7 @@ Render correct Portuguese accents exactly. Do not add prices, discounts, health 
 
 O seu sofá merece este cuidado. Limpeza profissional ao domicílio, com avaliação do tecido e orçamento antes de marcar.
 
-Envie uma fotografia do sofá e a sua localidade por WhatsApp. Respondemos em menos de 10 minutos.
+Envie uma fotografia do sofá e a sua localidade por WhatsApp. Respondemos em menos de 5 minutos.
 
 Equipas em Braga, Porto, Lisboa e Algarve.
 

@@ -14,7 +14,7 @@ Premium desde 89€ (1 lugar), colchões desde 59€, cadeiras desde 20€.
 
 | Título (≤25) | Linha 1 (≤35) | Linha 2 (≤35) | Destino Porto | Destino Lisboa |
 |---|---|---|---|---|
-| Preço de Limpeza de Sofá | Tabela de preços por tamanho | Orçamento grátis em 10 minutos | `/preco-limpeza-sofa-porto` | `/preco-limpeza-sofa-lisboa` |
+| Preço de Limpeza de Sofá | Tabela de preços por tamanho | Orçamento grátis em 5 minutos | `/preco-limpeza-sofa-porto` | `/preco-limpeza-sofa-lisboa` |
 | Antes e Depois | Fotografias de trabalhos reais | Sofás, colchões e tapetes | `/antes-depois-limpeza` | `/antes-depois-limpeza` |
 | Impermeabilização | Escolha Essencial ou Premium | Premium: até 10 anos sob condições | `/impermeabilizacao-porto` | `/impermeabilizacao-lisboa` |
 | Limpeza de Colchões | Colchões desde 59€ | Anti ácaros opcional | `/limpeza-colchoes-porto` | `/limpeza-colchoes-lisboa` |
@@ -34,10 +34,10 @@ Os 6 sitelinks de 18/09 que continuam na lista de recursos são da
 
 ## Callouts, partilhados pelas duas campanhas (≤25)
 
-**Aplicados a 24/09/2026 ao nível da conta** (valem para todas as campanhas), os seis abaixo, como estão. Garantia 48h, "menos de 10 minutos", 4,9★ e +1100 confirmados em `commercialPolicy.ts` e `business.ts` no próprio dia.
+**Aplicados a 24/09/2026 ao nível da conta** (valem para todas as campanhas), os seis abaixo, como estão. Garantia 48h, "menos de 5 minutos", 4,9★ e +1100 confirmados em `commercialPolicy.ts` e `business.ts` no próprio dia.
 
 - Orçamento grátis `(16)`
-- Resposta em 10 minutos `(22)`
+- Resposta em 5 minutos `(22)`
 - Deslocação desde 10€ `(20)`
 - Garantia de repetição 48h `(25)`
 - Avaliação média de 4,9 `(22)` (era "4,9 estrelas no Google" até 26/09/2026)
@@ -139,7 +139,7 @@ verdade.
 
 **Aplicado a 26/09/2026:** um recurso de mensagem por grupo de anúncios (4),
 número 925 530 647, botão "Receber estimativa do custo", descrição "Resposta em
-menos de 10 min". A mensagem pré-escrita segue o texto que o botão de WhatsApp
+menos de 5 min". A mensagem pré-escrita segue o texto que o botão de WhatsApp
 do site gera (`buildServiceWaMessage` em `src/lib/whatsappMessages.ts`), com o
 serviço e a cidade do grupo: "Olá! Gostaria de saber o preço e a próxima
 disponibilidade para limpar o meu sofá no Porto. Posso enviar fotografias para

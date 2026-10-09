@@ -278,7 +278,7 @@ Deslocação à parte. A duração depende do uso, cuidados e condições aplic�
       },
       {
         "heading": "Pedir o serviço certo",
-        "body": "Indique se procura remover sujidade, tratar uma mancha ou avaliar um extra. Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+        "body": "Indique se procura remover sujidade, tratar uma mancha ou avaliar um extra. Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
       }
     ],
     "faq": [
@@ -649,7 +649,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Como peço avaliação?",
-        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
       }
     ],
     "relatedService": {
@@ -1061,7 +1061,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Posso pedir avaliação antes de marcar?",
-        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
       }
     ],
     "relatedService": {
@@ -1101,7 +1101,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Pedir uma proposta informada",
-        "body": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar.\n\nA possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+        "body": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar.\n\nA possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
       }
     ],
     "faq": [
@@ -1414,7 +1414,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Como esclareço o meu caso?",
-        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
       }
     ],
     "relatedService": {
@@ -1473,7 +1473,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Como peço orçamento?",
-        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 5 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
       }
     ],
     "relatedService": {

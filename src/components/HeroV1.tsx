@@ -90,7 +90,7 @@ const Hero = () => {
               className="mb-5 max-w-[430px] text-sm leading-relaxed text-white sm:text-base md:mb-6 md:max-w-[360px] md:text-base lg:max-w-[390px]"
               style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
             >
-              Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.
+              Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 5 minutos. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.
             </p>
 
           </div>

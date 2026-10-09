@@ -178,10 +178,10 @@ const SofaVariantPage = () => {
   // — a duração real é a da impermeabilização nesse caso, não a da limpeza.
   const durationSlug = parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey];
   const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
-  // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
+  // Resposta alinhada com o orçamento: menos de 5 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: "<5min", label: "Resposta durante o horário de atendimento", icon: Clock },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 

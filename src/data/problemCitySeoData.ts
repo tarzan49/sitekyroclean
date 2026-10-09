@@ -80,8 +80,8 @@ export function problemCityBenefits(problem: Pick<ProblemPage, 'benefits' | 'cit
  * Título e descrição de uma página problema × cidade.
  *
  * O React (ProblemCityPage.tsx) e o scripts/prerender.ts escreviam cada um o
- * seu: "{problema} no Porto ... Orçamento grátis em menos de 10 minutos" para
- * as pessoas e "{problema} em Porto ... Resposta em menos de 10 minutos" para
+ * seu: "{problema} no Porto ... Orçamento grátis em menos de 5 minutos" para
+ * as pessoas e "{problema} em Porto ... Resposta em menos de 5 minutos" para
  * os motores. Uma função, lida pelos dois.
  *
  * O H1 das páginas de preço é uma pergunta: a cidade entra antes do "?"

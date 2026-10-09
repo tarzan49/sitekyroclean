@@ -2,7 +2,7 @@ import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '../src/lib/responsiveIm
 import type { LandingPageModel } from '../src/data/landingPageModel';
 import { landingBreadcrumb } from '../src/data/breadcrumb';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
-import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
+import { commercialHeroPriceLine, commercialHeroFacts } from '../src/data/commercialHeroCopy';
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
 import { SERVICE_CONDITIONS, SERVICE_CONDITIONS_LINKS } from '../src/constants/commercialPolicy';
 import { INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../src/constants/business';
@@ -101,7 +101,7 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
   // secagem já estavam todos no hero para quem visita o site. O que faltava era
   // chegarem aqui: "Desde 49€" e "deslocação 10€" não apareciam uma única vez
   // no HTML estático, que é o único que um crawler sem JavaScript lê.
-  const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroStats(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
+  const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroFacts(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
   // A mesma migalha que o CommercialHero desenha para quem vê a página:
   // Início, o serviço (ligado ao seu hub), nas freguesias o município, e a
   // própria página como texto. Não é informação nova, é a que faltava no HTML

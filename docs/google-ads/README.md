@@ -46,7 +46,7 @@ a favor, e é também o serviço de maior margem.
 
 **Três coisas mais que só a Kyro dá**, e que entraram nos anúncios: preço
 fechado antes da marcação (a maioria diz "sob orçamento"), resposta em menos de
-10 minutos (a EcoLimpeza promete menos de 2 horas) e a garantia concreta de
+5 minutos (a EcoLimpeza promete menos de 2 horas) e a garantia concreta de
 repetir sem custos se avisar em 48 horas (os outros escrevem "satisfação
 garantida" sem dizer o que isso significa).
 
@@ -206,7 +206,7 @@ Tudo confirmado depois de recarregar a página.
   outros não existem na base dele, daí os raios.
 - **WhatsApp:** 4 recursos de mensagem, um por grupo de anúncios, com o texto
   do site (`buildServiceWaMessage`) encurtado aos 140 carateres do Google,
-  apelo "Receber estimativa do custo" e descrição "Resposta em menos de 10 min".
+  apelo "Receber estimativa do custo" e descrição "Resposta em menos de 5 min".
 - **Nome da empresa:** recurso enviado a 25/09 ("Contestar decisão", em curso).
   O formulário não tem campo de texto. A alternativa é validar com o número de
   registo da marca no INPI, em nome do anunciante validado.
@@ -389,7 +389,7 @@ Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
 |---|---|---|
 | Página | `/limpeza-sofas-{cidade}?ads=1` | `/impermeabilizacao-{cidade}?ads=1` |
 | Palavras-chave | 12, correspondência de expressão | 7, correspondência de expressão |
-| Ângulo | prova social, preço fechado, resposta em 10 min, garantia 48 h | duração declarada, duas versões com preço, pack desde 89€ |
+| Ângulo | prova social, preço fechado, resposta em 5 min, garantia 48 h | duração declarada, duas versões com preço, pack desde 89€ |
 
 Definições: só Rede de Pesquisa da Google (sem parceiros, sem Display),
 Maximizar cliques com limite de CPC de **2,00 €** ao nível da campanha (as duas),

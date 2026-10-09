@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, MessageCircle, Timer } from 'lucide-react';
+import { Clock, Hourglass, MessageCircle, Star, Timer } from 'lucide-react';
 import { GoogleG } from './icons/GoogleG';
 import HeroBeforeAfterPool from './HeroBeforeAfterPool';
 import ServiceSnapshotStats from './ServiceSnapshotStats';
@@ -8,7 +8,8 @@ import type { BreadcrumbItem } from './PageBreadcrumb';
 import { categoryForServiceSlug } from '@/data/beforeAfterPool';
 import { pickServiceHero } from '@/constants/serviceContent';
 import { services } from '@/data/serviceCatalog';
-import { commercialHeroPaidPriceLine, commercialHeroPriceLine, commercialHeroStats, commercialHeroSubtitle } from '@/data/commercialHeroCopy';
+import { commercialHeroPaidPriceLine, commercialHeroStats, commercialHeroSubtitle } from '@/data/commercialHeroCopy';
+import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 
 interface Props {
   title: string;
@@ -26,8 +27,8 @@ interface Props {
   source: string;
   pricesHref?: string;
   preserveMobileHero?: boolean;
-  // Visita vinda de um anúncio (`isAdsVisit`): o preço sobe para cima do botão
-  // e o hero perde o espaço do cabeçalho fixo, que o `AdsLandingHeader` não tem.
+  // Visita vinda de um anúncio (`isAdsVisit`): o hero perde o espaço do
+  // cabeçalho fixo, que o `AdsLandingHeader` não tem.
   paid?: boolean;
 }
 
@@ -42,13 +43,14 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
     ? [primaryCategory, secondaryCategory]
     : primaryCategory;
   const items = breadcrumbs ?? [{ label: 'Início', to: '/' }, { label: service?.name ?? title, to: service?.baseRoute }, ...(city ? [{ label: city }] : [])];
-  const priceLine = commercialHeroPriceLine(serviceSlug, municipality, price);
+  const startingPrice = commercialHeroPaidPriceLine(serviceSlug, price);
+  const priceValue = startingPrice.replace(/^Desde\s+/, '');
   const words = title.trim().split(' ');
   const gold = words.pop();
   // Os ícones ficam deste lado: são componentes React e não cabem no módulo de
   // copy, que o prerender importa em Node para gerar o HTML estático.
-  const statIcons = [GoogleG, Clock, Timer];
-  const stats = commercialHeroStats(serviceSlug).map((stat, index) => ({ ...stat, icon: statIcons[index] }));
+  const statIcons = { rating: GoogleG, duration: Hourglass, response: Clock, drying: Timer };
+  const stats = commercialHeroStats(serviceSlug).map(stat => ({ ...stat, icon: statIcons[stat.key] }));
   return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
@@ -66,15 +68,20 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           </nav>
           <h1 data-hero-part="title" className="font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
           <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
-          {paid && <p data-hero-part="paid-price" className="mb-3 text-center text-base font-semibold text-white">{commercialHeroPaidPriceLine(serviceSlug, price)}</p>}
+          {/* Preço e avaliação lado a lado, por cima do botão (dono, 09/10/2026). */}
+          <div data-hero-part="proof" className="mb-4 grid grid-cols-2 items-center">
+            <a href={pricesHref} className="flex min-h-[56px] flex-col items-center justify-center border-r border-white/15 px-2 text-center">
+              {priceValue !== startingPrice && <span className="text-[11px] uppercase tracking-[0.12em] text-white/70">Desde</span>}
+              <span className="font-playfair text-[22px] font-semibold leading-tight text-[#D4AF37]">{priceValue}</span>
+            </a>
+            <div className="flex min-h-[56px] flex-col items-center justify-center px-2 text-center">
+              <span className="flex items-center gap-1.5"><GoogleG className="h-4 w-4 shrink-0" /><span className="sr-only">{`${REVIEW_RATING} em 5 estrelas no Google`}</span><span className="flex" aria-hidden="true">{[0, 1, 2, 3, 4].map(i => <Star key={i} className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}</span><span aria-hidden="true" className="text-[15px] font-semibold text-white">{REVIEW_RATING}</span></span>
+              <span className="mt-0.5 text-[11px] text-white/75">+{REVIEW_COUNT} avaliações Google</span>
+            </div>
+          </div>
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
-          <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 flex-wrap items-center justify-center gap-x-1.5 text-center">
+          <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 items-center justify-center text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
-            {/* Uma linha de preço comprida (os escalões das cadeiras) passa para
-                baixo: sem o "·", que ficava sozinho no início da segunda linha. */}
-            {paid ? null : priceLine.length > 48
-              ? <span className="basis-full text-[11px] leading-relaxed text-white/85">{priceLine}</span>
-              : <span className="text-[11px] leading-relaxed text-white/85">· {priceLine}</span>}
           </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">

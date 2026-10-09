@@ -135,48 +135,53 @@ export type PoolItem =
   | { kind: "single"; image: string }
   | { kind: "video"; src: string; poster: string };
 
+// Ordem = do melhor para o pior primeiro impacto (dono, 09/10/2026: "o
+// primeiro em cada é o melhor, rank do melhor para o pior"). O primeiro par de
+// cada lista é o que aparece no hero. A impermeabilização mantém o vídeo em
+// primeiro (regra de 28/09). "sofa-14" tinha antes e depois trocados (visto
+// pelo dono a 09/10): os ficheiros ficam, a ordem é invertida aqui.
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
   // pelo dono, no fim da lista ("só quero que fiquem lá", não em primeiro).
   sofa: [
-    { kind: "pair", before: sofa01Antes, after: sofa01Depois },
-    { kind: "pair", before: sofa02Antes, after: sofa02Depois },
-    { kind: "pair", before: sofa04Antes, after: sofa04Depois },
-    { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa06Antes, after: sofa06Depois },
-    { kind: "pair", before: sofa07Antes, after: sofa07Depois },
-    { kind: "pair", before: sofa08Antes, after: sofa08Depois },
-    { kind: "pair", before: sofa09Antes, after: sofa09Depois },
-    { kind: "pair", before: sofa10Antes, after: sofa10Depois },
-    { kind: "pair", before: sofa11Antes, after: sofa11Depois },
+    { kind: "pair", before: sofa02Antes, after: sofa02Depois },
+    { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },
-    { kind: "pair", before: sofa14Antes, after: sofa14Depois },
+    { kind: "pair", before: sofa07Antes, after: sofa07Depois },
+    { kind: "pair", before: sofa11Antes, after: sofa11Depois },
+    { kind: "pair", before: sofa10Antes, after: sofa10Depois },
+    { kind: "pair", before: sofa09Antes, after: sofa09Depois },
+    { kind: "pair", before: sofa01Antes, after: sofa01Depois },
+    { kind: "pair", before: sofa04Antes, after: sofa04Depois },
+    { kind: "pair", before: sofa14Depois, after: sofa14Antes },
+    { kind: "pair", before: sofa08Antes, after: sofa08Depois },
   ],
   colchao: [
-    { kind: "pair", before: colchao01Antes, after: colchao01Depois },
-    { kind: "pair", before: colchao02Antes, after: colchao02Depois },
-    { kind: "pair", before: colchao03Antes, after: colchao03Depois },
-    { kind: "pair", before: colchao04Antes, after: colchao04Depois },
-    { kind: "pair", before: colchao05Antes, after: colchao05Depois },
     { kind: "pair", before: colchao06Antes, after: colchao06Depois },
     { kind: "pair", before: colchao07Antes, after: colchao07Depois },
+    { kind: "pair", before: colchao04Antes, after: colchao04Depois },
+    { kind: "pair", before: colchao02Antes, after: colchao02Depois },
+    { kind: "pair", before: colchao01Antes, after: colchao01Depois },
+    { kind: "pair", before: colchao05Antes, after: colchao05Depois },
+    { kind: "pair", before: colchao03Antes, after: colchao03Depois },
   ],
   cadeiras: [
+    { kind: "pair", before: cadeiras05Antes, after: cadeiras05Depois },
     { kind: "pair", before: cadeiras01Antes, after: cadeiras01Depois },
     { kind: "pair", before: cadeiras02Antes, after: cadeiras02Depois },
-    { kind: "pair", before: cadeiras03Antes, after: cadeiras03Depois },
-    { kind: "pair", before: cadeiras04Antes, after: cadeiras04Depois },
-    { kind: "pair", before: cadeiras05Antes, after: cadeiras05Depois },
-    { kind: "pair", before: cadeiras06Antes, after: cadeiras06Depois },
     { kind: "pair", before: cadeiras07Antes, after: cadeiras07Depois },
+    { kind: "pair", before: cadeiras03Antes, after: cadeiras03Depois },
     { kind: "pair", before: cadeiras08Antes, after: cadeiras08Depois },
+    { kind: "pair", before: cadeiras06Antes, after: cadeiras06Depois },
+    { kind: "pair", before: cadeiras04Antes, after: cadeiras04Depois },
   ],
   tapete: [
-    { kind: "pair", before: tapete01Antes, after: tapete01Depois },
-    { kind: "pair", before: tapete03Antes, after: tapete03Depois },
     { kind: "pair", before: tapete04Antes, after: tapete04Depois },
-    { kind: "single", image: tapete05UnicoSemPar },
+    { kind: "pair", before: tapete03Antes, after: tapete03Depois },
     { kind: "pair", before: tapete06Antes, after: tapete06Depois },
+    { kind: "pair", before: tapete01Antes, after: tapete01Depois },
+    { kind: "single", image: tapete05UnicoSemPar },
   ],
   impermeabilizacao: [
     { kind: "video", src: impermeabilizacaoVideo, poster: impermeabilizacaoVideoPoster },

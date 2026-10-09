@@ -10,8 +10,9 @@ describe('mandatory commercial hero', () => {
     const { container } = render(<MemoryRouter><CommercialHero title="Higienização em Glória, Aveiro" serviceSlug="limpeza-sofas" city="Glória, Aveiro" municipality="Aveiro" whatsappHref="https://wa.me/351925530647" source="test" /></MemoryRouter>);
     expect(container.querySelector('nav')?.textContent).toContain('Glória, Aveiro');
     expect(container.querySelector('[data-hero-part="subtitle"]')?.textContent).toContain('Disponibilidade sob consulta.');
-    expect(container.textContent).toContain('deslocação 15€');
-    expect(container.textContent).not.toContain('a partir de 10€');
+    // O hero diz só o preço de partida (dono, 09/10/2026); a deslocação fica na tabela de preços.
+    expect(container.querySelector('[data-hero-part="proof"]')?.textContent).toContain('49€');
+    expect(container.textContent).not.toContain('deslocação');
   });
   it('opts the homepage out of mobile restyling and preserves its original photo', () => {
     const props = { title: 'Homepage', serviceSlug: 'limpeza-sofas', whatsappHref: 'https://wa.me/351925530647', source: 'home_hero', image: { m: '/mobile.webp', d: '/desktop.webp' } };
@@ -26,16 +27,19 @@ describe('mandatory commercial hero', () => {
   it('keeps the approved order and a real background for every service', () => {
     for (const serviceSlug of ['limpeza-sofas', 'limpeza-colchoes', 'limpeza-tapetes', 'limpeza-alcatifas', 'limpeza-cadeiras', 'impermeabilizacao']) {
       const { container } = render(<MemoryRouter><CommercialHero title="Cuidado profissional" serviceSlug={serviceSlug} whatsappHref="https://wa.me/351925530647" source="test" /></MemoryRouter>);
-      expect([...container.querySelectorAll('[data-hero-part]')].map(node => node.getAttribute('data-hero-part'))).toEqual(['breadcrumb', 'title', 'subtitle', 'whatsapp', 'prices', 'comparison', 'stats']);
+      expect([...container.querySelectorAll('[data-hero-part]')].map(node => node.getAttribute('data-hero-part'))).toEqual(['breadcrumb', 'title', 'subtitle', 'proof', 'whatsapp', 'prices', 'comparison', 'stats']);
       expect(container.querySelector('picture img')?.getAttribute('src')).toBeTruthy();
       expect(container.querySelector('[data-hero-part="subtitle"]')!.textContent!.length).toBeLessThan(120);
       expect(container.querySelector('[data-hero-part="prices"]')!.textContent).toContain('Ver preços');
-      expect(container.querySelector('[data-hero-part="prices"]')!.textContent).toContain('deslocação');
+      const proof = container.querySelector('[data-hero-part="proof"]')!.textContent!;
+      expect(proof).toContain('avaliações Google');
+      expect(proof).not.toContain('deslocação');
       expect(container.querySelector('[data-hero-part="prices"]')?.getAttribute('href')).toBe('#precos');
       const stats = container.querySelector('[data-hero-part="stats"]')!.textContent!;
-      expect(stats).toContain('avaliações');
-      expect(stats).toContain('<10 min');
-      expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? 'Ativação da proteção' : 'Secagem média');
+      expect(stats).toContain('± 1 h');
+      expect(stats).not.toContain('avaliações');
+      expect(stats).toContain('<5 min');
+      expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? 'Ativação' : 'Secagem');
       if (['limpeza-tapetes', 'limpeza-alcatifas'].includes(serviceSlug)) expect(container.textContent).toContain('Sob orçamento');
       cleanup();
     }
@@ -44,21 +48,15 @@ describe('mandatory commercial hero', () => {
     const { container } = render(<MemoryRouter><CommercialHero title="Sofá em tecido" serviceSlug="limpeza-sofas" image="/images/material.webp" city="Porto" breadcrumbs={[{label:'Início',to:'/'},{label:'Limpeza de Sofás'},{label:'Paranhos'}]} whatsappHref="https://wa.me/351925530647" source="test" /></MemoryRouter>);
     expect(container.querySelector('picture img')?.getAttribute('src')).toBe('/images/material.webp');
     expect(container.querySelector('nav')?.textContent).toContain('Paranhos');
-    expect(container.textContent).toContain('deslocação 10€');
+    expect(container.querySelector('[data-hero-part="proof"]')?.textContent).toContain('Desde49€');
   });
-  it('moves the starting price above the WhatsApp button only on paid visits', () => {
+  it('only drops the fixed-header space on paid visits', () => {
     const props = { title: 'Limpeza de Sofás no Porto', serviceSlug: 'limpeza-sofas', city: 'Porto', whatsappHref: 'https://wa.me/351925530647', source: 'test' };
     const { container, rerender } = render(<MemoryRouter><CommercialHero {...props} /></MemoryRouter>);
+    const organic = [...container.querySelectorAll('[data-hero-part]')].map(el => el.getAttribute('data-hero-part'));
     expect(container.querySelector('[data-paid-landing]')).toBeNull();
-    expect(container.querySelector('[data-hero-part="paid-price"]')).toBeNull();
-    const organicLine = container.querySelector('[data-hero-part="prices"]')!.textContent;
     rerender(<MemoryRouter><CommercialHero {...props} paid /></MemoryRouter>);
-    const paidPrice = container.querySelector('[data-hero-part="paid-price"]')!;
     expect(container.querySelector('[data-paid-landing]')).not.toBeNull();
-    expect(organicLine).toContain(paidPrice.textContent!);
-    expect(paidPrice.textContent).toBe('Desde 49€');
-    const parts = [...container.querySelectorAll('[data-hero-part]')].map(el => el.getAttribute('data-hero-part'));
-    expect(parts.indexOf('paid-price')).toBe(parts.indexOf('whatsapp') - 1);
-    expect(container.querySelector('[data-hero-part="prices"]')!.textContent).not.toContain(paidPrice.textContent!);
+    expect([...container.querySelectorAll('[data-hero-part]')].map(el => el.getAttribute('data-hero-part'))).toEqual(organic);
   });
 });

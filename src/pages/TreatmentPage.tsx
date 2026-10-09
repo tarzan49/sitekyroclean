@@ -34,7 +34,7 @@ export default function TreatmentPage() {
       <h1 className="font-playfair text-4xl md:text-6xl max-w-4xl mb-6">{page.h1}</h1>
       <p className="text-white/75 max-w-2xl text-lg leading-relaxed mb-7">{page.intro}</p>
       <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-gold text-[#071a12] font-bold rounded-lg px-6 py-4"><MessageCircle className="w-5 h-5" />Pedir orçamento personalizado</a>
-      <p className="text-sm text-white/70 my-4">Resposta em menos de 10 minutos · Sem compromisso</p><TrustRatingBadge variant="horizontal" />
+      <p className="text-sm text-white/70 my-4">Resposta em menos de 5 minutos · Sem compromisso</p><TrustRatingBadge variant="horizontal" />
     </div></section>
     <section className="max-w-5xl mx-auto px-5 py-14"><h2 className="font-playfair text-3xl mb-8">O que pode acrescentar ao seu cuidado habitual</h2><div className="grid md:grid-cols-3 gap-5">{page.benefits.map(b => <article key={b} className="p-6 bg-white border border-[#E8E4DE] rounded-xl"><CheckCircle2 className="text-[#9B7D20] mb-4" /><p>{b}</p></article>)}</div><p className="mt-8 leading-relaxed">{page.detail}</p></section>
     <section className="bg-[#F0EEE7] px-5 py-12"><div className="max-w-5xl mx-auto"><h2 className="font-playfair text-3xl mb-5">Uma proposta clara, antes de marcar</h2><p className="mb-4">{PRICE_PROMISE}</p><p>{page.coverage}</p></div></section>
