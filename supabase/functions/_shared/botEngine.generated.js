@@ -452,6 +452,7 @@ var CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
 var RUG_RATE_COMMON = 10;
 var RUG_RATE_NATURAL = 12;
 var RUG_ESTIMATE_MIN_AREA_M2 = 3;
+var RUG_ESTIMATE_PICKUP_EXTRA = 20;
 var RUG_VISIT_SOFA_PRICE = 70;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
@@ -474,7 +475,7 @@ function rugEstimate(rugs, city) {
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2);
+  const pickupFee = rugPickupFee(areaM2) === null ? null : RUG_ESTIMATE_PICKUP_EXTRA;
   return {
     ok: true,
     areaM2,

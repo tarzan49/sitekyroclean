@@ -5,16 +5,16 @@ import { rugEstimate, rugMaterialClass, roundToNine } from './botRugEstimate';
 describe('rugEstimate (owner, 10 Oct 2026)', () => {
   it("matches the owner's own rug quotes", () => {
     const sandra = rugEstimate([{ width: 2, length: 2.9, qty: 1, material: 'microfibra' }], 'Póvoa de Varzim');
-    expect(sandra.ok && [sandra.homePrice, sandra.pickupPrice, sandra.sofaUpsellPrice, sandra.sofaUsualPrice]).toEqual([69, 79, 70, 89]);
+    expect(sandra.ok && [sandra.homePrice, sandra.pickupPrice, sandra.sofaUpsellPrice, sandra.sofaUsualPrice]).toEqual([69, 89, 70, 89]);
     const liliana = rugEstimate([{ width: 3, length: 2.5, qty: 1, material: 'juta' }], 'Vila Nova de Gaia');
-    expect(liliana.ok && [liliana.homePrice, liliana.pickupPrice]).toEqual([99, 114]);
+    expect(liliana.ok && [liliana.homePrice, liliana.pickupPrice]).toEqual([99, 119]);
     const sonia = rugEstimate([{ width: 2.5, length: 3.5, qty: 1, material: 'Juta' }], 'Vila Nova de Gaia');
     expect(sonia.ok && sonia.homePrice).toBe(119);
   });
 
-  it('adds the pickup fee from the site rule, and no pickup above 20 m²', () => {
+  it('adds 20€ for pickup where the site allows one, and no pickup above 20 m²', () => {
     const r = rugEstimate([{ width: 2, length: 2.9, qty: 1 }], 'Porto');
-    expect(r.ok && [r.pickupFee, r.pickupPrice]).toEqual([10, 79]);
+    expect(r.ok && [r.pickupFee, r.pickupPrice]).toEqual([20, 89]);
     const big = rugEstimate([{ width: 4, length: 6, qty: 1 }], 'Porto');
     expect(big.ok && big.pickupPrice).toBeNull();
   });

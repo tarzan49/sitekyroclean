@@ -10,8 +10,10 @@
  *
  * Checked against his own quotes: microfibra 2,00 × 2,90 m in Póvoa de Varzim
  * 69€ (Sandra, 10 Oct), juta 3 × 2,5 m in Gaia 99€ (Liliana, 10 Oct), juta
- * 2,50 × 3,50 m in Gaia 119€ (Sónia). With pickup the price is the home price
- * plus the pickup fee (rugPickupFee), which already includes the travel.
+ * 2,50 × 3,50 m in Gaia 119€ (Sónia). With pickup the bot says the home price
+ * plus 20€ (owner, 10 Oct 2026: "deixa mais 20 euros"), wherever rugPickupFee
+ * allows a pickup (3 to 20 m²). The site's own pickup table (10/15/20€) is not
+ * changed by this.
  *
  * Delicate rugs (lã, seda, viscose, persa, Arraiolos, feito à mão, kilim),
  * orders under 3 m² and orders with anything other than rugs stay with the
@@ -24,6 +26,8 @@ import { sofaCleaningPrice } from '../data/enginePrices';
 export const RUG_RATE_COMMON = 10;
 export const RUG_RATE_NATURAL = 12;
 export const RUG_ESTIMATE_MIN_AREA_M2 = 3;
+/** What the bot adds for pickup and delivery over the home price (owner, 10 Oct 2026). */
+export const RUG_ESTIMATE_PICKUP_EXTRA = 20;
 /**
  * The extra the bot offers after the rug price: a sofa cleaned in the same
  * visit for 70€, "em vez de" a 3-seat sofa's cleaning plus the travel (89€ in
@@ -65,7 +69,7 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city as keyof typeof locationPrices];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2);
+  const pickupFee = rugPickupFee(areaM2) === null ? null : RUG_ESTIMATE_PICKUP_EXTRA;
   return {
     ok: true,
     areaM2,
