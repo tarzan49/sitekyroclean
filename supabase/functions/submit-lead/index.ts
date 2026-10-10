@@ -109,6 +109,18 @@ function cleanAttribution(raw: Record<string, unknown> | undefined): Record<stri
   return out;
 }
 
+// O pedido do questionário como dados (src/lib/quizOrder.ts), lido pelo bot do
+// WhatsApp através do `find-order` da bot-api. É o único campo que não é texto:
+// aceita-se um objeto até este tamanho, ou nada. Os preços que leva não mandam
+// em nada: o bot volta a calcular tudo com o motor do site.
+const QUIZ_ORDER_MAX_JSON = 12000;
+
+export function cleanQuizOrder(raw: unknown): Record<string, unknown> | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const json = JSON.stringify(raw);
+  return json.length <= QUIZ_ORDER_MAX_JSON ? JSON.parse(json) : null;
+}
+
 /** Aceita apenas os campos conhecidos, como texto, dentro do comprimento máximo. */
 function cleanLead(raw: Record<string, unknown>): Record<string, string> | null {
   const out: Record<string, string> = {};
@@ -193,8 +205,10 @@ export async function handleRequest(req: Request): Promise<Response> {
     );
   }
 
-  const { data: inserted, error } = await supabase.from("leads").insert({
+  const quizOrder = cleanQuizOrder((body.lead as Record<string, unknown>).quiz_order);
+  const insertLead = (withQuizOrder: boolean) => supabase.from("leads").insert({
     ...lead,
+    ...(withQuizOrder && quizOrder ? { quiz_order: quizOrder } : {}),
     status: "pending",
     // Estado inicial do funil de marketing. `status` (2024) fica como estava:
     // são dois vocabulários diferentes, de propósito — ver a migração
@@ -203,6 +217,12 @@ export async function handleRequest(req: Request): Promise<Response> {
     source: "Website",
     priority: "Quente",
   }).select("id").single();
+  let { data: inserted, error } = await insertLead(true);
+  // Coluna ainda por criar (migração por aplicar): grava o pedido sem ela.
+  if (error && quizOrder && (error.code === "PGRST204" || error.code === "42703")) {
+    safeLog("warn", "[submit-lead] quiz_order não gravado: coluna em falta", { message: error.message });
+    ({ data: inserted, error } = await insertLead(false));
+  }
 
   if (error) {
     // 23505 = violação de unicidade. Com dois pedidos a chegar ao mesmo tempo,

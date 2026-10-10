@@ -4,10 +4,11 @@ import { clearSubmissionId, currentSubmissionId } from '@/lib/submissionId';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, carpetTotalArea, calcSofaUnitPrice, calcMattressUnitPrice, chairAntiAcarosQty } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, carpetItemMeasure, carpetTotalArea, calcSofaUnitPrice, calcMattressUnitPrice, chairAntiAcarosQty } from '@/components/quiz/quizHelpers';
 import { chairAntiAcarosTotal, CHAIR_ANTI_ACAROS_UNIT_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
 import { rugPickupFee } from '@/constants/commercialPolicy';
 import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
+import { buildQuizOrder } from '@/lib/quizOrder';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -94,6 +95,9 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string, leadId: strin
     lead_id: leadId,
     message,
     notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
+    // O pedido como dados, para o bot do WhatsApp não voltar a perguntar o que
+    // a pessoa já escolheu aqui (dono, 2026-10-10). Ver src/lib/quizOrder.ts.
+    quiz_order: buildQuizOrder(payload, buildReceiptLines(payload)),
   };
 }
 
@@ -243,7 +247,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     carpetItems.forEach((item, i) => {
       const area = carpetItemArea(item);
       if (area === null) return;
-      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${ptDecimal(item.largura)} × ${ptDecimal(item.comprimento)} m (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: null, total: null });
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${carpetItemMeasure(item)} (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: null, total: null });
     });
     // Recolha e entrega com a deslocação incluída (dono, 2026-10-05): o único
     // valor fixo de um pedido de tapetes, pela área somada. Sem recolha, a
@@ -256,7 +260,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
   upsellItems.forEach(item => {
     const q = item.qty ?? 1;
     const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${ptDecimal(rug.largura)} × ${ptDecimal(rug.comprimento)} m`).join('; ');
+    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${carpetItemMeasure(rug) ?? `${ptDecimal(rug.largura)} × ${ptDecimal(rug.comprimento)} m`}`).join('; ');
     // A quantidade já vai na coluna própria: tira-a do rótulo, com ou sem
     // "x" ("1x Colchão Casal", "8 Cadeiras (paga 6)"), senão o resumo dizia
     // "8× 8 Cadeiras".

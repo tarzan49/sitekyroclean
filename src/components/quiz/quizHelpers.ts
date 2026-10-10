@@ -2,6 +2,7 @@ import { chairWaterproofTotal } from '../../constants/chairPricing';
 import { sofaAntiAcarosPrice, chairAntiAcarosTotal } from '../../constants/antiAcarosPricing';
 import { priceWithPackPerks, perkChairsFree, type PerkLineInput } from '../../constants/packPerks';
 import { sofaPrices, mattressPrices } from './QuizTypes';
+import { rugSide, formatMeters } from '../../constants/rugMeasure';
 import type { SofaItem, MattressItem, CarpetItem, PriceOption, QuizFormData } from './QuizTypes';
 
 // Undefined packQty preserves legacy all-or-nothing selections.
@@ -67,11 +68,19 @@ export function carpetRemoveItem(items: CarpetItem[], id: string): CarpetItem[] 
 export function carpetUpdateItem(items: CarpetItem[], id: string, field: 'largura' | 'comprimento', value: string): CarpetItem[] {
   return items.map(i => i.id === id ? { ...i, [field]: value } : i);
 }
+// Each side through rugSide: "230" × "160" is 2,30 × 1,60 m (3,68 m²), not 368 m².
 export function carpetItemArea(item: CarpetItem): number | null {
-  const l = Number(item.largura.trim().replace(',', '.'));
-  const c = Number(item.comprimento.trim().replace(',', '.'));
-  if (!Number.isFinite(l * c) || l <= 0 || c <= 0) return null;
-  return l * c;
+  const l = rugSide(item.largura), c = rugSide(item.comprimento);
+  return l && c ? l.meters * c.meters : null;
+}
+/** "2,3 × 1,6 m", with centimetres already read as centimetres; null while a side is missing. */
+export function carpetItemMeasure(item: CarpetItem): string | null {
+  const l = rugSide(item.largura), c = rugSide(item.comprimento);
+  return l && c ? `${formatMeters(l.meters)} × ${formatMeters(c.meters)} m` : null;
+}
+/** True when at least one side was typed in centimetres (the quiz shows how it read it). */
+export function carpetItemFromCm(item: CarpetItem): boolean {
+  return Boolean(rugSide(item.largura)?.fromCm || rugSide(item.comprimento)?.fromCm);
 }
 export function carpetHasValidItems(items: CarpetItem[]): boolean {
   return items.some(i => carpetItemArea(i) !== null);

@@ -226,6 +226,20 @@ var PACK_PERK_BULLETS = [
   "Uma só deslocação para a visita toda, cobrada uma única vez."
 ];
 
+// src/constants/rugMeasure.ts
+var RUG_SIDE_MAX_METERS = 20;
+var RUG_SIDE_DOUBTFUL_METERS = 8;
+function rugSide(raw) {
+  const n = typeof raw === "number" ? raw : Number(String(raw ?? "").trim().replace(",", "."));
+  if (!Number.isFinite(n) || n <= 0) return null;
+  if (n > RUG_SIDE_MAX_METERS) {
+    const meters = Math.round(n) / 100;
+    return meters > RUG_SIDE_MAX_METERS ? null : { meters, fromCm: true, doubtful: false };
+  }
+  return { meters: n, fromCm: false, doubtful: n >= RUG_SIDE_DOUBTFUL_METERS };
+}
+var formatMeters = (m) => String(Number(m.toFixed(2))).replace(".", ",");
+
 // src/components/quiz/quizHelpers.ts
 function calcPackPricing(option, packOn, isWaterproofBase, fallbackDelta = null, tier = "essencial") {
   const isPremium = tier === "premium";
@@ -420,10 +434,13 @@ function toItem(raw, index) {
     size = typeof r.size === "string" ? r.size : "";
     if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(", ")}`);
   }
-  const dim = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v <= 100 ? String(v) : "";
+  const dim = (v) => {
+    const side = typeof v === "number" ? rugSide(v) : null;
+    return side ? String(side.meters) : "";
+  };
   const width = kind === "rug" || kind === "carpet" ? dim(r.width) : "";
   const length = kind === "rug" || kind === "carpet" ? dim(r.length) : "";
-  if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros`);
+  if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
   return { id: String(index), kind, size, qty, extra, primary, width, length };
 }
 function rugPickupFor(items) {
@@ -1043,10 +1060,116 @@ function agendaMessage(day, services, issues, pending) {
   }
   return lines.join("\n");
 }
+
+// src/lib/quizOrder.ts
+var QUIZ_ORDER_VERSION = 1;
+var typed = (v) => String(v ?? "").trim();
+function rugOf(item, kind) {
+  const w = rugSide(item.largura), l = rugSide(item.comprimento);
+  if (!w || !l) return null;
+  return {
+    kind,
+    typed: `${typed(item.largura)} × ${typed(item.comprimento)}`,
+    width: w.meters,
+    length: l.meters,
+    areaM2: Math.round(w.meters * l.meters * 100) / 100,
+    fromCm: w.fromCm || l.fromCm,
+    doubtful: kind === "rug" && (w.doubtful || l.doubtful)
+  };
+}
+var fmtEuro = (n) => n % 1 === 0 ? `${n}€` : `${n.toFixed(2).replace(".", ",")}€`;
+var KIND_WORD = { rug: "Tapete", carpet: "Alcatifa" };
+function rugChecks(rugs) {
+  const out = [];
+  rugs.forEach((r, i) => {
+    const name = `${KIND_WORD[r.kind]} ${i + 1}`;
+    if (r.doubtful) out.push(`${name}: escreveu ${r.typed} no questionário (em metros, ${formatMeters(r.areaM2)} m²). É muito grande para um tapete: confirma as medidas antes do preço, numa pergunta curta ("São ${formatMeters(r.width)} × ${formatMeters(r.length)} metros?").`);
+  });
+  return out;
+}
+function rugLine(r, i) {
+  const read = `${formatMeters(r.width)} × ${formatMeters(r.length)} m (${formatMeters(r.areaM2)} m²)`;
+  return `${KIND_WORD[r.kind]} ${i + 1}: ${read}${r.fromCm ? `, escrito em centímetros no questionário (${r.typed}), já convertido` : ""}`;
+}
+function knownFrom(service, kinds, hasRugs, city, rugPickup) {
+  const out = [];
+  if (kinds.has("sofa") || /sof[aá]/i.test(service)) out.push("quantos lugares tem cada sofá e o tratamento escolhido");
+  if (kinds.has("mattress") || /colch/i.test(service)) out.push("o tamanho de cada colchão");
+  if (kinds.has("chairs") || /cadeira/i.test(service)) out.push("quantas cadeiras são");
+  if (hasRugs) out.push("as medidas de cada tapete ou alcatifa");
+  if (rugPickup !== null) out.push(rugPickup ? "que quer recolha e entrega" : "que quer a lavagem em casa");
+  if (city) out.push(`a localidade (${city})`);
+  return out;
+}
+function rugsFromDetails(details) {
+  const rugs = [];
+  for (const m of details.matchAll(/(Tapete|Alcatifa) \d+: ([\d.,]+) × ([\d.,]+) m/g)) {
+    const rug = rugOf({ id: "", largura: m[2], comprimento: m[3] }, m[1] === "Alcatifa" ? "carpet" : "rug");
+    if (rug) rugs.push(rug);
+  }
+  return rugs;
+}
+var isRecord = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+function describeQuizOrder(row) {
+  const city = typeof row.location === "string" ? row.location : "";
+  const service = typeof row.service === "string" ? row.service : "";
+  const o = isRecord(row.quiz_order) && row.quiz_order.v === QUIZ_ORDER_VERSION ? row.quiz_order : null;
+  if (o) {
+    const rugs2 = Array.isArray(o.rugs) ? o.rugs : [];
+    let rugIndex2 = 0;
+    const items2 = (Array.isArray(o.lines) ? o.lines : []).filter((l) => !/^Deslocação:/.test(l.label)).map((l) => {
+      const rug = /^(Tapete|Alcatifa) \d+:/.test(l.label) ? rugs2[rugIndex2++] : void 0;
+      const label = rug ? rugLine(rug, rugIndex2 - 1) : l.label;
+      return `${l.qty}x ${label}: ${l.price === null ? "sob orçamento" : fmtEuro(l.price)}`;
+    });
+    const quoteItems = Array.isArray(o.quote?.items) ? o.quote.items : [];
+    const kinds = new Set(quoteItems.map((i) => i.kind));
+    return {
+      source: "quiz_order",
+      items: items2,
+      rugs: rugs2,
+      quoteRequest: quoteItems.length ? { items: quoteItems, city: o.city || city } : null,
+      quoteExact: o.quote?.exact !== false,
+      alreadyKnown: knownFrom(service, kinds, rugs2.length > 0, o.city || city, o.rugPickup ?? null),
+      confirmFirst: rugChecks(rugs2),
+      rugPickup: o.rugPickup ?? null,
+      quizTotal: typeof o.total === "number" ? o.total : null,
+      quizPriceText: o.priceText || row.value || null,
+      sobOrcamento: Boolean(o.sobOrcamento),
+      observations: o.observations ?? null,
+      slot: o.slot ?? null
+    };
+  }
+  const details = typeof row.details === "string" ? row.details : "";
+  const rugs = rugsFromDetails(details);
+  let rugIndex = 0;
+  const items = details.split("\n").map((s) => s.trim()).filter(Boolean).map((line) => {
+    if (!/^\d+x (Tapete|Alcatifa) \d+:/.test(line)) return line;
+    const rug = rugs[rugIndex++];
+    return rug ? `1x ${rugLine(rug, rugIndex - 1)}: sob orçamento` : line;
+  });
+  const pickup = /Recolha, entrega e deslocação/.test(details);
+  return {
+    source: "details",
+    items,
+    rugs,
+    quoteRequest: null,
+    quoteExact: false,
+    alreadyKnown: knownFrom(service, /* @__PURE__ */ new Set(), rugs.length > 0, city, rugs.length ? pickup : null),
+    confirmFirst: rugChecks(rugs),
+    rugPickup: rugs.length ? pickup : null,
+    quizTotal: null,
+    quizPriceText: row.value ?? null,
+    sobOrcamento: /sob orçamento/i.test(`${details} ${row.value ?? ""}`),
+    observations: null,
+    slot: null
+  };
+}
 export {
   agendaCheck,
   botAvailability,
   botQuote,
+  describeQuizOrder,
   listBotCities,
   planBotBooking,
   planBotHold,

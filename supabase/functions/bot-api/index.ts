@@ -8,7 +8,7 @@
 //   quote       price items with the site's own engine (botEngine.generated.js,
 //               bundled from src/lib/botQuote.ts), so the bot never does sums
 //   cities      the served localities with their travel fee
-//   find-order  one order by its number ("Acabei de enviar o pedido #K7X2P9"),
+//   find-order  one quiz order by its number ("Acabei de enviar o pedido #K7X2P9") or by the chat's phone,
 //               summary only: no phone, email or message
 //   create-lead save the conversation as a lead, source "WhatsApp", once per
 //               conversationId
@@ -47,7 +47,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, botAvailability, botQuote, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, botAvailability, botQuote, describeQuizOrder, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -64,6 +64,8 @@ interface QueryResult { data: Row[] | null; error: { code?: string; message: str
 /** The two queries this function makes, so tests can pass a fake table. */
 export interface LeadsStore {
   findBy(column: "booking_id" | "lead_id", value: string, columns: string): Promise<QueryResult>;
+  /** Quiz orders (not the bot's own WhatsApp leads) created since `sinceIso`, newest first. */
+  recentQuiz?(sinceIso: string, columns: string): Promise<QueryResult>;
   insert(row: Row): Promise<QueryResult>;
 }
 /** The owner's calendar, or why it could not be read. */
@@ -127,23 +129,55 @@ const text = (v: unknown, max: number): string | null => {
 
 const ORDER_NUMBER = /^[A-Z0-9]{4,12}$/;
 const LEAD_ID = /^[LW]-[a-z0-9-]{6,40}$/;
-const SUMMARY_COLUMNS = "booking_id, created_at, name, service, details, location, value, funnel_status";
+const SUMMARY_COLUMNS = "booking_id, created_at, name, service, details, location, value, funnel_status, quiz_order, phone, whatsapp_phone";
+/** How far back a quiz order is found by the chat's phone alone (no "#…" in the conversation). */
+const PHONE_LOOKUP_DAYS = 30;
+const lastNine = (v: unknown) => (typeof v === "string" ? v.replace(/\D/g, "").slice(-9) : "");
 
+/**
+ * One quiz order, by its number ("Acabei de enviar o pedido #K7X2P9") or, when
+ * the chat never said it, by the chat's phone (owner, 10 Oct 2026: the bot must
+ * know from the first message everything the client chose in the quiz). The
+ * `brief` is what the bot reads (src/lib/quizOrder.ts): items, the request for
+ * its quote tool, what not to ask again and what to confirm. Never the phone,
+ * the email or the full message; the client's own observations only when the
+ * order was made with this chat's number.
+ */
 async function findOrder(body: Row, leads: LeadsStore): Promise<Response> {
   const raw = typeof body.order === "string" ? body.order.trim().replace(/^#/, "") : "";
+  const phone = lastNine(body.phone);
   const upper = raw.toUpperCase();
   const column = ORDER_NUMBER.test(upper) ? "booking_id" : LEAD_ID.test(raw) ? "lead_id" : null;
-  if (!column) return createErrorResponse("order tem de ser o número do pedido (ex.: K7X2P9)", 400);
-  const { data, error } = await leads.findBy(column, column === "booking_id" ? upper : raw, SUMMARY_COLUMNS);
-  if (error) {
-    safeLog("error", "[bot-api] find-order falhou", { message: error.message });
-    return createErrorResponse("Não foi possível procurar o pedido", 500);
+  if (raw && !column) return createErrorResponse("order tem de ser o número do pedido (ex.: K7X2P9)", 400);
+  if (!column && phone.length < 9) return createErrorResponse("find-order precisa de order ou phone", 400);
+
+  let row: Row | undefined;
+  let matchedBy: "number" | "phone" = "number";
+  if (column) {
+    const { data, error } = await leads.findBy(column, column === "booking_id" ? upper : raw, SUMMARY_COLUMNS);
+    if (error) {
+      safeLog("error", "[bot-api] find-order falhou", { message: error.message });
+      return createErrorResponse("Não foi possível procurar o pedido", 500);
+    }
+    row = data?.[0];
   }
-  const row = data?.[0];
+  if (!row && phone.length === 9 && leads.recentQuiz) {
+    const since = new Date(Date.now() - PHONE_LOOKUP_DAYS * 86400_000).toISOString();
+    const { data, error } = await leads.recentQuiz(since, SUMMARY_COLUMNS);
+    if (error) safeLog("warn", "[bot-api] find-order por telefone falhou", { message: error.message });
+    row = (data ?? []).find(r => lastNine(r.phone) === phone || lastNine(r.whatsapp_phone) === phone);
+    matchedBy = "phone";
+  }
   if (!row) return createSuccessResponse({ found: false });
+
+  const phoneMatches = phone ? lastNine(row.phone) === phone || lastNine(row.whatsapp_phone) === phone : null;
+  const brief = describeQuizOrder(row as Parameters<typeof describeQuizOrder>[0]);
+  if (phoneMatches !== true) brief.observations = null;
   const firstName = typeof row.name === "string" ? row.name.trim().split(/\s+/)[0] ?? "" : "";
   return createSuccessResponse({
     found: true,
+    matchedBy,
+    phoneMatches,
     order: {
       number: row.booking_id,
       createdAt: row.created_at,
@@ -153,6 +187,7 @@ async function findOrder(body: Row, leads: LeadsStore): Promise<Response> {
       location: row.location,
       value: row.value,
       status: row.funnel_status,
+      brief,
     },
   });
 }
@@ -486,6 +521,11 @@ function supabaseLeads(): LeadsStore | null {
   return {
     async findBy(column, value, columns) {
       const { data, error } = await client.from("leads").select(columns).eq(column, value).order("created_at", { ascending: false }).limit(1);
+      return { data: data as Row[] | null, error };
+    },
+    async recentQuiz(sinceIso, columns) {
+      const { data, error } = await client.from("leads").select(columns).neq("source", "WhatsApp").gte("created_at", sinceIso)
+        .order("created_at", { ascending: false }).limit(300);
       return { data: data as Row[] | null, error };
     },
     async insert(row) {

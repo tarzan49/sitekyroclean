@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
-import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea } from '@/components/quiz/quizHelpers';
+import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetItemFromCm, carpetItemMeasure, carpetTotalArea } from '@/components/quiz/quizHelpers';
 import { RUG_PICKUP_MAX_AREA_M2, RUG_PICKUP_MIN_AREA_M2, rugPickupFee } from '@/constants/commercialPolicy';
 
 interface Props {
@@ -71,7 +71,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
                   </div>
                 ))}
               </div>
-
+              {carpetItemFromCm(item) && area !== null && <p className="mt-1.5 text-sm text-white/80" aria-live="polite">Lemos em centímetros: {carpetItemMeasure(item)}.</p>}
             </fieldset>
           );
         })}

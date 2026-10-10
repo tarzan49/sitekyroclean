@@ -16,6 +16,7 @@ import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
+import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -69,10 +70,11 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
     size = typeof r.size === 'string' ? r.size : '';
     if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(', ')}`);
   }
-  const dim = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 && v <= 100 ? String(v) : '');
+  // Same reading as the quiz (rugSide): "230" is 2,30 m, never a 230 m rug.
+  const dim = (v: unknown) => { const side = typeof v === 'number' ? rugSide(v) : null; return side ? String(side.meters) : ''; };
   const width = kind === 'rug' || kind === 'carpet' ? dim(r.width) : '';
   const length = kind === 'rug' || kind === 'carpet' ? dim(r.length) : '';
-  if ((kind === 'rug' || kind === 'carpet') && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros`);
+  if ((kind === 'rug' || kind === 'carpet') && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
   return { id: String(index), kind, size, qty, extra, primary, width, length };
 }
 

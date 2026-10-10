@@ -85,6 +85,33 @@ const LOCATION_PREPOSITION: Record<string, string> = {
   "Póvoa de Varzim": "na", "Póvoa de Lanhoso": "na",
 };
 
+/**
+ * O que a pessoa escolheu, artigo a artigo, a partir de `details` (uma linha
+ * por artigo, "1x Sofá 3 Lugares + Impermeab. Premium: 189€"). Sem preços: o
+ * valor confirma-se depois das fotografias. Antes a mensagem só dizia "para
+ * limpeza de sofá e tapete" e a pessoa ficava sem saber se tínhamos lido as
+ * medidas (dono, 2026-10-10).
+ */
+export function detailLines(details: string | undefined): string[] {
+  return (details ?? "").split("\n").map(l => l.trim()).filter(Boolean)
+    .filter(l => !/^\d+x (Deslocação|Recolha, entrega)/.test(l))
+    .map(l => {
+      const m = /^(\d+)x (.*?)(?::\s*(?:\d[\d.,]*\s?€|Sob orçamento))?$/i.exec(l);
+      if (!m) return l;
+      const qty = Number(m[1]);
+      const label = m[2]
+        .replace(/^(Tapete|Alcatifa) \d+: /, "$1 de ")
+        .replace(/ \(Limpeza\)$/, "")
+        .replace(/ \(Pack: Limpeza \+ Desbacterização e Anti Ácaros\)$/, " com anti-ácaros")
+        .replace(/ \(Desbacterização e Anti Ácaros\)$/, ", anti-ácaros")
+        .replace(/Impermeab\. /g, "impermeabilização ")
+        .replace(/ \+ /g, " + ");
+      return `${qty > 1 ? `${qty} × ` : ""}${label}`;
+    });
+}
+
+const pickupOf = (details: string | undefined) => /Recolha, entrega e deslocação/.test(details ?? "");
+
 export function buildWhatsAppMessage(lead: Record<string, string>): string {
   const items = leadItems(lead.service ?? "", lead.service_type ?? "");
   const service = items.length ? ` para ${servicePhrase(items)}` : "";
@@ -93,6 +120,15 @@ export function buildWhatsAppMessage(lead: Record<string, string>): string {
     : "";
   // Primeira pessoa do plural: quem presta o serviço é a equipa. O nome do
   // António fica só na apresentação, para a pessoa saber com quem fala.
+  const lines = detailLines(lead.details);
+  if (lines.length) {
+    return [
+      `Olá ${firstName(lead.name)}, tudo bem?`,
+      `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${loc}:`,
+      [...lines.map(l => `• ${l}`), ...(pickupOf(lead.details) ? ["• Com recolha e entrega"] : [])].join("\n"),
+      ...(items.length ? [photoQuestion(items)] : []),
+    ].join("\n\n");
+  }
   return [
     `Olá ${firstName(lead.name)}, tudo bem?`,
     `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}.`,

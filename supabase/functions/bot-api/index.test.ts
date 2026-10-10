@@ -14,6 +14,9 @@ function fakeLeads(rows: Row[] = []) {
     findBy(column: "booking_id" | "lead_id", value: string) {
       return Promise.resolve({ data: rows.filter(r => r[column] === value).slice(0, 1), error: null });
     },
+    recentQuiz() {
+      return Promise.resolve({ data: rows.filter(r => r.source !== "WhatsApp"), error: null });
+    },
     insert(row: Row) {
       rows.push(row);
       return Promise.resolve({ data: [{ booking_id: row.booking_id }], error: null });
@@ -63,6 +66,28 @@ Deno.test("find-order returns a summary without phone, email or message", async 
   for (const secret of ["912000000", "example.invalid", "Silva"]) assert(!text.includes(secret), secret);
   assertEquals((await (await call({ action: "find-order", order: "ZZZZ99" }, { leads })).json()).found, false);
   assertEquals((await call({ action: "find-order", order: "'; drop table leads" }, { leads })).status, 400);
+});
+
+Deno.test("find-order gives the bot the order as data, by number or by the chat's phone", async () => {
+  const quizOrder = {
+    v: 1, service: "carpet", city: "Faro", lines: [{ label: "Tapete 1: 2,3 × 1,6 m (3,68 m²)", qty: 1, price: null }],
+    quote: { items: [{ kind: "rug", qty: 1, treatment: "clean", width: 2.3, length: 1.6 }], exact: true },
+    rugs: [{ kind: "rug", typed: "230 × 160", width: 2.3, length: 1.6, areaM2: 3.68, fromCm: true, doubtful: false }],
+    rugPickup: false, total: null, priceText: "Sob orçamento", sobOrcamento: true, observations: "Rua das Flores 3", slot: null,
+  };
+  const leads = fakeLeads([{ booking_id: "AB12CD34", name: "Julia Costa", phone: "+351 912 345 678", source: "Website", service: "Tapete", details: "x", location: "Faro", value: "Sob orçamento", quiz_order: quizOrder }]);
+  const byNumber = await (await call({ action: "find-order", order: "AB12CD34", phone: "351912345678" }, { leads })).json();
+  assertEquals([byNumber.found, byNumber.matchedBy, byNumber.phoneMatches], [true, "number", true]);
+  assertEquals(byNumber.order.brief.quoteRequest, { items: quizOrder.quote.items, city: "Faro" });
+  assert(byNumber.order.brief.alreadyKnown.includes("as medidas de cada tapete ou alcatifa"));
+  assertEquals(byNumber.order.brief.observations, "Rua das Flores 3");
+  const byPhone = await (await call({ action: "find-order", phone: "912345678" }, { leads })).json();
+  assertEquals([byPhone.found, byPhone.matchedBy, byPhone.order.number], [true, "phone", "AB12CD34"]);
+  // Someone else's number typed in another chat: the order, never its observations.
+  const other = await (await call({ action: "find-order", order: "AB12CD34", phone: "939999999" }, { leads })).json();
+  assertEquals([other.phoneMatches, other.order.brief.observations], [false, null]);
+  assert(!JSON.stringify(other).includes("912 345 678"));
+  assertEquals((await call({ action: "find-order" }, { leads })).status, 400);
 });
 
 Deno.test("create-lead saves one lead per conversation, as WhatsApp, with the ad origin", async () => {
