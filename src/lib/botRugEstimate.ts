@@ -38,7 +38,7 @@ const DELICATE = /\b(la|lan|wool|seda|silk|viscose|persa|persia|oriental|arraiol
 
 export type RugMaterial = 'common' | 'natural' | 'delicate';
 
-/** The material class from what the client or the bot wrote; unknown counts as common. */
+/** The material class from what the client or the bot wrote (rugEstimate refuses a missing one). */
 export function rugMaterialClass(material: unknown): RugMaterial {
   if (typeof material !== 'string' || !material.trim()) return 'common';
   const m = fold(material);
@@ -54,11 +54,17 @@ export type RugEstimateItem = { width: number; length: number; qty: number; mate
 
 export type RugEstimate =
   | { ok: true; areaM2: number; ratePerM2: number[]; travelFee: number; homePrice: number; pickupPrice: number | null; pickupFee: number | null; sofaUpsellPrice: number; sofaUsualPrice: number; rule: string }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; needsMaterial?: true };
 
 export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEstimate {
   if (!rugs.length) return { ok: false, reason: 'sem tapetes' };
   if (!city || !(city in locationPrices)) return { ok: false, reason: 'localidade não servida' };
+  // The quiz never asks the material (owner, 11 Oct 2026: "não compliques o questionário"), and an
+  // unknown material priced as common put a juta rug at 10€/m² and a wool one at a table price. No
+  // material, no price: the bot reads it from the photo or asks it in one line.
+  if (rugs.some(r => typeof r.material !== 'string' || !r.material.trim())) {
+    return { ok: false, needsMaterial: true, reason: 'falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular' };
+  }
   const classes = rugs.map(r => rugMaterialClass(r.material));
   if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;

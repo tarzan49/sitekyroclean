@@ -13,9 +13,9 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
   });
 
   it('adds the site pickup fee (20€) where a pickup exists, and no pickup above 20 m²', () => {
-    const r = rugEstimate([{ width: 2, length: 2.9, qty: 1 }], 'Porto');
+    const r = rugEstimate([{ width: 2, length: 2.9, qty: 1, material: 'microfibra' }], 'Porto');
     expect(r.ok && [r.pickupFee, r.pickupPrice]).toEqual([20, 89]);
-    const big = rugEstimate([{ width: 4, length: 6, qty: 1 }], 'Porto');
+    const big = rugEstimate([{ width: 4, length: 6, qty: 1, material: 'sintético' }], 'Porto');
     expect(big.ok && big.pickupPrice).toBeNull();
   });
 
@@ -24,6 +24,13 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'persa feito à mão' }], 'Porto').ok).toBe(false);
     expect(rugEstimate([{ width: 1, length: 2, qty: 1 }], 'Porto').ok).toBe(false);
     expect(rugEstimate([{ width: 2, length: 3, qty: 1 }], null).ok).toBe(false);
+  });
+
+  it('no material, no price: the bot must read it from the photo or ask', () => {
+    const r = rugEstimate([{ width: 2, length: 3, qty: 1 }], 'Porto');
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.needsMaterial).toBe(true);
+    expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: ' ' }, { width: 2, length: 3, qty: 1, material: 'juta' }], 'Porto').ok).toBe(false);
   });
 
   it('classifies materials and rounds to 9', () => {

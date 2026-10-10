@@ -466,6 +466,9 @@ var roundToNine = (value) => Math.max(9, Math.round((value - 9) / 10) * 10 + 9);
 function rugEstimate(rugs, city) {
   if (!rugs.length) return { ok: false, reason: "sem tapetes" };
   if (!city || !(city in locationPrices)) return { ok: false, reason: "localidade não servida" };
+  if (rugs.some((r) => typeof r.material !== "string" || !r.material.trim())) {
+    return { ok: false, needsMaterial: true, reason: "falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular" };
+  }
   const classes = rugs.map((r) => rugMaterialClass(r.material));
   if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
