@@ -27,20 +27,20 @@ export const RUG_PICKUP_MIN_AREA_M2 = 3;
 export const RUG_PICKUP_MAX_AREA_M2 = 20;
 export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
 
-// Recolha e entrega, com a deslocação incluída (dono, 2026-10-05): 10€ até
-// 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², pela soma dos tapetes do
-// pedido, como o mínimo acima. Entrega em até 4 dias úteis. A lavagem continua
+// Recolha e entrega: mais 20€ do que a lavagem em casa, em qualquer área em
+// que haja recolha (dono, 2026-10-10: "deixa mais 20 euros", "muda também no
+// site"; de 2026-10-05 a essa data era 10€ até 6 m², 15€ acima e 20€ a partir
+// de 10 m²). Entrega em até 4 dias úteis. A lavagem continua
 // sob orçamento, e na lavagem em casa a deslocação também (RUG_TRAVEL_RULE):
 // este é o único valor dos tapetes que o site escreve.
 /** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo ou acima do máximo). */
+export const RUG_PICKUP_FEE = 20;
 export function rugPickupFee(totalAreaM2: number): number | null {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
-  if (totalAreaM2 <= 6) return 10;
-  if (totalAreaM2 < 10) return 15;
-  return 20;
+  return RUG_PICKUP_FEE;
 }
 
-export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ de 10 a 20 m², somando os tapetes do pedido.';
+export const RUG_PICKUP_FEE_RULE = `A recolha e entrega tem um custo adicional de ${RUG_PICKUP_FEE}€.`;
 
 // Tapetes e alcatifas: na lavagem em casa a deslocação não tem valor de
 // tabela, entra no orçamento (dono, 2026-10-05). Os outros serviços continuam

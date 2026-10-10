@@ -9,7 +9,7 @@ import { usePriceWidgetState } from "@/hooks/use-price-widget";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
 import { locationPrices } from "@/components/quiz/QuizTypes";
-import { RUG_SERVICE_SLUGS } from "@/constants/commercialPolicy";
+import { RUG_PICKUP_FEE_RULE, RUG_SERVICE_SLUGS } from "@/constants/commercialPolicy";
 import type { PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import {
   widgetWaterproofPrice, widgetSofaUnitPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing,
@@ -216,7 +216,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
         {isRugService
-          ? <p className="text-base text-white/80 mb-3">{isAlcatifaService ? 'Lavagem e deslocação sob orçamento.' : 'Lavagem e deslocação sob orçamento. Com recolha e entrega, a deslocação já vem incluída: 10€ a 20€, conforme a área.'}</p>
+          ? <p className="text-base text-white/80 mb-3">{isAlcatifaService ? 'Lavagem e deslocação sob orçamento.' : `Lavagem e deslocação sob orçamento. ${RUG_PICKUP_FEE_RULE}`}</p>
           : !hasSelection && <p className="text-base text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
         <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full min-h-12 py-3 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />

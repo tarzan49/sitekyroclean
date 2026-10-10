@@ -373,13 +373,12 @@ var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O trat
 var RUG_PICKUP_MIN_AREA_M2 = 3;
 var RUG_PICKUP_MAX_AREA_M2 = 20;
 var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
+var RUG_PICKUP_FEE = 20;
 function rugPickupFee(totalAreaM2) {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
-  if (totalAreaM2 <= 6) return 10;
-  if (totalAreaM2 < 10) return 15;
-  return 20;
+  return RUG_PICKUP_FEE;
 }
-var RUG_PICKUP_FEE_RULE = "A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ de 10 a 20 m², somando os tapetes do pedido.";
+var RUG_PICKUP_FEE_RULE = `A recolha e entrega tem um custo adicional de ${RUG_PICKUP_FEE}€.`;
 var travelFees = Object.values(locationPrices);
 var TRAVEL_FEE_MIN = Math.min(...travelFees);
 var TRAVEL_FEE_MAX = Math.max(...travelFees);
@@ -452,7 +451,6 @@ var CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
 var RUG_RATE_COMMON = 10;
 var RUG_RATE_NATURAL = 12;
 var RUG_ESTIMATE_MIN_AREA_M2 = 3;
-var RUG_ESTIMATE_PICKUP_EXTRA = 20;
 var RUG_VISIT_SOFA_PRICE = 70;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
@@ -475,7 +473,7 @@ function rugEstimate(rugs, city) {
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2) === null ? null : RUG_ESTIMATE_PICKUP_EXTRA;
+  const pickupFee = rugPickupFee(areaM2);
   return {
     ok: true,
     areaM2,

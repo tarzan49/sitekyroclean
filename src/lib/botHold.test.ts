@@ -54,7 +54,7 @@ describe('planBotHold', () => {
     const p = plan(req({ items: [{ kind: 'rug', width: 2, length: 3 }], name: 'Rui\nTeste', rugPickup: true }));
     expect(p.event.title).toMatch(/– sob orçamento$/);
     expect(p.event.title).toContain('Rui Teste');
-    expect(p.event.description).toContain('Recolha e entrega: 10€');
+    expect(p.event.description).toContain('Recolha e entrega: 20€');
   });
 });
 

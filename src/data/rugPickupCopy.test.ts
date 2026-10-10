@@ -23,8 +23,8 @@ import { getProblemBySlug } from './problemSeoData';
  * Abaixo de 3 m² somados não há recolha (dono, 2026-09-30): as respostas que
  * explicam a recolha dizem-no, a partir de `RUG_PICKUP_RULE`.
  *
- * Desde 2026-10-05 o custo da recolha está escrito (dono), com a deslocação incluída: 10€ até 6 m²,
- * 15€ acima disso e 20€ de 10 a 20 m², a partir de `RUG_PICKUP_FEE_RULE`. Acima de 20 m²
+ * Desde 2026-10-05 o custo da recolha está escrito (dono); desde 2026-10-10 são 20€ em
+ * qualquer área com recolha, a partir de `RUG_PICKUP_FEE_RULE`. Acima de 20 m²
  * somados não há recolha (dono, 2026-10-10).
  */
 const ROOTS = ['src/data', 'src/constants', 'src/pages', 'src/components', 'scripts'];
@@ -64,10 +64,10 @@ describe('recolha dos tapetes', () => {
 
   it('o custo da recolha segue os escalões do dono, pela área somada', () => {
     expect(rugPickupFee(2.99)).toBeNull();
-    expect(rugPickupFee(3)).toBe(10);
-    expect(rugPickupFee(6)).toBe(10);
-    expect(rugPickupFee(6.01)).toBe(15);
-    expect(rugPickupFee(9.99)).toBe(15);
+    expect(rugPickupFee(3)).toBe(20);
+    expect(rugPickupFee(6)).toBe(20);
+    expect(rugPickupFee(6.01)).toBe(20);
+    expect(rugPickupFee(9.99)).toBe(20);
     expect(rugPickupFee(10)).toBe(20);
     expect(rugPickupFee(20)).toBe(20);
     expect(rugPickupFee(20.01)).toBeNull();
@@ -76,9 +76,8 @@ describe('recolha dos tapetes', () => {
   });
 
   it('o texto do custo diz os mesmos valores que a função', () => {
-    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(6)}€ até 6 m²`);
-    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(7)}€ acima de 6 m²`);
-    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(10)}€ de 10 a ${RUG_PICKUP_MAX_AREA_M2} m²`);
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(5)}€`);
+    expect(RUG_PICKUP_FEE_RULE).not.toMatch(/10€|15€/);
     expect(RUG_PICKUP_RULE).toContain(`entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²`);
   });
 

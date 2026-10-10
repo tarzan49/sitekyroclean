@@ -118,8 +118,8 @@ describe('specific regressions and delivery failures', () => {
 
 it.each([
   [[{ id: 'a', largura: '2', comprimento: '1' }], null],
-  [[{ id: 'a', largura: '2', comprimento: '3' }], 10],
-  [[{ id: 'a', largura: '2', comprimento: '3' }, { id: 'b', largura: '1', comprimento: '2' }], 15],
+  [[{ id: 'a', largura: '2', comprimento: '3' }], 20],
+  [[{ id: 'a', largura: '2', comprimento: '3' }, { id: 'b', largura: '1', comprimento: '2' }], 20],
   [[{ id: 'a', largura: '2,5', comprimento: '4' }], 20],
 ])('adds the rug pickup fee to the receipt by summed area (%#)', (items, fee) => {
   const p = payload({ service: 'carpet', serviceType: 'cleaning' });

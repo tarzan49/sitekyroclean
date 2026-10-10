@@ -53,8 +53,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('returns the rug pickup fee from the site rule, by the summed area of the rugs', () => {
     const fee = (items: unknown[]) => ok({ items, city: 'Porto' }).rugPickup?.fee;
     expect(fee([{ kind: 'rug', width: 1, length: 2 }])).toBeNull();
-    expect(fee([{ kind: 'rug', width: 1, length: 2, qty: 2 }])).toBe(10);
-    expect(fee([{ kind: 'rug', width: 2, length: 4 }])).toBe(15);
+    expect(fee([{ kind: 'rug', width: 1, length: 2, qty: 2 }])).toBe(20);
+    expect(fee([{ kind: 'rug', width: 2, length: 4 }])).toBe(20);
     expect(fee([{ kind: 'rug', width: 2, length: 3 }, { kind: 'rug', width: 2, length: 2 }])).toBe(20);
     expect(fee([{ kind: 'rug', width: 4, length: 5 }])).toBe(20);
     expect(fee([{ kind: 'rug', width: 4, length: 2.8 }, { kind: 'rug', width: 5, length: 3.8 }])).toBeNull();
