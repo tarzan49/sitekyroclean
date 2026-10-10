@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, rugPickupFee } from '../constants/commercialPolicy';
+import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_MAX_AREA_M2, RUG_PICKUP_MIN_AREA_M2, RUG_PICKUP_RULE, rugPickupFee } from '../constants/commercialPolicy';
 import { getAllPosts } from './blogData';
 import { commercialHeroPriceLine } from './commercialHeroCopy';
 import { getLandingFaqs } from './landingFaqPool';
@@ -24,7 +24,8 @@ import { getProblemBySlug } from './problemSeoData';
  * explicam a recolha dizem-no, a partir de `RUG_PICKUP_RULE`.
  *
  * Desde 2026-10-05 o custo da recolha está escrito (dono), com a deslocação incluída: 10€ até 6 m²,
- * 15€ acima disso e 20€ a partir de 10 m², a partir de `RUG_PICKUP_FEE_RULE`.
+ * 15€ acima disso e 20€ de 10 a 20 m², a partir de `RUG_PICKUP_FEE_RULE`. Acima de 20 m²
+ * somados não há recolha (dono, 2026-10-10).
  */
 const ROOTS = ['src/data', 'src/constants', 'src/pages', 'src/components', 'scripts'];
 const PICKUP_AS_DEFAULT = /recolha e entrega (ao domic[íi]lio|inclu[íi]das)|recolha e entrega\.|recolha ao domic[íi]lio|recolhemos e entregamos tapetes em toda|sem necessidade de recolha|n[ãa]o s[ãa]o anunciadas como servi[çc]o geral/i;
@@ -68,14 +69,17 @@ describe('recolha dos tapetes', () => {
     expect(rugPickupFee(6.01)).toBe(15);
     expect(rugPickupFee(9.99)).toBe(15);
     expect(rugPickupFee(10)).toBe(20);
-    expect(rugPickupFee(40)).toBe(20);
+    expect(rugPickupFee(20)).toBe(20);
+    expect(rugPickupFee(20.01)).toBeNull();
+    expect(rugPickupFee(30.2)).toBeNull();
     expect(rugPickupFee(Number.NaN)).toBeNull();
   });
 
   it('o texto do custo diz os mesmos valores que a função', () => {
     expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(6)}€ até 6 m²`);
     expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(7)}€ acima de 6 m²`);
-    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(10)}€ a partir de 10 m²`);
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(10)}€ de 10 a ${RUG_PICKUP_MAX_AREA_M2} m²`);
+    expect(RUG_PICKUP_RULE).toContain(`entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²`);
   });
 
   it('em tapetes e alcatifas a deslocação é sob orçamento, sem valor de tabela (dono, 2026-10-05)', () => {

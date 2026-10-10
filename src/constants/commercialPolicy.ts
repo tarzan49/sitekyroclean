@@ -21,22 +21,26 @@ export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibra
 // 2026-09-30). Conta a soma dos tapetes do pedido, não cada um: dois tapetes
 // de 2 m² (4 m² no total) já podem ser recolhidos.
 export const RUG_PICKUP_MIN_AREA_M2 = 3;
-export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
+// Acima de 20 m² somados também não há recolha, só lavagem em casa (dono,
+// 2026-10-10: "para de oferecer recolha para tapetes que sejam acima de 20 m2";
+// "o total dos tapetes").
+export const RUG_PICKUP_MAX_AREA_M2 = 20;
+export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
 
 // Recolha e entrega, com a deslocação incluída (dono, 2026-10-05): 10€ até
 // 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², pela soma dos tapetes do
 // pedido, como o mínimo acima. Entrega em até 4 dias úteis. A lavagem continua
 // sob orçamento, e na lavagem em casa a deslocação também (RUG_TRAVEL_RULE):
 // este é o único valor dos tapetes que o site escreve.
-/** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo). */
+/** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo ou acima do máximo). */
 export function rugPickupFee(totalAreaM2: number): number | null {
-  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2)) return null;
+  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
   if (totalAreaM2 <= 6) return 10;
   if (totalAreaM2 < 10) return 15;
   return 20;
 }
 
-export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², somando os tapetes do pedido.';
+export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ de 10 a 20 m², somando os tapetes do pedido.';
 
 // Tapetes e alcatifas: na lavagem em casa a deslocação não tem valor de
 // tabela, entra no orçamento (dono, 2026-10-05). Os outros serviços continuam

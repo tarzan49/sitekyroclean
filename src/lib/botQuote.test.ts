@@ -56,6 +56,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(fee([{ kind: 'rug', width: 1, length: 2, qty: 2 }])).toBe(10);
     expect(fee([{ kind: 'rug', width: 2, length: 4 }])).toBe(15);
     expect(fee([{ kind: 'rug', width: 2, length: 3 }, { kind: 'rug', width: 2, length: 2 }])).toBe(20);
+    expect(fee([{ kind: 'rug', width: 4, length: 5 }])).toBe(20);
+    expect(fee([{ kind: 'rug', width: 4, length: 2.8 }, { kind: 'rug', width: 5, length: 3.8 }])).toBeNull();
     expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5 }], city: 'Porto' }).rugPickup).toBeNull();
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).rugPickup).toBeNull();
   });

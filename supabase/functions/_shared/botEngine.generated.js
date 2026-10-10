@@ -354,14 +354,15 @@ var AVAILABILITY_PROMISE = "Procuramos realizar o serviço no próprio dia ou no
 var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.";
 var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
 var RUG_PICKUP_MIN_AREA_M2 = 3;
-var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
+var RUG_PICKUP_MAX_AREA_M2 = 20;
+var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
 function rugPickupFee(totalAreaM2) {
-  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2)) return null;
+  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
   if (totalAreaM2 <= 6) return 10;
   if (totalAreaM2 < 10) return 15;
   return 20;
 }
-var RUG_PICKUP_FEE_RULE = "A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², somando os tapetes do pedido.";
+var RUG_PICKUP_FEE_RULE = "A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ de 10 a 20 m², somando os tapetes do pedido.";
 var travelFees = Object.values(locationPrices);
 var TRAVEL_FEE_MIN = Math.min(...travelFees);
 var TRAVEL_FEE_MAX = Math.max(...travelFees);
