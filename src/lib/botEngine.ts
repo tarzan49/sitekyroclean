@@ -6,3 +6,4 @@ export { botAvailability } from './botAvailability';
 export { planBotBooking, planBotHold, planOwnerBooking } from './botHold';
 export { agendaCheck } from './agendaCheck';
 export { describeQuizOrder } from './quizOrder';
+export { isTestOrder } from './testLead';

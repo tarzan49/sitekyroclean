@@ -1,6 +1,6 @@
 // Corre com: deno test supabase/functions/send-lead-email/whatsappReply.test.ts
 import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
-import { buildWhatsAppMessage } from "./whatsappReply.ts";
+import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 
 Deno.test("um só artigo: serviço, localidade e fotografia, sem horários nem morada", () => {
   const msg = buildWhatsAppMessage({

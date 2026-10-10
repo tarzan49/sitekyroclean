@@ -10,6 +10,7 @@
 //   cities      the served localities with their travel fee
 //   find-order  one quiz order by its number ("Acabei de enviar o pedido #K7X2P9") or by the chat's phone,
 //               summary only: no phone, email or message
+//   new-orders  quiz orders since a date, with phone and the first WhatsApp message, for the bot to write first
 //   create-lead save the conversation as a lead, source "WhatsApp", once per
 //               conversationId
 //   availability two free times for a locality, from the owner's calendar
@@ -47,7 +48,8 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, botAvailability, botQuote, describeQuizOrder, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, botAvailability, botQuote, describeQuizOrder, isTestOrder, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -192,6 +194,40 @@ async function findOrder(body: Row, leads: LeadsStore): Promise<Response> {
   });
 }
 
+const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, service, service_type, details, location";
+/** How far back the bot server may ask for new orders (it asks every minute; this only bounds a restart). */
+const NEW_ORDERS_MAX_HOURS = 48;
+
+/**
+ * Quiz orders created after `since`, oldest first, for the bot's first WhatsApp
+ * message (owner, 11 Oct 2026: "o bot enviar logo msg automática à pessoa mal o
+ * orçamento me cai no email"). Each comes with the phone (the bot has to write to
+ * it) and the same text as the email's "Responder no WhatsApp" button. Test
+ * orders are left out. The bot server decides whether and when to send.
+ */
+async function newOrders(body: Row, leads: LeadsStore): Promise<Response> {
+  if (!leads.recentQuiz) return createErrorResponse("Pedidos indisponíveis", 503);
+  const sinceMs = typeof body.since === "string" ? Date.parse(body.since) : NaN;
+  if (!Number.isFinite(sinceMs)) return createErrorResponse("new-orders precisa de since (data ISO)", 400);
+  const since = new Date(Math.max(sinceMs, Date.now() - NEW_ORDERS_MAX_HOURS * 3600_000)).toISOString();
+  const { data, error } = await leads.recentQuiz(since, NEW_ORDER_COLUMNS);
+  if (error) {
+    safeLog("error", "[bot-api] new-orders falhou", { message: error.message });
+    return createErrorResponse("Não foi possível ler os pedidos", 500);
+  }
+  const orders = (data ?? [])
+    .filter(r => typeof r.booking_id === "string" && typeof r.phone === "string" && Date.parse(String(r.created_at)) > sinceMs)
+    .filter(r => !isTestOrder(r.name as string, lastNine(r.phone)))
+    .sort((a, b) => Date.parse(String(a.created_at)) - Date.parse(String(b.created_at)))
+    .map(r => ({
+      number: r.booking_id,
+      createdAt: r.created_at,
+      phone: String(r.phone),
+      message: buildWhatsAppMessage(Object.fromEntries(Object.entries(r).map(([k, v]) => [k, typeof v === "string" ? v : ""]))),
+    }));
+  return createSuccessResponse({ orders });
+}
+
 async function leadIdFor(conversationId: string): Promise<string> {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(`whatsapp-bot:${conversationId}`)));
   return `W-${Array.from(digest.slice(0, 8), b => b.toString(16).padStart(2, "0")).join("")}`;
@@ -294,6 +330,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
     }
     case "cities":
       return createSuccessResponse({ cities: listBotCities() });
+    case "new-orders":
+      if (!env.leads) return createErrorResponse("Pedidos indisponíveis", 503);
+      return await newOrders(body, env.leads);
     case "find-order":
       if (!env.leads) return createErrorResponse("Serviço indisponível", 503);
       return await findOrder(body, env.leads);
@@ -338,7 +377,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, hold, book, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 

@@ -1,4 +1,6 @@
-// Mensagem pré-preenchida no botão "Responder no WhatsApp" do email do pedido.
+// Mensagem pré-preenchida no botão "Responder no WhatsApp" do email do pedido, e
+// desde 2026-10-11 a primeira mensagem que o bot envia sozinho a um pedido novo
+// do questionário (bot-api new-orders, dono: "o bot enviar logo msg automática").
 // Recorda tudo o que a pessoa pediu (não só o primeiro artigo: um pedido com
 // upsell traz `service` como lista, "Sofá, 2x Colchão Casal, 4 Cadeiras
 // (Impermeabilização Premium)") e pede fotografias desses artigos. Nada de

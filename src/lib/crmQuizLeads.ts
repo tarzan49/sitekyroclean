@@ -20,6 +20,7 @@
 // A tabela `leads` só tem pedidos desde 14/09/2026 (o `db push` desse dia
 // apagou os anteriores; ver CLAUDE.md).
 import { phoneKey } from "@/lib/clientRecords";
+import { isTestOrder } from "@/lib/testLead";
 import { addDays, lisbonDay } from "@/lib/crmClosings";
 import { ownerUpsellOf } from "@/lib/crmUpsell";
 
@@ -96,9 +97,7 @@ export const isQuizLead = (l: Pick<QuizLeadRow, "source">) => l.source !== "What
 
 /** "TESTE GOOGLE ADS", "teste", e números como 911111111, 999999999 ou 910000000. */
 export function isTestLead(l: Pick<QuizLeadRow, "name" | "phone">): boolean {
-  if (/teste|n[aã]o contactar/i.test(l.name ?? "")) return true;
-  const key = phoneKey(l.phone);
-  return /^9(\d)\1{7}$/.test(key) || /^9\d0{7}$/.test(key);
+  return isTestOrder(l.name, phoneKey(l.phone));
 }
 
 const nameTokens = (name: string | null | undefined) =>

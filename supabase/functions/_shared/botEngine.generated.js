@@ -1268,11 +1268,18 @@ function describeQuizOrder(row) {
     slot: null
   };
 }
+
+// src/lib/testLead.ts
+function isTestOrder(name, phone9) {
+  if (/teste|n[aã]o contactar/i.test(name ?? "")) return true;
+  return /^9(\d)\1{7}$/.test(phone9) || /^9\d0{7}$/.test(phone9);
+}
 export {
   agendaCheck,
   botAvailability,
   botQuote,
   describeQuizOrder,
+  isTestOrder,
   listBotCities,
   planBotBooking,
   planBotHold,

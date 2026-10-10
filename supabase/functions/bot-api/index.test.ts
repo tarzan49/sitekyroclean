@@ -90,6 +90,21 @@ Deno.test("find-order gives the bot the order as data, by number or by the chat'
   assertEquals((await call({ action: "find-order" }, { leads })).status, 400);
 });
 
+Deno.test("new-orders: quiz orders after since, oldest first, with phone and the first message; no tests", async () => {
+  const leads = fakeLeads([
+    { booking_id: "NEW00002", created_at: "2026-10-11T10:05:00Z", name: "Rui Costa", phone: "+351 913 456 789", source: "Website", service: "Sofá", service_type: "Higienização Profunda", details: "1x Sofá 3 Lugares: 79€", location: "Porto" },
+    { booking_id: "NEW00001", created_at: "2026-10-11T10:01:00Z", name: "Ana", phone: "912345678", source: "Website", service: "Tapete", service_type: "Higienização Profunda", details: "1x Tapete 1: 2,3 × 1,6 m (3,68 m²): Sob orçamento", location: "Faro" },
+    { booking_id: "OLD00001", created_at: "2026-10-11T09:00:00Z", name: "Velho", phone: "934567890", source: "Website", service: "Sofá", location: "Porto" },
+    { booking_id: "TEST0001", created_at: "2026-10-11T10:02:00Z", name: "Teste Google", phone: "911111111", source: "Website", service: "Sofá", location: "Porto" },
+  ]);
+  const body = await (await call({ action: "new-orders", since: "2026-10-11T10:00:00Z" }, { leads })).json();
+  assertEquals(body.orders.map((o: Row) => o.number), ["NEW00001", "NEW00002"]);
+  assertEquals(body.orders[0].phone, "912345678");
+  assert(body.orders[0].message.startsWith("Olá Ana, tudo bem?"));
+  assert(body.orders[0].message.includes("• Tapete de 2,3 × 1,6 m (3,68 m²)"));
+  assertEquals((await call({ action: "new-orders" }, { leads })).status, 400);
+});
+
 Deno.test("create-lead saves one lead per conversation, as WhatsApp, with the ad origin", async () => {
   const leads = fakeLeads();
   const lead = { action: "create-lead", conversationId: "351912000000:2026-09-28", name: "Maria", phone: "+351 912 000 000", service: "Limpeza de sofá", details: "3 lugares", location: "Porto", value: 89, adOrigin: "google" };

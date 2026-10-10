@@ -11,7 +11,7 @@ import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, valida
 import { hasHeaderInjection } from "../_shared/validation.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
-import { buildWhatsAppMessage } from "./whatsappReply.ts";
+import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 
 const RATE_LIMIT_MAX = 8;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
