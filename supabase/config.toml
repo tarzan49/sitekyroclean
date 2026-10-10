@@ -1,1 +1,5 @@
 project_id = "kswapioiaetfccxzfwkg"
+# The WhatsApp bot authenticates with x-bot-key, not a Supabase JWT. A deploy
+# without this (or --no-verify-jwt) locks the bot out with 401 (10 Oct 2026).
+[functions.bot-api]
+verify_jwt = false
