@@ -5,6 +5,7 @@ import {
   campaignRun,
   CAMPAIGNS,
   isQuietTime,
+  quietUntilLabel,
   planAll,
   planClient,
   reviewLinkFor,
@@ -98,13 +99,23 @@ describe('seguimento de orçamentos (dois e parar)', () => {
     expect(p.stage).toBe('orcamento_parado');
   });
 
-  it('empurra para as 9h30 do dia seguinte o que calharia de noite', () => {
-    const c = client({ last_client_message_at: '2026-10-06T16:30:00Z', last_contact_at: '2026-10-06T18:00:00Z' }); // 19h em Lisboa
-    const p = plan({ client: c }, '2026-10-06T21:00:00Z');
+  it('empurra para as 7h o que calharia de madrugada num dia útil (dono, 11/10/2026)', () => {
+    const c = client({ last_client_message_at: '2026-10-06T19:30:00Z', last_contact_at: '2026-10-06T21:00:00Z' }); // 22h em Lisboa
+    const p = plan({ client: c }, '2026-10-06T21:30:00Z');
     expect(p.today).toEqual([]);
-    expect(p.soon[0]).toMatchObject({ kind: 'seguimento', due: '2026-10-07', notBefore: '9h30' });
-    expect(isQuietTime(new Date('2026-10-06T21:00:00Z'))).toBe(true);
-    expect(isQuietTime(new Date('2026-10-06T09:00:00Z'))).toBe(false);
+    expect(p.soon[0]).toMatchObject({ kind: 'seguimento', due: '2026-10-07', notBefore: '7h00' });
+  });
+
+  it('a seguir às 21h já se pode escrever; de madrugada não, até às 7h (dia útil) ou às 9h (fim de semana)', () => {
+    expect(isQuietTime(new Date('2026-10-06T21:00:00Z'))).toBe(false); // terça, 22h
+    expect(isQuietTime(new Date('2026-10-06T23:30:00Z'))).toBe(true); // quarta, 0h30
+    expect(isQuietTime(new Date('2026-10-07T05:59:00Z'))).toBe(true); // quarta, 6h59
+    expect(isQuietTime(new Date('2026-10-07T06:00:00Z'))).toBe(false); // quarta, 7h
+    expect(isQuietTime(new Date('2026-10-11T07:30:00Z'))).toBe(true); // domingo, 8h30
+    expect(isQuietTime(new Date('2026-10-11T08:00:00Z'))).toBe(false); // domingo, 9h
+    expect(isQuietTime(new Date('2026-10-10T07:59:00Z'))).toBe(true); // sábado, 8h59
+    expect(quietUntilLabel('2026-10-07')).toBe('7h');
+    expect(quietUntilLabel('2026-10-10')).toBe('9h');
   });
 
   it('com data combinada, só nessa data', () => {

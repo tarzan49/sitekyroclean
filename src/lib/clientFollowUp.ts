@@ -33,9 +33,9 @@ import { GOOGLE_REVIEW_LINK_LISBOA, GOOGLE_REVIEW_LINK_PORTO } from '../constant
 // ── Regras ─────────────────────────────────────────────────────────────────
 
 export const FOLLOW_UP_RULES = {
-  /** Nunca escrever primeiro entre as 21h e as 9h30 (bot, 2.12 e 8). */
-  quietFromMinutes: 21 * 60,
-  quietUntilMinutes: 9 * 60 + 30,
+  /** Nunca escrever primeiro de madrugada: da meia-noite às 7h nos dias úteis, às 9h ao fim de semana. Responder a quem escreve, a qualquer hora (dono, 11/10/2026). */
+  quietUntilWeekdayMinutes: 7 * 60,
+  quietUntilWeekendMinutes: 9 * 60,
   /** Seguimentos de um orçamento depois da última mensagem do cliente (bot, 8). */
   maxFollowUps: 2,
   /** O 1.º seguimento sai umas 4 horas depois da nossa última mensagem, no mesmo dia. */
@@ -163,7 +163,7 @@ export interface FollowUpAction {
   campaignId?: string;
   /** Dia (AAAA-MM-DD, Lisboa) a partir do qual faz sentido. */
   due: string;
-  /** Hora a partir da qual enviar nesse dia ("15h20", "9h30"). */
+  /** Hora a partir da qual enviar nesse dia ("15h20", "7h00"). */
   notBefore?: string;
   /** Último dia em que ainda faz sentido. */
   until?: string;
@@ -292,10 +292,19 @@ export function lisbonMinutes(d: Date): number {
 const clock = (minutes: number) => `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, '0')}`;
 const dm = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
 
-/** Entre as 21h e as 9h30 não se escreve primeiro a ninguém. */
+/** Fim da madrugada nesse dia (AAAA-MM-DD de Lisboa): 7h de segunda a sexta, 9h ao sábado e ao domingo. */
+export function quietUntilMinutes(day: string) {
+  return weekdayOf(day) >= 5 ? R.quietUntilWeekendMinutes : R.quietUntilWeekdayMinutes;
+}
+
+/** "7h" ou "9h": a hora a partir da qual se pode escrever primeiro nesse dia. */
+export function quietUntilLabel(day: string) {
+  return clock(quietUntilMinutes(day)).replace(/h00$/, 'h');
+}
+
+/** Da meia-noite às 7h (dias úteis) ou às 9h (fim de semana) não se escreve primeiro a ninguém. */
 export function isQuietTime(now: Date) {
-  const minutes = lisbonMinutes(now);
-  return minutes >= R.quietFromMinutes || minutes < R.quietUntilMinutes;
+  return lisbonMinutes(now) < quietUntilMinutes(lisbonDay(now));
 }
 
 /** "Bom dia" das 6h às 12h, "Boa tarde" das 12h às 20h, "Boa noite" depois (bot, 3b). */
@@ -322,12 +331,12 @@ export function whenPhrase(iso: string, today: string) {
   return `${ref} às ${clock(lisbonMinutes(new Date(iso)))}`;
 }
 
-/** Dia e hora a partir dos quais se pode enviar, empurrando a noite para as 9h30. */
+/** Dia e hora a partir dos quais se pode enviar, empurrando a madrugada para as 7h (ou 9h ao fim de semana). */
 function sendWindow(at: Date): { day: string; notBefore: string } {
   const day = lisbonDay(at);
   const minutes = lisbonMinutes(at);
-  if (minutes >= R.quietFromMinutes) return { day: addDays(day, 1), notBefore: clock(R.quietUntilMinutes) };
-  if (minutes < R.quietUntilMinutes) return { day, notBefore: clock(R.quietUntilMinutes) };
+  const until = quietUntilMinutes(day);
+  if (minutes < until) return { day, notBefore: clock(until) };
   return { day, notBefore: clock(minutes) };
 }
 
@@ -640,7 +649,7 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
   const today = ctx.today ?? lisbonDay(ctx.now);
   // Numa pré-visualização de outro dia, as mensagens saem como se fossem às 10h.
   const nowMinutes = ctx.today && ctx.today !== lisbonDay(ctx.now) ? 10 * 60 : lisbonMinutes(ctx.now);
-  const greeting = greetingFor(Math.max(nowMinutes, R.quietUntilMinutes));
+  const greeting = greetingFor(Math.max(nowMinutes, quietUntilMinutes(today)));
 
   const services = input.services
     .filter(s => !s.calendar_missing_since)

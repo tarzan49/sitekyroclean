@@ -4,6 +4,7 @@ import {
   ACTION_LABEL,
   campaignCalendar,
   isQuietTime,
+  quietUntilLabel,
   type FollowUpAction,
   type PlannedClient,
 } from "@/lib/clientFollowUp";
@@ -110,7 +111,7 @@ export default function ClientsToday({ planned, snapshot, lastDigest, onSendDige
 
       {isQuietTime(now) && (
         <p className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
-          <Moon className="w-4 h-4 shrink-0" /> É de noite: prepara as mensagens, mas nenhuma sai antes das 9h30.
+          <Moon className="w-4 h-4 shrink-0" /> É de madrugada: prepara as mensagens, mas nenhuma sai antes das {quietUntilLabel(lisbonDay(now))}.
         </p>
       )}
 

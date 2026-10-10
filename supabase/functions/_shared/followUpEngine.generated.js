@@ -236,9 +236,9 @@ var GOOGLE_REVIEW_LINK_LISBOA = "https://g.page/r/CRc7F7lX3xcEECE/review";
 
 // src/lib/clientFollowUp.ts
 var FOLLOW_UP_RULES = {
-  /** Nunca escrever primeiro entre as 21h e as 9h30 (bot, 2.12 e 8). */
-  quietFromMinutes: 21 * 60,
-  quietUntilMinutes: 9 * 60 + 30,
+  /** Nunca escrever primeiro de madrugada: da meia-noite às 7h nos dias úteis, às 9h ao fim de semana. Responder a quem escreve, a qualquer hora (dono, 11/10/2026). */
+  quietUntilWeekdayMinutes: 7 * 60,
+  quietUntilWeekendMinutes: 9 * 60,
   /** Seguimentos de um orçamento depois da última mensagem do cliente (bot, 8). */
   maxFollowUps: 2,
   /** O 1.º seguimento sai umas 4 horas depois da nossa última mensagem, no mesmo dia. */
@@ -351,9 +351,14 @@ function lisbonMinutes(d) {
 }
 var clock = (minutes) => `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}`;
 var dm = (day) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+function quietUntilMinutes(day) {
+  return weekdayOf(day) >= 5 ? R.quietUntilWeekendMinutes : R.quietUntilWeekdayMinutes;
+}
+function quietUntilLabel(day) {
+  return clock(quietUntilMinutes(day)).replace(/h00$/, "h");
+}
 function isQuietTime(now) {
-  const minutes = lisbonMinutes(now);
-  return minutes >= R.quietFromMinutes || minutes < R.quietUntilMinutes;
+  return lisbonMinutes(now) < quietUntilMinutes(lisbonDay(now));
 }
 function greetingFor(minutes) {
   if (minutes >= 6 * 60 && minutes < 12 * 60) return "Bom dia";
@@ -376,8 +381,8 @@ function whenPhrase(iso, today) {
 function sendWindow(at) {
   const day = lisbonDay(at);
   const minutes = lisbonMinutes(at);
-  if (minutes >= R.quietFromMinutes) return { day: addDays(day, 1), notBefore: clock(R.quietUntilMinutes) };
-  if (minutes < R.quietUntilMinutes) return { day, notBefore: clock(R.quietUntilMinutes) };
+  const until = quietUntilMinutes(day);
+  if (minutes < until) return { day, notBefore: clock(until) };
   return { day, notBefore: clock(minutes) };
 }
 var maxIso = (...values) => values.filter((v) => !!v).sort().at(-1) ?? null;
@@ -603,7 +608,7 @@ function planClient(input, ctx) {
   const c = input.client;
   const today = ctx.today ?? lisbonDay(ctx.now);
   const nowMinutes = ctx.today && ctx.today !== lisbonDay(ctx.now) ? 10 * 60 : lisbonMinutes(ctx.now);
-  const greeting = greetingFor(Math.max(nowMinutes, R.quietUntilMinutes));
+  const greeting = greetingFor(Math.max(nowMinutes, quietUntilMinutes(today)));
   const services = input.services.filter((s) => !s.calendar_missing_since).sort((a, b) => a.request_date.localeCompare(b.request_date));
   const past = services.filter((s) => s.request_date <= today);
   const future = services.filter((s) => s.request_date > today);
@@ -1095,6 +1100,7 @@ function buildDigest(planned, opts) {
   const dateLine = WEEKDAY_DATE.format(opts.now);
   const snapshotLine = opts.snapshot ? `As conversas do WhatsApp são da leitura de ${STAMP.format(new Date(opts.snapshot))}: o que aconteceu depois disso pode ainda não estar aqui.` : "Ainda não há leitura do WhatsApp nas fichas.";
   const quiet = isQuietTime(opts.now);
+  const quietNote = `Agora é de madrugada: nenhuma mensagem sai antes das ${quietUntilLabel(today)}.`;
   const itemHtml = (i) => {
     const a = i.action;
     const msg = a.messages[0];
@@ -1112,7 +1118,7 @@ ${msg ? `<div style="white-space:pre-wrap;background:#f9fafb;border-radius:8px;p
 <div style="border-top:3px solid #D4AF37;padding-top:12px">
 <h1 style="font-size:20px;margin:0">Seguimentos de hoje</h1>
 <p style="margin:2px 0 14px;color:#6b7280;font-size:13px">${esc(dateLine)} · ${count} ${count === 1 ? "pessoa" : "pessoas"}</p>
-${quiet ? '<p style="font-size:13px;background:#fef3c7;color:#92400e;padding:8px 10px;border-radius:8px">Agora é de noite: nenhuma mensagem sai antes das 9h30.</p>' : ""}
+${quiet ? `<p style="font-size:13px;background:#fef3c7;color:#92400e;padding:8px 10px;border-radius:8px">${esc(quietNote)}</p>` : ""}
 ${sections.map((s) => `<h2 style="font-size:15px;margin:22px 0 2px">${esc(s.title)} (${s.items.length})</h2>
 <p style="font-size:12px;color:#6b7280;margin:0 0 8px">${esc(s.tip)}</p>
 ${s.items.map(itemHtml).join("\n")}`).join("\n")}
@@ -1123,7 +1129,7 @@ ${campaigns.map((c) => `<p style="font-size:13px;margin:4px 0">${esc(c.name)}: $
 </div></div>`;
   const text = [
     `Seguimentos de hoje: ${dateLine} (${count} ${count === 1 ? "pessoa" : "pessoas"})`,
-    quiet ? "Agora é de noite: nenhuma mensagem sai antes das 9h30." : "",
+    quiet ? quietNote : "",
     ...sections.flatMap((s) => [
       "",
       `${s.title.toUpperCase()} (${s.items.length})`,

@@ -40,7 +40,7 @@ const money = (n: number) => `${Math.round(n).toLocaleString("pt-PT")}€`;
 const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 100)}%` : "-");
 
 const RULES = [
-  `Nunca escrever primeiro entre as 21h e as 9h30. O que calhar de noite vai às 9h30.`,
+  `Nunca escrever primeiro de madrugada: da meia-noite às 7h nos dias úteis, às 9h ao fim de semana. Responder a quem escreve, sempre.`,
   `Quem escreveu por último vem sempre primeiro: nada comercial antes de lhe responder.`,
   `Orçamento sem resposta: 1.º seguimento umas ${R.firstFollowUpHours} horas depois, no mesmo dia; 2.º cerca de 24 horas depois; e parar (no máximo ${R.maxFollowUps}).`,
   `Passados ${R.followUpWindowDays} dias sem resposta não se insiste: só na data que a pessoa deu, ou numa campanha com uma razão concreta.`,

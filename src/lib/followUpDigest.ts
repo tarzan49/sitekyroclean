@@ -5,7 +5,7 @@
 // campanhas aparecem só como contagem, porque vão em lote e o dono quer ver a
 // lista e o texto antes (regra de 05/10/2026); a lista está no painel.
 
-import { campaignCalendar, isQuietTime, waLink, type ActionKind, type FollowUpAction, type PlannedClient } from './clientFollowUp';
+import { campaignCalendar, isQuietTime, quietUntilLabel, waLink, type ActionKind, type FollowUpAction, type PlannedClient } from './clientFollowUp';
 import { displayName, formatPhone } from './clientRecords';
 import { lisbonDay } from './crmClosings';
 
@@ -84,6 +84,7 @@ export function buildDigest(planned: PlannedClient[], opts: DigestOptions): Dige
     ? `As conversas do WhatsApp são da leitura de ${STAMP.format(new Date(opts.snapshot))}: o que aconteceu depois disso pode ainda não estar aqui.`
     : 'Ainda não há leitura do WhatsApp nas fichas.';
   const quiet = isQuietTime(opts.now);
+  const quietNote = `Agora é de madrugada: nenhuma mensagem sai antes das ${quietUntilLabel(today)}.`;
 
   const itemHtml = (i: DigestItem) => {
     const a = i.action;
@@ -103,7 +104,7 @@ ${msg ? `<div style="white-space:pre-wrap;background:#f9fafb;border-radius:8px;p
 <div style="border-top:3px solid #D4AF37;padding-top:12px">
 <h1 style="font-size:20px;margin:0">Seguimentos de hoje</h1>
 <p style="margin:2px 0 14px;color:#6b7280;font-size:13px">${esc(dateLine)} · ${count} ${count === 1 ? 'pessoa' : 'pessoas'}</p>
-${quiet ? '<p style="font-size:13px;background:#fef3c7;color:#92400e;padding:8px 10px;border-radius:8px">Agora é de noite: nenhuma mensagem sai antes das 9h30.</p>' : ''}
+${quiet ? `<p style="font-size:13px;background:#fef3c7;color:#92400e;padding:8px 10px;border-radius:8px">${esc(quietNote)}</p>` : ''}
 ${sections.map(s => `<h2 style="font-size:15px;margin:22px 0 2px">${esc(s.title)} (${s.items.length})</h2>
 <p style="font-size:12px;color:#6b7280;margin:0 0 8px">${esc(s.tip)}</p>
 ${s.items.map(itemHtml).join('\n')}`).join('\n')}
@@ -115,7 +116,7 @@ ${campaigns.map(c => `<p style="font-size:13px;margin:4px 0">${esc(c.name)}: ${c
 
   const text = [
     `Seguimentos de hoje: ${dateLine} (${count} ${count === 1 ? 'pessoa' : 'pessoas'})`,
-    quiet ? 'Agora é de noite: nenhuma mensagem sai antes das 9h30.' : '',
+    quiet ? quietNote : '',
     ...sections.flatMap(s => [
       '',
       `${s.title.toUpperCase()} (${s.items.length})`,
