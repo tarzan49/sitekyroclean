@@ -121,6 +121,22 @@ export function cleanQuizOrder(raw: unknown): Record<string, unknown> | null {
   return json.length <= QUIZ_ORDER_MAX_JSON ? JSON.parse(json) : null;
 }
 
+// O bot do WhatsApp escreve à pessoa 10 segundos depois do pedido (dono, 2026-10-11:
+// "tem que demorar 10 segundos"). Este aviso só lhe diz "vai ver os pedidos novos":
+// não leva dados. Nunca atrasa o pedido mais de 1,5 s e nunca o faz falhar; sem
+// aviso, o servidor do bot encontra o pedido na mesma no minuto seguinte.
+const BOT_PING_TIMEOUT_MS = 1500;
+
+export async function pingBot(fetchImpl: typeof fetch = fetch): Promise<void> {
+  const url = Deno.env.get("QUIZ_HOOK_URL"), key = Deno.env.get("QUIZ_HOOK_KEY");
+  if (!url || !key) return;
+  try {
+    await fetchImpl(url, { method: "POST", headers: { "x-hook-key": key }, signal: AbortSignal.timeout(BOT_PING_TIMEOUT_MS) });
+  } catch (e) {
+    safeLog("warn", "[submit-lead] Aviso ao bot falhou", { message: String(e) });
+  }
+}
+
 /** Aceita apenas os campos conhecidos, como texto, dentro do comprimento máximo. */
 function cleanLead(raw: Record<string, unknown>): Record<string, string> | null {
   const out: Record<string, string> = {};
@@ -277,6 +293,8 @@ export async function handleRequest(req: Request): Promise<Response> {
     });
     if (historyError) safeLog("warn", "[submit-lead] Histórico não gravado", { message: historyError.message });
   }
+
+  await pingBot();
 
   return createSuccessResponse(
     { bookingId: lead.booking_id ?? null, leadId: lead.lead_id ?? null, duplicate: false },
