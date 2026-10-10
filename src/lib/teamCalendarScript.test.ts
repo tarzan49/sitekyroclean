@@ -139,10 +139,10 @@ describe('região e equipa de cada serviço', () => {
     expect(equipa(lisboa, undefined, 'Equipa Lisboa2')).toBe('lisboa2');
     expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 1')).toBe('lisboa');
     // Uma cor que não é de nenhuma equipa não é uma escolha.
-    expect(equipa(lisboa, '4')).toBeNull();
+    expect(equipa(lisboa, '11')).toBeNull();
     // Cada equipa com a sua cor.
-    expect(['9', '7', '10', '6', '3', '5'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
-      .toEqual(['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve']);
+    expect(['9', '7', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+      .toEqual(['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve', 'coimbra']);
   });
 
   it('não confunde o nome da rua com a cidade', () => {
@@ -298,8 +298,8 @@ describe('o que muda nos calendários das equipas', () => {
     });
 
     it('fora de todas as regiões, a zona é a da equipa mais perto; nas ilhas não adivinha', () => {
-      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
-      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '6300-000', lat: 40.54, lng: -7.27 }).id).toBe('porto');
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('coimbra');
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '6300-000', lat: 40.54, lng: -7.27 }).id).toBe('coimbra');
       expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: null, lat: 37.95, lng: -8.87 }).id).toBe('lisboa');
       expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '9000-000', lat: 32.65, lng: -16.91 })).toBeNull();
       expect(gs.equipaPeloMapa({ encontrado: false })).toBeNull();
@@ -409,10 +409,10 @@ describe('o que muda nos calendários das equipas', () => {
       expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
       expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
       expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
-      for (const linha of ['Mirtilo = Equipa Porto 1', 'Pavão = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve']) {
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Pavão = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
         expect(mensagem.texto).toContain(linha);
       }
-      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve"');
+      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2", "equipa algarve" ou "equipa coimbra"');
       expect(gs.mensagemParaDono(primeira.novos.slice(0, 1)).assunto).toBe('Escolhe a equipa deste serviço');
     });
   });

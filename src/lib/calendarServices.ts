@@ -250,7 +250,7 @@ const isNameLike = (s: string) => {
 const tidy = (s: string) => s.replace(/\s+/g, ' ').replace(/^[\s,.;:-]+|[\s,;:-]+$/g, '').trim();
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// "Equipa: Porto 1" (ou Porto 2, Braga, Lisboa 1, Lisboa 2, Algarve) na primeira linha
+// "Equipa: Porto 1" (ou Porto 2, Braga, Lisboa 1, Lisboa 2, Algarve, Coimbra) na primeira linha
 // da descrição: escrita pelo script dos calendários das equipas (28/09/2026).
 // Não é a morada, por isso não entra na procura da cidade ("Porto" num
 // serviço em Gondomar); serve de última pista para a região em
@@ -261,6 +261,8 @@ export function teamRegionOf(event: CalendarEvent): CrmLocality | null {
   const team = TEAM_LINE.exec(clean(event.description))?.[1];
   if (!team) return null;
   const key = normalizeCity(team);
+  // A equipa de Coimbra (10/10/2026) trabalha numa zona que o CRM conta como Porto.
+  if (key.startsWith('coimbra')) return 'Porto';
   return CRM_LOCALITIES.find(l => key.startsWith(normalizeCity(l))) ?? null;
 }
 

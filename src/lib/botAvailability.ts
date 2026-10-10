@@ -8,7 +8,7 @@
  * The rules are the owner's, from the bot briefing (section 3, "Marcar de forma
  * inteligente") and the replies file (2.6, 2.12):
  * - the client's locality says which teams work there (Porto 1 and 2, Braga,
- *   Lisboa 1 and 2, Algarve); a time is free if at least one of them is free.
+ *   Lisboa 1 and 2, Algarve, Coimbra); a time is free if at least one of them is free.
  *   Porto 1 and Lisboa 1 are two people who can each take a job at the same time
  *   (owner, 9 Oct 2026), so they count as free until they have two;
  * - a service with "Equipa: X" in the description (written by the team-calendar
@@ -20,8 +20,10 @@
  * - two times, near the team's other jobs that day when possible, and at an hour
  *   with no other service in the zone (owner, 9 Oct 2026: "tenta que os pedidos
  *   sejam sempre a horas diferentes, se for a mesma hora tem que me consultar").
- * Aveiro and the Alentejo Litoral are "sob consulta", and Coimbra and Figueira
- * da Foz have no team calendar: those go to the owner, with no hours.
+ * Aveiro and the Alentejo Litoral are "sob consulta": those go to the owner, with
+ * no hours. Coimbra and Figueira da Foz have their own team since 10 Oct 2026
+ * (owner: "cria o calendário da equipa de coimbra"); in the CRM they still count
+ * as region Porto, so the bot's zone (`TeamZone`) is not the CRM's locality.
  *
  * Bundled into the `bot-api` function by `npm run build:bot-engine` (through
  * botQuote.ts), so this file must not import anything that pulls the site's
@@ -41,20 +43,29 @@ export interface AvailabilityEvent {
   end: string | null;
 }
 
-export const TEAMS_BY_REGION: Record<CrmLocality, readonly string[]> = {
+/** The zones the bot books by: the CRM's four regions plus Coimbra, which the CRM counts as Porto. */
+export type TeamZone = CrmLocality | 'Coimbra';
+export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Porto: ['Porto 1', 'Porto 2'],
   Braga: ['Braga'],
   Lisboa: ['Lisboa 1', 'Lisboa 2'],
   Algarve: ['Algarve'],
+  Coimbra: ['Coimbra'],
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 /** Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo"). */
 export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Porto 1': 2, 'Lisboa 1': 2 };
 const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
-const TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map(t => [t, region as CrmLocality] as const)));
-const AREA_REGION: Record<string, CrmLocality | 'coimbra'> = {
-  porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'coimbra',
+const TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map(t => [t, region as TeamZone] as const)));
+const AREA_REGION: Record<string, TeamZone> = {
+  porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'Coimbra',
 };
+/** Coimbra (30xx) and Figueira da Foz (308x-309x) by postal code; the rest as in the CRM. */
+function zoneFromPostalCode(code: string): TeamZone | null {
+  const n = Number(code.slice(0, 4));
+  if (n >= 3000 && n < 3100) return 'Coimbra';
+  return localityFromPostalCode(code);
+}
 
 /** Minutes per article (owner's averages; the upper end where he gave a range). */
 const MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
@@ -89,16 +100,15 @@ export function eventTeam(e: AvailabilityEvent): string | null {
 }
 
 /** Region of a service still without a team: postal code first, then a served town in the title. */
-export function eventRegion(e: AvailabilityEvent): CrmLocality | null {
+export function eventRegion(e: AvailabilityEvent): TeamZone | null {
   const text = `${e.summary}\n${e.description}`;
   const postal = POSTAL.exec(text);
   if (postal) {
-    const r = localityFromPostalCode(postal[1]);
+    const r = zoneFromPostalCode(postal[1]);
     if (r) return r;
   }
   const folded = fold(e.summary);
   for (const c of CITY_NAMES) {
-    if (c.region === 'coimbra') continue;
     if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(folded)) return c.region;
   }
   return null;
@@ -167,7 +177,7 @@ export const hourLabel = (minutes: number) => `${Math.floor(minutes / 60)}h${min
 
 // ---------- availability ----------
 
-interface Busy { from: number; to: number; team: string | null; region: CrmLocality | null }
+interface Busy { from: number; to: number; team: string | null; region: TeamZone | null }
 
 function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   const out: Busy[] = [];
@@ -189,7 +199,7 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
 /** sameTime: another service of the same zone overlaps this visit (any team): the bot books it only with the owner. */
 export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean; sameTime: boolean }
 
-function slotState(busy: Busy[], teams: readonly string[], region: CrmLocality, from: number, to: number) {
+function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
   const spare = (t: string) => capacity(t) - busy.filter(b => b.team === t && overlaps(b)).length;
@@ -211,7 +221,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: CrmLocality, 
 export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
-  if (!area || area === 'coimbra') return null;
+  if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
@@ -243,7 +253,7 @@ export type AvailabilityResult =
   | { error: string }
   | {
       city: string | null;
-      region: CrmLocality | null;
+      region: TeamZone | null;
       teams: string[];
       durationMin: number;
       /** When set, no hours: the bot hands availability to the owner with this reason. */
@@ -303,7 +313,6 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req?.city !== undefined && typeof req.city !== 'string') return { error: 'city tem de ser texto' };
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
-  if (area === 'coimbra') return { ...base, region: null, teams: [], handToOwner: 'Coimbra e Figueira da Foz ainda não têm calendário de equipa: a disponibilidade é do responsável' };
   if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: 'Disponibilidade sob consulta (deslocação alargada): a data é do responsável' };
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
   const teams = [...TEAMS_BY_REGION[area]];

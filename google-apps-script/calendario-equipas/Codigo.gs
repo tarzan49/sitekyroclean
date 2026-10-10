@@ -22,7 +22,7 @@
 // (latitude, longitude) só decide as moradas fora de todas as regiões
 // (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
 // serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
-// 7 Pavão, 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva) e `corDoCalendario` é a mesma
+// 7 Pavão, 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva, 4 Flamingo) e `corDoCalendario` é a mesma
 // cor no calendário da equipa, para as duas coisas baterem certo.
 // `escrito` é o que o dono escreve depois de "equipa" para escolher a equipa.
 // Desde 29/09/2026 o dono escolhe sempre a equipa, em todas as regiões, pela
@@ -38,6 +38,9 @@ const EQUIPAS = [
   { id: 'lisboa', nome: 'Kyro · Equipa Lisboa 1', escrito: ['lisboa', 'lisboa 1'], regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', nomeDaCor: 'Tangerina', corDoCalendario: '#f4511e' },
   { id: 'lisboa2', nome: 'Kyro · Equipa Lisboa 2', escrito: ['lisboa 2'], regioes: [], base: null, cor: '3', nomeDaCor: 'Uva', corDoCalendario: '#8e24aa' },
   { id: 'algarve', nome: 'Kyro · Equipa Algarve', escrito: ['algarve'], regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', nomeDaCor: 'Banana', corDoCalendario: '#f6bf26' },
+  // Coimbra e Figueira da Foz (dono, 10/10/2026: "cria o calendário da equipa de coimbra"). No CRM continuam
+  // a contar como região Porto, por isso `regioes` fica vazio, como na Porto 2 e na Lisboa 2.
+  { id: 'coimbra', nome: 'Kyro · Equipa Coimbra', escrito: ['coimbra'], regioes: [], base: [40.2033, -8.4103], cor: '4', nomeDaCor: 'Flamingo', corDoCalendario: '#e67c73' },
 ];
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
@@ -494,8 +497,8 @@ function encontrarLugar(texto, lista) {
   return melhor;
 }
 
-const EQUIPA_ESCRITA = /\bequipa\s+(porto|braga|lisboa|algarve)\b/;
-const REGIAO_ESCRITA = { porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve' };
+const EQUIPA_ESCRITA = /\bequipa\s+(porto|braga|lisboa|algarve|coimbra)\b/;
+const REGIAO_ESCRITA = { porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'Porto' };
 
 /**
  * Por esta ordem: "equipa porto" (ou lisboa, braga, algarve) escrito no evento;
@@ -532,7 +535,7 @@ function origemDaRegiao(evento) {
  */
 function equipaEscrita(evento) {
   const texto = normalizar([evento.location, evento.summary, evento.description].filter(Boolean).join('\n'));
-  const escrito = /\bequipa\s+(braga|algarve|(?:porto|lisboa)(?:\s*[12])?)\b/.exec(texto);
+  const escrito = /\bequipa\s+(braga|algarve|coimbra|(?:porto|lisboa)(?:\s*[12])?)\b/.exec(texto);
   if (!escrito) return null;
   const nome = escrito[1].replace(/^(porto|lisboa)\s*([12])$/, '$1 $2');
   return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;

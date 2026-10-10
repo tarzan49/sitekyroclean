@@ -107,12 +107,22 @@ describe('botAvailability', () => {
     expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1', 'Lisboa 2'], sameTime: true, start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
-  it('hands the date to the owner where there is no team calendar or it is "sob consulta"', () => {
-    for (const city of ['Coimbra', 'Figueira da Foz', 'Aveiro', 'Sines', 'Madrid']) {
+  it('hands the date to the owner where there is no team or it is "sob consulta"', () => {
+    for (const city of ['Aveiro', 'Sines', 'Madrid']) {
       const r = ok(botAvailability({ city }, [], NOW));
       expect(r.handToOwner, city).toBeTruthy();
       expect(r.suggestion, city).toBeNull();
     }
+  });
+
+  it('Coimbra and Figueira da Foz book on the Coimbra team (owner, 10 Oct 2026)', () => {
+    const r = ok(botAvailability({ city: 'Figueira da Foz' }, [], NOW));
+    expect(r.teams).toEqual(['Coimbra']);
+    expect(r.handToOwner).toBeNull();
+    expect(r.suggestion).not.toBeNull();
+    // A Coimbra service still without a team busies the Coimbra team, not Porto's.
+    expect(eventRegion(ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Rua X 5, 3000-123 Coimbra', ''))).toBe('Coimbra');
+    expect(eventRegion(ev('2026-10-08', '15:00', '16:00', 'A confirmar · Serviço 45€ (89€) Sofá - Figueira da Foz', ''))).toBe('Coimbra');
   });
 
   it('cancelled and all-day events are ignored; bad input is refused', () => {
@@ -149,10 +159,11 @@ describe('two-person teams and the team the bot books on', () => {
     const far = [lisbon1('09:00', '10:00', 'Ana'), lisbon1('19:00', '20:00', 'Eva'), ev('2026-10-08', '19:00', '20:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
     expect(chooseTeam(far, 'Lisboa', ...at15)).toBe('Lisboa 2');
     expect(chooseTeam([], 'Lisboa', ...at15)).toBe('Lisboa 1');
-    // No room, no team; Coimbra has no team calendar.
+    // No room, no team; Coimbra and Figueira da Foz have their own team (10 Oct 2026).
     const full = [lisbon1('15:00', '16:00', 'Ana'), lisbon1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
     expect(chooseTeam(full, 'Lisboa', ...at15)).toBeNull();
-    expect(chooseTeam([], 'Coimbra', ...at15)).toBeNull();
+    expect(chooseTeam([], 'Coimbra', ...at15)).toBe('Coimbra');
+    expect(chooseTeam([], 'Figueira da Foz', ...at15)).toBe('Coimbra');
   });
 });
 

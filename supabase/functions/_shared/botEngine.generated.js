@@ -573,7 +573,8 @@ var TEAMS_BY_REGION = {
   Porto: ["Porto 1", "Porto 2"],
   Braga: ["Braga"],
   Lisboa: ["Lisboa 1", "Lisboa 2"],
-  Algarve: ["Algarve"]
+  Algarve: ["Algarve"],
+  Coimbra: ["Coimbra"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 var TEAM_CAPACITY = { "Porto 1": 2, "Lisboa 1": 2 };
@@ -584,8 +585,13 @@ var AREA_REGION = {
   braga: "Braga",
   lisboa: "Lisboa",
   algarve: "Algarve",
-  coimbra: "coimbra"
+  coimbra: "Coimbra"
 };
+function zoneFromPostalCode(code) {
+  const n = Number(code.slice(0, 4));
+  if (n >= 3e3 && n < 3100) return "Coimbra";
+  return localityFromPostalCode(code);
+}
 var MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
 var TRAVEL_MARGIN_MIN = 30;
 var EARLIEST_HOUR = 10;
@@ -611,12 +617,11 @@ function eventRegion(e) {
 ${e.description}`;
   const postal = POSTAL.exec(text2);
   if (postal) {
-    const r = localityFromPostalCode(postal[1]);
+    const r = zoneFromPostalCode(postal[1]);
     if (r) return r;
   }
   const folded = fold2(e.summary);
   for (const c of CITY_NAMES) {
-    if (c.region === "coimbra") continue;
     if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`).test(folded)) return c.region;
   }
   return null;
@@ -719,7 +724,7 @@ function slotState(busy, teams, region, from, to) {
 function chooseTeam(events, city, startIso, endIso) {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold2(name)) : void 0;
-  if (!area || area === "coimbra") return null;
+  if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
@@ -768,7 +773,6 @@ function botAvailability(req, events, now) {
   if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   const area = CITY_REGION.get(fold2(city));
-  if (area === "coimbra") return { ...base, region: null, teams: [], handToOwner: "Coimbra e Figueira da Foz ainda não têm calendário de equipa: a disponibilidade é do responsável" };
   if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const teams = [...TEAMS_BY_REGION[area]];
@@ -898,7 +902,7 @@ function planOwnerBooking(req, events) {
   return { ok: true, event: { title: parts.join(" - "), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 6e4).toISOString() } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "7", Braga: "10", "Lisboa 1": "6", "Lisboa 2": "3", Algarve: "5" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "7", Braga: "10", "Lisboa 1": "6", "Lisboa 2": "3", Algarve: "5", Coimbra: "4" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
