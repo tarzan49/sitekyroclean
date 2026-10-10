@@ -249,11 +249,12 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
       if (area === null) return;
       receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${carpetItemMeasure(item)} (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: null, total: null });
     });
-    // Recolha e entrega com a deslocação incluída (dono, 2026-10-05): o único
-    // valor fixo de um pedido de tapetes, pela área somada. Sem recolha, a
-    // deslocação dos tapetes e das alcatifas é sob orçamento.
+    // Recolha e entrega (dono, 2026-10-05; 20€ desde 2026-10-10): o único valor
+    // fixo de um pedido de tapetes. Desde 2026-10-10 já não diz "com a
+    // deslocação": o bot soma-a ao preço em casa, que já a inclui (dono: "sim
+    // tira"). A deslocação dos tapetes e das alcatifas é sob orçamento.
     const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
-    if (pickupFee !== null) receiptLines.push({ label: 'Recolha, entrega e deslocação (até 4 dias úteis)', qty: 1, unitPrice: pickupFee, total: pickupFee });
+    if (pickupFee !== null) receiptLines.push({ label: 'Recolha e entrega (até 4 dias úteis)', qty: 1, unitPrice: pickupFee, total: pickupFee });
     else if (finalLocation) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: null, total: null });
   }
 

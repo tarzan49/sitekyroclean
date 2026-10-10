@@ -7,7 +7,8 @@ interface QuizEstimateProps {
   location: string;
   travelCost?: number;
   // Tapetes e alcatifas (2026-10-05): com recolha, a linha da deslocação passa a
-  // "Recolha, entrega e deslocação"; em casa, a deslocação é sob orçamento.
+  // "Recolha e entrega" (até 2026-10-10 "Recolha, entrega e deslocação"); em
+  // casa, a deslocação é sob orçamento.
   travelRowLabel?: string;
   travelOnQuote?: boolean;
 }

@@ -625,7 +625,7 @@ ${formData.description || 'Sem observações adicionais'}
             <QuizEstimate
               totalPrice={totalPrice}
               travelCost={rugPickupCost ?? finalTravelCost}
-              travelRowLabel={rugPickupCost !== null ? 'Recolha, entrega e deslocação' : undefined}
+              travelRowLabel={rugPickupCost !== null ? 'Recolha e entrega' : undefined}
               travelOnQuote={rugTravelOnQuote}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
               // Só a deslocação quando nada mais tem preço: um extra do ecrã

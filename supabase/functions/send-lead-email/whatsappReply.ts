@@ -110,7 +110,7 @@ export function detailLines(details: string | undefined): string[] {
     });
 }
 
-const pickupOf = (details: string | undefined) => /Recolha, entrega e deslocação/.test(details ?? "");
+const pickupOf = (details: string | undefined) => /Recolha(?:, entrega e deslocação| e entrega)/.test(details ?? "");
 
 export function buildWhatsAppMessage(lead: Record<string, string>): string {
   const items = leadItems(lead.service ?? "", lead.service_type ?? "");

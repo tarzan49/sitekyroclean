@@ -1248,7 +1248,7 @@ function describeQuizOrder(row) {
     const rug = rugs[rugIndex++];
     return rug ? `1x ${rugLine(rug, rugIndex - 1)}: sob orçamento` : line;
   });
-  const pickup = /Recolha, entrega e deslocação/.test(details);
+  const pickup = /Recolha(?:, entrega e deslocação| e entrega)/.test(details);
   return {
     source: "details",
     items,
