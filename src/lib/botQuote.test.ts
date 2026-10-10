@@ -62,8 +62,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).rugPickup).toBeNull();
   });
 
-  it('hands to the owner: rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs, unknown or case-by-case localities', () => {
-    expect(ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Porto' }).handToOwner).toBe(true);
+  it('hands to the owner: delicate rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs, unknown or case-by-case localities', () => {
+    expect(ok({ items: [{ kind: 'rug', width: 2, length: 3, material: 'lã' }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);
     for (const treatment of ['clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium']) {
       const r = ok({ items: [{ kind: 'sofa', size: '5-lugares', treatment }], city: 'Porto' });

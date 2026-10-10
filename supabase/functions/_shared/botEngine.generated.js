@@ -170,6 +170,9 @@ function sofaAntiAcarosPrice(sizeId) {
 function chairAntiAcarosTotal(qty) {
   return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_ANTI_ACAROS_UNIT_PRICE : null;
 }
+function mattressAntiAcarosPrice(option2) {
+  return typeof option2.cleaningPrice === "number" && typeof option2.bothPrice === "number" ? option2.bothPrice - option2.cleaningPrice : null;
+}
 
 // src/constants/packPerks.ts
 var PACK_PERK_MIN_ORDER = 100;
@@ -241,30 +244,30 @@ function rugSide(raw) {
 var formatMeters = (m) => String(Number(m.toFixed(2))).replace(".", ",");
 
 // src/components/quiz/quizHelpers.ts
-function calcPackPricing(option, packOn, isWaterproofBase, fallbackDelta = null, tier = "essencial") {
+function calcPackPricing(option2, packOn, isWaterproofBase, fallbackDelta = null, tier = "essencial") {
   const isPremium = tier === "premium";
-  const isSob = typeof option.cleaningPrice !== "number";
-  const cleanPrice = typeof option.cleaningPrice === "number" ? option.cleaningPrice : null;
-  const waterPrice = typeof option.waterproofingPrice === "number" ? option.waterproofingPrice : null;
-  const waterPremiumPrice = typeof option.waterproofingPremiumPrice === "number" ? option.waterproofingPremiumPrice : null;
+  const isSob = typeof option2.cleaningPrice !== "number";
+  const cleanPrice = typeof option2.cleaningPrice === "number" ? option2.cleaningPrice : null;
+  const waterPrice = typeof option2.waterproofingPrice === "number" ? option2.waterproofingPrice : null;
+  const waterPremiumPrice = typeof option2.waterproofingPremiumPrice === "number" ? option2.waterproofingPremiumPrice : null;
   const basePrice = isWaterproofBase ? isPremium ? waterPremiumPrice : waterPrice : cleanPrice;
-  const tierDelta = isPremium ? typeof option.packPremiumDelta === "number" ? option.packPremiumDelta : waterPremiumPrice !== null && waterPrice !== null ? waterPremiumPrice - waterPrice : 0 : 0;
-  const bothEssencial = typeof option.bothPrice === "number" ? option.bothPrice : fallbackDelta !== null && cleanPrice !== null ? cleanPrice + fallbackDelta : null;
-  const upsellDiscount = option.waterproofingUpsellDiscount ?? 0;
+  const tierDelta = isPremium ? typeof option2.packPremiumDelta === "number" ? option2.packPremiumDelta : waterPremiumPrice !== null && waterPrice !== null ? waterPremiumPrice - waterPrice : 0 : 0;
+  const bothEssencial = typeof option2.bothPrice === "number" ? option2.bothPrice : fallbackDelta !== null && cleanPrice !== null ? cleanPrice + fallbackDelta : null;
+  const upsellDiscount = option2.waterproofingUpsellDiscount ?? 0;
   const packPrice = bothEssencial !== null ? bothEssencial + tierDelta - upsellDiscount : null;
   const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : fallbackDelta;
   const displayPrice = packOn ? packPrice : basePrice;
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
-function calcSofaUnitPrice(option, treated, serviceType, tier, antiAcaros) {
+function calcSofaUnitPrice(option2, treated, serviceType, tier, antiAcaros) {
   if (treated && antiAcaros && serviceType !== "waterproofing") {
-    const extra = sofaAntiAcarosPrice(option.id);
-    return typeof option.cleaningPrice === "number" && extra !== null ? option.cleaningPrice + extra : null;
+    const extra = sofaAntiAcarosPrice(option2.id);
+    return typeof option2.cleaningPrice === "number" && extra !== null ? option2.cleaningPrice + extra : null;
   }
-  return calcPackPricing(option, treated, serviceType === "waterproofing", null, tier).displayPrice;
+  return calcPackPricing(option2, treated, serviceType === "waterproofing", null, tier).displayPrice;
 }
-function calcMattressUnitPrice(option, treated, serviceType) {
-  const price = treated ? option.bothPrice : serviceType === "waterproofing" ? option.waterproofingPrice : option.cleaningPrice;
+function calcMattressUnitPrice(option2, treated, serviceType) {
+  const price = treated ? option2.bothPrice : serviceType === "waterproofing" ? option2.waterproofingPrice : option2.cleaningPrice;
   return typeof price === "number" ? price : null;
 }
 function calcChairClean(qty) {
@@ -292,14 +295,14 @@ function packItemValid(item) {
 var PERK_TREATMENT = { none: "none", premium: "waterproofing", essencial: "waterproofing", "anti-acaros": "anti-acaros" };
 function customPackLine(item) {
   const options = item.kind === "sofa" ? sofaPrices : mattressPrices;
-  const option = options.find((p) => p.id === item.size);
+  const option2 = options.find((p) => p.id === item.size);
   let amount2 = null;
-  const size = item.kind === "rug" || item.kind === "carpet" ? `${item.width} × ${item.length} m` : item.kind === "chairs" ? `${item.qty} unidades` : option?.label ?? "Tamanho a confirmar";
+  const size = item.kind === "rug" || item.kind === "carpet" ? `${item.width} × ${item.length} m` : item.kind === "chairs" ? `${item.qty} unidades` : option2?.label ?? "Tamanho a confirmar";
   const waterproofingOnly = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly && item.kind === "chairs") {
     amount2 = (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
-  } else if (waterproofingOnly && option) {
-    const unit = calcSofaUnitPrice(option, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
+  } else if (waterproofingOnly && option2) {
+    const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
     amount2 = calcChairClean(item.qty);
@@ -308,11 +311,11 @@ function customPackLine(item) {
       if (item.extra === "essencial") amount2 += calcChairWaterproof(item.qty) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
     }
-  } else if (item.kind === "sofa" && option) {
-    const unit = calcSofaUnitPrice(option, item.extra !== "none", "cleaning", item.extra === "premium" ? "premium" : "essencial", item.extra === "anti-acaros");
+  } else if (item.kind === "sofa" && option2) {
+    const unit = calcSofaUnitPrice(option2, item.extra !== "none", "cleaning", item.extra === "premium" ? "premium" : "essencial", item.extra === "anti-acaros");
     amount2 = unit === null ? null : unit * item.qty;
-  } else if (item.kind === "mattress" && option) {
-    const unit = calcMattressUnitPrice(option, item.extra === "anti-acaros", "cleaning");
+  } else if (item.kind === "mattress" && option2) {
+    const unit = calcMattressUnitPrice(option2, item.extra === "anti-acaros", "cleaning");
     amount2 = unit === null ? null : unit * item.qty;
   }
   return {
@@ -392,6 +395,100 @@ var SERVICE_CONDITIONS = [
   TREATMENT_EXTRAS
 ];
 
+// src/data/enginePrices.ts
+function formatEuro(value) {
+  return Number.isInteger(value) ? `${value}€` : `${value.toFixed(2).replace(".", ",")}€`;
+}
+function option(options, id, table) {
+  const found = options.find((item) => item.id === id);
+  if (!found) throw new Error(`enginePrices: "${id}" não existe em ${table}`);
+  return found;
+}
+function cheapest(options, field, table) {
+  const values = options.map((item) => item[field]).filter((value) => typeof value === "number");
+  if (!values.length) throw new Error(`enginePrices: ${table} não tem nenhum ${String(field)} numérico`);
+  return Math.min(...values);
+}
+var required = (value, what) => {
+  if (value === null) throw new Error(`enginePrices: o motor deixou de ter preço para ${what}`);
+  return value;
+};
+var SOFA_CLEANING_FROM = cheapest(sofaPrices, "cleaningPrice", "sofaPrices");
+var MATTRESS_CLEANING_FROM = cheapest(mattressPrices, "cleaningPrice", "mattressPrices");
+var CHAIR_CLEANING_FROM = required(calcChairClean(1), "uma cadeira");
+var SOFA_WATERPROOF_ESSENCIAL_FROM = cheapest(sofaPrices, "waterproofingPrice", "sofaPrices");
+var SOFA_WATERPROOF_PREMIUM_FROM = cheapest(sofaPrices, "waterproofingPremiumPrice", "sofaPrices");
+var sofaPack = calcPackPricing(option(sofaPrices, "1-lugar", "sofaPrices"), true, false);
+var SOFA_CLEAN_AND_PROTECT_FROM = required(sofaPack.packPrice, "limpeza + impermeabilização");
+var SOFA_PROTECT_WITH_CLEANING_FROM = required(sofaPack.packDelta, "a impermeabilização acrescentada à limpeza");
+var mattressSingle = option(mattressPrices, "solteiro", "mattressPrices");
+var MATTRESS_ANTI_MITE_WITH_CLEANING_FROM = required(mattressAntiAcarosPrice(mattressSingle), "o anti-ácaros acrescentado à limpeza do colchão");
+var MATTRESS_CLEAN_AND_ANTI_MITE_FROM = MATTRESS_CLEANING_FROM + MATTRESS_ANTI_MITE_WITH_CLEANING_FROM;
+var SOFA_ANTI_MITE_WITH_CLEANING_FROM = Math.min(...Object.values(SOFA_ANTI_ACAROS_PRICE));
+var priced = (value, what) => required(typeof value === "number" ? value : null, what);
+function sofaCleaningPrice(id) {
+  return priced(option(sofaPrices, id, "sofaPrices").cleaningPrice, `a limpeza do sofá "${id}"`);
+}
+function chairCleaningTiers() {
+  const tiers = [];
+  let qty = 1;
+  for (; qty < 100; qty++) {
+    const total = calcChairClean(qty);
+    if (total === null) break;
+    const unit = Math.round((total - (calcChairClean(qty - 1) ?? 0)) * 100) / 100;
+    const last = tiers[tiers.length - 1];
+    if (last && last.unit === unit) last.last = qty;
+    else tiers.push({ first: qty, last: qty, unit });
+  }
+  return { tiers, quoteFrom: qty };
+}
+var chairUnits = chairCleaningTiers().tiers.map((tier) => tier.unit);
+var CHAIR_UNIT_MIN = Math.min(...chairUnits);
+var CHAIR_UNIT_MAX = Math.max(...chairUnits);
+var CHAIR_PRICE_LABEL = `Desde ${formatEuro(CHAIR_UNIT_MIN)}`;
+var CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
+
+// src/lib/botRugEstimate.ts
+var RUG_RATE_COMMON = 10;
+var RUG_RATE_NATURAL = 12;
+var RUG_ESTIMATE_MIN_AREA_M2 = 3;
+var RUG_VISIT_SOFA_PRICE = 70;
+var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
+var DELICATE = /\b(la|lan|wool|seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
+function rugMaterialClass(material) {
+  if (typeof material !== "string" || !material.trim()) return "common";
+  const m = fold(material);
+  if (DELICATE.test(m)) return "delicate";
+  if (NATURAL.test(m)) return "natural";
+  return "common";
+}
+var roundToNine = (value) => Math.max(9, Math.round((value - 9) / 10) * 10 + 9);
+function rugEstimate(rugs, city) {
+  if (!rugs.length) return { ok: false, reason: "sem tapetes" };
+  if (!city || !(city in locationPrices)) return { ok: false, reason: "localidade não servida" };
+  const classes = rugs.map((r) => rugMaterialClass(r.material));
+  if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
+  const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
+  if (areaM2 < RUG_ESTIMATE_MIN_AREA_M2) return { ok: false, reason: `menos de ${RUG_ESTIMATE_MIN_AREA_M2} m² no total: o responsável dá o preço` };
+  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
+  const travelFee = locationPrices[city];
+  const homePrice = roundToNine(washing + travelFee);
+  const pickupFee = rugPickupFee(areaM2);
+  return {
+    ok: true,
+    areaM2,
+    ratePerM2: [...new Set(classes.map((c) => c === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON))],
+    travelFee,
+    homePrice,
+    pickupFee,
+    pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
+    sofaUpsellPrice: RUG_VISIT_SOFA_PRICE,
+    sofaUsualPrice: sofaCleaningPrice("3-lugares") + travelFee,
+    rule: "Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice."
+  };
+}
+
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
 var KINDS = ["sofa", "mattress", "chairs", "rug", "carpet"];
@@ -404,10 +501,10 @@ var TREATMENT_TO_ITEM = {
   essencial: { extra: "essencial", primary: "waterproofing" },
   premium: { extra: "premium", primary: "waterproofing" }
 };
-var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase().replace(/\s+/g, " ");
-var CITY_BY_FOLDED = new Map(Object.keys(locationPrices).map((name) => [fold(name), name]));
+var fold2 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase().replace(/\s+/g, " ");
+var CITY_BY_FOLDED = new Map(Object.keys(locationPrices).map((name) => [fold2(name), name]));
 function resolveBotCity(input) {
-  return typeof input === "string" ? CITY_BY_FOLDED.get(fold(input)) ?? null : null;
+  return typeof input === "string" ? CITY_BY_FOLDED.get(fold2(input)) ?? null : null;
 }
 function listBotCities() {
   return Object.entries(locationPrices).map(([name, travelFee]) => ({ name, travelFee, extendedTrip: EXTENDED_TRIP_CITIES.has(name) }));
@@ -463,6 +560,9 @@ function botQuote(input) {
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? "");
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  const rugsOnly = items.every((i) => i.kind === "rug");
+  const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
+  const rugPriced = rugPrice?.ok === true;
   return {
     ok: true,
     city,
@@ -482,8 +582,9 @@ function botQuote(input) {
     travel: result.travel,
     total: result.total,
     quote: result.quote,
-    handToOwner: result.quote || city === null || extendedTrip,
-    rugPickup: rugPickupFor(items)
+    handToOwner: result.quote && !rugPriced || city === null || extendedTrip,
+    rugPickup: rugPickupFor(items),
+    rugEstimate: rugPrice
   };
 }
 
@@ -617,17 +718,17 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
-var fold2 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
-var CITY_REGION = new Map(cities.map((c) => [fold2(c.name), AREA_REGION[c.area]]));
-var CITY_NAMES = cities.map((c) => ({ key: fold2(c.name), region: AREA_REGION[c.area] })).filter((c) => c.key.length >= 4).sort((a, b) => b.key.length - a.key.length);
+var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+var CITY_REGION = new Map(cities.map((c) => [fold3(c.name), AREA_REGION[c.area]]));
+var CITY_NAMES = cities.map((c) => ({ key: fold3(c.name), region: AREA_REGION[c.area] })).filter((c) => c.key.length >= 4).sort((a, b) => b.key.length - a.key.length);
 var SERVICE_LIKE = /^(servico|limpeza|pre-? ?reserva|a confirmar)\b/;
 var TEAM_LINE = /^\s*Equipa:\s*([^\n<]*)/im;
 var POSTAL = /\b(\d{4})-\d{3}\b/;
 function eventTeam(e) {
   const t = TEAM_LINE.exec(e.description ?? "")?.[1];
   if (!t) return null;
-  const k = fold2(t);
-  return ALL_TEAMS.find((team) => fold2(team) === k) ?? null;
+  const k = fold3(t);
+  return ALL_TEAMS.find((team) => fold3(team) === k) ?? null;
 }
 function eventRegion(e) {
   const text2 = `${e.summary}
@@ -637,7 +738,7 @@ ${e.description}`;
     const r = zoneFromPostalCode(postal[1]);
     if (r) return r;
   }
-  const folded = fold2(e.summary);
+  const folded = fold3(e.summary);
   for (const c of CITY_NAMES) {
     if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`).test(folded)) return c.region;
   }
@@ -721,7 +822,7 @@ function busyIntervals(events) {
       out.push({ from, to, team, region: null });
       continue;
     }
-    if (!SERVICE_LIKE.test(fold2(e.summary))) continue;
+    if (!SERVICE_LIKE.test(fold3(e.summary))) continue;
     const region = eventRegion(e);
     if (region) out.push({ from, to, team: null, region });
   }
@@ -740,7 +841,7 @@ function slotState(busy, teams, region, from, to) {
 }
 function chooseTeam(events, city, startIso, endIso) {
   const name = resolveBotCity(city);
-  const area = name ? CITY_REGION.get(fold2(name)) : void 0;
+  const area = name ? CITY_REGION.get(fold3(name)) : void 0;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
@@ -789,7 +890,7 @@ function botAvailability(req, events, now) {
   const base = { city, durationMin, suggestion: null, requested: null, free: [] };
   if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
-  const area = CITY_REGION.get(fold2(city));
+  const area = CITY_REGION.get(fold3(city));
   if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const teams = [...TEAMS_BY_REGION[area]];
@@ -965,7 +1066,7 @@ function planBotBooking(req, events, now, ownEventId) {
 }
 
 // src/lib/agendaCheck.ts
-var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+var fold4 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 var SERVICE = /^(servico|limpeza)\b/;
 var PENDING = /^(pre-? ?reserva|a confirmar)\b/;
 var AMOUNT = /\d+(?:[.,]\d{1,2})?\s*€/;
@@ -980,7 +1081,7 @@ var timed = (events) => events.flatMap((e) => {
   if (!Number.isFinite(from)) return [];
   const end = e.end ? Date.parse(e.end) : NaN;
   const to = Number.isFinite(end) && end > from ? end : from + 60 * 6e4;
-  return [{ e, from, to, team: eventTeam(e), summary: fold3(e.summary) }];
+  return [{ e, from, to, team: eventTeam(e), summary: fold4(e.summary) }];
 });
 function serviceWhat(summary) {
   const head = summary.split(/\s+[-–]\s+/)[0] ?? "";
@@ -991,10 +1092,10 @@ function missingData(e) {
   const text2 = `${e.summary}
 ${e.description ?? ""}`;
   const out = [];
-  if (!AMOUNT.test(e.summary) && !FREE.test(fold3(e.summary))) out.push("sem valor no título");
+  if (!AMOUNT.test(e.summary) && !FREE.test(fold4(e.summary))) out.push("sem valor no título");
   const withoutAmounts = text2.replace(/\d+(?:[.,]\d{1,2})?\s*€/g, " ");
   if (!PHONE.test(withoutAmounts)) out.push("sem telefone");
-  const segments = e.summary.split(/\s+[-–]\s+/).slice(1).map(fold3);
+  const segments = e.summary.split(/\s+[-–]\s+/).slice(1).map(fold4);
   const hasStreet = POSTAL2.test(text2) || segments.some((s) => STREET.test(s) && /\d/.test(s.replace(PHONE, "")));
   if (!hasStreet) out.push("morada sem rua e número nem código postal");
   return out;

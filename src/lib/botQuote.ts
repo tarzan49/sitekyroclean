@@ -17,6 +17,7 @@ import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
+import { rugEstimate } from './botRugEstimate';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -93,7 +94,8 @@ function rugPickupFor(items: CustomPackItem[]) {
 
 /**
  * `handToOwner` is true whenever the bot must not close the price itself: an
- * item "sob orçamento" (rugs, carpets, 4+ seats, 10+ chairs), a locality that
+ * item "sob orçamento" (carpets, 4+ seats, 10+ chairs, rugs the bot cannot price
+ * by rule: see botRugEstimate), a locality that
  * is not served, or one where availability is confirmed case by case.
  */
 export function botQuote(input: unknown) {
@@ -110,6 +112,13 @@ export function botQuote(input: unknown) {
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
+  // Anything mixed with other items still goes to the owner.
+  const rugsOnly = items.every(i => i.kind === 'rug');
+  const rugPrice = rugsOnly
+    ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawItems[n] as Record<string, unknown>).material })), city)
+    : null;
+  const rugPriced = rugPrice?.ok === true;
   return {
     ok: true as const,
     city,
@@ -129,7 +138,8 @@ export function botQuote(input: unknown) {
     travel: result.travel,
     total: result.total,
     quote: result.quote,
-    handToOwner: result.quote || city === null || extendedTrip,
+    handToOwner: (result.quote && !rugPriced) || city === null || extendedTrip,
     rugPickup: rugPickupFor(items),
+    rugEstimate: rugPrice,
   };
 }
