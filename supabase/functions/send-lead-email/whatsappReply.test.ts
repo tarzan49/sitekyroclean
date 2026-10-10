@@ -50,3 +50,11 @@ Deno.test("com details: cada artigo com o que a pessoa escolheu, sem preços", (
     "Tem fotografias do sofá, do colchão e do tapete?",
   ]);
 });
+
+Deno.test("recolha com a etiqueta de 10/10 ('Recolha e entrega'): uma só linha", () => {
+  const msg = buildWhatsAppMessage({
+    name: "Ana", service: "Tapete", service_type: "Higienização Profunda", location: "Porto",
+    details: "1x Tapete 1: 2,3 × 1,6 m (3,68 m²): Sob orçamento\n1x Recolha e entrega (até 4 dias úteis): 20€",
+  });
+  assertEquals(msg.split("\n\n")[2], "• Tapete de 2,3 × 1,6 m (3,68 m²)\n• Com recolha e entrega");
+});

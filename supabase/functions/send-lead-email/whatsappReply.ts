@@ -94,7 +94,7 @@ const LOCATION_PREPOSITION: Record<string, string> = {
  */
 export function detailLines(details: string | undefined): string[] {
   return (details ?? "").split("\n").map(l => l.trim()).filter(Boolean)
-    .filter(l => !/^\d+x (Deslocação|Recolha, entrega)/.test(l))
+    .filter(l => !/^\d+x (Deslocação|Recolha(, entrega| e entrega))/.test(l))
     .map(l => {
       const m = /^(\d+)x (.*?)(?::\s*(?:\d[\d.,]*\s?€|Sob orçamento))?$/i.exec(l);
       if (!m) return l;
