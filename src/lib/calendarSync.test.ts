@@ -29,6 +29,13 @@ describe('planCalendarSync', () => {
     });
   });
 
+  it('closes on the last change when the event only became a service later (A confirmar, Pré-reserva)', () => {
+    const late = event('e1', { created: '2026-10-10T22:02:03Z', updated: '2026-10-11T15:38:14Z' });
+    expect(plan([], [late]).inserts[0].booked_at).toBe('2026-10-11T15:38:14Z');
+    const repainted = event('e2', { created: '2026-10-10T22:02:03Z', updated: '2026-10-10T22:02:40Z' });
+    expect(plan([], [repainted]).inserts[0].booked_at).toBe('2026-10-10T22:02:03Z');
+  });
+
   it('ignores reminders, cancelled events and events created before the start', () => {
     const { inserts } = plan([], [
       event('reminder', { summary: 'Ligar Ana 912 345 678 follow up 89€' }),

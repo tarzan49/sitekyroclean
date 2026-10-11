@@ -3,6 +3,11 @@
 //
 // Regras:
 // - Evento de serviço novo → linha nova, com a data de fecho = criação do evento.
+//   Se o evento nasceu como outra coisa ("A confirmar · ", "Pré-reserva") e só
+//   mais de uma hora depois passou a "Serviço", o fecho é a última alteração
+//   (dono, 2026-10-11: um "A confirmar" de sábado à noite fechado no domingo
+//   contava no sábado). O CRM só vê o título de agora, por isso a mudança para
+//   "Serviço" é a última alteração que se conhece.
 // - Evento editado no calendário depois da última sincronização → a linha é
 //   atualizada. Uma edição feita no CRM mantém-se até o evento voltar a ser
 //   editado: ganha a alteração mais recente. O "pago" nunca é tocado, e a
@@ -79,6 +84,14 @@ export interface SyncPlan {
 
 const time = (iso: string | null) => (iso ? Date.parse(iso) : NaN);
 
+/** Margem para as alterações do script das equipas logo a seguir à criação (cor, linha "Equipa:"). */
+const LATE_SERVICE_MS = 60 * 60 * 1000;
+
+/** Data de fecho de um serviço que entra agora no CRM. */
+export function closingDateOf(event: CalendarEvent): string {
+  return time(event.updated) - time(event.created) > LATE_SERVICE_MS ? event.updated : event.created;
+}
+
 export function planCalendarSync(
   rows: SyncableRow[],
   events: CalendarEvent[],
@@ -112,7 +125,7 @@ export function planCalendarSync(
     if (!row) {
       plan.inserts.push({
         ...parsed,
-        booked_at: event.created,
+        booked_at: closingDateOf(event),
         calendar_event_id: event.id,
         calendar_updated_at: event.updated,
         source,
