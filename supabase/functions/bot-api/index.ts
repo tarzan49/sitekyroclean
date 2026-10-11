@@ -38,6 +38,19 @@
 //               a team block) and the pre-bookings still open, with a message
 //               ready for the owner (2026-10-09, src/lib/agendaCheck.ts).
 //               Times, teams and the service only: no name, phone or address.
+//   label-facts for each phone the bot asks about (at most 800, by their last 9
+//               digits), the latest past service, the next service and the
+//               next "Pré-reserva"/"A confirmar" in the owner's calendar
+//               (2026-10-11, src/lib/labelFacts.ts). A service is what the CRM
+//               and the team calendars count ("Serviço …", or "Limpeza" with
+//               euros); "A confirmar · Serviço" is pending. Phone jids only: a
+//               "@lid" or a group is skipped (its digits are not a phone), and so
+//               the bot sends the chat's phone jid. The bot server's label
+//               watcher (kyro-bot src/bot/labelWatch.ts) fixes "Por marcar
+//               serviço", "Serviço Marcado" and "Concluído" from it. Dates and the
+//               kind only: no name, address or event title. This is the only
+//               action whose body may pass 20 KB (up to 40 KB, so 800 phones fit
+//               in any format); the bot server sends batches of 300 anyway.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -48,7 +61,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, botAvailability, botQuote, describeQuizOrder, isTestOrder, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, botAvailability, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -58,6 +71,14 @@ import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, valida
 const RATE_LIMIT_MAX = 300;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
 const MAX_BODY_BYTES = 20_000;
+/**
+ * `label-facts` takes up to 800 phones. 800 digits-only phones fit in 20 KB, but
+ * 800 jids ("351912345678@s.whatsapp.net") or phones written with spaces do not:
+ * 800 × (40 characters, the phone limit, + quotes and comma) ≈ 34 KB. Only that
+ * action may go this far; every other action keeps the 20 KB limit.
+ */
+const LABEL_FACTS_MAX_BODY_BYTES = 40_000;
+const LABEL_FACTS_MAX_PHONES = 800;
 const AD_ORIGINS: Record<string, string> = { google: "Google", facebook: "Facebook", instagram: "Instagram" };
 const LIMITS = { name: 120, phone: 40, service: 120, details: 4000, location: 120 } as const;
 
@@ -312,7 +333,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
   }
 
   const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) return createErrorResponse("Pedido demasiado grande", 413);
+  if (raw.length > LABEL_FACTS_MAX_BODY_BYTES) return createErrorResponse("Pedido demasiado grande", 413);
   let body: Row;
   try {
     const parsed = JSON.parse(raw);
@@ -321,6 +342,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
   } catch {
     return createErrorResponse("O corpo tem de ser um objeto JSON", 400);
   }
+  if (raw.length > MAX_BODY_BYTES && body.action !== "label-facts") return createErrorResponse("Pedido demasiado grande", 413);
 
   switch (body.action) {
     case "quote": {
@@ -348,6 +370,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
     }
+    case "label-facts":
+      if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
+      return await labelFactsFor(body, env);
     case "agenda-check": {
       if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
       const cal = await env.calendar();
@@ -377,8 +402,41 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
+}
+
+const PHONE_JID = /@(s\.whatsapp\.net|c\.us)$/i;
+/**
+ * The last 9 digits of a phone, or null. A phone jid gives its number (without
+ * the ":device" part); a "@lid", a group or anything else with "@" is not a
+ * phone, and its digits would match someone else's number.
+ */
+function factsKey(value: string): string | null {
+  if (value.length > LIMITS.phone) return null;
+  const at = value.indexOf("@");
+  if (at >= 0 && !PHONE_JID.test(value)) return null;
+  const key = lastNine(at >= 0 ? value.slice(0, at).split(":")[0] : value);
+  return key.length === 9 ? key : null;
+}
+
+/**
+ * For the bot server's label watcher (owner, 11 Oct 2026: "um bot dentro do bot
+ * que constantemente esteja a vigiar as etiquetas"): per phone, the dates of the
+ * latest past service, the next service and the next pre-booking. Includes the
+ * bot's own bookings of the last hours that Google's feed does not show yet.
+ */
+async function labelFactsFor(body: Row, env: BotEnv): Promise<Response> {
+  const phones = body.phones;
+  if (!Array.isArray(phones)) return createErrorResponse("label-facts precisa de phones (lista de telefones)", 400);
+  if (phones.length > LABEL_FACTS_MAX_PHONES) return createErrorResponse(`label-facts aceita no máximo ${LABEL_FACTS_MAX_PHONES} telefones por pedido`, 400);
+  if (phones.some(p => typeof p !== "string")) return createErrorResponse("cada telefone tem de ser texto", 400);
+  const keys = [...new Set((phones as string[]).map(factsKey).filter((k): k is string => k !== null))];
+  if (keys.length === 0) return createSuccessResponse({ facts: {} });
+  const cal = await env.calendar!();
+  if ("error" in cal) return createErrorResponse(cal.error, 502);
+  const now = env.now?.() ?? new Date();
+  return createSuccessResponse({ facts: labelFacts(keys, await withRecentHolds(cal.events, env.holds, now), now) });
 }
 
 /** AAAA-MM-DD in Portugal. */

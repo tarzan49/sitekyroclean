@@ -263,6 +263,70 @@ Deno.test("agenda-check reports tomorrow's problems without client data", async 
   assertEquals((await calendarCall({ action: "agenda-check" }, null)).status, 503);
 });
 
+Deno.test("label-facts gives past, next and pending dates by the phone's last 9 digits, never titles or names", async () => {
+  // Invented data only: the repo is public. Calendar "now" is 7 Oct 2026, 09:45 in Portugal.
+  const ev = (id: string, start: string, summary: string, extra: Record<string, string> = {}) => ({
+    id, summary, description: "", location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED",
+    start, end: null, ...extra,
+  });
+  const events = [
+    ev("a", "2026-09-20T09:00:00Z", "Serviço 45€ (89€) Sofá - \u202a+351 912 345 678\u202c - Cliente Inventado - Rua X 1, 4000-123 Porto"),
+    ev("b", "2026-10-09T13:00:00Z", "Serviço 30€ (59€) Colchão - 912.345.678 - Cliente Inventado - Rua X 1"),
+    ev("c", "2026-10-08T09:00:00Z", "Pré-reserva – Outro Inventado – Gaia – sofá – 89€ – 913 000 111"),
+    ev("d", "2026-10-08T09:00:00Z", "Serviço 45€ (89€) Sofá - 914 222 333", { status: "CANCELLED" }),
+    ev("e", "2026-10-08T09:00:00Z", "Voo para o Porto - 915 444 555"),
+  ];
+  const res = await calendarCall({
+    action: "label-facts",
+    phones: ["351912345678@s.whatsapp.net", "351913000111:7@s.whatsapp.net", "914222333", "+351 915 444 555", "912345678123456@lid", "1234", "120363000000000000@g.us"],
+  }, () => Promise.resolve({ events }));
+  assertEquals(res.status, 200);
+  const text = await res.text();
+  for (const secret of ["Inventado", "Rua", "Serviço", "Gaia", "€"]) assert(!text.includes(secret), secret);
+  assertEquals(JSON.parse(text).facts, {
+    "912345678": { past: "2026-09-20", next: "2026-10-09", pending: null },
+    "913000111": { past: null, next: null, pending: "2026-10-08" },
+  });
+  // A lid or a group whose digits end like a client's phone is not that client.
+  const lids = await calendarCall({ action: "label-facts", phones: ["100000912345678@lid", "120363000913000111@g.us"] }, () => Promise.resolve({ events }));
+  assertEquals((await lids.json()).facts, {});
+});
+
+Deno.test("label-facts sees the bot's own booking before Google's feed shows it", async () => {
+  const holds: HoldStore = {
+    get: () => Promise.resolve(null),
+    recent: () => Promise.resolve([{ conversation_id: "conv", event_id: "new", title: "Serviço 45€ (89€) Sofá - 916 777 888 - Inventado - Rua Y 2", starts_at: "2026-10-12T09:00:00Z", ends_at: "2026-10-12T10:00:00Z", updated_at: "2026-10-07T08:30:00Z", released_at: null }]),
+    save: () => Promise.resolve(null),
+    release: () => Promise.resolve(null),
+  };
+  const res = await handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.1.${++ip % 250}` },
+      body: JSON.stringify({ action: "label-facts", phones: ["916777888"] }),
+    }),
+    { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events: [] }), holds, now: () => new Date("2026-10-07T08:45:00Z") },
+  );
+  assertEquals((await res.json()).facts, { "916777888": { past: null, next: "2026-10-12", pending: null } });
+});
+
+Deno.test("label-facts takes 800 phones in any format, and only that action may pass 20 KB", async () => {
+  const phones = Array.from({ length: 800 }, (_, i) => `3519${String(10_000_000 + i).padStart(8, "0")}:12@s.whatsapp.net`);
+  const big = JSON.stringify({ action: "label-facts", phones });
+  assert(big.length > 20_000 && big.length < 40_000, String(big.length));
+  const ok = await calendarCall({ action: "label-facts", phones }, () => Promise.resolve({ events: [] }));
+  assertEquals([ok.status, (await ok.json()).facts], [200, {}]);
+  assertEquals((await calendarCall({ action: "cities", padding: "x".repeat(25_000) }, null)).status, 413);
+  assertEquals((await calendarCall({ action: "label-facts", phones: phones.concat(["912345678"]) }, () => Promise.resolve({ events: [] }))).status, 400);
+  assertEquals((await calendarCall({ action: "label-facts", phones: "912345678" }, () => Promise.resolve({ events: [] }))).status, 400);
+  assertEquals((await calendarCall({ action: "label-facts", phones: [912345678] }, () => Promise.resolve({ events: [] }))).status, 400);
+  assertEquals((await calendarCall({ action: "label-facts", phones: ["912345678"] }, () => Promise.resolve({ error: "O calendário veio vazio" }))).status, 502);
+  assertEquals((await calendarCall({ action: "label-facts", phones: ["912345678"] }, null)).status, 503);
+  // Nothing that is a phone: no need to read the calendar at all.
+  const none = await calendarCall({ action: "label-facts", phones: ["123@lid", "abc"] }, () => Promise.resolve({ error: "não devia ser lido" }));
+  assertEquals([none.status, (await none.json()).facts], [200, {}]);
+});
+
 // Pre-bookings (2026-10-08): a fake table and a fake Apps Script.
 function fakeHolds() {
   const rows = new Map<string, HoldRow>();

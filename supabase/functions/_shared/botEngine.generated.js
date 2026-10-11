@@ -683,6 +683,7 @@ function localityFromPostalCode(code) {
   if (n >= 1e3 && n < 3e3) return "Lisboa";
   if (n >= 7e3 && n < 8e3) return "Lisboa";
   if (n >= 8e3 && n < 9e3) return "Algarve";
+  if (n >= 3e3 && n < 3100) return "Coimbra";
   if (n >= 4700 && n < 4780 || n >= 4800 && n < 5e3) return "Braga";
   if (n >= 3e3 && n < 6e3) return "Porto";
   return null;
@@ -1274,12 +1275,87 @@ function isTestOrder(name, phone9) {
   if (/teste|n[aã]o contactar/i.test(name ?? "")) return true;
   return /^9(\d)\1{7}$/.test(phone9) || /^9\d0{7}$/.test(phone9);
 }
+
+// src/lib/labelFacts.ts
+var LABEL_FACTS_PAST_AFTER_MS = 3 * 60 * 6e4;
+var INVISIBLE = new RegExp("[\\u200b-\\u200f\\u202a-\\u202e\\u2066-\\u2069\\ufeff]", "g");
+var UNICODE_HYPHEN = new RegExp("[\\u2010-\\u2015\\u2212]", "g");
+var COMBINING_MARK = new RegExp("[\\u0300-\\u036f]", "g");
+var fold5 = (s) => s.replace(INVISIBLE, "").replace(UNICODE_HYPHEN, "-").normalize("NFD").replace(COMBINING_MARK, "").toLowerCase().trim();
+var SERVICE2 = /^servico\b/;
+var CLEANING = /^limpeza\b/;
+var EURO_AMOUNT = /\d\s*€/;
+var PENDING2 = /^(a confirmar|pre[- ]?reserva)/;
+var SEPARATOR = "[\\s.\\-+\\u200b-\\u200f\\u202a-\\u202e\\u2066-\\u2069\\u2010-\\u2015\\u2212]";
+var DIGIT_RUN = new RegExp(`\\d+(?:${SEPARATOR}+\\d+)*`, "g");
+var HTML_SPACE = /&(?:nbsp|#160|#xa0);/gi;
+var NOT_A_PHONE = new RegExp("(?<!\\d)(?:\\d{4}[-\\u2010-\\u2015\\u2212]\\d{3}|\\d{1,2}[./-]\\d{1,2}[./-](?:19|20)\\d{2}|(?:19|20)\\d{2}-\\d{1,2}-\\d{1,2})(?!\\d)", "g");
+var phoneKey = (v) => v.replace(/\D/g, "").slice(-9);
+function phoneKeysIn(text2) {
+  const keys = /* @__PURE__ */ new Set();
+  for (const run of text2.replace(HTML_SPACE, " ").replace(NOT_A_PHONE, "|").match(DIGIT_RUN) ?? []) {
+    let digits = "";
+    for (const group of run.match(/\d+/g) ?? []) {
+      digits += group;
+      if (digits.length >= 9) keys.add(digits.slice(-9));
+    }
+  }
+  return keys;
+}
+function kindOf(summary) {
+  const s = fold5(summary);
+  if (SERVICE2.test(s) || CLEANING.test(s) && EURO_AMOUNT.test(s)) return "service";
+  if (PENDING2.test(s)) return "pending";
+  return null;
+}
+function instantOf(e) {
+  if (e.start) {
+    const t = Date.parse(e.start);
+    return Number.isFinite(t) ? t : null;
+  }
+  return e.startDate && /^\d{4}-\d{2}-\d{2}$/.test(e.startDate) ? lisbonToUtc(e.startDate, 21 * 60) : null;
+}
+function labelFacts(phones, events, now) {
+  const wanted = new Set(phones.map(phoneKey).filter((k) => k.length === 9));
+  const nowMs = now.getTime();
+  const pastBefore = nowMs - LABEL_FACTS_PAST_AFTER_MS;
+  if (wanted.size === 0) return {};
+  const best = /* @__PURE__ */ new Map();
+  for (const e of events) {
+    if (String(e.status).toUpperCase() === "CANCELLED") continue;
+    const kind = kindOf(e.summary ?? "");
+    if (!kind) continue;
+    const at = instantOf(e);
+    if (at === null) continue;
+    if (kind === "pending" && at < nowMs) continue;
+    const keys = phoneKeysIn(`${e.summary ?? ""}
+${e.description ?? ""}
+${e.location ?? ""}`);
+    for (const key of keys) {
+      if (!wanted.has(key)) continue;
+      const b = best.get(key) ?? { past: null, next: null, pending: null };
+      if (kind === "pending") {
+        if (b.pending === null || at < b.pending) b.pending = at;
+      } else if (at < pastBefore) {
+        if (b.past === null || at > b.past) b.past = at;
+      } else if (b.next === null || at < b.next) {
+        b.next = at;
+      }
+      best.set(key, b);
+    }
+  }
+  const day = (ms) => ms === null ? null : lisbon(ms).date;
+  const out = {};
+  for (const [key, b] of best) out[key] = { past: day(b.past), next: day(b.next), pending: day(b.pending) };
+  return out;
+}
 export {
   agendaCheck,
   botAvailability,
   botQuote,
   describeQuizOrder,
   isTestOrder,
+  labelFacts,
   listBotCities,
   planBotBooking,
   planBotHold,
