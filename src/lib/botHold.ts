@@ -87,7 +87,7 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
 export const OWNER_BOOKING_PREFIX = 'A confirmar · ';
 
 export type OwnerBookingResult =
-  | { ok: true; event: { title: string; description: string; start: string; end: string } }
+  | { ok: true; event: { title: string; description: string; start: string; end: string; colorId?: string }; team?: string }
   | { ok: false; exists: true; summary: string }
   | { error: string };
 
@@ -127,15 +127,35 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const total = amount(r.total);
   const pickupFee = amount(r.pickupFee) ?? 0;
   const money = total === null ? '?€ (?€)' : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
-  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
   const start = lisbonToUtc(r.date, minutes);
+  const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 60_000).toISOString();
+  // Owner, 11 Oct 2026: "é suposto tu reconheceres sempre que alguém fecha um serviço [...] e
+  // colocares no calendário". A booking the chat settles (time accepted, price, full address)
+  // goes in as his real "Serviço", in the colour of a team with room; anything less stays
+  // "A confirmar". The team is the one he already named for this chat, else chooseTeam.
+  const address = text(r.address, MAX.address);
+  const named = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
+  const team = r.confirmed === true && total !== null && address.length >= 8
+    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso) : null;
+  if (team) {
+    const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+    const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
+    const description = [
+      `Marcado pelo bot a partir da conversa do WhatsApp, equipa ${team} (muda a cor para trocar).`,
+      text(r.notes, 600),
+      pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : '',
+      `bot:${conversationId}`,
+    ].filter(Boolean).join('\n\n');
+    return { ok: true, team, event: { title, description, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
+  }
+  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
-    'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     text(r.notes, 600),
     pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : '',
     `bot:${conversationId}`,
   ].filter(Boolean).join('\n\n');
-  return { ok: true, event: { title: parts.join(' - '), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 60_000).toISOString() } };
+  return { ok: true, event: { title: parts.join(' - '), description, start: startIso, end: endIso } };
 }
 
 const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',').replace(/,?0+$/, ''));

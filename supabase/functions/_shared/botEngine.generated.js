@@ -1012,15 +1012,30 @@ function planOwnerBooking(req, events) {
   const total = amount(r.total);
   const pickupFee = amount(r.pickupFee) ?? 0;
   const money = total === null ? "?€ (?€)" : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
-  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
   const start = lisbonToUtc(r.date, minutes);
+  const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 6e4).toISOString();
+  const address = text(r.address, MAX.address);
+  const named = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
+  const team = r.confirmed === true && total !== null && address.length >= 8 ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso) : null;
+  if (team) {
+    const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+    const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
+    const description2 = [
+      `Marcado pelo bot a partir da conversa do WhatsApp, equipa ${team} (muda a cor para trocar).`,
+      text(r.notes, 600),
+      pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : "",
+      `bot:${conversationId}`
+    ].filter(Boolean).join("\n\n");
+    return { ok: true, team, event: { title, description: description2, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
+  }
+  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
-    'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     text(r.notes, 600),
     pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : "",
     `bot:${conversationId}`
   ].filter(Boolean).join("\n\n");
-  return { ok: true, event: { title: parts.join(" - "), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 6e4).toISOString() } };
+  return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
 var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "7", Braga: "10", "Lisboa 1": "6", "Lisboa 2": "3", Algarve: "5", Coimbra: "4" };

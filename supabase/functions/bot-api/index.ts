@@ -515,14 +515,16 @@ async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {
   if (!conversationId) return createErrorResponse("conversationId em falta", 400);
   const cal = await env.calendar!();
   if ("error" in cal) return createErrorResponse(cal.error, 502);
-  const plan = planOwnerBooking(body, cal.events);
+  const existing = await env.holds!.get(conversationId);
+  const live = existing && !("error" in existing) && !existing.released_at ? existing : null;
+  // The conversation's own pre-booking does not busy the team it is about to become.
+  const plan = planOwnerBooking(body, live ? cal.events.filter(e => e.id !== live.event_id) : cal.events);
   if ("error" in plan) return createErrorResponse(String(plan.error), 400);
   if (!plan.ok || !plan.event) return createSuccessResponse({ booking: { ok: false, exists: true } });
   const event = plan.event;
-  const existing = await env.holds!.get(conversationId);
-  const live = existing && !("error" in existing) && !existing.released_at ? existing : null;
-  // Same conversation: the bot's own "Pré-reserva" (or an earlier "A confirmar") becomes this one.
-  const written = await env.writeCalendar!({ action: "hold", conversationId, eventId: live?.event_id ?? null, ...event });
+  // Same conversation: the bot's own "Pré-reserva" (or an earlier "A confirmar") becomes this one;
+  // a settled booking goes in as the owner's "Serviço" in the team's colour (action book).
+  const written = await env.writeCalendar!({ action: event.colorId ? "book" : "hold", conversationId, eventId: live?.event_id ?? null, ...event });
   if (!written.ok || !written.eventId) {
     const detail = written.ok ? "sem eventId" : written.error;
     return createErrorResponse(`Não foi possível escrever no calendário (${detail.slice(0, 200)})`, 502);
@@ -534,7 +536,7 @@ async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {
   });
   if (saveError) safeLog("warn", "owner booking written but not saved", { error: saveError });
   calendarCache = null;
-  return createSuccessResponse({ booking: { ok: true, start: event.start, moved: !!live } });
+  return createSuccessResponse({ booking: { ok: true, start: event.start, moved: !!live, confirmed: !!event.colorId, team: plan.team ?? null } });
 }
 
 async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {

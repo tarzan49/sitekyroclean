@@ -84,6 +84,17 @@ describe('planOwnerBooking', () => {
     expect(planOwnerBooking(base, [mine])).toMatchObject({ ok: false, exists: true });
     expect(planOwnerBooking({ ...base, date: '2026-10-13' }, [mine])).toMatchObject({ ok: true });
   });
+  it('a settled booking (confirmed, price, address) goes in as his Serviço in a team colour', () => {
+    const p = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras' }, []);
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.team).toBe('Lisboa 1');
+    expect(p.event.colorId).toBe('6');
+    expect(p.event.title).toBe('Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - 900000001 - Cliente Inventado - Rua Inventada 1, Oeiras');
+    expect(planOwnerBooking({ ...base, confirmed: true, team: 'Lisboa 2' }, [])).toMatchObject({ team: 'Lisboa 2', event: { colorId: '3' } });
+    // Without a price it stays "A confirmar".
+    const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, []);
+    expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · /);
+  });
   it('checks its input', () => {
     expect(planOwnerBooking({ ...base, time: 'amanhã' }, [])).toHaveProperty('error');
     expect(planOwnerBooking({ ...base, service: '' }, [])).toHaveProperty('error');
