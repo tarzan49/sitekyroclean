@@ -517,6 +517,13 @@ async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {
   if ("error" in cal) return createErrorResponse(cal.error, 502);
   const existing = await env.holds!.get(conversationId);
   const live = existing && !("error" in existing) && !existing.released_at ? existing : null;
+  // Once the owner confirmed the conversation's event (no "A confirmar · " / "Pré-reserva"
+  // any more), it is his: a later read never rewrites it (Marina, 11 Oct 2026: he set
+  // 390€ and Lisboa 1, the next read would have put back half the total and another team).
+  const liveEvent = live ? cal.events.find(e => e.id === live.event_id) : undefined;
+  if (liveEvent && !/^\s*(a confirmar\b|pr[ée]-reserva\b)/i.test(liveEvent.summary)) {
+    return createSuccessResponse({ booking: { ok: false, exists: true } });
+  }
   // The conversation's own pre-booking does not busy the team it is about to become.
   const plan = planOwnerBooking(body, live ? cal.events.filter(e => e.id !== live.event_id) : cal.events);
   if ("error" in plan) return createErrorResponse(String(plan.error), 400);
