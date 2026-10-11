@@ -192,8 +192,8 @@ function sincronizarAgora() {
   const pessoas = {};
   for (const acao of acoes) {
     const calendario = calendarios[acao.equipaId];
-    if (acao.tipo === 'criar') Calendar.Events.insert(acao.corpo, calendario, { sendUpdates: 'none' });
-    else if (acao.tipo === 'atualizar') Calendar.Events.update(acao.corpo, calendario, acao.copia.id, { sendUpdates: 'none' });
+    if (acao.tipo === 'criar') Calendar.Events.insert(acao.corpo, calendario, { sendUpdates: 'none', supportsAttachments: true });
+    else if (acao.tipo === 'atualizar') Calendar.Events.update(acao.corpo, calendario, acao.copia.id, { sendUpdates: 'none', supportsAttachments: true });
     else apagarEvento(calendario, acao.copia.id);
     if (!acao.aviso) continue;
     if (!pessoas[acao.equipaId]) pessoas[acao.equipaId] = pessoasDoCalendario(calendario);
@@ -761,6 +761,8 @@ function corpoDaCopia(origem, moradaNoMapa) {
     start: horaEmPortugal(origem.start),
     end: horaEmPortugal(origem.end),
   };
+  // As fotografias do que se vai limpar (ReservasBot.gs, 2026-10-11) seguem para a equipa.
+  if (origem.attachments && origem.attachments.length) corpo.attachments = origem.attachments.map(function (a) { return { fileUrl: a.fileUrl, title: a.title, mimeType: a.mimeType, fileId: a.fileId }; });
   corpo.reminders = { useDefault: true };
   corpo.extendedProperties = {
     private: {

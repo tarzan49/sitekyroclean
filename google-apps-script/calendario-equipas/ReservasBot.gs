@@ -30,6 +30,15 @@
  *     por cima da pré-reserva da conversa, se houver. A partir daí é um serviço
  *     como os que o dono escreve: o resto deste script copia-o para a equipa e
  *     manda-lhe o email, e o CRM lê-o. Um pedido repetido muda o mesmo serviço.
+ *   { key, action: 'needPhotos' }
+ *     os serviços dos próximos 14 dias que ainda não têm a linha "Fotos:" na
+ *     descrição e com telefone: [{ eventId, phone }] (os 9 algarismos). Dono, 2026-10-11: "anexar ao calendário
+ *     sempre uma foto daquilo que se vai limpar".
+ *   { key, action: 'photos', eventId, images: [{ base64, mime, name }] }
+ *     guarda as fotografias que o cliente mandou no WhatsApp numa pasta do
+ *     Drive ("Kyro · Fotos dos serviços", só quem tem a ligação as vê), anexa-as
+ *     ao evento e escreve "Fotos: …" com as ligações na descrição. A descrição
+ *     vai para a cópia da equipa, por isso a equipa vê-as também.
  */
 
 // "A confirmar": o evento preparado depois de o dono escrever "fica agendado" (2026-10-09).
@@ -53,7 +62,9 @@ function doPost(e) {
     if (pedido.action === 'hold') return respostaBot(escreverPreReserva(pedido));
     if (pedido.action === 'release') return respostaBot(apagarPreReserva(pedido));
     if (pedido.action === 'book') return respostaBot(escreverServico(pedido));
-    return respostaBot({ ok: false, error: 'action tem de ser hold, book ou release' });
+    if (pedido.action === 'needPhotos') return respostaBot(servicosSemFotos());
+    if (pedido.action === 'photos') return respostaBot(anexarFotos(pedido));
+    return respostaBot({ ok: false, error: 'action tem de ser hold, book, release, needPhotos ou photos' });
   } catch (erro) {
     // Sem isto a Google responde com uma página de erro em HTML e a bot-api não sabe porquê.
     return respostaBot({ ok: false, error: String(erro && erro.message || erro) });
@@ -154,4 +165,51 @@ function eventoPorId(calendario, id) {
 
 function respostaBot(objeto) {
   return ContentService.createTextOutput(JSON.stringify(objeto)).setMimeType(ContentService.MimeType.JSON);
+}
+
+const LINHA_FOTOS = /^Fotos:/m;
+const PASTA_FOTOS = 'Kyro · Fotos dos serviços';
+const TELEFONE = /(?:\+?351[\s-]?)?\b(9[1236]\d)[\s-]?(\d{3})[\s-]?(\d{3})\b/;
+
+function servicosSemFotos() {
+  const agora = Date.now();
+  const eventos = CalendarApp.getDefaultCalendar().getEvents(new Date(agora - 3600000), new Date(agora + 14 * 86400000));
+  const lista = [];
+  for (let i = 0; i < eventos.length; i++) {
+    const ev = eventos[i];
+    if (!SERVICO_DO_BOT.test(ev.getTitle())) continue;
+    const descricao = String(ev.getDescription() || '');
+    if (LINHA_FOTOS.test(descricao)) continue;
+    const tel = TELEFONE.exec(ev.getTitle() + '\n' + descricao);
+    if (tel) lista.push({ eventId: ev.getId().replace(/@google\.com$/, ''), phone: tel[1] + tel[2] + tel[3] });
+  }
+  return { ok: true, events: lista };
+}
+
+function pastaDasFotos() {
+  const pastas = DriveApp.getFoldersByName(PASTA_FOTOS);
+  return pastas.hasNext() ? pastas.next() : DriveApp.createFolder(PASTA_FOTOS);
+}
+
+function anexarFotos(p) {
+  const calendario = CalendarApp.getDefaultCalendar();
+  const evento = p.eventId ? eventoPorId(calendario, p.eventId) : null;
+  if (!evento) return { ok: false, error: 'evento não existe' };
+  const descricao = String(evento.getDescription() || '');
+  if (LINHA_FOTOS.test(descricao)) return { ok: true, already: true };
+  const imagens = Array.isArray(p.images) ? p.images.slice(0, 6) : [];
+  if (!imagens.length) return { ok: false, error: 'sem imagens' };
+  const pasta = pastaDasFotos();
+  const anexos = [];
+  for (let i = 0; i < imagens.length; i++) {
+    const img = imagens[i];
+    const blob = Utilities.newBlob(Utilities.base64Decode(String(img.base64 || '')), String(img.mime || 'image/jpeg'), String(img.name || ('foto-' + (i + 1) + '.jpg')));
+    const ficheiro = pasta.createFile(blob);
+    ficheiro.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    anexos.push({ fileUrl: ficheiro.getUrl(), fileId: ficheiro.getId(), title: ficheiro.getName(), mimeType: ficheiro.getMimeType() });
+  }
+  const linha = 'Fotos: ' + anexos.map(function (a) { return a.fileUrl; }).join(' ');
+  const id = evento.getId().replace(/@google\.com$/, '');
+  Calendar.Events.patch({ description: (descricao ? descricao + '\n\n' : '') + linha, attachments: anexos }, 'primary', id, { supportsAttachments: true, sendUpdates: 'none' });
+  return { ok: true, files: anexos.length };
 }
