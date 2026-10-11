@@ -70,6 +70,8 @@ import colchao05Antes from "@/assets/before-after-pool/colchao-05-antes.webp";
 import colchao05Depois from "@/assets/before-after-pool/colchao-05-depois.webp";
 import impermeabilizacaoVideo from "@/assets/before-after-pool/impermeabilizacao-video.mp4";
 import impermeabilizacaoVideoPoster from "@/assets/before-after-pool/impermeabilizacao-video-poster.webp";
+import impermeabilizacaoVideoPepsi from "@/assets/before-after-pool/impermeabilizacao-video-pepsi.mp4";
+import impermeabilizacaoVideoPepsiPoster from "@/assets/before-after-pool/impermeabilizacao-video-pepsi-poster.webp";
 import impermeabilizacao01Antes from "@/assets/before-after-pool/impermeabilizacao-01-antes.webp";
 import impermeabilizacao01Depois from "@/assets/before-after-pool/impermeabilizacao-01-depois.webp";
 import impermeabilizacao02Antes from "@/assets/before-after-pool/impermeabilizacao-02-antes.webp";
@@ -129,11 +131,14 @@ export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "
 // "colocar em primeiro sempre" e no mesmo formato dos antes e depois). O
 // original é vertical; o ficheiro do site já vem em 4:3, com o próprio vídeo
 // desfocado a preencher os lados, para caber na mesma moldura das fotos sem
-// cortar o copo nem a água a escorrer. Sem som.
+// cortar o copo nem a água a escorrer. Sem som. O segundo vídeo (dono,
+// 11/10/2026: o teste da Pepsi num sofá claro, filmado pela equipa)
+// vem logo a seguir; o original é horizontal e leva o mesmo fundo desfocado
+// em cima e em baixo.
 export type PoolItem =
   | { kind: "pair"; before: string; after: string; illustrative?: boolean }
   | { kind: "single"; image: string }
-  | { kind: "video"; src: string; poster: string };
+  | { kind: "video"; src: string; poster: string; alt?: string };
 
 // Ordem = do melhor para o pior primeiro impacto (dono, 09/10/2026: "o
 // primeiro em cada é o melhor, rank do melhor para o pior"). O primeiro par de
@@ -187,6 +192,8 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   impermeabilizacao: [
     { kind: "video", src: impermeabilizacaoVideo, poster: impermeabilizacaoVideoPoster },
+    { kind: "video", src: impermeabilizacaoVideoPepsi, poster: impermeabilizacaoVideoPepsiPoster,
+      alt: "Vídeo real: Pepsi derramada num sofá claro impermeabilizado fica à superfície e sai com um pano" },
     { kind: "pair", before: impermeabilizacao01Antes, after: impermeabilizacao01Depois },
     { kind: "pair", before: impermeabilizacao02Antes, after: impermeabilizacao02Depois, illustrative: true },
     { kind: "pair", before: impermeabilizacao03Antes, after: impermeabilizacao03Depois, illustrative: true },

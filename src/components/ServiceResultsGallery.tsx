@@ -65,7 +65,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
         ) : item.kind === "video" ? (
           <div className="relative h-full w-full">
             <video key={index} src={item.src} poster={item.poster} autoPlay muted playsInline preload={priority && index === 0 ? "auto" : "metadata"}
-              aria-label="Vídeo real: água derramada num sofá impermeabilizado escorre sem entrar no tecido"
+              aria-label={item.alt ?? "Vídeo real: água derramada num sofá impermeabilizado escorre sem entrar no tecido"}
               className="h-full w-full object-cover"
               onEnded={event => {
                 if (playing && !hovered && !focused && pool.length > 1) setIndex(current => (current + 1) % pool.length);
