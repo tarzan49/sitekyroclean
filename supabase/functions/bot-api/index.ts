@@ -100,6 +100,8 @@ export interface BotEnv {
   followUps?: FollowUpStore | null;
   holds?: HoldStore | null;
   writeCalendar?: CalendarWriter | null;
+  /** Email to the owner (Resend); null = sent, else why not. */
+  notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
   now?: () => Date;
 }
 
@@ -396,6 +398,17 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
     case "book":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       return await (body.action === "hold" ? holdSlot(body, env) : body.action === "book" ? bookSlot(body, env) : releaseSlot(body, env));
+    // Since 12 Oct 2026 the bot speaks through Meta's official API, which cannot write to WhatsApp groups:
+    // the owner alerts and the 19h agenda that went to his groups come by email instead.
+    case "notify-owner": {
+      if (!env.notifyOwner) return createErrorResponse("Email ao dono por ligar", 503);
+      const subject = typeof body.subject === "string" ? body.subject.replace(/[\r\n]+/g, " ").trim().slice(0, 150) : "";
+      const text = typeof body.text === "string" ? body.text.slice(0, 8000) : "";
+      if (!subject || !text) return createErrorResponse("subject e text são obrigatórios", 400);
+      const err = await env.notifyOwner(subject, text);
+      if (err) return createErrorResponse(err, 502);
+      return createSuccessResponse({ sent: true });
+    }
     case "follow-ups":
     case "client-plan":
     case "log-touch":
@@ -744,8 +757,28 @@ function icsCalendar(): CalendarSource | null {
   };
 }
 
+/** Plain-text email to the owner through Resend, from the verified domain. */
+function resendOwnerMail(): BotEnv["notifyOwner"] {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  const to = Deno.env.get("LEAD_NOTIFICATION_EMAIL");
+  if (!apiKey || !to) return null;
+  return async (subject, text) => {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ from: "Kyro Bot <pedidos@cleansolutions.com.pt>", to: [to], subject, text }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      return res.ok ? null : `O Resend recusou o envio (${res.status})`;
+    } catch {
+      return "Não foi possível enviar o email";
+    }
+  };
+}
+
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail() }));
 }

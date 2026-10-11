@@ -429,3 +429,19 @@ Deno.test("book at an hour another service of the zone has: pre-booking for the 
   assertEquals([second.ok, second.sameTime, second.hold.ok], [false, true, true]);
   assertEquals(script.calls.map(c => c.action), ["book", "hold"]);
 });
+
+Deno.test("notify-owner emails the owner and refuses without subject or text", async () => {
+  const sent: string[][] = [];
+  const env = { botKey: KEY, leads: null, notifyOwner: (s: string, t: string) => { sent.push([s, t]); return Promise.resolve(null); } };
+  const post = (body: unknown) => handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+    method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.9.${++ip % 250}` }, body: JSON.stringify(body),
+  }), env);
+  const ok = await post({ action: "notify-owner", subject: "Agenda\nde amanhã", text: "3 serviços" });
+  assertEquals(ok.status, 200);
+  assertEquals(sent, [["Agenda de amanhã", "3 serviços"]]);
+  assertEquals((await post({ action: "notify-owner", subject: "", text: "x" })).status, 400);
+  const off = await handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+    method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.9.${++ip % 250}` }, body: JSON.stringify({ action: "notify-owner", subject: "a", text: "b" }),
+  }), { botKey: KEY, leads: null });
+  assertEquals(off.status, 503);
+});
