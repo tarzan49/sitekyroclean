@@ -3,7 +3,7 @@
 // ele, e no Porto 60% / 40%. A equipa fica sempre com a parte maior.
 
 /** As equipas do script dos calendários (`google-apps-script/calendario-equipas/`). */
-export const UPSELL_TEAMS = ['Porto 1', 'Porto 2', 'Braga', 'Lisboa 1', 'Lisboa 2', 'Algarve'] as const;
+export const UPSELL_TEAMS = ['Porto 1', 'Porto 2', 'Braga', 'Lisboa 1', 'Lisboa 2', 'Algarve', 'Coimbra'] as const;
 export type UpsellTeam = (typeof UPSELL_TEAMS)[number];
 
 /** Parte da equipa, de 0 a 1. */

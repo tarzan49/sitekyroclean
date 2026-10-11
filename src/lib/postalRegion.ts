@@ -1,14 +1,15 @@
-// As quatro regiões do CRM e a região pelo código postal. Vivem fora de
+// As cinco regiões do CRM e a região pelo código postal. Vivem fora de
 // `calendarServices.ts` porque esse módulo carrega as freguesias todas, e o
 // pacote do bot (`botAvailability.ts`) só precisa disto.
 
-export const CRM_LOCALITIES = ['Porto', 'Lisboa', 'Algarve', 'Braga'] as const;
+export const CRM_LOCALITIES = ['Porto', 'Lisboa', 'Algarve', 'Braga', 'Coimbra'] as const;
 export type CrmLocality = (typeof CRM_LOCALITIES)[number];
 
 /**
  * Pelos quatro primeiros dígitos do código postal, que é o que o dono escreve
  * quase sempre. O Centro (3xxx) é servido pela equipa do Porto e o Alentejo
- * (7xxx) pela de Lisboa, como em `travel.ts`. Braga é 4700–4779 e 4800–4999;
+ * (7xxx) pela de Lisboa, como em `travel.ts`; Coimbra e a Figueira da Foz
+ * (3000–3099) são região própria no CRM desde 2026-10-11 (dono). Braga é 4700–4779 e 4800–4999;
  * 4780–4799 é Santo Tirso e Trofa, do Porto. Leiria (24xx), Beira Interior
  * (6xxx) e ilhas ficam por identificar.
  */
@@ -19,6 +20,7 @@ export function localityFromPostalCode(code: string): CrmLocality | null {
   if (n >= 1000 && n < 3000) return 'Lisboa';
   if (n >= 7000 && n < 8000) return 'Lisboa';
   if (n >= 8000 && n < 9000) return 'Algarve';
+  if (n >= 3000 && n < 3100) return 'Coimbra';
   if ((n >= 4700 && n < 4780) || (n >= 4800 && n < 5000)) return 'Braga';
   if (n >= 3000 && n < 6000) return 'Porto';
   return null;

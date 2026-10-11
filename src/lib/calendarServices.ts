@@ -44,9 +44,8 @@ export interface ParsedService {
 
 const AREA_TO_LOCALITY: Record<string, CrmLocality> = {
   porto: 'Porto', lisboa: 'Lisboa', algarve: 'Algarve', braga: 'Braga',
-  // Coimbra tem trabalhador local desde 2026-09-28, mas o dono ainda não quis
-  // uma equipa própria no calendário: continua a contar como região Porto.
-  coimbra: 'Porto',
+  // Coimbra e Figueira da Foz: região própria no CRM desde 2026-10-11 (dono).
+  coimbra: 'Coimbra',
 };
 
 /** Direção de texto, espaços invisíveis e hífenes tipográficos que o Google Contacts mete à volta dos telefones. */
@@ -261,8 +260,6 @@ export function teamRegionOf(event: CalendarEvent): CrmLocality | null {
   const team = TEAM_LINE.exec(clean(event.description))?.[1];
   if (!team) return null;
   const key = normalizeCity(team);
-  // A equipa de Coimbra (10/10/2026) trabalha numa zona que o CRM conta como Porto.
-  if (key.startsWith('coimbra')) return 'Porto';
   return CRM_LOCALITIES.find(l => key.startsWith(normalizeCity(l))) ?? null;
 }
 

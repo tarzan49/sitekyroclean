@@ -109,7 +109,8 @@ describe('região e equipa de cada serviço', () => {
   it('tem uma equipa para cada região do CRM', () => {
     for (const regiao of CRM_LOCALITIES) expect(gs.equipaDaRegiao(regiao).id).toBe(regiao.toLowerCase());
     expect(gs.equipaDaRegiao(null)).toBeNull();
-    // Aveiro e Coimbra (região Porto) e o Alentejo (região Lisboa), como no travel.ts.
+    expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 3080-000 Figueira da Foz' })).id).toBe('coimbra');
+    // Aveiro (região Porto) e o Alentejo (região Lisboa), como no travel.ts.
     expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 3800-000 Aveiro' })).id).toBe('porto');
     expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 7520-000 Sines' })).id).toBe('lisboa');
     expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 4800-000 Guimarães' })).id).toBe('braga');
