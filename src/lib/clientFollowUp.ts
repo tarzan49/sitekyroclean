@@ -399,6 +399,12 @@ function jobOf(s: ClientService): string {
 
 const isRugPickup = (s: ClientService) => itemsOfService(s).includes('Tapete') && /recolh/i.test(s.description);
 
+/**
+ * Agradecimento a quem já é cliente (dono, 11/10). Nunca ligado à avaliação:
+ * a Google proíbe incentivos a avaliações, por isso vale quer avalie quer não.
+ */
+export const CLIENT_THANKS_DISCOUNT = 'Como cliente, tem 10% de desconto no seu próximo serviço connosco.';
+
 /** A ficha do Google onde a pessoa avalia: Lisboa para as equipas de Lisboa, Porto para todas as outras. */
 export const reviewLinkFor = (region: string | null | undefined) =>
   region === 'Lisboa' ? GOOGLE_REVIEW_LINK_LISBOA : GOOGLE_REVIEW_LINK_PORTO;
@@ -757,6 +763,7 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
     const link = reviewLinkFor(lastPast?.locality ?? c.region);
     const done = wordsFor(lastPast ? itemsOfService(lastPast) : items);
     const job = lastPast ? jobOf(lastPast) : `a limpeza ${done.of}`;
+    const afterJob = job.startsWith('a impermeabilização') ? 'da impermeabilização' : 'da limpeza';
     if (!asks.length) {
       if (today <= until) {
         cands.push({
@@ -765,12 +772,12 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
           check: pickup ? 'Tapete com recolha: confirmar primeiro no grupo da equipa que já foi entregue.' : undefined,
           messages: orderVariants([
             {
-              id: 'avaliacao-a', label: 'Versão A (bot 7.4)',
-              text: `${hello}\n\nEsperamos que ${done.the} ${done.plural ? 'tenham' : 'tenha'} ficado como queria. Se precisar de alguma coisa, estamos por aqui.\n\nSe gostou do resultado, uma avaliação no Google ajuda-nos muito: ${link}`,
+              id: 'avaliacao-c', label: 'Versão C (11/10, personalizada)',
+              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? 'ficaram' : 'ficou'} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}\n\n${CLIENT_THANKS_DISCOUNT}`,
             },
             {
-              id: 'avaliacao-b', label: 'Versão B (05/10)',
-              text: `${hello}\n\nEsperamos que tenha gostado do resultado ${job.replace(/^a /, 'da ')}. Se precisar de alguma coisa, estamos por aqui.\n\nSe ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e demora menos de um minuto:\n${link}\n\nMuito obrigado pela confiança!`,
+              id: 'avaliacao-d', label: 'Versão D (11/10, curta)',
+              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? 'ficaram' : 'ficou'} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}\n\n${CLIENT_THANKS_DISCOUNT}`,
             },
           ], `${c.id}:avaliacao`, ctx.variantStats),
         });

@@ -149,12 +149,13 @@ describe('depois do serviço', () => {
     const p = plan({ client: done, services: [service({ locality: 'Lisboa' })] }, '2026-10-06T10:00:00Z');
     const a = p.today.find(x => x.kind === 'avaliacao')!;
     expect(a.send).toBe('auto');
-    expect(a.messages.map(m => m.id).sort()).toEqual(['avaliacao-a', 'avaliacao-b']);
+    expect(a.messages.map(m => m.id).sort()).toEqual(['avaliacao-c', 'avaliacao-d']);
     for (const m of a.messages) {
       expect(m.text).toContain(GOOGLE_REVIEW_LINK_LISBOA);
       expect(m.text).not.toContain(GOOGLE_REVIEW_LINK_PORTO);
     }
-    expect(a.messages.find(m => m.id === 'avaliacao-b')!.text).toContain('resultado da limpeza do sofá');
+    expect(a.messages.find(m => m.id === 'avaliacao-c')!.text).toContain('Obrigado por ter feito a limpeza do sofá connosco');
+    expect(a.messages.every(m => m.text.includes('10% de desconto') && !/avalia[^]*desconto/.test(m.text.split('http')[0]))).toBe(true);
     expect(reviewLinkFor('Algarve')).toBe(GOOGLE_REVIEW_LINK_PORTO);
     expect(p.stage).toBe('cliente_recente');
   });
@@ -277,10 +278,10 @@ describe('aprender com os resultados', () => {
     const c = client({ status: 'cliente', last_client_message_at: '2026-10-05T17:00:00Z', last_contact_at: '2026-10-05T18:00:00Z' });
     const input = { client: c, services: [service()], touches: [] };
     const now = new Date('2026-10-06T10:00:00Z');
-    const bWins = { 'avaliacao-a': { sent: 10, won: 2 }, 'avaliacao-b': { sent: 10, won: 6 } };
-    expect(planClient(input, { now, variantStats: bWins }).today[0].messages[0].id).toBe('avaliacao-b');
-    const aWins = { 'avaliacao-a': { sent: 10, won: 7 }, 'avaliacao-b': { sent: 10, won: 6 } };
-    expect(planClient(input, { now, variantStats: aWins }).today[0].messages[0].id).toBe('avaliacao-a');
+    const bWins = { 'avaliacao-c': { sent: 10, won: 2 }, 'avaliacao-d': { sent: 10, won: 6 } };
+    expect(planClient(input, { now, variantStats: bWins }).today[0].messages[0].id).toBe('avaliacao-d');
+    const aWins = { 'avaliacao-c': { sent: 10, won: 7 }, 'avaliacao-d': { sent: 10, won: 6 } };
+    expect(planClient(input, { now, variantStats: aWins }).today[0].messages[0].id).toBe('avaliacao-c');
   });
 
   it('conta resultados por versão e por tipo, ligando o CRM pelo telefone', () => {

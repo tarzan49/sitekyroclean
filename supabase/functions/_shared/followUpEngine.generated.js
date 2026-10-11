@@ -431,6 +431,7 @@ function jobOf(s) {
   return items.length ? `${kind} ${wordsFor(items).of}` : kind;
 }
 var isRugPickup = (s) => itemsOfService(s).includes("Tapete") && /recolh/i.test(s.description);
+var CLIENT_THANKS_DISCOUNT = "Como cliente, tem 10% de desconto no seu próximo serviço connosco.";
 var reviewLinkFor = (region) => region === "Lisboa" ? GOOGLE_REVIEW_LINK_LISBOA : GOOGLE_REVIEW_LINK_PORTO;
 var TRAVEL_ALLOWANCE = 20;
 function sameVisitOffer(s) {
@@ -714,6 +715,7 @@ Quer que acrescentemos ao serviço?`
     const link = reviewLinkFor(lastPast?.locality ?? c.region);
     const done = wordsFor(lastPast ? itemsOfService(lastPast) : items);
     const job = lastPast ? jobOf(lastPast) : `a limpeza ${done.of}`;
+    const afterJob = job.startsWith("a impermeabilização") ? "da impermeabilização" : "da limpeza";
     if (!asks.length) {
       if (today <= until) {
         cands.push({
@@ -726,25 +728,18 @@ Quer que acrescentemos ao serviço?`
           check: pickup ? "Tapete com recolha: confirmar primeiro no grupo da equipa que já foi entregue." : void 0,
           messages: orderVariants([
             {
-              id: "avaliacao-a",
-              label: "Versão A (bot 7.4)",
-              text: `${hello}
+              id: "avaliacao-c",
+              label: "Versão C (11/10, personalizada)",
+              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? "ficaram" : "ficou"} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}
 
-Esperamos que ${done.the} ${done.plural ? "tenham" : "tenha"} ficado como queria. Se precisar de alguma coisa, estamos por aqui.
-
-Se gostou do resultado, uma avaliação no Google ajuda-nos muito: ${link}`
+${CLIENT_THANKS_DISCOUNT}`
             },
             {
-              id: "avaliacao-b",
-              label: "Versão B (05/10)",
-              text: `${hello}
+              id: "avaliacao-d",
+              label: "Versão D (11/10, curta)",
+              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? "ficaram" : "ficou"} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}
 
-Esperamos que tenha gostado do resultado ${job.replace(/^a /, "da ")}. Se precisar de alguma coisa, estamos por aqui.
-
-Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e demora menos de um minuto:
-${link}
-
-Muito obrigado pela confiança!`
+${CLIENT_THANKS_DISCOUNT}`
             }
           ], `${c.id}:avaliacao`, ctx.variantStats)
         });
