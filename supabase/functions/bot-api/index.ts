@@ -385,6 +385,12 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
     case "owner-booking":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       return await ownerBooking(body, env);
+    case "sweep-holds": {
+      if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
+      const cal = await env.calendar();
+      if ("error" in cal) return createErrorResponse(cal.error, 503);
+      return createSuccessResponse({ sweep: await sweepHolds(cal.events, env.holds, env.writeCalendar, env.now?.() ?? new Date()) });
+    }
     case "hold":
     case "release":
     case "book":
@@ -402,7 +408,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, sweep-holds, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
@@ -544,6 +550,37 @@ async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {
   if (saveError) safeLog("warn", "owner booking written but not saved", { error: saveError });
   calendarCache = null;
   return createSuccessResponse({ booking: { ok: true, start: event.start, moved: !!live, confirmed: !!event.colorId, team: plan.team ?? null } });
+}
+
+/**
+ * Pre-bookings that a real service already replaced go away by themselves (owner, 11 Oct 2026: "porque é que
+ * tive que ser eu a ir lá retirar?"). A live hold is released when the feed has a "Serviço" (or
+ * "A confirmar · Serviço") for the same phone, or for the same name at the same start; a hold the owner
+ * deleted by hand (gone from the feed after the feed lag) is just marked released.
+ */
+export async function sweepHolds(events: CalendarEvent[], holds: HoldStore, write: CalendarWriter, now: Date) {
+  const rows = await holds.recent(new Date(now.getTime() - 60 * 86_400_000).toISOString());
+  if ("error" in rows) return { released: 0, gone: 0, error: rows.error };
+  const digits = (v: string) => v.replace(/\D/g, "");
+  const services = events.filter(e => e.status !== "CANCELLED" && /^(A confirmar · )?Servi[çc]o\b/i.test(e.summary.trim()));
+  let released = 0, gone = 0;
+  for (const h of rows) {
+    if (h.released_at) continue;
+    const inFeed = events.some(e => e.id === h.event_id);
+    const phone = digits(h.conversation_id.split("@")[0]).slice(-9);
+    const name = (h.title.split(/\s[–-]\s/)[1] ?? "").trim().toLowerCase();
+    const replaced = services.find(e => e.id !== h.event_id && (
+      (phone.length === 9 && digits(`${e.summary} ${e.description}`).includes(phone)) ||
+      (name.length > 2 && e.start === h.starts_at && e.summary.toLowerCase().includes(name))));
+    if (replaced) {
+      if (inFeed) { const done = await write({ action: "release", eventId: h.event_id }); if (!done.ok) continue; }
+      await holds.release(h.conversation_id); released++;
+    } else if (!inFeed && now.getTime() - Date.parse(h.updated_at ?? h.starts_at) > HOLD_FEED_LAG_MS) {
+      await holds.release(h.conversation_id); gone++;
+    }
+  }
+  if (released) calendarCache = null;
+  return { released, gone };
 }
 
 async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
