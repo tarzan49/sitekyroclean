@@ -35,6 +35,9 @@ interface ServiceRequest {
   /** Vendido a mais pela equipa no serviço; fora de billed_value e de my_cut. A parte do dono soma-se ao cut só no ecrã (ver cutOf). */
   upsell_value: number | null;
   upsell_team: string | null;
+  /** Passou fatura (pelo Francisco). invoice_ref = nome e NIF da fatura. */
+  invoiced: boolean;
+  invoice_ref: string | null;
 }
 
 const LOCALITIES = CRM_LOCALITIES;
@@ -73,6 +76,8 @@ type FormState = {
   billed_value: string;
   my_cut: string;
   paid: boolean;
+  invoiced: boolean;
+  invoice_ref: string;
   locality: CrmLocality | "";
   phone: string;
   source: string;
@@ -89,6 +94,8 @@ const emptyForm = (): FormState => ({
   billed_value: "",
   my_cut: "",
   paid: false,
+  invoiced: false,
+  invoice_ref: "",
   locality: "Porto",
   phone: "",
   source: "WhatsApp",
@@ -225,7 +232,11 @@ const CrmPanel = () => {
       const rows = monthRecords.filter(r => r.locality === loc);
       return { loc, billed: rows.reduce((s, r) => s + r.billed_value, 0), cut: rows.reduce((s, r) => s + cutOf(r), 0), count: rows.length };
     }).filter(l => l.count > 0);
-    return { billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
+    const inv = monthRecords.filter(r => r.invoiced);
+    const noInv = monthRecords.filter(r => !r.invoiced);
+    const invoicedValue = inv.reduce((s, r) => s + r.billed_value, 0);
+    const notInvoicedValue = noInv.reduce((s, r) => s + r.billed_value, 0);
+    return { invoicedCount: inv.length, invoicedValue, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
   }, [monthRecords]);
 
   const maxLocalityCut = Math.max(1, ...totals.byLocality.map(l => l.cut));
@@ -249,6 +260,8 @@ const CrmPanel = () => {
       billed_value: String(r.billed_value),
       my_cut: String(r.my_cut),
       paid: r.paid,
+      invoiced: r.invoiced,
+      invoice_ref: r.invoice_ref ?? "",
       locality: r.locality ?? "",
       phone: r.phone ?? "",
       source: r.source ?? "",
@@ -284,6 +297,8 @@ const CrmPanel = () => {
       billed_value: billed,
       my_cut: cut,
       paid: form.paid,
+      invoiced: form.invoiced,
+      invoice_ref: form.invoiced ? form.invoice_ref.trim() || null : null,
       locality: form.locality,
       phone: form.phone.trim() || null,
       source: form.source || null,
@@ -336,6 +351,24 @@ const CrmPanel = () => {
     if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, ...patch } : x));
   };
 
+  const toggleInvoiced = async (r: ServiceRequest) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: err } = await (supabase as any).from("service_requests").update({ invoiced: !r.invoiced }).eq("id", r.id);
+    if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, invoiced: !x.invoiced } : x));
+  };
+
+  // Com e sem fatura, mês a mês (pelo dia do serviço).
+  const invoiceByMonth = useMemo(() => {
+    const m = new Map<string, { inv: number; invV: number; no: number; noV: number }>();
+    for (const r of records) {
+      const k = r.request_date.slice(0, 7);
+      const e = m.get(k) ?? { inv: 0, invV: 0, no: 0, noV: 0 };
+      if (r.invoiced) { e.inv++; e.invV += r.billed_value; } else { e.no++; e.noV += r.billed_value; }
+      m.set(k, e);
+    }
+    return [...m.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  }, [records]);
+
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -343,12 +376,12 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "Dados da fatura"];
     const rows = filtered.map(r => [
       new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", quizSummary?.quizServiceIds.has(r.id) ? [r.source, QUIZ_BADGE].filter(Boolean).join(" + ") : r.source ?? "",
-      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não",
+      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", r.invoiced ? "Sim" : "Não", r.invoice_ref ?? "",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
@@ -454,7 +487,7 @@ const CrmPanel = () => {
 
       {view === "pedidos" && (<>
       {/* Totals */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
         <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total faturado</p>
           <p className="text-xl font-bold text-navy">{money(totals.billed)}</p>
@@ -477,7 +510,34 @@ const CrmPanel = () => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Por pagar</p>
           <p className="text-xl font-bold text-red-600">{totals.unpaidCount} <span className="text-xs font-medium text-red-500">({money(totals.unpaidValue)})</span></p>
         </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Com fatura</p>
+          <p className="text-xl font-bold text-navy">{totals.invoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.invoicedValue)})</span></p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sem fatura</p>
+          <p className="text-xl font-bold text-navy">{totals.notInvoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.notInvoicedValue)})</span></p>
+        </div>
       </div>
+
+      {invoiceByMonth.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4 overflow-x-auto">
+          <p className="text-xs font-bold text-gray-500 mb-2">Com e sem fatura, por mês</p>
+          <table className="text-xs w-full">
+            <thead><tr className="text-left text-[10.5px] text-gray-500 uppercase"><th className="pr-3 py-1">Mês</th><th className="pr-3">Com fatura</th><th className="pr-3">Sem fatura</th><th>% faturado (valor)</th></tr></thead>
+            <tbody>
+              {invoiceByMonth.map(([k, e]) => (
+                <tr key={k} className="border-t border-gray-100 text-navy">
+                  <td className="pr-3 py-1 capitalize">{MONTH_FMT.format(new Date(k + "-01T00:00:00"))}</td>
+                  <td className="pr-3">{e.inv} · {money(e.invV)}</td>
+                  <td className="pr-3">{e.no} · {money(e.noV)}</td>
+                  <td>{e.invV + e.noV > 0 ? Math.round(e.invV / (e.invV + e.noV) * 100) : 0}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Locality breakdown */}
       {totals.byLocality.length > 0 && (
@@ -525,21 +585,21 @@ const CrmPanel = () => {
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
-              {["4%", "7%", "19%", "11%", "12%", "11%", "8%", "6%", "6%", "6%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+              {["4%", "7%", "17%", "10%", "11%", "11%", "7%", "6%", "6%", "6%", "6%", "5%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", ""].map(h => (
+                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", "Fatura", ""].map(h => (
                   <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={12} className="text-center py-10 text-gray-400">A carregar...</td></tr>
+                <tr><td colSpan={13} className="text-center py-10 text-gray-400">A carregar...</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={12} className="text-center py-10 text-gray-400">
+                <tr><td colSpan={13} className="text-center py-10 text-gray-400">
                   {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
                 </td></tr>
               )}
@@ -581,6 +641,12 @@ const CrmPanel = () => {
                   <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
                       {r.paid ? "Pago" : "Por pagar"}
+                    </button>
+                  </td>
+                  <td className="px-2 py-2">
+                    <button onClick={() => toggleInvoiced(r)} title={r.invoice_ref ?? undefined}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.invoiced ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                      {r.invoiced ? "Sim" : "Não"}
                     </button>
                   </td>
                   <td className="px-1 py-2">
@@ -645,7 +711,18 @@ const CrmPanel = () => {
                 <input type="checkbox" checked={form.paid} onChange={e => setForm(f => ({ ...f, paid: e.target.checked }))} className="rounded border-gray-300" />
                 Pago
               </label>
+              <label className="flex items-center gap-2 h-9 ml-4 text-sm text-navy cursor-pointer select-none">
+                <input type="checkbox" checked={form.invoiced} onChange={e => setForm(f => ({ ...f, invoiced: e.target.checked }))} className="rounded border-gray-300" />
+                Com fatura
+              </label>
             </div>
+            {form.invoiced && (
+              <div className="sm:col-span-2">
+                <label className="block text-[10px] text-gray-500 mb-1">Dados da fatura (nome e NIF)</label>
+                <input type="text" value={form.invoice_ref} onChange={e => setForm(f => ({ ...f, invoice_ref: e.target.value }))}
+                  className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold" />
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
