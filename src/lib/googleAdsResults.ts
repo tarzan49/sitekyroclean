@@ -14,9 +14,12 @@
 // - Gasto, cliques e as "conversões" do Google: ads_daily_stats, enviado pelo
 //   script da conta de hora a hora. As conversões do Google são cliques no
 //   WhatsApp e formulários, não clientes, e aparecem só como referência.
-import { phoneKey } from "@/lib/clientRecords";
-import { addDays, lisbonDay } from "@/lib/crmClosings";
-import { ownerUpsellOf } from "@/lib/crmUpsell";
+//
+// Imports relativos, sem `@/`: a revisão de segunda-feira (weeklyReview.ts)
+// usa estas contas e vai no pacote do email (followUpBundle.ts).
+import { phoneKey } from "./clientRecords";
+import { addDays, lisbonDay } from "./crmClosings";
+import { ownerUpsellOf } from "./crmUpsell";
 
 /** Primeiro dia com os anúncios ligados (as campanhas novas arrancaram a 26/09 à tarde). */
 export const ADS_START_DAY = "2026-09-26";

@@ -14,6 +14,7 @@ const CLIENT = {
 const SERVICE = {
   id: "s1", request_date: "2026-10-05", description: "Limpeza sofá 3 lugares", billed_value: 89,
   client_name: null, city: null, phone: "+351 900 000 001", locality: "Lisboa",
+  my_cut: 45, created_at: "2026-10-05T10:00:00Z", booked_at: "2026-10-05T10:00:00Z", source: "WhatsApp",
 };
 
 function fakes(opts: { sent?: boolean; clients?: unknown[] } = {}) {
@@ -81,4 +82,18 @@ Deno.test("pending bot pre-bookings go on top of the email and count", async () 
   assertEquals(d.subject, "Kyro · 1 marcação por confirmar");
   assertEquals(d.html.startsWith("<h3>Pré-reservas e marcações por confirmar (1)</h3>"), true);
   assertStringIncludes(d.text, "15:00 · Pré-reserva – Cliente Inventado");
+});
+
+Deno.test("on Mondays the weekly review goes on top, even with nothing to follow", async () => {
+  const quiet = { ...CLIENT, status: "nao_interessado", last_contact_at: "2026-06-01T10:00:00Z", last_client_message_at: "2026-06-01T09:00:00Z", phone: "351900000009" };
+  // Segunda-feira, 12/10/2026, 9h30 em Lisboa.
+  const monday = await call("2026-10-12T08:30:00Z", { clients: [quiet] });
+  assertEquals(monday.json.sent, true);
+  assertStringIncludes(monday.log.mails[0], "revisão da semana");
+  const preview = await call("2026-10-12T08:30:00Z", { body: { send: false } });
+  assertEquals(preview.json.html.startsWith("<h3>Revisão de segunda-feira · semana de 05/10 a 11/10</h3>"), true);
+  assertStringIncludes(preview.json.text, "Fechos: 1");
+  // Terça-feira: só a pedido do painel.
+  assertEquals((await call("2026-10-13T08:30:00Z", { body: { send: false } })).json.html.includes("Revisão de segunda-feira"), false);
+  assertEquals((await call("2026-10-13T08:30:00Z", { body: { send: false, weekly: true } })).json.html.includes("Revisão de segunda-feira"), true);
 });

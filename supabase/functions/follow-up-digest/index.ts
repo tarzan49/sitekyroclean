@@ -16,7 +16,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { buildDigest, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
+import { buildDigest, buildWeeklyReview, computeWeeklyReview, isReviewDay, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
 import { isAuthenticatedAdmin } from "../_shared/admin-request.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
 import { parseIcs } from "../_shared/ics.ts";
@@ -34,6 +34,8 @@ export interface DigestStore {
   record(day: string, items: number, error: string | null): Promise<void>;
   /** Pré-reservas do bot ainda por confirmar (2026-10-09): futuras e ainda com o título "Pré-reserva". */
   pendingHolds?(now: Date): Promise<PendingHold[]>;
+  /** Gasto diário do Google Ads (ads_daily_stats), para a revisão de segunda-feira (2026-10-13). */
+  adsStats?(sinceDay: string): Promise<{ stat_date: string; cost: number }[]>;
 }
 export interface PendingHold { title: string; starts_at: string }
 export interface Mailer {
@@ -102,15 +104,24 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   }
   // deno-lint-ignore no-explicit-any
   const planned = planAll(data as any, { now });
-  const digest = withHolds(
+  const holdsDigest = withHolds(
     buildDigest(planned, { now, panelUrl: PANEL_URL, snapshot: snapshotAt(data.clients as never) }),
     (await env.store.pendingHolds?.(now)) ?? [],
   );
+  // Às segundas-feiras (ou a pedido do painel, `weekly: true`) a revisão da semana vai no topo.
+  const weekly = isReviewDay(now) || body.weekly === true;
+  const digest = weekly
+    ? withWeeklyReview(holdsDigest, buildWeeklyReview(computeWeeklyReview(
+      // deno-lint-ignore no-explicit-any
+      { services: data.services as any, clients: data.clients as any, adsStats: (await env.store.adsStats?.(lisbonDay(new Date(now.getTime() - 50 * 86_400_000)))) ?? [] },
+      now,
+    )))
+    : holdsDigest;
 
   if (!send) {
     return createSuccessResponse({ subject: digest.subject, html: digest.html, text: digest.text, count: digest.count, campaigns: digest.campaigns });
   }
-  if (digest.count === 0 && digest.campaigns.length === 0) {
+  if (digest.count === 0 && digest.campaigns.length === 0 && !weekly) {
     await env.store.record(today, 0, null);
     return createSuccessResponse({ sent: false, count: 0 });
   }
@@ -141,6 +152,11 @@ export function withHolds<T extends { subject: string; html: string; text: strin
   return { ...digest, subject, html, text, count: digest.count + holds.length };
 }
 
+/** A revisão de segunda-feira vai antes de tudo; o assunto diz que ela lá está. */
+export function withWeeklyReview<T extends { subject: string; html: string; text: string }>(digest: T, review: { html: string; text: string }): T {
+  return { ...digest, subject: `${digest.subject} · revisão da semana`, html: review.html + digest.html, text: review.text + digest.text };
+}
+
 function supabaseStore(): DigestStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -151,7 +167,7 @@ function supabaseStore(): DigestStore | null {
       const since = new Date(Date.now() - 400 * 86_400_000).toISOString();
       const [c, s, t] = await Promise.all([
         client.from("clients").select("*"),
-        client.from("service_requests").select("id, request_date, description, billed_value, client_name, city, phone, locality, booked_at, calendar_missing_since"),
+        client.from("service_requests").select("id, request_date, description, billed_value, my_cut, upsell_value, upsell_team, source, created_at, client_name, city, phone, locality, booked_at, calendar_missing_since"),
         client.from("client_touches").select("id, client_id, kind, campaign, template, skipped, note, channel, created_at").gte("created_at", since),
       ]);
       const error = c.error ?? s.error ?? t.error;
@@ -164,6 +180,10 @@ function supabaseStore(): DigestStore | null {
     },
     async record(day, items, error) {
       await client.from("follow_up_digests").upsert({ day, items, error, sent_at: new Date().toISOString() }, { onConflict: "day" });
+    },
+    async adsStats(sinceDay) {
+      const { data, error } = await client.from("ads_daily_stats").select("stat_date, cost").gte("stat_date", sinceDay);
+      return error ? [] : (data ?? []) as { stat_date: string; cost: number }[];
     },
     async pendingHolds(now) {
       const { data, error } = await client.from("bot_calendar_holds").select("event_id, title, starts_at, updated_at").is("released_at", null).gte("starts_at", now.toISOString()).order("starts_at");

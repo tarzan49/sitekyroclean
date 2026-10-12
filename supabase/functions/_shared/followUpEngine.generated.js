@@ -1141,6 +1141,117 @@ ${campaigns.map((c) => `<p style="font-size:13px;margin:4px 0">${esc(c.name)}: $
   ].filter((l, i, all) => l !== "" || all[i - 1] !== "").join("\n");
   return { subject, html, text, count, sections, campaigns };
 }
+
+// src/lib/crmUpsell.ts
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Braga", "Lisboa 1", "Lisboa 2", "Algarve", "Coimbra"];
+function teamShareOf(team) {
+  return team.startsWith("Porto") ? 0.6 : 0.7;
+}
+var round2 = (n) => Math.round(n * 100) / 100;
+function splitUpsell(value, team) {
+  const teamPart = round2(value * teamShareOf(team));
+  return { team: teamPart, owner: round2(value - teamPart) };
+}
+function defaultTeamFor(locality) {
+  return UPSELL_TEAMS.find((t) => locality && t.startsWith(locality)) ?? "Porto 1";
+}
+var isUpsellTeam = (s) => !!s && UPSELL_TEAMS.includes(s);
+function ownerUpsellOf(r) {
+  const value = Number(r.upsell_value) || 0;
+  if (value <= 0) return 0;
+  return splitUpsell(value, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality)).owner;
+}
+
+// src/lib/googleAdsResults.ts
+var GOOGLE_ADS_SOURCE = "Google Ads";
+var num = (v) => Number(v) || 0;
+var shareOf = (r) => num(r.my_cut) + ownerUpsellOf(r);
+var closedDay = (r) => lisbonDay(r.booked_at ?? r.created_at);
+function googlePhoneSet(contacts) {
+  return new Set(contacts.filter((c) => c.from_google_ads).map((c) => phoneKey(c.phone)).filter(Boolean));
+}
+function isGoogleService(r, googlePhones) {
+  if (r.source === GOOGLE_ADS_SOURCE) return true;
+  const key = phoneKey(r.phone);
+  return key !== "" && googlePhones.has(key);
+}
+
+// src/lib/weeklyReview.ts
+var WEEKLY_REVIEW_WEEKS = 6;
+var num2 = (v) => Number(v) || 0;
+var round1 = (n) => Math.round(n * 10) / 10;
+var mondayOf = (day) => addDays(day, -weekdayOf(day));
+var isReviewDay = (now) => weekdayOf(lisbonDay(now)) === 0;
+function computeWeeklyReview(data, now, weeks = WEEKLY_REVIEW_WEEKS) {
+  const thisMonday = mondayOf(lisbonDay(now));
+  const rows = /* @__PURE__ */ new Map();
+  for (let i = weeks; i >= 1; i--) {
+    const week = addDays(thisMonday, -7 * i);
+    rows.set(week, { week, closes: 0, billed: 0, share: 0, ticket: null, spend: 0, googleCloses: 0, costPerGoogleClient: null });
+  }
+  const googlePhones = googlePhoneSet(data.clients);
+  for (const s of data.services) {
+    if (s.calendar_missing_since) continue;
+    const row = rows.get(mondayOf(closedDay(s)));
+    if (!row) continue;
+    row.closes++;
+    row.billed += num2(s.billed_value);
+    row.share += shareOf(s);
+    if (isGoogleService(s, googlePhones)) row.googleCloses++;
+  }
+  for (const a of data.adsStats) {
+    const row = rows.get(mondayOf(a.stat_date));
+    if (row) row.spend += num2(a.cost);
+  }
+  for (const r of rows.values()) {
+    r.billed = round1(r.billed);
+    r.share = round1(r.share);
+    r.spend = round1(r.spend);
+    r.ticket = r.closes ? round1(r.billed / r.closes) : null;
+    r.costPerGoogleClient = r.googleCloses ? round1(r.spend / r.googleCloses) : null;
+  }
+  return [...rows.values()];
+}
+var euro = (n) => n === null ? "–" : `${Math.round(n).toLocaleString("pt-PT")}€`;
+var dm2 = (day) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+var escapeHtml = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function delta(cur, prev, unit = "") {
+  if (cur === null || prev === null) return "";
+  const d = Math.round(cur - prev);
+  return d === 0 ? " (igual)" : ` (${d > 0 ? "+" : ""}${d.toLocaleString("pt-PT")}${unit} que na anterior)`;
+}
+var STEPS = [
+  "Olhar os 4 números e compará-los com a semana anterior (5 min).",
+  "Escolher o que piorou mais e perguntar porquê (10 min).",
+  "Tirar uma decisão para a semana, só uma, e escrevê-la (10 min).",
+  "Confirmar a decisão da semana passada: foi feita? Mudou alguma coisa? (5 min)"
+];
+function buildWeeklyReview(weeks) {
+  const last = weeks[weeks.length - 1];
+  const prev = weeks[weeks.length - 2] ?? null;
+  const title = `Revisão de segunda-feira · semana de ${dm2(last.week)} a ${dm2(addDays(last.week, 6))}`;
+  const highlights = [
+    `Fechos: ${last.closes}${delta(last.closes, prev?.closes ?? null)} · faturado ${euro(last.billed)} · a tua parte ${euro(last.share)}`,
+    `Ticket médio: ${euro(last.ticket)}${delta(last.ticket, prev?.ticket ?? null, "€")}`,
+    last.spend > 0 ? `Custo por cliente Google: ${last.costPerGoogleClient === null ? `nenhum cliente com ${euro(last.spend)} gastos` : euro(last.costPerGoogleClient)}${delta(last.costPerGoogleClient, prev?.costPerGoogleClient ?? null, "€")} (${last.googleCloses} clientes, ${euro(last.spend)} gastos)` : "Custo por cliente Google: sem gasto nesta semana",
+    "Avaliações novas: conta-as na ficha do Google e compara com a semana passada."
+  ];
+  const head = ["Semana", "Fechos", "Faturado", "Tua parte", "Ticket", "Gasto Google", "Clientes Google", "Custo/cliente"];
+  const cells = (r) => [dm2(r.week), String(r.closes), euro(r.billed), euro(r.share), euro(r.ticket), r.spend ? euro(r.spend) : "–", r.spend || r.googleCloses ? String(r.googleCloses) : "–", euro(r.costPerGoogleClient)];
+  const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
+  const html = `<h3>${escapeHtml(title)}</h3><ul>${highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + weeks.map((r) => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map((c) => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") + `</table><p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol><p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
+  const text = `${title}
+${highlights.map((h) => `- ${h}`).join("\n")}
+
+${head.join(" | ")}
+${weeks.map((r) => cells(r).join(" | ")).join("\n")}
+
+Os 30 minutos:
+${STEPS.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+
+`;
+  return { weeks, html, text };
+}
 export {
   ACTION_KINDS,
   CONTACT_PREFERENCES,
@@ -1148,10 +1259,13 @@ export {
   STAGE_INFO,
   botGuidance,
   buildDigest,
+  buildWeeklyReview,
   campaignCalendar,
+  computeWeeklyReview,
   factsFromLabels,
   firstName,
   isQuietTime,
+  isReviewDay,
   lisbonDay,
   normalizePhone,
   phoneKey,
