@@ -97,3 +97,10 @@ Deno.test("on Mondays the weekly review goes on top, even with nothing to follow
   assertEquals((await call("2026-10-13T08:30:00Z", { body: { send: false } })).json.html.includes("Revisão de segunda-feira"), false);
   assertEquals((await call("2026-10-13T08:30:00Z", { body: { send: false, weekly: true } })).json.html.includes("Revisão de segunda-feira"), true);
 });
+
+Deno.test("force sends at any hour and leaves the 9h send alone", async () => {
+  const { json, log } = await call("2026-10-13T21:00:00Z", { body: { send: true, force: true, weekly: true } });
+  assertEquals(json.sent, true);
+  assertStringIncludes(log.mails[0], "revisão da semana");
+  assertEquals(log.recorded.length, 0);
+});

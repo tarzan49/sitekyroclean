@@ -92,7 +92,10 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
 
   // Com a chave, só se envia às 9h de Lisboa e uma vez por dia; ver sem enviar
   // (send: false) pode ser a qualquer hora, para testar a função publicada.
-  if (fromCron && send) {
+  // `force: true` (dono, 2026-10-13: "manda-me o email agora para ver como
+  // fica") envia já e não marca o dia, para não tirar o envio das 9h.
+  const force = body.force === true;
+  if (fromCron && send && !force) {
     if (Number(LISBON_HOUR.format(now)) % 24 !== SEND_HOUR_LISBON) return createSuccessResponse({ skipped: "fora da hora" });
     if (await env.store.sentOn(today)) return createSuccessResponse({ skipped: "já enviado hoje" });
   }
@@ -127,7 +130,7 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   }
   if (!env.mailer) return createErrorResponse("Email por configurar", 503);
   const error = await env.mailer.send(digest.subject, digest.html, digest.text);
-  await env.store.record(today, digest.count, error);
+  if (!force) await env.store.record(today, digest.count, error);
   if (error) {
     safeLog("error", "[follow-up-digest] o Resend recusou o envio", { message: error });
     return createErrorResponse("O email não foi enviado", 502);
