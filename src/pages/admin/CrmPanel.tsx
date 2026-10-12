@@ -357,18 +357,6 @@ const CrmPanel = () => {
     if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, invoiced: !x.invoiced } : x));
   };
 
-  // Com e sem fatura, mês a mês (pelo dia do serviço).
-  const invoiceByMonth = useMemo(() => {
-    const m = new Map<string, { inv: number; invV: number; no: number; noV: number }>();
-    for (const r of records) {
-      const k = r.request_date.slice(0, 7);
-      const e = m.get(k) ?? { inv: 0, invV: 0, no: 0, noV: 0 };
-      if (r.invoiced) { e.inv++; e.invV += r.billed_value; } else { e.no++; e.noV += r.billed_value; }
-      m.set(k, e);
-    }
-    return [...m.entries()].sort((a, b) => b[0].localeCompare(a[0]));
-  }, [records]);
-
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -513,31 +501,13 @@ const CrmPanel = () => {
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Com fatura</p>
           <p className="text-xl font-bold text-navy">{totals.invoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.invoicedValue)})</span></p>
+          <p className="text-[11px] text-gray-500 mt-0.5">{totals.invoicedValue + totals.notInvoicedValue > 0 ? Math.round(totals.invoicedValue / (totals.invoicedValue + totals.notInvoicedValue) * 100) : 0}% do valor do mês</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sem fatura</p>
           <p className="text-xl font-bold text-navy">{totals.notInvoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.notInvoicedValue)})</span></p>
         </div>
       </div>
-
-      {invoiceByMonth.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4 overflow-x-auto">
-          <p className="text-xs font-bold text-gray-500 mb-2">Com e sem fatura, por mês</p>
-          <table className="text-xs w-full">
-            <thead><tr className="text-left text-[10.5px] text-gray-500 uppercase"><th className="pr-3 py-1">Mês</th><th className="pr-3">Com fatura</th><th className="pr-3">Sem fatura</th><th>% faturado (valor)</th></tr></thead>
-            <tbody>
-              {invoiceByMonth.map(([k, e]) => (
-                <tr key={k} className="border-t border-gray-100 text-navy">
-                  <td className="pr-3 py-1 capitalize">{MONTH_FMT.format(new Date(k + "-01T00:00:00"))}</td>
-                  <td className="pr-3">{e.inv} · {money(e.invV)}</td>
-                  <td className="pr-3">{e.no} · {money(e.noV)}</td>
-                  <td>{e.invV + e.noV > 0 ? Math.round(e.invV / (e.invV + e.noV) * 100) : 0}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {/* Locality breakdown */}
       {totals.byLocality.length > 0 && (
