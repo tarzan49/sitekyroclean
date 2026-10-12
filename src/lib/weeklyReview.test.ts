@@ -56,3 +56,33 @@ describe("weekly review", () => {
     expect(text).not.toContain("—");
   });
 });
+
+describe("service ranking", () => {
+  it("ranks services by close rate, with ticket and value per contact", async () => {
+    const { computeServiceRanking, buildWeeklyReview } = await import("./weeklyReview");
+    const c = (i: number, services: string[], status: string, at = "2026-09-20T10:00:00Z") =>
+      ({ phone: `35191000${String(i).padStart(4, "0")}`, status, services, first_contact_at: at });
+    const clients = [
+      ...Array.from({ length: 10 }, (_, i) => c(i, ["Sofá"], i < 5 ? "cliente" : "por_marcar")),
+      ...Array.from({ length: 10 }, (_, i) => c(100 + i, ["colchão"], i < 8 ? "marcado" : "nao_interessado")),
+      // Tem serviço no CRM: fechou, mesmo com a etiqueta para trás.
+      c(200, ["Cadeira"], "por_marcar"),
+      // Fora da janela de 90 dias.
+      c(300, ["Sofá"], "cliente", "2026-05-01T10:00:00Z"),
+    ];
+    const services = [
+      svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza sofá 3 lugares", billed_value: 80 }),
+      svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza colchão casal", billed_value: 60 }),
+      svc({ booked_at: "2026-09-25T10:00:00Z", description: "Sofá e colchão", billed_value: 500 }),
+      svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza 4 cadeiras", billed_value: 50, phone: "+351 910 000 200" }),
+    ];
+    const ranking = computeServiceRanking({ services, clients }, NOW);
+    expect(ranking.map(r => r.service)).toEqual(["Colchão", "Sofá", "Cadeira"]);
+    expect(ranking[0]).toMatchObject({ contacts: 10, closed: 8, rate: 0.8, ticket: 60, valuePerContact: 48 });
+    expect(ranking[1]).toMatchObject({ contacts: 10, closed: 5, ticket: 80, valuePerContact: 40 });
+    expect(ranking[2]).toMatchObject({ contacts: 1, closed: 1 });
+    const { text } = buildWeeklyReview(computeWeeklyReview({ services: [], clients: [], adsStats: [] }, NOW), ranking);
+    expect(text).toContain("Maior taxa: Colchão (80%). Mais dinheiro por conversa: Colchão (48€).");
+    expect(text).toContain("– | Cadeira | 1 | 1 | 100%");
+  });
+});

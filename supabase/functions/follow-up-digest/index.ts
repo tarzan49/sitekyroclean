@@ -16,7 +16,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { buildDigest, buildWeeklyReview, computeWeeklyReview, isReviewDay, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
+import { buildDigest, buildWeeklyReview, computeServiceRanking, computeWeeklyReview, isReviewDay, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
 import { isAuthenticatedAdmin } from "../_shared/admin-request.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
 import { parseIcs } from "../_shared/ics.ts";
@@ -113,12 +113,13 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   );
   // Às segundas-feiras (ou a pedido do painel, `weekly: true`) a revisão da semana vai no topo.
   const weekly = isReviewDay(now) || body.weekly === true;
+  // deno-lint-ignore no-explicit-any
+  const rows = { services: data.services as any, clients: data.clients as any };
   const digest = weekly
-    ? withWeeklyReview(holdsDigest, buildWeeklyReview(computeWeeklyReview(
-      // deno-lint-ignore no-explicit-any
-      { services: data.services as any, clients: data.clients as any, adsStats: (await env.store.adsStats?.(lisbonDay(new Date(now.getTime() - 50 * 86_400_000)))) ?? [] },
-      now,
-    )))
+    ? withWeeklyReview(holdsDigest, buildWeeklyReview(
+      computeWeeklyReview({ ...rows, adsStats: (await env.store.adsStats?.(lisbonDay(new Date(now.getTime() - 50 * 86_400_000)))) ?? [] }, now),
+      computeServiceRanking(rows, now),
+    ))
     : holdsDigest;
 
   if (!send) {

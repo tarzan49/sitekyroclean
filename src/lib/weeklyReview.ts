@@ -9,6 +9,8 @@
 // evento apagado no calendário não é fecho. As avaliações não têm data em
 // nenhuma tabela: o email só lembra de as contar na ficha do Google.
 import { addDays, lisbonDay, weekdayOf } from "./crmClosings";
+import { CLIENT_SERVICES, phoneKey } from "./clientRecords";
+import { itemsOf, typeOf } from "./crmServiceMix";
 import { closedDay, googlePhoneSet, isGoogleService, shareOf, type ContactRow, type ServiceRow } from "./googleAdsResults";
 
 export const WEEKLY_REVIEW_WEEKS = 6;
@@ -25,6 +27,87 @@ export interface WeekRow {
   googleCloses: number;
   /** null sem clientes do Google (com gasto, é o sinal mais importante da tabela). */
   costPerGoogleClient: number | null;
+}
+
+/**
+ * Ranking por serviço (dono, 2026-10-13: "qual é o serviço que eu tenho maior
+ * taxa de fecho", "um ranking"). Contactos = fichas com essa etiqueta do
+ * WhatsApp, com o primeiro contacto na janela; fechou = cliente ou marcado, ou
+ * serviço no CRM com esse telefone (como `effectiveStatus`). Ticket = média das
+ * linhas do CRM fechadas na janela que só têm esse serviço, para uma linha com
+ * sofá e tapete não inflacionar os dois. Valor por contacto = taxa × ticket:
+ * o que cada conversa desse serviço vale, em média.
+ */
+export interface ServiceRankRow {
+  service: string;
+  contacts: number;
+  closed: number;
+  rate: number;
+  ticket: number | null;
+  valuePerContact: number | null;
+}
+
+export const RANKING_DAYS = 90;
+/** Abaixo disto a taxa ainda é ruído: o serviço aparece no fim, sem posição. */
+export const RANKING_MIN_CONTACTS = 10;
+
+export interface RankingClient {
+  phone: string;
+  status: string;
+  services: string[] | null;
+  first_contact_at: string | null;
+}
+
+const fold = (t: string) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const LABEL_BY_FOLD = new Map(CLIENT_SERVICES.map(l => [fold(l), l]));
+
+/** A linha do CRM é só deste serviço? (Impermeabilização conta em qualquer artigo; recolha pela descrição.) */
+function lineIsOnly(service: string, description: string): boolean {
+  const items = itemsOf(description);
+  const type = typeOf(description);
+  switch (service) {
+    case "Impermeabilização": return type === "Impermeabilização";
+    case "Recolha": return /recolh/i.test(description);
+    case "Sofá": return type === "Limpeza" && items.length === 1 && items[0] === "Sofá";
+    case "Cadeira": return type === "Limpeza" && items.length === 1 && items[0] === "Cadeiras";
+    case "Colchão": return items.length === 1 && items[0] === "Colchão";
+    case "Tapete": return items.length === 1 && items[0] === "Tapete";
+    default: return false;
+  }
+}
+
+export function computeServiceRanking(
+  data: { services: ServiceRow[]; clients: RankingClient[] },
+  now: Date,
+  days = RANKING_DAYS,
+): ServiceRankRow[] {
+  const since = addDays(lisbonDay(now), -days);
+  const live = data.services.filter(s => !s.calendar_missing_since);
+  const crmPhones = new Set(live.map(s => phoneKey(s.phone)).filter(k => k.length === 9));
+  const rows = new Map(CLIENT_SERVICES.map(service => [service as string, { contacts: 0, closed: 0, billed: 0, lines: 0 }]));
+  for (const c of data.clients) {
+    if (!c.first_contact_at || lisbonDay(c.first_contact_at) < since) continue;
+    const closed = c.status === "cliente" || c.status === "marcado" || crmPhones.has(phoneKey(c.phone));
+    const labels = new Set((c.services ?? []).map(l => LABEL_BY_FOLD.get(fold(l))).filter(Boolean) as string[]);
+    for (const l of labels) {
+      const r = rows.get(l)!;
+      r.contacts++;
+      if (closed) r.closed++;
+    }
+  }
+  for (const s of live) {
+    if (closedDay(s) < since) continue;
+    for (const [service, r] of rows) {
+      if (lineIsOnly(service, s.description ?? "")) { r.billed += num(s.billed_value); r.lines++; }
+    }
+  }
+  const out = [...rows].map(([service, r]): ServiceRankRow => {
+    const rate = r.contacts ? r.closed / r.contacts : 0;
+    const ticket = r.lines ? round1(r.billed / r.lines) : null;
+    return { service, contacts: r.contacts, closed: r.closed, rate, ticket, valuePerContact: ticket === null ? null : round1(rate * ticket) };
+  }).filter(r => r.contacts > 0);
+  const big = (r: ServiceRankRow) => r.contacts >= RANKING_MIN_CONTACTS;
+  return out.sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
 }
 
 export interface WeeklyReview {
@@ -94,7 +177,30 @@ const STEPS = [
   "Confirmar a decisão da semana passada: foi feita? Mudou alguma coisa? (5 min)",
 ];
 
-export function buildWeeklyReview(weeks: WeekRow[]): WeeklyReview {
+const pct = (r: number) => `${Math.round(r * 100)}%`;
+
+function rankingSection(ranking: ServiceRankRow[]): { html: string; text: string } {
+  if (!ranking.length) return { html: "", text: "" };
+  const title = `Taxa de fecho por serviço (contactos dos últimos ${RANKING_DAYS} dias)`;
+  const head = ["#", "Serviço", "Contactos", "Fecharam", "Taxa", "Ticket médio", "Valor por contacto"];
+  const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
+  let pos = 0;
+  const cells = ranking.map(r => [
+    r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–", r.service, String(r.contacts), String(r.closed), pct(r.rate), euro(r.ticket), euro(r.valuePerContact),
+  ]);
+  const bestValue = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS && r.valuePerContact !== null).sort((a, b) => b.valuePerContact! - a.valuePerContact!)[0];
+  const note = `Maior taxa: ${ranking[0].service} (${pct(ranking[0].rate)}).` + (bestValue ? ` Mais dinheiro por conversa: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "");
+  const foot = `Um contacto conta em cada serviço que pediu. Ticket = linhas do CRM só desse serviço. Com menos de ${RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.`;
+  return {
+    html: `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(note)}</p>` +
+      `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map(h => `<th ${td}>${h}</th>`).join("")}</tr>` +
+      cells.map(c => `<tr>${c.map(x => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") +
+      `</table><p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
+    text: `${title}\n${note}\n${head.join(" | ")}\n${cells.map(c => c.join(" | ")).join("\n")}\n${foot}\n\n`,
+  };
+}
+
+export function buildWeeklyReview(weeks: WeekRow[], ranking: ServiceRankRow[] = []): WeeklyReview {
   const last = weeks[weeks.length - 1];
   const prev = weeks[weeks.length - 2] ?? null;
   const title = `Revisão de segunda-feira · semana de ${dm(last.week)} a ${dm(addDays(last.week, 6))}`;
@@ -115,11 +221,13 @@ export function buildWeeklyReview(weeks: WeekRow[]): WeeklyReview {
     `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map(h => `<th ${td}>${h}</th>`).join("")}</tr>` +
     weeks.map(r => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map(c => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") +
     `</table>` +
+    rankingSection(ranking).html +
     `<p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ol>` +
     `<p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
   const text =
     `${title}\n${highlights.map(h => `- ${h}`).join("\n")}\n\n` +
     `${head.join(" | ")}\n${weeks.map(r => cells(r).join(" | ")).join("\n")}\n\n` +
+    rankingSection(ranking).text +
     `Os 30 minutos:\n${STEPS.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n`;
   return { weeks, html, text };
 }

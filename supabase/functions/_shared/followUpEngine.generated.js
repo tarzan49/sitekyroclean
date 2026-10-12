@@ -1178,6 +1178,62 @@ function isGoogleService(r, googlePhones) {
 
 // src/lib/weeklyReview.ts
 var WEEKLY_REVIEW_WEEKS = 6;
+var RANKING_DAYS = 90;
+var RANKING_MIN_CONTACTS = 10;
+var fold2 = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+var LABEL_BY_FOLD = new Map(CLIENT_SERVICES.map((l) => [fold2(l), l]));
+function lineIsOnly(service, description) {
+  const items = itemsOf(description);
+  const type = typeOf(description);
+  switch (service) {
+    case "Impermeabilização":
+      return type === "Impermeabilização";
+    case "Recolha":
+      return /recolh/i.test(description);
+    case "Sofá":
+      return type === "Limpeza" && items.length === 1 && items[0] === "Sofá";
+    case "Cadeira":
+      return type === "Limpeza" && items.length === 1 && items[0] === "Cadeiras";
+    case "Colchão":
+      return items.length === 1 && items[0] === "Colchão";
+    case "Tapete":
+      return items.length === 1 && items[0] === "Tapete";
+    default:
+      return false;
+  }
+}
+function computeServiceRanking(data, now, days = RANKING_DAYS) {
+  const since = addDays(lisbonDay(now), -days);
+  const live = data.services.filter((s) => !s.calendar_missing_since);
+  const crmPhones = new Set(live.map((s) => phoneKey(s.phone)).filter((k) => k.length === 9));
+  const rows = new Map(CLIENT_SERVICES.map((service) => [service, { contacts: 0, closed: 0, billed: 0, lines: 0 }]));
+  for (const c of data.clients) {
+    if (!c.first_contact_at || lisbonDay(c.first_contact_at) < since) continue;
+    const closed = c.status === "cliente" || c.status === "marcado" || crmPhones.has(phoneKey(c.phone));
+    const labels = new Set((c.services ?? []).map((l) => LABEL_BY_FOLD.get(fold2(l))).filter(Boolean));
+    for (const l of labels) {
+      const r = rows.get(l);
+      r.contacts++;
+      if (closed) r.closed++;
+    }
+  }
+  for (const s of live) {
+    if (closedDay(s) < since) continue;
+    for (const [service, r] of rows) {
+      if (lineIsOnly(service, s.description ?? "")) {
+        r.billed += num2(s.billed_value);
+        r.lines++;
+      }
+    }
+  }
+  const out = [...rows].map(([service, r]) => {
+    const rate = r.contacts ? r.closed / r.contacts : 0;
+    const ticket = r.lines ? round1(r.billed / r.lines) : null;
+    return { service, contacts: r.contacts, closed: r.closed, rate, ticket, valuePerContact: ticket === null ? null : round1(rate * ticket) };
+  }).filter((r) => r.contacts > 0);
+  const big = (r) => r.contacts >= RANKING_MIN_CONTACTS;
+  return out.sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
+}
 var num2 = (v) => Number(v) || 0;
 var round1 = (n) => Math.round(n * 10) / 10;
 var mondayOf = (day) => addDays(day, -weekdayOf(day));
@@ -1226,7 +1282,37 @@ var STEPS = [
   "Tirar uma decisão para a semana, só uma, e escrevê-la (10 min).",
   "Confirmar a decisão da semana passada: foi feita? Mudou alguma coisa? (5 min)"
 ];
-function buildWeeklyReview(weeks) {
+var pct = (r) => `${Math.round(r * 100)}%`;
+function rankingSection(ranking) {
+  if (!ranking.length) return { html: "", text: "" };
+  const title = `Taxa de fecho por serviço (contactos dos últimos ${RANKING_DAYS} dias)`;
+  const head = ["#", "Serviço", "Contactos", "Fecharam", "Taxa", "Ticket médio", "Valor por contacto"];
+  const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
+  let pos = 0;
+  const cells = ranking.map((r) => [
+    r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–",
+    r.service,
+    String(r.contacts),
+    String(r.closed),
+    pct(r.rate),
+    euro(r.ticket),
+    euro(r.valuePerContact)
+  ]);
+  const bestValue = ranking.filter((r) => r.contacts >= RANKING_MIN_CONTACTS && r.valuePerContact !== null).sort((a, b) => b.valuePerContact - a.valuePerContact)[0];
+  const note = `Maior taxa: ${ranking[0].service} (${pct(ranking[0].rate)}).` + (bestValue ? ` Mais dinheiro por conversa: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "");
+  const foot = `Um contacto conta em cada serviço que pediu. Ticket = linhas do CRM só desse serviço. Com menos de ${RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.`;
+  return {
+    html: `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(note)}</p><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + cells.map((c) => `<tr>${c.map((x) => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") + `</table><p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
+    text: `${title}
+${note}
+${head.join(" | ")}
+${cells.map((c) => c.join(" | ")).join("\n")}
+${foot}
+
+`
+  };
+}
+function buildWeeklyReview(weeks, ranking = []) {
   const last = weeks[weeks.length - 1];
   const prev = weeks[weeks.length - 2] ?? null;
   const title = `Revisão de segunda-feira · semana de ${dm2(last.week)} a ${dm2(addDays(last.week, 6))}`;
@@ -1239,14 +1325,14 @@ function buildWeeklyReview(weeks) {
   const head = ["Semana", "Fechos", "Faturado", "Tua parte", "Ticket", "Gasto Google", "Clientes Google", "Custo/cliente"];
   const cells = (r) => [dm2(r.week), String(r.closes), euro(r.billed), euro(r.share), euro(r.ticket), r.spend ? euro(r.spend) : "–", r.spend || r.googleCloses ? String(r.googleCloses) : "–", euro(r.costPerGoogleClient)];
   const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
-  const html = `<h3>${escapeHtml(title)}</h3><ul>${highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + weeks.map((r) => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map((c) => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") + `</table><p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol><p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
+  const html = `<h3>${escapeHtml(title)}</h3><ul>${highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + weeks.map((r) => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map((c) => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") + `</table>` + rankingSection(ranking).html + `<p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol><p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
   const text = `${title}
 ${highlights.map((h) => `- ${h}`).join("\n")}
 
 ${head.join(" | ")}
 ${weeks.map((r) => cells(r).join(" | ")).join("\n")}
 
-Os 30 minutos:
+` + rankingSection(ranking).text + `Os 30 minutos:
 ${STEPS.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
 `;
@@ -1261,6 +1347,7 @@ export {
   buildDigest,
   buildWeeklyReview,
   campaignCalendar,
+  computeServiceRanking,
   computeWeeklyReview,
   factsFromLabels,
   firstName,
