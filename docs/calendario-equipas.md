@@ -55,7 +55,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   serviço sem preço escrito tem de ser feito na mesma.
 - **O dono escolhe sempre a equipa, em todas as regiões** (dono, 29/09/2026:
   "eu quero agora escolher sempre a equipa"). Escolhe pela **cor do evento**
-  no calendário dele: Mirtilo = Porto 1, Pavão = Porto 2, Basílico = Braga,
+  no calendário dele: Mirtilo = Porto 1, Grafite = Porto 2, Basílico = Braga,
   Tangerina = Lisboa 1, Uva = Lisboa 2, Banana = Algarve. Ou escrevendo
   "equipa porto 1" (porto 2, braga, lisboa 1, lisboa 2, algarve) no evento, que
   ganha à cor ("equipa porto" sozinho é a Porto 1, "equipa lisboa" a Lisboa 1).
@@ -93,7 +93,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Cores no calendário do dono** (dono, 28/09/2026: "quero o meu com cores
   em vez de ser tudo azul", "pinta só os serviços para a frente"): cada
   serviço que ainda não acabou fica com a cor da equipa (Porto 1
-  azul Mirtilo, Porto 2 azul-claro Pavão, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
+  azul Mirtilo, Porto 2 cinzento Grafite, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
   roxo Uva, Algarve amarelo Banana). A cor é a escolha do dono; o script só a
   põe quando a equipa foi escolhida por escrito ("equipa X"). **Cuidado com o
   CRM:** mudar a cor mexe na data de alteração do evento, e o CRM

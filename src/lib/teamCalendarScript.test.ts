@@ -142,7 +142,7 @@ describe('região e equipa de cada serviço', () => {
     // Uma cor que não é de nenhuma equipa não é uma escolha.
     expect(equipa(lisboa, '11')).toBeNull();
     // Cada equipa com a sua cor.
-    expect(['9', '7', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+    expect(['9', '8', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
       .toEqual(['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve', 'coimbra']);
   });
 
@@ -366,7 +366,7 @@ describe('o que muda nos calendários das equipas', () => {
 
     it('escolhe pela cor do evento, e a linha que o script escreve não é uma escolha', () => {
       expect(equipa(servico('e1', '9'))).toBe('porto');
-      expect(equipa(servico('e1', '7'))).toBe('porto2');
+      expect(equipa(servico('e1', '8'))).toBe('porto2');
       expect(equipa(servico('e1', '6'))).toBe('lisboa');
       expect(equipa({ ...servico('e1'), description: 'Equipa: Porto 2' })).toBeNull();
     });
@@ -387,14 +387,14 @@ describe('o que muda nos calendários das equipas', () => {
         const porEscolher = new Set(d.porEscolher.map((i: { evento: Evento }) => i.evento.id));
         return resumoDe(gs.planear(d.copias, copias, AGORA, false, porEscolher));
       };
-      expect(planearCom(servico('e1', '7'))).toEqual(['apagar:porto:retirado', 'criar:porto2:novo']);
+      expect(planearCom(servico('e1', '8'))).toEqual(['apagar:porto:retirado', 'criar:porto2:novo']);
       expect(planearCom(servico('e1'))).toEqual([]);
       expect(planearCom(servico('e1'), [{ ...existentes[0], equipaId: 'lisboa' }])).toEqual([]);
     });
 
     it('pinta e marca a equipa escrita como as outras', () => {
-      expect(gs.marcaDaEquipa(servico('e1', '7'), 'porto2', AGORA)).toEqual({ description: 'Equipa: Porto 2' });
-      expect(gs.marcaDaEquipa(servico('e1', '9', ' equipa porto 2'), 'porto2', AGORA)).toEqual({ colorId: '7', description: 'Equipa: Porto 2' });
+      expect(gs.marcaDaEquipa(servico('e1', '8'), 'porto2', AGORA)).toEqual({ description: 'Equipa: Porto 2' });
+      expect(gs.marcaDaEquipa(servico('e1', '9', ' equipa porto 2'), 'porto2', AGORA)).toEqual({ colorId: '8', description: 'Equipa: Porto 2' });
     });
 
     it('pede ao dono que escolha, uma vez por serviço, com a zona como pista e as cores de todas as equipas', () => {
@@ -410,7 +410,7 @@ describe('o que muda nos calendários das equipas', () => {
       expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
       expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
       expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
-      for (const linha of ['Mirtilo = Equipa Porto 1', 'Pavão = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
         expect(mensagem.texto).toContain(linha);
       }
       expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2", "equipa algarve" ou "equipa coimbra"');
