@@ -492,6 +492,31 @@ function rugEstimate(rugs, city) {
   };
 }
 
+// src/lib/botCloseNow.ts
+var CLOSE_NOW_RATE = 0.1;
+var CLOSE_NOW_MAX_TOTAL = 200;
+var CLOSE_NOW_DAYS = 7;
+var CLOSE_NOW_CONDITION = `Só se ficar marcado já, nesta conversa, para um dos dias que temos livres nos próximos ${CLOSE_NOW_DAYS} dias.`;
+var closeNowPrice = (price) => Math.round(price * (1 - CLOSE_NOW_RATE));
+var RULE = "Usa só quando o cliente disse que o problema é o preço, uma vez por conversa, e diz sempre a condição.";
+function closeNowOffer(q) {
+  if (q.hasWaterproofing) return { ok: false, reason: "impermeabilização: o desconto é sempre decisão do responsável" };
+  if (q.rug) {
+    if (q.rug.homePrice > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
+    return {
+      ok: true,
+      total: null,
+      homePrice: closeNowPrice(q.rug.homePrice),
+      pickupPrice: q.rug.pickupPrice === null ? null : closeNowPrice(q.rug.pickupPrice),
+      condition: CLOSE_NOW_CONDITION,
+      rule: RULE
+    };
+  }
+  if (q.handToOwner || q.total === null) return { ok: false, reason: "sob orçamento: o preço é do responsável" };
+  if (q.total > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
+  return { ok: true, total: closeNowPrice(q.total), homePrice: null, pickupPrice: null, condition: CLOSE_NOW_CONDITION, rule: RULE };
+}
+
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
 var KINDS = ["sofa", "mattress", "chairs", "rug", "carpet"];
@@ -566,6 +591,7 @@ function botQuote(input) {
   const rugsOnly = items.every((i) => i.kind === "rug");
   const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
   const rugPriced = rugPrice?.ok === true;
+  const handToOwner = result.quote && !rugPriced || city === null || extendedTrip;
   return {
     ok: true,
     city,
@@ -585,9 +611,16 @@ function botQuote(input) {
     travel: result.travel,
     total: result.total,
     quote: result.quote,
-    handToOwner: result.quote && !rugPriced || city === null || extendedTrip,
+    handToOwner,
     rugPickup: rugPickupFor(items),
-    rugEstimate: rugPrice
+    rugEstimate: rugPrice,
+    // 10% to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
+    closeNow: closeNowOffer({
+      total: result.quote ? null : result.total,
+      handToOwner: handToOwner && !rugPriced,
+      hasWaterproofing: items.some((i) => i.extra === "essencial" || i.extra === "premium"),
+      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null
+    })
   };
 }
 

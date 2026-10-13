@@ -18,6 +18,7 @@ import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugEstimate } from './botRugEstimate';
+import { closeNowOffer } from './botCloseNow';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -119,6 +120,7 @@ export function botQuote(input: unknown) {
     ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawItems[n] as Record<string, unknown>).material })), city)
     : null;
   const rugPriced = rugPrice?.ok === true;
+  const handToOwner = (result.quote && !rugPriced) || city === null || extendedTrip;
   return {
     ok: true as const,
     city,
@@ -138,8 +140,15 @@ export function botQuote(input: unknown) {
     travel: result.travel,
     total: result.total,
     quote: result.quote,
-    handToOwner: (result.quote && !rugPriced) || city === null || extendedTrip,
+    handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
+    // 10% to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
+    closeNow: closeNowOffer({
+      total: result.quote ? null : result.total,
+      handToOwner: handToOwner && !rugPriced,
+      hasWaterproofing: items.some(i => i.extra === 'essencial' || i.extra === 'premium'),
+      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null,
+    }),
   };
 }
