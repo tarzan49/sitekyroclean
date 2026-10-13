@@ -764,6 +764,10 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
     const done = wordsFor(lastPast ? itemsOfService(lastPast) : items);
     const job = lastPast ? jobOf(lastPast) : `a limpeza ${done.of}`;
     const afterJob = job.startsWith('a impermeabilização') ? 'da impermeabilização' : 'da limpeza';
+    // Confirmar o upsell com o cliente (dono, 13/10/2026: "quero perguntar para apanhar upsells"): o
+    // guião das equipas diz que um upsell que o cliente refira e não esteja no relatório conta como não
+    // comunicado. Vai no fim, depois do link e do desconto, para não tirar o pedido de avaliação da frente.
+    const upsellCheck = `\n\nSó para o nosso registo: além d${job}, a equipa fez mais algum tratamento nessa visita?`;
     if (!asks.length) {
       if (today <= until) {
         cands.push({
@@ -773,11 +777,11 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
           messages: orderVariants([
             {
               id: 'avaliacao-c', label: 'Versão C (11/10, personalizada)',
-              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? 'ficaram' : 'ficou'} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}\n\n${CLIENT_THANKS_DISCOUNT}`,
+              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? 'ficaram' : 'ficou'} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}\n\n${CLIENT_THANKS_DISCOUNT}${upsellCheck}`,
             },
             {
               id: 'avaliacao-d', label: 'Versão D (11/10, curta)',
-              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? 'ficaram' : 'ficou'} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}\n\n${CLIENT_THANKS_DISCOUNT}`,
+              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? 'ficaram' : 'ficou'} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}\n\n${CLIENT_THANKS_DISCOUNT}${upsellCheck}`,
             },
           ], `${c.id}:avaliacao`, ctx.variantStats),
         });

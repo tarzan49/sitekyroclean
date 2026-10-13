@@ -782,6 +782,9 @@ Quer que acrescentemos ao serviço?`
     const done = wordsFor(lastPast ? itemsOfService(lastPast) : items);
     const job = lastPast ? jobOf(lastPast) : `a limpeza ${done.of}`;
     const afterJob = job.startsWith("a impermeabilização") ? "da impermeabilização" : "da limpeza";
+    const upsellCheck = `
+
+Só para o nosso registo: além d${job}, a equipa fez mais algum tratamento nessa visita?`;
     if (!asks.length) {
       if (today <= until) {
         cands.push({
@@ -798,14 +801,14 @@ Quer que acrescentemos ao serviço?`
               label: "Versão C (11/10, personalizada)",
               text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? "ficaram" : "ficou"} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}
 
-${CLIENT_THANKS_DISCOUNT}`
+${CLIENT_THANKS_DISCOUNT}${upsellCheck}`
             },
             {
               id: "avaliacao-d",
               label: "Versão D (11/10, curta)",
               text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? "ficaram" : "ficou"} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}
 
-${CLIENT_THANKS_DISCOUNT}`
+${CLIENT_THANKS_DISCOUNT}${upsellCheck}`
             }
           ], `${c.id}:avaliacao`, ctx.variantStats)
         });
