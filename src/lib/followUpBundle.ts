@@ -19,4 +19,4 @@ export {
 export { buildDigest } from './followUpDigest';
 export { factsFromLabels, firstName, normalizePhone, phoneKey } from './clientRecords';
 export { lisbonDay } from './crmClosings';
-export { buildWeeklyReview, computeServiceRanking, computeWeeklyReview, isReviewDay } from './weeklyReview';
+export { buildWeeklyReview, computeCloseRateReview, computeWeeklyReview, isReviewDay } from './weeklyReview';

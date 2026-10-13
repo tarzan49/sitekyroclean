@@ -74,6 +74,71 @@ function itemsOf(description) {
 function typeOf(description) {
   return /impermeabiliz/.test(normalize(description)) ? "Impermeabilização" : "Limpeza";
 }
+var ITEM_NAME = {
+  "Sofá": "sofá",
+  "Colchão": "colchão",
+  "Tapete": "tapete",
+  "Cadeiras": "cadeiras",
+  "Alcatifa": "alcatifa",
+  "Cabeceira": "cabeceira",
+  "Outro": "outros"
+};
+function servicesOf(description) {
+  const type = typeOf(description);
+  return itemsOf(description).map((i) => i === "Outro" ? `${type} (outros)` : `${type} de ${ITEM_NAME[i]}`);
+}
+var value = (r) => Number(r.billed_value) || 0;
+var cutValue = (r) => Number(r.my_cut) || 0;
+function soloAverages(rows) {
+  const sums = /* @__PURE__ */ new Map();
+  for (const r of rows) {
+    const s = servicesOf(r.description ?? "");
+    if (s.length !== 1) continue;
+    const acc = sums.get(s[0]) ?? { n: 0, total: 0 };
+    acc.n++;
+    acc.total += value(r);
+    sums.set(s[0], acc);
+  }
+  return new Map([...sums].map(([k, v]) => [k, v.total / v.n]));
+}
+function summarizeServiceMix(rows, weightRows = rows) {
+  const weights = soloAverages(weightRows);
+  const lines = /* @__PURE__ */ new Map();
+  let combined = 0;
+  for (const r of rows) {
+    const services2 = servicesOf(r.description ?? "");
+    if (services2.length > 1) combined++;
+    const known = services2.map((s) => weights.get(s)).filter((w2) => w2 !== void 0 && w2 > 0);
+    const fallback = known.length ? known.reduce((a, b) => a + b, 0) / known.length : 1;
+    const w = services2.map((s) => weights.get(s) || fallback);
+    const totalW = w.reduce((a, b) => a + b, 0);
+    services2.forEach((s, i) => {
+      const l = lines.get(s) ?? { label: s, count: 0, billed: 0, cut: 0, average: 0, alone: 0, countRank: 0, billedRank: 0 };
+      l.count++;
+      if (services2.length === 1) l.alone++;
+      l.billed += value(r) * (w[i] / totalW);
+      l.cut += cutValue(r) * (w[i] / totalW);
+      lines.set(s, l);
+    });
+  }
+  const services = [...lines.values()].map((l) => ({ ...l, average: l.billed / l.count }));
+  [...services].sort((a, b) => b.billed - a.billed).forEach((l, i) => {
+    l.billedRank = i + 1;
+  });
+  services.sort((a, b) => b.count - a.count || b.billed - a.billed).forEach((l, i) => {
+    l.countRank = i + 1;
+  });
+  const count = rows.length;
+  const billed = rows.reduce((s, r) => s + value(r), 0);
+  return {
+    count,
+    billed,
+    cut: rows.reduce((s, r) => s + cutValue(r), 0),
+    average: count ? billed / count : 0,
+    services,
+    combined
+  };
+}
 
 // src/lib/crmClosings.ts
 var WEEKDAY_LONG = ["segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo"];
@@ -172,8 +237,8 @@ function calcChairClean(qty) {
 }
 
 // src/data/enginePrices.ts
-function formatEuro(value) {
-  return Number.isInteger(value) ? `${value}€` : `${value.toFixed(2).replace(".", ",")}€`;
+function formatEuro(value2) {
+  return Number.isInteger(value2) ? `${value2}€` : `${value2.toFixed(2).replace(".", ",")}€`;
 }
 function option(options, id, table) {
   const found = options.find((item) => item.id === id);
@@ -181,13 +246,13 @@ function option(options, id, table) {
   return found;
 }
 function cheapest(options, field, table) {
-  const values = options.map((item) => item[field]).filter((value) => typeof value === "number");
+  const values = options.map((item) => item[field]).filter((value2) => typeof value2 === "number");
   if (!values.length) throw new Error(`enginePrices: ${table} não tem nenhum ${String(field)} numérico`);
   return Math.min(...values);
 }
-var required = (value, what) => {
-  if (value === null) throw new Error(`enginePrices: o motor deixou de ter preço para ${what}`);
-  return value;
+var required = (value2, what) => {
+  if (value2 === null) throw new Error(`enginePrices: o motor deixou de ter preço para ${what}`);
+  return value2;
 };
 var SOFA_CLEANING_FROM = cheapest(sofaPrices, "cleaningPrice", "sofaPrices");
 var MATTRESS_CLEANING_FROM = cheapest(mattressPrices, "cleaningPrice", "mattressPrices");
@@ -201,7 +266,7 @@ var mattressSingle = option(mattressPrices, "solteiro", "mattressPrices");
 var MATTRESS_ANTI_MITE_WITH_CLEANING_FROM = required(mattressAntiAcarosPrice(mattressSingle), "o anti-ácaros acrescentado à limpeza do colchão");
 var MATTRESS_CLEAN_AND_ANTI_MITE_FROM = MATTRESS_CLEANING_FROM + MATTRESS_ANTI_MITE_WITH_CLEANING_FROM;
 var SOFA_ANTI_MITE_WITH_CLEANING_FROM = Math.min(...Object.values(SOFA_ANTI_ACAROS_PRICE));
-var priced = (value, what) => required(typeof value === "number" ? value : null, what);
+var priced = (value2, what) => required(typeof value2 === "number" ? value2 : null, what);
 function sofaCleaningPrice(id) {
   return priced(option(sofaPrices, id, "sofaPrices").cleaningPrice, `a limpeza do sofá "${id}"`);
 }
@@ -255,7 +320,7 @@ var FOLLOW_UP_RULES = {
   reviewWindowDays: 14,
   reviewReminderAfterDays: 1,
   reviewReminderUntilDays: 4,
-  /** Tapete com recolha: a avaliação só depois da entrega (até 4 dias úteis). */
+  /** Tapete com recolha: a avaliação só depois da entrega (até 5 dias úteis). */
   rugPickupDelayDays: 6,
   /** Recomendação: a quem avaliou ou já repetiu, entre 7 e 21 dias depois do serviço (com a experiência fresca), uma vez por ano. */
   referralFromDays: 7,
@@ -1149,18 +1214,18 @@ function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }
 var round2 = (n) => Math.round(n * 100) / 100;
-function splitUpsell(value, team) {
-  const teamPart = round2(value * teamShareOf(team));
-  return { team: teamPart, owner: round2(value - teamPart) };
+function splitUpsell(value2, team) {
+  const teamPart = round2(value2 * teamShareOf(team));
+  return { team: teamPart, owner: round2(value2 - teamPart) };
 }
 function defaultTeamFor(locality) {
   return UPSELL_TEAMS.find((t) => locality && t.startsWith(locality)) ?? "Porto 1";
 }
 var isUpsellTeam = (s) => !!s && UPSELL_TEAMS.includes(s);
 function ownerUpsellOf(r) {
-  const value = Number(r.upsell_value) || 0;
-  if (value <= 0) return 0;
-  return splitUpsell(value, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality)).owner;
+  const value2 = Number(r.upsell_value) || 0;
+  if (value2 <= 0) return 0;
+  return splitUpsell(value2, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality)).owner;
 }
 
 // src/lib/googleAdsResults.ts
@@ -1177,65 +1242,206 @@ function isGoogleService(r, googlePhones) {
   return key !== "" && googlePhones.has(key);
 }
 
+// src/lib/testLead.ts
+function isTestOrder(name, phone9) {
+  if (/teste|n[aã]o contactar/i.test(name ?? "")) return true;
+  return /^9(\d)\1{7}$/.test(phone9) || /^9\d0{7}$/.test(phone9);
+}
+
+// src/lib/crmQuizLeads.ts
+var num2 = (v) => Number(v) || 0;
+var round22 = (n) => Math.round(n * 100) / 100;
+var closedDay2 = (s) => lisbonDay(s.booked_at ?? s.created_at);
+var isQuizLead = (l) => l.source !== "WhatsApp";
+function isTestLead(l) {
+  return isTestOrder(l.name, phoneKey(l.phone));
+}
+var nameTokens = (name) => (name ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().match(/[a-z]{2,}/g) ?? [];
+function sameFullName(a, b) {
+  const x = nameTokens(a), y = nameTokens(b);
+  if (x.length < 2 || y.length < 2) return false;
+  return x[0] === y[0] && x[x.length - 1] === y[y.length - 1];
+}
+function summarizeQuizLeads(leads, services) {
+  const byKey = /* @__PURE__ */ new Map();
+  let withoutPhone = 0, tests = 0;
+  for (const l of leads) {
+    if (!isQuizLead(l)) continue;
+    if (isTestLead(l)) {
+      tests++;
+      continue;
+    }
+    const key = phoneKey(l.phone) || phoneKey(l.whatsapp_phone);
+    if (key.length < 9) {
+      withoutPhone++;
+      continue;
+    }
+    const list = byKey.get(key) ?? [];
+    list.push(l);
+    byKey.set(key, list);
+  }
+  const servicesByKey = /* @__PURE__ */ new Map();
+  for (const s of services) {
+    const key = phoneKey(s.phone);
+    if (key.length < 9) continue;
+    const list = servicesByKey.get(key) ?? [];
+    list.push(s);
+    servicesByKey.set(key, list);
+  }
+  const quizServiceIds = /* @__PURE__ */ new Set();
+  const people = [];
+  for (const [key, list] of byKey) {
+    list.sort((a, b) => a.created_at.localeCompare(b.created_at));
+    const firstDay = lisbonDay(list[0].created_at);
+    const from = addDays(firstDay, -1);
+    const won = [];
+    const matchedBy = [];
+    const take = (s, how) => {
+      if (quizServiceIds.has(s.id) || closedDay2(s) < from) return;
+      quizServiceIds.add(s.id);
+      won.push(s);
+      matchedBy.push(how);
+    };
+    (servicesByKey.get(key) ?? []).forEach((s) => take(s, "telefone"));
+    const waKeys = new Set(list.map((l) => phoneKey(l.whatsapp_phone)).filter((k) => k.length === 9 && k !== key));
+    waKeys.forEach((k) => (servicesByKey.get(k) ?? []).forEach((s) => take(s, "WhatsApp")));
+    people.push({ key, firstDay, leads: list, services: won, matchedBy, billed: 0, share: 0 });
+  }
+  for (const p of people) {
+    if (p.services.length) continue;
+    const until = addDays(p.firstDay, 60);
+    for (const s of services) {
+      if (quizServiceIds.has(s.id)) continue;
+      const day = closedDay2(s);
+      if (day < addDays(p.firstDay, -1) || day > until) continue;
+      if (!p.leads.some((l) => sameFullName(l.name, s.client_name))) continue;
+      quizServiceIds.add(s.id);
+      p.services.push(s);
+      p.matchedBy.push("nome");
+    }
+  }
+  for (const p of people) {
+    p.billed = round22(p.services.reduce((t, s) => t + num2(s.billed_value), 0));
+    p.share = round22(p.services.reduce((t, s) => t + num2(s.my_cut) + ownerUpsellOf(s), 0));
+  }
+  people.sort((a, b) => b.firstDay.localeCompare(a.firstDay) || b.leads[0].created_at.localeCompare(a.leads[0].created_at));
+  const monthMap = /* @__PURE__ */ new Map();
+  for (const p of people) {
+    const month = p.firstDay.slice(0, 7);
+    const m = monthMap.get(month) ?? { month, people: 0, closed: 0, billed: 0, share: 0 };
+    m.people++;
+    if (p.services.length) m.closed++;
+    m.billed = round22(m.billed + p.billed);
+    m.share = round22(m.share + p.share);
+    monthMap.set(month, m);
+  }
+  const months = [...monthMap.values()].sort((a, b) => b.month.localeCompare(a.month));
+  return { people, months, withoutPhone, tests, quizServiceIds };
+}
+
+// src/lib/crmServiceCloseRate.ts
+var fold2 = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+var LABEL_ITEM2 = { sofa: "sofá", colchao: "colchão", tapete: "tapete", cadeira: "cadeiras", recolha: "tapete" };
+var WATERPROOFABLE = /* @__PURE__ */ new Set(["sofá", "cadeiras"]);
+function fixWaterproofing(labels) {
+  const waterproof = labels.some((l) => l.startsWith("Impermeabilização"));
+  const out = labels.map((l) => {
+    const m = /^Impermeabilização de (.+)$/.exec(l);
+    return m && !WATERPROOFABLE.has(m[1]) ? `Limpeza de ${m[1]}` : l;
+  });
+  if (waterproof && !out.some((l) => l.startsWith("Impermeabilização"))) out.push("Impermeabilização de sofá");
+  return [...new Set(out)];
+}
+function servicesFromLabels(labels) {
+  const folded = (labels ?? []).map(fold2);
+  const type = folded.includes("impermeabilizacao") ? "Impermeabilização" : "Limpeza";
+  const items = [...new Set(folded.map((l) => LABEL_ITEM2[l]).filter(Boolean))];
+  if (!items.length && type === "Impermeabilização") items.push("sofá");
+  return fixWaterproofing(items.map((i) => `${type} de ${i}`));
+}
+var closedDay3 = (s) => lisbonDay(s.booked_at ?? s.created_at);
+var QUIZ_CLOSE_RATE_GOAL = 0.5;
+var SERVICE_CLOSE_RATE_GOAL = 0.7;
+function computeServiceCloseRates(period, quiz, contacts, services) {
+  const { from: start, to: end } = typeof period === "string" ? { from: `${period}-01`, to: `${period}-31` } : period;
+  const inPeriod = (day) => day >= start && day <= end;
+  const out = {
+    total: { quotes: 0, closed: 0 },
+    quiz: { quotes: 0, closed: 0 },
+    whatsApp: { quotes: 0, closed: 0 },
+    byService: /* @__PURE__ */ new Map(),
+    withoutService: 0
+  };
+  const add = (labels, closed, channel) => {
+    out.total.quotes++;
+    channel.quotes++;
+    if (closed) {
+      out.total.closed++;
+      channel.closed++;
+    }
+    for (const l of new Set(labels)) {
+      const c = out.byService.get(l) ?? { quotes: 0, closed: 0 };
+      c.quotes++;
+      if (closed) c.closed++;
+      out.byService.set(l, c);
+    }
+  };
+  const quizKeys = /* @__PURE__ */ new Set();
+  for (const p of quiz?.people ?? []) {
+    quizKeys.add(p.key);
+    p.leads.forEach((l) => {
+      const k = phoneKey(l.whatsapp_phone);
+      if (k) quizKeys.add(k);
+    });
+    if (!inPeriod(p.firstDay)) continue;
+    add(p.leads.flatMap((l) => l.service ? fixWaterproofing(servicesOf(l.service)) : []), p.services.length > 0, out.quiz);
+  }
+  const closedDays = /* @__PURE__ */ new Map();
+  for (const s of services) {
+    if (s.calendar_missing_since) continue;
+    const k = phoneKey(s.phone);
+    if (k.length === 9) closedDays.set(k, [...closedDays.get(k) ?? [], closedDay3(s)]);
+  }
+  for (const c of contacts ?? []) {
+    const key = phoneKey(c.phone);
+    if (!c.first_contact_at || key.length < 9 || quizKeys.has(key)) continue;
+    const first = lisbonDay(c.first_contact_at);
+    if (!inPeriod(first)) continue;
+    const from = addDays(first, -1);
+    const closed = c.status === "cliente" || c.status === "marcado" || (closedDays.get(key) ?? []).some((d) => d >= from);
+    const labels = servicesFromLabels(c.services);
+    if (!labels.length) out.withoutService++;
+    add(labels, closed, out.whatsApp);
+  }
+  return out;
+}
+var missingFor = (c, goal) => Math.max(0, Math.ceil(goal * c.quotes - c.closed));
+function closeRateRankRows(rates, ticketRows, weightRows = ticketRows) {
+  const tickets = new Map(summarizeServiceMix(ticketRows, weightRows).services.map((l) => [l.label, l.average]));
+  return [...rates.byService].map(([service, c]) => {
+    const rate = c.quotes ? c.closed / c.quotes : 0;
+    const t = tickets.get(service);
+    const ticket = t === void 0 ? null : Math.round(t * 10) / 10;
+    return { service, contacts: c.quotes, closed: c.closed, rate, ticket, valuePerContact: ticket === null ? null : Math.round(rate * ticket * 10) / 10 };
+  });
+}
+
 // src/lib/weeklyReview.ts
 var WEEKLY_REVIEW_WEEKS = 6;
 var RANKING_DAYS = 90;
 var RANKING_MIN_CONTACTS = 10;
-var fold2 = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-var LABEL_BY_FOLD = new Map(CLIENT_SERVICES.map((l) => [fold2(l), l]));
-function lineIsOnly(service, description) {
-  const items = itemsOf(description);
-  const type = typeOf(description);
-  switch (service) {
-    case "Impermeabilização":
-      return type === "Impermeabilização";
-    case "Recolha":
-      return /recolh/i.test(description);
-    case "Sofá":
-      return type === "Limpeza" && items.length === 1 && items[0] === "Sofá";
-    case "Cadeira":
-      return type === "Limpeza" && items.length === 1 && items[0] === "Cadeiras";
-    case "Colchão":
-      return items.length === 1 && items[0] === "Colchão";
-    case "Tapete":
-      return items.length === 1 && items[0] === "Tapete";
-    default:
-      return false;
-  }
-}
-function computeServiceRanking(data, now, days = RANKING_DAYS) {
-  const since = addDays(lisbonDay(now), -days);
-  const live = data.services.filter((s) => !s.calendar_missing_since);
-  const crmPhones = new Set(live.map((s) => phoneKey(s.phone)).filter((k) => k.length === 9));
-  const rows = new Map(CLIENT_SERVICES.map((service) => [service, { contacts: 0, closed: 0, billed: 0, lines: 0 }]));
-  for (const c of data.clients) {
-    if (!c.first_contact_at || lisbonDay(c.first_contact_at) < since) continue;
-    const closed = c.status === "cliente" || c.status === "marcado" || crmPhones.has(phoneKey(c.phone));
-    const labels = new Set((c.services ?? []).map((l) => LABEL_BY_FOLD.get(fold2(l))).filter(Boolean));
-    for (const l of labels) {
-      const r = rows.get(l);
-      r.contacts++;
-      if (closed) r.closed++;
-    }
-  }
-  for (const s of live) {
-    if (closedDay(s) < since) continue;
-    for (const [service, r] of rows) {
-      if (lineIsOnly(service, s.description ?? "")) {
-        r.billed += num2(s.billed_value);
-        r.lines++;
-      }
-    }
-  }
-  const out = [...rows].map(([service, r]) => {
-    const rate = r.contacts ? r.closed / r.contacts : 0;
-    const ticket = r.lines ? round1(r.billed / r.lines) : null;
-    return { service, contacts: r.contacts, closed: r.closed, rate, ticket, valuePerContact: ticket === null ? null : round1(rate * ticket) };
-  }).filter((r) => r.contacts > 0);
+function computeCloseRateReview(data, now, days = RANKING_DAYS) {
+  const to = addDays(mondayOf(lisbonDay(now)), -1);
+  const from = addDays(to, -(days - 1));
+  const upTo = data.services.filter((s) => closedDay(s) <= to);
+  const quiz = summarizeQuizLeads(data.leads, data.services);
+  const rates = computeServiceCloseRates({ from, to }, quiz, data.clients, upTo);
+  const live = upTo.filter((s) => !s.calendar_missing_since);
   const big = (r) => r.contacts >= RANKING_MIN_CONTACTS;
-  return out.sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
+  const rows = closeRateRankRows(rates, live.filter((s) => closedDay(s) >= from), live).sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
+  return { from, to, rates, rows };
 }
-var num2 = (v) => Number(v) || 0;
+var num3 = (v) => Number(v) || 0;
 var round1 = (n) => Math.round(n * 10) / 10;
 var mondayOf = (day) => addDays(day, -weekdayOf(day));
 var isReviewDay = (now) => weekdayOf(lisbonDay(now)) === 0;
@@ -1252,13 +1458,13 @@ function computeWeeklyReview(data, now, weeks = WEEKLY_REVIEW_WEEKS) {
     const row = rows.get(mondayOf(closedDay(s)));
     if (!row) continue;
     row.closes++;
-    row.billed += num2(s.billed_value);
+    row.billed += num3(s.billed_value);
     row.share += shareOf(s);
     if (isGoogleService(s, googlePhones)) row.googleCloses++;
   }
   for (const a of data.adsStats) {
     const row = rows.get(mondayOf(a.stat_date));
-    if (row) row.spend += num2(a.cost);
+    if (row) row.spend += num3(a.cost);
   }
   for (const r of rows.values()) {
     r.billed = round1(r.billed);
@@ -1284,36 +1490,50 @@ var STEPS = [
   "Confirmar a decisão da semana passada: foi feita? Mudou alguma coisa? (5 min)"
 ];
 var pct = (r) => `${Math.round(r * 100)}%`;
-function rankingSection(ranking) {
-  if (!ranking.length) return { html: "", text: "" };
-  const title = `Taxa de fecho por serviço (contactos dos últimos ${RANKING_DAYS} dias)`;
-  const head = ["#", "Serviço", "Contactos", "Fecharam", "Taxa", "Ticket médio", "Valor por contacto"];
+var rateText = (c) => c.quotes ? `${pct(c.closed / c.quotes)} (${c.closed} de ${c.quotes})` : "sem orçamentos";
+var goalText = (c, goal) => !c.quotes ? "" : c.closed / c.quotes >= goal ? " · meta atingida" : ((n) => ` · falta${n === 1 ? "" : "m"} ${n} fecho${n === 1 ? "" : "s"} para ${pct(goal)}`)(missingFor(c, goal));
+function rankingSection(review) {
+  if (!review || !review.rates.total.quotes) return { html: "", text: "" };
+  const { rates, rows: ranking } = review;
+  const title = `Taxa de fecho (orçamentos de qualquer canal, ${dm2(review.from)} a ${dm2(review.to)})`;
+  const channels = [
+    `Total: ${rateText(rates.total)}`,
+    `Questionário: ${rateText(rates.quiz)} · meta ${pct(QUIZ_CLOSE_RATE_GOAL)}${goalText(rates.quiz, QUIZ_CLOSE_RATE_GOAL)}`,
+    `WhatsApp: ${rateText(rates.whatsApp)}`
+  ];
+  const head = ["#", "Serviço", "Orçamentos", "Fecharam", "Taxa", `Até ${pct(SERVICE_CLOSE_RATE_GOAL)}`, "Ticket médio", "Valor por orçamento"];
   const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
   let pos = 0;
-  const cells = ranking.map((r) => [
-    r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–",
-    r.service,
-    String(r.contacts),
-    String(r.closed),
-    pct(r.rate),
-    euro(r.ticket),
-    euro(r.valuePerContact)
-  ]);
-  const bestValue = ranking.filter((r) => r.contacts >= RANKING_MIN_CONTACTS && r.valuePerContact !== null).sort((a, b) => b.valuePerContact - a.valuePerContact)[0];
-  const note = `Maior taxa: ${ranking[0].service} (${pct(ranking[0].rate)}).` + (bestValue ? ` Mais dinheiro por conversa: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "");
-  const foot = `Um contacto conta em cada serviço que pediu. Ticket = linhas do CRM só desse serviço. Com menos de ${RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.`;
+  const cells = ranking.map((r) => {
+    const missing = missingFor({ quotes: r.contacts, closed: r.closed }, SERVICE_CLOSE_RATE_GOAL);
+    return [
+      r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–",
+      r.service,
+      String(r.contacts),
+      String(r.closed),
+      pct(r.rate),
+      missing ? `+${missing}` : "atingida",
+      euro(r.ticket),
+      euro(r.valuePerContact)
+    ];
+  });
+  const ranked = ranking.filter((r) => r.contacts >= RANKING_MIN_CONTACTS);
+  const bestValue = ranked.filter((r) => r.valuePerContact !== null).sort((a, b) => b.valuePerContact - a.valuePerContact)[0];
+  const note = ranked.length ? `Maior taxa: ${ranked[0].service} (${pct(ranked[0].rate)}).` + (bestValue ? ` Mais dinheiro por orçamento: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "") : "";
+  const foot = `Orçamento = pessoa que pediu preço no questionário do site ou no WhatsApp, uma vez, no dia do primeiro pedido. Fechou = serviço no CRM a partir desse dia, ou etiqueta cliente ou marcado. Uma pessoa conta em cada serviço que pediu. Meta: ${pct(QUIZ_CLOSE_RATE_GOAL)} no questionário, ${pct(SERVICE_CLOSE_RATE_GOAL)} em cada serviço. Com menos de ${RANKING_MIN_CONTACTS} orçamentos o serviço fica sem posição. Os mesmos números da aba Fechos.`;
   return {
-    html: `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(note)}</p><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + cells.map((c) => `<tr>${c.map((x) => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") + `</table><p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
+    html: `<h3>${escapeHtml(title)}</h3><ul>${channels.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>` + (note ? `<p>${escapeHtml(note)}</p>` : "") + (cells.length ? `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + cells.map((c) => `<tr>${c.map((x) => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") + `</table>` : "") + `<p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
     text: `${title}
-${note}
-${head.join(" | ")}
+${channels.map((c) => `- ${c}`).join("\n")}
+${note ? `${note}
+` : ""}` + (cells.length ? `${head.join(" | ")}
 ${cells.map((c) => c.join(" | ")).join("\n")}
-${foot}
+` : "") + `${foot}
 
 `
   };
 }
-function buildWeeklyReview(weeks, ranking = []) {
+function buildWeeklyReview(weeks, closeRates) {
   const last = weeks[weeks.length - 1];
   const prev = weeks[weeks.length - 2] ?? null;
   const title = `Revisão de segunda-feira · semana de ${dm2(last.week)} a ${dm2(addDays(last.week, 6))}`;
@@ -1326,14 +1546,14 @@ function buildWeeklyReview(weeks, ranking = []) {
   const head = ["Semana", "Fechos", "Faturado", "Tua parte", "Ticket", "Gasto Google", "Clientes Google", "Custo/cliente"];
   const cells = (r) => [dm2(r.week), String(r.closes), euro(r.billed), euro(r.share), euro(r.ticket), r.spend ? euro(r.spend) : "–", r.spend || r.googleCloses ? String(r.googleCloses) : "–", euro(r.costPerGoogleClient)];
   const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
-  const html = `<h3>${escapeHtml(title)}</h3><ul>${highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + weeks.map((r) => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map((c) => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") + `</table>` + rankingSection(ranking).html + `<p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol><p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
+  const html = `<h3>${escapeHtml(title)}</h3><ul>${highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul><table style="border-collapse:collapse;font-size:13px"><tr>${head.map((h) => `<th ${td}>${h}</th>`).join("")}</tr>` + weeks.map((r) => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map((c) => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") + `</table>` + rankingSection(closeRates ?? null).html + `<p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ol><p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
   const text = `${title}
 ${highlights.map((h) => `- ${h}`).join("\n")}
 
 ${head.join(" | ")}
 ${weeks.map((r) => cells(r).join(" | ")).join("\n")}
 
-` + rankingSection(ranking).text + `Os 30 minutos:
+` + rankingSection(closeRates ?? null).text + `Os 30 minutos:
 ${STEPS.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
 `;
@@ -1348,7 +1568,7 @@ export {
   buildDigest,
   buildWeeklyReview,
   campaignCalendar,
-  computeServiceRanking,
+  computeCloseRateReview,
   computeWeeklyReview,
   factsFromLabels,
   firstName,

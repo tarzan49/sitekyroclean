@@ -9,9 +9,12 @@
 // evento apagado no calendário não é fecho. As avaliações não têm data em
 // nenhuma tabela: o email só lembra de as contar na ficha do Google.
 import { addDays, lisbonDay, weekdayOf } from "./crmClosings";
-import { CLIENT_SERVICES, phoneKey } from "./clientRecords";
-import { itemsOf, typeOf } from "./crmServiceMix";
 import { closedDay, googlePhoneSet, isGoogleService, shareOf, type ContactRow, type ServiceRow } from "./googleAdsResults";
+import { summarizeQuizLeads, type QuizLeadRow } from "./crmQuizLeads";
+import {
+  closeRateRankRows, computeServiceCloseRates, missingFor, QUIZ_CLOSE_RATE_GOAL, SERVICE_CLOSE_RATE_GOAL,
+  type CloseRateCount, type ServiceCloseRates,
+} from "./crmServiceCloseRate";
 
 export const WEEKLY_REVIEW_WEEKS = 6;
 
@@ -30,13 +33,11 @@ export interface WeekRow {
 }
 
 /**
- * Ranking por serviço (dono, 2026-10-13: "qual é o serviço que eu tenho maior
- * taxa de fecho", "um ranking"). Contactos = fichas com essa etiqueta do
- * WhatsApp, com o primeiro contacto na janela; fechou = cliente ou marcado, ou
- * serviço no CRM com esse telefone (como `effectiveStatus`). Ticket = média das
- * linhas do CRM fechadas na janela que só têm esse serviço, para uma linha com
- * sofá e tapete não inflacionar os dois. Valor por contacto = taxa × ticket:
- * o que cada conversa desse serviço vale, em média.
+ * Linha do ranking por serviço (dono, 2026-10-13: "qual é o serviço que eu
+ * tenho maior taxa de fecho", "um ranking"). Desde 13/10 é a mesma conta das
+ * abas Serviços e Fechos (crmServiceCloseRate.ts): contacts = orçamentos de
+ * qualquer canal, closed = os que fecharam. Ticket = média desse serviço nas
+ * linhas do CRM; valor por orçamento = taxa × ticket.
  */
 export interface ServiceRankRow {
   service: string;
@@ -58,56 +59,33 @@ export interface RankingClient {
   first_contact_at: string | null;
 }
 
-const fold = (t: string) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-const LABEL_BY_FOLD = new Map(CLIENT_SERVICES.map(l => [fold(l), l]));
-
-/** A linha do CRM é só deste serviço? (Impermeabilização conta em qualquer artigo; recolha pela descrição.) */
-function lineIsOnly(service: string, description: string): boolean {
-  const items = itemsOf(description);
-  const type = typeOf(description);
-  switch (service) {
-    case "Impermeabilização": return type === "Impermeabilização";
-    case "Recolha": return /recolh/i.test(description);
-    case "Sofá": return type === "Limpeza" && items.length === 1 && items[0] === "Sofá";
-    case "Cadeira": return type === "Limpeza" && items.length === 1 && items[0] === "Cadeiras";
-    case "Colchão": return items.length === 1 && items[0] === "Colchão";
-    case "Tapete": return items.length === 1 && items[0] === "Tapete";
-    default: return false;
-  }
+export interface CloseRateReview {
+  /** Primeiro e último dia da janela (o último é o domingo da semana revista). */
+  from: string;
+  to: string;
+  rates: ServiceCloseRates;
+  rows: ServiceRankRow[];
 }
 
-export function computeServiceRanking(
-  data: { services: ServiceRow[]; clients: RankingClient[] },
+/**
+ * Taxa de fecho dos `days` dias que acabam no domingo antes de `now`: a mesma
+ * janela que a leitura da semana da aba Fechos usa para a última semana completa.
+ */
+export function computeCloseRateReview(
+  data: { services: ServiceRow[]; clients: RankingClient[]; leads: QuizLeadRow[] },
   now: Date,
   days = RANKING_DAYS,
-): ServiceRankRow[] {
-  const since = addDays(lisbonDay(now), -days);
-  const live = data.services.filter(s => !s.calendar_missing_since);
-  const crmPhones = new Set(live.map(s => phoneKey(s.phone)).filter(k => k.length === 9));
-  const rows = new Map(CLIENT_SERVICES.map(service => [service as string, { contacts: 0, closed: 0, billed: 0, lines: 0 }]));
-  for (const c of data.clients) {
-    if (!c.first_contact_at || lisbonDay(c.first_contact_at) < since) continue;
-    const closed = c.status === "cliente" || c.status === "marcado" || crmPhones.has(phoneKey(c.phone));
-    const labels = new Set((c.services ?? []).map(l => LABEL_BY_FOLD.get(fold(l))).filter(Boolean) as string[]);
-    for (const l of labels) {
-      const r = rows.get(l)!;
-      r.contacts++;
-      if (closed) r.closed++;
-    }
-  }
-  for (const s of live) {
-    if (closedDay(s) < since) continue;
-    for (const [service, r] of rows) {
-      if (lineIsOnly(service, s.description ?? "")) { r.billed += num(s.billed_value); r.lines++; }
-    }
-  }
-  const out = [...rows].map(([service, r]): ServiceRankRow => {
-    const rate = r.contacts ? r.closed / r.contacts : 0;
-    const ticket = r.lines ? round1(r.billed / r.lines) : null;
-    return { service, contacts: r.contacts, closed: r.closed, rate, ticket, valuePerContact: ticket === null ? null : round1(rate * ticket) };
-  }).filter(r => r.contacts > 0);
+): CloseRateReview {
+  const to = addDays(mondayOf(lisbonDay(now)), -1);
+  const from = addDays(to, -(days - 1));
+  const upTo = data.services.filter(s => closedDay(s) <= to);
+  const quiz = summarizeQuizLeads(data.leads, data.services);
+  const rates = computeServiceCloseRates({ from, to }, quiz, data.clients, upTo);
+  const live = upTo.filter(s => !s.calendar_missing_since);
   const big = (r: ServiceRankRow) => r.contacts >= RANKING_MIN_CONTACTS;
-  return out.sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
+  const rows = closeRateRankRows(rates, live.filter(s => closedDay(s) >= from), live)
+    .sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts);
+  return { from, to, rates, rows };
 }
 
 export interface WeeklyReview {
@@ -179,28 +157,48 @@ const STEPS = [
 
 const pct = (r: number) => `${Math.round(r * 100)}%`;
 
-function rankingSection(ranking: ServiceRankRow[]): { html: string; text: string } {
-  if (!ranking.length) return { html: "", text: "" };
-  const title = `Taxa de fecho por serviço (contactos dos últimos ${RANKING_DAYS} dias)`;
-  const head = ["#", "Serviço", "Contactos", "Fecharam", "Taxa", "Ticket médio", "Valor por contacto"];
+const rateText = (c: CloseRateCount) => (c.quotes ? `${pct(c.closed / c.quotes)} (${c.closed} de ${c.quotes})` : "sem orçamentos");
+const goalText = (c: CloseRateCount, goal: number) =>
+  !c.quotes ? "" : c.closed / c.quotes >= goal ? " · meta atingida" : (n => ` · falta${n === 1 ? "" : "m"} ${n} fecho${n === 1 ? "" : "s"} para ${pct(goal)}`)(missingFor(c, goal));
+
+function rankingSection(review: CloseRateReview | null): { html: string; text: string } {
+  if (!review || !review.rates.total.quotes) return { html: "", text: "" };
+  const { rates, rows: ranking } = review;
+  const title = `Taxa de fecho (orçamentos de qualquer canal, ${dm(review.from)} a ${dm(review.to)})`;
+  const channels = [
+    `Total: ${rateText(rates.total)}`,
+    `Questionário: ${rateText(rates.quiz)} · meta ${pct(QUIZ_CLOSE_RATE_GOAL)}${goalText(rates.quiz, QUIZ_CLOSE_RATE_GOAL)}`,
+    `WhatsApp: ${rateText(rates.whatsApp)}`,
+  ];
+  const head = ["#", "Serviço", "Orçamentos", "Fecharam", "Taxa", `Até ${pct(SERVICE_CLOSE_RATE_GOAL)}`, "Ticket médio", "Valor por orçamento"];
   const td = 'style="padding:4px 8px;border-bottom:1px solid #ddd;text-align:right"';
   let pos = 0;
-  const cells = ranking.map(r => [
-    r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–", r.service, String(r.contacts), String(r.closed), pct(r.rate), euro(r.ticket), euro(r.valuePerContact),
-  ]);
-  const bestValue = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS && r.valuePerContact !== null).sort((a, b) => b.valuePerContact! - a.valuePerContact!)[0];
-  const note = `Maior taxa: ${ranking[0].service} (${pct(ranking[0].rate)}).` + (bestValue ? ` Mais dinheiro por conversa: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "");
-  const foot = `Um contacto conta em cada serviço que pediu. Ticket = linhas do CRM só desse serviço. Com menos de ${RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.`;
+  const cells = ranking.map(r => {
+    const missing = missingFor({ quotes: r.contacts, closed: r.closed }, SERVICE_CLOSE_RATE_GOAL);
+    return [
+      r.contacts >= RANKING_MIN_CONTACTS ? String(++pos) : "–", r.service, String(r.contacts), String(r.closed), pct(r.rate),
+      missing ? `+${missing}` : "atingida", euro(r.ticket), euro(r.valuePerContact),
+    ];
+  });
+  const ranked = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS);
+  const bestValue = ranked.filter(r => r.valuePerContact !== null).sort((a, b) => b.valuePerContact! - a.valuePerContact!)[0];
+  const note = ranked.length
+    ? `Maior taxa: ${ranked[0].service} (${pct(ranked[0].rate)}).` + (bestValue ? ` Mais dinheiro por orçamento: ${bestValue.service} (${euro(bestValue.valuePerContact)}).` : "")
+    : "";
+  const foot = `Orçamento = pessoa que pediu preço no questionário do site ou no WhatsApp, uma vez, no dia do primeiro pedido. Fechou = serviço no CRM a partir desse dia, ou etiqueta cliente ou marcado. Uma pessoa conta em cada serviço que pediu. Meta: ${pct(QUIZ_CLOSE_RATE_GOAL)} no questionário, ${pct(SERVICE_CLOSE_RATE_GOAL)} em cada serviço. Com menos de ${RANKING_MIN_CONTACTS} orçamentos o serviço fica sem posição. Os mesmos números da aba Fechos.`;
   return {
-    html: `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(note)}</p>` +
-      `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map(h => `<th ${td}>${h}</th>`).join("")}</tr>` +
-      cells.map(c => `<tr>${c.map(x => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") +
-      `</table><p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
-    text: `${title}\n${note}\n${head.join(" | ")}\n${cells.map(c => c.join(" | ")).join("\n")}\n${foot}\n\n`,
+    html: `<h3>${escapeHtml(title)}</h3><ul>${channels.map(c => `<li>${escapeHtml(c)}</li>`).join("")}</ul>` +
+      (note ? `<p>${escapeHtml(note)}</p>` : "") +
+      (cells.length ? `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map(h => `<th ${td}>${h}</th>`).join("")}</tr>` +
+        cells.map(c => `<tr>${c.map(x => `<td ${td}>${escapeHtml(x)}</td>`).join("")}</tr>`).join("") + `</table>` : "") +
+      `<p style="color:#666;font-size:12px">${escapeHtml(foot)}</p>`,
+    text: `${title}\n${channels.map(c => `- ${c}`).join("\n")}\n${note ? `${note}\n` : ""}` +
+      (cells.length ? `${head.join(" | ")}\n${cells.map(c => c.join(" | ")).join("\n")}\n` : "") + `${foot}\n\n`,
   };
 }
 
-export function buildWeeklyReview(weeks: WeekRow[], ranking: ServiceRankRow[] = []): WeeklyReview {
+// Sem valor por omissão no parâmetro: no pacote em JS o Deno inferia o tipo dele como `null`.
+export function buildWeeklyReview(weeks: WeekRow[], closeRates?: CloseRateReview | null): WeeklyReview {
   const last = weeks[weeks.length - 1];
   const prev = weeks[weeks.length - 2] ?? null;
   const title = `Revisão de segunda-feira · semana de ${dm(last.week)} a ${dm(addDays(last.week, 6))}`;
@@ -221,13 +219,13 @@ export function buildWeeklyReview(weeks: WeekRow[], ranking: ServiceRankRow[] = 
     `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map(h => `<th ${td}>${h}</th>`).join("")}</tr>` +
     weeks.map(r => `<tr${r === last ? ' style="font-weight:bold"' : ""}>${cells(r).map(c => `<td ${td}>${c}</td>`).join("")}</tr>`).join("") +
     `</table>` +
-    rankingSection(ranking).html +
+    rankingSection(closeRates ?? null).html +
     `<p><strong>Os 30 minutos:</strong></p><ol>${STEPS.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ol>` +
     `<p style="color:#666;font-size:12px">Fecho = dia em que o serviço foi fechado. Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio; depende de a ficha de clientes estar atualizada.</p><hr>`;
   const text =
     `${title}\n${highlights.map(h => `- ${h}`).join("\n")}\n\n` +
     `${head.join(" | ")}\n${weeks.map(r => cells(r).join(" | ")).join("\n")}\n\n` +
-    rankingSection(ranking).text +
+    rankingSection(closeRates ?? null).text +
     `Os 30 minutos:\n${STEPS.map((s, i) => `${i + 1}. ${s}`).join("\n")}\n\n`;
   return { weeks, html, text };
 }

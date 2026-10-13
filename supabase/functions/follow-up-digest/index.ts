@@ -16,7 +16,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { buildDigest, buildWeeklyReview, computeServiceRanking, computeWeeklyReview, isReviewDay, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
+import { buildDigest, buildWeeklyReview, computeCloseRateReview, computeWeeklyReview, isReviewDay, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
 import { isAuthenticatedAdmin } from "../_shared/admin-request.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
 import { parseIcs } from "../_shared/ics.ts";
@@ -34,6 +34,11 @@ export interface DigestStore {
   record(day: string, items: number, error: string | null): Promise<void>;
   /** Pré-reservas do bot ainda por confirmar (2026-10-09): futuras e ainda com o título "Pré-reserva". */
   pendingHolds?(now: Date): Promise<PendingHold[]>;
+  /**
+   * Pedidos do questionário (tabela `leads`), para a taxa de fecho da revisão de
+   * segunda-feira contar os orçamentos de todos os canais, como a aba Fechos.
+   */
+  quizLeads?(): Promise<Row[]>;
   /** Gasto diário do Google Ads (ads_daily_stats), para a revisão de segunda-feira (2026-10-13). */
   adsStats?(sinceDay: string): Promise<{ stat_date: string; cost: number }[]>;
 }
@@ -118,7 +123,8 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   const digest = weekly
     ? withWeeklyReview(holdsDigest, buildWeeklyReview(
       computeWeeklyReview({ ...rows, adsStats: (await env.store.adsStats?.(lisbonDay(new Date(now.getTime() - 50 * 86_400_000)))) ?? [] }, now),
-      computeServiceRanking(rows, now),
+      // deno-lint-ignore no-explicit-any
+      computeCloseRateReview({ ...rows, leads: ((await env.store.quizLeads?.()) ?? []) as any }, now),
     ))
     : holdsDigest;
 
@@ -184,6 +190,10 @@ function supabaseStore(): DigestStore | null {
     },
     async record(day, items, error) {
       await client.from("follow_up_digests").upsert({ day, items, error, sent_at: new Date().toISOString() }, { onConflict: "day" });
+    },
+    async quizLeads() {
+      const { data, error } = await client.from("leads").select("id, created_at, name, phone, service, location, value, source, whatsapp_phone");
+      return error ? [] : (data ?? []);
     },
     async adsStats(sinceDay) {
       const { data, error } = await client.from("ads_daily_stats").select("stat_date, cost").gte("stat_date", sinceDay);

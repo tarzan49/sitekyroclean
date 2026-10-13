@@ -19,10 +19,10 @@
 //
 // A tabela `leads` só tem pedidos desde 14/09/2026 (o `db push` desse dia
 // apagou os anteriores; ver CLAUDE.md).
-import { phoneKey } from "@/lib/clientRecords";
-import { isTestOrder } from "@/lib/testLead";
-import { addDays, lisbonDay } from "@/lib/crmClosings";
-import { ownerUpsellOf } from "@/lib/crmUpsell";
+import { phoneKey } from "./clientRecords";
+import { isTestOrder } from "./testLead";
+import { addDays, lisbonDay } from "./crmClosings";
+import { ownerUpsellOf } from "./crmUpsell";
 
 export const QUIZ_LEADS_SINCE = "2026-09-14";
 export const QUIZ_BADGE = "Questionário";

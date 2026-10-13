@@ -57,9 +57,9 @@ describe("weekly review", () => {
   });
 });
 
-describe("service ranking", () => {
-  it("ranks services by close rate, with ticket and value per contact", async () => {
-    const { computeServiceRanking, buildWeeklyReview } = await import("./weeklyReview");
+describe("close-rate ranking", () => {
+  it("uses quotes from any channel, ends on the Sunday before, with the 50% quiz and 70% service goals", async () => {
+    const { computeCloseRateReview, buildWeeklyReview } = await import("./weeklyReview");
     const c = (i: number, services: string[], status: string, at = "2026-09-20T10:00:00Z") =>
       ({ phone: `35191000${String(i).padStart(4, "0")}`, status, services, first_contact_at: at });
     const clients = [
@@ -69,20 +69,28 @@ describe("service ranking", () => {
       c(200, ["Cadeira"], "por_marcar"),
       // Fora da janela de 90 dias.
       c(300, ["Sofá"], "cliente", "2026-05-01T10:00:00Z"),
+      // Segunda-feira da semana em curso: ainda não entra.
+      c(301, ["Sofá"], "por_marcar", "2026-10-12T10:00:00Z"),
     ];
+    const lead = (id: string, phone: string) =>
+      ({ id, created_at: "2026-10-01T10:00:00Z", name: null, phone, service: "Tapete", location: null, value: null, source: "Website" });
     const services = [
       svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza sofá 3 lugares", billed_value: 80 }),
       svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza colchão casal", billed_value: 60 }),
-      svc({ booked_at: "2026-09-25T10:00:00Z", description: "Sofá e colchão", billed_value: 500 }),
       svc({ booked_at: "2026-09-25T10:00:00Z", description: "Limpeza 4 cadeiras", billed_value: 50, phone: "+351 910 000 200" }),
+      svc({ booked_at: "2026-10-03T10:00:00Z", description: "Limpeza tapete", billed_value: 90, phone: "920000001" }),
     ];
-    const ranking = computeServiceRanking({ services, clients }, NOW);
-    expect(ranking.map(r => r.service)).toEqual(["Colchão", "Sofá", "Cadeira"]);
-    expect(ranking[0]).toMatchObject({ contacts: 10, closed: 8, rate: 0.8, ticket: 60, valuePerContact: 48 });
-    expect(ranking[1]).toMatchObject({ contacts: 10, closed: 5, ticket: 80, valuePerContact: 40 });
-    expect(ranking[2]).toMatchObject({ contacts: 1, closed: 1 });
-    const { text } = buildWeeklyReview(computeWeeklyReview({ services: [], clients: [], adsStats: [] }, NOW), ranking);
-    expect(text).toContain("Maior taxa: Colchão (80%). Mais dinheiro por conversa: Colchão (48€).");
-    expect(text).toContain("– | Cadeira | 1 | 1 | 100%");
+    const review = computeCloseRateReview({ services, clients, leads: [lead("a", "920000001"), lead("b", "920000002"), lead("c", "920000003")] }, NOW);
+    expect([review.from, review.to]).toEqual(["2026-07-14", "2026-10-11"]);
+    expect(review.rates.total).toEqual({ quotes: 24, closed: 15 });
+    expect(review.rates.quiz).toEqual({ quotes: 3, closed: 1 });
+    expect(review.rows.map(r => r.service)).toEqual(["Limpeza de colchão", "Limpeza de sofá", "Limpeza de cadeiras", "Limpeza de tapete"]);
+    expect(review.rows[0]).toMatchObject({ contacts: 10, closed: 8, rate: 0.8, ticket: 60, valuePerContact: 48 });
+    const { text } = buildWeeklyReview(computeWeeklyReview({ services: [], clients: [], adsStats: [] }, NOW), review);
+    expect(text).toContain("Taxa de fecho (orçamentos de qualquer canal, 14/07 a 11/10)");
+    expect(text).toContain("Questionário: 33% (1 de 3) · meta 50% · falta 1 fecho para 50%");
+    expect(text).toContain("1 | Limpeza de colchão | 10 | 8 | 80% | atingida | 60€ | 48€");
+    expect(text).toContain("2 | Limpeza de sofá | 10 | 5 | 50% | +2");
+    expect(text).toContain("Maior taxa: Limpeza de colchão (80%).");
   });
 });
