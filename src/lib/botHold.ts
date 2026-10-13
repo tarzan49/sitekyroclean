@@ -15,6 +15,7 @@
  */
 import { botAvailability, chooseTeam, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
+import { CLOSE_NOW_DAYS } from './botCloseNow';
 
 const MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 } as const;
 
@@ -39,6 +40,19 @@ export type BotHoldResult =
  * existing pre-booking, if any: it is left out of the check, so moving a
  * pre-booking to a nearby time is not blocked by itself.
  */
+/**
+ * The total the booking carries: the table total, or, with `closeNow` (owner, 13 Oct 2026: 10% only to
+ * close now, "eu tenho que ganhar com esse fecho rápido"), the closeNow total, only for a day within the
+ * next CLOSE_NOW_DAYS days. Anything else is the owner's: a string with the reason.
+ */
+export function bookingTotal(quote: { total: number | null; closeNow: { ok: boolean; total?: number | null } }, wantsCloseNow: unknown, date: string, now: Date): { total: number | null; closeNow: boolean } | string {
+  if (wantsCloseNow !== true) return { total: quote.total, closeNow: false };
+  if (!quote.closeNow.ok || quote.closeNow.total == null) return 'condição de 10% sem preço do motor: decide o responsável';
+  const days = (Date.parse(`${date}T12:00:00Z`) - Date.parse(`${lisbon(now.getTime()).date}T12:00:00Z`)) / 86_400_000;
+  if (days > CLOSE_NOW_DAYS) return `condição de 10% só para os próximos ${CLOSE_NOW_DAYS} dias`;
+  return { total: quote.closeNow.total, closeNow: true };
+}
+
 export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: string })[], now: Date, ownEventId?: string | null): BotHoldResult {
   if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
   const r = req as Record<string, unknown>;
@@ -58,7 +72,9 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   if ('error' in quote) return { error: String(quote.error) };
   const city = availability.city!;
   const what = quote.lines.map(l => l.label).join(' + ');
-  const price = quote.quote ? 'sob orçamento' : euro(quote.total);
+  const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
+  if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
+  const price = quote.quote ? 'sob orçamento' : euro(agreed.total!) + (agreed.closeNow ? ' (com 10% para fechar já)' : '');
   const name = text(r.name, MAX.name) || 'cliente';
   const title = `Pré-reserva – ${name} – ${city} – ${what} – ${price}`;
   const pickup = quote.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote.rugPickup.fee)}` : '';
@@ -219,6 +235,9 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const quote = botQuote({ items: r.items, city: r.city });
   if ('error' in quote) return { error: String(quote.error) };
   if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
+  const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
+  if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
+  const total = agreed.total!;
   const team = chooseTeam(others, r.city, slot.start, slot.end);
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
@@ -228,13 +247,14 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const ad = typeof r.adOrigin === 'string' ? AD_MARK[r.adOrigin] ?? '' : '';
   // His titles carry the Portuguese number without the country code; the CRM matches the last 9 digits either way.
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
-  const title = [`Serviço ${formatAmount(ownerShare(quote.total, pickupFee))}€ (${formatAmount(quote.total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
+  const title = [`Serviço ${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
   const description = [
     ownerChose
       ? `Marcado pelo bot do WhatsApp numa hora de fim de semana escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
       : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
-    `Total: ${euro(quote.total)} (deslocação incluída)`,
+    `Total: ${euro(total)} (deslocação incluída)`,
+    agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : '',
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',
     `bot:${conversationId}`,
   ].filter(Boolean).join('\n');
