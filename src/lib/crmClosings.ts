@@ -19,6 +19,9 @@ export interface ClosingRow {
   locality?: string | null;
   source?: string | null;
   calendar_missing_since?: string | null;
+  phone?: string | null;
+  paid?: boolean;
+  upsell_value?: number | null;
 }
 
 export interface DayTotals { day: string; count: number; billed: number; cut: number }

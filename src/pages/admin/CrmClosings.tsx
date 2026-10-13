@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Target, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Pencil, Phone, Target, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
 import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
@@ -112,7 +112,16 @@ function RateCard({ label, now, before, goal }: { label: string; now: CloseRateC
   );
 }
 
-const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]; services: ServiceRow[]; quiz?: QuizSummary | null }) => {
+interface CrmClosingsProps {
+  records: ClosingRow[];
+  services: ServiceRow[];
+  quiz?: QuizSummary | null;
+  /** Mini CRM do dia: abre a mesma janela de edição e o mesmo "Pago" da aba Pedidos. */
+  onEdit?: (id: string) => void;
+  onTogglePaid?: (id: string) => void;
+}
+
+const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: CrmClosingsProps) => {
   const now = useMemo(() => new Date(), []);
   const today = lisbonDay(now);
   const thisMonday = mondayOf(today);
@@ -628,30 +637,95 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
             </div>
             {dayRows.length === 0 ? (
               <p className="text-xs text-gray-500">Nenhum serviço fechado neste dia.</p>
-            ) : (
-              <ul className="divide-y divide-gray-100">
+            ) : (<>
+              {/* Telemóvel: um cartão por serviço */}
+              <ul className="sm:hidden divide-y divide-gray-100">
                 {dayRows.map((r, i) => (
-                  <li key={r.id ?? i} className="py-2 flex items-start justify-between gap-3 text-xs">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-navy truncate">
-                        <span className="text-gray-400 font-normal mr-1.5">{TIME_FMT.format(new Date(r.booked_at!))}</span>
-                        {r.client_name || "Sem nome"}
-                        {(r.city || r.locality) && <span className="text-gray-500 font-normal"> · {r.city || r.locality}</span>}
-                      </p>
-                      {r.description && <p className="text-gray-600 break-words">{r.description}</p>}
-                      <p className="text-[11px] text-gray-400">
-                        Serviço a {r.request_date ? dm(r.request_date) : "?"}{r.source ? ` · ${r.source}` : ""}
-                        {r.calendar_missing_since && <span className="text-red-600"> · já não está no calendário</span>}
-                      </p>
+                  <li key={r.id ?? i} className={`py-2.5 text-xs ${r.paid === false ? "bg-red-50/60 -mx-2 px-2" : ""}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-navy">
+                          <span className="text-gray-400 font-normal mr-1.5">{TIME_FMT.format(new Date(r.booked_at!))}</span>
+                          {r.client_name || "Sem nome"}
+                        </p>
+                        <p className="text-gray-600 break-words">{r.description || "-"}</p>
+                        <p className="text-[11px] text-gray-400">
+                          {[r.locality, r.city].filter(Boolean).join(" · ") || "Região ?"} · serviço a {r.request_date ? dm(r.request_date) : "?"}{r.source ? ` · ${r.source}` : ""}
+                        </p>
+                        {r.phone && <a href={`tel:${r.phone}`} className="text-[11px] text-navy inline-flex items-center gap-1 mt-0.5"><Phone className="w-3 h-3 text-gray-400" />{r.phone}</a>}
+                        {r.calendar_missing_since && <p className="text-[11px] font-semibold text-red-600">Apagado no calendário</p>}
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-bold text-navy">{money(Number(r.billed_value) || 0)}</p>
+                        <p className="text-[11px] font-semibold text-gold">{money(Number(r.my_cut) || 0)}</p>
+                        {r.upsell_value ? <p className="text-[11px] font-semibold text-violet-600">+{money(Number(r.upsell_value))} upsell</p> : null}
+                      </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-navy">{money(Number(r.billed_value) || 0)}</p>
-                      <p className="text-[11px] text-gray-500">{money(Number(r.my_cut) || 0)} para ti</p>
-                    </div>
+                    {(onTogglePaid || onEdit) && r.id && (
+                      <div className="flex items-center gap-2 mt-1.5">
+                        {onTogglePaid && r.paid !== undefined && (
+                          <button onClick={() => onTogglePaid(r.id!)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
+                            {r.paid ? "Pago" : "Por pagar"}
+                          </button>
+                        )}
+                        {onEdit && (
+                          <button onClick={() => onEdit(r.id!)} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border border-gray-200 text-navy">
+                            <Pencil className="w-3 h-3" /> Editar
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
-            )}
+              {/* Ecrã largo: a mesma tabela da aba Pedidos */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      {["Fechado", "Dia", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", ""].map(h => (
+                        <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dayRows.map((r, i) => (
+                      <tr key={r.id ?? i} className={`border-b border-gray-100 last:border-0 ${r.paid === false ? "bg-red-50/60" : ""}`}>
+                        <td className="px-2 py-2 font-mono text-gray-500 whitespace-nowrap">{TIME_FMT.format(new Date(r.booked_at!))}</td>
+                        <td className="px-2 py-2 font-mono text-navy whitespace-nowrap">{r.request_date ? dm(r.request_date) : "?"}</td>
+                        <td className="px-2 py-2 text-navy font-medium min-w-[240px]">
+                          {r.description || "-"}
+                          {r.calendar_missing_since && <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300 whitespace-nowrap">Apagado no calendário</span>}
+                        </td>
+                        <td className="px-2 py-2 text-gray-600">{r.client_name || "-"}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">
+                          <span className={r.locality ? "text-gray-600" : "text-amber-700 font-semibold"}>{r.locality ?? "?"}</span>
+                          {r.city && <span className="text-gray-400"> · {r.city}</span>}
+                        </td>
+                        <td className="px-2 py-2 text-gray-600 whitespace-nowrap">{r.phone || "-"}</td>
+                        <td className="px-2 py-2 text-gray-500 whitespace-nowrap">{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
+                        <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(Number(r.billed_value) || 0)}</td>
+                        <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap">{money(Number(r.my_cut) || 0)}</td>
+                        <td className="px-2 py-2 font-semibold text-violet-600 whitespace-nowrap">{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
+                        <td className="px-2 py-2">
+                          {r.paid !== undefined && (
+                            <button onClick={() => r.id && onTogglePaid?.(r.id)} disabled={!onTogglePaid}
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
+                              {r.paid ? "Pago" : "Por pagar"}
+                            </button>
+                          )}
+                        </td>
+                        <td className="px-1 py-2">
+                          {onEdit && r.id && (
+                            <button onClick={() => onEdit(r.id!)} aria-label="Editar" className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>)}
           </div>
         )}
       </div>
