@@ -8,6 +8,7 @@ import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
 import CrmServiceMix from "./CrmServiceMix";
+import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmQuizLeads from "./CrmQuizLeads";
 import { summarizeQuizLeads, summarizeWhatsAppContacts, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
@@ -188,7 +189,7 @@ const CrmPanel = () => {
     setQuizLeads((data ?? []) as QuizLeadRow[]);
     // Contactos do WhatsApp, para comparar; se a leitura falhar, a aba mostra só o questionário.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: contacts } = await (supabase as any).from("clients").select("phone, first_contact_at, status");
+    const { data: contacts } = await (supabase as any).from("clients").select("phone, first_contact_at, status, services");
     setWaContacts((contacts ?? null) as WhatsAppContactRow[] | null);
   }, []);
 
@@ -457,7 +458,8 @@ const CrmPanel = () => {
       {view === "servicos" && (
         <CrmServiceMix monthLabel={monthLabel}
           records={monthRecords.map(r => ({ ...r, my_cut: cutOf(r) }))}
-          allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />
+          allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))}
+          closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
 
       {view === "questionario" && <CrmQuizLeads summary={quizSummary} whatsApp={waMonths} error={quizError} />}

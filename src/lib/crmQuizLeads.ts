@@ -200,6 +200,7 @@ export interface WhatsAppContactRow {
   phone: string;
   first_contact_at: string | null;
   status: string;
+  services?: string[] | null;
 }
 
 export interface WhatsAppMonth {
