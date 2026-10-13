@@ -11,6 +11,14 @@ export interface ClosingRow {
   request_date?: string;
   billed_value: number;
   my_cut: number;
+  /** Só para a lista dos fechos de um dia (aba Fechos). */
+  id?: string;
+  client_name?: string | null;
+  description?: string;
+  city?: string | null;
+  locality?: string | null;
+  source?: string | null;
+  calendar_missing_since?: string | null;
 }
 
 export interface DayTotals { day: string; count: number; billed: number; cut: number }
@@ -115,4 +123,11 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string, 
     withoutDate,
     ahead,
   };
+}
+
+/** Linhas fechadas num dia (hora de Lisboa), pela hora do fecho. */
+export function closingsOnDay<T extends ClosingRow>(rows: T[], day: string): T[] {
+  return rows
+    .filter(r => r.booked_at && lisbonDay(r.booked_at) === day)
+    .sort((a, b) => a.booked_at!.localeCompare(b.booked_at!));
 }

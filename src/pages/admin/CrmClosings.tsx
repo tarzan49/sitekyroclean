@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Target } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Target, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
+import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
 import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
 import { computeWeeklyReview, mondayOf, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
 import { closeRateRankRows, computeServiceCloseRates, missingFor, QUIZ_CLOSE_RATE_GOAL, type CloseRateCount } from "@/lib/crmServiceCloseRate";
@@ -50,6 +50,8 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 const monthName = (month: string) => MONTH_FMT.format(new Date(`${month}-15T12:00:00Z`));
 const DAY_FMT = new Intl.DateTimeFormat("pt-PT", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 const dayLabel = (day: string) => DAY_FMT.format(new Date(`${day}T12:00:00Z`));
+const DAY_LONG_FMT = new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" });
 const noon = (day: string) => new Date(`${day}T12:00:00Z`);
 const daysBetween = (from: string, to: string) => Math.round((noon(to).getTime() - noon(from).getTime()) / 86_400_000);
 
@@ -120,6 +122,8 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
   const [week, setWeek] = useState(addDays(thisMonday, -7));
   const [month, setMonth] = useState(currentMonth);
   const [hover, setHover] = useState<Hover | null>(null);
+  // Dia aberto no "Dia a dia" (dono, 13/10: "quando clico na terça, vejo o que se fechou").
+  const [openDay, setOpenDay] = useState<string | null>(null);
 
   const [clients, setClients] = useState<(RankingClient & { from_google_ads: boolean })[] | null>(null);
   const [adsStats, setAdsStats] = useState<{ stat_date: string; cost: number }[]>([]);
@@ -152,6 +156,8 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
   }, [period, week, month, today]);
 
   const summary = useMemo(() => summarizeClosings(records, from, to, aheadAfter ?? to), [records, from, to, aheadAfter]);
+  const shownDay = openDay && openDay >= from && openDay <= to ? openDay : null;
+  const dayRows = useMemo(() => (shownDay ? closingsOnDay(records, shownDay) : []), [records, shownDay]);
 
   // Todas as semanas até à em curso (inclusive), da mais antiga para a mais recente.
   const allWeeks: WeekRow[] = useMemo(
@@ -570,7 +576,7 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
       {/* Dia a dia, com os dias sem fechos a zero: são eles que mostram o padrão */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <p className="text-sm font-bold text-navy">Dia a dia</p>
-        <p className="text-[11px] text-gray-500 mb-4">Serviços fechados em cada dia, de {dayLabel(summary.from)} a {dayLabel(summary.to)}</p>
+        <p className="text-[11px] text-gray-500 mb-4">Serviços fechados em cada dia, de {dayLabel(summary.from)} a {dayLabel(summary.to)}. Carrega num dia para ver o que se fechou.</p>
         <div className="relative">
           <div className="flex items-end gap-[2px] h-28 border-b border-gray-200">
             {summary.perDay.map((d, i) => {
@@ -579,10 +585,11 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
                 <button key={d.day} type="button"
                   onPointerEnter={() => setHover({ chart: "day", index: i })} onPointerLeave={() => setHover(null)}
                   onFocus={() => setHover({ chart: "day", index: i })} onBlur={() => setHover(null)}
-                  aria-label={`${dayLabel(d.day)}: ${d.count} fechos`}
-                  className="flex-1 min-w-0 h-full flex items-end justify-center focus:outline-none">
+                  onClick={() => setOpenDay(o => (o === d.day ? null : d.day))}
+                  aria-label={`${dayLabel(d.day)}: ${d.count} fechos. Ver os fechos deste dia`} aria-pressed={shownDay === d.day}
+                  className="flex-1 min-w-0 h-full flex items-end justify-center focus:outline-none cursor-pointer">
                   <span className="w-full max-w-[24px] rounded-t-sm transition-colors"
-                    style={{ height: `${(d.count / maxDay) * 100}%`, minHeight: d.count ? 2 : 0, background: active ? GOLD_HOVER : GOLD }} />
+                    style={{ height: `${(d.count / maxDay) * 100}%`, minHeight: d.count ? 2 : 0, background: active || shownDay === d.day ? GOLD_HOVER : shownDay ? GOLD_FADED : GOLD }} />
                 </button>
               );
             })}
@@ -605,6 +612,48 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
             </div>
           )}
         </div>
+        {shownDay && (
+          <div className="mt-4 border-t border-gray-100 pt-3">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <p className="text-sm font-bold text-navy first-letter:uppercase">{DAY_LONG_FMT.format(noon(shownDay))}</p>
+                <p className="text-[11px] text-gray-500">
+                  {dayRows.length} fecho{dayRows.length === 1 ? "" : "s"}
+                  {dayRows.length > 0 && <> · {money(dayRows.reduce((t, r) => t + (Number(r.billed_value) || 0), 0))} faturado · {money(dayRows.reduce((t, r) => t + (Number(r.my_cut) || 0), 0))} para ti</>}
+                </p>
+              </div>
+              <button type="button" onClick={() => setOpenDay(null)} aria-label="Fechar o dia" className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-navy">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {dayRows.length === 0 ? (
+              <p className="text-xs text-gray-500">Nenhum serviço fechado neste dia.</p>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {dayRows.map((r, i) => (
+                  <li key={r.id ?? i} className="py-2 flex items-start justify-between gap-3 text-xs">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-navy truncate">
+                        <span className="text-gray-400 font-normal mr-1.5">{TIME_FMT.format(new Date(r.booked_at!))}</span>
+                        {r.client_name || "Sem nome"}
+                        {(r.city || r.locality) && <span className="text-gray-500 font-normal"> · {r.city || r.locality}</span>}
+                      </p>
+                      {r.description && <p className="text-gray-600 break-words">{r.description}</p>}
+                      <p className="text-[11px] text-gray-400">
+                        Serviço a {r.request_date ? dm(r.request_date) : "?"}{r.source ? ` · ${r.source}` : ""}
+                        {r.calendar_missing_since && <span className="text-red-600"> · já não está no calendário</span>}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-navy">{money(Number(r.billed_value) || 0)}</p>
+                      <p className="text-[11px] text-gray-500">{money(Number(r.my_cut) || 0)} para ti</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
 
       {summary.withoutDate > 0 && (
