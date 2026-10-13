@@ -85,6 +85,15 @@ export function shiftMonth(month: string, n: number): string {
   return fromUtc(d.getTime()).slice(0, 7);
 }
 
+/**
+ * Uma linha a 0€ sem upsell não é um fecho: é uma revisita ou garantia sem
+ * custo (dono, 2026-10-13: "a Manuela não é um fecho, é uma revisita"). Fica
+ * no CRM, para a equipa a ver, mas fora das contas e da lista do dia.
+ */
+export function countsAsClosing(r: Pick<ClosingRow, 'billed_value' | 'upsell_value'>): boolean {
+  return (Number(r.billed_value) || 0) > 0 || (Number(r.upsell_value) || 0) > 0;
+}
+
 export function summarizeClosings(rows: ClosingRow[], from: string, to: string, aheadAfter: string = to): ClosingsSummary {
   const perDayMap = new Map<string, DayTotals>();
   for (let d = from; d <= to; d = addDays(d, 1)) perDayMap.set(d, { day: d, count: 0, billed: 0, cut: 0 });
@@ -92,6 +101,7 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string, 
   let withoutDate = 0;
   const ahead = { count: 0, billed: 0, cut: 0 };
   for (const r of rows) {
+    if (!countsAsClosing(r)) continue;
     if (!r.booked_at) { withoutDate++; continue; }
     const bucket = perDayMap.get(lisbonDay(r.booked_at));
     if (!bucket) continue;
@@ -131,6 +141,6 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string, 
 /** Linhas fechadas num dia (hora de Lisboa), pela hora do fecho. */
 export function closingsOnDay<T extends ClosingRow>(rows: T[], day: string): T[] {
   return rows
-    .filter(r => r.booked_at && lisbonDay(r.booked_at) === day)
+    .filter(r => r.booked_at && countsAsClosing(r) && lisbonDay(r.booked_at) === day)
     .sort((a, b) => a.booked_at!.localeCompare(b.booked_at!));
 }

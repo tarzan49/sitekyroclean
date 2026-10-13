@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, lisbonDay, monthBounds, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
+import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
 
 describe('calendar helpers', () => {
   it('counts the day in Lisbon, not in UTC or Copenhagen', () => {
@@ -67,5 +67,17 @@ describe('closings by calendar month', () => {
     expect(s.count).toBe(2);
     expect(s.billed).toBe(250);
     expect(s.ahead).toEqual({ count: 1, billed: 150, cut: 75 });
+  });
+});
+
+describe('free revisits', () => {
+  it('a 0€ row without upsell is not a closing, in the totals or in the day list', () => {
+    const rows = [
+      { booked_at: '2026-10-13T09:22:58Z', billed_value: 0, my_cut: 0 },
+      { booked_at: '2026-10-13T14:26:32Z', billed_value: 119, my_cut: 60 },
+      { booked_at: '2026-10-13T15:00:00Z', billed_value: 0, my_cut: 0, upsell_value: 40 },
+    ];
+    expect(summarizeClosings(rows, '2026-10-13', '2026-10-13')).toMatchObject({ count: 2, billed: 119 });
+    expect(closingsOnDay(rows, '2026-10-13')).toHaveLength(2);
   });
 });
