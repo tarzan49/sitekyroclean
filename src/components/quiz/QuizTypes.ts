@@ -107,8 +107,12 @@ export interface PriceOption {
 // sob orçamento (o dono não deu valores: não inventar). O motor devolve null
 // nesses casos (calcSofaUnitPrice) e o quiz marca-os como sob orçamento.
 //
-// O id '4+-lugares' ficou para o sofá de canto, em U ou modular, todo sob
-// orçamento (precisa de fotografia): é o id que os pedidos, o CRM e o bot já
+// Sofá de canto (dono, 2026-10-13: "sofá de canto faz a 109 eur"): id 'canto',
+// só a limpeza tem preço; impermeabilização, anti-ácaros e pack ficam sob
+// orçamento, como no de 5+ lugares (o dono não deu valores: não inventar).
+//
+// O id '4+-lugares' ficou para o sofá em U ou modular (até 13/10 também o de
+// canto), todo sob orçamento (precisa de fotografia): é o id que os pedidos, o CRM e o bot já
 // guardam com o sentido "sob orçamento", e renomeá-lo faria esses registos
 // antigos passarem a ler-se como um preço. O espaço inseparável em "em U"
 // impede o "U" de ficar sozinho numa linha no ecrã das quantidades a 375px.
@@ -118,7 +122,8 @@ export const sofaPrices: PriceOption[] = [
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 209, originalBothPrice: 218, waterproofingPremiumPrice: 169, packPremiumDelta: 30 },
   { id: '5-lugares',  label: '5+ Lugares', cleaningPrice: 119, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
-  { id: '4+-lugares', label: 'Canto, em\u00A0U ou modular', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { id: 'canto',      label: 'Canto',      cleaningPrice: 109, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { id: '4+-lugares', label: 'Em\u00A0U ou modular', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Colchão: waterproofingPrice/bothPrice/originalBothPrice são reaproveitados

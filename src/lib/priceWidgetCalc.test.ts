@@ -46,11 +46,10 @@ describe('calcWidgetPricing — sem conceito de desconto', () => {
 });
 
 describe('calcWidgetTotal (limpeza-sofas, dados reais)', () => {
-  it('"Sofá de canto, em U ou modular" (sob orçamento) never silently contributes a price', () => {
-    const rowQuantities = { 5: 1 }; // index 5 = canto, em U ou modular
-    const total = calcWidgetTotal('limpeza-sofas', rowQuantities);
-    expect(total).toBe(0); // sob orçamento: não soma preço nenhum.
-    expect(widgetSofaUnitPrice(PRICE_TABLE_QUIZ_CONFIG['limpeza-sofas'][5]!, false, 'essencial')).toBeNull();
+  it('prices the corner sofa cleaning at 109 (owner, 13 Oct 2026); "em U ou modular" (sob orçamento) never contributes a price', () => {
+    expect(calcWidgetTotal('limpeza-sofas', { 5: 1 })).toBe(109); // index 5 = canto
+    expect(calcWidgetTotal('limpeza-sofas', { 6: 1 })).toBe(0); // index 6 = em U ou modular: sob orçamento.
+    expect(widgetSofaUnitPrice(PRICE_TABLE_QUIZ_CONFIG['limpeza-sofas'][6]!, false, 'essencial')).toBeNull();
   });
 
   it('prices the 5+ seat sofa cleaning at 119 and leaves its waterproofing under quote', () => {

@@ -53,8 +53,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").cleaningPrice) },
     { item: "Sofá 4 lugares", price: desde(sofaSize("4-lugares").cleaningPrice) },
     { item: "Sofá 5+ lugares", price: desde(sofaSize("5-lugares").cleaningPrice) },
-    { item: "Sofá de canto, em U ou modular", price: "Sob orçamento" },
-    { item: "Sofá em L", price: "Sob orçamento" },
+    { item: "Sofá de canto (em L)", price: desde(sofaSize("canto").cleaningPrice) },
+    { item: "Sofá em U ou modular", price: "Sob orçamento" },
     // Acrescentada à limpeza, a impermeabilização não custa o preço de
     // tabela (esse é o do serviço sozinho): custa a diferença que o quiz cobra
     // pelo pack de limpeza + Essencial no mesmo sofá.

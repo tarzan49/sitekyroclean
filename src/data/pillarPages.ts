@@ -70,9 +70,9 @@ const catalog = (slug: PillarSlug) => {
 
 /** Rótulo do tamanho a meio de uma frase: "4 Lugares" passa a "4 lugares",
  * mas o "U" de "em U" fica em maiúscula. */
-const inlineLabel = (label: string) => label.toLowerCase().replace(/\bem(\s)u\b/g, 'em$1U');
+const inlineLabel = (label: string) => label === 'Canto' ? 'sofá de canto' : label.toLowerCase().replace(/\bem(\s)u\b/g, 'em$1U');
 
-/** "49€ para 1 lugar, …, 99€ para 4 lugares e 119€ para 5+ lugares; canto, em U ou modular sob orçamento". */
+/** "49€ para 1 lugar, …, 119€ para 5+ lugares e 109€ para sofá de canto; em U ou modular sob orçamento". */
 function sizeList(options: PriceOption[]): string {
   const priced = options.filter(item => typeof item.cleaningPrice === 'number')
     .map(item => `${formatEuro(item.cleaningPrice as number)} para ${inlineLabel(item.label)}`);
