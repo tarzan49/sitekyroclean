@@ -465,7 +465,7 @@ const CrmPanel = () => {
       {view === "questionario" && <CrmQuizLeads summary={quizSummary} whatsApp={waMonths} error={quizError} />}
 
 
-      {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} services={records} />}
+      {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} services={records} quiz={quizSummary} />}
 
       {view === "upsell" && <CrmUpsell records={records} onEdit={id => {
         const r = records.find(x => x.id === id);

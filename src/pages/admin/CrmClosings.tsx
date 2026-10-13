@@ -3,7 +3,9 @@ import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Target } from "luc
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
 import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
-import { computeServiceRanking, computeWeeklyReview, mondayOf, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
+import { computeWeeklyReview, mondayOf, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
+import { closeRateRankRows, computeServiceCloseRates, missingFor, QUIZ_CLOSE_RATE_GOAL, type CloseRateCount } from "@/lib/crmServiceCloseRate";
+import type { QuizSummary } from "@/lib/crmQuizLeads";
 import { atStake, CLOSE_RATE_GOAL, computeWeekInsights, missingForGoal } from "@/lib/weeklyInsights";
 
 // Aba "Fechos" do CRM. Desde 2026-10-13 junta a antiga aba "Métricas" (dono:
@@ -12,8 +14,10 @@ import { atStake, CLOSE_RATE_GOAL, computeWeekInsights, missingForGoal } from "@
 //  - a semana escolhe-se como o mês (setas), e é o período por omissão;
 //  - na semana, a revisão de segunda-feira: os 4 números com a tendência de
 //    12 semanas, e o que está a correr bem e o que melhorar (weeklyInsights.ts);
-//  - fechos por semana, taxa de fecho por serviço com a meta de 70% e o
-//    dinheiro em jogo, e os fechos por dia da semana e dia a dia.
+//  - fechos por semana, taxa de fecho (fechos ÷ orçamentos de qualquer canal,
+//    crmServiceCloseRate.ts) com as metas do dono, 50% no questionário e 70%
+//    em cada serviço, e o dinheiro em jogo, e os fechos por dia da semana e
+//    dia a dia.
 // O dourado não chega a 3:1 sobre branco: cada coluna leva o valor escrito.
 
 const GOLD = "#D4AF37";
@@ -76,7 +80,37 @@ function Sparkline({ values }: { values: (number | null)[] }) {
   );
 }
 
-const CrmClosings = ({ records, services }: { records: ClosingRow[]; services: ServiceRow[] }) => {
+/** Taxa de fecho de um canal, com a meta (quando há) e a variação contra o período anterior. */
+function RateCard({ label, now, before, goal }: { label: string; now: CloseRateCount; before: CloseRateCount; goal?: number }) {
+  const rate = now.quotes ? now.closed / now.quotes : null;
+  const prev = before.quotes ? before.closed / before.quotes : null;
+  const change = rate !== null && prev !== null ? Math.round((rate - prev) * 100) : null;
+  const missing = goal !== undefined ? missingFor(now, goal) : 0;
+  const hit = goal !== undefined && rate !== null && rate >= goal;
+  return (
+    <div className="border border-gray-200 rounded-xl p-3">
+      <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}{goal !== undefined && ` · meta ${pct(goal)}`}</p>
+      <p className={`text-xl font-bold ${hit ? "text-emerald-600" : "text-navy"}`}>{rate === null ? "–" : pct(rate)}</p>
+      <p className="text-[11px] text-gray-500">{now.closed} fecho{now.closed === 1 ? "" : "s"} de {now.quotes} orçamento{now.quotes === 1 ? "" : "s"}</p>
+      {goal !== undefined && rate !== null && (
+        <>
+          <div className="relative h-1.5 mt-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${Math.min(100, rate * 100)}%`, background: GOLD }} />
+            <div className="absolute inset-y-0 w-px bg-navy/60" style={{ left: `${goal * 100}%` }} />
+          </div>
+          <p className="text-[11px] mt-1 text-gray-600">{hit ? "Meta atingida" : `Faltam ${missing} fecho${missing === 1 ? "" : "s"} para a meta`}</p>
+        </>
+      )}
+      {change !== null && (
+        <p className={`text-[11px] font-semibold ${change === 0 ? "text-gray-400" : change > 0 ? "text-emerald-600" : "text-red-600"}`}>
+          {change === 0 ? "igual ao período anterior" : `${change > 0 ? "+" : ""}${change} pp vs período anterior`}
+        </p>
+      )}
+    </div>
+  );
+}
+
+const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]; services: ServiceRow[]; quiz?: QuizSummary | null }) => {
   const now = useMemo(() => new Date(), []);
   const today = lisbonDay(now);
   const thisMonday = mondayOf(today);
@@ -131,22 +165,30 @@ const CrmClosings = ({ records, services }: { records: ClosingRow[]; services: S
   const selectedWeek = period === "week" ? chartWeeks[chartWeeks.length - 1] : undefined;
   const previousWeek = period === "week" ? chartWeeks[chartWeeks.length - 2] ?? null : null;
 
-  // Taxa de fecho por serviço: contactos com o primeiro contacto no período, e o período anterior do mesmo tamanho.
-  const rankingFor = (end: string, span: number): ServiceRankRow[] => {
-    if (!clients) return [];
-    return computeServiceRanking({
-      services: services.filter(s => closedDay(s) <= end),
-      clients: clients.filter(c => c.first_contact_at && lisbonDay(c.first_contact_at) <= end),
-    }, noon(end), span);
+  // Taxa de fecho: fechos ÷ orçamentos de qualquer canal (questionário + WhatsApp), pelo dia do
+  // primeiro pedido de cada pessoa, e o período anterior do mesmo tamanho. Só vê o estado de hoje:
+  // fecha o que até hoje fechou, e só com serviços fechados até ao fim do período.
+  const ratesFor = (start: string, end: string) => {
+    const upTo = services.filter(s => closedDay(s) <= end);
+    const rates = computeServiceCloseRates({ from: start, to: end }, quiz, clients, upTo);
+    // Ticket de cada serviço: linhas do CRM fechadas em pelo menos 90 dias até ao fim do período.
+    const ticketFrom = addDays(end, -Math.max(89, daysBetween(start, end)));
+    const live = upTo.filter(s => !s.calendar_missing_since);
+    const rows = closeRateRankRows(rates, live.filter(s => closedDay(s) >= ticketFrom), live);
+    const big = (r: ServiceRankRow) => r.contacts >= RANKING_MIN_CONTACTS;
+    return { rates, rows: rows.sort((a, b) => Number(big(b)) - Number(big(a)) || b.rate - a.rate || b.contacts - a.contacts) };
   };
   const span = daysBetween(from, to);
-  const ranking = useMemo(() => rankingFor(to, span), [clients, services, to, span]); // eslint-disable-line react-hooks/exhaustive-deps
-  const previousRanking = useMemo(() => rankingFor(addDays(from, -1), span), [clients, services, from, span]); // eslint-disable-line react-hooks/exhaustive-deps
-  // A leitura da semana olha para 90 dias: uma semana só tem poucos contactos por serviço.
-  const ranking90 = useMemo(() => (period === "week" ? rankingFor(to, 89) : []), [clients, services, to, period]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ready = !!clients || !!quiz;
+  const current = useMemo(() => ratesFor(from, to), [clients, quiz, services, from, to]); // eslint-disable-line react-hooks/exhaustive-deps
+  const previous = useMemo(() => ratesFor(addDays(from, -span - 1), addDays(from, -1)), [clients, quiz, services, from, span]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ranking = ready ? current.rows : [];
+  const previousRanking = previous.rows;
+  // A leitura da semana olha para 90 dias: uma semana só tem poucos orçamentos por serviço.
+  const last90 = useMemo(() => (period === "week" && ready ? ratesFor(addDays(to, -89), to) : null), [clients, quiz, services, to, period]); // eslint-disable-line react-hooks/exhaustive-deps
   const insights = useMemo(
-    () => (period === "week" && endIndex >= 0 ? computeWeekInsights(allWeeks.slice(0, endIndex + 1), ranking90) : null),
-    [period, allWeeks, endIndex, ranking90],
+    () => (period === "week" && endIndex >= 0 ? computeWeekInsights(allWeeks.slice(0, endIndex + 1), last90?.rows ?? [], last90?.rates.quiz) : null),
+    [period, allWeeks, endIndex, last90],
   );
 
   const ranked = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS);
@@ -403,16 +445,23 @@ const CrmClosings = ({ records, services }: { records: ClosingRow[]; services: S
 
       {/* Taxa de fecho por serviço, com a meta e o dinheiro que fica por fechar */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <p className="text-sm font-bold text-navy">Taxa de fecho por serviço · meta {pct(CLOSE_RATE_GOAL)}</p>
-        <p className="text-[11px] text-gray-500 mb-3">Contactos com o primeiro contacto na {periodLabel}, comparados com o período anterior do mesmo tamanho.</p>
-        {!clients && !loadError && <p className="text-sm text-gray-400">A carregar as fichas…</p>}
-        {clients && ranking.length === 0 && <p className="text-sm text-gray-400">Sem contactos com etiqueta neste período.</p>}
+        <p className="text-sm font-bold text-navy">Taxa de fecho · meta {pct(QUIZ_CLOSE_RATE_GOAL)} no questionário, {pct(CLOSE_RATE_GOAL)} em cada serviço</p>
+        <p className="text-[11px] text-gray-500 mb-3">Fechos ÷ orçamentos recebidos em qualquer canal, de quem pediu preço pela primeira vez na {periodLabel}, comparados com o período anterior do mesmo tamanho.</p>
+        {!ready && !loadError && <p className="text-sm text-gray-400">A carregar os orçamentos…</p>}
+        {ready && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <RateCard label="Total" now={current.rates.total} before={previous.rates.total} />
+            <RateCard label="Questionário" now={current.rates.quiz} before={previous.rates.quiz} goal={QUIZ_CLOSE_RATE_GOAL} />
+            <RateCard label="WhatsApp" now={current.rates.whatsApp} before={previous.rates.whatsApp} />
+          </div>
+        )}
+        {ready && ranking.length === 0 && <p className="text-sm text-gray-400">Sem orçamentos com serviço identificado neste período.</p>}
         {ranking.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  {["#", "Serviço", "Contactos", "Fecharam", "Taxa", "vs anterior", "Até 70%", "Ticket", "Em jogo"].map(h => (
+                  {["#", "Serviço", "Orçamentos", "Fecharam", "Taxa", "vs anterior", "Até 70%", "Ticket", "Em jogo"].map(h => (
                     <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -452,8 +501,8 @@ const CrmClosings = ({ records, services }: { records: ClosingRow[]; services: S
           </div>
         )}
         <p className="text-[11px] text-gray-500 mt-2">
-          Um contacto conta em cada serviço que pediu. Fechou = cliente ou marcado, ou serviço no CRM com esse telefone (o estado de hoje, por isso semanas antigas ficam um pouco acima).
-          Em jogo = fechos que faltavam para {pct(CLOSE_RATE_GOAL)} × ticket. Ticket = linhas do CRM só desse serviço. Com menos de {RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.
+          Orçamento = pessoa que pediu preço no questionário do site ou no WhatsApp, uma vez, no dia do primeiro pedido (quem fez os dois conta pelo questionário). Fechou = serviço no CRM a partir desse dia, ou etiqueta cliente ou marcado no WhatsApp (o estado de hoje, por isso semanas antigas ficam um pouco acima).
+          Uma pessoa conta em cada serviço que pediu. Em jogo = fechos que faltavam para {pct(CLOSE_RATE_GOAL)} × ticket. Ticket = média desse serviço nas linhas do CRM de pelo menos 90 dias, como na aba Serviços. Com menos de {RANKING_MIN_CONTACTS} orçamentos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.
         </p>
       </div>
 

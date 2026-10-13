@@ -6,8 +6,9 @@
 // Regras simples e escritas aqui, para a leitura ser a mesma em todo o lado.
 
 import { RANKING_MIN_CONTACTS, type ServiceRankRow, type WeekRow } from "./weeklyReview";
+import { QUIZ_CLOSE_RATE_GOAL, SERVICE_CLOSE_RATE_GOAL, type CloseRateCount } from "./crmServiceCloseRate";
 
-export const CLOSE_RATE_GOAL = 0.7;
+export const CLOSE_RATE_GOAL = SERVICE_CLOSE_RATE_GOAL;
 /** Semanas antes da escolhida usadas como termo de comparação. */
 export const BASELINE_WEEKS = 8;
 /** Variação a partir da qual um número conta como melhor ou pior que o normal. */
@@ -37,7 +38,17 @@ export const missingForGoal = (r: ServiceRankRow) => Math.max(0, Math.ceil(CLOSE
 /** Dinheiro que fica por fechar até à meta: fechos em falta × ticket do serviço. */
 export const atStake = (r: ServiceRankRow) => (r.ticket === null ? 0 : missingForGoal(r) * r.ticket);
 
+// Pelos rótulos da aba Serviços ("Limpeza de sofá"), que é o que a aba Fechos
+// mostra desde 2026-10-13, e pelas etiquetas antigas do WhatsApp.
+const SOFA_ACTION = "Mandar logo o antes e depois de um sofá parecido e propor duas horas concretas no fim do orçamento.";
+const WATERPROOF_ACTION = "Mostrar o vídeo da água a escorrer e apresentar o Premium primeiro, com o Essencial como alternativa.";
 const SERVICE_ACTIONS: Record<string, string> = {
+  "Limpeza de sofá": SOFA_ACTION,
+  "Limpeza de colchão": "Falar dos ácaros e da noite de sono, não só da mancha, e propor juntar o colchão a outro artigo na mesma visita.",
+  "Limpeza de tapete": "Pedir a fotografia e o material na primeira resposta, para o preço sair logo, sem ida e volta.",
+  "Limpeza de cadeiras": "Mostrar o vídeo das cadeiras e propor duas horas concretas no fim do orçamento.",
+  "Impermeabilização de sofá": WATERPROOF_ACTION,
+  "Impermeabilização de cadeiras": WATERPROOF_ACTION,
   "Sofá": "Mandar logo o antes e depois de um sofá parecido e propor duas horas concretas no fim do orçamento.",
   "Colchão": "Falar dos ácaros e da noite de sono, não só da mancha, e propor juntar o colchão a outro artigo na mesma visita.",
   "Tapete": "Pedir a fotografia e o material na primeira resposta, para o preço sair logo, sem ida e volta.",
@@ -46,7 +57,10 @@ const SERVICE_ACTIONS: Record<string, string> = {
   "Recolha": "Confirmar logo o dia da recolha e o da entrega: a dúvida é quando o tapete volta.",
 };
 
-export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[]): WeekInsights {
+/** Abaixo disto a taxa do questionário em 90 dias ainda é ruído. */
+const QUIZ_MIN_QUOTES = 10;
+
+export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[], quiz90?: CloseRateCount): WeekInsights {
   const good: Insight[] = [];
   const improve: Insight[] = [];
   const week = weeks[weeks.length - 1];
@@ -95,6 +109,17 @@ export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[
         action: "Ver no Google Ads as pesquisas da semana e pôr como negativas as que gastaram sem dar contactos.",
       });
     }
+  }
+
+  if (quiz90 && quiz90.quotes >= QUIZ_MIN_QUOTES) {
+    const rate = quiz90.closed / quiz90.quotes;
+    const detail = `${quiz90.closed} de ${quiz90.quotes} pedidos do site fecharam em 90 dias (meta ${pct(QUIZ_CLOSE_RATE_GOAL)}).`;
+    if (rate >= QUIZ_CLOSE_RATE_GOAL) good.push({ title: `Questionário acima da meta: ${pct(rate)}`, detail });
+    else improve.push({
+      title: `Questionário: ${pct(rate)} de fecho`,
+      detail: `${detail} Faltavam mais ${Math.ceil(QUIZ_CLOSE_RATE_GOAL * quiz90.quotes - quiz90.closed)} fechos.`,
+      action: "Responder a cada pedido do site nos primeiros minutos, com o preço e duas horas concretas, e fazer o seguimento das 4 h e das 24 h a quem não respondeu.",
+    });
   }
 
   const ranked = ranking90.filter(r => r.contacts >= RANKING_MIN_CONTACTS);

@@ -42,4 +42,14 @@ describe('leitura da semana', () => {
     // Com menos de 10 contactos não entra.
     expect(r.improve.some(i => i.title.startsWith('Cadeira'))).toBe(false);
   });
+
+  it('questionário: abaixo de 50% em 90 dias é um ponto a melhorar, com os fechos em falta', () => {
+    const low = computeWeekInsights([week(10, 100)], [], { quotes: 20, closed: 6 });
+    expect(low.improve[0].title).toBe('Questionário: 30% de fecho');
+    expect(low.improve[0].detail).toContain('mais 4 fechos');
+    const ok = computeWeekInsights([week(10, 100)], [], { quotes: 20, closed: 11 });
+    expect(ok.good[0].title).toBe('Questionário acima da meta: 55%');
+    // Com menos de 10 pedidos não entra.
+    expect(computeWeekInsights([week(10, 100)], [], { quotes: 5, closed: 0 }).improve).toEqual([]);
+  });
 });

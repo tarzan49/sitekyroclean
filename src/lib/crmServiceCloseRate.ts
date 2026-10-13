@@ -20,8 +20,9 @@
 // que pediu. Sem etiqueta de serviço entra só na taxa do mês.
 import { phoneKey } from "./clientRecords";
 import { addDays, lisbonDay } from "./crmClosings";
-import { servicesOf } from "./crmServiceMix";
 import type { QuizSummary } from "./crmQuizLeads";
+import { servicesOf, summarizeServiceMix, type MixRow } from "./crmServiceMix";
+import type { ServiceRankRow } from "./weeklyReview";
 
 export interface CloseRateContact {
   phone: string;
@@ -81,13 +82,22 @@ export function servicesFromLabels(labels: string[] | null | undefined): string[
 
 const closedDay = (s: CloseRateService) => lisbonDay(s.booked_at ?? s.created_at);
 
-/** @param month "AAAA-MM" */
+/** Metas (dono, 2026-10-13): o questionário fecha pelo menos 50%; cada serviço, 70%. */
+export const QUIZ_CLOSE_RATE_GOAL = 0.5;
+export const SERVICE_CLOSE_RATE_GOAL = 0.7;
+
+/**
+ * @param period "AAAA-MM" (um mês) ou { from, to } (dias AAAA-MM-DD, inclusive),
+ *   sobre o dia do primeiro pedido de cada pessoa.
+ */
 export function computeServiceCloseRates(
-  month: string,
+  period: string | { from: string; to: string },
   quiz: QuizSummary | null,
   contacts: CloseRateContact[] | null,
   services: CloseRateService[],
 ): ServiceCloseRates {
+  const { from: start, to: end } = typeof period === "string" ? { from: `${period}-01`, to: `${period}-31` } : period;
+  const inPeriod = (day: string) => day >= start && day <= end;
   const out: ServiceCloseRates = {
     total: { quotes: 0, closed: 0 }, quiz: { quotes: 0, closed: 0 }, whatsApp: { quotes: 0, closed: 0 },
     byService: new Map(), withoutService: 0,
@@ -107,7 +117,7 @@ export function computeServiceCloseRates(
   for (const p of quiz?.people ?? []) {
     quizKeys.add(p.key);
     p.leads.forEach(l => { const k = phoneKey(l.whatsapp_phone); if (k) quizKeys.add(k); });
-    if (p.firstDay.slice(0, 7) !== month) continue;
+    if (!inPeriod(p.firstDay)) continue;
     add(p.leads.flatMap(l => (l.service ? fixWaterproofing(servicesOf(l.service)) : [])), p.services.length > 0, out.quiz);
   }
 
@@ -121,7 +131,7 @@ export function computeServiceCloseRates(
     const key = phoneKey(c.phone);
     if (!c.first_contact_at || key.length < 9 || quizKeys.has(key)) continue;
     const first = lisbonDay(c.first_contact_at);
-    if (first.slice(0, 7) !== month) continue;
+    if (!inPeriod(first)) continue;
     const from = addDays(first, -1);
     const closed = c.status === "cliente" || c.status === "marcado" || (closedDays.get(key) ?? []).some(d => d >= from);
     const labels = servicesFromLabels(c.services);
@@ -129,4 +139,22 @@ export function computeServiceCloseRates(
     add(labels, closed, out.whatsApp);
   }
   return out;
+}
+
+/** Fechos que faltavam para a meta, com os mesmos orçamentos. */
+export const missingFor = (c: CloseRateCount, goal: number) => Math.max(0, Math.ceil(goal * c.quotes - c.closed));
+
+/**
+ * Linhas do ranking da aba Fechos: orçamentos e fechos de cada serviço, com o
+ * ticket médio desse serviço nas linhas do CRM dadas (repartidas como na aba
+ * Serviços, pesadas com `weightRows`).
+ */
+export function closeRateRankRows(rates: ServiceCloseRates, ticketRows: MixRow[], weightRows: MixRow[] = ticketRows): ServiceRankRow[] {
+  const tickets = new Map(summarizeServiceMix(ticketRows, weightRows).services.map(l => [l.label, l.average]));
+  return [...rates.byService].map(([service, c]) => {
+    const rate = c.quotes ? c.closed / c.quotes : 0;
+    const t = tickets.get(service);
+    const ticket = t === undefined ? null : Math.round(t * 10) / 10;
+    return { service, contacts: c.quotes, closed: c.closed, rate, ticket, valuePerContact: ticket === null ? null : Math.round(rate * ticket * 10) / 10 };
+  });
 }
