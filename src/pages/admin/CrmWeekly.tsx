@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays } from "@/lib/crmClosings";
-import type { ServiceRow } from "@/lib/googleAdsResults";
+import { addDays, lisbonDay } from "@/lib/crmClosings";
+import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
 import { computeServiceRanking, computeWeeklyReview, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
 
 // Aba "Métricas" do CRM (dono, 2026-10-13: "consegues colocar estas métricas
 // dentro do admin panel numa aba do CRM?", "eu tenho que fechar mais"). Os
 // mesmos números da revisão de segunda-feira do email (weeklyReview.ts), mais a
 // meta de 70% de fecho por serviço: quantos fechos faltavam para lá chegar.
+// Setas para andar pelas semanas (dono, mesma data: "ir para trás e para a
+// frente na cronologia das semanas"): a semana escolhida manda nos cartões, na
+// tabela das semanas e no fim da janela do ranking (30/90/120/365 dias).
 
 const GOAL = 0.7;
 const WEEKS = 12;
-const WINDOWS = [30, 60, 90, 180] as const;
+const WINDOWS = [30, 90, 120, 365] as const;
+/** Até onde se pode recuar: dois anos de semanas. */
+const HISTORY_WEEKS = 104;
 
 const euro = (n: number | null) => (n === null ? "–" : `${Math.round(n).toLocaleString("pt-PT")}€`);
 const pct = (r: number) => `${Math.round(r * 100)}%`;
@@ -33,6 +38,8 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
   const [adsStats, setAdsStats] = useState<{ stat_date: string; cost: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState<(typeof WINDOWS)[number]>(90);
+  /** 0 = última semana completa; 1 = a anterior; … */
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     // Os tipos gerados do Supabase não conhecem estas tabelas: mesmo padrão das outras abas.
@@ -49,17 +56,28 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
   }, []);
 
   const now = useMemo(() => new Date(), []);
-  const weeks: WeekRow[] = useMemo(
-    () => computeWeeklyReview({ services: records, clients: clients ?? [], adsStats }, now, WEEKS),
+  const allWeeks: WeekRow[] = useMemo(
+    () => computeWeeklyReview({ services: records, clients: clients ?? [], adsStats }, now, HISTORY_WEEKS),
     [records, clients, adsStats, now],
   );
-  const ranking = useMemo(
-    () => (clients ? computeServiceRanking({ services: records, clients }, now, days) : []),
-    [records, clients, now, days],
-  );
+  // Não deixa recuar para lá da primeira semana com fechos ou gasto.
+  const firstWithData = Math.max(0, allWeeks.findIndex(w => w.closes > 0 || w.spend > 0));
+  const maxOffset = Math.max(0, allWeeks.length - 1 - firstWithData);
+  const sel = allWeeks.length - 1 - Math.min(offset, maxOffset);
+  const last = allWeeks[sel];
+  const prev = allWeeks[sel - 1] ?? null;
+  const weeks = allWeeks.slice(Math.max(0, sel - WEEKS + 1), sel + 1);
 
-  const last = weeks[weeks.length - 1];
-  const prev = weeks[weeks.length - 2] ?? null;
+  // Na última semana a janela do ranking acaba hoje; numa semana passada, no domingo dela.
+  const rankingEnd = offset === 0 || !last ? null : addDays(last.week, 6);
+  const ranking = useMemo(() => {
+    if (!clients) return [];
+    if (!rankingEnd) return computeServiceRanking({ services: records, clients }, now, days);
+    return computeServiceRanking({
+      services: records.filter(s => closedDay(s) <= rankingEnd),
+      clients: clients.filter(c => c.first_contact_at && lisbonDay(c.first_contact_at) <= rankingEnd),
+    }, new Date(`${rankingEnd}T12:00:00Z`), days);
+  }, [records, clients, now, days, rankingEnd]);
   const ranked = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS);
   const bestRate = ranked[0];
   const bestValue = [...ranked].filter(r => r.valuePerContact !== null).sort((a, b) => b.valuePerContact! - a.valuePerContact!)[0];
@@ -82,7 +100,27 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
 
       {last && (
         <section className="space-y-3">
-          <h3 className="text-sm font-bold text-navy">Última semana completa · {dm(last.week)} a {dm(addDays(last.week, 6))}</h3>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h3 className="text-sm font-bold text-navy">
+              {offset === 0 ? "Última semana completa" : "Semana"} · {dm(last.week)} a {dm(addDays(last.week, 6))}
+            </h3>
+            <div className="flex gap-1" role="group" aria-label="Semana">
+              <button onClick={() => setOffset(o => Math.min(maxOffset, o + 1))} disabled={offset >= maxOffset}
+                className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:text-navy disabled:opacity-40">
+                ‹ Anterior
+              </button>
+              <button onClick={() => setOffset(o => Math.max(0, o - 1))} disabled={offset === 0}
+                className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:text-navy disabled:opacity-40">
+                Seguinte ›
+              </button>
+              {offset > 0 && (
+                <button onClick={() => setOffset(0)}
+                  className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-[#D4AF37] bg-[#D4AF37]/10 text-navy">
+                  Última
+                </button>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {cards!.map(c => (
               <div key={c.label} className="bg-white border border-gray-200 rounded-xl p-4">
@@ -98,7 +136,7 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h3 className="text-sm font-bold text-navy">Taxa de fecho por serviço · meta {pct(GOAL)}</h3>
+          <h3 className="text-sm font-bold text-navy">Taxa de fecho por serviço · meta {pct(GOAL)}{rankingEnd && <span className="font-normal text-gray-500"> · até {dm(rankingEnd)}</span>}</h3>
           <div className="flex gap-1" role="group" aria-label="Janela">
             {WINDOWS.map(w => (
               <button key={w} onClick={() => setDays(w)}
@@ -155,14 +193,14 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
           </div>
         )}
         <p className="text-xs text-gray-500">
-          Contactos = fichas com essa etiqueta e o primeiro contacto nos últimos {days} dias; um contacto conta em cada serviço que pediu.
+          Contactos = fichas com essa etiqueta e o primeiro contacto nos {days} dias até {rankingEnd ? dm(rankingEnd) : "hoje"}; um contacto conta em cada serviço que pediu.
           Fechou = cliente ou marcado, ou serviço no CRM com esse telefone. "Até 70%" = fechos que faltavam com os mesmos contactos.
           Ticket = linhas do CRM só desse serviço. Com menos de {RANKING_MIN_CONTACTS} contactos o serviço fica sem posição. Depende das etiquetas do WhatsApp estarem em dia.
         </p>
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-sm font-bold text-navy">Últimas {WEEKS} semanas</h3>
+        <h3 className="text-sm font-bold text-navy">{weeks.length} semanas até {last ? dm(last.week) : ""}</h3>
         <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-[11px] uppercase tracking-wider text-gray-500">
@@ -174,7 +212,8 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
             </thead>
             <tbody>
               {[...weeks].reverse().map(w => (
-                <tr key={w.week} className={`border-t border-gray-100 ${w === last ? "font-bold" : ""}`}>
+                <tr key={w.week} onClick={() => setOffset(allWeeks.length - 1 - allWeeks.indexOf(w))}
+                  className={`border-t border-gray-100 cursor-pointer hover:bg-gray-50 ${w === last ? "font-bold bg-[#D4AF37]/5" : ""}`}>
                   <td className="px-3 py-2 whitespace-nowrap">{dm(w.week)}</td>
                   <td className="px-3 py-2">{w.closes}</td>
                   <td className="px-3 py-2">{euro(w.billed)}</td>
@@ -189,7 +228,7 @@ const CrmWeekly = ({ records }: { records: ServiceRow[] }) => {
           </table>
         </div>
         <p className="text-xs text-gray-500">
-          Semana de segunda a domingo, pelo dia em que o serviço foi fechado. Antes de 26/09 conta o dia em que a linha entrou no CRM, por isso essas semanas são aproximadas.
+          Carrega numa semana para a ver em cima. Semana de segunda a domingo, pelo dia em que o serviço foi fechado. Antes de 26/09 conta o dia em que a linha entrou no CRM, por isso essas semanas são aproximadas.
           Cliente Google = "(anúncio)" no calendário ou contacto que veio do anúncio.
         </p>
       </section>

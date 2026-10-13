@@ -21,13 +21,25 @@ afterEach(cleanup);
 describe('aba Métricas do CRM', () => {
   it('mostra a semana, o ranking com a meta de 70% e as semanas', async () => {
     const records = [{ id: '1', booked_at: `${lastMonday}T10:00:00Z`, created_at: `${lastMonday}T10:00:00Z`, request_date: lastMonday, billed_value: 120, my_cut: 60,
-      upsell_value: null, upsell_team: null, locality: 'Porto', phone: null, source: 'WhatsApp', client_name: null, description: 'Limpeza colchão casal' }];
+      upsell_value: null, upsell_team: null, locality: 'Porto', phone: null, source: 'WhatsApp', client_name: null, description: 'Limpeza colchão casal' },
+      { id: '2', booked_at: `${addDays(lastMonday, -14)}T10:00:00Z`, created_at: `${addDays(lastMonday, -14)}T10:00:00Z`, request_date: lastMonday, billed_value: 333, my_cut: 167,
+      upsell_value: null, upsell_team: null, locality: 'Porto', phone: null, source: 'WhatsApp', client_name: null, description: 'Limpeza sofá' }];
     render(<CrmWeekly records={records} />);
     await screen.findByText('Colchão', { selector: 'td' });
-    expect(screen.getByText('Fechos da semana').parentElement!.textContent).toContain('1');
+    expect(screen.getByText('Fechos da semana').parentElement!.textContent).toContain('120€ faturado');
     expect(screen.getByText('80%')).toBeTruthy();
     expect(screen.getByText('atingida')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '30 dias' }));
-    expect(screen.getByText(/últimos 30 dias/)).toBeTruthy();
+    expect(screen.getByText(/30 dias até hoje/)).toBeTruthy();
+    expect((screen.getByRole('button', { name: /Seguinte/ }) as HTMLButtonElement).disabled).toBe(true);
+    // Recuar uma semana: a semana do fecho deixa de ser a mostrada e o ranking acaba no domingo dela.
+    fireEvent.click(screen.getByRole('button', { name: /Anterior/ }));
+    expect(screen.getByText('Fechos da semana').parentElement!.textContent).toContain('0€ faturado');
+    fireEvent.click(screen.getByRole('button', { name: /Anterior/ }));
+    expect(screen.getByText('Fechos da semana').parentElement!.textContent).toContain('333€ faturado');
+    expect((screen.getByRole('button', { name: /Anterior/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText(/30 dias até \d\d\/\d\d/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Última' }));
+    expect(screen.getByText('Fechos da semana').parentElement!.textContent).toContain('120€ faturado');
   });
 });
