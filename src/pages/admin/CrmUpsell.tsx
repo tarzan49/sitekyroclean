@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { lisbonDay, shiftMonth } from "@/lib/crmClosings";
-import { defaultTeamFor, isUpsellTeam, splitUpsell, summarizeUpsells, teamShareOf, UPSELL_TEXT, type UpsellRow } from "@/lib/crmUpsell";
+import { defaultTeamFor, isUpsellTeam, splitUpsell, summarizeUpsells, tieredUpsell, upsellRuleLabel, UPSELL_TEXT, type UpsellRow } from "@/lib/crmUpsell";
 
 // Aba "Upsell" do CRM: o que cada equipa vendeu a mais nos serviços do mês e
 // como se divide (70/30, no Porto 60/40; a equipa fica sempre com a maior).
@@ -17,10 +17,6 @@ interface Row extends UpsellRow {
 const money = (n: number) => `${(Math.round(n * 100) / 100).toLocaleString("pt-PT", { maximumFractionDigits: 2 })}€`;
 const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric", timeZone: "UTC" });
 const monthName = (month: string) => MONTH_FMT.format(new Date(`${month}-15T12:00:00Z`));
-const pct = (team: Parameters<typeof teamShareOf>[0]) => {
-  const t = Math.round(teamShareOf(team) * 100);
-  return `${t}/${100 - t}`;
-};
 
 const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) => void }) => {
   const currentMonth = lisbonDay(new Date()).slice(0, 7);
@@ -36,7 +32,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-sm text-gray-500">
-          Divisão: 70% equipa / 30% para ti; no Porto 60% / 40%. A tua parte já entra no teu cut. Mês do serviço. O valor mete-se em cada pedido (lápis), na aba Pedidos.
+          {tieredUpsell(`${month}-31`) ? "Divisão desde 19/10: 70% dos primeiros 100€ para a equipa e 60% do que passar, em todas as equipas; antes, 70/30 e no Porto 60/40." : "Divisão: 70% equipa / 30% para ti; no Porto 60% / 40%."} A tua parte já entra no teu cut. Mês do serviço. O valor mete-se em cada pedido (lápis), na aba Pedidos.
         </p>
         <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
           <button onClick={() => setMonth(m => shiftMonth(m, -1))} aria-label="Mês anterior" className="p-1.5 text-navy hover:bg-gray-50 rounded-l-lg">
@@ -86,7 +82,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
               {summary.teams.map(t => (
                 <tr key={t.team} className="border-b border-gray-100 last:border-0">
                   <td className="px-3 py-2 text-navy font-medium whitespace-nowrap">{t.team}</td>
-                  <td className="px-3 py-2 text-gray-500">{pct(t.team)}</td>
+                  <td className="px-3 py-2 text-gray-500">{upsellRuleLabel(t.team, `${month}-31`)}</td>
                   <td className="px-3 py-2 text-navy">{t.count}</td>
                   <td className={`px-3 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`}>{money(t.value)}</td>
                   <td className="px-3 py-2 font-semibold text-navy whitespace-nowrap">{money(t.teamPart)}</td>
@@ -113,7 +109,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
               <tbody>
                 {rows.map(r => {
                   const team = isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality);
-                  const split = splitUpsell(Number(r.upsell_value), team);
+                  const split = splitUpsell(Number(r.upsell_value), team, r.request_date);
                   return (
                     <tr key={r.id} onClick={() => onEdit(r.id)} className="border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50">
                       <td className="px-3 py-2 font-mono text-navy">{r.request_date.slice(8, 10)}/{r.request_date.slice(5, 7)}</td>

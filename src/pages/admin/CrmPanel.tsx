@@ -11,7 +11,7 @@ import CrmServiceMix from "./CrmServiceMix";
 import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmQuizLeads from "./CrmQuizLeads";
 import { summarizeQuizLeads, summarizeWhatsAppContacts, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
-import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
+import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
   id: string;
@@ -761,8 +761,9 @@ const CrmPanel = () => {
             <p className="col-span-2 sm:col-span-1 text-[11px] text-gray-500 self-end pb-1">
               {(() => {
                 const v = parseFloat(form.upsell_value.replace(",", ".")) || 0;
-                if (v <= 0) return "A tua parte soma-se ao teu cut. Equipa 70%, tu 30% (Porto 60/40).";
-                const s = splitUpsell(v, form.upsell_team);
+                const formDay = `${viewedMonth.getFullYear()}-${String(viewedMonth.getMonth() + 1).padStart(2, "0")}-${String(form.day).padStart(2, "0")}`;
+                if (v <= 0) return tieredUpsell(formDay) ? "A tua parte soma-se ao teu cut. Equipa 70% até 100€, 60% acima." : "A tua parte soma-se ao teu cut. Equipa 70%, tu 30% (Porto 60/40).";
+                const s = splitUpsell(v, form.upsell_team, formDay);
                 return `Equipa ${money(s.team)} · tu ${money(s.owner)}`;
               })()}
             </p>

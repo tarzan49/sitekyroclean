@@ -1214,8 +1214,12 @@ function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }
 var round2 = (n) => Math.round(n * 100) / 100;
-function splitUpsell(value2, team) {
-  const teamPart = round2(value2 * teamShareOf(team));
+var UPSELL_TIERS_FROM = "2026-10-19";
+var UPSELL_TIER_LIMIT = 100;
+var UPSELL_TIER_SHARES = { upTo: 0.7, above: 0.6 };
+var tieredUpsell = (day) => !!day && day >= UPSELL_TIERS_FROM;
+function splitUpsell(value2, team, day) {
+  const teamPart = tieredUpsell(day) ? round2(Math.min(value2, UPSELL_TIER_LIMIT) * UPSELL_TIER_SHARES.upTo + Math.max(0, value2 - UPSELL_TIER_LIMIT) * UPSELL_TIER_SHARES.above) : round2(value2 * teamShareOf(team));
   return { team: teamPart, owner: round2(value2 - teamPart) };
 }
 function defaultTeamFor(locality) {
@@ -1225,7 +1229,7 @@ var isUpsellTeam = (s) => !!s && UPSELL_TEAMS.includes(s);
 function ownerUpsellOf(r) {
   const value2 = Number(r.upsell_value) || 0;
   if (value2 <= 0) return 0;
-  return splitUpsell(value2, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality)).owner;
+  return splitUpsell(value2, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality), r.request_date).owner;
 }
 
 // src/lib/googleAdsResults.ts
