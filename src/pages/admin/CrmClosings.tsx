@@ -118,8 +118,8 @@ const CrmClosings = ({ records, services, quiz = null }: { records: ClosingRow[]
   const thisMonday = mondayOf(today);
   const currentMonth = today.slice(0, 7);
   const [period, setPeriod] = useState<PeriodId>("week");
-  // Por omissão a última semana completa: é a que se revê à segunda-feira.
-  const [week, setWeek] = useState(addDays(thisMonday, -7));
+  // Por omissão a semana em curso (dono, 13/10); a revisão de segunda-feira está a uma seta.
+  const [week, setWeek] = useState(thisMonday);
   const [month, setMonth] = useState(currentMonth);
   const [hover, setHover] = useState<Hover | null>(null);
   // Dia aberto no "Dia a dia" (dono, 13/10: "quando clico na terça, vejo o que se fechou").
