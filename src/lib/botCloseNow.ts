@@ -27,8 +27,6 @@ export const closeNowPrice = (price: number) => Math.round(price * (1 - CLOSE_NO
 export interface CloseNowInput {
   total: number | null;
   handToOwner: boolean;
-  /** Já não exclui (dono, 13/10/2026); fica no tipo para quem chama não ter de mudar. */
-  hasWaterproofing?: boolean;
   /** Tapetes: os preços do `rugEstimate`, quando a ferramenta o deu. */
   rug?: { homePrice: number; pickupPrice: number | null } | null;
 }

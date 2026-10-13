@@ -147,7 +147,6 @@ export function botQuote(input: unknown) {
     closeNow: closeNowOffer({
       total: result.quote ? null : result.total,
       handToOwner: handToOwner && !rugPriced,
-      hasWaterproofing: items.some(i => i.extra === 'essencial' || i.extra === 'premium'),
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null,
     }),
   };

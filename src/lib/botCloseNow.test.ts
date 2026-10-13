@@ -12,11 +12,11 @@ describe('condição para fechar já (dono, 13/10/2026)', () => {
   it('waterproofing included (owner, 13 Oct); never above 200€ or under quote', () => {
     const wp = botQuote({ city: 'Porto', items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+essencial' }] });
     expect(wp.ok && wp.closeNow.ok && wp.closeNow.total === Math.round(wp.total! * 0.9)).toBe(true);
-    expect(closeNowOffer({ total: 250, handToOwner: false, hasWaterproofing: false }).ok).toBe(false);
-    expect(closeNowOffer({ total: null, handToOwner: true, hasWaterproofing: false }).ok).toBe(false);
+    expect(closeNowOffer({ total: 250, handToOwner: false }).ok).toBe(false);
+    expect(closeNowOffer({ total: null, handToOwner: true }).ok).toBe(false);
   });
   it('rugs: 10% off the home and the pickup price', () => {
-    expect(closeNowOffer({ total: null, handToOwner: true, hasWaterproofing: false, rug: { homePrice: 69, pickupPrice: 89 } }))
+    expect(closeNowOffer({ total: null, handToOwner: true, rug: { homePrice: 69, pickupPrice: 89 } }))
       .toMatchObject({ ok: true, homePrice: 62, pickupPrice: 80 });
   });
 });
