@@ -11,7 +11,7 @@ import { getProblemBySlug } from './problemSeoData';
 
 /**
  * Tapetes: lavados em casa por defeito; recolha só quando o material ou o
- * estado do tapete o exigem, com entrega em até 4 dias úteis e com custo,
+ * estado do tapete o exigem, com entrega em até 5 dias úteis e com custo,
  * indicado no orçamento (dono, 2026-09-29/30).
  *
  * Até 2026-09-30 havia texto a dar a recolha como incluída ou como o modo

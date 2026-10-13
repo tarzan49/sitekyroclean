@@ -78,7 +78,7 @@ describe('describeQuizOrder', () => {
   });
 
   it('old order from the text summary: centimetres read as such, a 12 m side to confirm', () => {
-    const brief = describeQuizOrder({ details: '1x Tapete 1: 133 × 190 m (25270 m²): Sob orçamento\n1x Tapete 2: 12 × 3 m (36 m²): Sob orçamento\n1x Recolha, entrega e deslocação (até 4 dias úteis): 20€', location: 'Porto', service: 'Tapete' });
+    const brief = describeQuizOrder({ details: '1x Tapete 1: 133 × 190 m (25270 m²): Sob orçamento\n1x Tapete 2: 12 × 3 m (36 m²): Sob orçamento\n1x Recolha, entrega e deslocação (até 5 dias úteis): 20€', location: 'Porto', service: 'Tapete' });
     expect(brief.source).toBe('details');
     expect(brief.items[0]).toBe('1x Tapete 1: 1,33 × 1,9 m (2,53 m²), escrito em centímetros no questionário (133 × 190), já convertido: sob orçamento');
     expect(brief.confirmFirst).toHaveLength(1);

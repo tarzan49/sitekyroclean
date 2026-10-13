@@ -51,7 +51,7 @@ export const FOLLOW_UP_RULES = {
   reviewWindowDays: 14,
   reviewReminderAfterDays: 1,
   reviewReminderUntilDays: 4,
-  /** Tapete com recolha: a avaliação só depois da entrega (até 4 dias úteis). */
+  /** Tapete com recolha: a avaliação só depois da entrega (até 5 dias úteis). */
   rugPickupDelayDays: 6,
   /** Recomendação: a quem avaliou ou já repetiu, entre 7 e 21 dias depois do serviço (com a experiência fresca), uma vez por ano. */
   referralFromDays: 7,

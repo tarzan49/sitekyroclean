@@ -30,7 +30,7 @@ export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido 
 // Recolha e entrega: mais 20€ do que a lavagem em casa, em qualquer área em
 // que haja recolha (dono, 2026-10-10: "deixa mais 20 euros", "muda também no
 // site"; de 2026-10-05 a essa data era 10€ até 6 m², 15€ acima e 20€ a partir
-// de 10 m²). Entrega em até 4 dias úteis. A lavagem continua
+// de 10 m²). Entrega em até 5 dias úteis. A lavagem continua
 // sob orçamento, e na lavagem em casa a deslocação também (RUG_TRAVEL_RULE):
 // este é o único valor dos tapetes que o site escreve.
 /** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo ou acima do máximo). */

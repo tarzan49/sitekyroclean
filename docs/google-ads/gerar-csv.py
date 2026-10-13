@@ -212,7 +212,7 @@ def tapetes(city):
         # tapetes levam cerca de uma semana (Washouse 6 dias úteis, LavCarpet ~1
         # semana); a Kyro lava no local e o tapete fica seco em 3 a 6 horas
         # (FAQ da página-pilar). Recolha só quando é precisa (dono: "prefiro
-        # ao domicílio"), com entrega em até 4 dias úteis (dono, 05/10/2026; eram 3 dias). Tapetes nunca levam preço. Sem percentagens de ácaros.
+        # ao domicílio"), com entrega em até 5 dias úteis (dono, 05/10/2026; eram 3 dias; 5 dias desde 13/10/2026, dono). Tapetes nunca levam preço. Sem percentagens de ácaros.
         headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
                    "Higienização de Tapetes", f"Limpeza de Carpetes {cidade(city)}",
                    "Tapetes Lavados ao Domicílio", "Sem Levar o Tapete de Casa",
@@ -223,7 +223,7 @@ def tapetes(city):
         descriptions=[
             "Lavagem de tapetes ao domicílio com extração profunda. Fica seco em 3 a 6 horas.",
             "Envie foto e medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
-            "Lã, persas, shaggy e sisal. Se for preciso recolher, entregamos em 4 dias úteis.",
+            "Lã, persas, shaggy e sisal. Se for preciso recolher, entregamos em 5 dias úteis.",
             DESC_AVAL],
     )
 

@@ -26,7 +26,7 @@ describe('Quote confirmation', () => {
   it('asks for photos instead of showing the travel fee as a subtotal when nothing else has a price', () => {
     expect(needsPhotoQuote(receipt)).toBe(true);
     expect(needsPhotoQuote(mixed)).toBe(false);
-    expect(needsPhotoQuote({ ...receipt, lines: [{ label: 'Tapete 1: 2 × 3 m (6 m²)', qty: 1, unitPrice: null, total: null }, { label: 'Recolha, entrega e deslocação (até 4 dias úteis)', qty: 1, unitPrice: 10, total: 10 }] })).toBe(true);
+    expect(needsPhotoQuote({ ...receipt, lines: [{ label: 'Tapete 1: 2 × 3 m (6 m²)', qty: 1, unitPrice: null, total: null }, { label: 'Recolha, entrega e deslocação (até 5 dias úteis)', qty: 1, unitPrice: 10, total: 10 }] })).toBe(true);
     show(receipt);
     expect(screen.queryByText('Subtotal conhecido')).toBeNull();
     expect(screen.getByText('O preço é dado por fotografia')).toBeTruthy();
