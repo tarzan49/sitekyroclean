@@ -493,15 +493,14 @@ function rugEstimate(rugs, city) {
 }
 
 // src/lib/botCloseNow.ts
-var CLOSE_NOW_RATE = 0.1;
-var CLOSE_NOW_MAX_TOTAL = 200;
+var CLOSE_NOW_WATERPROOFING_RATE = 0.05;
 var CLOSE_NOW_DAYS = 7;
 var CLOSE_NOW_CONDITION = `Só se ficar marcado já, nesta conversa, para um dos dias que temos livres nos próximos ${CLOSE_NOW_DAYS} dias.`;
-var closeNowPrice = (price) => Math.round(price * (1 - CLOSE_NOW_RATE));
+var closeNowDiscount = (price) => price <= 150 ? 10 : 10 + 5 * Math.ceil((price - 150) / 50);
+var closeNowPrice = (price, waterproofing = false) => waterproofing ? Math.round(price * (1 - CLOSE_NOW_WATERPROOFING_RATE)) : Math.max(0, price - closeNowDiscount(price));
 var RULE = "Usa só quando o cliente disse que o problema é o preço, uma vez por conversa, e diz sempre a condição.";
 function closeNowOffer(q) {
   if (q.rug) {
-    if (q.rug.homePrice > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
     return {
       ok: true,
       total: null,
@@ -512,8 +511,7 @@ function closeNowOffer(q) {
     };
   }
   if (q.handToOwner || q.total === null) return { ok: false, reason: "sob orçamento: o preço é do responsável" };
-  if (q.total > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
-  return { ok: true, total: closeNowPrice(q.total), homePrice: null, pickupPrice: null, condition: CLOSE_NOW_CONDITION, rule: RULE };
+  return { ok: true, total: closeNowPrice(q.total, q.waterproofing), homePrice: null, pickupPrice: null, condition: CLOSE_NOW_CONDITION, rule: RULE };
 }
 
 // src/lib/botQuote.ts
@@ -613,9 +611,10 @@ function botQuote(input) {
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
-    // 10% to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
+    // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : result.total,
+      waterproofing: items.some((i) => i.extra === "essencial" || i.extra === "premium"),
       handToOwner: handToOwner && !rugPriced,
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null
     })

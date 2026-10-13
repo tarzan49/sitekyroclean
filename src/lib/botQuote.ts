@@ -143,9 +143,10 @@ export function botQuote(input: unknown) {
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
-    // 10% to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
+    // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : result.total,
+      waterproofing: items.some(i => i.extra === 'essencial' || i.extra === 'premium'),
       handToOwner: handToOwner && !rugPriced,
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null,
     }),
