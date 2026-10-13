@@ -500,7 +500,6 @@ var CLOSE_NOW_CONDITION = `Só se ficar marcado já, nesta conversa, para um dos
 var closeNowPrice = (price) => Math.round(price * (1 - CLOSE_NOW_RATE));
 var RULE = "Usa só quando o cliente disse que o problema é o preço, uma vez por conversa, e diz sempre a condição.";
 function closeNowOffer(q) {
-  if (q.hasWaterproofing) return { ok: false, reason: "impermeabilização: o desconto é sempre decisão do responsável" };
   if (q.rug) {
     if (q.rug.homePrice > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
     return {

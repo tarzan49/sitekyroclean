@@ -9,8 +9,9 @@
  * marcação fica feita já, nesta conversa, para um dos dias que temos livres nos
  * próximos 7 dias (agenda cheia mais cedo, sem seguimentos nem clientes a
  * comparar durante dias). Fica de fora o que ele decide sempre sozinho: pedidos
- * acima de 200€ e a impermeabilização (regra de desconto de 11/10/2026), e o
- * que é sob orçamento.
+ * acima de 200€ e o que é sob orçamento. A impermeabilização entra (dono,
+ * 13/10/2026: "sim, quero a impermeabilização incluída"; a regra de 11/10 dizia
+ * que nunca).
  *
  * O valor sai daqui e não do bot: o código do bot só deixa passar euros que a
  * ferramenta devolveu.
@@ -26,7 +27,8 @@ export const closeNowPrice = (price: number) => Math.round(price * (1 - CLOSE_NO
 export interface CloseNowInput {
   total: number | null;
   handToOwner: boolean;
-  hasWaterproofing: boolean;
+  /** Já não exclui (dono, 13/10/2026); fica no tipo para quem chama não ter de mudar. */
+  hasWaterproofing?: boolean;
   /** Tapetes: os preços do `rugEstimate`, quando a ferramenta o deu. */
   rug?: { homePrice: number; pickupPrice: number | null } | null;
 }
@@ -38,7 +40,6 @@ export type CloseNow =
 const RULE = 'Usa só quando o cliente disse que o problema é o preço, uma vez por conversa, e diz sempre a condição.';
 
 export function closeNowOffer(q: CloseNowInput): CloseNow {
-  if (q.hasWaterproofing) return { ok: false, reason: 'impermeabilização: o desconto é sempre decisão do responsável' };
   if (q.rug) {
     if (q.rug.homePrice > CLOSE_NOW_MAX_TOTAL) return { ok: false, reason: `acima de ${CLOSE_NOW_MAX_TOTAL}€: decide o responsável` };
     return {
