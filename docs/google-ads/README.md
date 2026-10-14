@@ -42,7 +42,10 @@ WhatsApp, imagens, tabela de preços).
 No mesmo dia, por carregamento em massa (`coimbra-sitelinks-e-orcamentos.csv`): Porto **40 €/dia**, Lisboa **50 €/dia**
 e os 6 sitelinks de Coimbra. Dois pormenores do formato: o orçamento vai como número inteiro ("40"; "40,00" foi
 recusado neste ficheiro, embora tenha passado noutro) e cada sitelink precisa da coluna `Asset action` = `Create new`.
-A regra "Segunda volta ao normal" ainda repõe 35 €/45 € às segundas: tem de passar a 40 €/50 € (mudança de regra = dono).
+A regra "Segunda volta ao normal" passou a repor 40 €/50 € (mudada no mesmo dia, a pedido do dono). Coimbra recebeu
+ainda a mensagem de WhatsApp (925 530 647, "…limpar o meu sofá em Coimbra.", botão "Receber estimativa do custo"),
+a tabela de preços (sofá 1/2/3 lugares desde 49/69/79 €, impermeabilização desde 59 €, PT-PT, Serviços, Desde) e 7
+fotografias de sofás (`imagens/sofa-*-depois-*`).
 
 ---
 
