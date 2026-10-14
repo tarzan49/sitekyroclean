@@ -94,14 +94,22 @@ describe('teamAccounts', () => {
     expect(r.teams[0].message).not.toContain('5%');
   });
 
-  it('a service paid to the owner is not owed by the team: he owes them their part', () => {
+  it('a service paid to the owner is not owed by the team and its part comes off the total', () => {
+    const r = teamAccounts([
+      row({ calendar_event_id: 'e3' }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 50, my_cut: 25, paid_to_owner: true }),
+    ], events, '2026-10-13');
+    expect(r.teams[0].total).toBe(15);
+    expect(r.teams[0].ownerOwes).toEqual([{ date: '2026-10-13', label: 'Sofia Teste, Porto', amount: 25 }]);
+    expect(r.teams[0].message).toContain('Soma: 40€\n\nPagos diretamente a mim (desconto a vossa parte):\n13/10 Sofia Teste, Porto · a vossa parte 25€\n\nTotal que me devem: 15€');
+  });
+
+  it('nothing is sent when what the owner received covers what the team owes', () => {
     const r = teamAccounts([
       row({ calendar_event_id: 'e3' }),
       row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 89, my_cut: 45, paid_to_owner: true }),
     ], events, '2026-10-13');
-    expect(r.teams[0].total).toBe(40);
-    expect(r.teams[0].ownerOwes).toEqual([{ date: '2026-10-13', label: 'Sofia Teste, Porto', amount: 44 }]);
-    expect(r.teams[0].message).toContain('Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):\n13/10 Sofia Teste, Porto: 44€');
+    expect(r.teams).toEqual([]);
   });
 
   it('with an invoice the 23% VAT goes on top and is all the owner\'s', () => {

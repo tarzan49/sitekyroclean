@@ -16,9 +16,11 @@
 // grupo do Porto (lotes até 10/10 e 13/10) entram como acertos
 // (`team_account_adjustments`), que aparecem nas contas até serem saldados.
 //
-// Pago ao dono (`paid_to_owner`, ex. LovelyStay por transferência depois da
-// fatura): a equipa não deve nada desse serviço; a mensagem diz que o dono lhe
-// entrega a parte dela quando o pagamento cair.
+// Pago ao dono (`paid_to_owner`): a equipa não deve nada desse serviço e a
+// parte dela sai do total, como o dono fez no grupo do Porto a 14/10 ("Pagos
+// diretamente a mim (desconto a vossa parte)", 997,75€ → 858,75€; dono, 15/10:
+// "não tiveste isso em conta"). Fica nas contas até o dono marcar a linha como
+// paga no CRM.
 //
 // Fatura (dono, 2026-10-14, Bruval: "vou adicionar ao preço o IVA", "é um
 // valor que tem que ser entregue a mim"): num serviço com fatura (`invoiced`)
@@ -169,11 +171,12 @@ function teamMessage(a: Omit<TeamAccount, 'message'>): string {
     out.push('', 'Acertos combinados:');
     for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
   }
-  out.push('', `Total que me devem: ${euros(a.total)}`);
   if (a.ownerOwes.length) {
-    out.push('', 'Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):');
-    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label}: ${euros(l.amount)}`);
+    out.push('', `Soma: ${euros(sum([...a.today, ...a.before, ...a.adjustments]))}`);
+    out.push('', 'Pagos diretamente a mim (desconto a vossa parte):');
+    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
   }
+  out.push('', `Total que me devem: ${euros(a.total)}`);
   return out.join('\n');
 }
 
@@ -224,7 +227,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {
       team, date, today: b.today, before: b.before, adjustments: b.adjustments, ownerOwes: b.ownerOwes,
-      todayTotal: sum(b.today), beforeTotal: sum(b.before), total: sum([...b.today, ...b.before, ...b.adjustments]),
+      todayTotal: sum(b.today), beforeTotal: sum(b.before), total: round2(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes)),
     };
     return { ...base, message: teamMessage(base) };
   }).filter(t => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));

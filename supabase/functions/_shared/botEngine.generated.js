@@ -1301,11 +1301,12 @@ function teamMessage(a) {
     out.push("", "Acertos combinados:");
     for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
   }
-  out.push("", `Total que me devem: ${euros(a.total)}`);
   if (a.ownerOwes.length) {
-    out.push("", "Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):");
-    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label}: ${euros(l.amount)}`);
+    out.push("", `Soma: ${euros(sum([...a.today, ...a.before, ...a.adjustments]))}`);
+    out.push("", "Pagos diretamente a mim (desconto a vossa parte):");
+    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
   }
+  out.push("", `Total que me devem: ${euros(a.total)}`);
   return out.join("\n");
 }
 function teamAccounts(rows, events, date, adjustments = []) {
@@ -1362,7 +1363,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
       ownerOwes: b.ownerOwes,
       todayTotal: sum(b.today),
       beforeTotal: sum(b.before),
-      total: sum([...b.today, ...b.before, ...b.adjustments])
+      total: round23(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes))
     };
     return { ...base, message: teamMessage(base) };
   }).filter((t) => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));
