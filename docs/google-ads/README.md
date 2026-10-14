@@ -39,6 +39,10 @@ aveiro, leiria, e a lista partilhada. O orçamento de Braga e as localizações 
 carregamento em massa (`coimbra-localizacoes-e-braga-20.csv`), que não pede a confirmação de identidade
 que o botão Guardar do orçamento pede. Ainda sem recursos próprios em Coimbra (sitelinks, mensagem de
 WhatsApp, imagens, tabela de preços).
+No mesmo dia, por carregamento em massa (`coimbra-sitelinks-e-orcamentos.csv`): Porto **40 €/dia**, Lisboa **50 €/dia**
+e os 6 sitelinks de Coimbra. Dois pormenores do formato: o orçamento vai como número inteiro ("40"; "40,00" foi
+recusado neste ficheiro, embora tenha passado noutro) e cada sitelink precisa da coluna `Asset action` = `Create new`.
+A regra "Segunda volta ao normal" ainda repõe 35 €/45 € às segundas: tem de passar a 40 €/50 € (mudança de regra = dono).
 
 ---
 
