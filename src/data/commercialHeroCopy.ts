@@ -94,11 +94,11 @@ export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
   { key: 'duration', value: ON_SITE_DURATION, label: 'Limpeza' },
   { key: 'response', value: '<5 min', label: 'Resposta' },
   // A impermeabilização não seca, ativa: o tratamento precisa de até 24 h para
-  // ficar operacional, ao contrário da limpeza, que devolve o artigo em 3 a 6 h
-  // (sofás: 2 a 5 h, dono 06/10/2026).
+  // ficar operacional, ao contrário da limpeza, que devolve o artigo em 2 a 5 h
+  // (todos os artigos desde 15/10/2026, dono).
   serviceSlug === 'impermeabilizacao'
     ? { key: 'drying', value: 'Até 24 h', label: 'Ativação' }
-    : { key: 'drying', value: serviceSlug === 'limpeza-sofas' ? '2 a 5 h' : '3 a 6 h', label: 'Secagem' },
+    : { key: 'drying', value: '2 a 5 h', label: 'Secagem' },
 ];
 
 /** O que o HTML estático lista por baixo do preço: a avaliação e a faixa, sem repetir. */

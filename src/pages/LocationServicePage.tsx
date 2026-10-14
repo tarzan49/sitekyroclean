@@ -89,7 +89,7 @@ const LocationServicePage = () => {
   // "Porto" takes the definite article ("no Porto"); every other city in our list reads naturally with "em"
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "2 a 5h", label: "Pronto a usar" };
   // Resposta alinhada com o orçamento: menos de 5 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },

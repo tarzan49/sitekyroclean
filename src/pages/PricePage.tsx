@@ -86,7 +86,7 @@ const PricePage = () => {
   // página: texto, sem ligação, como no HTML estático.
   const heroBreadcrumbs = heroBreadcrumb(data.breadcrumb);
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "2 a 5h", label: "Pronto a usar" };
   // Resposta em menos de 5 minutos: compromisso comum a todo o site.
 
   const snapshotStats = [

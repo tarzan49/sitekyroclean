@@ -33,7 +33,7 @@ const colchoesGuarantee: GuaranteeItem[] = [
   {
     label: "Segurança",
     title: "Utilize depois de secar",
-    body: "A secagem demora, em média, 3 a 6 horas com ventilação. Confirmamos os cuidados antes de terminar.",
+    body: "A secagem demora, em média, 2 a 5 horas com ventilação. Confirmamos os cuidados antes de terminar.",
     image: "/images/service-promises/LimpezaColchoes-promise-3-800.webp",
   },
 ];
@@ -51,7 +51,7 @@ const expertTips: ExpertTip[] = [
   },
   {
     title: "Quanto tempo demora o colchão a secar?",
-    summary: "Com equipamento de extração profissional, o colchão fica seco em 3 a 6 horas. Saiba como acelerar ainda mais o processo.",
+    summary: "Com equipamento de extração profissional, o colchão fica seco em 2 a 5 horas. Saiba como acelerar ainda mais o processo.",
     url: "/blog/limpeza-colchao-bebe-crianca",
   },
   {

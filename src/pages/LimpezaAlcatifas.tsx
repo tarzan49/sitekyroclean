@@ -32,7 +32,7 @@ const alcatifasGuarantee: GuaranteeItem[] = [
   },
   {
     label: "Secagem",
-    title: "Secagem média de 3 a 6 horas",
+    title: "Secagem média de 2 a 5 horas",
     body: "Controlamos a humidade e reforçamos a extração. A utilização depende da secagem e da ventilação.",
     image: "/images/service-promises/LimpezaAlcatifas-promise-3-800.webp",
   },

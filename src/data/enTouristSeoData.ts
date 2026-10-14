@@ -78,7 +78,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
       { question: "Do I need to be there?", answer: "It helps if someone can let the technician in, but we can also coordinate directly with your host or property manager if you're out for the day." },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2 to 5 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {
@@ -218,7 +218,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2 to 5 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {
@@ -459,7 +459,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2 to 5 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {

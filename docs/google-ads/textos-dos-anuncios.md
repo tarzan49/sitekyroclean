@@ -22,7 +22,7 @@ A contagem é feita por esse texto.
 - Cidade automática nos títulos e descrições sem cidade: com a segmentação a
   cobrir a Margem Sul e o Norte até Braga, "em Lisboa" lido em Almada ou "no
   Porto" lido em Braga soava a outra empresa.
-- "Seca em 3 a 6 Horas" passou a "Secagem Média de 3 a 6 Horas", que é o que
+- "Seca em 2 a 5 Horas" passou a "Secagem Média de 2 a 5 Horas", que é o que
   o site promete (média, dependente do tecido e da ventilação).
 - Porto: "Equipa Própria no Norte", porque a mesma equipa serve Braga e Guimarães.
 - Impermeabilização: saíram "Limpa com um Pano, Sem Nódoa" e "saem com um pano
@@ -52,7 +52,7 @@ A contagem é feita por esse texto.
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
 10. Limpeza de Sofás ao Domicílio  `(29)`
-11. Secagem Média de 3 a 6 Horas  `(28)`
+11. Secagem Média de 2 a 5 Horas  `(28)`
 12. Manchas, Pelos e Odores  `(23)`
 13. Limpeza de Estofos {LOCATION(City):Porto}  `(24)`
 14. Equipa Própria no Norte  `(23)`
@@ -60,7 +60,7 @@ A contagem é feita por esse texto.
 
 **Descrições (4):**
 
-1. Higienização profissional de sofás ao domicílio. Secagem média de 3 a 6 horas.  `(78)`
+1. Higienização profissional de sofás ao domicílio. Secagem média de 2 a 5 horas.  `(78)`
 2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
 3. Preço fechado antes da marcação, sem surpresas. Orçamento grátis pelo WhatsApp.  `(79)`
 4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
@@ -116,7 +116,7 @@ A contagem é feita por esse texto.
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
 10. Limpeza de Sofás ao Domicílio  `(29)`
-11. Secagem Média de 3 a 6 Horas  `(28)`
+11. Secagem Média de 2 a 5 Horas  `(28)`
 12. Manchas, Pelos e Odores  `(23)`
 13. Limpeza de Estofos {LOCATION(City):Lisboa}  `(25)`
 14. Equipa Própria em Lisboa  `(24)`
@@ -124,7 +124,7 @@ A contagem é feita por esse texto.
 
 **Descrições (4):**
 
-1. Higienização profissional de sofás ao domicílio. Secagem média de 3 a 6 horas.  `(78)`
+1. Higienização profissional de sofás ao domicílio. Secagem média de 2 a 5 horas.  `(78)`
 2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
 3. Preço fechado antes da marcação, sem surpresas. Orçamento grátis pelo WhatsApp.  `(79)`
 4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
@@ -217,7 +217,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 8. Orçamento Grátis no WhatsApp  `(28)`
 9. Preço Fechado Antes de Marcar  `(29)`
 10. Garantia de Repetição  `(21)`
-11. Secagem Média de 3 a 6 Horas  `(28)`
+11. Secagem Média de 2 a 5 Horas  `(28)`
 12. Manchas, Urina e Odores  `(23)`
 13. Tratamento Anti-Ácaros  `(22)`
 14. Equipa Própria no Norte  `(23)`
@@ -225,7 +225,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 
 **Descrições (4):**
 
-1. Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.  `(81)`
+1. Higienização profissional de colchões ao domicílio. Secagem média de 2 a 5 horas.  `(81)`
 2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
 3. Limpeza de colchão desde 59€. Tratamento anti-ácaros acrescentado desde 15€.  `(76)`
 4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
@@ -277,7 +277,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 8. Orçamento Grátis no WhatsApp  `(28)`
 9. Preço Fechado Antes de Marcar  `(29)`
 10. Garantia de Repetição  `(21)`
-11. Secagem Média de 3 a 6 Horas  `(28)`
+11. Secagem Média de 2 a 5 Horas  `(28)`
 12. Manchas, Urina e Odores  `(23)`
 13. Tratamento Anti-Ácaros  `(22)`
 14. Equipa Própria em Lisboa  `(24)`
@@ -285,7 +285,7 @@ e sem prometer recolha, porque o site diz que a modalidade se confirma no orçam
 
 **Descrições (4):**
 
-1. Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.  `(81)`
+1. Higienização profissional de colchões ao domicílio. Secagem média de 2 a 5 horas.  `(81)`
 2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
 3. Limpeza de colchão desde 59€. Tratamento anti-ácaros acrescentado desde 15€.  `(76)`
 4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`

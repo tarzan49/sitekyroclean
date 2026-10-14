@@ -56,7 +56,7 @@ todos os dias (antes, segunda a sexta). Comparar os fechos desses fins de semana
 
 | Empresa | Limpeza de sofá | Impermeabilização | Secagem | Prova social | Zona |
 |---|---|---|---|---|---|
-| **Kyro** | 49€ (1L) · 69€ (2L) · 79€ (3L) | **Essencial 59€ · Premium 89€** (1L) | 3 a 6 h | 4,9 · 125 avaliações · +1100 clientes | Porto, Braga, Lisboa, Algarve |
+| **Kyro** | 49€ (1L) · 69€ (2L) · 79€ (3L) | **Essencial 59€ · Premium 89€** (1L) | 2 a 5 h | 4,9 · 125 avaliações · +1100 clientes | Porto, Braga, Lisboa, Algarve |
 | EcoLimpeza | **49€ um sofá de 3 lugares** (+10€/módulo) | não anuncia | 2 a 4 h | 5,0 · 36 avaliações | Porto, Gaia, Matosinhos, Maia, Braga, Aveiro |
 | O Janota | 65€ (2L) · 70€ (3L) · 75€ (4L) | 100€ (2L) · 110€ (3L) · 125€ (4L) | não diz | 5,0 · 115 avaliações | Grande Porto, Grande Lisboa, Margem Sul, Algarve |
 | DeepClean | desde 60€ | sim, 10% de desconto com limpeza, preço não publicado | 4 a 6 h | 5,0 · **400 avaliações** | Grande Lisboa, Grande Porto, Setúbal |
@@ -100,7 +100,7 @@ especificidade, não com um número maior.
 
 **Prova social, onde a Kyro está:** 125 avaliações passam à frente do O Janota
 (115) e da EcoLimpeza (36), e ficam atrás só da DeepClean (400). **Onde está em
-desvantagem:** a EcoLimpeza seca em 2 a 4 horas contra as 3 a 6 da Kyro, e o
+desvantagem:** a EcoLimpeza seca em 2 a 4 horas contra as 2 a 5 da Kyro, e o
 Senhor dos Sofás anuncia 1 hora. Isso não se resolve com texto de anúncio.
 
 ---

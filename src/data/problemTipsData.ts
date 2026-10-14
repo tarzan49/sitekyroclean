@@ -11,7 +11,7 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   manchas: [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
-    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
+    { value: "2 a 5h", label: "Pronto a usar", icon: Timer },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   odores: [
@@ -29,13 +29,13 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   materiais: [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
-    { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
+    { value: "2 a 5h", label: "Tempo de secagem", icon: Timer },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   animais: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
-    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
+    { value: "2 a 5h", label: "Pronto a usar", icon: Timer },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   preco: [
@@ -48,11 +48,11 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
     { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: "24h", label: "Disponibilidade", icon: ShieldCheck },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
+    { value: "2 a 5h", label: "Pronto a usar", icon: Timer },
   ],
   metodo: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
-    { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
+    { value: "2 a 5h", label: "Tempo de secagem", icon: Timer },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],

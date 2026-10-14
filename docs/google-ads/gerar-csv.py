@@ -210,18 +210,18 @@ def tapetes(city):
         # prometer o que a página não promete.
         # v3 (29/09/2026). Concorrência lida no mesmo dia: as lavandarias de
         # tapetes levam cerca de uma semana (Washouse 6 dias úteis, LavCarpet ~1
-        # semana); a Kyro lava no local e o tapete fica seco em 3 a 6 horas
+        # semana); a Kyro lava no local e o tapete fica seco em 2 a 5 horas
         # (FAQ da página-pilar). Recolha só quando é precisa (dono: "prefiro
         # ao domicílio"), com entrega em até 5 dias úteis (dono, 05/10/2026; eram 3 dias; 5 dias desde 13/10/2026, dono). Tapetes nunca levam preço. Sem percentagens de ácaros.
         headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
                    "Higienização de Tapetes", f"Limpeza de Carpetes {cidade(city)}",
                    "Tapetes Lavados ao Domicílio", "Sem Levar o Tapete de Casa",
-                   "Seco em 3 a 6 Horas", "Entrega em 4 Dias Úteis",
+                   "Seco em 2 a 5 Horas", "Entrega em 4 Dias Úteis",
                    "Lã, Persas, Shaggy e Sisal", "Manchas, Pelos e Odores",
                    "Orçamento por Foto no WhatsApp", "Preço Fechado Antes de Marcar",
                    AVAL_TITULO, RATING_TITULO, "Garantia de Repetição 48h"],
         descriptions=[
-            "Lavagem de tapetes ao domicílio com extração profunda. Fica seco em 3 a 6 horas.",
+            "Lavagem de tapetes ao domicílio com extração profunda. Fica seco em 2 a 5 horas.",
             "Envie foto e medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
             "Lã, persas, shaggy e sisal. Se for preciso recolher, entregamos em 5 dias úteis.",
             DESC_AVAL],
@@ -253,13 +253,13 @@ def colchoes(city):
                    f"Lavagem de Colchões {cidade(city)}", "Limpeza de Colchões em Casa",
                    f"Colchões Desde {COLCHAO_DESDE}€", f"Colchão de Casal Desde {COLCHAO_CASAL}€",
                    "Tratamento Anti-Ácaros", "Manchas de Urina e Suor",
-                   "Sem Tirar o Colchão de Casa", "Secagem Média de 3 a 6 Horas",
+                   "Sem Tirar o Colchão de Casa", "Secagem Média de 2 a 5 Horas",
                    "Preço Fechado Antes de Marcar", "Orçamento Grátis no WhatsApp",
                    AVAL_TITULO, RATING_TITULO, "Garantia de Repetição 48h"],
         descriptions=[
             "Limpeza e higienização de colchões ao domicílio, sem tirar o colchão do quarto.",
             f"Solteiro desde {COLCHAO_DESDE}€, casal desde {COLCHAO_CASAL}€, king desde {COLCHAO_KING}€. Anti-ácaros opcional.",
-            "Manchas de urina, suor e marcas amareladas tratadas no local. Secagem de 3 a 6 horas.",
+            "Manchas de urina, suor e marcas amareladas tratadas no local. Secagem de 2 a 5 horas.",
             f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações. Orçamento grátis pelo WhatsApp."],
     )
 

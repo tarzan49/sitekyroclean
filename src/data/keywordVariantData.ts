@@ -245,12 +245,12 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       `Para casas e espaços de uso partilhado em ${loc}, a Kyro Clean Solutions limpa cadeiras estofadas ao domicílio. Pode acrescentar o tratamento anti-ácaros (desbacterização), opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`,
     ] as const, seed),
     whatIs: `A higienização de cadeiras em ${loc} remove sujidade e resíduos das fibras. O tratamento anti-ácaros, que é o mesmo que a desbacterização, é opcional e custa ${CHAIR_ANTI_ACAROS_UNIT_LABEL} Confirmamos o produto e a compatibilidade com o tecido antes da marcação.`,
-    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', `Anti-ácaros opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, `Desbacterização: é o mesmo tratamento anti-ácaros, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 3 a 6 horas, conforme ventilação'],
+    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', `Anti-ácaros opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, `Desbacterização: é o mesmo tratamento anti-ácaros, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 2 a 5 horas, conforme ventilação'],
     processSteps: [
       { step: 1, title: 'Avaliação do material', description: `Inspeção do tecido, das manchas e das costuras em ${loc}.` },
       { step: 2, title: 'Pré-tratamento', description: 'Aplicação de solução de limpeza adequada à sujidade e ao tecido.' },
       { step: 3, title: 'Extração da sujidade', description: 'Extração dos resíduos e da humidade. Tratamentos adicionais só quando escolhidos no orçamento.' },
-      { step: 4, title: 'Secagem e cuidados', description: 'Secagem média de 3 a 6 horas, dependendo da ventilação, tecido e condições do espaço.' },
+      { step: 4, title: 'Secagem e cuidados', description: 'Secagem média de 2 a 5 horas, dependendo da ventilação, tecido e condições do espaço.' },
     ],
     problems: [
       { title: 'Manchas e gordura nos assentos', description: 'Comida, bebidas e contacto diário deixam resíduos que podem exigir um tratamento localizado.' },
@@ -300,7 +300,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
       { step: 1, title: 'Aspiração industrial HEPA', description: `Remoção profunda de ácaros e alergénios em toda a superfície em ${loc}.` },
       { step: 2, title: 'Pré-tratamento de limpeza', description: 'Aplicação de agente de largo espectro aprovado para espaços públicos.' },
       { step: 3, title: 'Extração profunda', description: 'Extração da sujidade e dos resíduos acumulados nas fibras.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 3 a 6 horas com ventilação adequada.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 2 a 5 horas com ventilação adequada.' },
     ],
     problems: pick([
       [
@@ -574,15 +574,15 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       `Hotéis, escritórios e grandes espaços comerciais em ${loc} precisam de lavagem de alcatifa sem parar a atividade. A Kyro Clean Solutions faz extração profunda profissional em qualquer dimensão, com secagem rápida em ${loc}, ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
-      `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 3 a 6 horas em ${loc}.`,
-      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa — manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 3 a 6 horas em ${loc}.`,
-      `As manchas de passagem, derramamentos e sujidade que se acumulam numa alcatifa ao longo dos anos ficam presas nas fibras mais densas, fora do alcance da aspiração normal. A lavagem profissional remove-as, com resultado visível no mesmo dia e secagem em 3 a 6 horas em ${loc}.`,
+      `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 5 horas em ${loc}.`,
+      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa — manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 2 a 5 horas em ${loc}.`,
+      `As manchas de passagem, derramamentos e sujidade que se acumulam numa alcatifa ao longo dos anos ficam presas nas fibras mais densas, fora do alcance da aspiração normal. A lavagem profissional remove-as, com resultado visível no mesmo dia e secagem em 2 a 5 horas em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
         'Equipamento comercial para grandes superfícies',
         'Remove manchas de passagem e derramamentos',
-        'Secagem rápida: espaço apto em 3 a 6 horas',
+        'Secagem rápida: espaço apto em 2 a 5 horas',
         'Agendamento noturno e ao fim de semana',
         `Cobertura em ${loc} e toda a área envolvente`,
         'Orçamento competitivo à medida, mesmo em grandes áreas',
@@ -590,7 +590,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       [
         'Equipamento comercial adaptado a grandes superfícies',
         'Manchas de passagem e derramamentos removidos',
-        'Espaço apto em 3 a 6 horas de secagem rápida',
+        'Espaço apto em 2 a 5 horas de secagem rápida',
         'Trabalho noturno e ao fim de semana sempre possível',
         `Cobertura de ${loc} e toda a área envolvente`,
         'Orçamento à medida e competitivo em grandes áreas',
@@ -600,7 +600,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       { step: 1, title: 'Aspiração pré-lavagem', description: `Aspiração industrial para remoção de sujidade solta antes da lavagem em ${loc}.` },
       { step: 2, title: 'Aplicação de detergente', description: 'Produto profissional específico para alcatifas comerciais.' },
       { step: 3, title: 'Extração profissional', description: 'Lavagem a quente em profundidade e aspiração de alto volume.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Ventilação dirigida: espaço apto para uso em 3 a 6 horas.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Ventilação dirigida: espaço apto para uso em 2 a 5 horas.' },
     ],
     problems: pick([
       [
@@ -720,7 +720,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra de cada cadeira em ${loc}: veludo, mesh, tecido ou pele sintética.` },
       { step: 2, title: 'Limpeza prévia', description: 'Recomendamos limpeza das cadeiras antes da aplicação para máxima eficácia da barreira.' },
       { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial ou Premium, aplicada uniformemente com produto certificado, adaptado ao tipo de tecido.' },
-      { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 3 a 6 horas, sem interrupção do negócio.' },
+      { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 2 a 5 horas, sem interrupção do negócio.' },
     ],
     problems: pick([
       [

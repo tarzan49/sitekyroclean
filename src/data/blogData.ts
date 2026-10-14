@@ -111,7 +111,7 @@ Configurações maiores ou diferentes são avaliadas no orçamento. A deslocaç�
       },
       {
         "q": "Quando posso voltar a sentar-me?",
-        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "a": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       },
       {
         "q": "E se não ficar satisfeito?",
@@ -173,7 +173,7 @@ Configurações maiores ou diferentes são avaliadas no orçamento. A deslocaç�
       },
       {
         "q": "Quanto tempo demora a secagem?",
-        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "a": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "relatedService": {
@@ -340,7 +340,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Preparar a cama para voltar a usar",
-        "body": "Retire lençóis e objetos à volta da cama. Combine a hora da intervenção tendo em conta a secagem. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "Retire lençóis e objetos à volta da cama. Combine a hora da intervenção tendo em conta a secagem. Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -398,7 +398,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Local e condições do serviço",
-        "body": "Confirme com a equipa onde será feita a intervenção e as condições adequadas à peça. Quando o tapete precisa de ser recolhido, a entrega é feita em até 5 dias úteis. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "Confirme com a equipa onde será feita a intervenção e as condições adequadas à peça. Quando o tapete precisa de ser recolhido, a entrega é feita em até 5 dias úteis. Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -416,7 +416,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Quanto tempo demora a secagem?",
-        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "a": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "relatedService": {
@@ -473,7 +473,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Quando podemos voltar a usá-las?",
-        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "a": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "relatedService": {
@@ -573,7 +573,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Depois da limpeza",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nNão cubra os estofos húmidos. Siga as instruções de ventilação e de utilização dadas no final."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nNão cubra os estofos húmidos. Siga as instruções de ventilação e de utilização dadas no final."
       }
     ],
     "faq": [
@@ -747,7 +747,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Reabrir as áreas tratadas",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nCombine o percurso de circulação para não voltar a sujar as zonas ainda húmidas."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nCombine o percurso de circulação para não voltar a sujar as zonas ainda húmidas."
       }
     ],
     "faq": [
@@ -865,7 +865,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Planear a visita",
-        "body": "Mantenha os animais afastados da zona de intervenção. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca. Confirme também as instruções dos tratamentos opcionais, se os escolher."
+        "body": "Mantenha os animais afastados da zona de intervenção. Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca. Confirme também as instruções dos tratamentos opcionais, se os escolher."
       }
     ],
     "faq": [
@@ -983,7 +983,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Tempos de utilização diferentes",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nA proteção tem um período de cura próprio, que pode exigir 24 horas. Siga as indicações relativas ao produto aplicado."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nA proteção tem um período de cura próprio, que pode exigir 24 horas. Siga as indicações relativas ao produto aplicado."
       }
     ],
     "faq": [
@@ -1160,7 +1160,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Textura e secagem",
-        "body": "Marcas por atrito ou desgaste podem continuar visíveis depois de remover a sujidade. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "Marcas por atrito ou desgaste podem continuar visíveis depois de remover a sujidade. Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -1216,7 +1216,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Quando voltar a usar",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nSiga também os cuidados de utilização indicados para qualquer extra escolhido. Não presumimos que um produto é adequado apenas por ter pouco cheiro."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nSiga também os cuidados de utilização indicados para qualquer extra escolhido. Não presumimos que um produto é adequado apenas por ter pouco cheiro."
       },
       {
         "heading": "Proteção e rotina",
@@ -1279,7 +1279,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Planear a secagem",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nGaranta uma alternativa de utilização enquanto a peça seca e respeite as instruções de qualquer produto aplicado."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nGaranta uma alternativa de utilização enquanto a peça seca e respeite as instruções de qualquer produto aplicado."
       }
     ],
     "faq": [
@@ -1337,7 +1337,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "O que a extração não garante",
-        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nSecagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nSecagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -1514,7 +1514,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Intervenção e regresso ao uso",
-        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nSecagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nSecagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -1532,7 +1532,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Quando volto a fazer a cama?",
-        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "a": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "relatedService": {
@@ -1572,7 +1572,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Tempo para voltar a circular",
-        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nPlaneie a intervenção para permitir secagem e evitar passagem sobre áreas ainda húmidas."
+        "body": "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nPlaneie a intervenção para permitir secagem e evitar passagem sobre áreas ainda húmidas."
       }
     ],
     "faq": [

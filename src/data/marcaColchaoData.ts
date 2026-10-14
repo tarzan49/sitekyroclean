@@ -35,7 +35,7 @@ export const marcasColchao: MarcaColchao[] = [
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "O colchão IKEA de espuma pode ser lavado a vapor?", answer: "Sim. Usamos vapor de baixa humidade calibrado especificamente para não saturar a espuma viscoelástica. O processo remove sujidade e ácaros sem comprometer a estrutura do núcleo." },
-      { question: "Quanto tempo demora a secar um colchão IKEA depois da limpeza?", answer: "Em média, entre 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Recomendamos agendar de manhã para o colchão estar pronto ao final do dia." },
+      { question: "Quanto tempo demora a secar um colchão IKEA depois da limpeza?", answer: "Em média, entre 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Recomendamos agendar de manhã para o colchão estar pronto ao final do dia." },
       { question: "Conseguem remover manchas antigas de um colchão IKEA?", answer: "Na maioria dos casos sim. Manchas de suor, urina ou líquidos derramados respondem bem ao pré-tratamento enzimático aplicado antes da extração a vapor." },
     ],
   },
@@ -102,7 +102,7 @@ export const marcasColchao: MarcaColchao[] = [
     faqs: [
       { question: "O tecido respirável do Pikolin precisa de cuidados especiais?", answer: "Sim, usamos vapor de baixa humidade e evitamos produtos que obstruam os poros do tecido, para preservar a respirabilidade original." },
       { question: "A limpeza ajuda a manter o suporte ortopédico do colchão?", answer: "Sim. Ao remover sujidade acumulada e humidade retida, a limpeza profissional ajuda a manter a firmeza e o desempenho do núcleo ortopédico ao longo do tempo." },
-      { question: "Quanto tempo até o colchão Pikolin estar pronto a usar?", answer: "Em média, entre 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço." },
+      { question: "Quanto tempo até o colchão Pikolin estar pronto a usar?", answer: "Em média, entre 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço." },
     ],
   },
   {

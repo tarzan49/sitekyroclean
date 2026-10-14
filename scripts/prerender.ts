@@ -1079,7 +1079,7 @@ export function prerenderRoutes(outDir: string): number {
         'Remoção de manchas de suor, líquidos e acidentes',
         'Eliminação de odores e fungos',
         'Redução de alergias e problemas respiratórios',
-        'Secagem em 3 a 6 horas',
+        'Secagem em 2 a 5 horas',
         'Produto certificado e seguro para crianças e animais',
       ],
       'limpeza-tapetes': [
@@ -1087,7 +1087,7 @@ export function prerenderRoutes(outDir: string): number {
         'Remoção de sujidade e resíduos das fibras',
         'Recuperação das cores e textura original',
         'Tratamento específico por tipo de fibra',
-        'Secagem em 3 a 6 horas',
+        'Secagem em 2 a 5 horas',
         'Lavagem em sua casa na maioria dos casos',
       ],
       'limpeza-cadeiras': [
@@ -1095,7 +1095,7 @@ export function prerenderRoutes(outDir: string): number {
         'Remoção de sujidade e resíduos da superfície',
         'Eliminação de odores de cozinha e uso intenso',
         'Tratamento específico por tipo de tecido',
-        'Secagem rápida em 3 a 6 horas',
+        'Secagem rápida em 2 a 5 horas',
         'Preço por volume: quanto mais cadeiras, menor o preço unitário',
       ],
       'limpeza-alcatifas': [
@@ -1104,7 +1104,7 @@ export function prerenderRoutes(outDir: string): number {
         'Remoção de sujidade e resíduos das fibras',
         'Recuperação da textura e cor original',
         'Ideal para escritórios, hotéis e grandes superfícies',
-        'Secagem em 3 a 6 horas',
+        'Secagem em 2 a 5 horas',
       ],
       impermeabilizacao: [
         'Proteção invisível que não altera a textura nem a cor',

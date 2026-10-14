@@ -287,7 +287,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     "id": "tempo-secagem-humidade",
     "term": "Tempo de Secagem e Humidade Relativa",
-    "definition": "A secagem depende da humidade retida, da ventilação, do revestimento e das condições do espaço. Na limpeza Kyro, a média comunicada é de 3 a 6 horas. A utilização deve esperar pela secagem completa, mesmo que demore mais.",
+    "definition": "A secagem depende da humidade retida, da ventilação, do revestimento e das condições do espaço. Na limpeza Kyro, a média comunicada é de 2 a 5 horas. A utilização deve esperar pela secagem completa, mesmo que demore mais.",
     "serviceLink": {
       "label": "Limpeza de Sofás",
       "to": "/limpeza-sofas"

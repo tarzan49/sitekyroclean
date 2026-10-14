@@ -133,9 +133,9 @@ export const PRICE_HEADING_VERB: Record<string, string> = {
 // relevante para o cliente, tipo quanto tempo demora o serviço).
 export const SERVICE_DURATION: Record<string, { value: string; label: string }> = {
   "limpeza-sofas":     { value: "2 a 5h", label: "Pronto a usar" },
-  "limpeza-colchoes":  { value: "3 a 6h", label: "Pronto a usar" },
-  "limpeza-cadeiras":  { value: "3 a 6h", label: "Pronto a usar" },
-  "limpeza-tapetes":   { value: "3 a 6h", label: "Pronto a usar" },
-  "limpeza-alcatifas": { value: "3 a 6h", label: "Pronto a usar" },
+  "limpeza-colchoes":  { value: "2 a 5h", label: "Pronto a usar" },
+  "limpeza-cadeiras":  { value: "2 a 5h", label: "Pronto a usar" },
+  "limpeza-tapetes":   { value: "2 a 5h", label: "Pronto a usar" },
+  "limpeza-alcatifas": { value: "2 a 5h", label: "Pronto a usar" },
   "impermeabilizacao": { value: "24h",  label: "Proteção ativa" },
 };

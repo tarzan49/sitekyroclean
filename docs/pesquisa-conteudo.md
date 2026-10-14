@@ -33,7 +33,7 @@ coisas que esses textos não têm:
    água, ou que molhar demais provoca manchas castanhas ao secar. São factos
    verificáveis, úteis, e quem os escrever primeiro em português fica com a
    resposta.
-2. **Números com origem.** "Seca em 3 a 6 horas" vale se disseres em que
+2. **Números com origem.** "Seca em 2 a 5 horas" vale se disseres em que
    condições, porque a humidade do ar muda isso.
 3. **Assumir os limites.** A página que diz "nisto não mexemos, isto não sai"
    é a que um modelo cita como fiável.
