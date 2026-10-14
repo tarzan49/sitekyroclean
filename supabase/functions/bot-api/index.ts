@@ -709,7 +709,7 @@ function supabaseLeads(): LeadsStore | null {
   };
 }
 
-const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since";
+const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since, review_requested";
 /** The CRM services still unpaid, for `team-accounts`. */
 function supabaseAccounts(): BotEnv["accounts"] {
   const url = Deno.env.get("SUPABASE_URL");

@@ -7,7 +7,7 @@ const ev = (id: string, team?: string): AccountEvent =>
 const row = (over: Partial<AccountRow>): AccountRow => ({
   request_date: '2026-10-13', client_name: 'Ana Teste', city: 'Odivelas', locality: 'Lisboa',
   billed_value: 79, my_cut: 40, upsell_value: 0, upsell_team: null, paid: false,
-  calendar_event_id: 'e1', calendar_missing_since: null, ...over,
+  calendar_event_id: 'e1', calendar_missing_since: null, review_requested: true, ...over,
 });
 
 describe('teamAccounts', () => {
@@ -69,5 +69,15 @@ describe('teamAccounts', () => {
   it('cents are written with a comma', () => {
     const r = teamAccounts([row({ my_cut: 42.5 })], events, '2026-10-13');
     expect(r.teams[0].message).toContain('42,50€');
+  });
+
+  it('without the review asked: 5% of the service go to the owner, in Porto always, elsewhere from 19/10', () => {
+    const noReview = { review_requested: false, billed_value: 80, my_cut: 40 };
+    const porto = teamAccounts([row({ ...noReview, calendar_event_id: 'e3' })], events, '2026-10-13');
+    expect(porto.teams[0].todayTotal).toBe(44);
+    expect(porto.teams[0].message).toContain('Ana Teste, Odivelas: 44€ (inclui 4€ dos 5% sem avaliação)');
+    expect(teamAccounts([row(noReview)], events, '2026-10-13').teams[0].todayTotal).toBe(40);
+    expect(teamAccounts([row({ ...noReview, request_date: '2026-10-19' })], events, '2026-10-19').teams[0].todayTotal).toBe(44);
+    expect(teamAccounts([row({ calendar_event_id: 'e3', billed_value: 80, my_cut: 40 })], events, '2026-10-13').teams[0].todayTotal).toBe(40);
   });
 });

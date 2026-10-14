@@ -1249,6 +1249,11 @@ function ownerUpsellOf(r) {
 }
 
 // src/lib/teamAccounts.ts
+var REVIEW_PENALTY_SHARE = 0.05;
+var REVIEW_PENALTY_FROM = UPSELL_TIERS_FROM;
+function reviewPenaltyApplies(team, day) {
+  return team.startsWith("Porto") || day >= REVIEW_PENALTY_FROM;
+}
 var round23 = (n) => Math.round(n * 100) / 100;
 var euros = (n) => `${round23(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
 var dm = (date) => `${date.slice(8, 10)}/${date.slice(5, 7)}`;
@@ -1264,15 +1269,16 @@ function ownerShareOf(r) {
   return round23((Number(r.my_cut) || 0) + ownerUpsellOf(r));
 }
 var sum = (lines) => round23(lines.reduce((s, l) => s + l.amount, 0));
+var lineText = (l) => `${l.label}: ${euros(l.amount)}${l.reviewPenalty ? ` (inclui ${euros(l.reviewPenalty)} dos 5% sem avaliação)` : ""}`;
 function teamMessage(a) {
   const out = [`Contas de ${weekday2(a.date)}, ${dm(a.date)} (${a.team})`, ""];
   if (a.today.length) {
-    out.push("Hoje:", ...a.today.map((l) => `${l.label}: ${euros(l.amount)}`), `Total de hoje: ${euros(a.todayTotal)}`);
+    out.push("Hoje:", ...a.today.map(lineText), `Total de hoje: ${euros(a.todayTotal)}`);
   } else {
     out.push("Hoje: nenhum serviço por pagar.");
   }
   if (a.before.length) {
-    out.push("", "Para trás:", ...a.before.map((l) => `${dm(l.date)} ${l.label}: ${euros(l.amount)}`), `Total para trás: ${euros(a.beforeTotal)}`);
+    out.push("", "Para trás:", ...a.before.map((l) => `${dm(l.date)} ${lineText(l)}`), `Total para trás: ${euros(a.beforeTotal)}`);
   }
   out.push("", `Total que me devem: ${euros(a.total)}`);
   return out.join("\n");
@@ -1283,10 +1289,11 @@ function teamAccounts(rows, events, date) {
   const unassigned = [];
   const owed = rows.filter((r) => !r.paid && r.request_date && r.request_date <= date && !r.calendar_missing_since).filter((r) => (Number(r.billed_value) || 0) > 0 || (Number(r.upsell_value) || 0) > 0).sort((a, b) => a.request_date.localeCompare(b.request_date));
   for (const r of owed) {
-    const amount2 = ownerShareOf(r);
-    if (amount2 <= 0) continue;
-    const line = { date: r.request_date, label: labelOf(r), amount: amount2 };
+    const share = ownerShareOf(r);
+    if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
+    const line = { date: r.request_date, label: labelOf(r), amount: round23(share + penalty), ...penalty ? { reviewPenalty: penalty } : {} };
     if (!team) {
       unassigned.push(line);
       continue;

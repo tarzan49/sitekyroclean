@@ -39,6 +39,8 @@ interface ServiceRequest {
   /** Passou fatura (pelo Francisco). invoice_ref = nome e NIF da fatura. */
   invoiced: boolean;
   invoice_ref: string | null;
+  /** A equipa pediu a avaliação ao cliente; sem isso as contas da noite somam 5% do valor (src/lib/teamAccounts.ts). */
+  review_requested: boolean;
 }
 
 const LOCALITIES = CRM_LOCALITIES;
@@ -79,6 +81,7 @@ type FormState = {
   paid: boolean;
   invoiced: boolean;
   invoice_ref: string;
+  review_requested: boolean;
   locality: CrmLocality | "";
   phone: string;
   source: string;
@@ -97,6 +100,7 @@ const emptyForm = (): FormState => ({
   paid: false,
   invoiced: false,
   invoice_ref: "",
+  review_requested: false,
   locality: "Porto",
   phone: "",
   source: "WhatsApp",
@@ -263,6 +267,7 @@ const CrmPanel = () => {
       paid: r.paid,
       invoiced: r.invoiced,
       invoice_ref: r.invoice_ref ?? "",
+      review_requested: r.review_requested,
       locality: r.locality ?? "",
       phone: r.phone ?? "",
       source: r.source ?? "",
@@ -300,6 +305,7 @@ const CrmPanel = () => {
       paid: form.paid,
       invoiced: form.invoiced,
       invoice_ref: form.invoiced ? form.invoice_ref.trim() || null : null,
+      review_requested: form.review_requested,
       locality: form.locality,
       phone: form.phone.trim() || null,
       source: form.source || null,
@@ -358,6 +364,12 @@ const CrmPanel = () => {
     if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, invoiced: !x.invoiced } : x));
   };
 
+  const toggleReview = async (r: ServiceRequest) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: err } = await (supabase as any).from("service_requests").update({ review_requested: !r.review_requested }).eq("id", r.id);
+    if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, review_requested: !x.review_requested } : x));
+  };
+
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -365,12 +377,12 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "Dados da fatura"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "Dados da fatura", "Avaliação pedida"];
     const rows = filtered.map(r => [
       new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", quizSummary?.quizServiceIds.has(r.id) ? [r.source, QUIZ_BADGE].filter(Boolean).join(" + ") : r.source ?? "",
-      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", r.invoiced ? "Sim" : "Não", r.invoice_ref ?? "",
+      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", r.invoiced ? "Sim" : "Não", r.invoice_ref ?? "", r.review_requested ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
@@ -564,17 +576,17 @@ const CrmPanel = () => {
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", "Fatura", ""].map(h => (
+                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", "Fatura", "Avaliação", ""].map(h => (
                   <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={13} className="text-center py-10 text-gray-400">A carregar...</td></tr>
+                <tr><td colSpan={14} className="text-center py-10 text-gray-400">A carregar...</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={13} className="text-center py-10 text-gray-400">
+                <tr><td colSpan={14} className="text-center py-10 text-gray-400">
                   {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
                 </td></tr>
               )}
@@ -622,6 +634,12 @@ const CrmPanel = () => {
                     <button onClick={() => toggleInvoiced(r)} title={r.invoice_ref ?? undefined}
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.invoiced ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
                       {r.invoiced ? "Sim" : "Não"}
+                    </button>
+                  </td>
+                  <td className="px-2 py-2">
+                    <button onClick={() => toggleReview(r)} title="A equipa pediu a avaliação? Sem isso, as contas da noite somam 5% do valor (Porto sempre, outras equipas desde 19/10)"
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.review_requested ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                      {r.review_requested ? "Pedida" : "Não"}
                     </button>
                   </td>
                   <td className="px-1 py-2">
@@ -689,6 +707,10 @@ const CrmPanel = () => {
               <label className="flex items-center gap-2 h-9 ml-4 text-sm text-navy cursor-pointer select-none">
                 <input type="checkbox" checked={form.invoiced} onChange={e => setForm(f => ({ ...f, invoiced: e.target.checked }))} className="rounded border-gray-300" />
                 Com fatura
+              </label>
+              <label className="flex items-center gap-2 h-9 ml-4 text-sm text-navy cursor-pointer select-none">
+                <input type="checkbox" checked={form.review_requested} onChange={e => setForm(f => ({ ...f, review_requested: e.target.checked }))} className="rounded border-gray-300" />
+                Avaliação pedida
               </label>
             </div>
             {form.invoiced && (
