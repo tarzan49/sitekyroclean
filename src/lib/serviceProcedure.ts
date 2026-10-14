@@ -184,21 +184,41 @@ export interface PromptFacts {
   serviceDay: string;
   /** "15h", a hora de início. */
   time?: string | null;
+  /** O primeiro nome do cliente, para a mensagem que a equipa lhe reencaminha. */
+  firstName?: string | null;
 }
 
 const serviceName = (f: Pick<PromptFacts, 'label' | 'what'>) => `${f.label}${f.what ? ` (${f.what})` : ''}`;
 
-/** A mensagem que cada pessoa da equipa recebe quando o serviço acaba. Sem emojis nem travessões. */
+/**
+ * A mensagem que cada pessoa da equipa recebe quando o serviço acaba. Logo a
+ * seguir vai, sozinha, a de `procedureClientMessage`, para a equipa a
+ * reencaminhar ao cliente (dono, 2026-10-14). Sem emojis nem travessões.
+ */
 export function procedurePromptMessage(f: PromptFacts): string {
-  const link = REVIEW_LINKS[reviewProfileOfTeam(f.team)];
   return [
     `Serviço terminado: ${serviceName(f)}, ${dm(f.serviceDay)}${f.time ? ` às ${f.time}` : ''}.`,
     '',
     'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.',
     '',
-    `Link de avaliação para o cliente: ${link}`,
-    '',
-    `Prazo para a avaliação do cliente: ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
+    `A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
+  ].join('\n');
+}
+
+/**
+ * O pedido de avaliação que a equipa reencaminha ao cliente: o primeiro nome, o
+ * serviço feito e o link da ficha certa (Lisboa para as equipas de Lisboa, Porto
+ * para as outras). A frase dos 10% é do dono (14/10: "não é para tirar a
+ * frase"), avisado de que o Google não permite ofertas em troca de avaliações.
+ */
+export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what' | 'team'>): string {
+  const name = (f.firstName ?? '').trim();
+  const what = (f.what ?? '').trim();
+  const service = what ? `do serviço (${what.charAt(0).toLowerCase()}${what.slice(1)})` : 'do serviço';
+  return [
+    `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
+    REVIEW_LINKS[reviewProfileOfTeam(f.team)],
+    'Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!',
   ].join('\n');
 }
 
@@ -235,9 +255,10 @@ export function procedureReminderMessage(label: string, check: Pick<ProcedureChe
   return lines.join(' ');
 }
 
-/** O prazo acabou com alguma coisa em falta. Não diz a percentagem: a regra de pagamento está em procedurePay. */
-export function procedureClosedMessage(label: string, serviceDay: string, missing: ProcedureItem[]): string {
-  return `O prazo do serviço ${label}, ${dm(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.`;
+/** O prazo acabou com alguma coisa em falta; a percentagem vem de procedurePay (check.pay). */
+export function procedureClosedMessage(label: string, serviceDay: string, missing: ProcedureItem[], pay?: ProcedurePay | null): string {
+  const share = pay ? ` Neste serviço a equipa fica com ${pay.teamShare}%${pay.bonus ? ` + ${pay.bonus}€` : ''}.` : '';
+  return `O prazo do serviço ${label}, ${dm(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.${share}`;
 }
 
 /** Quando a equipa manda uma fotografia sem responder à mensagem de um serviço. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkProcedure, factsFromTitle, procedureAccountDelta, procedureApplies, procedurePay, procedurePromptMessage,
+  checkProcedure, factsFromTitle, procedureAccountDelta, procedureApplies, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
   PROCEDURE_PAY_ENABLED, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
@@ -97,14 +97,29 @@ describe('photos and video sent in reply', () => {
 
 describe('messages', () => {
   const noDash = /—|–/;
-  it('the service message asks for a reply with the photos and the video, with the right review link', () => {
+  it('the service message asks for a reply with the photos and the video and says the next one is for the client', () => {
     const m = procedurePromptMessage({ label: 'Ana, Paranhos', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15', time: '15h' });
     expect(m).toContain('Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.');
     expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.');
-    expect(m).toContain(REVIEW_LINKS.porto);
-    expect(m).toContain('22/10');
+    expect(m).toContain('A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é 22/10. Obrigado!');
     expect(m).not.toMatch(noDash);
-    expect(procedurePromptMessage({ label: 'Rui', team: 'Lisboa 1', serviceDay: '2026-10-20' })).toContain(REVIEW_LINKS.lisboa);
+  });
+  it('the client message: first name, the service, the right review link, the owner\'s 10% line', () => {
+    const m = procedureClientMessage({ firstName: 'Ana', what: 'Limpeza de sofá de 3 lugares', team: 'Porto 2' });
+    expect(m).toBe([
+      'Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares). Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:',
+      REVIEW_LINKS.porto,
+      'Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!',
+    ].join('\n'));
+    expect(m).not.toMatch(noDash);
+    const lx = procedureClientMessage({ firstName: null, what: null, team: 'Lisboa 1' });
+    expect(lx.startsWith('Olá, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço.')).toBe(true);
+    expect(lx).toContain(REVIEW_LINKS.lisboa);
+  });
+  it('the closing message says the team share from procedurePay', () => {
+    expect(procedureClosedMessage('Ana', '2026-10-15', ['video', 'review'], { teamShare: 45, bonus: 0 }))
+      .toBe('O prazo do serviço Ana, 15/10, acabou sem vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.');
+    expect(procedureClosedMessage('Ana', '2026-10-15', ['review'], { teamShare: 50, bonus: 0 })).toContain('a equipa fica com 50%.');
   });
   it('the receipt says what arrived and what is missing', () => {
     expect(procedureReceiptMessage('Ana, Paranhos', ['before', 'after'], { missing: ['video', 'review'], deadline: '2026-10-22' }))

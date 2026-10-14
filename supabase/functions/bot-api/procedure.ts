@@ -7,7 +7,7 @@
 // Times, teams, first names and the service only: no phone or address leaves.
 import {
   addDays, checkProcedure, eventTeam, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
-  procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
+  procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
 import { createErrorResponse, createSuccessResponse, safeLog } from "../_shared/security.ts";
@@ -37,13 +37,13 @@ const hhmm = (iso: string) =>
   new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
     .format(new Date(iso)).replace(":00", "h").replace(":", "h");
 
-function labelFor(service: Row | undefined, event: CalendarEvent): { label: string; what: string | null } {
+function labelFor(service: Row | undefined, event: CalendarEvent): { label: string; what: string | null; firstName: string | null } {
   const title = factsFromTitle(event.summary);
   const name = typeof service?.client_name === "string" ? service.client_name.trim().split(/\s+/)[0] : title.firstName;
   const city = typeof service?.city === "string" ? service.city.trim() : "";
   const what = (typeof service?.description === "string" && service.description.trim()) || title.what;
   const label = [name, city].filter(Boolean).join(", ") || "cliente";
-  return { label, what: what || null };
+  return { label, what: what || null, firstName: name || null };
 }
 
 const asRecord = (r: Row) => ({
@@ -95,6 +95,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     return {
       eventId: e.id, team, serviceDay: day, label: facts.label,
       message: procedurePromptMessage({ label: facts.label, what: facts.what, team: team!, serviceDay: day, time: hhmm(e.start!) }),
+      clientMessage: procedureClientMessage({ firstName: facts.firstName, what: facts.what, team: team! }),
     };
   });
 
@@ -121,7 +122,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
     const ev = eventById.get(r.calendar_event_id);
     const label = ev ? labelFor(serviceByEvent.get(r.calendar_event_id), ev).label : "o serviço";
-    closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing) });
+    closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, check.pay) });
   }
   return createSuccessResponse({ prompts, reminders, closed, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
 }

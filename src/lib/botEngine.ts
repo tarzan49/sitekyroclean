@@ -6,7 +6,7 @@ export { botAvailability, eventTeam } from './botAvailability';
 export { planBotBooking, planBotHold, planOwnerBooking } from './botHold';
 export { agendaCheck } from './agendaCheck';
 export { teamAccounts } from './teamAccounts';
-export { addDays, checkProcedure, factsFromTitle, lisbonDayOf, procedureApplies, procedureClosedMessage, procedureFrom, procedurePromptMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE } from './serviceProcedure';
+export { addDays, checkProcedure, factsFromTitle, lisbonDayOf, procedureApplies, procedureClientMessage, procedureClosedMessage, procedureFrom, procedurePromptMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE } from './serviceProcedure';
 export { describeQuizOrder } from './quizOrder';
 export { isTestOrder } from './testLead';
 export { labelFacts } from './labelFacts';

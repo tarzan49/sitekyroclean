@@ -1443,15 +1443,22 @@ function slotForMedia(rec, kind, caption) {
 }
 var serviceName = (f) => `${f.label}${f.what ? ` (${f.what})` : ""}`;
 function procedurePromptMessage(f) {
-  const link = REVIEW_LINKS[reviewProfileOfTeam(f.team)];
   return [
     `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`,
     "",
     "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.",
     "",
-    `Link de avaliação para o cliente: ${link}`,
-    "",
-    `Prazo para a avaliação do cliente: ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+    `A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+  ].join("\n");
+}
+function procedureClientMessage(f) {
+  const name = (f.firstName ?? "").trim();
+  const what = (f.what ?? "").trim();
+  const service = what ? `do serviço (${what.charAt(0).toLowerCase()}${what.slice(1)})` : "do serviço";
+  return [
+    `Olá${name ? ` ${name}` : ""}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
+    REVIEW_LINKS[reviewProfileOfTeam(f.team)],
+    "Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!"
   ].join("\n");
 }
 function procedureReceiptMessage(label, received, check) {
@@ -1482,8 +1489,9 @@ function procedureReminderMessage(label, check, serviceDay) {
   lines.push(`Prazo: ${dm2(check.deadline)}.`);
   return lines.join(" ");
 }
-function procedureClosedMessage(label, serviceDay, missing) {
-  return `O prazo do serviço ${label}, ${dm2(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.`;
+function procedureClosedMessage(label, serviceDay, missing, pay) {
+  const share = pay ? ` Neste serviço a equipa fica com ${pay.teamShare}%${pay.bonus ? ` + ${pay.bonus}€` : ""}.` : "";
+  return `O prazo do serviço ${label}, ${dm2(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.${share}`;
 }
 var PROCEDURE_NOT_A_REPLY_MESSAGE = "Para não misturar serviços, manda as fotografias e o vídeo em resposta à mensagem do serviço: carrega nessa mensagem, escolhe Responder e envia.";
 function factsFromTitle(summary) {
@@ -1706,6 +1714,7 @@ export {
   planBotHold,
   planOwnerBooking,
   procedureApplies,
+  procedureClientMessage,
   procedureClosedMessage,
   procedureFrom,
   procedurePromptMessage,

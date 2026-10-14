@@ -37,6 +37,7 @@ Deno.test("a service that just ended gets its message; revisits, other events an
   assertEquals(prompts.map(p => p.eventId), ["s1"]);
   assertEquals(prompts[0].label, "Ana, Paranhos");
   assert(String(prompts[0].message).startsWith("Serviço terminado: Ana, Paranhos (Limpeza de sofá de 3 lugares), 15/10 às 15h."));
+  assert(String(prompts[0].clientMessage).startsWith("Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares)."));
   assert(!JSON.stringify(body).includes("912000000"), "no phone leaves");
 });
 
@@ -79,7 +80,7 @@ Deno.test("the day after, a reminder; at the end of the 7th day, closed with a n
   const day8 = await json(await procedureDue(events, late.store, new Date("2026-10-23T00:10:00Z")));
   assertEquals(day8.reminders, []);
   assertEquals((day8.closed as Row[]).map(c => c.message), [
-    "O prazo do serviço Ana, Paranhos, 15/10, acabou sem fotografia de depois, vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto.",
+    "O prazo do serviço Ana, Paranhos, 15/10, acabou sem fotografia de depois, vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.",
   ]);
   assertEquals(late.table.get("s1")?.status, "fechado");
   // Next round: already closed, no second notice.
