@@ -319,8 +319,10 @@ function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { par
     const besidePhone = Boolean(phoneMatch) || previousWasPhone || PHONE.test(segments[i + 1] ?? '');
     previousWasPhone = Boolean(phoneMatch);
     if (!seg) return;
+    // "Inês Pereira (Bruval)": a nota entre parênteses não faz parte do nome (14/10/2026).
+    const bare = tidy(seg.replace(/\s*\([^()]*\)\s*$/, ''));
     if (!description && isServiceLike(seg)) description = tidy(seg);
-    else if (!name && isNameLike(seg) && (address.length === 0 || besidePhone)) name = seg;
+    else if (!name && bare && isNameLike(bare) && (address.length === 0 || besidePhone)) name = bare;
     else address.push(seg);
   });
 

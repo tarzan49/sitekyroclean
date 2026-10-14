@@ -58,6 +58,9 @@ describe('parseServiceEvent', () => {
     const nameBeforePhone = parse('Serviço 115€ (230€) Limpeza de colchões - Carla - 912345678 - Rua Central 6 -Setúbal');
     expect(nameBeforePhone).toMatchObject({ client_name: 'Carla', phone: '+351 912 345 678', city: 'Setúbal', locality: 'Lisboa' });
 
+    const nameWithNote = parse('Serviço 40€ (79€) Limpeza de sofá de 2 lugares - 912345678 - Ana Inventada (Empresa X) - Rua das Flores 5, 4415-903 Sandim');
+    expect(nameWithNote?.client_name).toBe('Ana Inventada');
+
     const nameAfterAddress = parse('Serviço 40€ (80€) Limpeza tapete - Rua das Flores 25 - Dora - +351 912 345 678');
     expect(nameAfterAddress?.client_name).toBe('Dora');
 
