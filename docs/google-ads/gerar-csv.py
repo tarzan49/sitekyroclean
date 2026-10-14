@@ -216,7 +216,7 @@ def tapetes(city):
         headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
                    "Higienização de Tapetes", f"Limpeza de Carpetes {cidade(city)}",
                    "Tapetes Lavados ao Domicílio", "Sem Levar o Tapete de Casa",
-                   "Seco em 2 a 5 Horas", "Entrega em 4 Dias Úteis",
+                   "Seco em 2 a 5 Horas", "Entrega em 5 Dias Úteis",
                    "Lã, Persas, Shaggy e Sisal", "Manchas, Pelos e Odores",
                    "Orçamento por Foto no WhatsApp", "Preço Fechado Antes de Marcar",
                    AVAL_TITULO, RATING_TITULO, "Garantia de Repetição 48h"],
