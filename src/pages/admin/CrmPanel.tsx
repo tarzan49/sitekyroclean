@@ -574,7 +574,7 @@ const CrmPanel = () => {
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
-              {["4%", "7%", "17%", "10%", "11%", "11%", "7%", "6%", "6%", "6%", "6%", "5%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+              {["3%", "7%", "16%", "9%", "10%", "9%", "7%", "6%", "6%", "5%", "6%", "5%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">

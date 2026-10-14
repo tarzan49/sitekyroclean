@@ -19,7 +19,7 @@ const MobileStickyBar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  if (pathname === '/obrigado') return null;
+  if (pathname === '/obrigado' || pathname.startsWith('/admin')) return null;
 
   return (
     <div
