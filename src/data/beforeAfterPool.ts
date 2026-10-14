@@ -115,6 +115,19 @@ import sofa14Antes from "@/assets/before-after-pool/sofa-14-antes.webp";
 import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
 import tapete06Antes from "@/assets/before-after-pool/tapete-06-antes.webp";
 import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
+// 14/10/2026: trabalhos reais enviados pelas equipas no WhatsApp (Porto e Lisboa).
+import cadeiras09Antes from "@/assets/before-after-pool/cadeiras-09-antes.webp";
+import cadeiras09Depois from "@/assets/before-after-pool/cadeiras-09-depois.webp";
+import sofa15Antes from "@/assets/before-after-pool/sofa-15-antes.webp";
+import sofa15Depois from "@/assets/before-after-pool/sofa-15-depois.webp";
+import sofa16Antes from "@/assets/before-after-pool/sofa-16-antes.webp";
+import sofa16Depois from "@/assets/before-after-pool/sofa-16-depois.webp";
+import sofa17Antes from "@/assets/before-after-pool/sofa-17-antes.webp";
+import sofa17Depois from "@/assets/before-after-pool/sofa-17-depois.webp";
+import colchao08Antes from "@/assets/before-after-pool/colchao-08-antes.webp";
+import colchao08Depois from "@/assets/before-after-pool/colchao-08-depois.webp";
+import tapete07Antes from "@/assets/before-after-pool/tapete-07-antes.webp";
+import tapete07Depois from "@/assets/before-after-pool/tapete-07-depois.webp";
 
 export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "alcatifa" | "impermeabilizacao";
 
@@ -153,6 +166,9 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
+    { kind: "pair", before: sofa15Antes, after: sofa15Depois },
+    { kind: "pair", before: sofa16Antes, after: sofa16Depois },
+    { kind: "pair", before: sofa17Antes, after: sofa17Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },
@@ -166,6 +182,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   colchao: [
     { kind: "pair", before: colchao06Antes, after: colchao06Depois },
+    { kind: "pair", before: colchao08Antes, after: colchao08Depois },
     { kind: "pair", before: colchao07Antes, after: colchao07Depois },
     { kind: "pair", before: colchao04Antes, after: colchao04Depois },
     { kind: "pair", before: colchao02Antes, after: colchao02Depois },
@@ -175,6 +192,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   cadeiras: [
     { kind: "pair", before: cadeiras05Antes, after: cadeiras05Depois },
+    { kind: "pair", before: cadeiras09Antes, after: cadeiras09Depois },
     { kind: "pair", before: cadeiras01Antes, after: cadeiras01Depois },
     { kind: "pair", before: cadeiras02Antes, after: cadeiras02Depois },
     { kind: "pair", before: cadeiras07Antes, after: cadeiras07Depois },
@@ -185,6 +203,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   tapete: [
     { kind: "pair", before: tapete04Antes, after: tapete04Depois },
+    { kind: "pair", before: tapete07Antes, after: tapete07Depois },
     { kind: "pair", before: tapete03Antes, after: tapete03Depois },
     { kind: "pair", before: tapete06Antes, after: tapete06Depois },
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
