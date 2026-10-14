@@ -25,7 +25,7 @@ const row = (id: string, day: string, billed: number, description: string) => ({
 });
 
 describe('aba Fechos do CRM', () => {
-  it('abre na última semana completa, anda pelas semanas e mostra a revisão e a taxa por serviço', async () => {
+  it('abre na semana em curso, anda pelas semanas e mostra a revisão e a taxa por serviço', async () => {
     const services = [row('1', lastMonday, 120, 'Limpeza colchão casal'), row('2', addDays(lastMonday, -14), 333, 'Limpeza sofá')];
     // Dois pedidos do site há 10 dias, um fechou (serviço no CRM com o mesmo telefone): 50%, a meta.
     const quizRows = [{ ...row('3', addDays(lisbonDay(new Date()), -9), 90, 'Limpeza tapete'), phone: '920000001' }];
@@ -35,9 +35,14 @@ describe('aba Fechos do CRM', () => {
       { id: 'b', created_at: at, name: 'Eva Lopes', phone: '920000002', service: 'Tapete', location: null, value: null, source: 'Website' },
     ], quizRows);
     render(<CrmClosings records={services} services={[...services, ...quizRows]} quiz={quiz} />);
-    expect(await screen.findByText(/Última semana completa/)).toBeTruthy();
+    expect(await screen.findByText(/Semana em curso/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Semana anterior' }));
+    expect(screen.getByText(/Última semana completa/)).toBeTruthy();
     expect(screen.getByText('Revisão de segunda-feira')).toBeTruthy();
-    expect(screen.getByText('120€ faturado')).toBeTruthy();
+    // O serviço do pedido do site (há 9 dias) cai nesta semana conforme o dia de hoje.
+    const quizDay = quizRows[0].request_date;
+    const sameWeek = quizDay >= lastMonday && quizDay <= addDays(lastMonday, 6);
+    expect(screen.getByText(`${sameWeek ? 210 : 120}€ faturado`)).toBeTruthy();
     // Contactos de há 10 dias: entram na taxa de 30 dias, colchão com a meta atingida (8 de 10).
     fireEvent.click(screen.getByRole('button', { name: '30 dias' }));
     await screen.findByText('Limpeza de colchão', { selector: 'td' });
@@ -56,5 +61,30 @@ describe('aba Fechos do CRM', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Semana seguinte' }));
     expect(screen.getByText(/Semana em curso/)).toBeTruthy();
     expect((screen.getByRole('button', { name: 'Semana seguinte' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('na semana em curso compara com os mesmos dias da semana anterior, não com a semana inteira', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-14T12:00:00Z')); // quarta-feira
+    try {
+      // Esta semana: 1 fecho na segunda. A anterior: 1 na segunda e 2 na sexta.
+      const services = [
+        row('1', '2026-10-12', 100, 'Limpeza sofá'),
+        row('2', '2026-10-05', 100, 'Limpeza sofá'),
+        row('3', '2026-10-09', 100, 'Limpeza sofá'),
+        row('4', '2026-10-09', 100, 'Limpeza sofá'),
+      ];
+      render(<CrmClosings records={services} services={services} />);
+      expect(await screen.findByText(/Semana em curso/)).toBeTruthy();
+      expect(screen.getAllByText('igual à anterior').length).toBeGreaterThan(0);
+      expect(screen.queryByText(/-2 vs/)).toBeNull();
+      expect(screen.getByText(/cada uma só de seg a qua/)).toBeTruthy();
+      // A semana anterior, inteira, compara com a semana inteira.
+      fireEvent.click(screen.getByRole('button', { name: 'Semana anterior' }));
+      expect(screen.getByText('300€ faturado')).toBeTruthy();
+      expect(screen.getByText('+3 vs semana anterior')).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -60,7 +60,13 @@ const SERVICE_ACTIONS: Record<string, string> = {
 /** Abaixo disto a taxa do questionário em 90 dias ainda é ruído. */
 const QUIZ_MIN_QUOTES = 10;
 
-export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[], quiz90?: CloseRateCount): WeekInsights {
+/**
+ * `sameDays` ("seg a qua"): a semana está a meio e `weeks` traz só esses dias de
+ * cada semana (dono, 14/10: "não faz sentido comparar dois dias com uma semana completa").
+ */
+export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[], quiz90?: CloseRateCount, sameDays?: string): WeekInsights {
+  const base = sameDays ? `nos mesmos dias (${sameDays}) das semanas anteriores` : "nas semanas anteriores";
+  const ofAvg = sameDays ? `de média nos mesmos dias (${sameDays})` : "de média";
   const good: Insight[] = [];
   const improve: Insight[] = [];
   const week = weeks[weeks.length - 1];
@@ -77,19 +83,19 @@ export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[
   if (before.length) {
     const baseCloses = avg(before.map(w => w.closes))!;
     const c = compare(week.closes, baseCloses);
-    if (c > 0) good.push({ title: "Mais fechos que o normal", detail: `${week.closes} fechos, contra uma média de ${Math.round(baseCloses)} nas semanas anteriores.` });
+    if (c > 0) good.push({ title: "Mais fechos que o normal", detail: `${week.closes} fechos, contra uma média de ${Math.round(baseCloses)} ${base}.` });
     if (c < 0) improve.push({
       title: "Menos fechos que o normal",
-      detail: `${week.closes} fechos, contra uma média de ${Math.round(baseCloses)} nas semanas anteriores.`,
+      detail: `${week.closes} fechos, contra uma média de ${Math.round(baseCloses)} ${base}.`,
       action: "Abrir Clientes → Hoje e fazer todos os seguimentos de orçamento por responder antes de qualquer outra coisa.",
     });
 
     const baseTicket = avg(before.map(w => w.ticket).filter((t): t is number => t !== null));
     const t = compare(week.ticket, baseTicket);
-    if (t > 0) good.push({ title: "Ticket médio acima do normal", detail: `${euro(week.ticket!)} por serviço, contra ${euro(baseTicket!)} de média.` });
+    if (t > 0) good.push({ title: "Ticket médio acima do normal", detail: `${euro(week.ticket!)} por serviço, contra ${euro(baseTicket!)} ${ofAvg}.` });
     if (t < 0) improve.push({
       title: "Ticket médio abaixo do normal",
-      detail: `${euro(week.ticket!)} por serviço, contra ${euro(baseTicket!)} de média.`,
+      detail: `${euro(week.ticket!)} por serviço, contra ${euro(baseTicket!)} ${ofAvg}.`,
       action: "Em cada orçamento, propor um segundo artigo na mesma visita e a impermeabilização Premium primeiro.",
     });
 
@@ -102,10 +108,10 @@ export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[
     });
     else {
       const g = compare(week.costPerGoogleClient, baseCost, true);
-      if (g > 0) good.push({ title: "Cliente do Google mais barato", detail: `${euro(week.costPerGoogleClient!)} por cliente, contra ${euro(baseCost!)} de média.` });
+      if (g > 0) good.push({ title: "Cliente do Google mais barato", detail: `${euro(week.costPerGoogleClient!)} por cliente, contra ${euro(baseCost!)} ${ofAvg}.` });
       if (g < 0) improve.push({
         title: "Cliente do Google mais caro",
-        detail: `${euro(week.costPerGoogleClient!)} por cliente, contra ${euro(baseCost!)} de média.`,
+        detail: `${euro(week.costPerGoogleClient!)} por cliente, contra ${euro(baseCost!)} ${ofAvg}.`,
         action: "Ver no Google Ads as pesquisas da semana e pôr como negativas as que gastaram sem dar contactos.",
       });
     }

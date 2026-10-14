@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Pencil, Phone, Target, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
+import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, weekdayOf, type ClosingRow } from "@/lib/crmClosings";
 import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
 import { computeWeeklyReview, mondayOf, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
 import { closeRateRankRows, computeServiceCloseRates, missingFor, QUIZ_CLOSE_RATE_GOAL, type CloseRateCount } from "@/lib/crmServiceCloseRate";
@@ -57,12 +57,12 @@ const daysBetween = (from: string, to: string) => Math.round((noon(to).getTime()
 
 interface Hover { chart: "weekday" | "day" | "week"; index: number }
 
-function Delta({ cur, prev, unit = "", lowerIsBetter = false }: { cur: number | null; prev: number | null; unit?: string; lowerIsBetter?: boolean }) {
+function Delta({ cur, prev, unit = "", lowerIsBetter = false, vs = "vs semana anterior" }: { cur: number | null; prev: number | null; unit?: string; lowerIsBetter?: boolean; vs?: string }) {
   if (cur === null || prev === null) return <span className="text-[11px] text-gray-400">sem comparação</span>;
   const d = Math.round(cur - prev);
   if (d === 0) return <span className="text-[11px] text-gray-400">igual à anterior</span>;
   const good = lowerIsBetter ? d < 0 : d > 0;
-  return <span className={`text-[11px] font-semibold ${good ? "text-emerald-600" : "text-red-600"}`}>{d > 0 ? "+" : ""}{d.toLocaleString("pt-PT")}{unit} vs semana anterior</span>;
+  return <span className={`text-[11px] font-semibold ${good ? "text-emerald-600" : "text-red-600"}`}>{d > 0 ? "+" : ""}{d.toLocaleString("pt-PT")}{unit} {vs}</span>;
 }
 
 /** Tendência das últimas semanas; o último ponto é a semana escolhida. */
@@ -173,12 +173,29 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
     () => computeWeeklyReview({ services, clients: clients ?? [], adsStats }, noon(addDays(thisMonday, 7)), HISTORY_WEEKS),
     [services, clients, adsStats, thisMonday],
   );
+  // Semana em curso: só de segunda até hoje, e as outras semanas com os mesmos dias
+  // (dono, 14/10: "não faz sentido comparar dois dias com uma semana completa").
+  const lastWeekday = weekdayOf(today);
+  const partial = period === "week" && week === thisMonday && lastWeekday < 6;
+  const sameDays = partial ? (lastWeekday === 0 ? "só segunda" : `seg a ${WEEKDAY_SHORT[lastWeekday].toLowerCase()}`) : undefined;
+  const partialWeeks: WeekRow[] = useMemo(
+    () => (partial
+      ? computeWeeklyReview({
+          services: services.filter(s => weekdayOf(closedDay(s)) <= lastWeekday),
+          clients: clients ?? [],
+          adsStats: adsStats.filter(a => weekdayOf(a.stat_date) <= lastWeekday),
+        }, noon(addDays(thisMonday, 7)), HISTORY_WEEKS)
+      : []),
+    [partial, services, clients, adsStats, thisMonday, lastWeekday],
+  );
+  const cardWeeks = partial ? partialWeeks : allWeeks;
   const firstWeekWithData = allWeeks.find(w => w.closes > 0 || w.spend > 0)?.week ?? thisMonday;
   const endWeek = period === "week" ? week : mondayOf(to);
   const endIndex = allWeeks.findIndex(w => w.week === endWeek);
   const chartWeeks = endIndex < 0 ? [] : allWeeks.slice(Math.max(0, endIndex - CHART_WEEKS + 1), endIndex + 1);
-  const selectedWeek = period === "week" ? chartWeeks[chartWeeks.length - 1] : undefined;
-  const previousWeek = period === "week" ? chartWeeks[chartWeeks.length - 2] ?? null : null;
+  const cardChartWeeks = endIndex < 0 ? [] : cardWeeks.slice(Math.max(0, endIndex - CHART_WEEKS + 1), endIndex + 1);
+  const selectedWeek = period === "week" ? cardChartWeeks[cardChartWeeks.length - 1] : undefined;
+  const previousWeek = period === "week" ? cardChartWeeks[cardChartWeeks.length - 2] ?? null : null;
 
   // Taxa de fecho: fechos ÷ orçamentos de qualquer canal (questionário + WhatsApp), pelo dia do
   // primeiro pedido de cada pessoa, e o período anterior do mesmo tamanho. Só vê o estado de hoje:
@@ -196,14 +213,18 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
   const span = daysBetween(from, to);
   const ready = !!clients || !!quiz;
   const current = useMemo(() => ratesFor(from, to), [clients, quiz, services, from, to]); // eslint-disable-line react-hooks/exhaustive-deps
-  const previous = useMemo(() => ratesFor(addDays(from, -span - 1), addDays(from, -1)), [clients, quiz, services, from, span]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Na semana, a anterior é a mesma semana de calendário (na semana em curso, os mesmos dias).
+  const previous = useMemo(
+    () => (period === "week" ? ratesFor(addDays(from, -7), addDays(to, -7)) : ratesFor(addDays(from, -span - 1), addDays(from, -1))),
+    [clients, quiz, services, from, to, span, period], // eslint-disable-line react-hooks/exhaustive-deps
+  );
   const ranking = ready ? current.rows : [];
   const previousRanking = previous.rows;
   // A leitura da semana olha para 90 dias: uma semana só tem poucos orçamentos por serviço.
   const last90 = useMemo(() => (period === "week" && ready ? ratesFor(addDays(to, -89), to) : null), [clients, quiz, services, to, period]); // eslint-disable-line react-hooks/exhaustive-deps
   const insights = useMemo(
-    () => (period === "week" && endIndex >= 0 ? computeWeekInsights(allWeeks.slice(0, endIndex + 1), last90?.rows ?? [], last90?.rates.quiz) : null),
-    [period, allWeeks, endIndex, last90],
+    () => (period === "week" && endIndex >= 0 ? computeWeekInsights(cardWeeks.slice(0, endIndex + 1), last90?.rows ?? [], last90?.rates.quiz, sameDays) : null),
+    [period, cardWeeks, endIndex, last90, sameDays],
   );
 
   const ranked = ranking.filter(r => r.contacts >= RANKING_MIN_CONTACTS);
@@ -221,7 +242,8 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
   const weekHover = hover?.chart === "week" ? chartWeeks[hover.index] : null;
 
   const pickWeek = (w: string) => { setPeriod("week"); setWeek(w); };
-  const trend = (f: (w: WeekRow) => number | null) => chartWeeks.map(f);
+  const trend = (f: (w: WeekRow) => number | null) => cardChartWeeks.map(f);
+  const vs = sameDays ? `vs ${sameDays} da semana anterior` : undefined;
   const periodLabel = period === "week" ? `semana de ${dm(from)} a ${dm(addDays(from, 6))}` : period === "month" ? monthName(month) : `${dm(from)} a ${dm(to)}`;
 
   return (
@@ -278,14 +300,14 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Fechos", value: String(selectedWeek.closes), sub: `${euro(selectedWeek.billed)} faturado`,
-                delta: <Delta cur={selectedWeek.closes} prev={previousWeek?.closes ?? null} />, trend: trend(w => w.closes) },
+                delta: <Delta cur={selectedWeek.closes} prev={previousWeek?.closes ?? null} vs={vs} />, trend: trend(w => w.closes) },
               { label: "A tua parte", value: euro(selectedWeek.share), sub: "parte da empresa + upsell",
-                delta: <Delta cur={selectedWeek.share} prev={previousWeek?.share ?? null} unit="€" />, trend: trend(w => w.share) },
+                delta: <Delta cur={selectedWeek.share} prev={previousWeek?.share ?? null} unit="€" vs={vs} />, trend: trend(w => w.share) },
               { label: "Ticket médio", value: euro(selectedWeek.ticket), sub: "faturado ÷ fechos",
-                delta: <Delta cur={selectedWeek.ticket} prev={previousWeek?.ticket ?? null} unit="€" />, trend: trend(w => w.ticket) },
+                delta: <Delta cur={selectedWeek.ticket} prev={previousWeek?.ticket ?? null} unit="€" vs={vs} />, trend: trend(w => w.ticket) },
               { label: "Custo por cliente Google", value: selectedWeek.spend ? euro(selectedWeek.costPerGoogleClient) : "–",
                 sub: selectedWeek.spend ? `${selectedWeek.googleCloses} clientes · ${euro(selectedWeek.spend)} gastos` : "sem gasto nesta semana",
-                delta: <Delta cur={selectedWeek.costPerGoogleClient} prev={previousWeek?.costPerGoogleClient ?? null} unit="€" lowerIsBetter />,
+                delta: <Delta cur={selectedWeek.costPerGoogleClient} prev={previousWeek?.costPerGoogleClient ?? null} unit="€" lowerIsBetter vs={vs} />,
                 trend: trend(w => w.costPerGoogleClient) },
             ].map((c, i) => (
               <div key={c.label} className={`rounded-xl p-4 border ${i === 0 ? "bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border-gold/25" : "bg-white border-gray-200"}`}>
@@ -297,7 +319,7 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-gray-500">A linha de cada cartão são as últimas {chartWeeks.length} semanas; o ponto é a semana escolhida. Avaliações novas: contar na ficha da Google (ainda não há registo com data).</p>
+          <p className="text-[11px] text-gray-500">A linha de cada cartão são as últimas {cardChartWeeks.length} semanas{sameDays ? `, cada uma só de ${sameDays}, para comparar o mesmo número de dias` : ""}; o ponto é a semana escolhida. Avaliações novas: contar na ficha da Google (ainda não há registo com data).</p>
         </section>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -375,7 +397,7 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
           </div>
           <p className="px-4 py-2 text-[11px] text-gray-500 border-t border-gray-100">
             {insights.baselineWeeks
-              ? `Comparado com a média das ${insights.baselineWeeks} semanas anteriores com fechos (conta como diferente a partir de 10%).`
+              ? `Comparado com a média das ${insights.baselineWeeks} semanas anteriores com fechos${sameDays ? `, só nos mesmos dias (${sameDays})` : ""} (conta como diferente a partir de 10%).`
               : "Ainda não há semanas anteriores para comparar."}{" "}
             Os serviços olham para os 90 dias até {dm(to)}, porque numa semana só há poucos contactos de cada.
           </p>
