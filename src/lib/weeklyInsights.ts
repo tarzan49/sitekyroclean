@@ -61,7 +61,7 @@ const SERVICE_ACTIONS: Record<string, string> = {
 const QUIZ_MIN_QUOTES = 10;
 
 /**
- * `sameDays` ("seg a qua"): a semana está a meio e `weeks` traz só esses dias de
+ * `sameDays` ("seg a qua até às 12:41"): a semana está a meio e `weeks` traz só esses dias, até essa hora, de
  * cada semana (dono, 14/10: "não faz sentido comparar dois dias com uma semana completa").
  */
 export function computeWeekInsights(weeks: WeekRow[], ranking90: ServiceRankRow[], quiz90?: CloseRateCount, sameDays?: string): WeekInsights {

@@ -63,26 +63,31 @@ describe('aba Fechos do CRM', () => {
     expect((screen.getByRole('button', { name: 'Semana seguinte' }) as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('na semana em curso compara com os mesmos dias da semana anterior, não com a semana inteira', async () => {
+  it('na semana em curso compara com os mesmos dias e a mesma hora da semana anterior, não com a semana inteira', async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date('2026-10-14T12:00:00Z')); // quarta-feira
+    vi.setSystemTime(new Date('2026-10-14T12:00:00Z')); // quarta-feira, 13h00 em Lisboa
     try {
-      // Esta semana: 1 fecho na segunda. A anterior: 1 na segunda e 2 na sexta.
+      const at = (r: ReturnType<typeof row>, iso: string) => ({ ...r, booked_at: iso, created_at: iso });
+      // Esta semana: segunda e quarta de manhã. A anterior: segunda, quarta de manhã, quarta
+      // depois da hora de agora e duas na sexta. Até quarta às 13h00: 2 contra 2.
       const services = [
         row('1', '2026-10-12', 100, 'Limpeza sofá'),
-        row('2', '2026-10-05', 100, 'Limpeza sofá'),
-        row('3', '2026-10-09', 100, 'Limpeza sofá'),
-        row('4', '2026-10-09', 100, 'Limpeza sofá'),
+        at(row('2', '2026-10-14', 100, 'Limpeza sofá'), '2026-10-14T09:00:00Z'),
+        row('3', '2026-10-05', 100, 'Limpeza sofá'),
+        at(row('4', '2026-10-07', 100, 'Limpeza sofá'), '2026-10-07T09:00:00Z'),
+        at(row('5', '2026-10-07', 100, 'Limpeza sofá'), '2026-10-07T15:00:00Z'),
+        row('6', '2026-10-09', 100, 'Limpeza sofá'),
+        row('7', '2026-10-09', 100, 'Limpeza sofá'),
       ];
       render(<CrmClosings records={services} services={services} />);
       expect(await screen.findByText(/Semana em curso/)).toBeTruthy();
       expect(screen.getAllByText('igual à anterior').length).toBeGreaterThan(0);
-      expect(screen.queryByText(/-2 vs/)).toBeNull();
-      expect(screen.getByText(/cada uma só de seg a qua/)).toBeTruthy();
+      expect(screen.queryByText(/-1 vs/)).toBeNull();
+      expect(screen.getByText(/cada uma só de seg a qua até às 13:00/)).toBeTruthy();
       // A semana anterior, inteira, compara com a semana inteira.
       fireEvent.click(screen.getByRole('button', { name: 'Semana anterior' }));
-      expect(screen.getByText('300€ faturado')).toBeTruthy();
-      expect(screen.getByText('+3 vs semana anterior')).toBeTruthy();
+      expect(screen.getByText('500€ faturado')).toBeTruthy();
+      expect(screen.getByText('+5 vs semana anterior')).toBeTruthy();
     } finally {
       vi.useRealTimers();
     }

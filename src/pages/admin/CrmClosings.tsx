@@ -6,6 +6,7 @@ import { closedDay, type ServiceRow } from "@/lib/googleAdsResults";
 import { computeWeeklyReview, mondayOf, RANKING_MIN_CONTACTS, type RankingClient, type ServiceRankRow, type WeekRow } from "@/lib/weeklyReview";
 import { closeRateRankRows, computeServiceCloseRates, missingFor, QUIZ_CLOSE_RATE_GOAL, type CloseRateCount } from "@/lib/crmServiceCloseRate";
 import type { QuizSummary } from "@/lib/crmQuizLeads";
+import { lisbonMinutes } from "@/lib/clientFollowUp";
 import { atStake, CLOSE_RATE_GOAL, computeWeekInsights, missingForGoal } from "@/lib/weeklyInsights";
 
 // Aba "Fechos" do CRM. Desde 2026-10-13 junta a antiga aba "Métricas" (dono:
@@ -53,6 +54,8 @@ const dayLabel = (day: string) => DAY_FMT.format(new Date(`${day}T12:00:00Z`));
 const DAY_LONG_FMT = new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" });
 const noon = (day: string) => new Date(`${day}T12:00:00Z`);
+/** Minutos desde segunda às 0h, hora de Lisboa. */
+const weekMinutes = (iso: string) => weekdayOf(lisbonDay(iso)) * 1440 + lisbonMinutes(new Date(iso));
 const daysBetween = (from: string, to: string) => Math.round((noon(to).getTime() - noon(from).getTime()) / 86_400_000);
 
 interface Hover { chart: "weekday" | "day" | "week"; index: number }
@@ -173,20 +176,30 @@ const CrmClosings = ({ records, services, quiz = null, onEdit, onTogglePaid }: C
     () => computeWeeklyReview({ services, clients: clients ?? [], adsStats }, noon(addDays(thisMonday, 7)), HISTORY_WEEKS),
     [services, clients, adsStats, thisMonday],
   );
-  // Semana em curso: só de segunda até hoje, e as outras semanas com os mesmos dias
-  // (dono, 14/10: "não faz sentido comparar dois dias com uma semana completa").
+  // Semana em curso: só de segunda até agora, e as outras semanas até ao mesmo dia e à mesma
+  // hora (dono, 14/10: "não faz sentido comparar dois dias com uma semana completa"; "em
+  // relação à hora específica de quarta há uma semana"). Quarta às 12h41 compara com as
+  // quartas às 12h41, não com as quartas inteiras.
   const lastWeekday = weekdayOf(today);
+  const cutMinutes = lastWeekday * 1440 + lisbonMinutes(now);
   const partial = period === "week" && week === thisMonday && lastWeekday < 6;
-  const sameDays = partial ? (lastWeekday === 0 ? "só segunda" : `seg a ${WEEKDAY_SHORT[lastWeekday].toLowerCase()}`) : undefined;
+  const sameDays = partial ? `${lastWeekday === 0 ? "seg" : `seg a ${WEEKDAY_SHORT[lastWeekday].toLowerCase()}`} até às ${TIME_FMT.format(now)}` : undefined;
   const partialWeeks: WeekRow[] = useMemo(
     () => (partial
       ? computeWeeklyReview({
-          services: services.filter(s => weekdayOf(closedDay(s)) <= lastWeekday),
+          services: services.filter(s => weekMinutes(s.booked_at ?? s.created_at) <= cutMinutes),
           clients: clients ?? [],
-          adsStats: adsStats.filter(a => weekdayOf(a.stat_date) <= lastWeekday),
+          // O gasto do Google é por dia: no dia de hoje das semanas anteriores conta a parte do
+          // dia que já passou hoje (o de hoje já vem parcial).
+          adsStats: adsStats.flatMap(a => {
+            const wd = weekdayOf(a.stat_date);
+            if (wd > lastWeekday) return [];
+            if (wd < lastWeekday || a.stat_date === today) return [a];
+            return [{ ...a, cost: (Number(a.cost) || 0) * ((cutMinutes - wd * 1440) / 1440) }];
+          }),
         }, noon(addDays(thisMonday, 7)), HISTORY_WEEKS)
       : []),
-    [partial, services, clients, adsStats, thisMonday, lastWeekday],
+    [partial, services, clients, adsStats, thisMonday, lastWeekday, cutMinutes, today],
   );
   const cardWeeks = partial ? partialWeeks : allWeeks;
   const firstWeekWithData = allWeeks.find(w => w.closes > 0 || w.spend > 0)?.week ?? thisMonday;
