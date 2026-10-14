@@ -1251,14 +1251,15 @@ function ownerUpsellOf(r) {
 // src/lib/teamAccounts.ts
 var REVIEW_PENALTY_SHARE = 0.05;
 var REVIEW_PENALTY_FROM = UPSELL_TIERS_FROM;
+var REVIEW_PENALTY_FROM_BY_TEAM = { "Porto 1": "", "Porto 2": "2026-10-15" };
+var REVIEW_PENALTY_LABEL = { "Porto 2": "sem fotos antes e depois e avaliação" };
+var INVOICE_VAT = 0.23;
 function reviewPenaltyApplies(team, day) {
-  return team.startsWith("Porto") || day >= REVIEW_PENALTY_FROM;
+  return day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
 }
 var round23 = (n) => Math.round(n * 100) / 100;
 var euros = (n) => `${round23(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
 var dm = (date) => `${date.slice(8, 10)}/${date.slice(5, 7)}`;
-var WEEKDAYS2 = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
-var weekday2 = (date) => WEEKDAYS2[(/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay()];
 function labelOf(r) {
   const name = (r.client_name ?? "").trim();
   const city = (r.city ?? "").trim();
@@ -1269,16 +1270,27 @@ function ownerShareOf(r) {
   return round23((Number(r.my_cut) || 0) + ownerUpsellOf(r));
 }
 var sum = (lines) => round23(lines.reduce((s, l) => s + l.amount, 0));
-var lineText = (l) => `${l.label}: ${euros(l.amount)}${l.reviewPenalty ? ` (inclui ${euros(l.reviewPenalty)} dos 5% sem avaliação)` : ""}`;
+function lineBlock(l, team) {
+  const head = [dm(l.date), l.label, l.what].filter(Boolean).join(" · ");
+  if (l.billed === void 0 || l.share === void 0) return [`${head}: ${euros(l.amount)}`];
+  const parts = [`a minha parte ${euros(l.share)}`];
+  if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
+  if (l.vat) parts.push(`IVA 23% ${euros(l.vat)}`);
+  return [head, `Serviço ${euros(l.billed)} · ${parts.join(" + ")} = deves-me ${euros(l.amount)}`];
+}
 function teamMessage(a) {
-  const out = [`Contas de ${weekday2(a.date)}, ${dm(a.date)} (${a.team})`, ""];
+  const out = [`Contas até ${dm(a.date)} (${a.team})`, ""];
   if (a.today.length) {
-    out.push("Hoje:", ...a.today.map(lineText), `Total de hoje: ${euros(a.todayTotal)}`);
+    out.push(`Serviços de ${dm(a.date)}:`, "");
+    for (const l of a.today) out.push(...lineBlock(l, a.team), "");
+    out.push(`Total de ${dm(a.date)}: ${euros(a.todayTotal)}`);
   } else {
-    out.push("Hoje: nenhum serviço por pagar.");
+    out.push(`${dm(a.date)}: nenhum serviço por pagar.`);
   }
   if (a.before.length) {
-    out.push("", "Para trás:", ...a.before.map((l) => `${dm(l.date)} ${lineText(l)}`), `Total para trás: ${euros(a.beforeTotal)}`);
+    out.push("", "Por pagar de dias anteriores:", "");
+    for (const l of a.before) out.push(...lineBlock(l, a.team), "");
+    out.push(`Total de dias anteriores: ${euros(a.beforeTotal)}`);
   }
   out.push("", `Total que me devem: ${euros(a.total)}`);
   return out.join("\n");
@@ -1293,7 +1305,19 @@ function teamAccounts(rows, events, date) {
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
-    const line = { date: r.request_date, label: labelOf(r), amount: round23(share + penalty), ...penalty ? { reviewPenalty: penalty } : {} };
+    const billed = Number(r.billed_value) || 0;
+    const vat = r.invoiced ? round23(billed * INVOICE_VAT) : 0;
+    const what = (r.description ?? "").trim();
+    const line = {
+      date: r.request_date,
+      label: labelOf(r),
+      amount: round23(share + penalty + vat),
+      billed,
+      share,
+      ...what ? { what } : {},
+      ...penalty ? { reviewPenalty: penalty } : {},
+      ...vat ? { vat } : {}
+    };
     if (!team) {
       unassigned.push(line);
       continue;
