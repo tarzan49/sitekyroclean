@@ -9,13 +9,16 @@
 // calendário, que é o dono que escolhe; uma linha sem evento ou sem equipa não
 // vai para ninguém e aparece no resumo do dono para ele a resolver.
 //
-// Avaliação (dono, 2026-10-14): a equipa que não pede a avaliação ao cliente
-// perde 5% do valor do serviço, que passa para o dono. Na Porto 1 conta desde
-// sempre; na Porto 2 a partir de 15/10 (dono: "no Porto 2 ainda não conta
-// isso", e as regras explicadas ao Aleixo a 14/10: fotografias antes e depois
-// e avaliação de 5 estrelas = 50%, sem isso 45%); nas outras equipas desde
-// 19/10/2026, o dia do guião das equipas. O dono marca no CRM os serviços em
-// que o procedimento foi feito (`review_requested`); sem marca, os 5% somam-se.
+// Avaliação: os 5% automáticos por "avaliação pedida" estão desligados desde a
+// noite de 14/10 (dono: "acho que faz mais sentido se for por serviço"). O
+// modelo novo (fotografias, vídeo e avaliação por serviço) vai ser medido pelo
+// bot do procedimento; até lá, nada se soma sozinho. Os 5% já combinados no
+// grupo do Porto (lotes até 10/10 e 13/10) entram como acertos
+// (`team_account_adjustments`), que aparecem nas contas até serem saldados.
+//
+// Pago ao dono (`paid_to_owner`, ex. LovelyStay por transferência depois da
+// fatura): a equipa não deve nada desse serviço; a mensagem diz que o dono lhe
+// entrega a parte dela quando o pagamento cair.
 //
 // Fatura (dono, 2026-10-14, Bruval: "vou adicionar ao preço o IVA", "é um
 // valor que tem que ser entregue a mim"): num serviço com fatura (`invoiced`)
@@ -44,9 +47,12 @@ const REVIEW_PENALTY_LABEL: Record<string, string> = { 'Porto 2': 'sem fotos ant
 /** IVA de um serviço com fatura: vai por cima do valor e é do dono. */
 export const INVOICE_VAT = 0.23;
 
-/** Os 5% contam neste serviço? Porto 1 sempre, Porto 2 desde 15/10, as outras equipas desde REVIEW_PENALTY_FROM. */
+/** Desligado a 14/10 à noite (dono): o modelo por serviço vai ser medido pelo bot do procedimento. */
+export const REVIEW_PENALTY_ENABLED = false;
+
+/** Os 5% contam neste serviço? Só com REVIEW_PENALTY_ENABLED; então Porto 1 sempre, Porto 2 desde 15/10, as outras equipas desde REVIEW_PENALTY_FROM. */
 export function reviewPenaltyApplies(team: string, day: string): boolean {
-  return day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
+  return REVIEW_PENALTY_ENABLED && day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
 }
 
 export interface AccountRow {
@@ -64,7 +70,12 @@ export interface AccountRow {
   review_requested?: boolean | null;
   description?: string | null;
   invoiced?: boolean | null;
+  /** O cliente paga ao dono (transferência): a equipa não deve nada deste serviço. */
+  paid_to_owner?: boolean | null;
 }
+
+/** Um valor combinado com a equipa que não é um serviço (team_account_adjustments, por saldar). */
+export interface AccountAdjustment { team: string; day: string; label: string; amount: number }
 
 export interface AccountEvent extends AvailabilityEvent { id: string }
 
@@ -91,6 +102,10 @@ export interface TeamAccount {
   before: AccountLine[];
   todayTotal: number;
   beforeTotal: number;
+  /** Acertos combinados (não são serviços), já dentro de total. */
+  adjustments: AccountLine[];
+  /** Serviços pagos ao dono: ele deve à equipa a parte dela (amount = parte da equipa). Fora de total. */
+  ownerOwes: AccountLine[];
   total: number;
   /** A mensagem para a equipa, em português. */
   message: string;
@@ -150,13 +165,27 @@ function teamMessage(a: Omit<TeamAccount, 'message'>): string {
     for (const l of a.before) out.push(...lineBlock(l, a.team), '');
     out.push(`Total de dias anteriores: ${euros(a.beforeTotal)}`);
   }
+  if (a.adjustments.length) {
+    out.push('', 'Acertos combinados:');
+    for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
+  }
   out.push('', `Total que me devem: ${euros(a.total)}`);
+  if (a.ownerOwes.length) {
+    out.push('', 'Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):');
+    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label}: ${euros(l.amount)}`);
+  }
   return out.join('\n');
 }
 
-export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: string): TeamAccountsReport {
+export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: string, adjustments: AccountAdjustment[] = []): TeamAccountsReport {
   const teamOfEvent = new Map(events.map(e => [e.id, eventTeam(e)]));
-  const byTeam = new Map<string, { today: AccountLine[]; before: AccountLine[] }>();
+  type Bucket = { today: AccountLine[]; before: AccountLine[]; adjustments: AccountLine[]; ownerOwes: AccountLine[] };
+  const byTeam = new Map<string, Bucket>();
+  const bucketOf = (team: string) => {
+    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [] };
+    byTeam.set(team, b);
+    return b;
+  };
   const unassigned: AccountLine[] = [];
 
   const owed = rows
@@ -168,6 +197,11 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const share = ownerShareOf(r);
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    if (r.paid_to_owner) {
+      const teamPart = round2((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
+      if (team && teamPart > 0) bucketOf(team).ownerOwes.push({ date: r.request_date!, label: labelOf(r), amount: teamPart });
+      continue;
+    }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date!)
       ? round2((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
     const billed = Number(r.billed_value) || 0;
@@ -178,15 +212,19 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
       ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}), ...(vat ? { vat } : {}),
     };
     if (!team) { unassigned.push(line); continue; }
-    const bucket = byTeam.get(team) ?? { today: [], before: [] };
+    const bucket = bucketOf(team);
     (line.date === date ? bucket.today : bucket.before).push(line);
-    byTeam.set(team, bucket);
+  }
+
+  for (const a of adjustments) {
+    if (a.day > date || !(Number(a.amount) > 0)) continue;
+    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round2(Number(a.amount)) });
   }
 
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {
-      team, date, today: b.today, before: b.before,
-      todayTotal: sum(b.today), beforeTotal: sum(b.before), total: sum([...b.today, ...b.before]),
+      team, date, today: b.today, before: b.before, adjustments: b.adjustments, ownerOwes: b.ownerOwes,
+      todayTotal: sum(b.today), beforeTotal: sum(b.before), total: sum([...b.today, ...b.before, ...b.adjustments]),
     };
     return { ...base, message: teamMessage(base) };
   }).filter(t => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));

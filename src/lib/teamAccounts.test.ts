@@ -81,17 +81,27 @@ describe('teamAccounts', () => {
     expect(r.teams[0].message).toContain('42,50€');
   });
 
-  it('5% without the review: Porto 1 always, Porto 2 from 15/10, other teams from 19/10', () => {
+  it('no automatic 5% since 14/10 at night: the agreed ones come as adjustments', () => {
     const noReview = { review_requested: false, billed_value: 80, my_cut: 40 };
-    const porto1 = teamAccounts([row({ ...noReview, calendar_event_id: 'e3' })], events, '2026-10-13');
-    expect(porto1.teams[0].todayTotal).toBe(44);
-    expect(porto1.teams[0].message).toContain('Serviço 80€ · a minha parte 40€ + 5% sem avaliação 4€ = deves-me 44€');
-    expect(teamAccounts([row({ ...noReview, calendar_event_id: 'e5', request_date: '2026-10-14' })], events, '2026-10-14').teams[0].todayTotal).toBe(40);
-    const porto2 = teamAccounts([row({ ...noReview, calendar_event_id: 'e5', request_date: '2026-10-15' })], events, '2026-10-15');
-    expect(porto2.teams[0].message).toContain('+ 5% sem fotos antes e depois e avaliação 4€ = deves-me 44€');
-    expect(teamAccounts([row(noReview)], events, '2026-10-13').teams[0].todayTotal).toBe(40);
-    expect(teamAccounts([row({ ...noReview, request_date: '2026-10-19' })], events, '2026-10-19').teams[0].todayTotal).toBe(44);
-    expect(teamAccounts([row({ calendar_event_id: 'e3', billed_value: 80, my_cut: 40 })], events, '2026-10-13').teams[0].todayTotal).toBe(40);
+    const r = teamAccounts([row({ ...noReview, calendar_event_id: 'e3' })], events, '2026-10-13', [
+      { team: 'Porto 1', day: '2026-10-10', label: 'Avaliações, lote até 10/10', amount: 85 },
+      { team: 'Porto 1', day: '2026-10-20', label: 'Ainda não', amount: 10 },
+    ]);
+    expect(r.teams[0].todayTotal).toBe(40);
+    expect(r.teams[0].total).toBe(125);
+    expect(r.teams[0].message).toContain('Acertos combinados:\nAvaliações, lote até 10/10: 85€');
+    expect(r.teams[0].message).not.toContain('Ainda não');
+    expect(r.teams[0].message).not.toContain('5%');
+  });
+
+  it('a service paid to the owner is not owed by the team: he owes them their part', () => {
+    const r = teamAccounts([
+      row({ calendar_event_id: 'e3' }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 89, my_cut: 45, paid_to_owner: true }),
+    ], events, '2026-10-13');
+    expect(r.teams[0].total).toBe(40);
+    expect(r.teams[0].ownerOwes).toEqual([{ date: '2026-10-13', label: 'Sofia Teste, Porto', amount: 44 }]);
+    expect(r.teams[0].message).toContain('Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):\n13/10 Sofia Teste, Porto: 44€');
   });
 
   it('with an invoice the 23% VAT goes on top and is all the owner\'s', () => {

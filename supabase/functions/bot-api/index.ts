@@ -107,7 +107,7 @@ export interface BotEnv {
   holds?: HoldStore | null;
   writeCalendar?: CalendarWriter | null;
   /** CRM rows for `team-accounts` (service_requests). */
-  accounts?: (() => Promise<{ rows: Row[] } | { error: string }>) | null;
+  accounts?: (() => Promise<{ rows: Row[]; adjustments?: Row[] } | { error: string }>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -400,7 +400,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const [cal, crm] = await Promise.all([env.calendar(), env.accounts()]);
       if ("error" in cal) return createErrorResponse(cal.error, 502);
       if ("error" in crm) return createErrorResponse(crm.error, 502);
-      return createSuccessResponse({ accounts: teamAccounts(crm.rows, cal.events, date) });
+      return createSuccessResponse({ accounts: teamAccounts(crm.rows, cal.events, date, crm.adjustments ?? []) });
     }
     case "owner-booking":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
@@ -709,7 +709,7 @@ function supabaseLeads(): LeadsStore | null {
   };
 }
 
-const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since, review_requested, description, invoiced";
+const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since, review_requested, description, invoiced, paid_to_owner";
 /** The CRM services still unpaid, for `team-accounts`. */
 function supabaseAccounts(): BotEnv["accounts"] {
   const url = Deno.env.get("SUPABASE_URL");
@@ -717,8 +717,13 @@ function supabaseAccounts(): BotEnv["accounts"] {
   if (!url || !key) return null;
   const client = createClient(url, key);
   return async () => {
-    const { data, error } = await client.from("service_requests").select(ACCOUNT_COLUMNS).eq("paid", false);
-    return error ? { error: error.message } : { rows: (data ?? []) as Row[] };
+    const [{ data, error }, adj] = await Promise.all([
+      client.from("service_requests").select(ACCOUNT_COLUMNS).eq("paid", false),
+      client.from("team_account_adjustments").select("team, day, label, amount").is("settled_at", null),
+    ]);
+    if (error) return { error: error.message };
+    // Os acertos não travam as contas: se a tabela falhar, saem só os serviços.
+    return { rows: (data ?? []) as Row[], adjustments: (adj.error ? [] : adj.data ?? []) as Row[] };
   };
 }
 

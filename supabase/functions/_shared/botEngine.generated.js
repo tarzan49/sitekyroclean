@@ -1254,8 +1254,9 @@ var REVIEW_PENALTY_FROM = UPSELL_TIERS_FROM;
 var REVIEW_PENALTY_FROM_BY_TEAM = { "Porto 1": "", "Porto 2": "2026-10-15" };
 var REVIEW_PENALTY_LABEL = { "Porto 2": "sem fotos antes e depois e avaliação" };
 var INVOICE_VAT = 0.23;
+var REVIEW_PENALTY_ENABLED = false;
 function reviewPenaltyApplies(team, day) {
-  return day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
+  return REVIEW_PENALTY_ENABLED && day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
 }
 var round23 = (n) => Math.round(n * 100) / 100;
 var euros = (n) => `${round23(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
@@ -1292,18 +1293,36 @@ function teamMessage(a) {
     for (const l of a.before) out.push(...lineBlock(l, a.team), "");
     out.push(`Total de dias anteriores: ${euros(a.beforeTotal)}`);
   }
+  if (a.adjustments.length) {
+    out.push("", "Acertos combinados:");
+    for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
+  }
   out.push("", `Total que me devem: ${euros(a.total)}`);
+  if (a.ownerOwes.length) {
+    out.push("", "Pagos a mim por transferência (entrego-vos a vossa parte quando o pagamento cair):");
+    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label}: ${euros(l.amount)}`);
+  }
   return out.join("\n");
 }
-function teamAccounts(rows, events, date) {
+function teamAccounts(rows, events, date, adjustments = []) {
   const teamOfEvent = new Map(events.map((e) => [e.id, eventTeam(e)]));
   const byTeam = /* @__PURE__ */ new Map();
+  const bucketOf = (team) => {
+    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [] };
+    byTeam.set(team, b);
+    return b;
+  };
   const unassigned = [];
   const owed = rows.filter((r) => !r.paid && r.request_date && r.request_date <= date && !r.calendar_missing_since).filter((r) => (Number(r.billed_value) || 0) > 0 || (Number(r.upsell_value) || 0) > 0).sort((a, b) => a.request_date.localeCompare(b.request_date));
   for (const r of owed) {
     const share = ownerShareOf(r);
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    if (r.paid_to_owner) {
+      const teamPart = round23((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
+      if (team && teamPart > 0) bucketOf(team).ownerOwes.push({ date: r.request_date, label: labelOf(r), amount: teamPart });
+      continue;
+    }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
     const billed = Number(r.billed_value) || 0;
     const vat = r.invoiced ? round23(billed * INVOICE_VAT) : 0;
@@ -1322,9 +1341,12 @@ function teamAccounts(rows, events, date) {
       unassigned.push(line);
       continue;
     }
-    const bucket = byTeam.get(team) ?? { today: [], before: [] };
+    const bucket = bucketOf(team);
     (line.date === date ? bucket.today : bucket.before).push(line);
-    byTeam.set(team, bucket);
+  }
+  for (const a of adjustments) {
+    if (a.day > date || !(Number(a.amount) > 0)) continue;
+    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round23(Number(a.amount)) });
   }
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {
@@ -1332,9 +1354,11 @@ function teamAccounts(rows, events, date) {
       date,
       today: b.today,
       before: b.before,
+      adjustments: b.adjustments,
+      ownerOwes: b.ownerOwes,
       todayTotal: sum(b.today),
       beforeTotal: sum(b.before),
-      total: sum([...b.today, ...b.before])
+      total: sum([...b.today, ...b.before, ...b.adjustments])
     };
     return { ...base, message: teamMessage(base) };
   }).filter((t) => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));
