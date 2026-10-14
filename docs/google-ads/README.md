@@ -29,6 +29,17 @@ lugares desde 49/69/79 €, impermeabilização desde 59 €), mensagem de Whats
 campanha "porto" e "lisboa". As chamadas não contam a dobrar: "Clicks to call"
 não está incluída nos objetivos da conta.
 
+**Atualização 14/10/2026 (dono).** Braga passou a **20 €/dia**. Há uma quarta campanha, **Coimbra**
+(id `24347923170`, 20 €/dia, limite de 2 € por clique, todos os dias, só "Presença", português),
+criada com `campanha-coimbra.csv`, que `gerar-csv-coimbra.py` gera a partir do de Braga: quatro grupos,
+limpeza e impermeabilização para Coimbra e Figueira da Foz. Localizações: "Coimbra,Coimbra District,Portugal"
+e "Figueira da Foz,Coimbra District,Portugal" (no carregamento em massa, "Coimbra, Coimbra, Portugal"
+é recusado: o formato aceite é o que o próprio erro sugere). Negativas de campanha porto, lisboa, braga,
+aveiro, leiria, e a lista partilhada. O orçamento de Braga e as localizações foram mudados por
+carregamento em massa (`coimbra-localizacoes-e-braga-20.csv`), que não pede a confirmação de identidade
+que o botão Guardar do orçamento pede. Ainda sem recursos próprios em Coimbra (sitelinks, mensagem de
+WhatsApp, imagens, tabela de preços).
+
 ---
 
 ## 1. A concorrência, preços reais lidos nos sites deles
