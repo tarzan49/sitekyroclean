@@ -1386,7 +1386,14 @@ function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
   if (rule === "review_bonus") return { teamShare: media ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: media && got.review ? PROCEDURE_REVIEW_BONUS : 0 };
   return { teamShare: media && got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };
 }
-var PROCEDURE_FROM_BY_TEAM = { "Porto 1": "2026-10-15", "Porto 2": "2026-10-15" };
+var PROCEDURE_FROM_BY_TEAM = {
+  "Porto 1": "2026-10-15",
+  "Porto 2": "2026-10-15",
+  "Lisboa 1": "2026-10-15",
+  "Lisboa 2": "2026-10-15",
+  "Algarve": "2026-10-15",
+  "Coimbra": "2026-10-15"
+};
 var procedureFrom = (team) => PROCEDURE_FROM_BY_TEAM[team] ?? UPSELL_TIERS_FROM;
 var REVIEW_LINKS = {
   lisboa: "https://g.page/r/CRc7F7lX3xcEECE/review",

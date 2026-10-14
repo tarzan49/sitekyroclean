@@ -76,12 +76,14 @@ describe('the pay rule lives in one function', () => {
 });
 
 describe('when the procedure counts', () => {
-  it('only with the bot message, from 15/10 in Porto and 19/10 in the other teams', () => {
+  it('only with the bot message, from 15/10 in the teams told on 14/10 and 19/10 in Braga', () => {
     expect(procedureApplies(rec())).toBe(true);
     expect(procedureApplies(rec({ prompted_at: null }))).toBe(false);
     expect(procedureApplies(rec({ service_day: '2026-10-14' }))).toBe(false);
-    expect(procedureApplies(rec({ team: 'Lisboa 1', service_day: '2026-10-18' }))).toBe(false);
-    expect(procedureApplies(rec({ team: 'Lisboa 1', service_day: '2026-10-19' }))).toBe(true);
+    expect(procedureApplies(rec({ team: 'Lisboa 1', service_day: '2026-10-15' }))).toBe(true);
+    expect(procedureApplies(rec({ team: 'Coimbra', service_day: '2026-10-15' }))).toBe(true);
+    expect(procedureApplies(rec({ team: 'Braga', service_day: '2026-10-18' }))).toBe(false);
+    expect(procedureApplies(rec({ team: 'Braga', service_day: '2026-10-19' }))).toBe(true);
   });
 });
 

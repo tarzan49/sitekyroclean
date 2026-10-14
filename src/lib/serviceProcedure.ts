@@ -68,7 +68,12 @@ export function procedurePay(got: { before: boolean; after: boolean; video: bool
  * 19/10, o dia do guião. Só conta num serviço que recebeu a mensagem do bot
  * (`prompted_at`): sem ela a equipa não tinha a que responder.
  */
-const PROCEDURE_FROM_BY_TEAM: Record<string, string> = { 'Porto 1': '2026-10-15', 'Porto 2': '2026-10-15' };
+// Dono, 14/10: "liga o envio". As regras foram mandadas a 14/10 ao Porto, a
+// Lisboa (com o Algarve no mesmo grupo) e a Coimbra: começam a 15/10. Braga
+// (Clivia) ainda não as recebeu: fica na data do guião (UPSELL_TIERS_FROM).
+const PROCEDURE_FROM_BY_TEAM: Record<string, string> = {
+  'Porto 1': '2026-10-15', 'Porto 2': '2026-10-15', 'Lisboa 1': '2026-10-15', 'Lisboa 2': '2026-10-15', 'Algarve': '2026-10-15', 'Coimbra': '2026-10-15',
+};
 export const procedureFrom = (team: string) => PROCEDURE_FROM_BY_TEAM[team] ?? UPSELL_TIERS_FROM;
 
 /** Fichas do Google: as equipas de Lisboa pedem na ficha de Lisboa, as outras na do Porto. */
