@@ -14,18 +14,19 @@ export const REVIEW_MIN_STARS = 4;
 export const REVIEW_DEADLINE_DAYS = 7;
 
 /**
- * Metas do mês por ficha (dono, 2026-10-14): o total que a ficha mostra no
- * Google no último dia do mês, contando todas as avaliações (é o número que o
- * Google mostra). Lisboa: 60 (50€ a cada um da equipa Lisboa); Porto: 170
- * (50€ a cada um do Porto 1). A ficha do Porto também recebe as do Algarve,
- * de Braga e de Coimbra.
+ * Metas do dono por ficha: o total que a ficha mostra no Google no último dia
+ * do mês, contando todas as avaliações (é o número que o Google mostra). A
+ * ficha do Porto também recebe as do Algarve, de Braga e de Coimbra. Já não há
+ * prémio para as equipas (dono, 14/10: "esqueçam as metas"; cada avaliação
+ * passou a valer 5€ no serviço, ver procedurePay em serviceProcedure.ts): ficam
+ * só como meta dele.
  */
-export const REVIEW_GOALS: { profile: ReviewProfile; month: string; total: number; reward: string }[] = [
-  { profile: 'porto', month: '2026-10', total: 170, reward: '50€ a cada um do Porto 1' },
-  { profile: 'lisboa', month: '2026-10', total: 60, reward: '50€ a cada um da equipa Lisboa' },
+export const REVIEW_GOALS: { profile: ReviewProfile; month: string; total: number }[] = [
+  { profile: 'porto', month: '2026-10', total: 170 },
+  { profile: 'lisboa', month: '2026-10', total: 60 },
 ];
 
-export interface GoalProgress { profile: ReviewProfile; month: string; total: number; reward: string; current: number; missing: number }
+export interface GoalProgress { profile: ReviewProfile; month: string; total: number; current: number; missing: number }
 
 /** Quanto falta para cada meta do mês: todas as avaliações da ficha até agora (as excluídas também, o Google conta-as). */
 export function goalProgress(reviews: GoogleReview[], month: string): GoalProgress[] {

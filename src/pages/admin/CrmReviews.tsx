@@ -123,7 +123,7 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
               <div className="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
                 <div className="h-full bg-[#D4AF37]" style={{ width: `${Math.min(100, (g.current / g.total) * 100)}%` }} />
               </div>
-              <p className="mt-1.5 text-xs text-gray-500">{g.missing > 0 ? `Faltam ${g.missing}. ` : "Meta atingida. "}Prémio: {g.reward}.</p>
+              <p className="mt-1.5 text-xs text-gray-500">{g.missing > 0 ? `Faltam ${g.missing}.` : "Meta atingida."}</p>
             </div>
           ))}
         </div>

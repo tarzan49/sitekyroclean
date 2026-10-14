@@ -44,6 +44,14 @@ describe('checkProcedure', () => {
 
 describe('the pay rule lives in one function', () => {
   const all = { before: true, after: true, video: true, review: true };
+  it("'review_compensates' (in force): the four = 50% + 5€, a review makes up for missing media, neither = 45%", () => {
+    expect(procedurePay(all)).toEqual({ teamShare: 50, bonus: 5 });
+    expect(procedurePay({ ...all, review: false })).toEqual({ teamShare: 50, bonus: 0 });
+    expect(procedurePay({ ...all, video: false })).toEqual({ teamShare: 50, bonus: 0 });
+    expect(procedurePay({ before: false, after: false, video: false, review: true })).toEqual({ teamShare: 50, bonus: 0 });
+    expect(procedurePay({ ...all, video: false, review: false })).toEqual({ teamShare: 45, bonus: 0 });
+    expect(procedurePay({ ...all, before: false, review: false })).toEqual({ teamShare: 45, bonus: 0 });
+  });
   it("'review_in_50': the four = 50%, anything missing = 45%", () => {
     expect(procedurePay(all, 'review_in_50')).toEqual({ teamShare: 50, bonus: 0 });
     expect(procedurePay({ ...all, review: false }, 'review_in_50')).toEqual({ teamShare: 45, bonus: 0 });
@@ -58,10 +66,11 @@ describe('the pay rule lives in one function', () => {
     expect(PROCEDURE_PAY_ENABLED).toBe(false);
     expect(procedureAccountDelta(rec(), [], '2026-10-22', 80).delta).toBe(0);
   });
-  it('switched on: 5% of the service once the deadline closes incomplete, nothing while it runs', () => {
+  it('switched on: 5% of the service when the deadline closes with neither, the 5€ owed to the team when complete', () => {
     expect(procedureAccountDelta(rec(), [], '2026-10-21', 80, true).delta).toBe(0);
     expect(procedureAccountDelta(rec(), [], '2026-10-22', 80, true).delta).toBe(4);
-    expect(procedureAccountDelta(rec(media), [five], '2026-10-22', 80, true).delta).toBe(0);
+    expect(procedureAccountDelta(rec(media), [], '2026-10-22', 80, true).delta).toBe(0);
+    expect(procedureAccountDelta(rec(media), [five], '2026-10-18', 80, true).delta).toBe(-5);
     expect(procedureAccountDelta(rec({ prompted_at: null }), [], '2026-10-22', 80, true).delta).toBe(0);
   });
 });
