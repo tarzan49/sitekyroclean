@@ -51,6 +51,12 @@
 //               kind only: no name, address or event title. This is the only
 //               action whose body may pass 20 KB (up to 40 KB, so 800 phones fit
 //               in any format); the bot server sends batches of 300 anyway.
+//   team-accounts what each team owes the owner (2026-10-14, owner: "todos os dias
+//               à meia-noite envias a cada parceiro as contas"): the CRM services
+//               still unpaid up to `date` (default today in Lisbon), by the team in
+//               the calendar's "Equipa: X" line, with a message ready per team
+//               (src/lib/teamAccounts.ts). The client's first name and locality
+//               only, which the team already has in its calendar: no phone or address.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -61,7 +67,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, botAvailability, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -100,6 +106,8 @@ export interface BotEnv {
   followUps?: FollowUpStore | null;
   holds?: HoldStore | null;
   writeCalendar?: CalendarWriter | null;
+  /** CRM rows for `team-accounts` (service_requests). */
+  accounts?: (() => Promise<{ rows: Row[] } | { error: string }>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -384,6 +392,16 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return createErrorResponse("date tem de ser AAAA-MM-DD", 400);
       return createSuccessResponse({ agenda: agendaCheck(cal.events, date, now) });
     }
+    case "team-accounts": {
+      if (!env.calendar || !env.accounts) return createErrorResponse("Contas por ligar", 503);
+      const now = env.now?.() ?? new Date();
+      const date = body.date === undefined ? lisbonDate(now.getTime()) : String(body.date);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return createErrorResponse("date tem de ser AAAA-MM-DD", 400);
+      const [cal, crm] = await Promise.all([env.calendar(), env.accounts()]);
+      if ("error" in cal) return createErrorResponse(cal.error, 502);
+      if ("error" in crm) return createErrorResponse(crm.error, 502);
+      return createSuccessResponse({ accounts: teamAccounts(crm.rows, cal.events, date) });
+    }
     case "owner-booking":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       return await ownerBooking(body, env);
@@ -421,7 +439,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, sweep-holds, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, team-accounts, sweep-holds, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
@@ -691,6 +709,19 @@ function supabaseLeads(): LeadsStore | null {
   };
 }
 
+const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since";
+/** The CRM services still unpaid, for `team-accounts`. */
+function supabaseAccounts(): BotEnv["accounts"] {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  return async () => {
+    const { data, error } = await client.from("service_requests").select(ACCOUNT_COLUMNS).eq("paid", false);
+    return error ? { error: error.message } : { rows: (data ?? []) as Row[] };
+  };
+}
+
 function supabaseFollowUps(): FollowUpStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -780,5 +811,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts() }));
 }

@@ -445,3 +445,29 @@ Deno.test("notify-owner emails the owner and refuses without subject or text", a
   }), { botKey: KEY, leads: null });
   assertEquals(off.status, 503);
 });
+
+Deno.test("team-accounts: what each team owes, from the CRM and the calendar's team line, never phones", async () => {
+  // Invented data only: the repo is public.
+  const events = [{
+    id: "e1", summary: "Serviço 40€ (79€) Sofá - 912 345 678 - Ana Inventada - Rua X 1", description: "Equipa: Lisboa 1",
+    location: "", startDate: "2026-10-13", created: "", updated: "", status: "CONFIRMED", start: null, end: null,
+  }];
+  const rows = [{
+    request_date: "2026-10-13", client_name: "Ana Inventada", city: "Odivelas", locality: "Lisboa", billed_value: 79,
+    my_cut: 40, upsell_value: 0, upsell_team: null, paid: false, calendar_event_id: "e1", calendar_missing_since: null,
+  }];
+  const call = (body: unknown, accounts: (() => Promise<{ rows: Record<string, unknown>[] } | { error: string }>) | null) =>
+    handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.2.${++ip % 250}` },
+      body: JSON.stringify(body),
+    }), { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events }), accounts, now: () => new Date("2026-10-13T23:05:00Z") });
+  const res = await call({ action: "team-accounts", date: "2026-10-13" }, () => Promise.resolve({ rows }));
+  assertEquals(res.status, 200);
+  const text = await res.text();
+  assert(!text.includes("912"), text);
+  const { accounts } = JSON.parse(text);
+  assertEquals(accounts.teams.map((t: { team: string; total: number }) => [t.team, t.total]), [["Lisboa 1", 40]]);
+  assertEquals((await call({ action: "team-accounts", date: "ontem" }, () => Promise.resolve({ rows }))).status, 400);
+  assertEquals((await call({ action: "team-accounts" }, null)).status, 503);
+});

@@ -192,7 +192,7 @@ function perkChairsFree(qty) {
 }
 var round2 = (n) => Math.round(n * 100) / 100;
 function priceWithPackPerks(lines, mainKind = lines[0]?.kind) {
-  const tableSubtotal = round2(lines.reduce((sum, line) => sum + (line.tablePrice ?? 0), 0));
+  const tableSubtotal = round2(lines.reduce((sum2, line) => sum2 + (line.tablePrice ?? 0), 0));
   const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER;
   const results = lines.map((line) => {
     const isMain = line.kind === mainKind;
@@ -328,7 +328,7 @@ function customPackLine(item) {
 }
 function calculateCustomPack(items, city) {
   const waterproofingOnly = (item) => item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial");
-  const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly(i)).reduce((sum, i) => sum + i.qty, 0);
+  const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly(i)).reduce((sum2, i) => sum2 + i.qty, 0);
   const table = items.map((item) => {
     const line = customPackLine(item);
     return item.kind === "chairs" && !waterproofingOnly(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
@@ -342,7 +342,7 @@ function calculateCustomPack(items, city) {
     treatment: PERK_TREATMENT[item.extra]
   })), mainKind);
   const lines = table.map((line, i) => ({ ...line, ...perks.lines[i] }));
-  const subtotal = Math.round(lines.reduce((sum, line) => sum + (line.amount ?? 0), 0) * 100) / 100;
+  const subtotal = Math.round(lines.reduce((sum2, line) => sum2 + (line.amount ?? 0), 0) * 100) / 100;
   const tableSubtotal = perks.tableSubtotal;
   const savings = Math.round((tableSubtotal - subtotal) * 100) / 100;
   const baseTravel = locationPrices[city] ?? null;
@@ -568,7 +568,7 @@ function toItem(raw, index) {
 function rugPickupFor(items) {
   const rugs = items.filter((i) => i.kind === "rug");
   if (!rugs.length) return null;
-  const areaM2 = Math.round(rugs.reduce((sum, i) => sum + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
+  const areaM2 = Math.round(rugs.reduce((sum2, i) => sum2 + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
   return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2), rule: RUG_PICKUP_FEE_RULE };
 }
 function botQuote(input) {
@@ -1224,6 +1224,92 @@ function agendaMessage(day, services, issues, pending) {
   return lines.join("\n");
 }
 
+// src/lib/crmUpsell.ts
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Braga", "Lisboa 1", "Lisboa 2", "Algarve", "Coimbra"];
+function teamShareOf(team) {
+  return team.startsWith("Porto") ? 0.6 : 0.7;
+}
+var round22 = (n) => Math.round(n * 100) / 100;
+var UPSELL_TIERS_FROM = "2026-10-19";
+var UPSELL_TIER_LIMIT = 100;
+var UPSELL_TIER_SHARES = { upTo: 0.7, above: 0.6 };
+var tieredUpsell = (day) => !!day && day >= UPSELL_TIERS_FROM;
+function splitUpsell(value, team, day) {
+  const teamPart = tieredUpsell(day) ? round22(Math.min(value, UPSELL_TIER_LIMIT) * UPSELL_TIER_SHARES.upTo + Math.max(0, value - UPSELL_TIER_LIMIT) * UPSELL_TIER_SHARES.above) : round22(value * teamShareOf(team));
+  return { team: teamPart, owner: round22(value - teamPart) };
+}
+function defaultTeamFor(locality) {
+  return UPSELL_TEAMS.find((t) => locality && t.startsWith(locality)) ?? "Porto 1";
+}
+var isUpsellTeam = (s) => !!s && UPSELL_TEAMS.includes(s);
+function ownerUpsellOf(r) {
+  const value = Number(r.upsell_value) || 0;
+  if (value <= 0) return 0;
+  return splitUpsell(value, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality), r.request_date).owner;
+}
+
+// src/lib/teamAccounts.ts
+var round23 = (n) => Math.round(n * 100) / 100;
+var euros = (n) => `${round23(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
+var dm = (date) => `${date.slice(8, 10)}/${date.slice(5, 7)}`;
+var WEEKDAYS2 = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+var weekday2 = (date) => WEEKDAYS2[(/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay()];
+function labelOf(r) {
+  const name = (r.client_name ?? "").trim();
+  const city = (r.city ?? "").trim();
+  if (name && city && !name.toLowerCase().includes(city.toLowerCase())) return `${name}, ${city}`;
+  return name || city || "Serviço";
+}
+function ownerShareOf(r) {
+  return round23((Number(r.my_cut) || 0) + ownerUpsellOf(r));
+}
+var sum = (lines) => round23(lines.reduce((s, l) => s + l.amount, 0));
+function teamMessage(a) {
+  const out = [`Contas de ${weekday2(a.date)}, ${dm(a.date)} (${a.team})`, ""];
+  if (a.today.length) {
+    out.push("Hoje:", ...a.today.map((l) => `${l.label}: ${euros(l.amount)}`), `Total de hoje: ${euros(a.todayTotal)}`);
+  } else {
+    out.push("Hoje: nenhum serviço por pagar.");
+  }
+  if (a.before.length) {
+    out.push("", "Para trás:", ...a.before.map((l) => `${dm(l.date)} ${l.label}: ${euros(l.amount)}`), `Total para trás: ${euros(a.beforeTotal)}`);
+  }
+  out.push("", `Total que me devem: ${euros(a.total)}`);
+  return out.join("\n");
+}
+function teamAccounts(rows, events, date) {
+  const teamOfEvent = new Map(events.map((e) => [e.id, eventTeam(e)]));
+  const byTeam = /* @__PURE__ */ new Map();
+  const unassigned = [];
+  const owed = rows.filter((r) => !r.paid && r.request_date && r.request_date <= date && !r.calendar_missing_since).filter((r) => (Number(r.billed_value) || 0) > 0 || (Number(r.upsell_value) || 0) > 0).sort((a, b) => a.request_date.localeCompare(b.request_date));
+  for (const r of owed) {
+    const amount2 = ownerShareOf(r);
+    if (amount2 <= 0) continue;
+    const line = { date: r.request_date, label: labelOf(r), amount: amount2 };
+    const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    if (!team) {
+      unassigned.push(line);
+      continue;
+    }
+    const bucket = byTeam.get(team) ?? { today: [], before: [] };
+    (line.date === date ? bucket.today : bucket.before).push(line);
+    byTeam.set(team, bucket);
+  }
+  const teams = [...byTeam.entries()].map(([team, b]) => {
+    const base = {
+      team,
+      date,
+      today: b.today,
+      before: b.before,
+      todayTotal: sum(b.today),
+      beforeTotal: sum(b.before),
+      total: sum([...b.today, ...b.before])
+    };
+    return { ...base, message: teamMessage(base) };
+  }).filter((t) => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));
+  return { date, teams, unassigned };
+}
+
 // src/lib/quizOrder.ts
 var QUIZ_ORDER_VERSION = 1;
 var typed = (v) => String(v ?? "").trim();
@@ -1419,5 +1505,6 @@ export {
   planBotBooking,
   planBotHold,
   planOwnerBooking,
-  resolveBotCity
+  resolveBotCity,
+  teamAccounts
 };
