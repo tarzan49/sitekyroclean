@@ -88,8 +88,6 @@ import sofa04Antes from "@/assets/before-after-pool/sofa-04-antes.webp";
 import sofa04Depois from "@/assets/before-after-pool/sofa-04-depois.webp";
 import sofa05Antes from "@/assets/before-after-pool/sofa-05-antes.webp";
 import sofa05Depois from "@/assets/before-after-pool/sofa-05-depois.webp";
-import sofa06Antes from "@/assets/before-after-pool/sofa-06-antes.webp";
-import sofa06Depois from "@/assets/before-after-pool/sofa-06-depois.webp";
 import sofa07Antes from "@/assets/before-after-pool/sofa-07-antes.webp";
 import sofa07Depois from "@/assets/before-after-pool/sofa-07-depois.webp";
 import sofa08Antes from "@/assets/before-after-pool/sofa-08-antes.webp";
@@ -145,6 +143,9 @@ export type PoolItem =
 // cada lista é o que aparece no hero. A impermeabilização mantém o vídeo em
 // primeiro (regra de 28/09). "sofa-14" tinha antes e depois trocados (visto
 // pelo dono a 09/10): os ficheiros ficam, a ordem é invertida aqui.
+// "sofa-06" (chaise castanho com nódoas de café e vinho) saiu a 14/10/2026:
+// as nódoas do "antes" foram feitas com IA (dono: "não podemos meter coisas
+// com a AI"). O sofá branco (sofa-05) é real e fica.
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   alcatifa: [],
   // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
@@ -152,7 +153,6 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
-    { kind: "pair", before: sofa06Antes, after: sofa06Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },

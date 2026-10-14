@@ -41,8 +41,6 @@ import photo19 from '@/assets/before-after-pool/sofa-04-depois.webp';
 import thumb19 from '@/assets/before-after-pool/sofa-04-depois-thumb.webp';
 import photo20 from '@/assets/before-after-pool/sofa-05-depois.webp';
 import thumb20 from '@/assets/before-after-pool/sofa-05-depois-thumb.webp';
-import photo21 from '@/assets/before-after-pool/sofa-06-depois.webp';
-import thumb21 from '@/assets/before-after-pool/sofa-06-depois-thumb.webp';
 import photo22 from '@/assets/before-after-pool/sofa-07-depois.webp';
 import thumb22 from '@/assets/before-after-pool/sofa-07-depois-thumb.webp';
 import photo23 from '@/assets/before-after-pool/sofa-08-depois.webp';
@@ -87,7 +85,6 @@ const thumbnails: Record<string, string> = {
   [photo18]: thumb18,
   [photo19]: thumb19,
   [photo20]: thumb20,
-  [photo21]: thumb21,
   [photo22]: thumb22,
   [photo23]: thumb23,
   [photo24]: thumb24,
