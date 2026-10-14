@@ -13,10 +13,12 @@ describe('condição para fechar já (dono, 13/10/2026)', () => {
     if (!q.ok) return;
     expect(q.closeNow).toEqual({ ok: true, total: q.total! - closeNowDiscount(q.total!), homePrice: null, pickupPrice: null, condition: CLOSE_NOW_CONDITION, rule: expect.any(String) });
   });
-  it('waterproofing always 5%; no 200€ cap any more; never under quote', () => {
+  it('waterproofing always 5%; above 200€ the owner decides (14 Oct); never under quote', () => {
     const wp = botQuote({ city: 'Porto', items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+essencial' }] });
     expect(wp.ok && wp.closeNow.ok && wp.closeNow.total === Math.round(wp.total! * 0.95)).toBe(true);
-    expect(closeNowOffer({ total: 250, handToOwner: false })).toMatchObject({ ok: true, total: 230 });
+    expect(closeNowOffer({ total: 200, handToOwner: false })).toMatchObject({ ok: true, total: 185 });
+    expect(closeNowOffer({ total: 250, handToOwner: false })).toMatchObject({ ok: false, reason: expect.stringContaining('responsável') });
+    expect(closeNowOffer({ total: null, handToOwner: true, rug: { homePrice: 189, pickupPrice: 209 } }).ok).toBe(false);
     expect(closeNowOffer({ total: null, handToOwner: true }).ok).toBe(false);
   });
   it('rugs: the same euros off the home and the pickup price', () => {
