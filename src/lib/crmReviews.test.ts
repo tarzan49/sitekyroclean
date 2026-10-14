@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { monthlyReviewStats, serviceReviews, unlinkedReviews, type GoogleReview, type ReviewService } from './crmReviews';
+import { goalProgress, monthlyReviewStats, serviceReviews, unlinkedReviews, type GoogleReview, type ReviewService } from './crmReviews';
 
 const review = (over: Partial<GoogleReview>): GoogleReview => ({
   review_id: Math.random().toString(36),
@@ -78,5 +78,19 @@ describe('unlinkedReviews', () => {
       review({ author: 'D', reviewed_at: '2026-10-02T10:00:00Z' }),
     ], '2026-09');
     expect(list.map(r => r.author)).toEqual(['A']);
+  });
+});
+
+describe('goalProgress', () => {
+  it('counts every review of the profile up to the month, excluded ones too', () => {
+    const [porto, lisboa] = goalProgress([
+      review({ reviewed_at: '2026-01-10T10:00:00Z' }),
+      review({ reviewed_at: '2026-10-05T10:00:00Z', excluded: 'equipa' }),
+      review({ reviewed_at: '2026-11-05T10:00:00Z' }),
+      review({ profile: 'lisboa', reviewed_at: '2026-10-05T10:00:00Z' }),
+    ], '2026-10');
+    expect(porto).toMatchObject({ total: 170, current: 2, missing: 168 });
+    expect(lisboa).toMatchObject({ total: 60, current: 1, missing: 59 });
+    expect(goalProgress([], '2026-11')).toEqual([]);
   });
 });

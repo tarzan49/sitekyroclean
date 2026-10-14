@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lisbonDay, shiftMonth } from "@/lib/crmClosings";
-import { monthlyReviewStats, REVIEW_MIN_STARS, reviewCounts, serviceReviews, unlinkedReviews, type GoogleReview, type ReviewService } from "@/lib/crmReviews";
+import { goalProgress, monthlyReviewStats, REVIEW_DEADLINE_DAYS, REVIEW_MIN_STARS, reviewCounts, serviceReviews, unlinkedReviews, type GoogleReview, type ReviewService } from "@/lib/crmReviews";
 
 // Aba "Avaliações" do CRM: quantas avaliações entram por mês (estão a crescer?)
 // e, serviço a serviço, quem deixou avaliação. As contas estão em crmReviews.ts;
@@ -40,6 +40,7 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
   const stat = monthly.find(m => m.month === month) ?? null;
   const summary = useMemo(() => serviceReviews(services, reviews ?? [], month), [services, reviews, month]);
   const loose = useMemo(() => unlinkedReviews(reviews ?? [], month), [reviews, month]);
+  const goals = useMemo(() => goalProgress(reviews ?? [], month), [reviews, month]);
 
   /** Liga a avaliação escolhida ao serviço (e desliga a que lá estava). */
   const link = async (serviceId: string, current: GoogleReview | null, reviewId: string) => {
@@ -68,7 +69,7 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-sm text-gray-500">
-          Avaliações das duas fichas do Google, pela data em que foram escritas. Para as equipas contam as de {REVIEW_MIN_STARS} e 5 estrelas. Não contam as da equipa nem da família.
+          Avaliações das duas fichas do Google, pela data em que foram escritas. Para as equipas contam as de {REVIEW_MIN_STARS} e 5 estrelas. Não contam as da equipa nem da família. Prazo para o cliente avaliar: {REVIEW_DEADLINE_DAYS} dias depois do serviço.
         </p>
         <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
           <button onClick={() => setMonth(m => shiftMonth(m, -1))} aria-label="Mês anterior" className="p-1.5 text-navy hover:bg-gray-50 rounded-l-lg">
@@ -80,6 +81,23 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
           </button>
         </div>
       </div>
+
+      {goals.length > 0 && (
+        <div className="grid sm:grid-cols-2 gap-3">
+          {goals.map(g => (
+            <div key={g.profile} className="bg-white border border-gray-200 rounded-xl p-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Meta {g.profile === "lisboa" ? "Lisboa" : "Porto"} · fim de {shortMonth(g.month)}</p>
+                <p className="text-xs font-semibold text-navy">{g.current} / {g.total}</p>
+              </div>
+              <div className="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                <div className="h-full bg-[#D4AF37]" style={{ width: `${Math.min(100, (g.current / g.total) * 100)}%` }} />
+              </div>
+              <p className="mt-1.5 text-xs text-gray-500">{g.missing > 0 ? `Faltam ${g.missing}. ` : "Meta atingida. "}Prémio: {g.reward}.</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4">
