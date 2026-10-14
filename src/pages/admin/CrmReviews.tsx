@@ -3,10 +3,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lisbonDay, shiftMonth } from "@/lib/crmClosings";
 import { goalProgress, monthlyReviewStats, REVIEW_DEADLINE_DAYS, REVIEW_MIN_STARS, reviewCounts, serviceReviews, unlinkedReviews, type GoogleReview, type ReviewService } from "@/lib/crmReviews";
+import { addDays, checkProcedure, ITEM_LABEL, PROCEDURE_PAY_ENABLED, procedureWeeklySummary, type ProcedureCheck, type ProcedureRecord } from "@/lib/serviceProcedure";
 
 // Aba "Avaliações" do CRM: quantas avaliações entram por mês (estão a crescer?)
 // e, serviço a serviço, quem deixou avaliação. As contas estão em crmReviews.ts;
-// as avaliações vêm da tabela google_reviews.
+// as avaliações vêm da tabela google_reviews. A coluna Procedimento lê
+// service_procedure (fotografias e vídeo que a equipa mandou ao bot) e mostra a
+// percentagem da equipa pela regra de serviceProcedure.ts.
 
 const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric", timeZone: "UTC" });
 const SHORT_MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "short", year: "numeric", timeZone: "UTC" });
@@ -22,6 +25,7 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
   const [reviews, setReviews] = useState<GoogleReview[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+  const [procedures, setProcedures] = useState<ProcedureRecord[]>([]);
 
   const fetchReviews = useCallback(async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,6 +39,32 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
   }, []);
 
   useEffect(() => { fetchReviews(); }, [fetchReviews]);
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from("service_procedure").select("*").order("service_day", { ascending: true })
+      .then(({ data, error: err }: { data: ProcedureRecord[] | null; error: { message: string } | null }) => { if (!err) setProcedures(data ?? []); });
+  }, []);
+
+  // O procedimento de cada serviço: pela linha do CRM, ou pelo evento do calendário enquanto a linha não estava ligada.
+  const endedDay = addDays(lisbonDay(new Date()), -1);
+  const procByService = useMemo(() => {
+    const byEvent = new Map(procedures.map(p => [p.calendar_event_id, p]));
+    const map = new Map<string, ProcedureRecord>();
+    for (const s of services) {
+      const p = procedures.find(x => x.service_request_id === s.id) ?? (s.calendar_event_id ? byEvent.get(s.calendar_event_id) : undefined);
+      if (p) map.set(s.id, p);
+    }
+    return map;
+  }, [procedures, services]);
+  const serviceOfProc = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const [sid, p] of procByService) map.set(p.calendar_event_id, sid);
+    return map;
+  }, [procByService]);
+  const reviewsOfService = useCallback((sid: string | undefined) =>
+    (reviews ?? []).filter(r => sid && r.service_request_id === sid).map(r => ({ stars: r.stars, reviewed_at: r.reviewed_at, excluded: r.excluded })), [reviews]);
+  const weekly = useMemo(() => procedureWeeklySummary(procedures, p => reviewsOfService(p.service_request_id ?? serviceOfProc.get(p.calendar_event_id)), endedDay)
+    .filter(w => w.week.slice(0, 7) === month || addDays(w.week, 6).slice(0, 7) === month), [procedures, reviewsOfService, serviceOfProc, endedDay, month]);
 
   const monthly = useMemo(() => reviews ? monthlyReviewStats(reviews, currentMonth) : [], [reviews, currentMonth]);
   const stat = monthly.find(m => m.month === month) ?? null;
@@ -166,14 +196,14 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Cliente", "Região", "Faturado", "Avaliação"].map(h => (
+                {["Dia", "Cliente", "Região", "Faturado", "Avaliação", "Procedimento"].map(h => (
                   <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {summary.rows.length === 0 && (
-                <tr><td colSpan={5} className="text-center py-8 text-gray-400">Sem serviços em {monthName(month)}.</td></tr>
+                <tr><td colSpan={6} className="text-center py-8 text-gray-400">Sem serviços em {monthName(month)}.</td></tr>
               )}
               {summary.rows.map(({ service: s, review: r }) => (
                 <tr key={s.id} className="border-b border-gray-100 last:border-0">
@@ -195,12 +225,47 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
                       ))}
                     </select>
                   </td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <ProcedureCell rec={procByService.get(s.id)} check={procByService.get(s.id) ? checkProcedure(procByService.get(s.id)!, reviewsOfService(s.id), endedDay) : null} />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {weekly.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <p className="text-sm font-bold text-navy px-3 pt-3">Procedimento por semana e equipa</p>
+          <p className="text-xs text-gray-500 px-3">Serviços com a mensagem do bot: fotografia de antes, de depois e vídeo enviados em resposta, e avaliação de {REVIEW_MIN_STARS} ou 5 estrelas até {REVIEW_DEADLINE_DAYS} dias depois.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  {["Semana", "Equipa", "Serviços", "Fotos e vídeo", "Avaliação", "Completos", "A correr", "Incompletos"].map(h => (
+                    <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {weekly.map(w => (
+                  <tr key={`${w.week}-${w.team}`} className="border-b border-gray-100 last:border-0">
+                    <td className="px-3 py-2 font-mono text-navy whitespace-nowrap">{dm(w.week)} a {dm(addDays(w.week, 6))}</td>
+                    <td className="px-3 py-2 text-navy whitespace-nowrap">{w.team}</td>
+                    <td className="px-3 py-2 text-navy font-semibold">{w.services}</td>
+                    <td className="px-3 py-2 text-gray-600">{w.media}</td>
+                    <td className="px-3 py-2 text-gray-600">{w.review}</td>
+                    <td className="px-3 py-2 text-green-700 font-semibold">{w.complete}</td>
+                    <td className="px-3 py-2 text-gray-600">{w.open}</td>
+                    <td className={`px-3 py-2 ${w.closedIncomplete ? "text-red-600 font-semibold" : "text-gray-600"}`}>{w.closedIncomplete}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {loose.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -213,6 +278,33 @@ const CrmReviews = ({ services }: { services: ReviewService[] }) => {
           </ul>
         </div>
       )}
+    </div>
+  );
+};
+
+const MARKS: { key: keyof Pick<ProcedureCheck, "before" | "after" | "video" | "review">; short: string; item: "before" | "after" | "video" | "review" }[] = [
+  { key: "before", short: "Antes", item: "before" },
+  { key: "after", short: "Depois", item: "after" },
+  { key: "video", short: "Vídeo", item: "video" },
+  { key: "review", short: "Aval.", item: "review" },
+];
+
+/** ✓/✗ de antes, depois, vídeo e avaliação, e a % da equipa quando o prazo acabou. */
+const ProcedureCell = ({ rec, check }: { rec: ProcedureRecord | undefined; check: ProcedureCheck | null }) => {
+  if (!rec || !check) return <span className="text-gray-400">Sem mensagem do bot</span>;
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="text-gray-400 mr-0.5">{rec.team}</span>
+      {MARKS.map(m => (
+        <span key={m.key} title={`${ITEM_LABEL[m.item]}: ${check[m.key] ? "sim" : "não"}`}
+          className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold ${check[m.key] ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+          {check[m.key] ? "✓" : "✗"} {m.short}
+        </span>
+      ))}
+      <span className={`ml-1 font-bold ${check.status === "completo" ? "text-green-700" : check.status === "fechado" ? "text-red-600" : "text-gray-500"}`}
+        title={PROCEDURE_PAY_ENABLED ? undefined : "Regra de pagamento por confirmar: as contas ainda não aplicam isto."}>
+        {check.pay ? `${check.pay.teamShare}%${check.pay.bonus ? ` + ${check.pay.bonus}€` : ""}` : `até ${dm(check.deadline)}`}
+      </span>
     </div>
   );
 };

@@ -57,6 +57,11 @@
 //               the calendar's "Equipa: X" line, with a message ready per team
 //               (src/lib/teamAccounts.ts). The client's first name and locality
 //               only, which the team already has in its calendar: no phone or address.
+//   procedure-due, procedure-sent, procedure-media
+//               the team procedure of each service (2026-10-14, procedure.ts,
+//               src/lib/serviceProcedure.ts): services that just ended (message
+//               to the team), reminders, closed deadlines; the ids of what the
+//               bot sent; the photos and video the team sent in reply.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -71,6 +76,7 @@ import { agendaCheck, teamAccounts, botAvailability, botQuote, describeQuizOrder
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
+import { procedureDue, procedureMedia, procedureSent, type ProcedureStore } from "./procedure.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 
@@ -108,6 +114,8 @@ export interface BotEnv {
   writeCalendar?: CalendarWriter | null;
   /** CRM rows for `team-accounts` (service_requests). */
   accounts?: (() => Promise<{ rows: Row[]; adjustments?: Row[] } | { error: string }>) | null;
+  /** service_procedure, service_requests and google_reviews for the procedure actions. */
+  procedures?: ProcedureStore | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -402,6 +410,18 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if ("error" in crm) return createErrorResponse(crm.error, 502);
       return createSuccessResponse({ accounts: teamAccounts(crm.rows, cal.events, date, crm.adjustments ?? []) });
     }
+    case "procedure-due":
+    case "procedure-sent":
+    case "procedure-media": {
+      if (!env.procedures) return createErrorResponse("Procedimento por ligar", 503);
+      const now = env.now?.() ?? new Date();
+      if (body.action === "procedure-sent") return await procedureSent(body, env.procedures, now);
+      if (body.action === "procedure-media") return await procedureMedia(body, env.procedures, now);
+      if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
+      const cal = await env.calendar();
+      if ("error" in cal) return createErrorResponse(cal.error, 502);
+      return await procedureDue(cal.events, env.procedures, now);
+    }
     case "owner-booking":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       return await ownerBooking(body, env);
@@ -439,7 +459,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, team-accounts, sweep-holds, label-facts, hold, book, release, owner-booking, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, team-accounts, sweep-holds, label-facts, hold, book, release, owner-booking, procedure-due, procedure-sent, procedure-media, find-order, new-orders, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
@@ -727,6 +747,30 @@ function supabaseAccounts(): BotEnv["accounts"] {
   };
 }
 
+const PROCEDURE_COLUMNS = "calendar_event_id, service_request_id, team, service_day, prompt_msg_ids, prompted_at, before_msg_id, before_at, after_msg_id, after_at, video_msg_id, video_at, reminders_sent, last_reminder_at, status, closed_at, penalty_paid";
+/** service_procedure and what it reads from the CRM and the reviews. */
+function supabaseProcedures(): ProcedureStore | null {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  const rows = (r: { data: unknown; error: { message: string } | null }) => r.error ? { error: r.error.message } : ((r.data ?? []) as Row[]);
+  return {
+    async records(sinceDay) { return rows(await client.from("service_procedure").select(PROCEDURE_COLUMNS).gte("service_day", sinceDay)); },
+    async byPrompt(messageId) {
+      const r = rows(await client.from("service_procedure").select(PROCEDURE_COLUMNS).contains("prompt_msg_ids", [messageId]).limit(1));
+      return "error" in r ? r : r[0] ?? null;
+    },
+    async services(eventIds) { return rows(await client.from("service_requests").select("id, calendar_event_id, client_name, city, description").in("calendar_event_id", eventIds)); },
+    async reviews(serviceIds) {
+      if (!serviceIds.length) return [];
+      return rows(await client.from("google_reviews").select("service_request_id, stars, reviewed_at, excluded").in("service_request_id", serviceIds));
+    },
+    async upsert(row) { return (await client.from("service_procedure").upsert(row, { onConflict: "calendar_event_id" })).error?.message ?? null; },
+    async update(eventId, patch) { return (await client.from("service_procedure").update(patch).eq("calendar_event_id", eventId)).error?.message ?? null; },
+  };
+}
+
 function supabaseFollowUps(): FollowUpStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -816,5 +860,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures() }));
 }

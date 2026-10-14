@@ -9,8 +9,12 @@ const lastMonth = shiftMonth(thisMonth, -1);
 
 const updates: unknown[] = [];
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {
-  from() {
-    const data = [
+  from(table: string) {
+    const data = table === 'service_procedure' ? [
+      { calendar_event_id: 'ev1', service_request_id: 's1', team: 'Porto 2', service_day: `${lastMonth}-08`, prompt_msg_ids: ['m1'], prompted_at: `${lastMonth}-08T17:00:00Z`,
+        before_msg_id: 'b', before_at: `${lastMonth}-08T17:05:00Z`, after_msg_id: 'a', after_at: `${lastMonth}-08T17:05:00Z`, video_msg_id: null, video_at: null,
+        reminders_sent: 0, last_reminder_at: null, status: 'em_curso', closed_at: null, penalty_paid: false },
+    ] : [
       { review_id: 'r1', profile: 'porto', author: 'Ana Teste', stars: 5, reviewed_at: `${lastMonth}-10T10:00:00Z`, service_request_id: 's1', excluded: null },
       { review_id: 'r2', profile: 'lisboa', author: 'Rui Teste', stars: 4, reviewed_at: `${lastMonth}-12T10:00:00Z`, service_request_id: null, excluded: null },
       { review_id: 'r3', profile: 'porto', author: 'Equipa Teste', stars: 5, reviewed_at: `${lastMonth}-12T10:00:00Z`, service_request_id: null, excluded: 'equipa' },
@@ -33,6 +37,10 @@ describe('aba Avaliações do CRM', () => {
     fireEvent.click(await screen.findByLabelText('Mês anterior'));
     expect(screen.getByText('1 de 2')).toBeTruthy();
     expect(screen.getByText('Avaliações de ' + new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${lastMonth}-15T12:00:00Z`)) + ' sem serviço ligado')).toBeTruthy();
+    expect(screen.getByText('Sem mensagem do bot')).toBeTruthy();
+    expect(screen.getAllByText('Porto 2').length).toBeGreaterThan(0);
+    expect(screen.getByTitle('vídeo: não')).toBeTruthy();
+    expect(screen.getByText('Procedimento por semana e equipa')).toBeTruthy();
     const selects = screen.getAllByRole('combobox');
     fireEvent.change(selects[1], { target: { value: 'r2' } });
     await vi.waitFor(() => expect(updates).toContainEqual({ service_request_id: 's2' }));

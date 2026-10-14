@@ -55,6 +55,7 @@ export interface ReviewService {
   city: string | null;
   locality: string | null;
   billed_value: number;
+  calendar_event_id?: string | null;
 }
 
 export interface MonthReviewStats {

@@ -1365,6 +1365,141 @@ function teamAccounts(rows, events, date, adjustments = []) {
   return { date, teams, unassigned };
 }
 
+// src/lib/crmClosings.ts
+var lisbon2 = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" });
+
+// src/lib/crmReviews.ts
+var REVIEW_MIN_STARS = 4;
+var REVIEW_DEADLINE_DAYS = 7;
+
+// src/lib/serviceProcedure.ts
+var PROCEDURE_FULL_SHARE = 50;
+var PROCEDURE_REDUCED_SHARE = 45;
+var PROCEDURE_PAY_RULE = "review_in_50";
+var PROCEDURE_REVIEW_BONUS = 5;
+function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
+  const media = got.before && got.after && got.video;
+  if (rule === "review_bonus") return { teamShare: media ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: media && got.review ? PROCEDURE_REVIEW_BONUS : 0 };
+  return { teamShare: media && got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };
+}
+var PROCEDURE_FROM_BY_TEAM = { "Porto 1": "2026-10-15", "Porto 2": "2026-10-15" };
+var procedureFrom = (team) => PROCEDURE_FROM_BY_TEAM[team] ?? UPSELL_TIERS_FROM;
+var REVIEW_LINKS = {
+  lisboa: "https://g.page/r/CRc7F7lX3xcEECE/review",
+  porto: "https://search.google.com/local/writereview?placeid=ChIJt71NLgBlJA0RIT9kggF_3Fk"
+};
+var reviewProfileOfTeam = (team) => /^lisboa/i.test(team) ? "lisboa" : "porto";
+var ITEM_LABEL = {
+  before: "fotografia de antes",
+  after: "fotografia de depois",
+  video: "vídeo",
+  review: "avaliação do cliente"
+};
+var lisbon3 = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon" });
+var lisbonDayOf = (iso) => lisbon3.format(typeof iso === "string" ? new Date(iso) : iso);
+function addDays2(day, n) {
+  const t = Date.UTC(Number(day.slice(0, 4)), Number(day.slice(5, 7)) - 1, Number(day.slice(8, 10)), 12) + n * 864e5;
+  return new Date(t).toISOString().slice(0, 10);
+}
+var dm2 = (day) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+var procedureDeadline = (serviceDay) => addDays2(serviceDay, REVIEW_DEADLINE_DAYS);
+function joinPt(items) {
+  return items.length <= 1 ? items[0] ?? "" : `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+}
+var missingText = (missing) => joinPt(missing.map((i) => ITEM_LABEL[i]));
+function procedureApplies(rec) {
+  return !!rec?.prompted_at && rec.service_day >= procedureFrom(rec.team);
+}
+function checkProcedure(rec, reviews, endedDay) {
+  const deadline = procedureDeadline(rec.service_day);
+  const inTime = (at) => !!at && lisbonDayOf(at) <= deadline;
+  const before = !!rec.before_msg_id && inTime(rec.before_at);
+  const after = !!rec.after_msg_id && inTime(rec.after_at);
+  const video = !!rec.video_msg_id && inTime(rec.video_at);
+  const review = reviews.some((r) => !r.excluded && r.stars >= REVIEW_MIN_STARS && lisbonDayOf(r.reviewed_at) <= deadline);
+  const missing = ["before", "after", "video", "review"].filter((k) => !{ before, after, video, review }[k]);
+  const status = missing.length === 0 ? "completo" : endedDay >= deadline ? "fechado" : "em_curso";
+  return {
+    before,
+    after,
+    video,
+    review,
+    missing: [...missing],
+    deadline,
+    status,
+    pay: status === "em_curso" ? null : procedurePay({ before, after, video, review })
+  };
+}
+function slotForMedia(rec, kind, caption) {
+  if (kind === "video") return "video";
+  const c = (caption ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  if (/\bdepois\b|\bafter\b|\bdps\b/.test(c)) return "after";
+  if (/\bantes\b|\bbefore\b/.test(c)) return "before";
+  return rec.before_msg_id ? "after" : "before";
+}
+var serviceName = (f) => `${f.label}${f.what ? ` (${f.what})` : ""}`;
+function procedurePromptMessage(f) {
+  const link = REVIEW_LINKS[reviewProfileOfTeam(f.team)];
+  return [
+    `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`,
+    "",
+    "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.",
+    "",
+    `Link de avaliação para o cliente: ${link}`,
+    "",
+    `Prazo para a avaliação do cliente: ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+  ].join("\n");
+}
+function procedureReceiptMessage(label, received, check) {
+  const got = received.length ? `Recebido para ${label}: ${missingText(received)}.` : `Para ${label}:`;
+  const media = check.missing.filter((i) => i !== "review");
+  if (media.length) return `${got} Falta: ${missingText(media)}.${check.missing.includes("review") ? ` E a avaliação do cliente até ${dm2(check.deadline)}.` : ""}`;
+  if (check.missing.includes("review")) return `${got} Fotografias e vídeo completos, obrigado. Falta só a avaliação do cliente até ${dm2(check.deadline)}.`;
+  return `${got} Procedimento completo, obrigado!`;
+}
+var REMINDER_DAYS = [1, 5];
+var REMINDER_HOUR = 10;
+function reminderDue(rec, check, now) {
+  if (!rec.prompted_at || check.status !== "em_curso" || check.missing.length === 0) return null;
+  const today = lisbonDayOf(now);
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Lisbon", hour: "2-digit", hourCycle: "h23" }).format(now));
+  if (hour < REMINDER_HOUR) return null;
+  let due = null;
+  REMINDER_DAYS.forEach((d, i) => {
+    if (i >= rec.reminders_sent && today >= addDays2(rec.service_day, d)) due = i;
+  });
+  return due;
+}
+function procedureReminderMessage(label, check, serviceDay) {
+  const media = check.missing.filter((i) => i !== "review");
+  const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(check.missing)}.`];
+  if (media.length) lines.push("Responde à mensagem desse serviço com o que falta.");
+  if (check.missing.includes("review")) lines.push("Se o cliente ainda não avaliou, manda-lhe outra vez o link.");
+  lines.push(`Prazo: ${dm2(check.deadline)}.`);
+  return lines.join(" ");
+}
+function procedureClosedMessage(label, serviceDay, missing) {
+  return `O prazo do serviço ${label}, ${dm2(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.`;
+}
+var PROCEDURE_NOT_A_REPLY_MESSAGE = "Para não misturar serviços, manda as fotografias e o vídeo em resposta à mensagem do serviço: carrega nessa mensagem, escolhe Responder e envia.";
+function factsFromTitle(summary) {
+  const parts = summary.split(/\s+-\s+/).map((s) => s.trim());
+  const what = (parts[0] ?? "").replace(/^(a confirmar\s*·\s*)?(servi[cç]o|limpeza)\b/i, (m) => /limpeza/i.test(m) ? "Limpeza" : "").replace(/\d+(?:[.,]\d+)?\s*€/g, "").replace(/\((?:\s*|an[uú]ncio[^)]*)\)/gi, "").replace(/\s+/g, " ").trim();
+  const nameish = parts.slice(1).find((p) => /^[\p{L} '.]+$/u.test(p) && p.split(/\s+/).length <= 4 && !/^(rua|av|avenida|travessa|largo|praça|estrada)\b/i.test(p));
+  return { what: what || null, firstName: nameish ? nameish.split(/\s+/)[0] : null };
+}
+function procedureStatusChanges(records, reviews, endedDay, nowIso) {
+  const out = [];
+  for (const rec of records) {
+    if (!rec.prompted_at) continue;
+    const own = rec.service_request_id ? reviews.filter((r) => r.service_request_id === rec.service_request_id) : [];
+    const { status } = checkProcedure(rec, own, endedDay);
+    if (status === rec.status) continue;
+    out.push({ calendar_event_id: rec.calendar_event_id, status, closed_at: status === "em_curso" ? null : rec.closed_at ?? nowIso });
+  }
+  return out;
+}
+
 // src/lib/quizOrder.ts
 var QUIZ_ORDER_VERSION = 1;
 var typed = (v) => String(v ?? "").trim();
@@ -1550,16 +1685,31 @@ ${e.location ?? ""}`);
   return out;
 }
 export {
+  PROCEDURE_NOT_A_REPLY_MESSAGE,
+  addDays2 as addDays,
   agendaCheck,
   botAvailability,
   botQuote,
+  checkProcedure,
   describeQuizOrder,
+  eventTeam,
+  factsFromTitle,
   isTestOrder,
   labelFacts,
+  lisbonDayOf,
   listBotCities,
   planBotBooking,
   planBotHold,
   planOwnerBooking,
+  procedureApplies,
+  procedureClosedMessage,
+  procedureFrom,
+  procedurePromptMessage,
+  procedureReceiptMessage,
+  procedureReminderMessage,
+  procedureStatusChanges,
+  reminderDue,
   resolveBotCity,
+  slotForMedia,
   teamAccounts
 };
