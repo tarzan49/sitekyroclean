@@ -46,6 +46,9 @@ A regra "Segunda volta ao normal" passou a repor 40 €/50 € (mudada no mesmo 
 ainda a mensagem de WhatsApp (925 530 647, "…limpar o meu sofá em Coimbra.", botão "Receber estimativa do custo"),
 a tabela de preços (sofá 1/2/3 lugares desde 49/69/79 €, impermeabilização desde 59 €, PT-PT, Serviços, Desde) e 7
 fotografias de sofás (`imagens/sofa-*-depois-*`).
+**Fim de semana em teste (dono, 14/10, 2 fins de semana):** a regra de sexta às 23h passou a pôr Porto e Lisboa a **25 €** e
+Braga e Coimbra a **10 €**; a de segunda às 0h repõe Porto 40, Lisboa 50, Braga 20 e Coimbra 20. Braga passou a correr
+todos os dias (antes, segunda a sexta). Comparar os fechos desses fins de semana com os anteriores pela faturação.
 
 ---
 
