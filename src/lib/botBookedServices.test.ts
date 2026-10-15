@@ -11,7 +11,8 @@ describe('bookedServices', () => {
       ev('2026-10-17T09:00:00Z', 'Serviço 45€ (89€) Limpeza de sofá - 911111222 - Outra - Rua Y'),
       ev('2026-10-01T09:00:00Z', 'Serviço 45€ (89€) Limpeza de sofá - 965540640 - Adriana - antigo'),
     ], now);
-    expect(r).toEqual([{ date: '2026-10-17', time: '9h30', kind: 'serviço', service: 'Impermeabilização Premium de 8 cadeiras' }]);
+    expect(r.map(({ date, time, kind, service }) => ({ date, time, kind, service }))).toEqual([{ date: '2026-10-17', time: '9h30', kind: 'serviço', service: 'Impermeabilização Premium de 8 cadeiras' }]);
+    expect(r[0].id).toContain('Serviço 108€');
   });
   it('reads "A confirmar" and pré-reservas, and the phone in the description', () => {
     const r = bookedServices('351920529136', [

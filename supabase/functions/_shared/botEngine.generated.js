@@ -1658,10 +1658,10 @@ var phoneKey = (v) => v.replace(/\D/g, "").slice(-9);
 function phoneKeysIn(text2) {
   const keys = /* @__PURE__ */ new Set();
   for (const run of text2.replace(HTML_SPACE, " ").replace(NOT_A_PHONE, "|").match(DIGIT_RUN) ?? []) {
-    let digits2 = "";
+    let digits3 = "";
     for (const group of run.match(/\d+/g) ?? []) {
-      digits2 += group;
-      if (digits2.length >= 9) keys.add(digits2.slice(-9));
+      digits3 += group;
+      if (digits3.length >= 9) keys.add(digits3.slice(-9));
     }
   }
   return keys;
@@ -1731,9 +1731,77 @@ function bookedServices(phone, events, now) {
     const at = lisbon(t);
     const kind = m[1] ? "a confirmar" : /pr/i.test(m[2]) ? "pré-reserva" : "serviço";
     const service = (e.summary ?? "").replace(KIND, "").replace(/^[\s?\d€()]+/, "").replace(/\(an[úu]ncio[^)]*\)\s*/i, "").split(" - ")[0].replace(/^[–\s]+/, "").trim();
-    out.push({ date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, "0") : ""}`, kind, service });
+    out.push({ id: e.id ?? "", title: e.summary ?? "", description: e.description ?? "", date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, "0") : ""}`, kind, service });
   }
   return out.sort((a, b) => (a.date + a.time.padStart(5, "0")).localeCompare(b.date + b.time.padStart(5, "0")));
+}
+
+// src/lib/botBookingUpdate.ts
+var digits2 = (s) => s.replace(/\D/g, "");
+var SERVICE_TITLE = /^\s*(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
+var POSTCODE = /\b\d{4}-\d{3}\b/;
+function stamp(now) {
+  return new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(now);
+}
+function planBookingUpdate(ev, phone, c, now) {
+  const key9 = digits2(phone).slice(-9);
+  if (key9.length !== 9 || !digits2(`${ev.summary} ${ev.description}`).includes(key9)) return { ok: false, reason: "o evento não é deste cliente" };
+  if (!SERVICE_TITLE.test(ev.summary)) return { ok: false, reason: 'só serviços e "A confirmar"' };
+  if (!ev.start || !ev.end) return { ok: false, reason: "evento sem hora" };
+  const parts = ev.summary.split(" - ");
+  const said = [];
+  const clean = (v) => (v ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
+  const postcode = clean(c.postcode), floor = clean(c.floor), address = clean(c.address), name = clean(c.name), note = clean(c.note), cancel = clean(c.cancel);
+  if (parts.length >= 2) {
+    const phoneAt = parts.findIndex((p) => digits2(p).endsWith(key9));
+    if (name && phoneAt > 0 && (parts.length <= phoneAt + 1 || !parts[phoneAt + 1].trim())) {
+      parts[phoneAt + 1] = name;
+      said.push(`nome ${name}`);
+    }
+    const addrAt = phoneAt > 0 && parts.length > phoneAt + 2 ? phoneAt + 2 : -1;
+    if (address && address.length >= 8 && addrAt < 0) {
+      parts.push(address);
+      said.push(`morada ${address}`);
+    } else if (address && address.length >= 8 && addrAt > 0 && digits2(address) !== digits2(parts.slice(addrAt).join(" - "))) {
+      said.push(`morada ${address} (era ${parts.slice(addrAt).join(" - ")})`);
+      parts.splice(addrAt, parts.length - addrAt, address);
+    }
+    const at = addrAt > 0 ? addrAt : parts.length - 1;
+    if (postcode && POSTCODE.test(postcode) && !parts.join(" - ").includes(postcode.match(POSTCODE)[0])) {
+      parts[at] = `${parts[at]}, ${postcode.match(POSTCODE)[0]}`;
+      said.push(`código postal ${postcode.match(POSTCODE)[0]}`);
+    }
+    if (floor && !fold6(ev.summary + ev.description).includes(fold6(floor))) {
+      parts[at] = `${parts[at]}, ${floor}`;
+      said.push(floor);
+    }
+  }
+  let start = ev.start, end = ev.end, moved = false;
+  if (c.date && c.time && /^\d{4}-\d{2}-\d{2}$/.test(c.date) && /^\d{1,2}:\d{2}$/.test(c.time)) {
+    const [h, m] = c.time.split(":").map(Number);
+    const s = lisbonToUtc(c.date, h * 60 + m);
+    const dur = Date.parse(ev.end) - Date.parse(ev.start);
+    if (s !== Date.parse(ev.start) && s > now.getTime()) {
+      const was = lisbon(Date.parse(ev.start));
+      start = new Date(s).toISOString();
+      end = new Date(s + dur).toISOString();
+      moved = true;
+      said.push(`mudou de ${was.date.slice(8)}/${was.date.slice(5, 7)} às ${hm(was.minutes)} para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time}`);
+    }
+  }
+  if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
+  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+  if (!said.length) return { ok: false, reason: "nada de novo" };
+  const line = `Atualizado pela conversa (${stamp(now)}): ${said.join("; ")}.`;
+  const lines = ev.description.split("\n");
+  const markAt = lines.findIndex((l) => /^bot:/.test(l));
+  if (markAt >= 0) lines.splice(markAt, 0, line, "");
+  else lines.push("", line);
+  return { ok: true, title: parts.join(" - "), description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said };
+}
+var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+function fold6(s) {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ");
 }
 export {
   PROCEDURE_NOT_A_REPLY_MESSAGE,
@@ -1750,6 +1818,7 @@ export {
   labelFacts,
   lisbonDayOf,
   listBotCities,
+  planBookingUpdate,
   planBotBooking,
   planBotHold,
   planOwnerBooking,

@@ -72,7 +72,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, teamAccounts, botAvailability, bookedServices, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, bookedServices, planBookingUpdate, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -398,6 +398,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const now = env.now?.() ?? new Date();
       return createSuccessResponse({ services: bookedServices(phone, await withRecentHolds(cal.events, env.holds, now), now) });
     }
+    case "update-booking":
+      if (!env.calendar || !env.writeCalendar) return createErrorResponse("Calendário por ligar", 503);
+      return await updateBooking(body, env);
     case "label-facts":
       if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
       return await labelFactsFor(body, env);
@@ -575,6 +578,35 @@ async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
     return createSuccessResponse({ booking: { ...plan, hold } });
   }
   return createSuccessResponse({ booking: plan });
+}
+
+/**
+ * What a booked client says later (postcode, floor, a new hour, a note for the team, a cancel
+ * request) goes into the owner's event by itself (owner, 15 Oct 2026: "eu não ter que meter nada
+ * no calendário"). Only an event of this client's phone, only "Serviço"/"A confirmar"; a cancel
+ * request is written and emailed to the owner, the event is never deleted.
+ */
+async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
+  const eventId = typeof body.eventId === "string" ? body.eventId : "";
+  const phone = typeof body.phone === "string" ? body.phone : "";
+  const changes = body.changes && typeof body.changes === "object" ? body.changes as Record<string, unknown> : null;
+  if (!eventId || !phone || !changes) return createErrorResponse("eventId, phone e changes são obrigatórios", 400);
+  const cal = await env.calendar!();
+  if ("error" in cal) return createErrorResponse(cal.error, 502);
+  const ev = cal.events.find(e => e.id === eventId);
+  if (!ev) return createErrorResponse("evento não encontrado", 404);
+  const str = (k: string) => typeof changes[k] === "string" ? String(changes[k]) : undefined;
+  const now = env.now?.() ?? new Date();
+  const plan = planBookingUpdate(ev, phone, { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") }, now);
+  if (!plan.ok) return createSuccessResponse({ update: plan });
+  const written = await env.writeCalendar!({ action: "update", eventId, phone, title: plan.title, description: plan.description, start: plan.start, end: plan.end });
+  if (!written.ok) return createErrorResponse(`Não foi possível atualizar o calendário (${written.error.slice(0, 200)})`, 502);
+  calendarCache = null;
+  if ((plan.cancel || plan.moved) && env.notifyOwner) {
+    await env.notifyOwner(plan.cancel ? `Cliente pediu para desmarcar: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
+      `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " (não foi apagado: decides tu)" : ""}.\n\n${plan.title}`).catch(() => null);
+  }
+  return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, summary: plan.summary } });
 }
 
 async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {

@@ -30,6 +30,11 @@
  *     por cima da pré-reserva da conversa, se houver. A partir daí é um serviço
  *     como os que o dono escreve: o resto deste script copia-o para a equipa e
  *     manda-lhe o email, e o CRM lê-o. Um pedido repetido muda o mesmo serviço.
+ *   { key, action: 'update', eventId, phone, title, description, start, end }
+ *     o que um cliente com serviço marcado diz depois (código postal, andar, nova
+ *     hora, nota para a equipa) vai sozinho para o evento (dono, 2026-10-15: "eu
+ *     não ter que meter nada no calendário"). Só um evento "Serviço"/"A confirmar"
+ *     cujo título ou descrição tenha o telefone desse cliente; nunca apaga nada.
  *   { key, action: 'needPhotos' }
  *     os serviços dos próximos 14 dias que ainda não têm a linha "Fotos:" na
  *     descrição e com telefone: [{ eventId, phone }] (os 9 algarismos). Dono, 2026-10-11: "anexar ao calendário
@@ -62,9 +67,10 @@ function doPost(e) {
     if (pedido.action === 'hold') return respostaBot(escreverPreReserva(pedido));
     if (pedido.action === 'release') return respostaBot(apagarPreReserva(pedido));
     if (pedido.action === 'book') return respostaBot(escreverServico(pedido));
+    if (pedido.action === 'update') return respostaBot(atualizarServico(pedido));
     if (pedido.action === 'needPhotos') return respostaBot(servicosSemFotos());
     if (pedido.action === 'photos') return respostaBot(anexarFotos(pedido));
-    return respostaBot({ ok: false, error: 'action tem de ser hold, book, release, needPhotos ou photos' });
+    return respostaBot({ ok: false, error: 'action tem de ser hold, book, release, update, needPhotos ou photos' });
   } catch (erro) {
     // Sem isto a Google responde com uma página de erro em HTML e a bot-api não sabe porquê.
     return respostaBot({ ok: false, error: String(erro && erro.message || erro) });
@@ -114,6 +120,22 @@ function escreverServico(p) {
   }
   evento.setColor(cor);
   return { ok: true, eventId: evento.getId().replace(/@google\.com$/, ''), moved: evento === antigo };
+}
+
+function atualizarServico(p) {
+  const evento = p.eventId ? eventoPorId(CalendarApp.getDefaultCalendar(), p.eventId) : null;
+  if (!evento) return { ok: false, error: 'evento não encontrado' };
+  const titulo = String(p.title || ''), descricao = String(p.description || '').slice(0, 4000);
+  if (!/^(a confirmar\s*·\s*)?servi[cç]o\b/i.test(evento.getTitle()) || !/^(a confirmar\s*·\s*)?servi[cç]o\b/i.test(titulo)) return { ok: false, error: 'só serviços' };
+  const nove = String(p.phone || '').replace(/\D/g, '').slice(-9);
+  const algarismos = (evento.getTitle() + ' ' + evento.getDescription()).replace(/\D/g, '');
+  if (nove.length !== 9 || algarismos.indexOf(nove) < 0) return { ok: false, error: 'o evento não é deste cliente' };
+  const inicio = new Date(p.start), fim = new Date(p.end);
+  if (isNaN(inicio) || isNaN(fim) || fim <= inicio) return { ok: false, error: 'start/end inválidos' };
+  if (inicio.getTime() !== evento.getStartTime().getTime() || fim.getTime() !== evento.getEndTime().getTime()) evento.setTime(inicio, fim);
+  if (titulo && titulo !== evento.getTitle()) evento.setTitle(titulo);
+  if (descricao && descricao !== evento.getDescription()) evento.setDescription(descricao);
+  return { ok: true, eventId: evento.getId().replace(/@google\.com$/, '') };
 }
 
 function servicoDaConversa(calendario, conversa) {
