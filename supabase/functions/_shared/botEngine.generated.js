@@ -1805,6 +1805,7 @@ function fold6(s) {
 }
 export {
   PROCEDURE_NOT_A_REPLY_MESSAGE,
+  TEAM_COLOR,
   addDays2 as addDays,
   agendaCheck,
   bookedServices,

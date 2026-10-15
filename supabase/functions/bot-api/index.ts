@@ -72,7 +72,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, teamAccounts, botAvailability, bookedServices, planBookingUpdate, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, bookedServices, planBookingUpdate, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -599,7 +599,17 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   const now = env.now?.() ?? new Date();
   const plan = planBookingUpdate(ev, phone, { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") }, now);
   if (!plan.ok) return createSuccessResponse({ update: plan });
-  const written = await env.writeCalendar!({ action: "update", eventId, phone, title: plan.title, description: plan.description, start: plan.start, end: plan.end });
+  let written = await env.writeCalendar!({ action: "update", eventId, phone, title: plan.title, description: plan.description, start: plan.start, end: plan.end });
+  // Until the web app runs the version with "update": "book" changes an event in place when it
+  // carries this conversation's "bot:" mark (otherwise it would create a second one, so never then).
+  if (!written.ok && /action tem de ser/.test(written.error)) {
+    const conversationId = typeof body.conversationId === "string" ? body.conversationId : "";
+    const team = /^Equipa:\s*(.+)$/m.exec(ev.description)?.[1]?.trim() ?? "";
+    const colorId = (TEAM_COLOR as Record<string, string>)[team];
+    if (conversationId && colorId && /^\s*servi[cç]o\b/i.test(plan.title) && ev.description.split("\n").includes(`bot:${conversationId}`)) {
+      written = await env.writeCalendar!({ action: "book", conversationId, eventId, title: plan.title, description: plan.description, start: plan.start, end: plan.end, colorId });
+    }
+  }
   if (!written.ok) return createErrorResponse(`Não foi possível atualizar o calendário (${written.error.slice(0, 200)})`, 502);
   calendarCache = null;
   if ((plan.cancel || plan.moved) && env.notifyOwner) {
