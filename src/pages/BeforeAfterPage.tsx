@@ -133,7 +133,7 @@ const BeforeAfterPage = () => {
                   // Cadeiras: por cadeira, nunca "Desde" (pedido do dono, 26/09/2026).
                   { name: "Limpeza de Cadeiras", link: "/limpeza-cadeiras", price: CHAIR_PRICE_LABEL },
                   { name: "Limpeza de Alcatifas",link: "/limpeza-alcatifas",price: "Sob orçamento" },
-                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: "Desde 59€" },
+                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: "Desde 49€" },
                 ].map(svc => (
                   <Link
                     key={svc.link}
