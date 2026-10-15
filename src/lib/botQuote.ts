@@ -106,7 +106,10 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   const premium = calculateCustomPack(withTier(items, 'premium'), city);
   const essencial = calculateCustomPack(withTier(items, 'essencial'), city);
   if (premium.travel === null) return null;
-  const travel = Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  // Farther towns (15€ and 20€) always carry 10€ on both versions (owner, 15 Oct 2026: "em Setúbal, que já é
+  // mais longe, podes fazer a 149 e a 109"); 10€ towns keep the waiver, read from the Premium.
+  const baseFee = locationPrices[city] ?? 0;
+  const travel = baseFee > WATERPROOFING_TRAVEL_MAX ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal + travel),
