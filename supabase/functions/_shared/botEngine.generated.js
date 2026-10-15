@@ -733,6 +733,11 @@ var TEAMS_BY_REGION = {
   Coimbra: ["Coimbra"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+var WATERPROOFING_TEAMS = { Braga: ["Porto 1"] };
+var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
+function hasWaterproofing(items) {
+  return Array.isArray(items) && items.some((i) => /essencial|premium/.test(String(i?.treatment ?? "")));
+}
 var TEAM_CAPACITY = { "Porto 1": 2, "Lisboa 1": 2 };
 var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
 var TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map((t) => [t, region])));
@@ -877,18 +882,18 @@ function slotState(busy, teams, region, from, to) {
   const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
-function chooseTeam(events, city, startIso, endIso) {
+function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold3(name)) : void 0;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const st = slotState(busy, TEAMS_BY_REGION[area], area, from, to);
+  const order = teamsFor(area, waterproofing);
+  const st = slotState(busy, order, area, from, to);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
-  const order = TEAMS_BY_REGION[area];
   return [...st.teamsFree].sort((a, b) => Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 var DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -931,7 +936,7 @@ function botAvailability(req, events, now) {
   const area = CITY_REGION.get(fold3(city));
   if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
-  const teams = [...TEAMS_BY_REGION[area]];
+  const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
   if (req.date !== void 0) {
@@ -1060,7 +1065,7 @@ function planOwnerBooking(req, events) {
   const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 6e4).toISOString();
   const address = text(r.address, MAX.address);
   const named = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
-  const team = r.confirmed === true && total !== null && address.length >= 8 ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso) : null;
+  const team = r.confirmed === true && total !== null && address.length >= 8 ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, /imperm/i.test(service)) : null;
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
@@ -1112,7 +1117,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = chooseTeam(others, r.city, slot.start, slot.end);
+  const team = chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");

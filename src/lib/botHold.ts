@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, hasWaterproofing, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -152,7 +152,7 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const address = text(r.address, MAX.address);
   const named = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
   const team = r.confirmed === true && total !== null && address.length >= 8
-    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso) : null;
+    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, /imperm/i.test(service)) : null;
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
@@ -238,7 +238,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
-  const team = chooseTeam(others, r.city, slot.start, slot.end);
+  const team = chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;

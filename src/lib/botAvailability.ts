@@ -53,6 +53,20 @@ export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Coimbra: ['Coimbra'],
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+/**
+ * Waterproofing goes to another team in some zones (owner, 15 Oct 2026: "para já a equipa de
+ * braga só fica com limpeza de estofos ao domicílio, a do porto fica com impermeabilizações
+ * nessa zona"; "o porto por defeito é sempre porto 1"). A Guimarães waterproofing job had gone
+ * to Braga and nobody turned up.
+ */
+export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Braga: ['Porto 1'] };
+/** The teams that can take this job in the zone. */
+export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly string[] =>
+  (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+/** The job includes waterproofing: an item with Essencial/Premium (the bot's `quote` items). */
+export function hasWaterproofing(items: unknown): boolean {
+  return Array.isArray(items) && items.some(i => /essencial|premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
+}
 /** Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo"). */
 export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Porto 1': 2, 'Lisboa 1': 2 };
 const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
@@ -218,18 +232,18 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
  * one already working next to it that day first (less driving), then the one
  * with fewer jobs that day, then the region's order. null when none has room.
  */
-export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string): string | null {
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const st = slotState(busy, TEAMS_BY_REGION[area], area, from, to);
+  const order = teamsFor(area, waterproofing);
+  const st = slotState(busy, order, area, from, to);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t: string) => busy.filter(b => b.team === t && lisbon(b.from).date === day).length;
-  const order = TEAMS_BY_REGION[area];
   return [...st.teamsFree].sort((a, b) =>
     Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
     || jobsThatDay(a) - jobsThatDay(b)
@@ -315,7 +329,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const area = CITY_REGION.get(fold(city));
   if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: 'Disponibilidade sob consulta (deslocação alargada): a data é do responsável' };
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
-  const teams = [...TEAMS_BY_REGION[area]];
+  const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
 
   const today = lisbon(now.getTime()).date;
   let onlyDay: string | null = null;

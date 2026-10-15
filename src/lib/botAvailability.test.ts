@@ -165,6 +165,17 @@ describe('two-person teams and the team the bot books on', () => {
     expect(chooseTeam([], 'Coimbra', ...at15)).toBe('Coimbra');
     expect(chooseTeam([], 'Figueira da Foz', ...at15)).toBe('Coimbra');
   });
+
+  it('in the Braga zone, waterproofing goes to Porto 1 and Braga keeps the cleaning (owner, 15 Oct 2026)', () => {
+    const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
+    expect(chooseTeam([], 'Guimarães', ...at15)).toBe('Braga');
+    expect(chooseTeam([], 'Guimarães', ...at15, true)).toBe('Porto 1');
+    expect(chooseTeam([], 'Braga', ...at15, true)).toBe('Porto 1');
+    expect(chooseTeam([], 'Porto', ...at15, true)).toBe('Porto 1');
+    const premium = [{ kind: 'sofa', qty: 1, treatment: 'premium' }];
+    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 1']);
+    expect(ok(botAvailability({ city: 'Guimarães', items: [{ kind: 'sofa', qty: 1 }], date: '2026-10-08' }, [], NOW)).teams).toEqual(['Braga']);
+  });
 });
 
 describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre a horas diferentes")', () => {
