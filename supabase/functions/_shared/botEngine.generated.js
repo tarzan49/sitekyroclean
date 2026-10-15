@@ -1658,10 +1658,10 @@ var phoneKey = (v) => v.replace(/\D/g, "").slice(-9);
 function phoneKeysIn(text2) {
   const keys = /* @__PURE__ */ new Set();
   for (const run of text2.replace(HTML_SPACE, " ").replace(NOT_A_PHONE, "|").match(DIGIT_RUN) ?? []) {
-    let digits = "";
+    let digits2 = "";
     for (const group of run.match(/\d+/g) ?? []) {
-      digits += group;
-      if (digits.length >= 9) keys.add(digits.slice(-9));
+      digits2 += group;
+      if (digits2.length >= 9) keys.add(digits2.slice(-9));
     }
   }
   return keys;
@@ -1713,10 +1713,33 @@ ${e.location ?? ""}`);
   for (const [key, b] of best) out[key] = { past: day(b.past), next: day(b.next), pending: day(b.pending) };
   return out;
 }
+
+// src/lib/botBookedServices.ts
+var digits = (s) => s.replace(/\D/g, "");
+var KIND = /^\s*(?:(a confirmar)\s*·\s*)?(servi[cç]o|pr[ée]-reserva)\b/i;
+function bookedServices(phone, events, now) {
+  const key9 = digits(phone).slice(-9);
+  if (key9.length !== 9) return [];
+  const from = now.getTime() - 12 * 36e5, to = now.getTime() + 60 * 864e5;
+  const out = [];
+  for (const e of events) {
+    const m = KIND.exec(e.summary ?? "");
+    if (!m || !e.start) continue;
+    const t = Date.parse(e.start);
+    if (!(t >= from && t <= to)) continue;
+    if (!digits(`${e.summary} ${e.description ?? ""}`).includes(key9)) continue;
+    const at = lisbon(t);
+    const kind = m[1] ? "a confirmar" : /pr/i.test(m[2]) ? "pré-reserva" : "serviço";
+    const service = (e.summary ?? "").replace(KIND, "").replace(/^[\s?\d€()]+/, "").replace(/\(an[úu]ncio[^)]*\)\s*/i, "").split(" - ")[0].replace(/^[–\s]+/, "").trim();
+    out.push({ date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, "0") : ""}`, kind, service });
+  }
+  return out.sort((a, b) => (a.date + a.time.padStart(5, "0")).localeCompare(b.date + b.time.padStart(5, "0")));
+}
 export {
   PROCEDURE_NOT_A_REPLY_MESSAGE,
   addDays2 as addDays,
   agendaCheck,
+  bookedServices,
   botAvailability,
   botQuote,
   checkProcedure,

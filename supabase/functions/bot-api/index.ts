@@ -72,7 +72,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, teamAccounts, botAvailability, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, bookedServices, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -387,6 +387,16 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const now = env.now?.() ?? new Date();
       const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
+    }
+    case "booked-services": {
+      // The client's own bookings, so the bot never answers a booked client with "pré-reservado" (15 Oct 2026).
+      if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
+      const phone = typeof body.phone === "string" ? body.phone : "";
+      if (phone.replace(/\D/g, "").length < 9) return createErrorResponse("phone em falta", 400);
+      const cal = await env.calendar();
+      if ("error" in cal) return createErrorResponse(cal.error, 502);
+      const now = env.now?.() ?? new Date();
+      return createSuccessResponse({ services: bookedServices(phone, await withRecentHolds(cal.events, env.holds, now), now) });
     }
     case "label-facts":
       if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);

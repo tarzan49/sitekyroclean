@@ -10,3 +10,4 @@ export { addDays, checkProcedure, factsFromTitle, lisbonDayOf, procedureApplies,
 export { describeQuizOrder } from './quizOrder';
 export { isTestOrder } from './testLead';
 export { labelFacts } from './labelFacts';
+export { bookedServices } from './botBookedServices';
