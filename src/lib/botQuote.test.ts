@@ -22,6 +22,26 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'essencial'))).toEqual([49, 79, 99, 119]);
     expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'premium'))).toEqual([79, 109, 139, 169]);
   });
+  it('waterproofing: the same travel on both versions, never more than 10€ (owner, 15 Oct 2026: 139/114 in Setúbal)', () => {
+    const q = (size: string, treatment: string, city: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city });
+    // Setúbal (15€): the bot sent Premium 139€ / Essencial 114€.
+    for (const t of ['premium', 'essencial']) {
+      const r = q('3-lugares', t, 'Setúbal');
+      expect(r.waterproofingTiers).toEqual({ travel: 0, premium: 139, essencial: 99 });
+      expect(r.travel).toBe(0);
+    }
+    expect(q('3-lugares', 'essencial', 'Setúbal').total).toBe(99);
+    // Porto (10€): the bot sent 139€ / 109€.
+    expect(q('3-lugares', 'essencial', 'Porto').total).toBe(99);
+    // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
+    expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 119, essencial: 89 });
+    expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 59 });
+    expect(q('1-lugar', 'essencial', 'Sines').total).toBe(59);
+    // Cleaning with waterproofing follows the same rule.
+    const pack = q('1-lugar', 'clean+essencial', 'Setúbal').waterproofingTiers;
+    expect(pack?.travel).toBeLessThanOrEqual(10);
+    expect(ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Sines' }).travel).toBe(20);
+  });
   it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 199€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
     const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
     expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 199, 229, 159]);

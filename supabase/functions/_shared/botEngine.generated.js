@@ -118,8 +118,8 @@ var EXTENDED_TRIP_CITIES = /* @__PURE__ */ new Set([
 ]);
 function calculateTravelFee(baseFee, servicesTotal) {
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
-  const cents = Math.round(servicesTotal * 100);
-  if (baseFee === 10 && cents > 12e3 || baseFee === 15 && cents > 13500 || baseFee === 20 && cents >= 15e3) return 0;
+  const cents2 = Math.round(servicesTotal * 100);
+  if (baseFee === 10 && cents2 > 12e3 || baseFee === 15 && cents2 > 13500 || baseFee === 20 && cents2 >= 15e3) return 0;
   return baseFee;
 }
 
@@ -569,6 +569,21 @@ function toItem(raw, index) {
   if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
   return { id: String(index), kind, size, qty, extra, primary, width, length };
 }
+var WATERPROOFING_TRAVEL_MAX = 10;
+var isWaterproofing = (i) => i.extra === "essencial" || i.extra === "premium";
+var withTier = (items, tier) => items.map((i) => isWaterproofing(i) ? { ...i, extra: tier } : i);
+var cents = (n) => Math.round(n * 100) / 100;
+function waterproofingTiers(items, city) {
+  const premium = calculateCustomPack(withTier(items, "premium"), city);
+  const essencial = calculateCustomPack(withTier(items, "essencial"), city);
+  if (premium.travel === null) return null;
+  const travel = Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  return {
+    travel,
+    premium: premium.quote ? null : cents(premium.subtotal + travel),
+    essencial: essencial.quote ? null : cents(essencial.subtotal + travel)
+  };
+}
 function rugPickupFor(items) {
   const rugs = items.filter((i) => i.kind === "rug");
   if (!rugs.length) return null;
@@ -588,6 +603,9 @@ function botQuote(input) {
   }
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? "");
+  const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? "") : null;
+  const travel = tiers ? tiers.travel : result.travel;
+  const total = tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   const rugsOnly = items.every((i) => i.kind === "rug");
   const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
@@ -609,16 +627,18 @@ function botQuote(input) {
     subtotal: result.subtotal,
     savings: result.savings,
     perkEligible: result.perkEligible,
-    travel: result.travel,
-    total: result.total,
+    travel,
+    total,
+    // Both versions of the same order, same travel: quote them from here.
+    waterproofingTiers: tiers,
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
-      total: result.quote ? null : result.total,
-      waterproofing: items.some((i) => i.extra === "essencial" || i.extra === "premium"),
+      total: result.quote ? null : total,
+      waterproofing: items.some(isWaterproofing),
       handToOwner: handToOwner && !rugPriced,
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null
     })

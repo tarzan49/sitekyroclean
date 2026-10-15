@@ -86,6 +86,34 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
  * home only). Carpets are fixed to the floor and never picked up. Returned so
  * the bot quotes it from the tool and its guard can check it like any price.
  */
+/**
+ * Travel on an order with waterproofing (owner, 15 Oct 2026, after the bot
+ * quoted Premium 139€ / Essencial 114€ in Setúbal): the client always sees the
+ * two versions side by side, so both carry the SAME travel, and never more than
+ * 10€. The bot asks for each version in a separate call, and the site waiver
+ * (calculateTravelFee) used to read each subtotal on its own: the Premium passed
+ * the threshold and went out without travel, the Essencial paid 15€ more.
+ * Now every call reads the waiver from the Premium version of the same order,
+ * so the Premium call and the Essencial call return the same travel.
+ */
+export const WATERPROOFING_TRAVEL_MAX = 10;
+const isWaterproofing = (i: CustomPackItem) => i.extra === 'essencial' || i.extra === 'premium';
+const withTier = (items: CustomPackItem[], tier: 'essencial' | 'premium') =>
+  items.map(i => (isWaterproofing(i) ? { ...i, extra: tier } : i));
+const cents = (n: number) => Math.round(n * 100) / 100;
+
+function waterproofingTiers(items: CustomPackItem[], city: string) {
+  const premium = calculateCustomPack(withTier(items, 'premium'), city);
+  const essencial = calculateCustomPack(withTier(items, 'essencial'), city);
+  if (premium.travel === null) return null;
+  const travel = Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  return {
+    travel,
+    premium: premium.quote ? null : cents(premium.subtotal + travel),
+    essencial: essencial.quote ? null : cents(essencial.subtotal + travel),
+  };
+}
+
 function rugPickupFor(items: CustomPackItem[]) {
   const rugs = items.filter(i => i.kind === 'rug');
   if (!rugs.length) return null;
@@ -112,6 +140,9 @@ export function botQuote(input: unknown) {
   }
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
+  const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? '') : null;
+  const travel = tiers ? tiers.travel : result.travel;
+  const total = tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
   // Anything mixed with other items still goes to the owner.
@@ -137,16 +168,18 @@ export function botQuote(input: unknown) {
     subtotal: result.subtotal,
     savings: result.savings,
     perkEligible: result.perkEligible,
-    travel: result.travel,
-    total: result.total,
+    travel,
+    total,
+    // Both versions of the same order, same travel: quote them from here.
+    waterproofingTiers: tiers,
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
-      total: result.quote ? null : result.total,
-      waterproofing: items.some(i => i.extra === 'essencial' || i.extra === 'premium'),
+      total: result.quote ? null : total,
+      waterproofing: items.some(isWaterproofing),
       handToOwner: handToOwner && !rugPriced,
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null,
     }),
