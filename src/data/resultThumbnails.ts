@@ -63,25 +63,7 @@ import photo31 from '@/assets/before-after-pool/tapete-05-unico-sem-par.webp';
 import thumb31 from '@/assets/before-after-pool/tapete-05-unico-sem-par-thumb.webp';
 import photo32 from '@/assets/before-after-pool/tapete-06-depois.webp';
 import thumb32 from '@/assets/before-after-pool/tapete-06-depois-thumb.webp';
-import photo40 from '@/assets/before-after-pool/cadeiras-09-depois.webp';
-import thumb40 from '@/assets/before-after-pool/cadeiras-09-depois-thumb.webp';
-import photo41 from '@/assets/before-after-pool/sofa-15-depois.webp';
-import thumb41 from '@/assets/before-after-pool/sofa-15-depois-thumb.webp';
-import photo42 from '@/assets/before-after-pool/sofa-16-depois.webp';
-import thumb42 from '@/assets/before-after-pool/sofa-16-depois-thumb.webp';
-import photo43 from '@/assets/before-after-pool/sofa-17-depois.webp';
-import thumb43 from '@/assets/before-after-pool/sofa-17-depois-thumb.webp';
-import photo44 from '@/assets/before-after-pool/colchao-08-depois.webp';
-import thumb44 from '@/assets/before-after-pool/colchao-08-depois-thumb.webp';
-import photo45 from '@/assets/before-after-pool/tapete-07-depois.webp';
-import thumb45 from '@/assets/before-after-pool/tapete-07-depois-thumb.webp';
 const thumbnails: Record<string, string> = {
-  [photo40]: thumb40,
-  [photo41]: thumb41,
-  [photo42]: thumb42,
-  [photo43]: thumb43,
-  [photo44]: thumb44,
-  [photo45]: thumb45,
   [photo0]: thumb0,
   [photo1]: thumb1,
   [photo2]: thumb2,
