@@ -16,8 +16,9 @@
 // grupo do Porto (lotes até 10/10 e 13/10) entram como acertos
 // (`team_account_adjustments`), que aparecem nas contas até serem saldados.
 //
-// Pago ao dono (`paid_to_owner`): a equipa não deve nada desse serviço e a
-// parte dela sai do total, como o dono fez no grupo do Porto a 14/10 ("Pagos
+// Pago ao dono (`paid_to_owner`): a equipa não deve nada desse serviço e,
+// depois de o cliente pagar (`client_paid_owner_at`; dono, 16/10: a Catarina
+// Foz ainda não tinha pago e a parte já era descontada), a parte dela sai do total, como o dono fez no grupo do Porto a 14/10 ("Pagos
 // diretamente a mim (desconto a vossa parte)", 997,75€ → 858,75€; dono, 15/10:
 // "não tiveste isso em conta"). Fica nas contas até o dono marcar a linha como
 // paga no CRM.
@@ -74,6 +75,8 @@ export interface AccountRow {
   invoiced?: boolean | null;
   /** O cliente paga ao dono (transferência): a equipa não deve nada deste serviço. */
   paid_to_owner?: boolean | null;
+  /** Pago ao dono: quando o cliente pagou. Sem data, a parte da equipa ainda não se desconta. */
+  client_paid_owner_at?: string | null;
 }
 
 /** Um valor combinado com a equipa que não é um serviço (team_account_adjustments, por saldar). */
@@ -108,6 +111,8 @@ export interface TeamAccount {
   adjustments: AccountLine[];
   /** Serviços pagos ao dono: ele deve à equipa a parte dela (amount = parte da equipa). Fora de total. */
   ownerOwes: AccountLine[];
+  /** Pagos ao dono que o cliente ainda não pagou: só informação, fora de total. */
+  awaitingClient: AccountLine[];
   total: number;
   /** A mensagem para a equipa, em português. */
   message: string;
@@ -176,16 +181,20 @@ function teamMessage(a: Omit<TeamAccount, 'message'>): string {
     out.push('', 'Pagos diretamente a mim (desconto a vossa parte):');
     for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
   }
+  if (a.awaitingClient.length) {
+    out.push('', 'O cliente paga-me a mim e ainda não pagou (desconto a vossa parte quando pagar):');
+    for (const l of a.awaitingClient) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+  }
   out.push('', `Total que me devem: ${euros(a.total)}`);
   return out.join('\n');
 }
 
 export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: string, adjustments: AccountAdjustment[] = []): TeamAccountsReport {
   const teamOfEvent = new Map(events.map(e => [e.id, eventTeam(e)]));
-  type Bucket = { today: AccountLine[]; before: AccountLine[]; adjustments: AccountLine[]; ownerOwes: AccountLine[] };
+  type Bucket = { today: AccountLine[]; before: AccountLine[]; adjustments: AccountLine[]; ownerOwes: AccountLine[]; awaitingClient: AccountLine[] };
   const byTeam = new Map<string, Bucket>();
   const bucketOf = (team: string) => {
-    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [] };
+    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [], awaitingClient: [] };
     byTeam.set(team, b);
     return b;
   };
@@ -202,7 +211,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
     if (r.paid_to_owner) {
       const teamPart = round2((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
-      if (team && teamPart > 0) bucketOf(team).ownerOwes.push({ date: r.request_date!, label: labelOf(r), amount: teamPart });
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date!)
@@ -226,7 +235,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
 
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {
-      team, date, today: b.today, before: b.before, adjustments: b.adjustments, ownerOwes: b.ownerOwes,
+      team, date, today: b.today, before: b.before, adjustments: b.adjustments, ownerOwes: b.ownerOwes, awaitingClient: b.awaitingClient,
       todayTotal: sum(b.today), beforeTotal: sum(b.before), total: round2(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes)),
     };
     return { ...base, message: teamMessage(base) };

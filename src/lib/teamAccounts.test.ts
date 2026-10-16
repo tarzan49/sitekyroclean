@@ -97,7 +97,7 @@ describe('teamAccounts', () => {
   it('a service paid to the owner is not owed by the team and its part comes off the total', () => {
     const r = teamAccounts([
       row({ calendar_event_id: 'e3' }),
-      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 50, my_cut: 25, paid_to_owner: true }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 50, my_cut: 25, paid_to_owner: true, client_paid_owner_at: '2026-10-14T12:00:00Z' }),
     ], events, '2026-10-13');
     expect(r.teams[0].total).toBe(15);
     expect(r.teams[0].ownerOwes).toEqual([{ date: '2026-10-13', label: 'Sofia Teste, Porto', amount: 25 }]);
@@ -107,9 +107,19 @@ describe('teamAccounts', () => {
   it('nothing is sent when what the owner received covers what the team owes', () => {
     const r = teamAccounts([
       row({ calendar_event_id: 'e3' }),
-      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 89, my_cut: 45, paid_to_owner: true }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 89, my_cut: 45, paid_to_owner: true, client_paid_owner_at: '2026-10-14T12:00:00Z' }),
     ], events, '2026-10-13');
     expect(r.teams).toEqual([]);
+  });
+
+  it('paid to the owner but the client has not paid yet: listed, nothing comes off (Catarina Foz, 16 Oct)', () => {
+    const r = teamAccounts([
+      row({ calendar_event_id: 'e3' }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 50, my_cut: 25, paid_to_owner: true }),
+    ], events, '2026-10-13');
+    expect(r.teams[0].total).toBe(40);
+    expect(r.teams[0].ownerOwes).toEqual([]);
+    expect(r.teams[0].message).toContain('ainda não pagou (desconto a vossa parte quando pagar):\n13/10 Sofia Teste, Porto · a vossa parte 25€\n\nTotal que me devem: 40€');
   });
 
   it('with an invoice the 23% VAT goes on top and is all the owner\'s', () => {

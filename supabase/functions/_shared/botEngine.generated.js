@@ -1332,6 +1332,10 @@ function teamMessage(a) {
     out.push("", "Pagos diretamente a mim (desconto a vossa parte):");
     for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
   }
+  if (a.awaitingClient.length) {
+    out.push("", "O cliente paga-me a mim e ainda não pagou (desconto a vossa parte quando pagar):");
+    for (const l of a.awaitingClient) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+  }
   out.push("", `Total que me devem: ${euros(a.total)}`);
   return out.join("\n");
 }
@@ -1339,7 +1343,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
   const teamOfEvent = new Map(events.map((e) => [e.id, eventTeam(e)]));
   const byTeam = /* @__PURE__ */ new Map();
   const bucketOf = (team) => {
-    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [] };
+    const b = byTeam.get(team) ?? { today: [], before: [], adjustments: [], ownerOwes: [], awaitingClient: [] };
     byTeam.set(team, b);
     return b;
   };
@@ -1351,7 +1355,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
     if (r.paid_to_owner) {
       const teamPart = round23((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
-      if (team && teamPart > 0) bucketOf(team).ownerOwes.push({ date: r.request_date, label: labelOf(r), amount: teamPart });
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
@@ -1387,6 +1391,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
       before: b.before,
       adjustments: b.adjustments,
       ownerOwes: b.ownerOwes,
+      awaitingClient: b.awaitingClient,
       todayTotal: sum(b.today),
       beforeTotal: sum(b.before),
       total: round23(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes))
