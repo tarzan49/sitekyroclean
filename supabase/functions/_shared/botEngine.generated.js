@@ -1306,7 +1306,9 @@ function lineBlock(l, team) {
   if (l.billed === void 0 || l.share === void 0) return [`${head}: ${euros(l.amount)}`];
   const parts = [`a minha parte ${euros(l.share)}`];
   if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
-  if (l.vat) parts.push(`IVA 23% ${euros(l.vat)}`);
+  if (l.vat && l.teamPart !== void 0) {
+    return [head, `Serviço ${euros(l.billed)} com fatura (${euros(l.billed - l.vat)} + ${euros(l.vat)} de IVA) · a vossa parte ${euros(l.teamPart)}, metade do valor sem IVA = deves-me ${euros(l.amount)}`];
+  }
   return [head, `Serviço ${euros(l.billed)} · ${parts.join(" + ")} = deves-me ${euros(l.amount)}`];
 }
 function teamMessage(a) {
@@ -1353,24 +1355,28 @@ function teamAccounts(rows, events, date, adjustments = []) {
     const share = ownerShareOf(r);
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    const billed = Number(r.billed_value) || 0;
+    const net = r.invoiced ? round23(billed / (1 + INVOICE_VAT)) : billed;
+    const invoiceTeamPart = r.invoiced ? Math.floor(round23(net * 50)) / 100 : null;
+    const ownerUpsell = round23(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
-      const teamPart = round23((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
+      const teamPart = invoiceTeamPart !== null ? round23(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round23(billed + (Number(r.upsell_value) || 0) - share);
       if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
-    const billed = Number(r.billed_value) || 0;
-    const vat = r.invoiced ? round23(billed * INVOICE_VAT) : 0;
+    const vat = r.invoiced ? round23(billed - net) : 0;
     const what = (r.description ?? "").trim();
+    const amount2 = invoiceTeamPart !== null ? round23(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round23(share + penalty);
     const line = {
       date: r.request_date,
       label: labelOf(r),
-      amount: round23(share + penalty + vat),
+      amount: amount2,
       billed,
       share,
       ...what ? { what } : {},
       ...penalty ? { reviewPenalty: penalty } : {},
-      ...vat ? { vat } : {}
+      ...vat ? { vat, teamPart: invoiceTeamPart } : {}
     };
     if (!team) {
       unassigned.push(line);

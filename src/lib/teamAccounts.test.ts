@@ -122,9 +122,18 @@ describe('teamAccounts', () => {
     expect(r.teams[0].message).toContain('ainda não pagou (desconto a vossa parte quando pagar):\n13/10 Sofia Teste, Porto · a vossa parte 25€\n\nTotal que me devem: 40€');
   });
 
-  it('with an invoice the 23% VAT goes on top and is all the owner\'s', () => {
+  it('paid to the owner with an invoice: the team gets half of the price without VAT (Inês, 16 Oct)', () => {
+    const r = teamAccounts([
+      row({ calendar_event_id: 'e3', billed_value: 200, my_cut: 100 }),
+      row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 79, my_cut: 40, invoiced: true, paid_to_owner: true, client_paid_owner_at: '2026-10-16T12:00:00Z' }),
+    ], events, '2026-10-13');
+    expect(r.teams[0].ownerOwes[0].amount).toBe(32.11);
+  });
+
+  it('with an invoice the VAT is inside the price and split in half', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40, invoiced: true })], events, '2026-10-14');
-    expect(r.teams[0].total).toBe(58.17);
-    expect(r.teams[0].message).toContain('Serviço 79€ · a minha parte 40€ + IVA 23% 18,17€ = deves-me 58,17€');
+    // IVA incluído no preço e dividido a meias (16/10): base 64,23€, a equipa fica com 32,11€.
+    expect(r.teams[0].total).toBe(46.89);
+    expect(r.teams[0].message).toContain('Serviço 79€ com fatura (64,23€ + 14,77€ de IVA) · a vossa parte 32,11€, metade do valor sem IVA = deves-me 46,89€');
   });
 });

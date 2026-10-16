@@ -98,6 +98,8 @@ export interface AccountLine {
   share?: number;
   /** IVA da fatura, já dentro de `amount`. */
   vat?: number;
+  /** Com fatura: a parte da equipa, metade do valor sem IVA. */
+  teamPart?: number;
 }
 
 export interface TeamAccount {
@@ -154,7 +156,9 @@ function lineBlock(l: AccountLine, team: string): string[] {
   if (l.billed === undefined || l.share === undefined) return [`${head}: ${euros(l.amount)}`];
   const parts = [`a minha parte ${euros(l.share)}`];
   if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? 'sem avaliação'} ${euros(l.reviewPenalty)}`);
-  if (l.vat) parts.push(`IVA 23% ${euros(l.vat)}`);
+  if (l.vat && l.teamPart !== undefined) {
+    return [head, `Serviço ${euros(l.billed)} com fatura (${euros(l.billed - l.vat)} + ${euros(l.vat)} de IVA) · a vossa parte ${euros(l.teamPart)}, metade do valor sem IVA = deves-me ${euros(l.amount)}`];
+  }
   return [head, `Serviço ${euros(l.billed)} · ${parts.join(' + ')} = deves-me ${euros(l.amount)}`];
 }
 
@@ -209,19 +213,28 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const share = ownerShareOf(r);
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
+    const billed = Number(r.billed_value) || 0;
+    // Com fatura, o IVA (23%) está incluído no preço e divide-se a meias: a equipa fica com metade
+    // do valor sem IVA (dono, 2026-10-16, Aleixo: "temos que dividir o IVA... estava incluído no valor").
+    const net = r.invoiced ? round2(billed / (1 + INVOICE_VAT)) : billed;
+    const invoiceTeamPart = r.invoiced ? Math.floor(round2(net * 50)) / 100 : null;
+    const ownerUpsell = round2(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
-      const teamPart = round2((Number(r.billed_value) || 0) + (Number(r.upsell_value) || 0) - share);
+      const teamPart = invoiceTeamPart !== null
+        ? round2(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell))
+        : round2(billed + (Number(r.upsell_value) || 0) - share);
       if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date!)
       ? round2((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
-    const billed = Number(r.billed_value) || 0;
-    const vat = r.invoiced ? round2(billed * INVOICE_VAT) : 0;
+    const vat = r.invoiced ? round2(billed - net) : 0;
     const what = (r.description ?? '').trim();
+    const amount = invoiceTeamPart !== null ? round2(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round2(share + penalty);
     const line: AccountLine = {
-      date: r.request_date!, label: labelOf(r), amount: round2(share + penalty + vat), billed, share,
-      ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}), ...(vat ? { vat } : {}),
+      date: r.request_date!, label: labelOf(r), amount, billed, share,
+      ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}),
+      ...(vat ? { vat, teamPart: invoiceTeamPart! } : {}),
     };
     if (!team) { unassigned.push(line); continue; }
     const bucket = bucketOf(team);
