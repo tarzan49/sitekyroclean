@@ -19,6 +19,7 @@ import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../co
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
+import { freguesiaToMunicipio } from './parishMunicipality';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -37,9 +38,22 @@ const TREATMENT_TO_ITEM: Record<BotTreatment, { extra: PackExtra; primary: 'clea
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
 const CITY_BY_FOLDED = new Map(Object.keys(locationPrices).map(name => [fold(name), name]));
 
-/** The served locality as the site writes it ("Vila Nova de Gaia"), or null. */
+/**
+ * The served locality as the site writes it ("Vila Nova de Gaia"), or null.
+ * A freguesia resolves to its municipality, as in the quiz's location step:
+ * on 16 Oct 2026 a client wrote "Ericeira", the quote came back without a
+ * locality and "sob orçamento", and the bot held a 4-chair quote for the owner
+ * instead of pricing it (Mafra, 10€). "Ericeira, Mafra" works part by part.
+ */
 export function resolveBotCity(input: unknown): string | null {
-  return typeof input === 'string' ? CITY_BY_FOLDED.get(fold(input)) ?? null : null;
+  if (typeof input !== 'string') return null;
+  for (const part of [input, ...input.split(/[,()/]/)]) {
+    const key = fold(part);
+    if (!key) continue;
+    const city = CITY_BY_FOLDED.get(key) ?? freguesiaToMunicipio.get(key);
+    if (city) return city;
+  }
+  return null;
 }
 
 /** Every served locality with its travel fee, for the bot to match names. */

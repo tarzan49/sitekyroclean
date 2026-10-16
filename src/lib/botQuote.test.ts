@@ -111,6 +111,17 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(resolveBotCity(42)).toBeNull();
     expect(listBotCities()).toHaveLength(Object.keys(locationPrices).length);
   });
+  it('resolves a freguesia to its municipality, like the quiz (Ericeira, 16 Oct 2026)', () => {
+    expect(resolveBotCity('Ericeira')).toBe('Mafra');
+    expect(resolveBotCity('ericeira, mafra')).toBe('Mafra');
+    expect(resolveBotCity('Paranhos (Porto)')).toBe('Porto');
+    // A name shared by two served municipalities decides nothing on its own.
+    expect(resolveBotCity('Santa Clara')).toBeNull();
+    expect(resolveBotCity('Santa Clara, Coimbra')).toBe('Coimbra');
+    expect(resolveBotCity('Madrid')).toBeNull();
+    const chairs = ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'clean+essencial' }], city: 'Ericeira' });
+    expect([chairs.city, chairs.lines[0].amount, chairs.travel, chairs.handToOwner]).toEqual(['Mafra', 172, 10, false]);
+  });
   it('rejects what the engine does not sell, with a message the bot developer can read', () => {
     const errors = [
       { items: [{ kind: 'mattress', size: 'casal', treatment: 'premium' }], city: 'Porto' },
