@@ -519,6 +519,10 @@ Pedido do dono: "quero saber exatamente quanto estou a fechar do Google e quanto
 - As "conversões" do Google Ads (cliques no WhatsApp, formulários) aparecem só como referência na tabela das campanhas; nunca como clientes.
 - Os contactos dependem de a tabela `clients` estar atualizada a partir do WhatsApp Web (não há sincronização automática); o painel diz quando foi a última leitura.
 
+## Aba "Conversas" do CRM (2026-10-16)
+
+Dono: "a quantidade de novas conversas que eu recebi no WhatsApp por dia, por semana [...] para comparar com a altura em que isto era orgânico". Tabela `whatsapp_conversations` (migração `20261016120000`, aplicada; só leitura `is_admin`), uma linha por contacto com a primeira mensagem e a origem (`google`/`meta`/`questionario`/`organico`, lida de "Vi o vosso anúncio no…" e "Acabei de enviar o pedido #"; quem recebeu a mensagem automática do questionário conta como questionário). Escrita só pela `bot-api` `conversations-upsert`, chamada de hora a hora (minuto 17) pelo kyro-bot `scripts/conversations-export.ts --push`, que lê o `kyro.db` e tira grupos, equipas (`TEAM_RECIPIENTS`), parceiros, o próprio número e conversas que começámos nós. Contas em `src/lib/whatsappConversations.ts`; a aba (`CrmConversations.tsx`) compara a média por semana orgânica (desde 17/08) com a dos anúncios (desde 28/09; a semana de 21/09 fica de fora). **O Google é um mínimo** (quem vem do anúncio e escreve outra coisa conta como orgânico) e **antes de meados de setembro o histórico do servidor é incompleto**.
+
 ## Fichas de clientes (2026-10-06)
 
 Separador "Clientes" do painel (`src/pages/admin/ClientsPanel.tsx`, lógica em `src/lib/clientRecords.ts`), à parte do CRM de vendas. Pedido do dono: "todos os contactos" do WhatsApp (98% dos clientes chegam por lá), os que fecharam, os por marcar e os não interessados, para mandar no Natal, na Black Friday, etc. uma mensagem diferente a cada tipo de pessoa; e uma vista "Evolução" por mês e a 30/60/90/120/360 dias, com contactos novos, fechos, taxa de fecho e "mensagem recebida vs fecho".

@@ -471,3 +471,17 @@ Deno.test("team-accounts: what each team owes, from the CRM and the calendar's t
   assertEquals((await call({ action: "team-accounts", date: "ontem" }, () => Promise.resolve({ rows }))).status, 400);
   assertEquals((await call({ action: "team-accounts" }, null)).status, 503);
 });
+
+Deno.test("conversations-upsert grava linhas válidas e recusa as inválidas", async () => {
+  const saved: Row[][] = [];
+  const env = { botKey: KEY, leads: fakeLeads(), conversations: async (rows: Row[]) => { saved.push(rows); return {}; } };
+  const send = (body: unknown) => handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+    method: "POST", body: JSON.stringify(body),
+    headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": "10.9.9.9" },
+  }), env);
+  const ok = await send({ action: "conversations-upsert", rows: [{ contact_key: "351910000001", first_at: "2026-10-01T10:00:00Z", origin: "google", inbound_count: 3 }] });
+  assertEquals(ok.status, 200);
+  assertEquals(saved[0][0].origin, "google");
+  const bad = await send({ action: "conversations-upsert", rows: [{ contact_key: "x", first_at: "2026-10-01", origin: "google" }] });
+  assertEquals(bad.status, 400);
+});

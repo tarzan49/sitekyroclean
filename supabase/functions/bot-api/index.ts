@@ -83,6 +83,7 @@ import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, valida
 const RATE_LIMIT_MAX = 300;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
 const MAX_BODY_BYTES = 20_000;
+const CONVERSATION_ORIGINS = ["google", "meta", "questionario", "organico"];
 /**
  * `label-facts` takes up to 800 phones. 800 digits-only phones fit in 20 KB, but
  * 800 jids ("351912345678@s.whatsapp.net") or phones written with spaces do not:
@@ -116,6 +117,8 @@ export interface BotEnv {
   accounts?: (() => Promise<{ rows: Row[]; adjustments?: Row[] } | { error: string }>) | null;
   /** service_procedure, service_requests and google_reviews for the procedure actions. */
   procedures?: ProcedureStore | null;
+  /** Conversas novas do WhatsApp (tabela whatsapp_conversations), escritas pelo servidor do bot. */
+  conversations?: ((rows: Row[]) => Promise<{ error?: string }>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -422,6 +425,24 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if ("error" in cal) return createErrorResponse(cal.error, 502);
       if ("error" in crm) return createErrorResponse(crm.error, 502);
       return createSuccessResponse({ accounts: teamAccounts(crm.rows, cal.events, date, crm.adjustments ?? []) });
+    }
+    case "conversations-upsert": {
+      if (!env.conversations) return createErrorResponse("Conversas por ligar", 503);
+      const rows = Array.isArray(body.rows) ? body.rows : null;
+      if (!rows || rows.length > 150) return createErrorResponse("rows tem de ser uma lista até 150", 400);
+      const clean: Row[] = [];
+      for (const r of rows as Row[]) {
+        const key = String(r?.contact_key ?? "");
+        const at = new Date(String(r?.first_at ?? ""));
+        if (!/^\d{6,20}$/.test(key) || Number.isNaN(at.getTime()) || !CONVERSATION_ORIGINS.includes(String(r.origin))) {
+          return createErrorResponse("linha inválida", 400);
+        }
+        clean.push({ contact_key: key, is_lid: r.is_lid === true, first_at: at.toISOString(), origin: String(r.origin),
+          started_by_us: r.started_by_us === true, inbound_count: Math.max(0, Math.floor(Number(r.inbound_count) || 0)), updated_at: new Date().toISOString() });
+      }
+      const res = await env.conversations(clean);
+      if (res.error) return createErrorResponse("Não foi possível gravar as conversas", 500);
+      return createSuccessResponse({ saved: clean.length });
     }
     case "procedure-due":
     case "procedure-sent":
@@ -823,6 +844,17 @@ function supabaseProcedures(): ProcedureStore | null {
   };
 }
 
+function supabaseConversations(): BotEnv["conversations"] {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  return async rows => {
+    const { error } = await client.from("whatsapp_conversations").upsert(rows, { onConflict: "contact_key" });
+    return error ? { error: error.message } : {};
+  };
+}
+
 function supabaseFollowUps(): FollowUpStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -912,5 +944,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), conversations: supabaseConversations() }));
 }

@@ -10,6 +10,7 @@ import CrmUpsell from "./CrmUpsell";
 import CrmServiceMix from "./CrmServiceMix";
 import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmQuizLeads from "./CrmQuizLeads";
+import CrmConversations from "./CrmConversations";
 import CrmReviews from "./CrmReviews";
 import { summarizeQuizLeads, summarizeWhatsAppContacts, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
@@ -113,7 +114,7 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "upsell" | "questionario" | "avaliacoes">("pedidos");
+  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "conversas" | "upsell" | "questionario" | "avaliacoes">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
   const [quizError, setQuizError] = useState<string | null>(null);
@@ -402,7 +403,7 @@ const CrmPanel = () => {
         <div>
           <h2 className="text-lg font-bold text-navy">CRM — Pedidos de Serviço</h2>
           <p className="text-sm text-gray-500">
-            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : view === "questionario" ? "Pedidos do questionário do site e quantos fecharam" : view === "fechos" ? "Fechos por semana, a revisão de segunda-feira e a taxa de fecho por serviço" : view === "avaliacoes" ? "Avaliações do Google por mês e por serviço" : "Serviços fechados por dia"}
+            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : view === "questionario" ? "Pedidos do questionário do site e quantos fecharam" : view === "fechos" ? "Fechos por semana, a revisão de segunda-feira e a taxa de fecho por serviço" : view === "avaliacoes" ? "Avaliações do Google por mês e por serviço" : view === "conversas" ? "Conversas novas do WhatsApp por dia e por semana, por origem" : "Serviços fechados por dia"}
             {reviewCount > 0 && <span className="text-amber-700"> · {reviewCount} para rever</span>}
           </p>
           <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
@@ -453,7 +454,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200" role="tablist">
-        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["upsell", "Upsell"], ["questionario", "Questionário"], ["avaliacoes", "Avaliações"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["conversas", "Conversas"], ["upsell", "Upsell"], ["questionario", "Questionário"], ["avaliacoes", "Avaliações"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -475,6 +476,7 @@ const CrmPanel = () => {
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
 
+      {view === "conversas" && <CrmConversations />}
       {view === "avaliacoes" && <CrmReviews services={records} />}
       {view === "questionario" && <CrmQuizLeads summary={quizSummary} whatsApp={waMonths} error={quizError} />}
 
