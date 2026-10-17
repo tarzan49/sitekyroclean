@@ -120,7 +120,7 @@ export interface BotEnv {
   /** Conversas novas do WhatsApp (tabela whatsapp_conversations), escritas pelo servidor do bot. */
   conversations?: ((rows: Row[]) => Promise<{ error?: string }>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
-  notifyOwner?: ((subject: string, text: string) => Promise<string | null>) | null;
+  notifyOwner?: ((subject: string, text: string, html?: string) => Promise<string | null>) | null;
   now?: () => Date;
 }
 
@@ -477,7 +477,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const subject = typeof body.subject === "string" ? body.subject.replace(/[\r\n]+/g, " ").trim().slice(0, 150) : "";
       const text = typeof body.text === "string" ? body.text.slice(0, 8000) : "";
       if (!subject || !text) return createErrorResponse("subject e text são obrigatórios", 400);
-      const err = await env.notifyOwner(subject, text);
+      // Optional HTML version: the handoff alerts are laid out for the phone (owner, 16 Oct 2026: "organiza essas informações").
+      const html = typeof body.html === "string" && body.html.trim() ? body.html.slice(0, 40000) : undefined;
+      const err = await env.notifyOwner(subject, text, html);
       if (err) return createErrorResponse(err, 502);
       return createSuccessResponse({ sent: true });
     }
@@ -939,12 +941,12 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   const to = Deno.env.get("LEAD_NOTIFICATION_EMAIL");
   if (!apiKey || !to) return null;
-  return async (subject, text) => {
+  return async (subject, text, html) => {
     try {
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: "Kyro Bot <pedidos@cleansolutions.com.pt>", to: [to], subject, text }),
+        body: JSON.stringify({ from: "Kyro Bot <pedidos@cleansolutions.com.pt>", to: [to], subject, text, ...(html ? { html } : {}) }),
         signal: AbortSignal.timeout(15_000),
       });
       return res.ok ? null : `O Resend recusou o envio (${res.status})`;

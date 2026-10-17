@@ -431,8 +431,8 @@ Deno.test("book at an hour another service of the zone has: pre-booking for the 
 });
 
 Deno.test("notify-owner emails the owner and refuses without subject or text", async () => {
-  const sent: string[][] = [];
-  const env = { botKey: KEY, leads: null, notifyOwner: (s: string, t: string) => { sent.push([s, t]); return Promise.resolve(null); } };
+  const sent: (string | undefined)[][] = [];
+  const env = { botKey: KEY, leads: null, notifyOwner: (s: string, t: string, h?: string) => { sent.push(h ? [s, t, h] : [s, t]); return Promise.resolve(null); } };
   const post = (body: unknown) => handleBotRequest(new Request("https://x/functions/v1/bot-api", {
     method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.9.${++ip % 250}` }, body: JSON.stringify(body),
   }), env);
@@ -440,6 +440,9 @@ Deno.test("notify-owner emails the owner and refuses without subject or text", a
   assertEquals(ok.status, 200);
   assertEquals(sent, [["Agenda de amanhã", "3 serviços"]]);
   assertEquals((await post({ action: "notify-owner", subject: "", text: "x" })).status, 400);
+  // The handoff alerts also carry an HTML version, laid out for the phone (16 Oct 2026).
+  await post({ action: "notify-owner", subject: "Responde tu", text: "texto", html: "<p>texto</p>" });
+  assertEquals(sent[1], ["Responde tu", "texto", "<p>texto</p>"]);
   const off = await handleBotRequest(new Request("https://x/functions/v1/bot-api", {
     method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.9.${++ip % 250}` }, body: JSON.stringify({ action: "notify-owner", subject: "a", text: "b" }),
   }), { botKey: KEY, leads: null });

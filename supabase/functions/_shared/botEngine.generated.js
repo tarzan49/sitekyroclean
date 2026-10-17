@@ -1797,9 +1797,13 @@ function toItem(raw, index) {
   if (kind === "mattress" && (extra === "premium" || extra === "essencial")) return fail(`items[${index}]: colchões não se impermeabilizam`);
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   let size = "";
-  if (kind === "sofa" || kind === "mattress") {
+  if (kind === "sofa" && r.size === "u") {
+    const seats = r.seats;
+    if (typeof seats !== "number" || !Number.isInteger(seats) || seats < 2 || seats > 15) return fail(`items[${index}].seats (lugares contados na fotografia, 2 a 15) é obrigatório num sofá em U`);
+    size = treatment !== "clean" ? "4+-lugares" : seats <= 4 ? "4-lugares" : "5-lugares";
+  } else if (kind === "sofa" || kind === "mattress") {
     size = typeof r.size === "string" ? r.size : "";
-    if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(", ")}`);
+    if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(", ")}${kind === "sofa" ? ", ou u (sofá em U, com seats)" : ""}`);
   }
   const dim = (v) => {
     const side = typeof v === "number" ? rugSide(v) : null;

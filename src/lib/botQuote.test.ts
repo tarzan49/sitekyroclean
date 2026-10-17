@@ -9,6 +9,13 @@ const ok = (input: unknown) => {
 };
 
 describe('botQuote: the numbers the bot replies with come from the site engine', () => {
+  it('a U sofa is priced by the seats counted in the photo: up to 4 as 4 lugares, 5+ as 5+; waterproofing stays with the owner (16 Oct 2026)', () => {
+    const u = (seats: number, treatment = 'clean') => ok({ items: [{ kind: 'sofa', size: 'u', seats, treatment }], city: 'Porto' });
+    expect([u(4).subtotal, u(4).handToOwner]).toEqual([99, false]);
+    expect([u(6).subtotal, u(6).handToOwner]).toEqual([119, false]);
+    expect(u(6, 'clean+premium').handToOwner).toBe(true);
+    expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);
+  });
   it('sofa 3 seats in Oeiras: 79€ + 10€ travel (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' });
     expect([r.subtotal, r.travel, r.total, r.handToOwner]).toEqual([79, 10, 89, false]);
