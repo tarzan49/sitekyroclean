@@ -464,6 +464,23 @@ function rugMaterialClass(material) {
   return "common";
 }
 var roundToNine = (value) => Math.max(9, Math.round((value - 9) / 10) * 10 + 9);
+var roundDownToNine = (value) => Math.max(9, Math.floor((value - 9) / 10) * 10 + 9);
+function rugComboEstimate(rugs, othersPrice, city) {
+  const rug = rugEstimate(rugs, city);
+  if (!rug.ok) return rug;
+  const rugsWashing = roundToNine(rug.homePrice - rug.travelFee);
+  const usualPrice = rug.homePrice + othersPrice + rug.travelFee;
+  const comboPrice = roundDownToNine(rugsWashing + othersPrice);
+  return {
+    ok: true,
+    rugsWashing,
+    othersPrice,
+    usualPrice,
+    comboPrice,
+    travelWaived: usualPrice - comboPrice,
+    rule: "Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas."
+  };
+}
 function rugEstimate(rugs, city) {
   if (!rugs.length) return { ok: false, reason: "sem tapetes" };
   if (!city || !(city in locationPrices)) return { ok: false, reason: "localidade não servida" };
@@ -1855,7 +1872,11 @@ function botQuote(input) {
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   const rugsOnly = items.every((i) => i.kind === "rug");
   const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
-  const rugPriced = rugPrice?.ok === true;
+  const rugIdx = items.flatMap((i, n) => i.kind === "rug" ? [n] : []);
+  const others = items.filter((i) => i.kind !== "rug");
+  const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? "") : null;
+  const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawItems[n].material })), othersResult.subtotal, city) : null;
+  const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = result.quote && !rugPriced || city === null || extendedTrip;
   return {
     ok: true,
@@ -1881,12 +1902,13 @@ function botQuote(input) {
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
+    rugCombo,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,
       waterproofing: items.some(isWaterproofing),
       handToOwner: handToOwner && !rugPriced,
-      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null
+      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : rugCombo?.ok ? { homePrice: rugCombo.comboPrice, pickupPrice: null } : null
     })
   };
 }

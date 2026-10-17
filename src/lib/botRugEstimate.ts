@@ -56,6 +56,36 @@ export type RugEstimate =
   | { ok: true; areaM2: number; ratePerM2: number[]; travelFee: number; homePrice: number; pickupPrice: number | null; pickupFee: number | null; sofaUpsellPrice: number; sofaUsualPrice: number; rule: string }
   | { ok: false; reason: string; needsMaterial?: true };
 
+/** Highest amount ending in 9 at or below the value (172 → 169, 169 → 169). */
+export const roundDownToNine = (value: number) => Math.max(9, Math.floor((value - 9) / 10) * 10 + 9);
+
+export type RugComboEstimate =
+  | { ok: true; rugsWashing: number; othersPrice: number; usualPrice: number; comboPrice: number; travelWaived: number; rule: string }
+  | { ok: false; reason: string; needsMaterial?: true };
+
+/**
+ * Rugs plus other items in the same visit (owner, 17 Oct 2026: "é suposto o bot dar preço e
+ * saber dar uma condição especial boa", "deslocação gratuita para este tipo de pedidos").
+ * usualPrice = the rugs at their own price with travel + the other items + travel again, as two
+ * separate visits would cost; comboPrice = rug washing + other items, no travel, rounded down to 9.
+ */
+export function rugComboEstimate(rugs: RugEstimateItem[], othersPrice: number, city: string | null): RugComboEstimate {
+  const rug = rugEstimate(rugs, city);
+  if (!rug.ok) return rug;
+  const rugsWashing = roundToNine(rug.homePrice - rug.travelFee);
+  const usualPrice = rug.homePrice + othersPrice + rug.travelFee;
+  const comboPrice = roundDownToNine(rugsWashing + othersPrice);
+  return {
+    ok: true,
+    rugsWashing,
+    othersPrice,
+    usualPrice,
+    comboPrice,
+    travelWaived: usualPrice - comboPrice,
+    rule: 'Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas.',
+  };
+}
+
 export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEstimate {
   if (!rugs.length) return { ok: false, reason: 'sem tapetes' };
   if (!city || !(city in locationPrices)) return { ok: false, reason: 'localidade não servida' };

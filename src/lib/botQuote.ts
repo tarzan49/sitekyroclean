@@ -17,7 +17,7 @@ import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
-import { rugEstimate } from './botRugEstimate';
+import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio } from './parishMunicipality';
 
@@ -173,7 +173,14 @@ export function botQuote(input: unknown) {
   const rugPrice = rugsOnly
     ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawItems[n] as Record<string, unknown>).material })), city)
     : null;
-  const rugPriced = rugPrice?.ok === true;
+  // Rugs mixed with priced items: one visit, travel offered (owner, 17 Oct 2026).
+  const rugIdx = items.flatMap((i, n) => (i.kind === 'rug' ? [n] : []));
+  const others = items.filter(i => i.kind !== 'rug');
+  const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? '') : null;
+  const rugCombo = othersResult && !othersResult.quote
+    ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: (rawItems[n] as Record<string, unknown>).material })), othersResult.subtotal, city)
+    : null;
+  const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = (result.quote && !rugPriced) || city === null || extendedTrip;
   return {
     ok: true as const,
@@ -199,12 +206,13 @@ export function botQuote(input: unknown) {
     handToOwner,
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
+    rugCombo,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,
       waterproofing: items.some(isWaterproofing),
       handToOwner: handToOwner && !rugPriced,
-      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : null,
+      rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : rugCombo?.ok ? { homePrice: rugCombo.comboPrice, pickupPrice: null } : null,
     }),
   };
 }
