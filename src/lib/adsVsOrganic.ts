@@ -1,4 +1,5 @@
 import { addDays, countsAsClosing, lisbonDay, weekdayOf } from './crmClosings';
+import { lisbonMidnight } from './lisbonTime';
 
 // O que os anúncios trazem a mais (dono, 2026-10-17: "termos dados para perceber
 // quantos pedidos de orçamento temos a mais comparando com agosto e setembro";
@@ -59,7 +60,7 @@ export function buildWeeks(closings: ClosingInput[], spend: SpendInput[], conver
     const inWeek = (day: string) => day >= week && day <= end;
     const done = closings.filter(c => c.booked_at && countsAsClosing({ billed_value: Number(c.billed_value) || 0, upsell_value: c.upsell_value }) && inWeek(lisbonDay(c.booked_at)));
     const conv = pickConversations(conversations, week);
-    const daysElapsed = end < today ? 7 : Math.min(7, Math.max(0, (now.getTime() - Date.parse(`${week}T00:00:00+01:00`)) / 86_400_000));
+    const daysElapsed = end < today ? 7 : Math.min(7, Math.max(0, (now.getTime() - lisbonMidnight(week)) / 86_400_000));
     out.push({
       week, daysElapsed,
       spend: spend.filter(s => inWeek(s.stat_date)).reduce((s, x) => s + (Number(x.cost) || 0), 0),
