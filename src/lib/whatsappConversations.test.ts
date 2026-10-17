@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareEras, summarizeConversations, weeklyConversations, type ConversationRow } from './whatsappConversations';
+import { compareEras, summarizeConversations, weeklyCloseRate, weeklyConversations, type ConversationRow } from './whatsappConversations';
 
 const rows: ConversationRow[] = [
   { first_at: '2026-09-07T10:00:00Z', origin: 'organico' },
@@ -28,5 +28,25 @@ describe('whatsappConversations', () => {
     expect(e.organic.perWeek).toBe(1);
     expect(e.ads.perWeek).toBe(3);
     expect(e.ads.costPerWeek).toBe(100);
+  });
+  it('taxa de fecho por semana de contacto', () => {
+    const contacts: ConversationRow[] = [
+      { first_at: '2026-09-28T09:00:00Z', origin: 'google', contact_key: '351910000001' },
+      { first_at: '2026-09-29T09:00:00Z', origin: 'organico', contact_key: '351910000002' },
+      { first_at: '2026-09-30T09:00:00Z', origin: 'organico', contact_key: '351910000003' },
+      { first_at: '2026-10-01T09:00:00Z', origin: 'organico', is_lid: true, contact_key: '999@lid' },
+      { first_at: '2026-10-06T09:00:00Z', origin: 'organico', contact_key: '351910000004' },
+    ];
+    const closings = [
+      { phone: '910000001', booked_at: '2026-09-28T12:00:00Z', billed_value: 89 }, // no próprio dia
+      { phone: '+351 910 000 002', booked_at: '2026-10-09T12:00:00Z', billed_value: 69 }, // 10 dias depois: conta, fora dos 7
+      { phone: '910000003', booked_at: '2026-09-20T12:00:00Z', billed_value: 79 }, // antes do contacto: não conta
+      { phone: '910000003', booked_at: '2026-10-02T12:00:00Z', billed_value: 0 }, // revisita a 0€: não conta
+      { phone: '910000004', booked_at: '2026-11-20T12:00:00Z', billed_value: 99 }, // depois dos 30 dias
+    ];
+    const [w1, w2] = weeklyCloseRate(contacts, closings, '2026-10-06', 2, new Date('2026-10-08T12:00:00Z'));
+    expect(w1).toMatchObject({ week: '2026-09-28', contacts: 4, google: 1, noPhone: 1, closed: 2, closedIn7: 1, revenue: 158, open: false });
+    expect(w1.rate).toBe(0.5);
+    expect(w2).toMatchObject({ week: '2026-10-05', contacts: 1, closed: 0, open: true });
   });
 });

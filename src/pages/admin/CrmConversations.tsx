@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { addDays, lisbonDay, monthBounds, shiftMonth, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import { mondayOf } from "@/lib/weeklyReview";
 import {
-  ADS_START, compareEras, ORIGIN_LABEL, ORIGINS, summarizeConversations, weeklyConversations,
-  type ConversationOrigin, type ConversationRow, type SpendRow,
+  ADS_START, COHORT_CLOSE_DAYS, compareEras, ORIGIN_LABEL, ORIGINS, summarizeConversations, weeklyCloseRate, weeklyConversations,
+  type ClosingRow, type ConversationOrigin, type ConversationRow, type SpendRow,
 } from "@/lib/whatsappConversations";
 
 // Aba "Conversas" do CRM (dono, 2026-10-16): conversas novas do WhatsApp por dia e
@@ -30,6 +30,9 @@ const ORGANIC_FROM = "2026-08-17";
 const euro = (n: number | null) => (n === null ? "–" : `${n.toLocaleString("pt-PT", { maximumFractionDigits: 2 })}€`);
 const one = (n: number) => n.toLocaleString("pt-PT", { maximumFractionDigits: 1 });
 const dm = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+const pct = (n: number | null) => (n === null ? "–" : `${Math.round(n * 100)}%`);
+/** Semanas de contacto mostradas na tabela de fecho: as do servidor com telefone fiável. */
+const COHORT_FROM = "2026-09-14";
 
 function Stacked({ items, onPick, selected }: { items: { label: string; byOrigin: Record<ConversationOrigin, number>; key: string; note?: string }[]; onPick?: (key: string) => void; selected?: string }) {
   const max = Math.max(1, ...items.map(i => ORIGINS.reduce((s, o) => s + i.byOrigin[o], 0)));
@@ -72,6 +75,7 @@ const CrmConversations = () => {
   const today = lisbonDay(new Date());
   const [rows, setRows] = useState<ConversationRow[] | null>(null);
   const [spend, setSpend] = useState<SpendRow[]>([]);
+  const [closings, setClosings] = useState<ClosingRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<PeriodId>("week");
   const [week, setWeek] = useState(mondayOf(today));
@@ -81,11 +85,13 @@ const CrmConversations = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sb = supabase as any;
     Promise.all([
-      sb.from("whatsapp_conversations").select("first_at, origin, is_lid").order("first_at").limit(20000),
+      sb.from("whatsapp_conversations").select("first_at, origin, is_lid, contact_key").order("first_at").limit(20000),
       sb.from("ads_daily_stats").select("stat_date, cost"),
-    ]).then(([c, a]) => {
+      sb.from("service_requests").select("phone, booked_at, billed_value").not("booked_at", "is", null).limit(20000),
+    ]).then(([c, a, s]) => {
       if (c.error) setError(c.error.message); else setRows(c.data ?? []);
       if (!a.error) setSpend((a.data ?? []).map((x: SpendRow) => ({ stat_date: x.stat_date, cost: Number(x.cost) })));
+      if (!s.error) setClosings(s.data ?? []);
     });
   }, []);
 
@@ -104,15 +110,27 @@ const CrmConversations = () => {
     const weeks = weeklyConversations(rows, spend, period === "week" ? week : to, CHART_WEEKS);
     const allWeeks = weeklyConversations(rows, spend, today, Math.ceil((Date.parse(`${today}T12:00:00Z`) - Date.parse(`${ORGANIC_FROM}T12:00:00Z`)) / 604_800_000) + 1);
     const eras = compareEras(rows, spend, ORGANIC_FROM, today);
-    return { cur, prev, weeks, allWeeks, eras };
-  }, [rows, spend, from, to, length, period, week, today]);
+    const cohortCount = Math.floor((Date.parse(`${mondayOf(today)}T12:00:00Z`) - Date.parse(`${COHORT_FROM}T12:00:00Z`)) / 604_800_000) + 1;
+    const cohorts = weeklyCloseRate(rows, closings, today, cohortCount);
+    // Taxa de fecho dos contactos que entraram nas semanas do período escolhido.
+    const inPeriod = (a: string, b: string) => cohorts.filter(c => c.week >= mondayOf(a) && c.week <= b);
+    const rateOf = (list: typeof cohorts) => {
+      const contacts = list.reduce((s, c) => s + c.contacts, 0);
+      return { contacts, closed: list.reduce((s, c) => s + c.closed, 0), rate: contacts ? list.reduce((s, c) => s + c.closed, 0) / contacts : null, open: list.some(c => c.open) };
+    };
+    const curRate = rateOf(inPeriod(from, to));
+    const prevRate = rateOf(inPeriod(addDays(from, -length), addDays(from, -1)));
+    return { cur, prev, weeks, allWeeks, eras, cohorts, curRate, prevRate };
+  }, [rows, spend, closings, from, to, length, period, week, today]);
 
   if (error) return <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">Conversas: {error}</div>;
   if (!data) return <p className="text-sm text-gray-500">A carregar conversas…</p>;
-  const { cur, prev, weeks, allWeeks, eras } = data;
+  const { cur, prev, weeks, allWeeks, eras, cohorts, curRate, prevRate } = data;
+  const cohortByWeek = new Map(cohorts.map(c => [c.week, c]));
   const delta = (a: number, b: number) => { const d = a - b; return d === 0 ? "igual ao período anterior" : `${d > 0 ? "+" : ""}${d} vs período anterior`; };
   const cards = [
     { label: "Conversas novas", value: String(cur.total), sub: delta(cur.total, prev.total), spark: weeks.map(w => w.total) },
+    { label: "Taxa de fecho", value: pct(curRate.rate), sub: `${curRate.closed} de ${curRate.contacts} fecharam${curRate.open ? " (ainda a subir)" : ""} · antes ${pct(prevRate.rate)}`, spark: weeks.map(w => cohortByWeek.get(w.week)?.rate ?? 0) },
     { label: "Do anúncio Google", value: String(cur.byOrigin.google), sub: delta(cur.byOrigin.google, prev.byOrigin.google), spark: weeks.map(w => w.byOrigin.google) },
     { label: "Gasto Google", value: euro(Math.round(cur.googleCost)), sub: `${euro(prev.googleCost ? Math.round(prev.googleCost) : 0)} no período anterior`, spark: weeks.map(w => w.cost) },
     { label: "Custo por conversa Google", value: euro(cur.costPerGoogle === null ? null : Math.round(cur.costPerGoogle)), sub: `gasto ÷ conversas que dizem "Vi o vosso anúncio no Google"`, spark: weeks.map(w => (w.byOrigin.google ? w.cost / w.byOrigin.google : 0)) },
@@ -136,7 +154,7 @@ const CrmConversations = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {cards.map(c => (
           <div key={c.label} className="border border-gray-200 rounded-xl p-3">
             <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">{c.label}</p>
@@ -146,6 +164,37 @@ const CrmConversations = () => {
           </div>
         ))}
       </div>
+
+      <section className="border border-gray-200 rounded-xl p-4 space-y-2">
+        <h3 className="text-sm font-bold text-navy">Por semana: conversas novas e taxa de fecho</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="text-left text-[11px] text-gray-500">
+              <th className="py-1 pr-3">Semana</th><th className="pr-3">Conversas novas</th><th className="pr-3">Fecharam</th><th className="pr-3">Taxa de fecho</th>
+              <th className="pr-3">Fecharam em 7 dias</th><th className="pr-3">Faturado</th><th className="pr-3">Do Google</th><th>Gasto Google</th>
+            </tr></thead>
+            <tbody>
+              {[...cohorts].reverse().map(c => (
+                <tr key={c.week} className={`border-t border-gray-100 ${c.week === (period === "week" ? week : "") ? "bg-amber-50" : ""}`}>
+                  <td className="py-1.5 pr-3 whitespace-nowrap">{dm(c.week)}{c.week === mondayOf(today) ? " (em curso)" : ""}</td>
+                  <td className="pr-3 font-semibold">{c.contacts}</td>
+                  <td className="pr-3">{c.closed}</td>
+                  <td className="pr-3 font-semibold text-navy">{pct(c.rate)}{c.open ? <span className="text-[10px] font-normal text-gray-500"> a subir</span> : null}</td>
+                  <td className="pr-3">{c.closedIn7} <span className="text-[11px] text-gray-500">({pct(c.rateIn7)})</span></td>
+                  <td className="pr-3">{euro(Math.round(c.revenue))}</td>
+                  <td className="pr-3">{c.google}</td>
+                  <td>{euro(Math.round(spend.filter(s => s.stat_date >= c.week && s.stat_date <= addDays(c.week, 6)).reduce((s, x) => s + x.cost, 0)))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-gray-500 leading-relaxed">
+          Cada pessoa conta na semana da primeira mensagem. Fechou se tem um serviço no CRM marcado a partir dessa mensagem e até {COHORT_CLOSE_DAYS} dias depois (pelos últimos 9 dígitos do telefone; revisitas a 0€ não contam), e o faturado é o desses serviços.
+          Uma semana com contactos de há menos de 7 dias ainda está "a subir": compara-a com as outras pela coluna dos 7 dias quando fechar.
+          Contactos que o WhatsApp mostra sem número (@lid) contam nas conversas mas não se ligam ao CRM, por isso a taxa sai um pouco por baixo. Começa a 14/09: antes disso o servidor não tem os telefones.
+        </p>
+      </section>
 
       <section className="border border-gray-200 rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-bold text-navy">Por origem, neste período</h3>
