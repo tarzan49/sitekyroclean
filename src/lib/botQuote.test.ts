@@ -20,7 +20,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('waterproofing alone: Essencial 59/79/99/119, Premium 89/109/139/169 (reply 3.2)', () => {
     const price = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' }).subtotal;
     expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'essencial'))).toEqual([49, 79, 99, 119]);
-    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'premium'))).toEqual([79, 109, 139, 169]);
+    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'premium'))).toEqual([69, 109, 139, 169]);
   });
   it('waterproofing: the same travel on both versions, never more than 10€ (owner, 15 Oct 2026: 139/114 in Setúbal)', () => {
     const q = (size: string, treatment: string, city: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city });
@@ -35,7 +35,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(q('3-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 0, premium: 139, essencial: 99 });
     // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
     expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 119, essencial: 89 });
-    expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 59 });
+    expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 79, essencial: 59 });
     expect(q('1-lugar', 'essencial', 'Sines').total).toBe(59);
     // Cleaning with waterproofing follows the same rule.
     const pack = q('1-lugar', 'clean+essencial', 'Setúbal').waterproofingTiers;

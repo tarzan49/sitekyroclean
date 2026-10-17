@@ -116,9 +116,9 @@ export interface PriceOption {
 // guardam com o sentido "sob orçamento", e renomeá-lo faria esses registos
 // antigos passarem a ler-se como um preço. O espaço inseparável em "em U"
 // impede o "U" de ficar sozinho numa linha no ecrã das quantidades a 375px.
-// Impermeabilização do sofá de 1 lugar: Essencial 49€ e Premium 79€ (dono, 2026-10-15: "baixar 10€ … em cada uma"; eram 59€ e 89€).
+// Impermeabilização do sofá de 1 lugar: Essencial 49€ e Premium 69€ (dono, 2026-10-17; a 15/10 tinha baixado para 49€ e 79€, antes 59€ e 89€).
 export const sofaPrices: PriceOption[] = [
-  { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 49, bothPrice: 99,  originalBothPrice: 98, waterproofingPremiumPrice: 79 },
+  { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 49, bothPrice: 99,  originalBothPrice: 98, waterproofingPremiumPrice: 69 },
   { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 209, originalBothPrice: 218, waterproofingPremiumPrice: 169, packPremiumDelta: 30 },
