@@ -7,28 +7,21 @@ import {
   CLIENT_SERVICES,
   CLIENT_STATUSES,
   STATUS_LABEL,
-  STAT_PERIODS,
   clientsCsv,
-  contactMonth,
-  contactStats,
-  contactWeek,
   displayName,
   effectiveStatus,
   emptyFilters,
   firstName,
   formatPhone,
-  inWindow,
   matchesFilters,
-  monthlyStats,
   normalizePhone,
   servicesByPhone,
   summarizeClient,
   type ClientFilters,
+  type ClientService,
   type ClientRow,
   type ClientStatus,
   type ClientSummary,
-  type StatPeriod,
-  weeklyStats,
 } from "@/lib/clientRecords";
 import {
   ACTION_LABEL,
@@ -43,29 +36,18 @@ import {
 } from "@/lib/clientFollowUp";
 import ClientsToday from "./ClientsToday";
 import ClientsCampaigns from "./ClientsCampaigns";
-import ClientsStrategy, { type SpendRow, type StrategyService } from "./ClientsStrategy";
 import type { ClientPatch, TouchPayload } from "./FollowUpActionCard";
 
 // Separador "Clientes" (dono, 2026-10-06): fichas de todos os contactos do
 // WhatsApp Business (os que fecharam, os por marcar e os não interessados), à
 // parte do CRM de vendas. Os serviços de cada ficha leem-se do CRM pelo telefone.
-// Vistas: Hoje (o que fazer hoje, com a mensagem pronta), Campanhas, Estratégia,
-// Fichas e Evolução. As regras dos seguimentos vivem em clientFollowUp.ts e são
+// Vistas: Hoje (o que fazer hoje, com a mensagem pronta), Campanhas e Fichas
+// (Estratégia e Evolução saíram a 2026-10-17: os números de crescimento estão no
+// separador Crescimento). As regras dos seguimentos vivem em clientFollowUp.ts e são
 // as mesmas do email das 9h30 e do bot.
 
-const GOLD = "#D4AF37";
 const money = (n: number) => `${Math.round(n).toLocaleString("pt-PT")}€`;
-const pct = (r: number | null) => (r === null ? "-" : `${Math.round(r * 100)}%`);
 const dayLabel = (iso: string | null) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(2, 4)}` : "-");
-const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", timeZone: "UTC" });
-const monthLabel = (m: string) => `${MONTH_FMT.format(new Date(`${m}-15T12:00:00Z`))} ${m.slice(0, 4)}`;
-/** "28/09 a 04/10" a partir da segunda-feira. */
-const weekLabel = (monday: string) => {
-  const end = new Date(`${monday}T12:00:00Z`);
-  end.setUTCDate(end.getUTCDate() + 6);
-  const dm = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
-  return `${dm(monday)} a ${dm(end.toISOString().slice(0, 10))}`;
-};
 
 const STATUS_STYLE: Record<ClientStatus, string> = {
   cliente: "bg-green-50 text-green-800 border-green-200",
@@ -76,7 +58,9 @@ const STATUS_STYLE: Record<ClientStatus, string> = {
 };
 
 type Enriched = { client: ClientRow; summary: ClientSummary; status: ClientStatus };
-type View = "hoje" | "campanhas" | "estrategia" | "fichas" | "evolucao";
+type View = "hoje" | "campanhas" | "fichas";
+/** Serviço do CRM lido pelas fichas. */
+interface StrategyService extends ClientService { source?: string | null; created_at?: string | null }
 
 const TOUCH_COLUMNS = "id, client_id, kind, campaign, template, skipped, note, message, channel, created_at";
 
@@ -89,24 +73,8 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
-function Kpi({ label, value, note, accent }: { label: string; value: string; note?: React.ReactNode; accent?: boolean }) {
-  return (
-    <div className={accent ? "bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4" : "bg-white border border-gray-200 rounded-xl p-4"}>
-      <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-xl font-bold text-navy">{value}</p>
-      {note && <p className="text-[11px] text-gray-500 mt-0.5">{note}</p>}
-    </div>
-  );
-}
 
 /** "+12 vs. 30 dias antes" a verde/vermelho. */
-function Delta({ now, before, rate }: { now: number | null; before: number | null; rate?: boolean }) {
-  if (now === null || before === null) return <span>sem período anterior</span>;
-  const diff = rate ? Math.round((now - before) * 100) : now - before;
-  const sign = diff > 0 ? "+" : "";
-  const color = diff > 0 ? "text-green-700" : diff < 0 ? "text-red-600" : "text-gray-500";
-  return <span className={color}>{sign}{diff}{rate ? " p.p." : ""} vs. período anterior</span>;
-}
 
 const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter(x => x !== v) : [...list, v]);
 
@@ -115,13 +83,11 @@ const ClientsPanel = () => {
   const [services, setServices] = useState<StrategyService[]>([]);
   const [touches, setTouches] = useState<ClientTouch[]>([]);
   const [touchesReady, setTouchesReady] = useState(true);
-  const [spend, setSpend] = useState<SpendRow[]>([]);
   const [lastDigest, setLastDigest] = useState<{ day: string; items: number; error: string | null } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>("hoje");
   const [filters, setFilters] = useState<ClientFilters>(emptyFilters());
-  const [period, setPeriod] = useState<StatPeriod>(30);
   const [openId, setOpenId] = useState<string | null>(null);
   const [limit, setLimit] = useState(60);
   // As regras dependem da hora (seguimento "a partir das 15h", noite): recalcula de 5 em 5 minutos.
@@ -138,13 +104,11 @@ const ClientsPanel = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
       const since = new Date(Date.now() - 400 * 86_400_000).toISOString();
-      const spendSince = lisbonDay(new Date(Date.now() - 60 * 86_400_000));
-      const [c, s, t, d, sp] = await Promise.all([
+      const [c, s, t, d] = await Promise.all([
         db.from("clients").select("*").order("last_contact_at", { ascending: false, nullsFirst: false }),
         db.from("service_requests").select("id, request_date, description, billed_value, client_name, city, phone, locality, booked_at, created_at, source, calendar_missing_since"),
         db.from("client_touches").select(TOUCH_COLUMNS).gte("created_at", since).order("created_at", { ascending: false }),
         db.from("follow_up_digests").select("day, items, error").order("day", { ascending: false }).limit(1),
-        db.from("ad_spend_daily").select("platform, spend_date, amount").gte("spend_date", spendSince),
       ]);
       if (c.error) throw c.error;
       if (s.error) throw s.error;
@@ -154,7 +118,6 @@ const ClientsPanel = () => {
       setTouchesReady(!t.error);
       setTouches(t.error ? [] : t.data ?? []);
       setLastDigest(d.error ? null : d.data?.[0] ?? null);
-      setSpend(sp.error ? [] : sp.data ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Erro ao carregar os clientes.");
     } finally {
@@ -237,9 +200,7 @@ const ClientsPanel = () => {
   const VIEWS: [View, string][] = [
     ["hoje", `Hoje${todayCount ? ` (${todayCount})` : ""}`],
     ["campanhas", "Campanhas"],
-    ["estrategia", "Estratégia"],
     ["fichas", "Fichas"],
-    ["evolucao", "Evolução"],
   ];
 
   return (
@@ -274,9 +235,7 @@ const ClientsPanel = () => {
           onShowCampaigns={() => setView("campanhas")} {...handlers} />
       ) : view === "campanhas" ? (
         <ClientsCampaigns data={followUpData} {...handlers} />
-      ) : view === "estrategia" ? (
-        <ClientsStrategy planned={planned} data={followUpData} spend={spend} services={services} />
-      ) : view === "fichas" ? (
+      ) : (
         <>
           <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
             <div className="relative">
@@ -356,8 +315,6 @@ const ClientsPanel = () => {
             </button>
           )}
         </>
-      ) : (
-        <Evolution rows={enriched} period={period} setPeriod={setPeriod} />
       )}
 
       {open && (
@@ -367,104 +324,6 @@ const ClientsPanel = () => {
     </div>
   );
 };
-
-function Evolution({ rows, period, setPeriod }: { rows: Enriched[]; period: StatPeriod; setPeriod: (p: StatPeriod) => void }) {
-  const now = new Date();
-  const current = contactStats(inWindow(rows, now, period));
-  const before = contactStats(inWindow(rows, now, period, 1));
-  const hasBefore = before.contacts > 0;
-  const months = monthlyStats(rows);
-  const weeks = weeklyStats(rows);
-  const undated = rows.filter(r => !r.client.first_contact_at).length;
-  const thisMonth = contactMonth(now.toISOString());
-  const thisWeek = contactWeek(now.toISOString());
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-white w-fit" role="group" aria-label="Período">
-        {STAT_PERIODS.map(p => (
-          <button key={p} onClick={() => setPeriod(p)} aria-pressed={period === p}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md ${period === p ? "bg-navy text-white" : "text-navy hover:bg-gray-50"}`}>{p} dias</button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Kpi accent label="Contactos novos" value={String(current.contacts)} note={<Delta now={current.contacts} before={hasBefore ? before.contacts : null} />} />
-        <Kpi label="Fecharam" value={String(current.closed)} note={`serviço feito ou marcado · ${current.notInterested} não interessados`} />
-        <Kpi label="Taxa de fecho" value={pct(current.closeRate)} note={<Delta now={current.closeRate} before={hasBefore ? before.closeRate : null} rate />} />
-        <Kpi label="Mensagem recebida vs fecho" value={pct(current.messageCloseRate)}
-          note={<>{current.closedWhoWrote} de {current.wrote} que escreveram · <Delta now={current.messageCloseRate} before={hasBefore ? before.messageCloseRate : null} rate /></>} />
-      </div>
-
-      <StatsTable title="Por mês" note="Cada contacto conta no mês do primeiro contacto. Todos os meses, seja qual for o período escolhido em cima."
-        firstColumn="Mês" rows={months} label={monthLabel} running={thisMonth} />
-      <StatsTable title="Por semana" note="De segunda a domingo, pela semana do primeiro contacto. Todas as semanas, da mais recente para a mais antiga."
-        firstColumn="Semana" rows={[...weeks].reverse()} label={weekLabel} running={thisWeek} newestFirst />
-
-      <p className="text-[11px] text-gray-500">
-        Fecharam = etiqueta Concluído, Deu Avaliação ou Serviço Marcado, ou um serviço no CRM com o mesmo telefone. "Mensagem recebida vs fecho" conta só quem
-        chegou a escrever (há conversas que começaram por nós). A etiqueta de um contacto recente pode ainda mudar, por isso o mês e a semana em curso tendem a subir.
-        {undated > 0 && ` ${undated} contactos antigos não têm data de primeiro contacto (o WhatsApp não guardava o início da conversa) e ficam fora destas contas.`}
-      </p>
-    </div>
-  );
-}
-
-type StatRow = ReturnType<typeof monthlyStats>[number];
-
-function StatsTable({ title, note, firstColumn, rows, label, running, newestFirst }: {
-  title: string; note: string; firstColumn: string; rows: StatRow[]; label: (key: string) => string; running: string; newestFirst?: boolean;
-}) {
-  const maxContacts = Math.max(1, ...rows.map(r => r.contacts));
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <div className="p-4 pb-3">
-        <p className="text-sm font-bold text-navy">{title}</p>
-        <p className="text-[11px] text-gray-500">{note}</p>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-y border-gray-200 bg-gray-50">
-              {[firstColumn, "Contactos", "Escreveram", "Fecharam", "Taxa de fecho", "Msg recebida vs fecho", "Do anúncio Google"].map(h => (
-                <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => {
-              const prev = rows[newestFirst ? i + 1 : i - 1];
-              const isRunning = r.key === running;
-              const change = prev ? Math.round((r.closeRate ?? 0) * 100) - Math.round((prev.closeRate ?? 0) * 100) : 0;
-              return (
-                <tr key={r.key} className="border-b border-gray-100 last:border-0">
-                  <td className="px-3 py-2 text-navy font-medium whitespace-nowrap first-letter:uppercase">
-                    {label(r.key)}{isRunning && <span className="text-gray-500 font-normal"> (até hoje)</span>}
-                  </td>
-                  <td className="px-3 py-2 min-w-[110px]">
-                    <span className="font-semibold text-navy">{r.contacts}</span>
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${(r.contacts / maxContacts) * 100}%`, background: GOLD }} />
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 text-navy">{r.wrote}</td>
-                  <td className="px-3 py-2 text-navy">{r.closed}</td>
-                  <td className="px-3 py-2 text-navy font-semibold whitespace-nowrap">
-                    {pct(r.closeRate)}
-                    {!isRunning && change !== 0 && <span className={`ml-1 text-[10.5px] ${change > 0 ? "text-green-700" : "text-red-600"}`}>{change > 0 ? "▲" : "▼"}</span>}
-                  </td>
-                  <td className="px-3 py-2 text-navy">{pct(r.messageCloseRate)}</td>
-                  <td className="px-3 py-2 text-navy">{r.googleAds}</td>
-                </tr>
-              );
-            })}
-            {rows.length === 0 && <tr><td colSpan={7} className="text-center text-gray-500 py-6">Sem contactos com data.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
 const field = "mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40";
 const fieldLabel = "text-[10.5px] font-bold text-gray-500 uppercase tracking-wider";

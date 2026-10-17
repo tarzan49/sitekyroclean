@@ -1,19 +1,23 @@
-import { useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, Mail, Megaphone, Contact } from "lucide-react";
+import { AlertTriangle, Home, Settings2, Lock, LogOut, Users, Contact, TrendingUp } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
 
+const GrowthPanel = lazy(() => import("./admin/GrowthPanel"));
 const CrmPanel = lazy(() => import("./admin/CrmPanel"));
 const ClientsPanel = lazy(() => import("./admin/ClientsPanel"));
-const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
-const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
-const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
-const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
-const MarketingPanel = lazy(() => import("./admin/MarketingPanel"));
-const GoogleAdsPanel = lazy(() => import("./admin/GoogleAdsPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm" | "clientes" | "quiz-leads" | "marketing" | "meta-marketing";
+// Três separadores (dono, 2026-10-17: "quero apenas dados que me farão crescer"):
+// Crescimento (abre aqui), CRM e Clientes. Saíram Sitemaps, Error Log, Métricas
+// Quiz, Quiz Leads, Google Ads e Meta Ads. O separador fica no endereço (?tab=),
+// para um recarregamento não voltar ao primeiro.
+type Tab = "crescimento" | "crm" | "clientes";
+const TABS: Tab[] = ["crescimento", "crm", "clientes"];
+const tabFromUrl = (): Tab => {
+  const t = new URLSearchParams(window.location.search).get("tab");
+  return TABS.includes(t as Tab) ? (t as Tab) : "crescimento";
+};
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -28,7 +32,13 @@ const AdminPanel = () => {
   const [pwd, setPwd] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [signingIn, setSigningIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("sitemap");
+  const [activeTab, setActiveTab] = useState<Tab>(tabFromUrl);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("tab") === activeTab) return;
+    url.searchParams.set("tab", activeTab);
+    window.history.replaceState(null, "", url);
+  }, [activeTab]);
 
   const handleLogin = async () => {
     setSigningIn(true);
@@ -149,21 +159,16 @@ const AdminPanel = () => {
         </div>
 
         {/* Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-hide">
           {([
+            { id: "crescimento", label: "Crescimento", icon: TrendingUp },
             { id: "crm",       label: "CRM",          icon: Users },
             { id: "clientes",  label: "Clientes",     icon: Contact },
-            { id: "quiz-leads", label: "Quiz Leads",  icon: Mail },
-            { id: "marketing", label: "Google Ads",  icon: Megaphone },
-            { id: "meta-marketing", label: "Meta Ads", icon: Megaphone },
-            { id: "sitemap",   label: "Sitemaps",      icon: Globe },
-            { id: "errors",    label: "Error Log",     icon: AlertTriangle },
-            { id: "metrics",   label: "Métricas Quiz", icon: BarChart3 },
           ] as { id: Tab; label: string; icon: React.ElementType }[]).map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-all border-t border-x -mb-px ${
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium whitespace-nowrap shrink-0 rounded-t-lg transition-all border-t border-x -mb-px ${
                 activeTab === tab.id
                   ? "bg-[#f4f5f7] text-navy border-white/20 border-b-[#f4f5f7]"
                   : "text-white/50 hover:text-white border-transparent"
@@ -183,7 +188,7 @@ const AdminPanel = () => {
             <div className="text-sm">
               <p className="font-bold">Supabase não está configurado neste ambiente</p>
               <p className="mt-1">
-                CRM, Métricas Quiz e Error Log não estão a gravar nem a ler dados agora.
+                O painel não está a ler nem a gravar dados agora.
                 Se isto acontece em produção: configura <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_URL</code> e{" "}
                 <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_PUBLISHABLE_KEY</code> no Cloudflare Pages
                 (Settings → Environment variables) e faz um novo deploy, o <code className="bg-red-100 px-1 rounded">.env</code> local não chega ao build.
@@ -191,51 +196,11 @@ const AdminPanel = () => {
             </div>
           </div>
         )}
-        {activeTab === "sitemap" && (
-          <Suspense fallback={<TabFallback />}>
-            <SitemapMonitor />
-          </Suspense>
-        )}
-
-        {activeTab === "errors" && (
-          <Suspense fallback={<TabFallback />}>
-            <ErrorLogPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "metrics" && (
-          <Suspense fallback={<TabFallback />}>
-            <QuizMetricsPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "crm" && (
-          <Suspense fallback={<TabFallback />}>
-            <CrmPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "clientes" && (
-          <Suspense fallback={<TabFallback />}>
-            <ClientsPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "quiz-leads" && (
-          <Suspense fallback={<TabFallback />}>
-            <QuizLeadsPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "marketing" && (
-          <Suspense fallback={<TabFallback />}>
-            <GoogleAdsPanel />
-          </Suspense>
-        )}
-
-        {activeTab === "meta-marketing" && (
-          <Suspense fallback={<TabFallback />}><MarketingPanel key="meta" platform="meta" /></Suspense>
-        )}
+        <Suspense fallback={<TabFallback />}>
+          {activeTab === "crescimento" && <GrowthPanel />}
+          {activeTab === "crm" && <CrmPanel />}
+          {activeTab === "clientes" && <ClientsPanel />}
+        </Suspense>
       </main>
     </div>
   );

@@ -49,7 +49,7 @@ export function isGoogleAdsVisit(search: string): boolean {
 /**
  * Anúncios da Meta (dono, 2026-09-28: a mesma marca que o Google, para separar
  * os clientes da Meta dos orgânicos no WhatsApp). Só com os parâmetros de URL
- * que a campanha leva (`META_URL_PARAMETERS` em `marketingPlatforms.ts`):
+ * que a campanha leva (`utm_medium=paid_social` ou `meta_*_id`):
  * `utm_medium=paid_social` com uma origem da Meta, ou os `meta_*_id`. O
  * `fbclid` sozinho não chega, porque a Meta também o põe nas ligações
  * partilhadas sem anúncio nenhum. `{{site_source_name}}` dá `ig` no Instagram

@@ -20,7 +20,7 @@ export function useQuizAnalytics(options: QuizAnalyticsOptions) {
   // duas vezes o mesmo passo é ignorado, mas avançar e voltar a sair reporta
   // o passo novo. Logo pode haver mais do que uma linha `abandon` por
   // `session_id`, e a análise conta tentativas distintas, nunca linhas
-  // (ver `uniqueAttempts` em `src/lib/quizMetrics.ts` e a CTE `tentativas` em
+  // (ver a CTE `tentativas` em
   // `supabase/queries/estudo-dados-proprios.sql`).
   const abandon = useCallback(() => {
     const a = attempt.current;

@@ -5,15 +5,11 @@ import { CRM_LOCALITIES, type CrmLocality } from "@/lib/calendarServices";
 import type { SyncPlan } from "@/lib/calendarSync";
 import { syncCalendarIntoCrm } from "@/lib/crmCalendarSync";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
-import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
 import CrmServiceMix from "./CrmServiceMix";
 import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
-import CrmQuizLeads from "./CrmQuizLeads";
-import CrmConversations from "./CrmConversations";
-import CrmAdsVsOrganic from "./CrmAdsVsOrganic";
 import CrmReviews from "./CrmReviews";
-import { summarizeQuizLeads, summarizeWhatsAppContacts, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
+import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
@@ -115,10 +111,9 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "conversas" | "anuncios" | "upsell" | "questionario" | "avaliacoes">("pedidos");
+  const [view, setView] = useState<"pedidos" | "servicos" | "avaliacoes" | "upsell">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
-  const [quizError, setQuizError] = useState<string | null>(null);
   const [waContacts, setWaContacts] = useState<WhatsAppContactRow[] | null>(null);
 
   const [viewedMonth, setViewedMonth] = useState(() => {
@@ -191,8 +186,7 @@ const CrmPanel = () => {
       .from("leads")
       .select("id, created_at, name, phone, service, location, value, source, whatsapp_phone")
       .order("created_at", { ascending: true });
-    if (err) { setQuizError(err.message); return; }
-    setQuizError(null);
+    if (err) return;
     setQuizLeads((data ?? []) as QuizLeadRow[]);
     // Contactos do WhatsApp, para comparar; se a leitura falhar, a aba mostra só o questionário.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -203,7 +197,6 @@ const CrmPanel = () => {
   useEffect(() => { fetchQuizLeads(); }, [fetchQuizLeads]);
 
   const quizSummary = useMemo(() => quizLeads ? summarizeQuizLeads(quizLeads, records) : null, [quizLeads, records]);
-  const waMonths = useMemo(() => quizSummary && waContacts ? summarizeWhatsAppContacts(waContacts, records, quizSummary) : null, [quizSummary, waContacts, records]);
 
   const runSync = async () => {
     fetchQuizLeads();
@@ -404,7 +397,7 @@ const CrmPanel = () => {
         <div>
           <h2 className="text-lg font-bold text-navy">CRM — Pedidos de Serviço</h2>
           <p className="text-sm text-gray-500">
-            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : view === "questionario" ? "Pedidos do questionário do site e quantos fecharam" : view === "fechos" ? "Fechos por semana, a revisão de segunda-feira e a taxa de fecho por serviço" : view === "avaliacoes" ? "Avaliações do Google por mês e por serviço" : view === "conversas" ? "Conversas novas do WhatsApp por dia e por semana, por origem" : view === "anuncios" ? "O que os anúncios trazem a mais do que a média de agosto e setembro" : "Serviços fechados por dia"}
+            {view === "avaliacoes" ? "Avaliações do Google por mês e por serviço" : view === "upsell" ? "O que as equipas venderam a mais e a divisão" : `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês`}
             {reviewCount > 0 && <span className="text-amber-700"> · {reviewCount} para rever</span>}
           </p>
           <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
@@ -455,7 +448,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto" role="tablist">
-        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["conversas", "Conversas"], ["anuncios", "Anúncios vs orgânico"], ["upsell", "Upsell"], ["questionario", "Questionário"], ["avaliacoes", "Avaliações"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold whitespace-nowrap -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -477,15 +470,8 @@ const CrmPanel = () => {
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
 
-      {view === "conversas" && <CrmConversations />}
-      {view === "anuncios" && <CrmAdsVsOrganic />}
       {view === "avaliacoes" && <CrmReviews services={records} />}
-      {view === "questionario" && <CrmQuizLeads summary={quizSummary} whatsApp={waMonths} error={quizError} />}
 
-
-      {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} services={records} quiz={quizSummary}
-        onEdit={id => { const r = records.find(x => x.id === id); if (r) openEdit(r); }}
-        onTogglePaid={id => { const r = records.find(x => x.id === id); if (r) togglePaid(r); }} />}
 
       {view === "upsell" && <CrmUpsell records={records} onEdit={id => {
         const r = records.find(x => x.id === id);
@@ -573,8 +559,46 @@ const CrmPanel = () => {
         </div>
       )}
 
+      {/* Telemóvel: cartões em vez das 14 colunas da tabela */}
+      <div className="md:hidden space-y-2">
+        {loading && <p className="text-center py-6 text-sm text-gray-400">A carregar...</p>}
+        {!loading && filtered.length === 0 && (
+          <p className="text-center py-6 text-sm text-gray-400">{monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}</p>
+        )}
+        {filtered.map(r => (
+          <div key={r.id} className={`rounded-xl border p-3 space-y-2 ${r.paid ? "bg-white border-gray-200" : "bg-red-50/60 border-red-200"}`}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[11px] text-gray-500">Dia {new Date(r.request_date + "T00:00:00").getDate()} · fechado {closedLabel(r.booked_at)}</p>
+                <p className="text-sm font-semibold text-navy break-words">{r.description || "-"}</p>
+                <p className="text-xs text-gray-600">{[r.client_name, r.locality ?? "Região?", r.city].filter(Boolean).join(" · ")}</p>
+                {r.phone && <a href={`tel:${r.phone}`} className="text-xs text-gray-500 flex items-center gap-1"><Phone className="w-3 h-3" />{r.phone}</a>}
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-sm font-bold text-navy">{money(r.billed_value)}</p>
+                <p className="text-xs font-semibold text-gold">{money(cutOf(r))}</p>
+                {r.upsell_value ? <p className={`text-[11px] font-semibold ${UPSELL_TEXT}`}>+{money(Number(r.upsell_value))}</p> : null}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {quizSummary?.quizServiceIds.has(r.id) && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>}
+              {r.calendar_missing_since && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>}
+              {r.needs_review && <button onClick={() => openEdit(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
+              <button onClick={() => togglePaid(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
+              <button onClick={() => toggleInvoiced(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.invoiced ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>{r.invoiced ? "Com fatura" : "Sem fatura"}</button>
+              <button onClick={() => toggleReview(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.review_requested ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>{r.review_requested ? "Avaliação pedida" : "Avaliação não pedida"}</button>
+              <div className="ml-auto flex items-center gap-1">
+                {r.calendar_missing_since && <button onClick={() => keepMissing(r)} className="px-2 py-1 text-[11px] font-bold rounded-md border border-gray-200 text-navy">Manter</button>}
+                <button onClick={() => openEdit(r)} aria-label="Editar" className="p-2 text-gray-500 hover:text-navy rounded-md"><Pencil className="w-4 h-4" /></button>
+                <button onClick={() => handleDelete(r.id)} aria-label="Apagar" className="p-2 text-gray-500 hover:text-red-600 rounded-md"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="hidden md:block bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
