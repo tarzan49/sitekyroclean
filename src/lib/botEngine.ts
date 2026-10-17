@@ -2,7 +2,7 @@
 // (`npm run build:bot-engine` → supabase/functions/_shared/botEngine.generated.js):
 // the bot's prices and its availability, from the site's own code.
 export { botQuote, listBotCities, resolveBotCity } from './botQuote';
-export { botAvailability, eventTeam } from './botAvailability';
+export { botAvailability, eventTeam, teamBusyAt } from './botAvailability';
 export { planBotBooking, planBotHold, planOwnerBooking, TEAM_COLOR } from './botHold';
 export { agendaCheck } from './agendaCheck';
 export { teamAccounts } from './teamAccounts';

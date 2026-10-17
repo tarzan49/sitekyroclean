@@ -72,7 +72,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, teamAccounts, botAvailability, bookedServices, planBookingUpdate, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, bookedServices, eventTeam, planBookingUpdate, teamBusyAt, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -618,8 +618,21 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   if (!ev) return createErrorResponse("evento não encontrado", 404);
   const str = (k: string) => typeof changes[k] === "string" ? String(changes[k]) : undefined;
   const now = env.now?.() ?? new Date();
-  const plan = planBookingUpdate(ev, phone, { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") }, now);
-  if (!plan.ok) return createSuccessResponse({ update: plan });
+  const asked = { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") };
+  let plan = planBookingUpdate(ev, phone, asked, now);
+  // Reschedules are the bot's (owner, 16 Oct 2026). A move keeps the event's team, so the new hour has to
+  // have room for that team, not only for the zone: otherwise the hour stays and the owner picks the team.
+  let busyTeam: string | null = null;
+  if (plan.ok && plan.moved) {
+    const team = eventTeam(ev);
+    if (team && teamBusyAt(cal.events.filter(e => e.id !== ev.id), team, plan.start, plan.end)) {
+      busyTeam = team;
+      plan = planBookingUpdate(ev, phone, { ...asked, date: undefined, time: undefined }, now);
+      if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} está ocupada`,
+        `O cliente combinou ${asked.date} às ${asked.time}, mas a equipa ${team} já tem um serviço a essa hora. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
+    }
+  }
+  if (!plan.ok) return createSuccessResponse({ update: busyTeam ? { ok: false, reason: `equipa ${busyTeam} ocupada a essa hora`, teamBusy: busyTeam } : plan });
   let written = await env.writeCalendar!({ action: "update", eventId, phone, title: plan.title, description: plan.description, start: plan.start, end: plan.end });
   // Until the web app runs the version with "update": "book" changes an event in place when it
   // carries this conversation's "bot:" mark (otherwise it would create a second one, so never then).
@@ -637,7 +650,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     await env.notifyOwner(plan.cancel ? `Cliente pediu para desmarcar: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
       `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " (não foi apagado: decides tu)" : ""}.\n\n${plan.title}`).catch(() => null);
   }
-  return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, summary: plan.summary } });
+  return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, summary: plan.summary, ...(busyTeam ? { teamBusy: busyTeam } : {}) } });
 }
 
 async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {

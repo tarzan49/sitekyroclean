@@ -227,6 +227,18 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
 }
 
 /**
+ * Whether a team has no room left at this time (its own jobs, with the travel margin, against its
+ * capacity). For a service the bot moves to another hour (owner, 16 Oct 2026: reschedules are the
+ * bot's): the move keeps the event's team, so the zone having a free team is not enough.
+ */
+export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string): boolean {
+  const from = Date.parse(startIso), to = Date.parse(endIso);
+  if (!Number.isFinite(from) || !(to > from)) return true;
+  const margin = TRAVEL_MARGIN_MIN * 60_000;
+  return busyIntervals(events).filter(b => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
+}
+
+/**
  * The team the bot books a job on (owner, 9 Oct 2026: on weekdays the bot closes
  * by itself "nas vagas que não estão ocupadas"): one with room at that time, the
  * one already working next to it that day first (less driving), then the one

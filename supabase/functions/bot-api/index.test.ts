@@ -485,3 +485,35 @@ Deno.test("conversations-upsert grava linhas válidas e recusa as inválidas", a
   const bad = await send({ action: "conversations-upsert", rows: [{ contact_key: "x", first_at: "2026-10-01", origin: "google" }] });
   assertEquals(bad.status, 400);
 });
+
+Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour and the owner is told (16 Oct)", async () => {
+  const ev = (id: string, phone: string, start: string, end: string, team: string) => ({
+    id, summary: `Serviço 108€ (215€) Impermeabilização Premium de 8 cadeiras - ${phone} - Cliente Inventado - Rua X 1, 2640-000 Mafra`,
+    description: `Equipa: ${team}\n\nbot:${phone}@s.whatsapp.net`, location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED", start, end,
+  });
+  const events = [ev("mine", "900000001", "2026-10-19T09:00:00Z", "2026-10-19T10:45:00Z", "Lisboa 2"),
+    ev("other", "900000002", "2026-10-19T14:00:00Z", "2026-10-19T15:00:00Z", "Lisboa 2")];
+  const writes: Record<string, unknown>[] = [], mails: string[] = [];
+  const call = (time: string) => handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.3.${++ip % 250}` },
+      body: JSON.stringify({ action: "update-booking", eventId: "mine", phone: "900000001", changes: { date: "2026-10-19", time, postcode: "2640-813" } }),
+    }),
+    { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events }), now: () => new Date("2026-10-16T12:30:00Z"),
+      writeCalendar: p => { writes.push(p); return Promise.resolve({ ok: true, eventId: "mine" }); },
+      notifyOwner: (subject: string) => { mails.push(subject); return Promise.resolve(null); } },
+  ).then(r => r.json());
+
+  // 15:00 Lisbon = 14:00 UTC: Lisboa 2 (one person) already works then.
+  const busy = await call("15:00");
+  assertEquals([busy.update.ok, busy.update.moved, busy.update.teamBusy], [true, false, "Lisboa 2"]);
+  assertEquals(writes[0].start, "2026-10-19T09:00:00Z");
+  assert(String(writes[0].title).includes("2640-813"));
+  assert(mails.some(m => m.includes("Lisboa 2 está ocupada")), mails.join());
+
+  // 12:00 Lisbon is free for the team: the event moves.
+  const free = await call("12:00");
+  assertEquals([free.update.ok, free.update.moved, free.update.teamBusy], [true, true, undefined]);
+  assertEquals(writes[1].start, "2026-10-19T11:00:00.000Z");
+});

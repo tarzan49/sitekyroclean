@@ -2144,6 +2144,12 @@ function slotState(busy, teams, region, from, to) {
   const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
+function teamBusyAt(events, team, startIso, endIso) {
+  const from = Date.parse(startIso), to = Date.parse(endIso);
+  if (!Number.isFinite(from) || !(to > from)) return true;
+  const margin = TRAVEL_MARGIN_MIN * 6e4;
+  return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
+}
 function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold3(name)) : void 0;
@@ -3107,5 +3113,6 @@ export {
   reminderDue,
   resolveBotCity,
   slotForMedia,
-  teamAccounts
+  teamAccounts,
+  teamBusyAt
 };
