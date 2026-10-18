@@ -101,6 +101,12 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string, leadId: strin
   };
 }
 
+// Sem limite, um Supabase em baixo deixava o botão em "A enviar…" para sempre
+// (18/10/2026, 22h36–23h40): o pedido nunca falhava e a pessoa nunca via a
+// alternativa do WhatsApp. Com o limite, os dois canais falham e o QuizForm
+// mostra o botão para enviar o pedido pelo WhatsApp.
+const SUBMIT_TIMEOUT_MS = 15_000;
+
 type SupabaseClient = (typeof import('@/lib/supabase'))['supabase'];
 
 async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean; bookingId: string }> {
@@ -120,6 +126,7 @@ async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boo
   // com que qualquer campo novo de campanha tivesse de passar pela validação
   // dos dados do cliente, que é mais apertada e por boas razões.
   const { data, error } = await supabase.functions.invoke('submit-lead', {
+    timeout: SUBMIT_TIMEOUT_MS,
     body: {
       lead: { ...row, email: row.email ?? undefined },
       recaptchaToken,
@@ -147,7 +154,7 @@ async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayloa
 
   // Deliberadamente sem recaptchaToken aqui — ver o comentário em insertCrmLead
   // sobre porque o token nunca deve ir para o canal de email.
-  const doInvoke = () => supabase.functions.invoke('send-lead-email', { body });
+  const doInvoke = () => supabase.functions.invoke('send-lead-email', { body, timeout: SUBMIT_TIMEOUT_MS });
 
   // O antigo envio direto ao Formspree repetia uma vez em caso de falha de
   // rede (comum em dados móveis) — mantém-se esse comportamento aqui.
