@@ -12,6 +12,7 @@ import { costPerExtraRequest, growthInsights, recentWindow } from "@/lib/growthI
 import { AdsHero, CampaignList, InsightList, LiveWeekCard, RecentClosingsList, SinceVisitStrip } from "./growth/LiveCards";
 import WeekExplorer from "./growth/WeekExplorer";
 import GrowthSimulator from "./growth/GrowthSimulator";
+import DailyClosings from "./growth/DailyClosings";
 import { dm, euro, one, pct } from "./growth/format";
 
 // Separador "Crescimento" do painel (dono, 2026-10-17: "quero apenas dados que me
@@ -192,6 +193,8 @@ const GrowthPanel = () => {
         <div className="lg:col-span-2"><AdsHero rows={extra.rows} total={extra.total} /></div>
         <div className="lg:col-span-3"><LiveWeekCard live={live} /></div>
       </div>
+
+      <DailyClosings rows={loaded.closings} now={tick} />
 
       <InsightList insights={insights} />
 
