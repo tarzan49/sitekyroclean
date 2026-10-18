@@ -116,6 +116,18 @@ describe('planBotBooking', () => {
     expect(p.event.description).toContain('bot:c1');
   });
 
+  it('a total agreed in the chat closes it, even with an item off the table (owner, 18 Oct: 7 chairs at 15€ + headboard 29€ = 134€)', () => {
+    const chairs = [{ kind: 'chairs', qty: 7 }];
+    const p = planBotBooking(book({ items: chairs, agreedTotal: 134, service: 'Limpeza de 7 cadeiras e cabeceira' }), [], NOW);
+    expect(p).toMatchObject({ ok: true });
+    if (!('ok' in p) || !p.ok) return;
+    expect(p.event.title).toMatch(/^Serviço 67€ \(134€\) Limpeza de 7 cadeiras e cabeceira/);
+    expect(p.event.description).toContain('Preço combinado na conversa (tabela 122,50€)');
+    // A rug with no engine price closes too once the price was agreed; without it, it goes to the owner.
+    expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }], agreedTotal: 79 }), [], NOW)).toMatchObject({ ok: true });
+    expect(planBotBooking(book({ agreedTotal: -5, items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false });
+  });
+
   it('closes Saturdays and Sundays from the calendar (owner, 18 Oct), leaves anything without an engine price', () => {
     expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toMatchObject({ ok: true });

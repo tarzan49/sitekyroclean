@@ -53,6 +53,15 @@ export function bookingTotal(quote: { total: number | null; closeNow: { ok: bool
   return { total: quote.closeNow.total, closeNow: true };
 }
 
+/**
+ * A total already agreed in the conversation (owner, 18 Oct 2026, Helder: he gave 15€ per chair + 29€
+ * for the headboard, the client asked "fica por 134€?", he said "Exatamente", and the bot held the
+ * booking because the table said 122,50€ and the headboard is "sob orçamento"). The bot server checks
+ * the number was said or confirmed by us in that chat before it sends it; here it only has to be sane.
+ */
+export const agreedTotalOf = (v: unknown): number | null =>
+  typeof v === 'number' && Number.isFinite(v) && v > 0 && v <= 5000 ? Math.round(v * 100) / 100 : null;
+
 export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: string })[], now: Date, ownEventId?: string | null): BotHoldResult {
   if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
   const r = req as Record<string, unknown>;
@@ -72,9 +81,10 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   if ('error' in quote) return { error: String(quote.error) };
   const city = availability.city!;
   const what = quote.lines.map(l => l.label).join(' + ');
-  const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
+  const chatTotal = agreedTotalOf(r.agreedTotal);
+  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
-  const price = quote.quote ? 'sob orçamento' : euro(agreed.total!) + (agreed.closeNow ? ' (com 10% para fechar já)' : '');
+  const price = chatTotal ? euro(chatTotal) : quote.quote ? 'sob orçamento' : euro(agreed.total!) + (agreed.closeNow ? ' (com 10% para fechar já)' : '');
   const name = text(r.name, MAX.name) || 'cliente';
   const title = `Pré-reserva – ${name} – ${city} – ${what} – ${price}`;
   const pickup = quote.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote.rugPickup.fee)}` : '';
@@ -232,8 +242,9 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city });
   if ('error' in quote) return { error: String(quote.error) };
-  if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
-  const agreed = bookingTotal(quote, r.closeNow, slot.date, now);
+  const chatTotal = agreedTotalOf(r.agreedTotal);
+  if (!chatTotal && (quote.quote || !(quote.total > 0))) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
+  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   const team = chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
@@ -252,6 +263,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
       : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
     `Total: ${euro(total)} (deslocação incluída)`,
+    chatTotal ? `Preço combinado na conversa${quote.quote || !(quote.total > 0) ? '' : ` (tabela ${euro(quote.total)})`}.` : '',
     agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : '',
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',
     `bot:${conversationId}`,
