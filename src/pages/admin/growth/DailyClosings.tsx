@@ -21,8 +21,7 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
     const r = rows as any[];
     return summarizeClosings(r, addDays(today, -(days - 1)), today);
   }, [rows, today, days]);
-  const perDay = [...summary.perDay].reverse();
-  const maxBilled = Math.max(1, ...perDay.map(d => d.billed));
+  const maxBilled = Math.max(1, ...summary.perDay.map(d => d.billed));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dayRows = open ? closingsOnDay(rows as any[], open) as unknown as LiveClosing[] : [];
   const avg = summary.billed / days;
@@ -49,51 +48,69 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
       </div>
       <p className="text-[11px] text-gray-500">Média: {euro(avg)} faturados e {(summary.count / days).toLocaleString("pt-PT", { maximumFractionDigits: 1 })} fechos por dia.</p>
 
-      <ul className="divide-y divide-gray-100">
-        {perDay.map(d => {
-          const isOpen = open === d.day;
-          return (
-            <li key={d.day}>
-              <button onClick={() => setOpen(isOpen ? null : d.day)} className="w-full py-2 flex items-center gap-3 text-left">
-                <span className={`w-20 shrink-0 text-xs ${d.day === today ? "font-bold text-navy" : "text-gray-600"}`}>
-                  {d.day === today ? "Hoje" : `${WEEKDAY_SHORT[weekdayOf(d.day)]} ${dm(d.day)}`}
-                </span>
-                <span className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <span className="block h-full rounded-full" style={{ width: `${(d.billed / maxBilled) * 100}%`, background: "#D4AF37" }} />
-                </span>
-                <span className="w-8 text-right text-xs text-gray-600 tabular-nums">{d.count}</span>
-                <span className="w-16 text-right text-sm font-bold text-navy tabular-nums">{euro(d.billed)}</span>
-                <span className="w-16 text-right text-[11px] text-gray-500 tabular-nums">{euro(d.cut)}</span>
+      <div className="pt-6">
+        <div className="flex items-end gap-[3px] sm:gap-1.5 h-40 border-b border-gray-200">
+          {summary.perDay.map(d => {
+            const sel = open === d.day;
+            const h = d.billed > 0 ? Math.max(4, (d.billed / maxBilled) * 100) : 0;
+            return (
+              <button key={d.day} onClick={() => setOpen(sel ? null : d.day)}
+                title={`${d.count} fechos · ${euro(d.billed)} faturado · ${euro(d.cut)} para ti`}
+                className="group relative flex-1 h-full flex flex-col justify-end items-center min-w-0">
+                {days <= 14 && d.billed > 0 && (
+                  <span className={`absolute text-[10px] tabular-nums whitespace-nowrap ${sel ? "font-bold text-navy" : "text-gray-500"}`} style={{ bottom: `calc(${h}% + 4px)`, top: "auto" }}>{euro(d.billed)}</span>
+                )}
+                <span className={`w-full max-w-[34px] rounded-t-md transition-all ${sel ? "" : "opacity-80 group-hover:opacity-100"}`}
+                  style={{ height: `${h}%`, background: sel ? "#0B2F2A" : "#D4AF37" }} />
               </button>
-              {isOpen && (
-                <div className="pb-2 pl-2">
-                  {dayRows.length === 0 ? <p className="text-xs text-gray-500">Nenhum serviço fechado neste dia.</p> : (
-                    <ul className="space-y-1.5">
-                      {dayRows.map((r, i) => (
-                        <li key={r.id ?? i} className="flex items-start gap-3 rounded-lg bg-gray-50 px-2.5 py-1.5">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs text-navy font-medium line-clamp-1">{r.description || "Serviço"}</p>
-                            <p className="text-[11px] text-gray-500">
-                              {new Date(r.booked_at!).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" })}
-                              {(r.locality || r.city) && ` · ${r.locality || r.city}`}
-                              {r.source === "Google Ads" && " · Google Ads"}
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-xs font-bold text-navy tabular-nums">{euro(Number(r.billed_value) || 0)}</p>
-                            <p className="text-[11px] text-gray-500 tabular-nums">{euro(Number(r.my_cut) || 0)} para ti</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      <p className="text-[11px] text-gray-500">Colunas: fechos · faturado · para ti. Um fecho conta no dia em que foi marcado (não no dia do serviço); revisitas a 0€ não contam.</p>
+            );
+          })}
+        </div>
+        <div className="flex gap-[3px] sm:gap-1.5 mt-1">
+          {summary.perDay.map((d, i) => {
+            const step = days <= 14 ? 1 : days <= 30 ? 3 : 7;
+            const show = (summary.perDay.length - 1 - i) % step === 0;
+            return (
+              <span key={d.day} className={`flex-1 min-w-0 text-center text-[10px] leading-tight ${open === d.day ? "font-bold text-navy" : "text-gray-400"}`}>
+                {show ? <>{d.day === today ? "Hoje" : WEEKDAY_SHORT[weekdayOf(d.day)]}<br />{dm(d.day)}</> : null}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      {open && (() => {
+        const d = summary.perDay.find(x => x.day === open);
+        return (
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 space-y-2">
+            <div className="flex items-baseline justify-between gap-2 flex-wrap">
+              <p className="text-sm font-bold text-navy">{open === today ? "Hoje" : `${WEEKDAY_SHORT[weekdayOf(open)]} ${dm(open)}`}</p>
+              <p className="text-xs text-gray-600 tabular-nums">{d?.count ?? 0} fechos · <b className="text-navy">{euro(d?.billed ?? 0)}</b> faturado · {euro(d?.cut ?? 0)} para ti</p>
+            </div>
+            {dayRows.length === 0 ? <p className="text-xs text-gray-500">Nenhum serviço fechado neste dia.</p> : (
+              <ul className="space-y-1.5">
+                {dayRows.map((r, i) => (
+                  <li key={r.id ?? i} className="flex items-start gap-3 rounded-lg bg-white px-2.5 py-1.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-navy font-medium line-clamp-1">{r.description || "Serviço"}</p>
+                      <p className="text-[11px] text-gray-500">
+                        {new Date(r.booked_at!).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" })}
+                        {(r.locality || r.city) && ` · ${r.locality || r.city}`}
+                        {r.source === "Google Ads" && " · Google Ads"}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-bold text-navy tabular-nums">{euro(Number(r.billed_value) || 0)}</p>
+                      <p className="text-[11px] text-gray-500 tabular-nums">{euro(Number(r.my_cut) || 0)} para ti</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      })()}
+      <p className="text-[11px] text-gray-500">Barras = faturado em cada dia. Um fecho conta no dia em que foi marcado (não no dia do serviço); revisitas a 0€ não contam.</p>
     </section>
   );
 }
