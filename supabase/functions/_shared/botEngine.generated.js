@@ -2391,7 +2391,6 @@ function planBotBooking(req, events, now, ownEventId) {
   if (!conversationId) return { error: "conversationId em falta" };
   if (typeof r.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
   const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true;
-  if (isWeekend(r.date) && !ownerChose) return { ok: false, weekend: true };
   const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
   const missing = [!name && "nome", address.length < 8 && "morada completa"].filter((m) => !!m);
   if (missing.length) return { ok: false, missing };

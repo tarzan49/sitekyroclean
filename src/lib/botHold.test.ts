@@ -116,9 +116,9 @@ describe('planBotBooking', () => {
     expect(p.event.description).toContain('bot:c1');
   });
 
-  it('leaves Saturdays and Sundays to the owner, and anything without an engine price', () => {
-    expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toEqual({ ok: false, weekend: true });
-    expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toEqual({ ok: false, weekend: true });
+  it('closes Saturdays and Sundays from the calendar (owner, 18 Oct), leaves anything without an engine price', () => {
+    expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toMatchObject({ ok: true });
+    expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.stringContaining('sob orçamento') });
     expect(planBotBooking(book({ city: 'Aveiro' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) });
   });
@@ -131,7 +131,7 @@ describe('planBotBooking', () => {
     const other = { id: 'o', summary: 'Serviço 45€ (89€) Sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-10T14:00:00.000Z', end: '2026-10-10T15:00:00.000Z' };
     expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: true }), [other], NOW)).toMatchObject({ ok: true });
     // Only true counts, and only on a weekend: a weekday still refuses a shared hour.
-    expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: 'yes' }), [], NOW)).toEqual({ ok: false, weekend: true });
+    expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: 'yes' }), [other], NOW)).toEqual({ ok: false, sameTime: true });
     expect(planBotBooking(book({ ownerApprovedWeekend: true }), [{ ...other, start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' }], NOW)).toEqual({ ok: false, sameTime: true });
   });
 

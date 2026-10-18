@@ -194,7 +194,6 @@ const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', faceb
 
 export type BotBookingResult =
   | { ok: true; team: string; event: { title: string; description: string; start: string; end: string; colorId: string }; slot: { date: string; time: string; durationMin: number } }
-  | { ok: false; weekend: true }
   | { ok: false; sameTime: true }
   | { ok: false; missing: string[] }
   | { ok: false; exists: true }
@@ -210,11 +209,10 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const conversationId = text(r.conversationId, MAX.conversationId);
   if (!conversationId) return { error: 'conversationId em falta' };
   if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== 'string') return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
-  // A Saturday or Sunday time the owner chose himself, answering the bot in his own chat (owner,
-  // 9 Oct 2026: "marcar ou para domingo ou para sábado em horários que eu escolha"), closes like
-  // a weekday; the bot server sends the flag only for a time he wrote for this conversation.
+  // Saturday and Sunday close like a weekday from the calendar (owner, 18 Oct 2026: "tens que só agendar
+  // esses dias, senão estamos condicionados"; until then they waited for him). The flag stays for a time
+  // he chose himself: that one may share the hour with another service of the zone.
   const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true;
-  if (isWeekend(r.date) && !ownerChose) return { ok: false, weekend: true };
   const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
   const missing = [!name && 'nome', address.length < 8 && 'morada completa'].filter((m): m is string => !!m);
   if (missing.length) return { ok: false, missing };

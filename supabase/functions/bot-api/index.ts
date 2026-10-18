@@ -595,7 +595,7 @@ async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
   }
   // Not the bot's to close (weekend, no engine price, data still missing): the time
   // stays held for the owner as a pre-booking, exactly as `hold` would.
-  if (plan.weekend || plan.sameTime || plan.handToOwner || plan.missing) {
+  if (plan.sameTime || plan.handToOwner || plan.missing) {
     const hold = await placeHold(conversationId, body, env, ctx);
     if (hold instanceof Response) return hold;
     return createSuccessResponse({ booking: { ...plan, hold } });

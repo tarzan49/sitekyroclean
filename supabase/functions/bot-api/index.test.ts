@@ -408,12 +408,13 @@ Deno.test("book writes the owner's 'Serviço' in a team colour on a weekday, ove
   assertEquals(rows.get("a")?.title, call.title);
 });
 
-Deno.test("book leaves weekends, prices to confirm and missing data as a pre-booking for the owner", async () => {
+Deno.test("book leaves prices to confirm and missing data as a pre-booking for the owner; weekends close (owner, 18 Oct)", async () => {
   const { store } = fakeHolds();
   const script = fakeScript();
   const sat = JSON.parse(await (await holdCall(book("s", { date: "2026-10-10" }), store, script.write)).text()).booking;
-  assertEquals([sat.ok, sat.weekend, sat.hold.ok], [false, true, true]);
-  assert(String(script.calls[0].title).startsWith("Pré-reserva"));
+  assertEquals(sat.ok, true);
+  assertEquals(script.calls[0].action, "book");
+  script.calls.length = 0;
   const rug = JSON.parse(await (await holdCall(book("r", { items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
   assertEquals([rug.ok, typeof rug.handToOwner, rug.hold.ok], [false, "string", true]);
   const noAddress = JSON.parse(await (await holdCall(book("n", { address: "" }), store, script.write)).text()).booking;
