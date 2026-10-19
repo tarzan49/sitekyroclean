@@ -2016,7 +2016,7 @@ function localityFromPostalCode(code) {
 var TEAMS_BY_REGION = {
   Porto: ["Porto 1", "Porto 2"],
   Braga: ["Braga"],
-  Lisboa: ["Lisboa 1", "Lisboa 2"],
+  Lisboa: ["Lisboa 1"],
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };
@@ -2351,7 +2351,8 @@ function planOwnerBooking(req, events) {
   const phone = text(r.phone, MAX.phone);
   const key9 = digitsOf(phone).slice(-9);
   if (key9.length === 9) {
-    const same = events.find((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9));
+    const day = Date.parse(`${r.date}T12:00:00Z`);
+    const same = events.find((e) => e.start && Math.abs(Date.parse(e.start) - day) <= 60 * 864e5 && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9));
     if (same) return { ok: false, exists: true, summary: same.summary };
   }
   const total = amount(r.total);

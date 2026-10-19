@@ -144,8 +144,11 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const key9 = digitsOf(phone).slice(-9);
 
   if (key9.length === 9) {
-    const same = events.find(e => e.start && lisbon(Date.parse(e.start)).date === r.date
-      && /^\s*servi[cç]o\b/i.test(e.summary)
+    // A service of this phone on ANY nearby day counts (owner, 19 Oct 2026: a rescheduled job came in
+    // as a second booking). Moving an existing booking is update-booking's job, never a new event.
+    const day = Date.parse(`${r.date}T12:00:00Z`);
+    const same = events.find(e => e.start && Math.abs(Date.parse(e.start) - day) <= 60 * 86_400_000
+      && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary)
       && digitsOf(`${e.summary} ${e.description}`).includes(key9));
     if (same) return { ok: false, exists: true, summary: same.summary };
   }
