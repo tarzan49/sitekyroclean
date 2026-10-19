@@ -60,20 +60,19 @@ describe('planBotHold', () => {
 
 describe('planOwnerBooking', () => {
   const base = { conversationId: 'c9', date: '2026-10-12', time: '15h', service: 'Recolha de 2 tapetes (2x3)', total: 159, phone: '+351 900 000 001', name: 'Cliente Inventado', address: 'Rua Inventada 1, Oeiras' };
-  it('builds his own title with "A confirmar · " in front, share rounded up, Lisbon time', () => {
+  it('with a price it is his real Serviço, even without confirmed (owner, 19 Oct), share rounded up, Lisbon time', () => {
     const p = planOwnerBooking(base, []);
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
-    expect(p.event.title).toBe('A confirmar · Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');
+    expect(p.event.title).toBe('Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - 900000001 - Cliente Inventado - Rua Inventada 1, Oeiras');
     expect(p.event.start).toBe('2026-10-12T14:00:00.000Z');
     expect(p.event.description).toContain('bot:c9');
-    // Neither the CRM nor the team script treat it as a service; availability does count it.
     expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
   });
   it('rug pickup: half the total minus the pickup price he set, rounded up', () => {
     const p = planOwnerBooking({ ...base, pickupFee: 20 }, []);
-    expect('ok' in p && p.ok && p.event.title).toMatch(/^A confirmar · Serviço 60€ \(159€\)/);
+    expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 60€ \(159€\)/);
     const q = planOwnerBooking({ ...base, total: 119, pickupFee: 15 }, []);
-    expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · Serviço 45€ \(119€\)/);
+    expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 45€ \(119€\)/);
   });
   it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
     const p = planOwnerBooking({ ...base, total: null, fromAds: true }, []);

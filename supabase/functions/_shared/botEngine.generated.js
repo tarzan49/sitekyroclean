@@ -2363,7 +2363,7 @@ function planOwnerBooking(req, events) {
   const waterproofing = /imperm|premium|essencial/i.test(service);
   const namedRaw = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
   const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
-  const team = r.confirmed === true && total !== null && address.length >= 8 ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing) : null;
+  const team = total !== null ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing) : null;
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
