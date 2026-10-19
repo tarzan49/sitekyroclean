@@ -77,7 +77,7 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   if (!slot) return { error: 'time inválido' };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
 
-  const quote = botQuote({ items: r.items, city: r.city });
+  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
   if ('error' in quote) return { error: String(quote.error) };
   const city = availability.city!;
   const what = quote.lines.map(l => l.label).join(' + ');
@@ -264,14 +264,15 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
   // Owner, 9 Oct 2026: "se for a mesma hora tem que me consultar" (two services of the zone at once).
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
-  const quote = botQuote({ items: r.items, city: r.city });
+  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
   if ('error' in quote) return { error: String(quote.error) };
   const chatTotal = agreedTotalOf(r.agreedTotal);
   if (!chatTotal && (quote.quote || !(quote.total > 0))) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
-  const team = chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
+  // Far zone: the team already there that day (availability.sharedTrip).
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
@@ -286,7 +287,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
       ? `Marcado pelo bot do WhatsApp numa hora de fim de semana escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
       : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
-    `Total: ${euro(total)} (deslocação incluída)`,
+    availability.sharedTrip ? `Total: ${euro(total)} (sem deslocação: a equipa já está na zona nesse dia)` : `Total: ${euro(total)} (deslocação incluída)`,
     chatTotal ? `Preço combinado na conversa${quote.quote || !(quote.total > 0) ? '' : ` (tabela ${euro(quote.total)})`}.` : '',
     agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : '',
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',

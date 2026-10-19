@@ -290,7 +290,92 @@ export type AvailabilityResult =
       requested: { date: string; time: string; free: boolean; teamsFree: string[]; sameTime: boolean; start: string; end: string } | null;
       /** Every free start time per day, for a client who asks for another one. */
       free: Array<{ date: string; label: string; times: string[] }>;
+      /** Far zone only: a booked service of ours is already there that day; same team, travel waived. */
+      sharedTrip?: SharedTrip | null;
     };
+
+/**
+ * Far zones (EXTENDED_TRIP_CITIES): no free hours of their own, but when one of our booked
+ * services is already in the same far zone in the next 14 days, the bot offers that day right
+ * after it, same team, with the travel fee waived (owner, 19 Oct 2026: a 5-seat sofa in Santo
+ * André went from 139€ to 119€ because Lisboa 1 was in Sines that Monday; "o bot tem de saber
+ * ver estas situações"; confirmed: waive travel, far zones only, else hand to him as before).
+ */
+export interface SharedTrip { date: string; team: string; anchorEnd: string; anchorTime: string }
+const FAR_ZONES: Array<{ cities: string[]; places: string[]; postal: [number, number] }> = [
+  { cities: ['Alcácer do Sal', 'Grândola', 'Santiago do Cacém', 'Sines'],
+    places: ['alcacer', 'grandola', 'santiago do cacem', 'sines', 'santo andre', 'comporta', 'troia', 'melides', 'porto covo', 'carvalhal'],
+    postal: [7500, 7599] },
+  { cities: ['Aveiro'], places: ['aveiro', 'ilhavo', 'gafanha', 'costa nova', 'barra'], postal: [3800, 3839] },
+];
+const farZoneOf = (city: string) => FAR_ZONES.find(z => z.cities.includes(city)) ?? null;
+function inFarZone(e: AvailabilityEvent, zone: typeof FAR_ZONES[number]): boolean {
+  const text = `${e.summary}\n${e.description}`;
+  const postal = POSTAL.exec(text);
+  if (postal) { const n = Number(postal[1]); return n >= zone.postal[0] && n <= zone.postal[1]; }
+  const f = fold(e.summary);
+  return zone.places.some(p => new RegExp(`(^|[^a-z])${p}([^a-z]|$)`).test(f));
+}
+
+function sharedTripAvailability(req: AvailabilityRequest, city: string, area: TeamZone | null, durationMin: number, events: AvailabilityEvent[], now: Date): AvailabilityResult {
+  const empty = { city, region: area, teams: [] as string[], durationMin, suggestion: null, requested: null, free: [] as Array<{ date: string; label: string; times: string[] }>, sharedTrip: null };
+  const zone = farZoneOf(city);
+  const today = lisbon(now.getTime()).date;
+  const last = addDays(today, MAX_DAYS - 1);
+  const earliest = now.getTime() + LEAD_TIME_MIN * 60_000;
+  const anchors = zone ? events
+    .filter(e => e.start && e.end && String(e.status).toUpperCase() !== 'CANCELLED' && /^servico\b/.test(fold(e.summary)) && eventTeam(e) && inFarZone(e, zone))
+    .map(e => ({ team: eventTeam(e)!, from: Date.parse(e.start!), to: Date.parse(e.end!) }))
+    .filter(a => Number.isFinite(a.to) && a.to > now.getTime() && lisbon(a.from).date <= last)
+    .sort((a, b) => a.from - b.from) : [];
+  const onlyDay = typeof req.date === 'string' && DATE.test(req.date) ? req.date : null;
+  const usable = anchors.filter(a => !onlyDay || lisbon(a.from).date === onlyDay);
+  if (!usable.length) return { ...empty, handToOwner: 'Disponibilidade sob consulta (deslocação alargada): a data é do responsável' };
+
+  const margin = TRAVEL_MARGIN_MIN * 60_000;
+  const busyTeam = (team: string, from: number, to: number) =>
+    teamBusyAt(events, team, new Date(from).toISOString(), new Date(to).toISOString());
+  const trips = usable.map(a => {
+    const date = lisbon(a.from).date;
+    const startMin = Math.ceil((lisbon(a.to + margin).minutes) / 30) * 30;
+    const slots: Slot[] = [];
+    for (let m = Math.max(startMin, EARLIEST_HOUR * 60); m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 30) {
+      const from = lisbonToUtc(date, m);
+      if (from < earliest || busyTeam(a.team, from, from + durationMin * 60_000)) continue;
+      slots.push({ date, minutes: m, label: dayLabel(date, today), time: hourLabel(m), teamsFree: [a.team], nearOtherJob: true, sameTime: false });
+    }
+    return { a, date, slots };
+  });
+  const trip = trips.find(t => t.slots.length);
+  const first = trip?.slots[0];
+  const second = trip && first ? (trip.slots.find(s => s.minutes - first.minutes >= 180) ?? trip.slots.find(s => s.minutes - first.minutes >= 120) ?? trip.slots[1]) : undefined;
+  const two = [first, second].filter((s): s is Slot => !!s);
+
+  let requested: Extract<AvailabilityResult, { city: string | null }>['requested'] = null;
+  let reqTrip = trip;
+  if (req.time !== undefined) {
+    const m = parseTime(req.time);
+    if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
+    const from = lisbonToUtc(onlyDay, m), to = from + durationMin * 60_000;
+    const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
+    const fit = trips.find(t => !busyTeam(t.a.team, from, to)) ?? trips[0];
+    reqTrip = fit;
+    const free = inHours && !busyTeam(fit.a.team, from, to);
+    requested = { date: onlyDay, time: hourLabel(m), free, teamsFree: free ? [fit.a.team] : [], sameTime: false,
+      start: new Date(from).toISOString(), end: new Date(to).toISOString() };
+  }
+  const chosen = reqTrip ?? trips[0];
+  const sharedTrip: SharedTrip = { date: chosen.date, team: chosen.a.team, anchorEnd: new Date(chosen.a.to).toISOString(), anchorTime: hourLabel(lisbon(chosen.a.from).minutes) };
+  if (!two.length && !requested) return { ...empty, handToOwner: 'Disponibilidade sob consulta (deslocação alargada): a data é do responsável' };
+  return {
+    ...empty, teams: [sharedTrip.team],
+    handToOwner: two.length ? null : 'Equipa na zona mas sem hora livre a seguir: o responsável confirma',
+    suggestion: two.length ? { text: suggestionText(two), slots: two } : null,
+    requested,
+    free: trip ? [{ date: trip.date, label: dayLabel(trip.date, today), times: trip.slots.map(s => s.time) }] : [],
+    sharedTrip,
+  };
+}
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 export function parseTime(v: unknown): number | null {
@@ -339,7 +424,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req?.city !== undefined && typeof req.city !== 'string') return { error: 'city tem de ser texto' };
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
-  if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: 'Disponibilidade sob consulta (deslocação alargada): a data é do responsável' };
+  if (EXTENDED_TRIP_CITIES.has(city)) {
+    if (req.date !== undefined && (typeof req.date !== 'string' || !DATE.test(req.date))) return { error: 'date tem de ser AAAA-MM-DD' };
+    return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
+  }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
 

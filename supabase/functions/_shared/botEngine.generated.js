@@ -1855,7 +1855,7 @@ function rugPickupFor(items) {
 }
 function botQuote(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
-  const { items: rawItems, city: rawCity } = input;
+  const { items: rawItems, city: rawCity, sharedTrip: rawShared } = input;
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail("items tem de ser uma lista com pelo menos um artigo");
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items = [];
@@ -1867,9 +1867,11 @@ function botQuote(input) {
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? "");
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? "") : null;
-  const travel = tiers ? tiers.travel : result.travel;
-  const total = tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  const sharedTrip = extendedTrip && rawShared === true && !result.quote;
+  const tiersOut = tiers && sharedTrip ? { travel: 0, premium: tiers.premium === null ? null : cents(tiers.premium - tiers.travel), essencial: tiers.essencial === null ? null : cents(tiers.essencial - tiers.travel) } : tiers;
+  const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
+  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const rugsOnly = items.every((i) => i.kind === "rug");
   const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
   const rugIdx = items.flatMap((i, n) => i.kind === "rug" ? [n] : []);
@@ -1877,12 +1879,13 @@ function botQuote(input) {
   const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? "") : null;
   const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawItems[n].material })), othersResult.subtotal, city) : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
-  const handToOwner = result.quote && !rugPriced || city === null || extendedTrip;
+  const handToOwner = result.quote && !rugPriced || city === null || extendedTrip && !sharedTrip;
   return {
     ok: true,
     city,
     cityKnown: city !== null,
     extendedTrip,
+    sharedTrip,
     lines: result.lines.map((line) => ({
       label: line.label,
       amount: line.amount,
@@ -1897,7 +1900,7 @@ function botQuote(input) {
     travel,
     total,
     // Both versions of the same order, same travel: quote them from here.
-    waterproofingTiers: tiers,
+    waterproofingTiers: tiersOut,
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items),
@@ -2190,6 +2193,86 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
   return [...st.teamsFree].sort((a, b) => Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
+var FAR_ZONES = [
+  {
+    cities: ["Alcácer do Sal", "Grândola", "Santiago do Cacém", "Sines"],
+    places: ["alcacer", "grandola", "santiago do cacem", "sines", "santo andre", "comporta", "troia", "melides", "porto covo", "carvalhal"],
+    postal: [7500, 7599]
+  },
+  { cities: ["Aveiro"], places: ["aveiro", "ilhavo", "gafanha", "costa nova", "barra"], postal: [3800, 3839] }
+];
+var farZoneOf = (city) => FAR_ZONES.find((z) => z.cities.includes(city)) ?? null;
+function inFarZone(e, zone) {
+  const text2 = `${e.summary}
+${e.description}`;
+  const postal = POSTAL.exec(text2);
+  if (postal) {
+    const n = Number(postal[1]);
+    return n >= zone.postal[0] && n <= zone.postal[1];
+  }
+  const f = fold3(e.summary);
+  return zone.places.some((p) => new RegExp(`(^|[^a-z])${p}([^a-z]|$)`).test(f));
+}
+function sharedTripAvailability(req, city, area, durationMin, events, now) {
+  const empty = { city, region: area, teams: [], durationMin, suggestion: null, requested: null, free: [], sharedTrip: null };
+  const zone = farZoneOf(city);
+  const today = lisbon(now.getTime()).date;
+  const last = addDays(today, MAX_DAYS - 1);
+  const earliest = now.getTime() + LEAD_TIME_MIN * 6e4;
+  const anchors = zone ? events.filter((e) => e.start && e.end && String(e.status).toUpperCase() !== "CANCELLED" && /^servico\b/.test(fold3(e.summary)) && eventTeam(e) && inFarZone(e, zone)).map((e) => ({ team: eventTeam(e), from: Date.parse(e.start), to: Date.parse(e.end) })).filter((a) => Number.isFinite(a.to) && a.to > now.getTime() && lisbon(a.from).date <= last).sort((a, b) => a.from - b.from) : [];
+  const onlyDay = typeof req.date === "string" && DATE.test(req.date) ? req.date : null;
+  const usable = anchors.filter((a) => !onlyDay || lisbon(a.from).date === onlyDay);
+  if (!usable.length) return { ...empty, handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
+  const margin = TRAVEL_MARGIN_MIN * 6e4;
+  const busyTeam = (team, from, to) => teamBusyAt(events, team, new Date(from).toISOString(), new Date(to).toISOString());
+  const trips = usable.map((a) => {
+    const date = lisbon(a.from).date;
+    const startMin = Math.ceil(lisbon(a.to + margin).minutes / 30) * 30;
+    const slots = [];
+    for (let m = Math.max(startMin, EARLIEST_HOUR * 60); m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 30) {
+      const from = lisbonToUtc(date, m);
+      if (from < earliest || busyTeam(a.team, from, from + durationMin * 6e4)) continue;
+      slots.push({ date, minutes: m, label: dayLabel(date, today), time: hourLabel(m), teamsFree: [a.team], nearOtherJob: true, sameTime: false });
+    }
+    return { a, date, slots };
+  });
+  const trip = trips.find((t) => t.slots.length);
+  const first = trip?.slots[0];
+  const second = trip && first ? trip.slots.find((s) => s.minutes - first.minutes >= 180) ?? trip.slots.find((s) => s.minutes - first.minutes >= 120) ?? trip.slots[1] : void 0;
+  const two = [first, second].filter((s) => !!s);
+  let requested = null;
+  let reqTrip = trip;
+  if (req.time !== void 0) {
+    const m = parseTime(req.time);
+    if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
+    const from = lisbonToUtc(onlyDay, m), to = from + durationMin * 6e4;
+    const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
+    const fit = trips.find((t) => !busyTeam(t.a.team, from, to)) ?? trips[0];
+    reqTrip = fit;
+    const free = inHours && !busyTeam(fit.a.team, from, to);
+    requested = {
+      date: onlyDay,
+      time: hourLabel(m),
+      free,
+      teamsFree: free ? [fit.a.team] : [],
+      sameTime: false,
+      start: new Date(from).toISOString(),
+      end: new Date(to).toISOString()
+    };
+  }
+  const chosen = reqTrip ?? trips[0];
+  const sharedTrip = { date: chosen.date, team: chosen.a.team, anchorEnd: new Date(chosen.a.to).toISOString(), anchorTime: hourLabel(lisbon(chosen.a.from).minutes) };
+  if (!two.length && !requested) return { ...empty, handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
+  return {
+    ...empty,
+    teams: [sharedTrip.team],
+    handToOwner: two.length ? null : "Equipa na zona mas sem hora livre a seguir: o responsável confirma",
+    suggestion: two.length ? { text: suggestionText(two), slots: two } : null,
+    requested,
+    free: trip ? [{ date: trip.date, label: dayLabel(trip.date, today), times: trip.slots.map((s) => s.time) }] : [],
+    sharedTrip
+  };
+}
 var DATE = /^\d{4}-\d{2}-\d{2}$/;
 function parseTime(v) {
   const m = /^(\d{1,2})(?:[:h](\d{2})?)?h?$/i.exec(String(v ?? "").trim());
@@ -2228,7 +2311,10 @@ function botAvailability(req, events, now) {
   if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   const area = CITY_REGION.get(fold3(city));
-  if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
+  if (EXTENDED_TRIP_CITIES.has(city)) {
+    if (req.date !== void 0 && (typeof req.date !== "string" || !DATE.test(req.date))) return { error: "date tem de ser AAAA-MM-DD" };
+    return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
+  }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const today = lisbon(now.getTime()).date;
@@ -2309,7 +2395,7 @@ function planBotHold(req, events, now, ownEventId) {
   const slot = availability.requested;
   if (!slot) return { error: "time inválido" };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
-  const quote = botQuote({ items: r.items, city: r.city });
+  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
   if ("error" in quote) return { error: String(quote.error) };
   const city = availability.city;
   const what = quote.lines.map((l) => l.label).join(" + ");
@@ -2416,14 +2502,14 @@ function planBotBooking(req, events, now, ownEventId) {
   if (!slot) return { error: "time inválido" };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
-  const quote = botQuote({ items: r.items, city: r.city });
+  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
   if ("error" in quote) return { error: String(quote.error) };
   const chatTotal = agreedTotalOf(r.agreedTotal);
   if (!chatTotal && (quote.quote || !(quote.total > 0))) return { ok: false, handToOwner: "sob orçamento: o responsável dá o valor e marca" };
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");
@@ -2434,7 +2520,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const description = [
     ownerChose ? `Marcado pelo bot do WhatsApp numa hora de fim de semana escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).` : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
-    `Total: ${euro(total)} (deslocação incluída)`,
+    availability.sharedTrip ? `Total: ${euro(total)} (sem deslocação: a equipa já está na zona nesse dia)` : `Total: ${euro(total)} (deslocação incluída)`,
     chatTotal ? `Preço combinado na conversa${quote.quote || !(quote.total > 0) ? "" : ` (tabela ${euro(quote.total)})`}.` : "",
     agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : "",
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : "",

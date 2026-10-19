@@ -152,7 +152,7 @@ function rugPickupFor(items: CustomPackItem[]) {
  */
 export function botQuote(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItems, city: rawCity } = input as Record<string, unknown>;
+  const { items: rawItems, city: rawCity, sharedTrip: rawShared } = input as Record<string, unknown>;
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail('items tem de ser uma lista com pelo menos um artigo');
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items: CustomPackItem[] = [];
@@ -164,9 +164,15 @@ export function botQuote(input: unknown) {
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? '') : null;
-  const travel = tiers ? tiers.travel : result.travel;
-  const total = tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  // Far zone, on a day a booked team is already there (availability.sharedTrip): no travel fee,
+  // and the price is the bot's (owner, 19 Oct 2026: Santo André 139€ → 119€).
+  const sharedTrip = extendedTrip && rawShared === true && !result.quote;
+  const tiersOut = tiers && sharedTrip
+    ? { travel: 0, premium: tiers.premium === null ? null : cents(tiers.premium - tiers.travel), essencial: tiers.essencial === null ? null : cents(tiers.essencial - tiers.travel) }
+    : tiers;
+  const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
+  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
   // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
   // Anything mixed with other items still goes to the owner.
   const rugsOnly = items.every(i => i.kind === 'rug');
@@ -181,12 +187,13 @@ export function botQuote(input: unknown) {
     ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: (rawItems[n] as Record<string, unknown>).material })), othersResult.subtotal, city)
     : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
-  const handToOwner = (result.quote && !rugPriced) || city === null || extendedTrip;
+  const handToOwner = (result.quote && !rugPriced) || city === null || (extendedTrip && !sharedTrip);
   return {
     ok: true as const,
     city,
     cityKnown: city !== null,
     extendedTrip,
+    sharedTrip,
     lines: result.lines.map(line => ({
       label: line.label,
       amount: line.amount,
@@ -201,7 +208,7 @@ export function botQuote(input: unknown) {
     travel,
     total,
     // Both versions of the same order, same travel: quote them from here.
-    waterproofingTiers: tiers,
+    waterproofingTiers: tiersOut,
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items),
