@@ -27,12 +27,11 @@ describe('planBotHold', () => {
     expect(eventRegion(asEvent(p, 'e1'))).toBe('Lisboa');
   });
 
-  it('busies a team, so the same time is not given to a fourth client in Lisbon (Lisboa 1 is two people, Lisboa 2 one)', () => {
+  it('busies a team, so the same time is not given to a third client in Lisbon (only Lisboa 1, two people, since 19 Oct)', () => {
     const a = plan(req({ conversationId: 'a' }));
     const b = plan(req({ conversationId: 'b' }), [asEvent(a, 'ea')]);
-    const c = plan(req({ conversationId: 'c' }), [asEvent(a, 'ea'), asEvent(b, 'eb')]);
-    const three = [asEvent(a, 'ea'), asEvent(b, 'eb'), asEvent(c, 'ec')];
-    expect(planBotHold(req({ conversationId: 'd' }), three, NOW)).toMatchObject({ ok: false, taken: true });
+    const three = [asEvent(a, 'ea'), asEvent(b, 'eb')];
+    expect(planBotHold(req({ conversationId: 'c' }), three, NOW)).toMatchObject({ ok: false, taken: true });
     const after = botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '15h' }, three, NOW);
     expect('requested' in after && after.requested?.free).toBe(false);
   });
@@ -91,7 +90,8 @@ describe('planOwnerBooking', () => {
     expect(p.team).toBe('Lisboa 1');
     expect(p.event.colorId).toBe('6');
     expect(p.event.title).toBe('Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - 900000001 - Cliente Inventado - Rua Inventada 1, Oeiras');
-    expect(planOwnerBooking({ ...base, confirmed: true, team: 'Lisboa 2' }, [])).toMatchObject({ team: 'Lisboa 2', event: { colorId: '3' } });
+    // Lisboa 2 no longer books (owner, 19 Oct 2026): a chat that names it goes to Lisboa 1.
+    expect(planOwnerBooking({ ...base, confirmed: true, team: 'Lisboa 2' }, [])).toMatchObject({ team: 'Lisboa 1', event: { colorId: '6' } });
     // Without a price it stays "A confirmar".
     const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, []);
     expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · /);
@@ -158,6 +158,12 @@ describe('planBotBooking', () => {
     expect('ok' in p && p.ok).toBe(true);
     const busy = [1, 2, 3].map(i => ({ id: `x${i}`, summary: `Serviço 45€ (89€) Sofá - Lisboa`, description: `Equipa: ${i < 3 ? 'Lisboa 1' : 'Lisboa 2'}`, status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' }));
     expect(planBotBooking(book(), busy, NOW)).toMatchObject({ ok: false, taken: true });
+  });
+
+  it('a client who already has a service on another day is a reschedule, never a second booking (Filipa, 19 Oct)', () => {
+    const mine = { id: 'm', summary: 'Serviço 40€ (79€) Sofá - 900 000 000 - Ana - Oeiras', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-07T09:00:00.000Z', end: '2026-10-07T10:00:00.000Z' };
+    expect(planBotBooking(book(), [mine], NOW)).toMatchObject({ ok: false, reschedule: { eventId: 'm', date: '2026-10-08' } });
+    expect(planBotBooking(book(), [{ ...mine, summary: mine.summary.replace('900 000 000', '911 222 333') }], NOW)).toMatchObject({ ok: true });
   });
 
   it('never books the same phone twice on the same day', () => {

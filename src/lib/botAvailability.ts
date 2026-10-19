@@ -48,7 +48,7 @@ export type TeamZone = CrmLocality | 'Coimbra';
 export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Porto: ['Porto 1', 'Porto 2'],
   Braga: ['Braga'],
-  Lisboa: ['Lisboa 1', 'Lisboa 2'],
+  Lisboa: ['Lisboa 1'],
   Algarve: ['Algarve'],
   Coimbra: ['Coimbra'],
 };

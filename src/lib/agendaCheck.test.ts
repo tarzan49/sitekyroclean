@@ -49,8 +49,8 @@ describe('agendaCheck', () => {
 
   it('flags a job on top of a team block and ignores the owner\'s own appointments', () => {
     const r = agendaCheck([
-      ev('09:00', '18:00', 'Bloqueio Lisboa 2', 'Lisboa 2'),
-      ev('15:00', '16:00', GOOD, 'Lisboa 2'),
+      ev('09:00', '18:00', 'Bloqueio Porto 2', 'Porto 2'),
+      ev('15:00', '16:00', GOOD, 'Porto 2'),
       ev('15:00', '16:00', 'Jantar com amigos'),
     ], TOMORROW, NOW);
     expect(r.services).toHaveLength(1);

@@ -589,6 +589,12 @@ async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
   if ("response" in ctx) return ctx.response!;
   const plan = planBotBooking(body, ctx.events, ctx.now, ctx.live?.event_id ?? null);
   if ("error" in plan) return createErrorResponse(String(plan.error), 400);
+  // The client already has a service on another day: move that one (owner, 19 Oct 2026), never a second event.
+  if (plan.reschedule) {
+    const moved = await updateBooking({ eventId: plan.reschedule.eventId, phone: body.phone, changes: { date: plan.reschedule.date, time: plan.reschedule.time } }, env);
+    const data = await moved.clone().json().catch(() => ({}));
+    return createSuccessResponse({ booking: { ok: !!data?.update?.ok, rescheduled: true, update: data?.update ?? null } });
+  }
   if (plan.ok && plan.event) {
     const failed = await writeAndSave(conversationId, ctx.live, ctx.now, env, "book", plan.event);
     return failed ?? createSuccessResponse({ booking: { ok: true, slot: plan.slot, team: plan.team } });

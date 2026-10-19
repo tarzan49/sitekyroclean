@@ -2016,7 +2016,7 @@ function localityFromPostalCode(code) {
 var TEAMS_BY_REGION = {
   Porto: ["Porto 1", "Porto 2"],
   Braga: ["Braga"],
-  Lisboa: ["Lisboa 1", "Lisboa 2"],
+  Lisboa: ["Lisboa 1"],
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };
@@ -2336,6 +2336,12 @@ var OWNER_BOOKING_PREFIX = "A confirmar · ";
 var digitsOf = (t) => t.replace(/\D/g, "");
 var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
 var ownerShare = (total, pickupFee = 0) => Math.ceil(total / 2 - pickupFee);
+function clientServiceNear(events, phone, date) {
+  const key9 = digitsOf(phone).slice(-9);
+  if (key9.length !== 9) return void 0;
+  const day = Date.parse(`${date}T12:00:00Z`);
+  return events.filter((e) => e.start && e.status !== "CANCELLED" && Math.abs(Date.parse(e.start) - day) <= 60 * 864e5 && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9)).sort((a, b) => Math.abs(Date.parse(a.start) - day) - Math.abs(Date.parse(b.start) - day))[0];
+}
 function planOwnerBooking(req, events) {
   if (!req || typeof req !== "object") return { error: "O pedido tem de ser um objeto" };
   const r = req;
@@ -2351,8 +2357,7 @@ function planOwnerBooking(req, events) {
   const phone = text(r.phone, MAX.phone);
   const key9 = digitsOf(phone).slice(-9);
   if (key9.length === 9) {
-    const day = Date.parse(`${r.date}T12:00:00Z`);
-    const same = events.find((e) => e.start && Math.abs(Date.parse(e.start) - day) <= 60 * 864e5 && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9));
+    const same = clientServiceNear(events, phone, r.date);
     if (same) return { ok: false, exists: true, summary: same.summary };
   }
   const total = amount(r.total);
@@ -2386,7 +2391,7 @@ function planOwnerBooking(req, events) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", Braga: "10", "Lisboa 1": "6", "Lisboa 2": "3", Algarve: "5", Coimbra: "4" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
@@ -2402,6 +2407,8 @@ function planBotBooking(req, events, now, ownEventId) {
   const others = ownEventId ? events.filter((e) => e.id !== ownEventId) : events;
   const key9 = digitsOf(phone).slice(-9);
   if (key9.length === 9 && others.some((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
+  const booked = clientServiceNear(others, phone, r.date);
+  if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };

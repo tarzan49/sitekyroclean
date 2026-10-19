@@ -44,7 +44,7 @@ describe('botAvailability', () => {
   it('offers two times from 10h, never too close to now, in the owner wording', () => {
     const r = ok(botAvailability({ city: 'Oeiras', items: [{ kind: 'sofa', qty: 1 }] }, [], NOW));
     expect(r.region).toBe('Lisboa');
-    expect(r.teams).toEqual(['Lisboa 1', 'Lisboa 2']);
+    expect(r.teams).toEqual(['Lisboa 1']);
     expect(r.handToOwner).toBeNull();
     // 09:45 now + 90 min lead → first whole hour is 12h.
     expect(r.suggestion?.slots.map(s => [s.date, s.time])).toEqual([['2026-10-07', '12h'], ['2026-10-07', '15h']]);
@@ -54,14 +54,14 @@ describe('botAvailability', () => {
 
   it('a time is free while one of the two teams of the zone is free', () => {
     const events = [
-      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Lisboa', 'Equipa: Lisboa 2'),
-      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Lisboa', 'Equipa: Lisboa 1'),
-      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Eva - Lisboa', 'Equipa: Lisboa 1'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Porto', 'Equipa: Porto 1'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Eva - Porto', 'Equipa: Porto 1'),
     ];
-    const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events, NOW));
+    const r = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events, NOW));
     // Both busy 10-12 (+30 min drive): 10h, 11h and 12h are gone, 13h is the first.
     expect(r.free[0].times[0]).toBe('13h');
-    const one = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events.slice(1), NOW));
+    const one = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events.slice(1), NOW));
     // 10h still has a free team, but another service of the zone is there: offered only when nothing else is.
     expect(one.free[0].times[0]).toBe('10h');
     expect(one.suggestion?.slots.map(s => [s.time, s.sameTime])).toEqual([['13h', false], ['16h', false]]);
@@ -104,7 +104,7 @@ describe('botAvailability', () => {
     const events = [ev('2026-10-12', '15:00', '16:00', 'Serviço retificação - Rua Z, 2770-010 Paço de Arcos', 'Equipa: Lisboa 1')];
     const r = ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW));
     // Lisboa 1 is two people: one job leaves it room for a second.
-    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1', 'Lisboa 2'], sameTime: true, start: at('2026-10-12', '15:00'), end: expect.any(String) });
+    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1'], sameTime: true, start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
   it('hands the date to the owner where there is no team or it is "sob consulta"', () => {
@@ -138,30 +138,30 @@ describe('botAvailability', () => {
 });
 
 describe('two-person teams and the team the bot books on', () => {
-  const lisbon1 = (from: string, to: string, who: string) => ev('2026-10-08', from, to, `Serviço 60€ (119€) Sofá - ${who} - Lisboa`, 'Equipa: Lisboa 1');
+  const porto1 = (from: string, to: string, who: string) => ev('2026-10-08', from, to, `Serviço 60€ (119€) Sofá - ${who} - Porto`, 'Equipa: Porto 1');
 
-  it('Porto 1 and Lisboa 1 take two jobs at the same time, the other teams one', () => {
-    const one = [lisbon1('10:00', '12:00', 'Ana'), ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Lisboa', 'Equipa: Lisboa 2')];
-    const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, one, NOW));
-    expect(r.requested).toMatchObject({ free: true, teamsFree: ['Lisboa 1'] });
-    const two = [...one, lisbon1('10:00', '12:00', 'Eva')];
-    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, two, NOW)).requested?.free).toBe(false);
+  it('Porto 1 and Porto 1 take two jobs at the same time, the other teams one', () => {
+    const one = [porto1('10:00', '12:00', 'Ana'), ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2')];
+    const r = ok(botAvailability({ city: 'Porto', date: '2026-10-08', time: '10h' }, one, NOW));
+    expect(r.requested).toMatchObject({ free: true, teamsFree: ['Porto 1'] });
+    const two = [...one, porto1('10:00', '12:00', 'Eva')];
+    expect(ok(botAvailability({ city: 'Porto', date: '2026-10-08', time: '10h' }, two, NOW)).requested?.free).toBe(false);
     const braga = [ev('2026-10-08', '10:00', '12:00', 'Serviço 45€ (89€) Sofá - Braga', 'Equipa: Braga')];
     expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08', time: '10h' }, braga, NOW)).requested?.free).toBe(false);
   });
 
   it('books the team already working next to that time, then the one with fewer jobs that day', () => {
     const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
-    // Lisboa 2 has a job ending at 14h: next to 15h, so it goes there.
-    const near = [ev('2026-10-08', '13:00', '14:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
-    expect(chooseTeam(near, 'Lisboa', ...at15)).toBe('Lisboa 2');
+    // Porto 2 has a job ending at 14h: next to 15h, so it goes there.
+    const near = [ev('2026-10-08', '13:00', '14:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    expect(chooseTeam(near, 'Porto', ...at15)).toBe('Porto 2');
     // Nothing next to it: the team with fewer jobs that day.
-    const far = [lisbon1('09:00', '10:00', 'Ana'), lisbon1('19:00', '20:00', 'Eva'), ev('2026-10-08', '19:00', '20:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
-    expect(chooseTeam(far, 'Lisboa', ...at15)).toBe('Lisboa 2');
-    expect(chooseTeam([], 'Lisboa', ...at15)).toBe('Lisboa 1');
+    const far = [porto1('09:00', '10:00', 'Ana'), porto1('19:00', '20:00', 'Eva'), ev('2026-10-08', '19:00', '20:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    expect(chooseTeam(far, 'Porto', ...at15)).toBe('Porto 2');
+    expect(chooseTeam([], 'Porto', ...at15)).toBe('Porto 1');
     // No room, no team; Coimbra and Figueira da Foz have their own team (10 Oct 2026).
-    const full = [lisbon1('15:00', '16:00', 'Ana'), lisbon1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
-    expect(chooseTeam(full, 'Lisboa', ...at15)).toBeNull();
+    const full = [porto1('15:00', '16:00', 'Ana'), porto1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    expect(chooseTeam(full, 'Porto', ...at15)).toBeNull();
     expect(chooseTeam([], 'Coimbra', ...at15)).toBe('Coimbra');
     expect(chooseTeam([], 'Figueira da Foz', ...at15)).toBe('Coimbra');
   });

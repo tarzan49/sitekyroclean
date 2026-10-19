@@ -238,7 +238,7 @@ Deno.test("availability gives two times and no client data, and never guesses wi
   const text = await res.text();
   assert(!text.includes("912") && !text.includes("Inventado") && !text.includes("Rua X"), text);
   const { availability } = JSON.parse(text);
-  assertEquals(availability.teams, ["Lisboa 1", "Lisboa 2"]);
+  assertEquals(availability.teams, ["Lisboa 1"]);
   assertEquals(availability.suggestion.slots.length, 2);
 
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras" }, () => Promise.resolve({ error: "O calendário veio vazio" }))).status, 502);
@@ -376,17 +376,16 @@ Deno.test("hold writes one pre-booking per conversation, returns only times, and
   assertEquals(script.calls[1].eventId, "ev1");
   assertEquals(rows.size, 1);
 
-  // Oeiras: Lisboa 1 is two people and Lisboa 2 one, so a third client fits at 16h and a fourth does not.
+  // Oeiras: only Lisboa 1 since 19 Oct (two people), so a second client fits at 16h and a third does not.
   assertEquals(JSON.parse(await (await holdCall(hold("b", "16h"), store, script.write)).text()).hold.ok, true);
-  assertEquals(JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold.ok, true);
-  const fourth = JSON.parse(await (await holdCall(hold("d", "16h"), store, script.write)).text()).hold;
-  assertEquals(fourth.ok, false);
-  assertEquals(fourth.taken, true);
-  assertEquals(script.calls.length, 4);
+  const third = JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold;
+  assertEquals(third.ok, false);
+  assertEquals(third.taken, true);
+  assertEquals(script.calls.length, 3);
 
   const rel = await holdCall({ action: "release", conversationId: "a" }, store, script.write);
   assertEquals(JSON.parse(await rel.text()).release.released, true);
-  assertEquals(script.calls[4], { action: "release", eventId: "ev1" });
+  assertEquals(script.calls[3], { action: "release", eventId: "ev1" });
   assertEquals((await holdCall(hold("e"), store, null)).status, 503);
 });
 
@@ -415,7 +414,7 @@ Deno.test("book leaves prices to confirm and missing data as a pre-booking for t
   assertEquals(sat.ok, true);
   assertEquals(script.calls[0].action, "book");
   script.calls.length = 0;
-  const rug = JSON.parse(await (await holdCall(book("r", { items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
+  const rug = JSON.parse(await (await holdCall(book("r", { phone: "911000001", items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
   assertEquals([rug.ok, typeof rug.handToOwner, rug.hold.ok], [false, "string", true]);
   const noAddress = JSON.parse(await (await holdCall(book("n", { address: "" }), store, script.write)).text()).booking;
   assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
@@ -495,8 +494,8 @@ Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour a
     id, summary: `Serviço 108€ (215€) Impermeabilização Premium de 8 cadeiras - ${phone} - Cliente Inventado - Rua X 1, 2640-000 Mafra`,
     description: `Equipa: ${team}\n\nbot:${phone}@s.whatsapp.net`, location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED", start, end,
   });
-  const events = [ev("mine", "900000001", "2026-10-19T09:00:00Z", "2026-10-19T10:45:00Z", "Lisboa 2"),
-    ev("other", "900000002", "2026-10-19T14:00:00Z", "2026-10-19T15:00:00Z", "Lisboa 2")];
+  const events = [ev("mine", "900000001", "2026-10-19T09:00:00Z", "2026-10-19T10:45:00Z", "Porto 2"),
+    ev("other", "900000002", "2026-10-19T14:00:00Z", "2026-10-19T15:00:00Z", "Porto 2")];
   const writes: Record<string, unknown>[] = [], mails: string[] = [];
   const call = (time: string) => handleBotRequest(
     new Request("https://x/functions/v1/bot-api", {
@@ -509,12 +508,12 @@ Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour a
       notifyOwner: (subject: string) => { mails.push(subject); return Promise.resolve(null); } },
   ).then(r => r.json());
 
-  // 15:00 Lisbon = 14:00 UTC: Lisboa 2 (one person) already works then.
+  // 15:00 Lisbon = 14:00 UTC: Porto 2 (one person) already works then.
   const busy = await call("15:00");
-  assertEquals([busy.update.ok, busy.update.moved, busy.update.teamBusy], [true, false, "Lisboa 2"]);
+  assertEquals([busy.update.ok, busy.update.moved, busy.update.teamBusy], [true, false, "Porto 2"]);
   assertEquals(writes[0].start, "2026-10-19T09:00:00Z");
   assert(String(writes[0].title).includes("2640-813"));
-  assert(mails.some(m => m.includes("Lisboa 2 está ocupada")), mails.join());
+  assert(mails.some(m => m.includes("Porto 2 está ocupada")), mails.join());
 
   // 12:00 Lisbon is free for the team: the event moves.
   const free = await call("12:00");

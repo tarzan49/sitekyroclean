@@ -33,8 +33,8 @@ Deno.test("a service that just ended gets its message; revisits, other events an
   const { store } = fakeStore([], [{ id: "c1", calendar_event_id: "s1", client_name: "Ana Teste", city: "Paranhos", description: "Limpeza de sofá de 3 lugares" }]);
   const body = await json(await procedureDue(events, store, now));
   const prompts = body.prompts as Row[];
-  // s6: Lisboa 1 only counts from 19/10.
-  assertEquals(prompts.map(p => p.eventId), ["s1"]);
+  // s6: Lisboa 1 counts from 15/10, like Porto (owner, 14 Oct).
+  assertEquals(prompts.map(p => p.eventId), ["s1", "s6"]);
   assertEquals(prompts[0].label, "Ana, Paranhos");
   assert(String(prompts[0].message).startsWith("Serviço terminado: Ana, Paranhos (Limpeza de sofá de 3 lugares), 15/10 às 15h."));
   assert(String(prompts[0].clientMessage).startsWith("Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares)."));

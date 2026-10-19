@@ -128,6 +128,18 @@ const amount = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v
  */
 export const ownerShare = (total: number, pickupFee = 0) => Math.ceil(total / 2 - pickupFee);
 
+/** A "Serviço" (or "A confirmar · Serviço") of this phone within 60 days of `date`, the nearest one. */
+export function clientServiceNear<E extends AvailabilityEvent & { id?: string }>(events: E[], phone: string, date: string): E | undefined {
+  const key9 = digitsOf(phone).slice(-9);
+  if (key9.length !== 9) return undefined;
+  const day = Date.parse(`${date}T12:00:00Z`);
+  return events
+    .filter(e => e.start && e.status !== 'CANCELLED' && Math.abs(Date.parse(e.start) - day) <= 60 * 86_400_000
+      && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary)
+      && digitsOf(`${e.summary} ${e.description}`).includes(key9))
+    .sort((a, b) => Math.abs(Date.parse(a.start!) - day) - Math.abs(Date.parse(b.start!) - day))[0];
+}
+
 export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[]): OwnerBookingResult {
   if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
   const r = req as Record<string, unknown>;
@@ -146,10 +158,7 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   if (key9.length === 9) {
     // A service of this phone on ANY nearby day counts (owner, 19 Oct 2026: a rescheduled job came in
     // as a second booking). Moving an existing booking is update-booking's job, never a new event.
-    const day = Date.parse(`${r.date}T12:00:00Z`);
-    const same = events.find(e => e.start && Math.abs(Date.parse(e.start) - day) <= 60 * 86_400_000
-      && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary)
-      && digitsOf(`${e.summary} ${e.description}`).includes(key9));
+    const same = clientServiceNear(events, phone, r.date);
     if (same) return { ok: false, exists: true, summary: same.summary };
   }
 
@@ -208,7 +217,7 @@ const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed
  * already has ("se for a mesma hora tem que me consultar"), and anything without
  * an engine price.
  */
-export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '8', Braga: '10', 'Lisboa 1': '6', 'Lisboa 2': '3', Algarve: '5', Coimbra: '4' };
+export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '8', Braga: '10', 'Lisboa 1': '6', Algarve: '5', Coimbra: '4' };
 /** The owner's ads mark in the title, read by the CRM (calendarServices adSourceFromTitle). */
 const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', facebook: ' (anúncio facebook)', instagram: ' (anúncio instagram)' };
 
@@ -217,6 +226,7 @@ export type BotBookingResult =
   | { ok: false; sameTime: true }
   | { ok: false; missing: string[] }
   | { ok: false; exists: true }
+  | { ok: false; reschedule: { eventId: string; date: string; time: string } }
   | { ok: false; taken: true; alternatives: unknown }
   | { ok: false; handToOwner: string }
   | { error: string };
@@ -241,6 +251,10 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const key9 = digitsOf(phone).slice(-9);
   if (key9.length === 9 && others.some(e => e.start && lisbon(Date.parse(e.start)).date === r.date
     && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
+  // The client already has a service on another nearby day: this is a reschedule, never a second
+  // booking (owner, 19 Oct 2026, Filipa: moved from 19 to 20 Oct and came in twice).
+  const booked = clientServiceNear(others, phone, r.date);
+  if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
 
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
