@@ -3091,10 +3091,7 @@ function planBookingUpdate(ev, phone, c, now) {
     const [h, m] = c.time.split(":").map(Number);
     const s = lisbonToUtc(c.date, h * 60 + m);
     const dur = Date.parse(ev.end) - Date.parse(ev.start);
-    const sameDay = lisbon(Date.parse(ev.start)).date === lisbon(now.getTime()).date;
-    if (s !== Date.parse(ev.start) && sameDay) {
-      said.push(`PEDIU PARA MUDAR NO PRÓPRIO DIA para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time} (não mexido, decide o dono)`);
-    } else if (s !== Date.parse(ev.start) && s > now.getTime()) {
+    if (s !== Date.parse(ev.start) && s > now.getTime()) {
       const was = lisbon(Date.parse(ev.start));
       start = new Date(s).toISOString();
       end = new Date(s + dur).toISOString();
