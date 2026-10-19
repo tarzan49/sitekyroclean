@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, hasWaterproofing, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, hasWaterproofing, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -160,9 +160,13 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   // goes in as his real "Serviço", in the colour of a team with room; anything less stays
   // "A confirmar". The team is the one he already named for this chat, else chooseTeam.
   const address = text(r.address, MAX.address);
-  const named = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
+  // Owner, 19 Oct 2026: "todos os serviços de braga q precisem de imper colocas no porto 1",
+  // also when the chat named Braga.
+  const waterproofing = /imperm|premium|essencial/i.test(service);
+  const namedRaw = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
+  const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
   const team = r.confirmed === true && total !== null && address.length >= 8
-    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, /imperm/i.test(service)) : null;
+    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing) : null;
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
