@@ -2016,7 +2016,7 @@ function localityFromPostalCode(code) {
 var TEAMS_BY_REGION = {
   Porto: ["Porto 1", "Porto 2"],
   Braga: ["Braga"],
-  Lisboa: ["Lisboa 1"],
+  Lisboa: ["Lisboa 1", "Lisboa 2"],
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };

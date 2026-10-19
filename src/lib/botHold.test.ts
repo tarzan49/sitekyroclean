@@ -78,10 +78,12 @@ describe('planOwnerBooking', () => {
     const p = planOwnerBooking({ ...base, total: null, fromAds: true }, []);
     expect('ok' in p && p.ok && p.event.title).toBe('A confirmar · Serviço ?€ (?€) (anúncio) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');
   });
-  it('writes nothing when he already has a Serviço for that phone that day', () => {
+  it('writes nothing when that phone already has a Serviço on that day or a nearby one (a reschedule, owner 19 Oct)', () => {
     const mine: AvailabilityEvent = { summary: 'Serviço ?€ (?€) Recolha de tapete - +351 900 000 001 - Cliente', description: '', status: 'CONFIRMED', start: '2026-10-12T14:00:00Z', end: '2026-10-12T14:30:00Z' };
     expect(planOwnerBooking(base, [mine])).toMatchObject({ ok: false, exists: true });
-    expect(planOwnerBooking({ ...base, date: '2026-10-13' }, [mine])).toMatchObject({ ok: true });
+    expect(planOwnerBooking({ ...base, date: '2026-10-16' }, [mine])).toMatchObject({ ok: false, exists: true });
+    expect(planOwnerBooking({ ...base, date: '2027-01-20' }, [mine])).toMatchObject({ ok: true });
+    expect(planOwnerBooking({ ...base, phone: '+351 900 000 002', date: '2026-10-16' }, [mine])).toMatchObject({ ok: true });
   });
   it('a settled booking (confirmed, price, address) goes in as his Serviço in a team colour', () => {
     const p = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras' }, []);
