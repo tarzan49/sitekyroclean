@@ -2758,7 +2758,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
     (line.date === date ? bucket.today : bucket.before).push(line);
   }
   for (const a of adjustments) {
-    if (a.day > date || !(Number(a.amount) > 0)) continue;
+    if (a.day > date || !Number(a.amount)) continue;
     bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round23(Number(a.amount)) });
   }
   const teams = [...byTeam.entries()].map(([team, b]) => {

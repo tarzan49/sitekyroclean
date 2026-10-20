@@ -242,7 +242,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
   }
 
   for (const a of adjustments) {
-    if (a.day > date || !(Number(a.amount) > 0)) continue;
+    if (a.day > date || !Number(a.amount)) continue; // negativo = pagamento já feito pela equipa
     bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round2(Number(a.amount)) });
   }
 
