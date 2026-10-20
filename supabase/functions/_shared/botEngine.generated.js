@@ -2786,6 +2786,11 @@ var lisbon2 = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon", year
 var REVIEW_MIN_STARS = 4;
 var REVIEW_DEADLINE_DAYS = 7;
 
+// src/constants/business.ts
+var INSTAGRAM_URL = "https://www.instagram.com/kyrocleansolutions/";
+var BUSINESS_EMAIL = "cleansolutions.pt25@gmail.com";
+var BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;
+
 // src/lib/serviceProcedure.ts
 var PROCEDURE_FULL_SHARE = 50;
 var PROCEDURE_REDUCED_SHARE = 45;
@@ -2879,7 +2884,11 @@ function procedureClientMessage(f) {
   return [
     `Olá${name ? ` ${name}` : ""}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
     REVIEW_LINKS[reviewProfileOfTeam(f.team)],
-    "Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!"
+    "Como agradecimento, fica com 10% de desconto no próximo serviço.",
+    "",
+    "E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:",
+    INSTAGRAM_URL,
+    "Obrigado!"
   ].join("\n");
 }
 function procedureReceiptMessage(label, received, check) {

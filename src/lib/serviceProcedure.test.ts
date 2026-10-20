@@ -111,7 +111,11 @@ describe('messages', () => {
     expect(m).toBe([
       'Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares). Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:',
       REVIEW_LINKS.porto,
-      'Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!',
+      'Como agradecimento, fica com 10% de desconto no próximo serviço.',
+      '',
+      'E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:',
+      'https://www.instagram.com/kyrocleansolutions/',
+      'Obrigado!',
     ].join('\n'));
     expect(m).not.toMatch(noDash);
     const lx = procedureClientMessage({ firstName: null, what: null, team: 'Lisboa 1' });

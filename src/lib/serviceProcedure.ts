@@ -19,6 +19,7 @@
 // imports puros, porque vai no pacote do bot.
 import { REVIEW_DEADLINE_DAYS, REVIEW_MIN_STARS } from './crmReviews';
 import { UPSELL_TIERS_FROM } from './crmUpsell';
+import { INSTAGRAM_URL } from '../constants/business';
 
 export const PROCEDURE_FULL_SHARE = 50;
 export const PROCEDURE_REDUCED_SHARE = 45;
@@ -223,7 +224,11 @@ export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what'
   return [
     `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
     REVIEW_LINKS[reviewProfileOfTeam(f.team)],
-    'Como agradecimento, fica com 10% de desconto no próximo serviço. Obrigado!',
+    'Como agradecimento, fica com 10% de desconto no próximo serviço.',
+    '',
+    'E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:',
+    INSTAGRAM_URL,
+    'Obrigado!',
   ].join('\n');
 }
 
