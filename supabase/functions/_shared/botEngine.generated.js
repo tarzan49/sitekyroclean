@@ -1853,9 +1853,55 @@ function rugPickupFor(items) {
   const areaM2 = Math.round(rugs.reduce((sum2, i) => sum2 + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
   return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2), rule: RUG_PICKUP_FEE_RULE };
 }
+var PUFF_PRICE = 25;
+var PUFF_SAME_VISIT_PRICE = 20;
+function puffQuote(qty, city, withOthers, othersTotal) {
+  const unitPrice = withOthers ? PUFF_SAME_VISIT_PRICE : PUFF_PRICE;
+  const amount2 = qty * unitPrice;
+  const travel = withOthers ? 0 : city !== null ? locationPrices[city] ?? null : null;
+  return {
+    qty,
+    tablePrice: PUFF_PRICE,
+    unitPrice,
+    specialCondition: withOthers,
+    amount: amount2,
+    travel,
+    // Order total with the puffs; null when the rest of the order has no price.
+    total: withOthers ? othersTotal === null ? null : cents(othersTotal + amount2) : travel === null ? null : amount2 + travel
+  };
+}
 function botQuote(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
-  const { items: rawItems, city: rawCity, sharedTrip: rawShared } = input;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs } = input;
+  const puffs = rawPuffs ?? 0;
+  if (typeof puffs !== "number" || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail("puffs tem de ser um inteiro entre 0 e 20");
+  const rawItems = rawItemsIn ?? [];
+  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0) {
+    const city2 = resolveBotCity(rawCity);
+    const puff = puffQuote(puffs, city2, false, null);
+    const extendedTrip2 = city2 !== null && EXTENDED_TRIP_CITIES.has(city2);
+    return {
+      ok: true,
+      city: city2,
+      cityKnown: city2 !== null,
+      extendedTrip: extendedTrip2,
+      sharedTrip: false,
+      lines: [],
+      subtotal: puff.amount,
+      savings: 0,
+      perkEligible: false,
+      travel: puff.travel ?? 0,
+      total: puff.total ?? puff.amount,
+      waterproofingTiers: null,
+      quote: false,
+      handToOwner: city2 === null || extendedTrip2,
+      rugPickup: null,
+      rugEstimate: null,
+      rugCombo: null,
+      puff,
+      closeNow: closeNowOffer({ total: puff.total, waterproofing: false, handToOwner: city2 === null || extendedTrip2, rug: null })
+    };
+  }
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail("items tem de ser uma lista com pelo menos um artigo");
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items = [];
@@ -1906,6 +1952,8 @@ function botQuote(input) {
     rugPickup: rugPickupFor(items),
     rugEstimate: rugPrice,
     rugCombo,
+    // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.
+    puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,

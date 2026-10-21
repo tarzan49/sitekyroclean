@@ -146,3 +146,14 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     }
   });
 });
+
+describe('puffs (owner, 21 Oct 2026)', () => {
+  it('25€ alone plus travel, 20€ on the same visit', () => {
+    const alone = botQuote({ items: [], city: 'Porto', puffs: 1 });
+    expect(alone.ok && alone.puff?.unitPrice).toBe(25);
+    expect(alone.ok && alone.total).toBe(35);
+    const mixed = botQuote({ items: [{ kind: 'sofa', size: '2-lugares' }], city: 'Porto', puffs: 1 });
+    expect(mixed.ok && mixed.puff?.unitPrice).toBe(20);
+    expect(mixed.ok && mixed.puff?.total).toBe((mixed.ok ? mixed.total : 0) + 20);
+  });
+});
