@@ -9,11 +9,13 @@ const ok = (input: unknown) => {
 };
 
 describe('botQuote: the numbers the bot replies with come from the site engine', () => {
-  it('a U sofa is priced by the seats counted in the photo: up to 4 as 4 lugares, 5+ as 5+; waterproofing stays with the owner (16 Oct 2026)', () => {
+  it('a U sofa is priced by the seats counted in the photo: up to 4 as 4 lugares, 5+ as 5+; waterproofing = cleaning + 150€ Premium / + 100€ Essencial (22 Oct 2026); alone stays with the owner', () => {
     const u = (seats: number, treatment = 'clean') => ok({ items: [{ kind: 'sofa', size: 'u', seats, treatment }], city: 'Porto' });
     expect([u(4).subtotal, u(4).handToOwner]).toEqual([99, false]);
     expect([u(6).subtotal, u(6).handToOwner]).toEqual([119, false]);
-    expect(u(6, 'clean+premium').handToOwner).toBe(true);
+    const p = u(6, 'clean+premium');
+    expect([p.total, p.handToOwner, p.waterproofingTiers]).toEqual([279, false, { travel: 10, premium: 279, essencial: 229 }]);
+    expect(u(6, 'premium').handToOwner).toBe(true);
     expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);
   });
   it('sofa 3 seats in Oeiras: 79€ + 10€ travel (reply 2.1)', () => {
@@ -90,7 +92,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
 
   it('hands to the owner: delicate rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs, unknown or case-by-case localities', () => {
-    expect(ok({ items: [{ kind: 'rug', width: 2, length: 3, material: 'lã' }], city: 'Porto' }).handToOwner).toBe(true);
+    expect(ok({ items: [{ kind: 'rug', width: 2, length: 3, material: 'seda' }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);
     for (const treatment of ['clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium']) {
       const r = ok({ items: [{ kind: 'sofa', size: '5-lugares', treatment }], city: 'Porto' });

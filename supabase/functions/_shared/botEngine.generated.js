@@ -1901,7 +1901,38 @@ function puffQuote(qty, city, withOthers, othersTotal) {
     total: withOthers ? othersTotal === null ? null : cents(othersTotal + amount2) : travel === null ? null : amount2 + travel
   };
 }
+var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 100 };
+function uWaterproofingQuote(input) {
+  const raw = input.items;
+  if (!Array.isArray(raw)) return null;
+  const isUw = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u" && ["clean+premium", "clean+essencial"].includes(String(r.treatment));
+  const uItems = raw.filter(isUw);
+  if (!uItems.length) return null;
+  if (raw.some((r) => !isUw(r) && r && typeof r === "object" && /premium|essencial/.test(String(r.treatment ?? "")))) return null;
+  const base = botQuote({ ...input, items: raw.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
+  if (!base.ok || base.quote || base.total === null) return null;
+  const n = uItems.reduce((sum2, r) => sum2 + (typeof r.qty === "number" ? r.qty : 1), 0);
+  const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
+  const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
+  const tier = uItems[0].treatment === "clean+premium" ? "premium" : "essencial";
+  const total = tier === "premium" ? premium : essencial;
+  return {
+    ...base,
+    lines: [...base.lines, { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} sofá em U`, amount: U_WATERPROOFING_EXTRA[tier] * n, tablePrice: U_WATERPROOFING_EXTRA[tier] * n, perkApplied: false, perkNote: void 0, quote: false }],
+    subtotal: cents(base.subtotal + U_WATERPROOFING_EXTRA[tier] * n),
+    total,
+    waterproofingTiers: { travel: base.travel, premium, essencial },
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: base.handToOwner, rug: null })
+  };
+}
 function botQuote(input) {
+  if (input && typeof input === "object") {
+    const u = uWaterproofingQuote(input);
+    if (u) return u;
+  }
+  return botQuoteInner(input);
+}
+function botQuoteInner(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
   const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs } = input;
   const puffs = rawPuffs ?? 0;

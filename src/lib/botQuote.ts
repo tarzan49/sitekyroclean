@@ -174,7 +174,48 @@ function puffQuote(qty: number, city: string | null, withOthers: boolean, others
   };
 }
 
+/**
+ * Waterproofing on a U sofa (owner, 22 Oct 2026: "a imper fica mais 150 premium e mais 100 essencial"):
+ * the U's cleaning price plus 150€ (Premium) or 100€ (Essencial) per U, travel as in the cleaning.
+ * Only with cleaning; waterproofing alone on a U stays sob orçamento. Bot only.
+ */
+export const U_WATERPROOFING_EXTRA = { premium: 150, essencial: 100 } as const;
+
+function uWaterproofingQuote(input: Record<string, unknown>) {
+  const raw = input.items;
+  if (!Array.isArray(raw)) return null;
+  const isUw = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === 'u'
+    && ['clean+premium', 'clean+essencial'].includes(String((r as Record<string, unknown>).treatment));
+  const uItems = raw.filter(isUw) as Record<string, unknown>[];
+  if (!uItems.length) return null;
+  // Other waterproofed items in the same order: keep the old path (owner prices it).
+  if (raw.some(r => !isUw(r) && r && typeof r === 'object' && /premium|essencial/.test(String((r as Record<string, unknown>).treatment ?? '')))) return null;
+  const base = botQuote({ ...input, items: raw.map(r => (isUw(r) ? { ...(r as object), treatment: 'clean' } : r)) });
+  if (!base.ok || base.quote || base.total === null) return null;
+  const n = uItems.reduce((sum, r) => sum + (typeof r.qty === 'number' ? r.qty : 1), 0);
+  const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
+  const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
+  const tier = uItems[0].treatment === 'clean+premium' ? 'premium' : 'essencial';
+  const total = tier === 'premium' ? premium : essencial;
+  return {
+    ...base,
+    lines: [...base.lines, { label: `Impermeabilização ${tier === 'premium' ? 'Premium' : 'Essencial'} sofá em U`, amount: U_WATERPROOFING_EXTRA[tier] * n, tablePrice: U_WATERPROOFING_EXTRA[tier] * n, perkApplied: false, perkNote: undefined as string | undefined, quote: false }],
+    subtotal: cents(base.subtotal + U_WATERPROOFING_EXTRA[tier] * n),
+    total,
+    waterproofingTiers: { travel: base.travel, premium, essencial },
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: base.handToOwner, rug: null }),
+  };
+}
+
 export function botQuote(input: unknown) {
+  if (input && typeof input === 'object') {
+    const u = uWaterproofingQuote(input as Record<string, unknown>);
+    if (u) return u;
+  }
+  return botQuoteInner(input);
+}
+
+function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
   const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
