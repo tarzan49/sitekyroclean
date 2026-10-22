@@ -14,9 +14,8 @@
  * plus rugPickupFee: 20€ wherever a pickup exists, 3 to 20 m² (owner, 10 Oct
  * 2026: "deixa mais 20 euros", the same on the site).
  *
- * Delicate rugs (lã, seda, viscose, persa, Arraiolos, feito à mão, kilim),
- * orders under 3 m² and orders with anything other than rugs stay with the
- * owner: he never priced those by a rule.
+ * Delicate rugs (lã, seda, viscose, persa, Arraiolos, feito à mão, kilim) stay
+ * with the owner. Under 3 m²: no pickup, priced at home (owner, 22 Oct 2026).
  */
 import { locationPrices } from '../constants/travel';
 import { rugPickupFee } from '../constants/commercialPolicy';
@@ -25,6 +24,8 @@ import { sofaCleaningPrice } from '../data/enginePrices';
 export const RUG_RATE_COMMON = 10;
 export const RUG_RATE_NATURAL = 12;
 export const RUG_ESTIMATE_MIN_AREA_M2 = 3;
+/** A rug under 3 m² added to other items costs 10€ more (owner, 22 Oct 2026). */
+export const RUG_SMALL_COMBO_EXTRA = 10;
 /**
  * The extra the bot offers after the rug price: a sofa cleaned in the same
  * visit for 70€, "em vez de" a 3-seat sofa's cleaning plus the travel (89€ in
@@ -73,6 +74,17 @@ export function rugComboEstimate(rugs: RugEstimateItem[], othersPrice: number, c
   const rug = rugEstimate(rugs, city);
   if (!rug.ok) return rug;
   const rugsWashing = roundToNine(rug.homePrice - rug.travelFee);
+  // Under 3 m² with other items (owner, 22 Oct 2026, Espinho: two 2-seat sofas 138€ + a 2,6 m² rug
+  // → "seria 177€, fica tudo a 159€", "mais 10€ tapete"): usual = items + travel + the rug's washing,
+  // special = items + travel + 10€, rounded to 9.
+  if (rug.areaM2 < RUG_ESTIMATE_MIN_AREA_M2) {
+    const usualPrice = othersPrice + rug.travelFee + rugsWashing;
+    const comboPrice = roundToNine(othersPrice + rug.travelFee + RUG_SMALL_COMBO_EXTRA);
+    return {
+      ok: true, rugsWashing, othersPrice, usualPrice, comboPrice, travelWaived: usualPrice - comboPrice,
+      rule: 'Tapete pequeno na mesma visita. Dá o preço como condição especial: com o tapete seria usualPrice, fazemos tudo por comboPrice. Depois a prova e as horas.',
+    };
+  }
   const usualPrice = rug.homePrice + othersPrice + rug.travelFee;
   const comboPrice = roundDownToNine(rugsWashing + othersPrice);
   return {
@@ -92,13 +104,15 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   // The quiz never asks the material (owner, 11 Oct 2026: "não compliques o questionário"), and an
   // unknown material priced as common put a juta rug at 10€/m² and a wool one at a table price. No
   // material, no price: the bot reads it from the photo or asks it in one line.
-  if (rugs.some(r => typeof r.material !== 'string' || !r.material.trim())) {
+  const rawArea = rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0);
+  // A small rug (under 3 m²) is priced as common when the material is unknown (owner, 22 Oct 2026:
+  // "tens que dar preço a uma merda dessas"): asking first lost a client waiting on a 2,6 m² rug.
+  if (rawArea >= RUG_ESTIMATE_MIN_AREA_M2 && rugs.some(r => typeof r.material !== 'string' || !r.material.trim())) {
     return { ok: false, needsMaterial: true, reason: 'falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular' };
   }
   const classes = rugs.map(r => rugMaterialClass(r.material));
   if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
-  if (areaM2 < RUG_ESTIMATE_MIN_AREA_M2) return { ok: false, reason: `menos de ${RUG_ESTIMATE_MIN_AREA_M2} m² no total: o responsável dá o preço` };
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city as keyof typeof locationPrices];
   const homePrice = roundToNine(washing + travelFee);

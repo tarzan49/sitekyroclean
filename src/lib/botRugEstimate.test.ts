@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { botQuote } from './botQuote';
-import { rugEstimate, rugMaterialClass, roundToNine } from './botRugEstimate';
+import { rugComboEstimate, rugEstimate, rugMaterialClass, roundToNine } from './botRugEstimate';
 
 describe('rugEstimate (owner, 10 Oct 2026)', () => {
   it("matches the owner's own rug quotes", () => {
@@ -22,7 +22,7 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
   it('leaves delicate rugs, small orders and unknown places to the owner', () => {
     expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'lã' }], 'Porto').ok).toBe(false);
     expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'persa feito à mão' }], 'Porto').ok).toBe(false);
-    expect(rugEstimate([{ width: 1, length: 2, qty: 1 }], 'Porto').ok).toBe(false);
+    expect(rugEstimate([{ width: 1, length: 2, qty: 1 }], 'Porto').ok).toBe(true); // small rugs priced since 22 Oct
     expect(rugEstimate([{ width: 2, length: 3, qty: 1 }], null).ok).toBe(false);
   });
 
@@ -48,5 +48,16 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     const mixed = botQuote({ items: [{ kind: 'rug', width: 2, length: 3 }, { kind: 'sofa', size: '3-lugares' }], city: 'Porto' });
     expect('ok' in mixed && mixed.ok && mixed.handToOwner).toBe(true);
     expect('ok' in mixed && mixed.ok && mixed.rugEstimate).toBeNull();
+  });
+});
+
+describe('small rug with other items (owner, 22 Oct 2026)', () => {
+  it('Espinho: two sofas 138€ + 2,00 × 1,30 m rug = seria 177€, fica 159€', () => {
+    const r = rugComboEstimate([{ width: 2, length: 1.3, qty: 1 }], 138, 'Espinho');
+    expect(r).toMatchObject({ ok: true, usualPrice: 177, comboPrice: 159 });
+  });
+  it('a small rug alone gets a home price, no pickup', () => {
+    const r = rugEstimate([{ width: 2, length: 1.3, qty: 1, material: 'sintético' }], 'Espinho');
+    expect(r).toMatchObject({ ok: true, homePrice: 39, pickupPrice: null });
   });
 });
