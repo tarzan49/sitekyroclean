@@ -120,6 +120,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('resolves a freguesia to its municipality, like the quiz (Ericeira, 16 Oct 2026)', () => {
     expect(resolveBotCity('Ericeira')).toBe('Mafra');
+    // Part of a union parish (Cascais e Estoril), 22 Oct 2026.
+    expect(resolveBotCity('Estoril')).toBe('Cascais');
+    expect(resolveBotCity('Parede')).toBe('Cascais');
     expect(resolveBotCity('ericeira, mafra')).toBe('Mafra');
     expect(resolveBotCity('Paranhos (Porto)')).toBe('Porto');
     // A name shared by two served municipalities decides nothing on its own.

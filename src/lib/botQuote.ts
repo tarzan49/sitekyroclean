@@ -19,7 +19,7 @@ import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../co
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
-import { freguesiaToMunicipio } from './parishMunicipality';
+import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -50,7 +50,7 @@ export function resolveBotCity(input: unknown): string | null {
   for (const part of [input, ...input.split(/[,()/]/)]) {
     const key = fold(part);
     if (!key) continue;
-    const city = CITY_BY_FOLDED.get(key) ?? freguesiaToMunicipio.get(key);
+    const city = CITY_BY_FOLDED.get(key) ?? freguesiaToMunicipio.get(key) ?? parishPartToMunicipio.get(key);
     if (city) return city;
   }
   return null;

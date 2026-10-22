@@ -1782,6 +1782,23 @@ for (const m of municipiosComFreguesias) {
   }
 }
 for (const key of [...ambiguousParishNames, ...TOO_COMMON_PARISH_NAMES]) freguesiaToMunicipio.delete(key);
+var parishPartToMunicipio = /* @__PURE__ */ new Map();
+var ambiguousParts = /* @__PURE__ */ new Set();
+for (const m of municipiosComFreguesias) {
+  if (!(m.name in locationPrices)) continue;
+  for (const f of m.freguesias) {
+    const parts = f.name.replace(/^uni[aã]o das freguesias d[eo]s?\s+/i, "").split(/,\s*|\s+e\s+/);
+    if (parts.length < 2) continue;
+    for (const part of parts) {
+      const key = normalizeCity(part);
+      if (key.length < 4) continue;
+      const previous = parishPartToMunicipio.get(key);
+      if (previous && previous !== m.name) ambiguousParts.add(key);
+      parishPartToMunicipio.set(key, m.name);
+    }
+  }
+}
+for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToMunicipio.delete(key);
 
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
@@ -1802,7 +1819,7 @@ function resolveBotCity(input) {
   for (const part of [input, ...input.split(/[,()/]/)]) {
     const key = fold2(part);
     if (!key) continue;
-    const city = CITY_BY_FOLDED.get(key) ?? freguesiaToMunicipio.get(key);
+    const city = CITY_BY_FOLDED.get(key) ?? freguesiaToMunicipio.get(key) ?? parishPartToMunicipio.get(key);
     if (city) return city;
   }
   return null;

@@ -40,3 +40,29 @@ for (const m of municipiosComFreguesias) {
   }
 }
 for (const key of [...ambiguousParishNames, ...TOO_COMMON_PARISH_NAMES]) freguesiaToMunicipio.delete(key);
+
+/**
+ * For the bot only: each part of a union parish ("Cascais e Estoril",
+ * "Carcavelos e Parede") on its own. On 22 Oct 2026 a client wrote
+ * "Estoril", the quote came back without a locality and the bot passed a
+ * fully priced order to the owner. A part shared by two served
+ * municipalities, or one of the too-common names, decides nothing.
+ * Kept apart from freguesiaToMunicipio, which the GPS match reads.
+ */
+export const parishPartToMunicipio = new Map<string, string>();
+const ambiguousParts = new Set<string>();
+for (const m of municipiosComFreguesias) {
+  if (!(m.name in locationPrices)) continue;
+  for (const f of m.freguesias) {
+    const parts = f.name.replace(/^uni[aã]o das freguesias d[eo]s?\s+/i, '').split(/,\s*|\s+e\s+/);
+    if (parts.length < 2) continue;
+    for (const part of parts) {
+      const key = normalizeCity(part);
+      if (key.length < 4) continue;
+      const previous = parishPartToMunicipio.get(key);
+      if (previous && previous !== m.name) ambiguousParts.add(key);
+      parishPartToMunicipio.set(key, m.name);
+    }
+  }
+}
+for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToMunicipio.delete(key);
