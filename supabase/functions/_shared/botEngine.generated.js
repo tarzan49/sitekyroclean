@@ -456,7 +456,7 @@ var RUG_SMALL_COMBO_EXTRA = 10;
 var RUG_VISIT_SOFA_PRICE = 70;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
-var DELICATE = /\b(la|lan|wool|seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
+var DELICATE = /\b(seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
 function rugMaterialClass(material) {
   if (typeof material !== "string" || !material.trim()) return "common";
   const m = fold(material);
@@ -503,7 +503,7 @@ function rugEstimate(rugs, city) {
     return { ok: false, needsMaterial: true, reason: "falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular" };
   }
   const classes = rugs.map((r) => rugMaterialClass(r.material));
-  if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
+  if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city];

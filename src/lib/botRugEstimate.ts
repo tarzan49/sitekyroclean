@@ -14,7 +14,7 @@
  * plus rugPickupFee: 20€ wherever a pickup exists, 3 to 20 m² (owner, 10 Oct
  * 2026: "deixa mais 20 euros", the same on the site).
  *
- * Delicate rugs (lã, seda, viscose, persa, Arraiolos, feito à mão, kilim) stay
+ * Wool is priced as common (owner, 22 Oct 2026: "cobra a lã como o sintético"). Delicate rugs (seda, viscose, persa, Arraiolos, feito à mão, kilim) stay
  * with the owner. Under 3 m²: no pickup, priced at home (owner, 22 Oct 2026).
  */
 import { locationPrices } from '../constants/travel';
@@ -35,7 +35,7 @@ export const RUG_VISIT_SOFA_PRICE = 70;
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 const NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
-const DELICATE = /\b(la|lan|wool|seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
+const DELICATE = /\b(seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
 
 export type RugMaterial = 'common' | 'natural' | 'delicate';
 
@@ -111,7 +111,7 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
     return { ok: false, needsMaterial: true, reason: 'falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular' };
   }
   const classes = rugs.map(r => rugMaterialClass(r.material));
-  if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (lã, seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
+  if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city as keyof typeof locationPrices];

@@ -20,7 +20,8 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
   });
 
   it('leaves delicate rugs, small orders and unknown places to the owner', () => {
-    expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'lã' }], 'Porto').ok).toBe(false);
+    expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'seda' }], 'Porto').ok).toBe(false);
+    expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'lã' }], 'Porto').ok).toBe(true);
     expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: 'persa feito à mão' }], 'Porto').ok).toBe(false);
     expect(rugEstimate([{ width: 1, length: 2, qty: 1 }], 'Porto').ok).toBe(true); // small rugs priced since 22 Oct
     expect(rugEstimate([{ width: 2, length: 3, qty: 1 }], null).ok).toBe(false);
