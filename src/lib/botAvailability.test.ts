@@ -83,14 +83,14 @@ describe('botAvailability', () => {
       ev('2026-10-08', '10:00', '20:00', 'Voo para Cracóvia'),
       ev('2026-10-08', '10:00', '20:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1'),
     ];
-    const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, events, NOW));
+    const r = ok(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-08' }, events, NOW));
     expect(r.teams).toEqual(['Algarve']);
     expect(r.free[0].times[0]).toBe('10h');
   });
 
   it('prefers a time next to a job the team already has that day', () => {
     const events = [ev('2026-10-08', '14:00', '15:00', 'Serviço 45€ (89€) Sofá - Faro', 'Equipa: Algarve')];
-    const r = ok(botAvailability({ city: 'Loulé', date: '2026-10-08', items: [{ kind: 'mattress', qty: 1 }] }, events, NOW));
+    const r = ok(botAvailability({ ownerTime: true, city: 'Loulé', date: '2026-10-08', items: [{ kind: 'mattress', qty: 1 }] }, events, NOW));
     // 12h ends 12h45 (75 min before the job) and 16h starts an hour after it: both on the team's way.
     expect(r.suggestion?.slots.map(s => [s.time, s.nearOtherJob])).toEqual([['12h', true], ['16h', true]]);
   });
@@ -130,10 +130,10 @@ describe('botAvailability', () => {
       { ...ev('2026-10-08', '10:00', '20:00', 'Serviço 1€ - Faro', 'Equipa: Algarve'), status: 'CANCELLED' },
       { summary: 'Serviço 1€ - Faro', description: 'Equipa: Algarve', status: 'CONFIRMED', start: null, end: null },
     ];
-    expect(ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, events, NOW)).free[0].times[0]).toBe('10h');
-    expect(botAvailability({ city: 'Faro', date: '8/10' }, [], NOW)).toHaveProperty('error');
-    expect(botAvailability({ city: 'Faro', date: '2026-10-01' }, [], NOW)).toHaveProperty('error');
-    expect(botAvailability({ city: 'Faro', time: '15h' }, [], NOW)).toHaveProperty('error');
+    expect(ok(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-08' }, events, NOW)).free[0].times[0]).toBe('10h');
+    expect(botAvailability({ ownerTime: true, city: 'Faro', date: '8/10' }, [], NOW)).toHaveProperty('error');
+    expect(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-01' }, [], NOW)).toHaveProperty('error');
+    expect(botAvailability({ ownerTime: true, city: 'Faro', time: '15h' }, [], NOW)).toHaveProperty('error');
   });
 });
 
@@ -191,5 +191,10 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     const full = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, busyDay, NOW));
     expect(full.suggestion?.slots).toHaveLength(2);
     expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);
+  });
+  it('Algarve: no hours from the bot, the owner picks the time (22 Oct 2026)', () => {
+    const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
+    expect(r.free).toEqual([]);
+    expect(r.handToOwner).toMatch(/Algarve/);
   });
 });

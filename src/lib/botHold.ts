@@ -70,7 +70,7 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   if (typeof r.date !== 'string' || typeof r.time !== 'string') return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
 
   const others = ownEventId ? events.filter(e => e.id !== ownEventId) : events;
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
@@ -242,7 +242,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   // Saturday and Sunday close like a weekday from the calendar (owner, 18 Oct 2026: "tens que só agendar
   // esses dias, senão estamos condicionados"; until then they waited for him). The flag stays for a time
   // he chose himself: that one may share the hour with another service of the zone.
-  const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true;
+  const ownerChose = (isWeekend(r.date) && r.ownerApprovedWeekend === true) || r.ownerApprovedTime === true;
   const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
   const missing = [!name && 'nome', address.length < 8 && 'morada completa'].filter((m): m is string => !!m);
   if (missing.length) return { ok: false, missing };
@@ -256,7 +256,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const booked = clientServiceNear(others, phone, r.date);
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
 
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;

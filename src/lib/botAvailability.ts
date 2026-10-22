@@ -271,6 +271,8 @@ export interface AvailabilityRequest {
   date?: unknown;
   /** "15h", "15:00", "15h30": with `date`, is this exact time free? */
   time?: unknown;
+  /** The owner gave this time himself (Algarve and his weekend picks). */
+  ownerTime?: unknown;
   /** How many days to look ahead (default 4, max 14). */
   days?: unknown;
 }
@@ -429,6 +431,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
+  // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
+  // offers no hours there; it books only a time he gave.
+  if (area === 'Algarve' && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: 'Algarve: o responsável escolhe o horário' };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
 
   const today = lisbon(now.getTime()).date;

@@ -2395,6 +2395,7 @@ function botAvailability(req, events, now) {
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
+  if (area === "Algarve" && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
@@ -2468,7 +2469,7 @@ function planBotHold(req, events, now, ownEventId) {
   if (!conversationId) return { error: "conversationId em falta" };
   if (typeof r.date !== "string" || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
   const others = ownEventId ? events.filter((e) => e.id !== ownEventId) : events;
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
@@ -2565,7 +2566,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const conversationId = text(r.conversationId, MAX.conversationId);
   if (!conversationId) return { error: "conversationId em falta" };
   if (typeof r.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
-  const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true;
+  const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true || r.ownerApprovedTime === true;
   const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
   const missing = [!name && "nome", address.length < 8 && "morada completa"].filter((m) => !!m);
   if (missing.length) return { ok: false, missing };
@@ -2574,7 +2575,7 @@ function planBotBooking(req, events, now, ownEventId) {
   if (key9.length === 9 && others.some((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
   const booked = clientServiceNear(others, phone, r.date);
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
