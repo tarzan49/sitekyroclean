@@ -36,6 +36,12 @@ describe('planCalendarSync', () => {
     expect(plan([], [repainted]).inserts[0].booked_at).toBe('2026-10-10T22:02:03Z');
   });
 
+  it('closes a bot booking on creation even when it was edited later (team change)', () => {
+    const bot = event('e3', { created: '2026-10-22T19:16:24Z', updated: '2026-10-23T11:29:10Z',
+      description: 'Equipa: Coimbra\n\nMarcado pelo bot do WhatsApp numa vaga livre, equipa Coimbra.' });
+    expect(plan([], [bot]).inserts[0].booked_at).toBe('2026-10-22T19:16:24Z');
+  });
+
   it('ignores reminders, cancelled events and events created before the start', () => {
     const { inserts } = plan([], [
       event('reminder', { summary: 'Ligar Ana 912 345 678 follow up 89€' }),

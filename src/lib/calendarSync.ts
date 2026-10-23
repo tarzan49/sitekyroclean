@@ -7,7 +7,9 @@
 //   mais de uma hora depois passou a "Serviço", o fecho é a última alteração
 //   (dono, 2026-10-11: um "A confirmar" de sábado à noite fechado no domingo
 //   contava no sábado). O CRM só vê o título de agora, por isso a mudança para
-//   "Serviço" é a última alteração que se conhece.
+//   "Serviço" é a última alteração que se conhece. Exceção: um serviço marcado
+//   pelo bot ("Marcado pelo bot" na descrição) já nasceu "Serviço" e fecha
+//   sempre na criação (2026-10-23).
 // - Evento editado no calendário depois da última sincronização → a linha é
 //   atualizada. Uma edição feita no CRM mantém-se até o evento voltar a ser
 //   editado: ganha a alteração mais recente. O "pago" nunca é tocado, e a
@@ -87,8 +89,15 @@ const time = (iso: string | null) => (iso ? Date.parse(iso) : NaN);
 /** Margem para as alterações do script das equipas logo a seguir à criação (cor, linha "Equipa:"). */
 const LATE_SERVICE_MS = 60 * 60 * 1000;
 
+const BOT_BOOKED = /Marcado pelo bot/;
+
 /** Data de fecho de um serviço que entra agora no CRM. */
 export function closingDateOf(event: CalendarEvent): string {
+  // O bot escreve logo "Serviço" (`book`): nasceu fechado, e uma edição depois
+  // (trocar a equipa, a morada) não é o fecho (dono, 2026-10-23: um serviço de
+  // Coimbra fechado a 22/10 entrou a 23/10 porque o CRM só o viu depois de ele
+  // mudar a cor).
+  if (BOT_BOOKED.test(event.description ?? '')) return event.created;
   return time(event.updated) - time(event.created) > LATE_SERVICE_MS ? event.updated : event.created;
 }
 
