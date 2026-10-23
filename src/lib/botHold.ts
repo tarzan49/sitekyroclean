@@ -140,7 +140,7 @@ export function clientServiceNear<E extends AvailabilityEvent & { id?: string }>
     .sort((a, b) => Math.abs(Date.parse(a.start!) - day) - Math.abs(Date.parse(b.start!) - day))[0];
 }
 
-export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[]): OwnerBookingResult {
+export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[], nowMs = Date.now()): OwnerBookingResult {
   if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
   const r = req as Record<string, unknown>;
   const conversationId = text(r.conversationId, MAX.conversationId);
@@ -166,6 +166,9 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const pickupFee = amount(r.pickupFee) ?? 0;
   const money = total === null ? '?€ (?€)' : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
   const start = lisbonToUtc(r.date, minutes);
+  // Never a service at an hour already gone (22 Oct 2026: at 19:34 the chat was read as "quinta às 10h",
+  // that same morning, and a 94€ "Serviço" went in for a client who had asked to cancel).
+  if (start < nowMs) return { error: 'A hora já passou: não se marca um serviço no passado' };
   const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 60_000).toISOString();
   // Owner, 11 Oct 2026: "é suposto tu reconheceres sempre que alguém fecha um serviço [...] e
   // colocares no calendário". A booking the chat settles (time accepted, price, full address)

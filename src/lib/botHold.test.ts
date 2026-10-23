@@ -59,8 +59,11 @@ describe('planBotHold', () => {
 
 describe('planOwnerBooking', () => {
   const base = { conversationId: 'c9', date: '2026-10-12', time: '15h', service: 'Recolha de 2 tapetes (2x3)', total: 159, phone: '+351 900 000 001', name: 'Cliente Inventado', address: 'Rua Inventada 1, Oeiras' };
+  it('never books an hour already gone (22 Oct: 10h booked at 19:34 the same day)', () => {
+    expect(planOwnerBooking({ ...base, date: '2026-10-07', time: '9h' }, [], NOW.getTime())).toMatchObject({ error: expect.stringMatching(/já passou/) });
+  });
   it('with a price it is his real Serviço, even without confirmed (owner, 19 Oct), share rounded up, Lisbon time', () => {
-    const p = planOwnerBooking(base, []);
+    const p = planOwnerBooking(base, [], NOW.getTime());
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
     expect(p.event.title).toBe('Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - 900000001 - Cliente Inventado - Rua Inventada 1, Oeiras');
     expect(p.event.start).toBe('2026-10-12T14:00:00.000Z');
@@ -68,37 +71,37 @@ describe('planOwnerBooking', () => {
     expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
   });
   it('rug pickup: half the total minus the pickup price he set, rounded up', () => {
-    const p = planOwnerBooking({ ...base, pickupFee: 20 }, []);
+    const p = planOwnerBooking({ ...base, pickupFee: 20 }, [], NOW.getTime());
     expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 60€ \(159€\)/);
-    const q = planOwnerBooking({ ...base, total: 119, pickupFee: 15 }, []);
+    const q = planOwnerBooking({ ...base, total: 119, pickupFee: 15 }, [], NOW.getTime());
     expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 45€ \(119€\)/);
   });
   it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
-    const p = planOwnerBooking({ ...base, total: null, fromAds: true }, []);
+    const p = planOwnerBooking({ ...base, total: null, fromAds: true }, [], NOW.getTime());
     expect('ok' in p && p.ok && p.event.title).toBe('A confirmar · Serviço ?€ (?€) (anúncio) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');
   });
   it('writes nothing when that phone already has a Serviço on that day or a nearby one (a reschedule, owner 19 Oct)', () => {
     const mine: AvailabilityEvent = { summary: 'Serviço ?€ (?€) Recolha de tapete - +351 900 000 001 - Cliente', description: '', status: 'CONFIRMED', start: '2026-10-12T14:00:00Z', end: '2026-10-12T14:30:00Z' };
-    expect(planOwnerBooking(base, [mine])).toMatchObject({ ok: false, exists: true });
-    expect(planOwnerBooking({ ...base, date: '2026-10-16' }, [mine])).toMatchObject({ ok: false, exists: true });
-    expect(planOwnerBooking({ ...base, date: '2027-01-20' }, [mine])).toMatchObject({ ok: true });
-    expect(planOwnerBooking({ ...base, phone: '+351 900 000 002', date: '2026-10-16' }, [mine])).toMatchObject({ ok: true });
+    expect(planOwnerBooking(base, [mine], NOW.getTime())).toMatchObject({ ok: false, exists: true });
+    expect(planOwnerBooking({ ...base, date: '2026-10-16' }, [mine], NOW.getTime())).toMatchObject({ ok: false, exists: true });
+    expect(planOwnerBooking({ ...base, date: '2027-01-20' }, [mine], NOW.getTime())).toMatchObject({ ok: true });
+    expect(planOwnerBooking({ ...base, phone: '+351 900 000 002', date: '2026-10-16' }, [mine], NOW.getTime())).toMatchObject({ ok: true });
   });
   it('a settled booking (confirmed, price, address) goes in as his Serviço in a team colour', () => {
-    const p = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras' }, []);
+    const p = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras' }, [], NOW.getTime());
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
     expect(p.team).toBe('Lisboa 1');
     expect(p.event.colorId).toBe('6');
     expect(p.event.title).toBe('Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - 900000001 - Cliente Inventado - Rua Inventada 1, Oeiras');
     // Lisboa 2 no longer books (owner, 19 Oct 2026): a chat that names it goes to Lisboa 1.
-    expect(planOwnerBooking({ ...base, confirmed: true, team: 'Lisboa 2' }, [])).toMatchObject({ team: 'Lisboa 1', event: { colorId: '6' } });
+    expect(planOwnerBooking({ ...base, confirmed: true, team: 'Lisboa 2' }, [], NOW.getTime())).toMatchObject({ team: 'Lisboa 1', event: { colorId: '6' } });
     // Without a price it stays "A confirmar".
-    const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, []);
+    const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, [], NOW.getTime());
     expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · /);
   });
   it('checks its input', () => {
-    expect(planOwnerBooking({ ...base, time: 'amanhã' }, [])).toHaveProperty('error');
-    expect(planOwnerBooking({ ...base, service: '' }, [])).toHaveProperty('error');
+    expect(planOwnerBooking({ ...base, time: 'amanhã' }, [], NOW.getTime())).toHaveProperty('error');
+    expect(planOwnerBooking({ ...base, service: '' }, [], NOW.getTime())).toHaveProperty('error');
   });
 });
 

@@ -2539,7 +2539,7 @@ function clientServiceNear(events, phone, date) {
   const day = Date.parse(`${date}T12:00:00Z`);
   return events.filter((e) => e.start && e.status !== "CANCELLED" && Math.abs(Date.parse(e.start) - day) <= 60 * 864e5 && /^\s*(a confirmar · )?servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9)).sort((a, b) => Math.abs(Date.parse(a.start) - day) - Math.abs(Date.parse(b.start) - day))[0];
 }
-function planOwnerBooking(req, events) {
+function planOwnerBooking(req, events, nowMs = Date.now()) {
   if (!req || typeof req !== "object") return { error: "O pedido tem de ser um objeto" };
   const r = req;
   const conversationId = text(r.conversationId, MAX.conversationId);
@@ -2561,6 +2561,7 @@ function planOwnerBooking(req, events) {
   const pickupFee = amount(r.pickupFee) ?? 0;
   const money = total === null ? "?€ (?€)" : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
   const start = lisbonToUtc(r.date, minutes);
+  if (start < nowMs) return { error: "A hora já passou: não se marca um serviço no passado" };
   const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 6e4).toISOString();
   const address = text(r.address, MAX.address);
   const waterproofing = /imperm|premium|essencial/i.test(service);
