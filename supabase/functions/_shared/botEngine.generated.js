@@ -125,10 +125,10 @@ function calculateTravelFee(baseFee, servicesTotal) {
 
 // src/components/quiz/QuizTypes.ts
 var sofaPrices = [
-  { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 49, bothPrice: 99, originalBothPrice: 98, waterproofingPremiumPrice: 69 },
-  { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
-  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
-  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 209, originalBothPrice: 218, waterproofingPremiumPrice: 169, packPremiumDelta: 30 },
+  { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 69 },
+  { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 129, originalBothPrice: 138, waterproofingPremiumPrice: 109, packPremiumDelta: 40 },
+  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 159, originalBothPrice: 168, waterproofingPremiumPrice: 139, packPremiumDelta: 40 },
+  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 199, originalBothPrice: 208, waterproofingPremiumPrice: 169, packPremiumDelta: 40 },
   { id: "5-lugares", label: "5+ Lugares", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "canto", label: "Canto", cleaningPrice: 109, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "4+-lugares", label: "Em U ou modular", cleaningPrice: "Sob orçamento", waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" }
@@ -1901,20 +1901,59 @@ function puffQuote(qty, city, withOthers, othersTotal) {
     total: withOthers ? othersTotal === null ? null : cents(othersTotal + amount2) : travel === null ? null : amount2 + travel
   };
 }
-var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 100 };
+var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 90 };
+var U_WATERPROOFING_ALONE = { premium: 179, essencial: 129 };
 function uWaterproofingQuote(input) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
-  const isUw = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u" && ["clean+premium", "clean+essencial"].includes(String(r.treatment));
+  const treatmentOf = (r) => String(r.treatment ?? "");
+  const isU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
+  const isUw = (r) => isU(r) && ["clean+premium", "clean+essencial", "premium", "essencial"].includes(treatmentOf(r));
   const uItems = raw.filter(isUw);
   if (!uItems.length) return null;
-  if (raw.some((r) => !isUw(r) && r && typeof r === "object" && /premium|essencial/.test(String(r.treatment ?? "")))) return null;
+  if (raw.some((r) => !isUw(r) && r && typeof r === "object" && /premium|essencial/.test(treatmentOf(r)))) return null;
+  const alone = uItems.every((r) => !treatmentOf(r).startsWith("clean"));
+  if (!alone && uItems.some((r) => !treatmentOf(r).startsWith("clean"))) return null;
+  const n = uItems.reduce((sum2, r) => sum2 + (typeof r.qty === "number" ? r.qty : 1), 0);
+  const tier = /premium/.test(treatmentOf(uItems[0])) ? "premium" : "essencial";
+  const others = raw.filter((r) => !isUw(r));
+  if (alone) {
+    const city = resolveBotCity(input.city);
+    if (city === null || EXTENDED_TRIP_CITIES.has(city)) return null;
+    const base2 = others.length ? botQuote({ ...input, items: others }) : null;
+    if (base2 && (!base2.ok || base2.quote || base2.total === null)) return null;
+    const rest = base2 && base2.ok && base2.total !== null ? base2.total : 0;
+    const premium2 = cents(rest + U_WATERPROOFING_ALONE.premium * n);
+    const essencial2 = cents(rest + U_WATERPROOFING_ALONE.essencial * n);
+    const total2 = tier === "premium" ? premium2 : essencial2;
+    const amount2 = U_WATERPROOFING_ALONE[tier] * n;
+    const line = { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} sofá em U`, amount: amount2, tablePrice: amount2, perkApplied: false, perkNote: void 0, quote: false };
+    return {
+      ok: true,
+      city,
+      cityKnown: true,
+      extendedTrip: false,
+      sharedTrip: false,
+      lines: [...base2 && base2.ok ? base2.lines : [], line],
+      subtotal: cents((base2 && base2.ok ? base2.subtotal : 0) + amount2),
+      savings: 0,
+      perkEligible: false,
+      travel: base2 && base2.ok ? base2.travel : 0,
+      total: total2,
+      waterproofingTiers: { travel: base2 && base2.ok ? base2.travel : 0, premium: premium2, essencial: essencial2 },
+      quote: false,
+      handToOwner: false,
+      rugPickup: null,
+      rugEstimate: null,
+      rugCombo: null,
+      puff: base2 && base2.ok ? base2.puff : null,
+      closeNow: closeNowOffer({ total: total2, waterproofing: true, handToOwner: false, rug: null })
+    };
+  }
   const base = botQuote({ ...input, items: raw.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
   if (!base.ok || base.quote || base.total === null) return null;
-  const n = uItems.reduce((sum2, r) => sum2 + (typeof r.qty === "number" ? r.qty : 1), 0);
   const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
   const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
-  const tier = uItems[0].treatment === "clean+premium" ? "premium" : "essencial";
   const total = tier === "premium" ? premium : essencial;
   return {
     ...base,

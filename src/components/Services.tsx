@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { CHAIR_PRICE_SHORT } from "@/data/enginePrices";
+import { CHAIR_PRICE_SHORT, formatEuro, SOFA_WATERPROOF_ESSENCIAL_FROM } from "@/data/enginePrices";
 import sofaImg         from "@/assets/hero-sofa-v4.webp";
 import sofaImgM        from "@/assets/hero-sofa-v4-m720.webp";
 import waterproofImg   from "@/assets/hero-waterproofing.webp";
@@ -244,7 +244,7 @@ const Services = () => {
 
   /* Services */
   const services = [
-    { title: "Impermeabilização",            price: "49€",    image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos" },
+    { title: "Impermeabilização",            price: formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM), image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos" },
     { title: "Limpeza de Colchões", price: "59€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões" },
     { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás" },
     // Cadeiras: por cadeira, nunca "a partir de" (pedido do dono, 26/09/2026).

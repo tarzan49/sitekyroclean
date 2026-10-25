@@ -175,27 +175,58 @@ function puffQuote(qty: number, city: string | null, withOthers: boolean, others
 }
 
 /**
- * Waterproofing on a U sofa (owner, 22 Oct 2026: "a imper fica mais 150 premium e mais 100 essencial"):
- * the U's cleaning price plus 150€ (Premium) or 100€ (Essencial) per U, travel as in the cleaning.
- * Only with cleaning; waterproofing alone on a U stays sob orçamento. Bot only.
+ * Waterproofing on a U sofa, bot only.
+ * - With cleaning (owner, 22 Oct 2026: "a imper fica mais 150 premium e mais 100 essencial"): the U's
+ *   cleaning price plus 150€ (Premium) or 90€ (Essencial; 100€ until 25 Oct, when every Essencial
+ *   went down 10€) per U, travel as in the cleaning.
+ * - Alone (owner, 25 Oct 2026: "em U fica 179eur e essencial 129 eur"): 179€ / 129€ per U, travel
+ *   included, whatever the seats.
+ * Other waterproofed items in the same order still go to the owner.
  */
-export const U_WATERPROOFING_EXTRA = { premium: 150, essencial: 100 } as const;
+export const U_WATERPROOFING_EXTRA = { premium: 150, essencial: 90 } as const;
+export const U_WATERPROOFING_ALONE = { premium: 179, essencial: 129 } as const;
 
 function uWaterproofingQuote(input: Record<string, unknown>) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
-  const isUw = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === 'u'
-    && ['clean+premium', 'clean+essencial'].includes(String((r as Record<string, unknown>).treatment));
+  const treatmentOf = (r: unknown) => String((r as Record<string, unknown>).treatment ?? '');
+  const isU = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === 'u';
+  const isUw = (r: unknown) => isU(r) && ['clean+premium', 'clean+essencial', 'premium', 'essencial'].includes(treatmentOf(r));
   const uItems = raw.filter(isUw) as Record<string, unknown>[];
   if (!uItems.length) return null;
   // Other waterproofed items in the same order: keep the old path (owner prices it).
-  if (raw.some(r => !isUw(r) && r && typeof r === 'object' && /premium|essencial/.test(String((r as Record<string, unknown>).treatment ?? '')))) return null;
+  if (raw.some(r => !isUw(r) && r && typeof r === 'object' && /premium|essencial/.test(treatmentOf(r)))) return null;
+  const alone = uItems.every(r => !treatmentOf(r).startsWith('clean'));
+  if (!alone && uItems.some(r => !treatmentOf(r).startsWith('clean'))) return null;
+  const n = uItems.reduce((sum, r) => sum + (typeof r.qty === 'number' ? r.qty : 1), 0);
+  const tier = /premium/.test(treatmentOf(uItems[0])) ? 'premium' : 'essencial';
+  const others = raw.filter(r => !isUw(r));
+  if (alone) {
+    // Travel included: price the rest of the order (if any) as usual, then add the U at its fixed price.
+    const city = resolveBotCity(input.city);
+    if (city === null || EXTENDED_TRIP_CITIES.has(city)) return null;
+    const base = others.length ? botQuote({ ...input, items: others }) : null;
+    if (base && (!base.ok || base.quote || base.total === null)) return null;
+    const rest = base && base.ok && base.total !== null ? base.total : 0;
+    const premium = cents(rest + U_WATERPROOFING_ALONE.premium * n);
+    const essencial = cents(rest + U_WATERPROOFING_ALONE.essencial * n);
+    const total = tier === 'premium' ? premium : essencial;
+    const amount = U_WATERPROOFING_ALONE[tier] * n;
+    const line = { label: `Impermeabilização ${tier === 'premium' ? 'Premium' : 'Essencial'} sofá em U`, amount, tablePrice: amount, perkApplied: false, perkNote: undefined as string | undefined, quote: false };
+    return {
+      ok: true as const, city, cityKnown: true, extendedTrip: false, sharedTrip: false,
+      lines: [...(base && base.ok ? base.lines : []), line],
+      subtotal: cents((base && base.ok ? base.subtotal : 0) + amount), savings: 0, perkEligible: false,
+      travel: base && base.ok ? base.travel : 0, total, waterproofingTiers: { travel: base && base.ok ? base.travel : 0, premium, essencial },
+      quote: false, handToOwner: false, rugPickup: null, rugEstimate: null, rugCombo: null,
+      puff: base && base.ok ? base.puff : null,
+      closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
+    };
+  }
   const base = botQuote({ ...input, items: raw.map(r => (isUw(r) ? { ...(r as object), treatment: 'clean' } : r)) });
   if (!base.ok || base.quote || base.total === null) return null;
-  const n = uItems.reduce((sum, r) => sum + (typeof r.qty === 'number' ? r.qty : 1), 0);
   const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
   const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
-  const tier = uItems[0].treatment === 'clean+premium' ? 'premium' : 'essencial';
   const total = tier === 'premium' ? premium : essencial;
   return {
     ...base,
@@ -210,9 +241,38 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
 export function botQuote(input: unknown) {
   if (input && typeof input === 'object') {
     const u = uWaterproofingQuote(input as Record<string, unknown>);
-    if (u) return u;
+    if (u) return withBigOrder(u);
   }
-  return botQuoteInner(input);
+  return withBigOrder(botQuoteInner(input));
+}
+
+/**
+ * Orders above 300€: the bot answers them itself with the owner's own special condition (owner, 25 Oct
+ * 2026: "quero que respondas as coisas de 300 mas que analises as conversas que tenho e vejas maneiras boas
+ * de dar condições especiais inteligentes"). Read from his replies of Sep and Oct: he always shows the
+ * normal value first, then a condition "pelo conjunto", 6 to 10% under it, ending in 9, with the travel
+ * offered (441 → 399, 415 → 389, 412 → 379, 522 → 489, 299 → 269), and he barely touches waterproofing
+ * ("o produto é caro e a margem não me permite"). So: travel off, then 7% off a cleaning order or 4% off an
+ * order with waterproofing, rounded down to end in 9, never less than 20€ of saving.
+ */
+export const BIG_ORDER_MIN = 300;
+const BIG_ORDER_CUT = { cleaning: 0.07, waterproofing: 0.04 } as const;
+const BIG_ORDER_MIN_SAVING = 20;
+const endIn9 = (v: number) => Math.floor((v + 1) / 10) * 10 - 1;
+export function bigOrderPrice(total: number, travel: number, waterproofing: boolean): number {
+  const cut = waterproofing ? BIG_ORDER_CUT.waterproofing : BIG_ORDER_CUT.cleaning;
+  const special = endIn9((total - travel) * (1 - cut));
+  return total - special >= BIG_ORDER_MIN_SAVING ? special : endIn9(total - BIG_ORDER_MIN_SAVING);
+}
+function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal: number; special: number; savings: number; tiers: { premium: number | null; essencial: number | null } | null } | null } {
+  const q = r as unknown as { ok: boolean; total?: number | null; travel?: number | null; quote?: boolean; handToOwner?: boolean; waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null };
+  if (!q.ok || q.quote || q.handToOwner || typeof q.total !== 'number' || q.total <= BIG_ORDER_MIN) return { ...r, bigOrder: null };
+  const wp = !!q.waterproofingTiers;
+  const travel = q.travel ?? 0;
+  const special = bigOrderPrice(q.total, travel, wp);
+  const t = q.waterproofingTiers;
+  const tierPrice = (v: number | null) => (v === null ? null : v > BIG_ORDER_MIN ? bigOrderPrice(v, t!.travel, true) : v);
+  return { ...r, bigOrder: { normal: q.total, special, savings: cents(q.total - special), tiers: t ? { premium: tierPrice(t.premium), essencial: tierPrice(t.essencial) } : null } };
 }
 
 function botQuoteInner(input: unknown) {

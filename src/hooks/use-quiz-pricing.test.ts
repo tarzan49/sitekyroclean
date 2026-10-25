@@ -102,7 +102,7 @@ describe('anti-acaros on sofas and chairs', () => {
     const { result } = renderHook(() => useQuizPricing(
       { ...initialFormData, service: 'sofa', serviceType: 'waterproofing', waterproofingTier: 'essencial', sofaAntiAcaros: true },
       [{ sizeId: '2-lugares', qty: 1, packEnabled: false }], [], [], []));
-    expect(result.current.calculateServicePrice).toBe(79);
+    expect(result.current.calculateServicePrice).toBe(69);
   });
   it('charges 5€ per chair, only without waterproofing', () => {
     expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(80 + 20);

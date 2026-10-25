@@ -20,7 +20,7 @@ export const services = [
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "Sob orçamento", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "Sob orçamento", icon: "rug" },
-  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "49€", icon: "waterproof" },
+  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "39€", icon: "waterproof" },
 ] as const;
 
 // Os concelhos que levam artigo: "no Porto", "na Maia", "da Trofa". O nome

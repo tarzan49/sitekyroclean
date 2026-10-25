@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import ServiceResultsGallery from "@/components/ServiceResultsGallery";
 import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
+import { formatEuro, SOFA_WATERPROOF_ESSENCIAL_FROM } from "@/data/enginePrices";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { SITE_URL, WHATSAPP_BASE, PHONE_E164, CLIENTS_SERVED_LABEL } from "@/constants/business";
 import { CHAIR_PRICE_LABEL } from "@/data/enginePrices";
@@ -127,13 +128,13 @@ const BeforeAfterPage = () => {
               </h2>
               <div className="grid sm:grid-cols-3 gap-3">
                 {[
-                  { name: "Limpeza de Sofás",    link: "/limpeza-sofas",    price: "Desde 49€" },
+                  { name: "Limpeza de Sofás",    link: "/limpeza-sofas",    price: `Desde ${formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)}` },
                   { name: "Limpeza de Colchões", link: "/limpeza-colchoes", price: "Desde 59€" },
                   { name: "Limpeza de Tapetes",  link: "/limpeza-tapetes",  price: "Sob orçamento" },
                   // Cadeiras: por cadeira, nunca "Desde" (pedido do dono, 26/09/2026).
                   { name: "Limpeza de Cadeiras", link: "/limpeza-cadeiras", price: CHAIR_PRICE_LABEL },
                   { name: "Limpeza de Alcatifas",link: "/limpeza-alcatifas",price: "Sob orçamento" },
-                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: "Desde 49€" },
+                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: `Desde ${formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)}` },
                 ].map(svc => (
                   <Link
                     key={svc.link}
