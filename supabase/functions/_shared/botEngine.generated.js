@@ -1967,9 +1967,28 @@ function uWaterproofingQuote(input) {
 function botQuote(input) {
   if (input && typeof input === "object") {
     const u = uWaterproofingQuote(input);
-    if (u) return u;
+    if (u) return withBigOrder(u);
   }
-  return botQuoteInner(input);
+  return withBigOrder(botQuoteInner(input));
+}
+var BIG_ORDER_MIN = 300;
+var BIG_ORDER_CUT = { cleaning: 0.07, waterproofing: 0.04 };
+var BIG_ORDER_MIN_SAVING = 20;
+var endIn9 = (v) => Math.floor((v + 1) / 10) * 10 - 1;
+function bigOrderPrice(total, travel, waterproofing) {
+  const cut = waterproofing ? BIG_ORDER_CUT.waterproofing : BIG_ORDER_CUT.cleaning;
+  const special = endIn9((total - travel) * (1 - cut));
+  return total - special >= BIG_ORDER_MIN_SAVING ? special : endIn9(total - BIG_ORDER_MIN_SAVING);
+}
+function withBigOrder(r) {
+  const q = r;
+  if (!q.ok || q.quote || q.handToOwner || typeof q.total !== "number" || q.total <= BIG_ORDER_MIN) return { ...r, bigOrder: null };
+  const wp = !!q.waterproofingTiers;
+  const travel = q.travel ?? 0;
+  const special = bigOrderPrice(q.total, travel, wp);
+  const t = q.waterproofingTiers;
+  const tierPrice = (v) => v === null ? null : v > BIG_ORDER_MIN ? bigOrderPrice(v, t.travel, true) : v;
+  return { ...r, bigOrder: { normal: q.total, special, savings: cents(q.total - special), tiers: t ? { premium: tierPrice(t.premium), essencial: tierPrice(t.essencial) } : null } };
 }
 function botQuoteInner(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
