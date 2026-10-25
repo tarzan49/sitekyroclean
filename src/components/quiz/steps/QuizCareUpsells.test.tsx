@@ -70,12 +70,12 @@ describe('care upsells', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retirar tratamento: 3 Lugares' }));
     expect(screen.getByText('1 de 2')).toBeTruthy();
     expect(screen.getByText('+70€')).toBeTruthy();
-    expect(screen.getByText('+110€')).toBeTruthy();
-    expect(screen.getByLabelText('Preço original da impermeabilização: 139 euros').tagName).toBe('DEL');
+    expect(screen.getByText('+120€')).toBeTruthy();
+    expect(screen.getByLabelText('Preço original da impermeabilização: 149 euros').tagName).toBe('DEL');
     expect(screen.getByLabelText('Preço original da impermeabilização: 89 euros').tagName).toBe('DEL');
-    expect(screen.getByText('Pack: 189€ em vez de 218€')).toBeTruthy();
+    expect(screen.getByText('Pack: 199€ em vez de 228€')).toBeTruthy();
     expect(screen.getByText('Pack: 149€ em vez de 168€')).toBeTruthy();
-    expect(screen.getByLabelText('Mais 40€ que o Essencial').textContent).toContain('+40€');
+    expect(screen.getByLabelText('Mais 50€ que o Essencial').textContent).toContain('+50€');
     fireEvent.click(screen.getByRole('button', { name: /^Essencial/ }));
     expect(screen.getByText('1 de 2')).toBeTruthy();
     fireEvent.click(premium);
@@ -94,7 +94,7 @@ describe('care upsells', () => {
     const cleaning = screen.getByRole('button', { name: /Higienização Profunda/ });
     expect(cleaning.textContent).toContain('+50€');
     expect(screen.getByLabelText('Preço original da limpeza: 79 euros').textContent).toBe('79€');
-    expect(screen.getByText('Pack: 189€ em vez de 218€')).toBeTruthy();
+    expect(screen.getByText('Pack: 199€ em vez de 228€')).toBeTruthy();
     expect(screen.getByText('Ajuda a reduzir odores')).toBeTruthy();
     fireEvent.click(cleaning);
     expect(cleaning.getAttribute('aria-pressed')).toBe('true');

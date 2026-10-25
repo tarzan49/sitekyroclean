@@ -125,10 +125,10 @@ function calculateTravelFee(baseFee, servicesTotal) {
 
 // src/components/quiz/QuizTypes.ts
 var sofaPrices = [
-  { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 69 },
-  { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 129, originalBothPrice: 138, waterproofingPremiumPrice: 109, packPremiumDelta: 40 },
-  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 159, originalBothPrice: 168, waterproofingPremiumPrice: 139, packPremiumDelta: 40 },
-  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 199, originalBothPrice: 208, waterproofingPremiumPrice: 169, packPremiumDelta: 40 },
+  { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },
+  { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 129, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
+  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 159, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 50 },
+  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 199, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 50 },
   { id: "5-lugares", label: "5+ Lugares", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "canto", label: "Canto", cleaningPrice: 109, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "4+-lugares", label: "Em U ou modular", cleaningPrice: "Sob orçamento", waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" }

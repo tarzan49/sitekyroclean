@@ -119,11 +119,11 @@ describe('sofa waterproofing upsell reduction', () => {
   // redução, Premium mais 30).
   it('prices the 4-seat sofa like the other sizes', () => {
     const four = sofaPrices.find(p => p.id === '4-lugares')!;
-    expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 109, 169]);
+    expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 109, 179]);
     expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(189);
-    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(229);
+    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(239);
     expect(calcSofaUnitPrice(four, false, 'waterproofing', 'essencial', false)).toBe(109);
-    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'premium', false)).toBe(169);
+    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'premium', false)).toBe(179);
   });
   it('keeps large sofas subject to quotation', () => {
     const option = sofaPrices.find(p => p.id === '4+-lugares')!;

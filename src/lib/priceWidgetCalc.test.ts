@@ -113,7 +113,7 @@ describe('waterproof widget handoff', () => {
     const quantities = { 1: 2, 6: 4 }; // index 6 = cadeiras (depois dos seis tamanhos de sofá)
     const total = calcWidgetTotal('impermeabilizacao', quantities, tier);
     const config = buildWidgetQuizConfig('impermeabilizacao', quantities, tier)!;
-    const sofaUnit = tier === 'premium' ? 109 : 69;
+    const sofaUnit = tier === 'premium' ? 119 : 69;
     const chairs = tier === 'premium' ? 120 : 92; // 4 cadeiras: 30€ / 23€ cada
     expect(total).toBe(sofaUnit * 2 + chairs);
     expect(config.waterproofingTier).toBe(tier);
