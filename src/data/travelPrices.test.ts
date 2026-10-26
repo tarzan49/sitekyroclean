@@ -41,6 +41,6 @@ describe('travel fees shared by quote and SEO pages', () => {
     expect(locationPrices.Coimbra).toBe(10);
     expect(EXTENDED_TRIP_CITIES.has('Coimbra')).toBe(false);
     expect(locationPrices['Figueira da Foz']).toBe(20);
-    expect(cities.filter(city => city.area === 'coimbra').map(city => city.name).sort()).toEqual(['Coimbra', 'Figueira da Foz']);
+    expect(cities.filter(city => city.area === 'coimbra').map(city => city.name).sort()).toEqual(['Batalha', 'Coimbra', 'Figueira da Foz', 'Leiria']);
   });
 });

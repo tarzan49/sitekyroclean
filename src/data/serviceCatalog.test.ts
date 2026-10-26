@@ -5,7 +5,7 @@ import { cities, cityPrep, cityPrepCap, cityPrepDe, headingWithCity } from './se
 // Trofa e as duas Póvoas, e o site dizia "Limpeza de Sofás em Maia".
 const WITH_ARTICLE: Record<string, 'o' | 'a'> = {
   Porto: 'o', Barreiro: 'o', Seixal: 'o', Montijo: 'o',
-  Amadora: 'a', Moita: 'a', 'Figueira da Foz': 'a',
+  Amadora: 'a', Moita: 'a', 'Figueira da Foz': 'a', Batalha: 'a',
   Maia: 'a', Trofa: 'a', 'Póvoa de Varzim': 'a', 'Póvoa de Lanhoso': 'a',
 };
 

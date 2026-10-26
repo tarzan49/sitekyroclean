@@ -468,7 +468,7 @@ function ehServico(titulo) {
 function regiaoPorCodigoPostal(codigo) {
   const n = Number(String(codigo).slice(0, 4));
   if (!Number.isInteger(n)) return null;
-  if (n >= 2400 && n < 2500) return null;
+  if (n >= 2400 && n < 2500) return 'Coimbra'; // Leiria/Batalha (dono, 2026-10-26)
   if (n >= 1000 && n < 3000) return 'Lisboa';
   if (n >= 7000 && n < 8000) return 'Lisboa';
   if (n >= 8000 && n < 9000) return 'Algarve';

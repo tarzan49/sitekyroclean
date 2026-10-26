@@ -34,6 +34,7 @@ const ARTICLE_CITIES: Record<string, "o" | "a"> = {
   "Amadora": "a",
   "Moita": "a",
   "Figueira da Foz": "a",
+  "Batalha": "a",
   "Maia": "a",
   "Trofa": "a",
   "Póvoa de Varzim": "a",
@@ -100,6 +101,9 @@ export const cities = [
   // calendarServices.ts): o dono ainda não quis uma equipa Coimbra.
   { name: "Coimbra", slug: "coimbra", region: "primary", area: "coimbra", description: "cidade universitária às margens do Mondego" },
   { name: "Figueira da Foz", slug: "figueira-da-foz", region: "secondary", area: "coimbra", description: "cidade de praia na foz do Mondego" },
+  // Leiria e Batalha (equipa Coimbra, dono 2026-10-26)
+  { name: "Leiria", slug: "leiria", region: "secondary", area: "coimbra", description: "cidade do castelo, no centro litoral" },
+  { name: "Batalha", slug: "batalha", region: "secondary", area: "coimbra", description: "vila do mosteiro, junto a Leiria" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },

@@ -40,6 +40,9 @@ var locationPrices = {
   "Coimbra": 10,
   "Figueira da Foz": 20,
   // ~45 min pela A14
+  // Dono, 2026-10-26: Leiria fica perto de Coimbra, equipa Coimbra, 20€.
+  "Leiria": 20,
+  "Batalha": 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
@@ -2116,6 +2119,9 @@ var cities = [
   // calendarServices.ts): o dono ainda não quis uma equipa Coimbra.
   { name: "Coimbra", slug: "coimbra", region: "primary", area: "coimbra", description: "cidade universitária às margens do Mondego" },
   { name: "Figueira da Foz", slug: "figueira-da-foz", region: "secondary", area: "coimbra", description: "cidade de praia na foz do Mondego" },
+  // Leiria e Batalha (equipa Coimbra, dono 2026-10-26)
+  { name: "Leiria", slug: "leiria", region: "secondary", area: "coimbra", description: "cidade do castelo, no centro litoral" },
+  { name: "Batalha", slug: "batalha", region: "secondary", area: "coimbra", description: "vila do mosteiro, junto a Leiria" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
@@ -2173,7 +2179,7 @@ var cities = [
 function localityFromPostalCode(code) {
   const n = Number(code.slice(0, 4));
   if (!Number.isInteger(n)) return null;
-  if (n >= 2400 && n < 2500) return null;
+  if (n >= 2400 && n < 2500) return "Coimbra";
   if (n >= 1e3 && n < 3e3) return "Lisboa";
   if (n >= 7e3 && n < 8e3) return "Lisboa";
   if (n >= 8e3 && n < 9e3) return "Algarve";

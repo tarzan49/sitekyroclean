@@ -11,7 +11,7 @@ import { cities, cityPrep } from './serviceCatalog';
 describe('shared landing composition', () => {
   it('covers all four families with the right service, four problems and the original four FAQs', () => {
     const records = getLandingFaqRoutes();
-    expect(records).toHaveLength(14190);
+    expect(records).toHaveLength(14238);
     for (const record of records) {
       const model = getLandingPageModel(record.path);
       expect(model, record.path).not.toBeNull();

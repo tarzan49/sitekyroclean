@@ -144,7 +144,7 @@ describe('localityFromPostalCode', () => {
     expect(localityFromPostalCode('4800')).toBe('Braga'); // Guimarães
     expect(localityFromPostalCode('4900')).toBe('Braga'); // Viana do Castelo
     expect(localityFromPostalCode('8600')).toBe('Algarve');
-    expect(localityFromPostalCode('2410')).toBeNull(); // Leiria
+    expect(localityFromPostalCode('2410')).toBe('Coimbra'); // Leiria, equipa Coimbra desde 2026-10-26
     expect(localityFromPostalCode('9000')).toBeNull();
   });
 });

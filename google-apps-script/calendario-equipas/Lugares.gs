@@ -29,6 +29,8 @@ var LUGARES = {
     ["aveiro","Porto"],
     ["coimbra","Coimbra"],
     ["figueira da foz","Coimbra"],
+    ["leiria","Coimbra"],
+    ["batalha","Coimbra"],
     ["braga","Braga"],
     ["guimaraes","Braga"],
     ["vila nova de famalicao","Braga"],

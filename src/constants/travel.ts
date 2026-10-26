@@ -37,6 +37,9 @@ export const locationPrices: Record<string, number> = {
   // alargada: saiu de EXTENDED_TRIP_CITIES.
   'Coimbra': 10,
   'Figueira da Foz': 20, // ~45 min pela A14
+  // Dono, 2026-10-26: Leiria fica perto de Coimbra, equipa Coimbra, 20€.
+  'Leiria': 20,
+  'Batalha': 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
