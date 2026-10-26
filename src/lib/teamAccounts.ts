@@ -24,8 +24,13 @@
 // paga no CRM.
 //
 // Fatura (dono, 2026-10-14, Bruval: "vou adicionar ao preço o IVA", "é um
-// valor que tem que ser entregue a mim"): num serviço com fatura (`invoiced`)
-// o IVA de 23% vai por cima do valor e é todo do dono.
+// valor que tem que ser entregue a mim"; 2026-10-16, Aleixo: "temos que dividir
+// o IVA... estava incluído no valor"): num serviço com fatura (`invoiced`) o
+// valor do CRM já tem o IVA de 23%; o IVA é do dono (entrega-o ao Estado) e o
+// valor sem IVA divide-se a meias. A mensagem discrimina-o linha a linha e soma
+// o IVA a entregar no fim (dono, 2026-10-26: "sempre que alguém pedir IVA mete
+// isso bem explícito nas contas, para eu saber quanto é o valor do serviço e o
+// IVA a entregar ao Estado").
 //
 // A mensagem diz a data (nunca o dia da semana, dono) e discrimina cada
 // serviço: o que foi feito, o valor, a parte do dono e o que fica a dever.
@@ -100,6 +105,8 @@ export interface AccountLine {
   vat?: number;
   /** Com fatura: a parte da equipa, metade do valor sem IVA. */
   teamPart?: number;
+  /** Parte do dono no upsell, já dentro de `share`. */
+  upsellShare?: number;
 }
 
 export interface TeamAccount {
@@ -149,7 +156,9 @@ const sum = (lines: AccountLine[]) => round2(lines.reduce((s, l) => s + l.amount
 /**
  * Um serviço, ponto por ponto:
  *   14/10 · Ana, Odivelas · Limpeza de sofá de 2 lugares
- *   Serviço 79€ · a minha parte 40€ + IVA 23% 18,17€ = deves-me 58,17€
+ *   Serviço 79€ · a minha parte 40€ = deves-me 40€
+ * Com fatura, uma linha por valor: preço com IVA, valor sem IVA, IVA a entregar
+ * ao Estado, a parte de cada um e o que a equipa deve.
  */
 function lineBlock(l: AccountLine, team: string): string[] {
   const head = [dm(l.date), l.label, l.what].filter(Boolean).join(' · ');
@@ -157,9 +166,29 @@ function lineBlock(l: AccountLine, team: string): string[] {
   const parts = [`a minha parte ${euros(l.share)}`];
   if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? 'sem avaliação'} ${euros(l.reviewPenalty)}`);
   if (l.vat && l.teamPart !== undefined) {
-    return [head, `Serviço ${euros(l.billed)} com fatura (${euros(l.billed - l.vat)} + ${euros(l.vat)} de IVA) · a vossa parte ${euros(l.teamPart)}, metade do valor sem IVA = deves-me ${euros(l.amount)}`];
+    const net = round2(l.billed - l.vat);
+    const mine = round2(net - l.teamPart);
+    const owed = [`a minha parte ${euros(mine)}`, `o IVA ${euros(l.vat)}`];
+    if (l.upsellShare) owed.push(`a minha parte no upsell ${euros(l.upsellShare)}`);
+    if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? 'sem avaliação'} ${euros(l.reviewPenalty)}`);
+    return [
+      head,
+      `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
+      `Valor do serviço sem IVA: ${euros(net)}`,
+      `IVA a entregar ao Estado: ${euros(l.vat)}`,
+      `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
+      `Minha parte (metade do valor sem IVA): ${euros(mine)}`,
+      `Deves-me ${euros(l.amount)} (${owed.join(' + ')})`,
+    ];
   }
   return [head, `Serviço ${euros(l.billed)} · ${parts.join(' + ')} = deves-me ${euros(l.amount)}`];
+}
+
+/** Um serviço pago diretamente ao dono; com fatura, diz o valor sem IVA e o IVA a entregar. */
+function paidToOwnerLine(l: AccountLine): string {
+  const base = `${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`;
+  if (!l.vat || l.billed === undefined) return base;
+  return `${base} (com fatura: ${euros(l.billed)} = ${euros(l.billed - l.vat)} sem IVA + ${euros(l.vat)} de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)`;
 }
 
 function teamMessage(a: Omit<TeamAccount, 'message'>): string {
@@ -183,13 +212,15 @@ function teamMessage(a: Omit<TeamAccount, 'message'>): string {
   if (a.ownerOwes.length) {
     out.push('', `Soma: ${euros(sum([...a.today, ...a.before, ...a.adjustments]))}`);
     out.push('', 'Pagos diretamente a mim (desconto a vossa parte):');
-    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+    for (const l of a.ownerOwes) out.push(paidToOwnerLine(l));
   }
   if (a.awaitingClient.length) {
     out.push('', 'O cliente paga-me a mim e ainda não pagou (desconto a vossa parte quando pagar):');
-    for (const l of a.awaitingClient) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+    for (const l of a.awaitingClient) out.push(paidToOwnerLine(l));
   }
   out.push('', `Total que me devem: ${euros(a.total)}`);
+  const vat = round2([...a.today, ...a.before].reduce((s, l) => s + (l.vat ?? 0), 0));
+  if (vat > 0) out.push(`Dos quais IVA a entregar ao Estado: ${euros(vat)}`);
   return out.join('\n');
 }
 
@@ -223,7 +254,8 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
       const teamPart = invoiceTeamPart !== null
         ? round2(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell))
         : round2(billed + (Number(r.upsell_value) || 0) - share);
-      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart });
+      const invoice = r.invoiced ? { billed, vat: round2(billed - net) } : {};
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart, ...invoice });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date!)
@@ -234,7 +266,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const line: AccountLine = {
       date: r.request_date!, label: labelOf(r), amount, billed, share,
       ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}),
-      ...(vat ? { vat, teamPart: invoiceTeamPart! } : {}),
+      ...(vat ? { vat, teamPart: invoiceTeamPart!, ...(ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {}) } : {}),
     };
     if (!team) { unassigned.push(line); continue; }
     const bucket = bucketOf(team);

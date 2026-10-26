@@ -128,12 +128,32 @@ describe('teamAccounts', () => {
       row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 79, my_cut: 40, invoiced: true, paid_to_owner: true, client_paid_owner_at: '2026-10-16T12:00:00Z' }),
     ], events, '2026-10-13');
     expect(r.teams[0].ownerOwes[0].amount).toBe(32.11);
+    expect(r.teams[0].message).toContain('13/10 Sofia Teste, Porto · a vossa parte 32,11€ (com fatura: 79€ = 64,23€ sem IVA + 14,77€ de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)');
   });
 
   it('with an invoice the VAT is inside the price and split in half', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40, invoiced: true })], events, '2026-10-14');
     // IVA incluído no preço e dividido a meias (16/10): base 64,23€, a equipa fica com 32,11€.
     expect(r.teams[0].total).toBe(46.89);
-    expect(r.teams[0].message).toContain('Serviço 79€ com fatura (64,23€ + 14,77€ de IVA) · a vossa parte 32,11€, metade do valor sem IVA = deves-me 46,89€');
+    // Dono, 26/10: o IVA bem explícito, linha a linha, e o total de IVA a entregar ao Estado no fim.
+    expect(r.teams[0].message).toContain([
+      'COM FATURA: o cliente paga 79€, IVA incluído',
+      'Valor do serviço sem IVA: 64,23€',
+      'IVA a entregar ao Estado: 14,77€',
+      'Vossa parte (metade do valor sem IVA): 32,11€',
+      'Minha parte (metade do valor sem IVA): 32,12€',
+      'Deves-me 46,89€ (a minha parte 32,12€ + o IVA 14,77€)',
+    ].join('\n'));
+    expect(r.teams[0].message).toContain('Total que me devem: 46,89€\nDos quais IVA a entregar ao Estado: 14,77€');
+  });
+
+  it('without an invoice there is no VAT line', () => {
+    const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40 })], events, '2026-10-14');
+    expect(r.teams[0].message).not.toContain('IVA');
+  });
+
+  it('with an invoice and an upsell the owner part of the upsell is spelled out too', () => {
+    const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-20', billed_value: 123, my_cut: 62, invoiced: true, upsell_value: 50, upsell_team: 'Lisboa 1' })], events, '2026-10-20');
+    expect(r.teams[0].message).toMatch(/Deves-me [\d,]+€ \(a minha parte [\d,]+€ \+ o IVA 23€ \+ a minha parte no upsell [\d,]+€\)/);
   });
 });

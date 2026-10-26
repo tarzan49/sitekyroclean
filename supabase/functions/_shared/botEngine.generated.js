@@ -2855,9 +2855,27 @@ function lineBlock(l, team) {
   const parts = [`a minha parte ${euros(l.share)}`];
   if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
   if (l.vat && l.teamPart !== void 0) {
-    return [head, `Serviço ${euros(l.billed)} com fatura (${euros(l.billed - l.vat)} + ${euros(l.vat)} de IVA) · a vossa parte ${euros(l.teamPart)}, metade do valor sem IVA = deves-me ${euros(l.amount)}`];
+    const net = round23(l.billed - l.vat);
+    const mine = round23(net - l.teamPart);
+    const owed = [`a minha parte ${euros(mine)}`, `o IVA ${euros(l.vat)}`];
+    if (l.upsellShare) owed.push(`a minha parte no upsell ${euros(l.upsellShare)}`);
+    if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
+    return [
+      head,
+      `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
+      `Valor do serviço sem IVA: ${euros(net)}`,
+      `IVA a entregar ao Estado: ${euros(l.vat)}`,
+      `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
+      `Minha parte (metade do valor sem IVA): ${euros(mine)}`,
+      `Deves-me ${euros(l.amount)} (${owed.join(" + ")})`
+    ];
   }
   return [head, `Serviço ${euros(l.billed)} · ${parts.join(" + ")} = deves-me ${euros(l.amount)}`];
+}
+function paidToOwnerLine(l) {
+  const base = `${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`;
+  if (!l.vat || l.billed === void 0) return base;
+  return `${base} (com fatura: ${euros(l.billed)} = ${euros(l.billed - l.vat)} sem IVA + ${euros(l.vat)} de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)`;
 }
 function teamMessage(a) {
   const out = [`Contas até ${dm(a.date)} (${a.team})`, ""];
@@ -2880,13 +2898,15 @@ function teamMessage(a) {
   if (a.ownerOwes.length) {
     out.push("", `Soma: ${euros(sum([...a.today, ...a.before, ...a.adjustments]))}`);
     out.push("", "Pagos diretamente a mim (desconto a vossa parte):");
-    for (const l of a.ownerOwes) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+    for (const l of a.ownerOwes) out.push(paidToOwnerLine(l));
   }
   if (a.awaitingClient.length) {
     out.push("", "O cliente paga-me a mim e ainda não pagou (desconto a vossa parte quando pagar):");
-    for (const l of a.awaitingClient) out.push(`${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`);
+    for (const l of a.awaitingClient) out.push(paidToOwnerLine(l));
   }
   out.push("", `Total que me devem: ${euros(a.total)}`);
+  const vat = round23([...a.today, ...a.before].reduce((s, l) => s + (l.vat ?? 0), 0));
+  if (vat > 0) out.push(`Dos quais IVA a entregar ao Estado: ${euros(vat)}`);
   return out.join("\n");
 }
 function teamAccounts(rows, events, date, adjustments = []) {
@@ -2909,7 +2929,8 @@ function teamAccounts(rows, events, date, adjustments = []) {
     const ownerUpsell = round23(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
       const teamPart = invoiceTeamPart !== null ? round23(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round23(billed + (Number(r.upsell_value) || 0) - share);
-      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart });
+      const invoice = r.invoiced ? { billed, vat: round23(billed - net) } : {};
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart, ...invoice });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
@@ -2924,7 +2945,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
       share,
       ...what ? { what } : {},
       ...penalty ? { reviewPenalty: penalty } : {},
-      ...vat ? { vat, teamPart: invoiceTeamPart } : {}
+      ...vat ? { vat, teamPart: invoiceTeamPart, ...ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {} } : {}
     };
     if (!team) {
       unassigned.push(line);
