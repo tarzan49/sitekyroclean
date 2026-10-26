@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { botAvailability, chooseTeam, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent } from './botAvailability';
+import { DAY_RULES, botAvailability, chooseTeam, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -196,5 +196,67 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
     expect(r.free).toEqual([]);
     expect(r.handToOwner).toMatch(/Algarve/);
+  });
+});
+
+describe("the owner's rules for the next days (DAY_RULES)", () => {
+  // As on 26 Oct 2026, with NOW's dates: Porto closed tomorrow and only Friday offered;
+  // Lisboa tomorrow only from 14h, Friday first.
+  const rules: DayRule[] = [
+    { zone: 'Porto', from: '2026-10-07', until: '2026-10-08', closed: [{ date: '2026-10-08' }], prefer: ['2026-10-09'], onlyPreferred: true, note: 'Porto: só sexta.' },
+    { zone: 'Lisboa', from: '2026-10-07', until: '2026-10-08', closed: [{ date: '2026-10-08', fromHour: 14 }], prefer: ['2026-10-09'], note: 'Lisboa: sexta primeiro.' },
+  ];
+  const sofa = [{ kind: 'sofa', qty: 1 }];
+
+  it('Porto: no time on the closed day, only the preferred day offered, and the bot told why', () => {
+    const r = ok(botAvailability({ city: 'Porto', items: sofa, days: 7 }, [], NOW, rules));
+    expect(r.suggestion?.slots.every(s => s.date === '2026-10-09')).toBe(true);
+    expect(r.free.map(d => d.date)).toEqual(['2026-10-09']);
+    expect(r.dayRule).toBe('Porto: só sexta.');
+  });
+
+  it('a client who asks for the closed day gets the preferred day, and a booking there is refused', () => {
+    const r = ok(botAvailability({ city: 'Porto', items: sofa, date: '2026-10-08', time: '11h' }, [], NOW, rules));
+    expect(r.requested?.free).toBe(false);
+    expect(r.suggestion?.slots.map(s => s.date)).toEqual(['2026-10-09', '2026-10-09']);
+    expect(r.handToOwner).toBeNull();
+    // Another day the client asks for himself still books (only the offer is limited).
+    expect(ok(botAvailability({ city: 'Porto', items: sofa, date: '2026-10-12', time: '11h' }, [], NOW, rules)).requested?.free).toBe(true);
+  });
+
+  it('Porto: once the preferred day is full, the other days come back', () => {
+    const fullFriday = ['10', '11', '12', '13', '14', '15', '16', '17', '18'].flatMap(h => ['Porto 1', 'Porto 1', 'Porto 2']
+      .map(t => ev('2026-10-09', `${h}:00`, `${h}:59`, 'Serviço 45€ (89€) Sofá - Porto', `Equipa: ${t}`)));
+    const r = ok(botAvailability({ city: 'Porto', items: sofa, days: 7 }, fullFriday, NOW, rules));
+    expect(r.free.map(d => d.date)).not.toContain('2026-10-08');
+    expect(r.free.length).toBeGreaterThan(0);
+  });
+
+  it('Lisboa: the closed morning is gone, the afternoon books, and the preferred day comes first', () => {
+    const r = ok(botAvailability({ city: 'Oeiras', items: sofa, days: 7 }, [], NOW, rules));
+    expect(r.suggestion?.slots.every(s => s.date === '2026-10-09')).toBe(true);
+    expect(r.free[0].date).toBe('2026-10-09');
+    expect(r.free.find(d => d.date === '2026-10-08')?.times[0]).toBe('14h');
+    const morning = ok(botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '11h' }, [], NOW, rules));
+    expect(morning.requested?.free).toBe(false);
+    expect(morning.suggestion?.slots.every(s => s.date === '2026-10-08' && s.minutes >= 14 * 60)).toBe(true);
+    expect(ok(botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '15h' }, [], NOW, rules)).requested?.free).toBe(true);
+  });
+
+  it('a time the owner gave himself and the other zones are not touched; rules switch themselves off', () => {
+    expect(ok(botAvailability({ city: 'Porto', items: sofa, date: '2026-10-08', time: '11h', ownerTime: true }, [], NOW, rules)).requested?.free).toBe(true);
+    const braga = ok(botAvailability({ city: 'Braga', items: sofa, days: 4 }, [], NOW, rules));
+    expect(braga.dayRule).toBeUndefined();
+    expect(braga.free[0].date).toBe('2026-10-07');
+    const later = ok(botAvailability({ city: 'Porto', items: sofa, days: 4 }, [], new Date('2026-10-09T08:45:00Z'), rules));
+    expect(later.dayRule).toBeUndefined();
+  });
+
+  it('the live rules are well formed', () => {
+    for (const r of DAY_RULES) {
+      expect(r.from <= r.until).toBe(true);
+      for (const d of [...(r.closed ?? []).map(c => c.date), ...(r.prefer ?? [])]) expect(d).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(r.note.length).toBeGreaterThan(0);
+    }
   });
 });

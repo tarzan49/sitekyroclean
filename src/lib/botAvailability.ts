@@ -94,6 +94,34 @@ const LEAD_TIME_MIN = 90;
 const DEFAULT_DAYS = 4;
 const MAX_DAYS = 14;
 
+/**
+ * The owner's day-by-day instructions on which days the bot fills. Each rule is on while Lisbon's
+ * today is between `from` and `until`, so it switches itself off; a time he gave himself (`ownerTime`)
+ * ignores them, and so do his own bookings (planOwnerBooking does not come through here).
+ * - closed: the bot books nothing new that day (or only from `fromHour` on);
+ * - prefer: the days the two offered times come from first;
+ * - onlyPreferred: without a day asked by the client, only the preferred days are offered
+ *   (the other days come back only when the preferred ones are full).
+ */
+export interface DayRule {
+  zone: TeamZone;
+  from: string;
+  until: string;
+  closed?: Array<{ date: string; fromHour?: number }>;
+  prefer?: string[];
+  onlyPreferred?: boolean;
+  /** For the bot: what to tell a client who asks for a closed day. */
+  note: string;
+}
+export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
+  { zone: 'Porto', from: '2026-10-26', until: '2026-10-27', closed: [{ date: '2026-10-27' }], prefer: ['2026-10-28'], onlyPreferred: true,
+    note: 'Terça (dia 27) já não temos vaga no Porto: oferece quarta (dia 28).' },
+  // "E para Lisboa podes marcar para a parte da tarde, mas … principalmente serviços para quarta-feira".
+  { zone: 'Lisboa', from: '2026-10-26', until: '2026-10-27', closed: [{ date: '2026-10-27', fromHour: 14 }], prefer: ['2026-10-28'],
+    note: 'Terça (dia 27) em Lisboa só há vaga à tarde, a partir das 14h: oferece primeiro quarta (dia 28).' },
+];
+
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 const CITY_REGION = new Map(cities.map(c => [fold(c.name), AREA_REGION[c.area]] as const));
 const CITY_NAMES = cities
@@ -294,6 +322,8 @@ export type AvailabilityResult =
       free: Array<{ date: string; label: string; times: string[] }>;
       /** Far zone only: a booked service of ours is already there that day; same team, travel waived. */
       sharedTrip?: SharedTrip | null;
+      /** The owner's rule for these days (DAY_RULES), when one is on for this zone. */
+      dayRule?: string | null;
     };
 
 /**
@@ -415,7 +445,7 @@ function suggestionText(slots: Slot[]): string {
   return a.date === b.date ? `${a.label} às ${a.time} ou às ${b.time}` : `${a.label} às ${a.time} ou ${b.label} às ${b.time}`;
 }
 
-export function botAvailability(req: AvailabilityRequest, events: AvailabilityEvent[], now: Date): AvailabilityResult {
+export function botAvailability(req: AvailabilityRequest, events: AvailabilityEvent[], now: Date, rules: readonly DayRule[] = DAY_RULES): AvailabilityResult {
   const city = resolveBotCity(req?.city);
   const durationRaw = Number(req?.durationMin);
   const durationMin = Number.isFinite(durationRaw) && durationRaw >= 15 && durationRaw <= 600
@@ -445,16 +475,26 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   }
   const daysRaw = Math.floor(Number(req.days));
   const span = Number.isFinite(daysRaw) && daysRaw >= 1 ? Math.min(MAX_DAYS, daysRaw) : DEFAULT_DAYS;
-  const dayOrder = onlyDay ? [onlyDay] : Array.from({ length: span }, (_, i) => addDays(today, i));
+
+  // The owner's rules for these days (DAY_RULES): a rule for the zone, or for the teams the job goes to.
+  const active = req.ownerTime === true ? [] : rules.filter(r => r.from <= today && today <= r.until
+    && (r.zone === area || teams.every(t => TEAMS_BY_REGION[r.zone].includes(t))));
+  const closedAt = (date: string, m: number) => active.some(r => r.closed?.some(c => c.date === date && (c.fromHour === undefined || m < c.fromHour * 60)));
+  const preferred = [...new Set(active.flatMap(r => r.prefer ?? []))].filter(d => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
+  const onlyPreferred = active.some(r => r.onlyPreferred);
+  const ahead = Array.from({ length: span }, (_, i) => addDays(today, i));
+  const dayOrder = onlyDay ? [onlyDay] : [...preferred, ...ahead.filter(d => !preferred.includes(d))];
+  // A client who asks for a day the owner closed gets the preferred days instead.
+  const scan = onlyDay ? [onlyDay, ...preferred.filter(d => d !== onlyDay)] : dayOrder;
 
   const busy = busyIntervals(events);
   const earliestToday = now.getTime() + LEAD_TIME_MIN * 60_000;
   const slots: Slot[] = [];
-  for (const date of dayOrder) {
+  for (const date of scan) {
     const label = dayLabel(date, today);
     for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
-      if (from < earliestToday) continue;
+      if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
@@ -467,13 +507,20 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
-    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [], sameTime: st.sameTime,
+    const open = inHours && !closedAt(onlyDay, m);
+    requested = { date: onlyDay, time: hourLabel(m), free: open && st.free, teamsFree: open ? st.teamsFree : [], sameTime: st.sameTime,
       start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };
   }
 
-  const two = pickTwo(slots, dayOrder, onlyDay);
-  const free = dayOrder
-    .map(date => ({ date, label: dayLabel(date, today), times: slots.filter(s => s.date === date).map(s => s.time) }))
+  // Which days are offered: the asked day (or, when the owner closed it, his preferred days);
+  // without one, the preferred days first, or only them while they still have a time.
+  let offerDays = dayOrder;
+  if (onlyDay && !slots.some(s => s.date === onlyDay) && active.some(r => r.closed?.some(c => c.date === onlyDay))) offerDays = preferred;
+  else if (!onlyDay && onlyPreferred && slots.some(s => preferred.includes(s.date))) offerDays = preferred;
+  const offered = slots.filter(s => offerDays.includes(s.date));
+  const two = pickTwo(offered, offerDays, offerDays.length === 1 ? offerDays[0] : null);
+  const free = offerDays
+    .map(date => ({ date, label: dayLabel(date, today), times: offered.filter(s => s.date === date).map(s => s.time) }))
     .filter(d => d.times.length);
   return {
     city, region: area, teams, durationMin,
@@ -481,5 +528,6 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     suggestion: two.length ? { text: suggestionText(two), slots: two } : null,
     requested,
     free,
+    ...(active.length ? { dayRule: active.map(r => r.note).join(' ') } : {}),
   };
 }

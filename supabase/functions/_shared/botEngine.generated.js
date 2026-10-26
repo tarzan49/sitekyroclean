@@ -2226,6 +2226,27 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
+var DAY_RULES = [
+  // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
+  {
+    zone: "Porto",
+    from: "2026-10-26",
+    until: "2026-10-27",
+    closed: [{ date: "2026-10-27" }],
+    prefer: ["2026-10-28"],
+    onlyPreferred: true,
+    note: "Terça (dia 27) já não temos vaga no Porto: oferece quarta (dia 28)."
+  },
+  // "E para Lisboa podes marcar para a parte da tarde, mas … principalmente serviços para quarta-feira".
+  {
+    zone: "Lisboa",
+    from: "2026-10-26",
+    until: "2026-10-27",
+    closed: [{ date: "2026-10-27", fromHour: 14 }],
+    prefer: ["2026-10-28"],
+    note: "Terça (dia 27) em Lisboa só há vaga à tarde, a partir das 14h: oferece primeiro quarta (dia 28)."
+  }
+];
 var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 var CITY_REGION = new Map(cities.map((c) => [fold3(c.name), AREA_REGION[c.area]]));
 var CITY_NAMES = cities.map((c) => ({ key: fold3(c.name), region: AREA_REGION[c.area] })).filter((c) => c.key.length >= 4).sort((a, b) => b.key.length - a.key.length);
@@ -2477,7 +2498,7 @@ function suggestionText(slots) {
   const [a, b] = slots;
   return a.date === b.date ? `${a.label} às ${a.time} ou às ${b.time}` : `${a.label} às ${a.time} ou ${b.label} às ${b.time}`;
 }
-function botAvailability(req, events, now) {
+function botAvailability(req, events, now, rules = DAY_RULES) {
   const city = resolveBotCity(req?.city);
   const durationRaw = Number(req?.durationMin);
   const durationMin = Number.isFinite(durationRaw) && durationRaw >= 15 && durationRaw <= 600 ? Math.ceil(durationRaw / 15) * 15 : visitMinutes(req?.items);
@@ -2501,15 +2522,21 @@ function botAvailability(req, events, now) {
   }
   const daysRaw = Math.floor(Number(req.days));
   const span = Number.isFinite(daysRaw) && daysRaw >= 1 ? Math.min(MAX_DAYS, daysRaw) : DEFAULT_DAYS;
-  const dayOrder = onlyDay ? [onlyDay] : Array.from({ length: span }, (_, i) => addDays(today, i));
+  const active = req.ownerTime === true ? [] : rules.filter((r) => r.from <= today && today <= r.until && (r.zone === area || teams.every((t) => TEAMS_BY_REGION[r.zone].includes(t))));
+  const closedAt = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
+  const preferred = [...new Set(active.flatMap((r) => r.prefer ?? []))].filter((d) => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
+  const onlyPreferred = active.some((r) => r.onlyPreferred);
+  const ahead = Array.from({ length: span }, (_, i) => addDays(today, i));
+  const dayOrder = onlyDay ? [onlyDay] : [...preferred, ...ahead.filter((d) => !preferred.includes(d))];
+  const scan = onlyDay ? [onlyDay, ...preferred.filter((d) => d !== onlyDay)] : dayOrder;
   const busy = busyIntervals(events);
   const earliestToday = now.getTime() + LEAD_TIME_MIN * 6e4;
   const slots = [];
-  for (const date of dayOrder) {
+  for (const date of scan) {
     const label = dayLabel(date, today);
     for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
-      if (from < earliestToday) continue;
+      if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
@@ -2521,18 +2548,23 @@ function botAvailability(req, events, now) {
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
+    const open = inHours && !closedAt(onlyDay, m);
     requested = {
       date: onlyDay,
       time: hourLabel(m),
-      free: inHours && st.free,
-      teamsFree: inHours ? st.teamsFree : [],
+      free: open && st.free,
+      teamsFree: open ? st.teamsFree : [],
       sameTime: st.sameTime,
       start: new Date(from).toISOString(),
       end: new Date(from + durationMin * 6e4).toISOString()
     };
   }
-  const two = pickTwo(slots, dayOrder, onlyDay);
-  const free = dayOrder.map((date) => ({ date, label: dayLabel(date, today), times: slots.filter((s) => s.date === date).map((s) => s.time) })).filter((d) => d.times.length);
+  let offerDays = dayOrder;
+  if (onlyDay && !slots.some((s) => s.date === onlyDay) && active.some((r) => r.closed?.some((c) => c.date === onlyDay))) offerDays = preferred;
+  else if (!onlyDay && onlyPreferred && slots.some((s) => preferred.includes(s.date))) offerDays = preferred;
+  const offered = slots.filter((s) => offerDays.includes(s.date));
+  const two = pickTwo(offered, offerDays, offerDays.length === 1 ? offerDays[0] : null);
+  const free = offerDays.map((date) => ({ date, label: dayLabel(date, today), times: offered.filter((s) => s.date === date).map((s) => s.time) })).filter((d) => d.times.length);
   return {
     city,
     region: area,
@@ -2541,7 +2573,8 @@ function botAvailability(req, events, now) {
     handToOwner: two.length ? null : "Sem horas livres nos próximos dias: o responsável confirma a data",
     suggestion: two.length ? { text: suggestionText(two), slots: two } : null,
     requested,
-    free
+    free,
+    ...active.length ? { dayRule: active.map((r) => r.note).join(" ") } : {}
   };
 }
 
