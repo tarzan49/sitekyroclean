@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CalendarEvent } from './calendarServices';
-import { CALENDAR_SOURCE, planCalendarSync, type SyncableRow } from './calendarSync';
+import { CALENDAR_SOURCE, planCalendarSync, VAT_HINT, type SyncableRow } from './calendarSync';
 
 const since = '2026-09-26T15:00:00Z';
 const now = '2026-09-28T09:00:00Z';
@@ -136,5 +136,51 @@ describe('planCalendarSync', () => {
     // Tirar a marca volta a pôr a origem do calendário.
     const untagged = event('e1', { updated: '2026-09-27T18:00:00Z' });
     expect(plan([row('r1', { ...linked, source: 'Google Ads' })], [untagged]).updates[0].patch).toMatchObject({ source: CALENDAR_SOURCE });
+  });
+
+  describe('invoice (owner, 27 Oct: the VAT value has to stay right in the CRM)', () => {
+    const linked = { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00Z' };
+    const edited = (extra: Partial<CalendarEvent> = {}) => event('e1', { updated: '2026-09-28T08:00:00Z', ...extra });
+
+    it('keeps the value with VAT when the title says the price before VAT', () => {
+      // Título "(209€)", CRM 257,07€ (209€ + 48,07€ de IVA por cima).
+      const r = row('r1', { ...linked, invoiced: true, billed_value: 257.07, my_cut: 105 });
+      const patch = plan([r], [edited({ summary: 'Serviço 105€ (209€) Limpeza de sofá - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia' })]).updates[0].patch;
+      expect(patch).toMatchObject({ billed_value: 257.07, my_cut: 105, needs_review: null });
+    });
+
+    it('also with an invoice for part of the service', () => {
+      // 159€ no título; o colchão (60€ + IVA = 73,80€) vai na fatura: 172,80€ no CRM.
+      const r = row('r1', { ...linked, invoiced: true, billed_value: 172.8, my_cut: 80, invoice_value: 73.8 });
+      const patch = plan([r], [edited({ summary: 'Serviço 80€ (159€) Limpeza de sofá - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia' })]).updates[0].patch;
+      expect(patch).toMatchObject({ billed_value: 172.8, my_cut: 80 });
+    });
+
+    it('follows a real price change in the calendar and asks to review it', () => {
+      const r = row('r1', { ...linked, invoiced: true, billed_value: 89, my_cut: 45 });
+      const patch = plan([r], [edited({ summary: 'Serviço 60€ (119€) Limpeza de sofá - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia' })]).updates[0].patch;
+      expect(patch.billed_value).toBe(119);
+      expect(patch.needs_review).toContain('Com fatura: o calendário passou a dizer 119€ e o CRM tinha 89€');
+    });
+
+    it('a new service whose event talks about an invoice is left to review, never marked on its own', () => {
+      const insert = plan([], [event('e1', { description: 'Fatura com NIF 500000000; total 98,10€ + IVA.' })]).inserts[0];
+      expect(insert.needs_review).toBe(VAT_HINT);
+      expect('invoiced' in insert).toBe(false);
+    });
+
+    it('an existing row without invoice is flagged when the event starts talking about VAT', () => {
+      const r = row('r1', { ...linked, billed_value: 148, my_cut: 74 });
+      const patch = plan([r], [edited({ description: 'Nota: Valor de 148€ sem IVA. Com fatura fica em 182,04€.' })]).updates[0].patch;
+      expect(patch.needs_review).toBe(VAT_HINT);
+      // Palavras que só contêm as letras (positiva, motivo) não contam.
+      const quiet = plan([r], [edited({ description: 'Avaliação positiva, sem motivo de queixa.' })]).updates[0].patch;
+      expect(quiet.needs_review).toBeNull();
+    });
+
+    it('no flag when the row already has the invoice', () => {
+      const r = row('r1', { ...linked, invoiced: true, billed_value: 89, my_cut: 45 });
+      expect(plan([r], [edited({ description: 'Fatura em nome da empresa.' })]).updates[0].patch.needs_review).toBeNull();
+    });
   });
 });

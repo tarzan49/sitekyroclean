@@ -11,6 +11,7 @@ import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmReviews from "./CrmReviews";
 import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
+import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, type InvoiceStatus } from "@/lib/invoiceVat";
 
 interface ServiceRequest {
   id: string;
@@ -35,9 +36,15 @@ interface ServiceRequest {
   /** Vendido a mais pela equipa no serviço; fora de billed_value e de my_cut. A parte do dono soma-se ao cut só no ecrã (ver cutOf). */
   upsell_value: number | null;
   upsell_team: string | null;
-  /** Passou fatura (pelo Francisco). invoice_ref = nome e NIF da fatura. */
+  /** Com fatura: o valor tem o IVA de 23% lá dentro (src/lib/invoiceVat.ts). invoice_ref = nome e NIF da fatura. */
   invoiced: boolean;
   invoice_ref: string | null;
+  /** Dia da fatura; vazio com `invoiced` = fatura por passar. */
+  invoice_issued_on: string | null;
+  /** Quem passou a fatura: "Empresa" ou "Francisco" (até 20/10/2026). */
+  invoice_by: string | null;
+  /** Fatura de só uma parte do serviço: o valor dessa parte, com IVA. Vazio = o serviço todo. */
+  invoice_value: number | null;
   /** A equipa pediu a avaliação ao cliente; sem isso as contas da noite somam 5% do valor (src/lib/teamAccounts.ts). */
   review_requested: boolean;
 }
@@ -51,6 +58,44 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 const cutOf = (r: ServiceRequest) => r.my_cut + ownerUpsellOf(r);
 const money = (n: number) => `${n.toFixed(2).replace(/\.00$/, "")}€`;
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
+const round2 = (n: number) => Math.round(n * 100) / 100;
+const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
+
+// Filtros da aba Pedidos (dono, 2026-10-27: "um botão de filtro [...] por pagar,
+// por fatura [...] em vez de me aparecer todas as informações, aparece só uma").
+type StatusFilter = "all" | "unpaid" | "paid" | "to_issue" | "invoiced" | "no_invoice" | "review";
+const STATUS_FILTERS: ReadonlyArray<readonly [StatusFilter, string]> = [
+  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["to_issue", "Fatura por passar"],
+  ["invoiced", "Com fatura"], ["no_invoice", "Sem fatura"], ["review", "Para rever"],
+];
+const matchesStatus = (r: ServiceRequest, f: StatusFilter) => {
+  switch (f) {
+    case "unpaid": return !r.paid;
+    case "paid": return r.paid;
+    case "to_issue": return invoiceStatusOf(r) === "to_issue";
+    case "invoiced": return r.invoiced;
+    case "no_invoice": return !r.invoiced;
+    case "review": return !!r.needs_review;
+    default: return true;
+  }
+};
+
+const INVOICE_CHIP: Record<InvoiceStatus, { short: string; long: string; cls: string }> = {
+  none: { short: "Não", long: "Sem fatura", cls: "bg-gray-50 text-gray-500 border-gray-200" },
+  to_issue: { short: "Por passar", long: "Fatura por passar", cls: "bg-amber-50 text-amber-800 border-amber-300" },
+  issued: { short: "Passada", long: "Fatura passada", cls: "bg-blue-50 text-blue-700 border-blue-200" },
+};
+
+/** "28/10", a partir de AAAA-MM-DD. */
+const dayMonth = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+function invoiceTitle(r: ServiceRequest): string {
+  const status = invoiceStatusOf(r);
+  if (status === "none") return "Sem fatura. Carrega para passar a com fatura (IVA 23% incluído no valor).";
+  const vat = `IVA ${money(invoiceVatOf(r))}${r.invoice_value != null ? ` (fatura de ${money(Number(r.invoice_value))})` : ""}`;
+  if (status === "to_issue") return `Fatura por passar · ${vat}. Carrega quando a passares.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
+  return `Fatura passada a ${dayMonth(r.invoice_issued_on!)}${r.invoice_by ? ` (${r.invoice_by})` : ""} · ${vat}. Carrega para editar.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
+}
 
 function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -80,6 +125,11 @@ type FormState = {
   paid: boolean;
   invoiced: boolean;
   invoice_ref: string;
+  /** AAAA-MM-DD; vazio = fatura por passar. */
+  invoice_issued_on: string;
+  invoice_by: "Empresa" | "Francisco";
+  /** Fatura de só uma parte do serviço; vazio = o serviço todo. */
+  invoice_value: string;
   review_requested: boolean;
   locality: CrmLocality | "";
   phone: string;
@@ -99,6 +149,9 @@ const emptyForm = (): FormState => ({
   paid: false,
   invoiced: false,
   invoice_ref: "",
+  invoice_issued_on: "",
+  invoice_by: "Empresa",
+  invoice_value: "",
   review_requested: false,
   locality: "Porto",
   phone: "",
@@ -123,7 +176,9 @@ const CrmPanel = () => {
 
   const [search, setSearch] = useState("");
   const [filterLocality, setFilterLocality] = useState<string>("all");
-  const [filterPaid, setFilterPaid] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  /** Os filtros olham para todos os meses, não só para o mês aberto. */
+  const [allMonths, setAllMonths] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const backdropMouseDownRef = useRef(false);
@@ -212,16 +267,30 @@ const CrmPanel = () => {
     [records, viewedMonth]
   );
 
-  const filtered = useMemo(() => {
+  // Localidade e pesquisa, no mês aberto ou em todos; o estado filtra-se por cima, para os botões terem o número de cada um.
+  const scoped = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return monthRecords.filter(r => {
+    return (allMonths ? records : monthRecords).filter(r => {
       if (filterLocality !== "all" && r.locality !== filterLocality) return false;
-      if (filterPaid === "paid" && !r.paid) return false;
-      if (filterPaid === "unpaid" && r.paid) return false;
       if (term && !(r.description.toLowerCase().includes(term) || (r.phone ?? "").toLowerCase().includes(term) || (r.city ?? "").toLowerCase().includes(term) || (r.client_name ?? "").toLowerCase().includes(term))) return false;
       return true;
     });
-  }, [monthRecords, search, filterLocality, filterPaid]);
+  }, [allMonths, records, monthRecords, search, filterLocality]);
+
+  const statusCounts = useMemo(
+    () => Object.fromEntries(STATUS_FILTERS.map(([id]) => [id, scoped.filter(r => matchesStatus(r, id)).length])) as Record<StatusFilter, number>,
+    [scoped]
+  );
+
+  const filtered = useMemo(() => scoped.filter(r => matchesStatus(r, statusFilter)), [scoped, statusFilter]);
+
+  const filteredSums = useMemo(() => ({
+    billed: round2(filtered.reduce((s, r) => s + r.billed_value + (Number(r.upsell_value) || 0), 0)),
+    vat: round2(filtered.reduce((s, r) => s + invoiceVatOf(r), 0)),
+  }), [filtered]);
+
+  /** Carregar outra vez no filtro ligado volta a "Todos". */
+  const pickStatus = (f: StatusFilter) => setStatusFilter(prev => (prev === f ? "all" : f));
 
   const totals = useMemo(() => {
     const billed = monthRecords.reduce((s, r) => s + r.billed_value, 0);
@@ -237,7 +306,9 @@ const CrmPanel = () => {
     const noInv = monthRecords.filter(r => !r.invoiced);
     const invoicedValue = inv.reduce((s, r) => s + r.billed_value, 0);
     const notInvoicedValue = noInv.reduce((s, r) => s + r.billed_value, 0);
-    return { invoicedCount: inv.length, invoicedValue, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
+    const invoicedVat = round2(inv.reduce((s, r) => s + invoiceVatOf(r), 0));
+    const toIssueCount = inv.filter(r => invoiceStatusOf(r) === "to_issue").length;
+    return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
   }, [monthRecords]);
 
   const maxLocalityCut = Math.max(1, ...totals.byLocality.map(l => l.cut));
@@ -263,6 +334,9 @@ const CrmPanel = () => {
       paid: r.paid,
       invoiced: r.invoiced,
       invoice_ref: r.invoice_ref ?? "",
+      invoice_issued_on: r.invoice_issued_on ?? "",
+      invoice_by: r.invoice_by === "Francisco" ? "Francisco" : "Empresa",
+      invoice_value: r.invoice_value != null ? String(r.invoice_value) : "",
       review_requested: r.review_requested,
       locality: r.locality ?? "",
       phone: r.phone ?? "",
@@ -271,6 +345,13 @@ const CrmPanel = () => {
       upsell_team: isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality),
     });
     setFormOpen(true);
+  };
+
+  /** O formulário escreve o dia no mês aberto: com "Todos os meses", abre primeiro o mês do serviço. */
+  const editRow = (r: ServiceRequest) => {
+    const [y, m] = r.request_date.split("-").map(Number);
+    setViewedMonth(new Date(y, m - 1, 1));
+    openEdit(r);
   };
 
   const closeForm = () => { setFormOpen(false); setEditingId(null); };
@@ -282,6 +363,8 @@ const CrmPanel = () => {
     const billed = parseFloat(form.billed_value.replace(",", ".")) || 0;
     const cut = parseFloat(form.my_cut.replace(",", ".")) || 0;
     const upsell = Math.max(0, parseFloat(form.upsell_value.replace(",", ".")) || 0);
+    const invoiceValue = form.invoiced && form.invoice_value.trim() ? parseEuros(form.invoice_value) : null;
+    if (invoiceValue !== null && !(invoiceValue >= 0)) { alert("O valor na fatura não é um número."); return; }
     const requestDate = `${viewedMonth.getFullYear()}-${String(viewedMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
     // A data de fecho só se escreve quando muda: assim a hora exata (do evento
@@ -301,6 +384,9 @@ const CrmPanel = () => {
       paid: form.paid,
       invoiced: form.invoiced,
       invoice_ref: form.invoiced ? form.invoice_ref.trim() || null : null,
+      invoice_issued_on: form.invoiced ? form.invoice_issued_on || null : null,
+      invoice_by: form.invoiced ? form.invoice_by : null,
+      invoice_value: invoiceValue,
       review_requested: form.review_requested,
       locality: form.locality,
       phone: form.phone.trim() || null,
@@ -354,10 +440,20 @@ const CrmPanel = () => {
     if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, ...patch } : x));
   };
 
-  const toggleInvoiced = async (r: ServiceRequest) => {
+  /**
+   * Sem fatura → fatura por passar → fatura passada (hoje). Uma fatura passada
+   * abre o formulário: voltar atrás, ou mudar a data, faz-se lá, nunca com um toque.
+   */
+  const advanceInvoice = async (r: ServiceRequest) => {
+    const status = invoiceStatusOf(r);
+    if (status === "issued") { editRow(r); return; }
+    const patch = status === "none"
+      ? { invoiced: true, invoice_by: r.invoice_by ?? "Empresa", invoice_issued_on: null }
+      : { invoice_issued_on: lisbonDay(new Date()), invoice_by: r.invoice_by ?? "Empresa" };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: err } = await (supabase as any).from("service_requests").update({ invoiced: !r.invoiced }).eq("id", r.id);
-    if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, invoiced: !x.invoiced } : x));
+    const { error: err } = await (supabase as any).from("service_requests").update(patch).eq("id", r.id);
+    if (err) { alert(`Erro ao guardar a fatura: ${err.message}`); return; }
+    setRecords(prev => prev.map(x => x.id === r.id ? { ...x, ...patch } : x));
   };
 
   const toggleReview = async (r: ServiceRequest) => {
@@ -373,18 +469,18 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "Dados da fatura", "Avaliação pedida"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "IVA", "Valor na fatura", "Fatura passada em", "Fatura passada por", "Dados da fatura", "Avaliação pedida"];
     const rows = filtered.map(r => [
-      new Date(r.request_date + "T00:00:00").getDate(),
+      allMonths ? r.request_date : new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", quizSummary?.quizServiceIds.has(r.id) ? [r.source, QUIZ_BADGE].filter(Boolean).join(" + ") : r.source ?? "",
-      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", r.invoiced ? "Sim" : "Não", r.invoice_ref ?? "", r.review_requested ? "Sim" : "Não",
+      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", INVOICE_CHIP[invoiceStatusOf(r)].long, r.invoiced ? invoiceVatOf(r).toFixed(2) : "", r.invoice_value != null ? Number(r.invoice_value).toFixed(2) : "", r.invoice_issued_on ?? "", r.invoiced ? r.invoice_by ?? "" : "", r.invoice_ref ?? "", r.review_requested ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `kyro-crm-${monthKey(viewedMonth)}.csv`;
+    a.href = url; a.download = `kyro-crm-${allMonths ? "todos-os-meses" : monthKey(viewedMonth)}${statusFilter === "all" ? "" : `-${statusFilter}`}.csv`;
     a.click(); URL.revokeObjectURL(url);
   };
 
@@ -499,23 +595,29 @@ const CrmPanel = () => {
           <p className="text-xl font-bold text-navy">{money(monthRecords.length ? Math.round(totals.billed / monthRecords.length * 100) / 100 : 0)}</p>
           <p className="text-[11px] text-gray-500">{monthRecords.length ? money(Math.round(totals.cut / monthRecords.length * 100) / 100) : "0€"} para ti</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <button type="button" onClick={() => pickStatus("paid")} aria-pressed={statusFilter === "paid"}
+          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "paid" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pagos</p>
           <p className="text-xl font-bold text-green-600">{totals.paidCount}</p>
-        </div>
-        <div className="bg-white border border-red-200 rounded-xl p-4">
+        </button>
+        <button type="button" onClick={() => pickStatus("unpaid")} aria-pressed={statusFilter === "unpaid"}
+          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "unpaid" ? "border-red-500 ring-1 ring-red-500" : "border-red-200 hover:border-red-300"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Por pagar</p>
           <p className="text-xl font-bold text-red-600">{totals.unpaidCount} <span className="text-xs font-medium text-red-500">({money(totals.unpaidValue)})</span></p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        </button>
+        <button type="button" onClick={() => pickStatus(totals.toIssueCount ? "to_issue" : "invoiced")} aria-pressed={statusFilter === "to_issue" || statusFilter === "invoiced"}
+          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "to_issue" || statusFilter === "invoiced" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Com fatura</p>
           <p className="text-xl font-bold text-navy">{totals.invoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.invoicedValue)})</span></p>
-          <p className="text-[11px] text-gray-500 mt-0.5">{totals.invoicedValue + totals.notInvoicedValue > 0 ? Math.round(totals.invoicedValue / (totals.invoicedValue + totals.notInvoicedValue) * 100) : 0}% do valor do mês</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          {totals.invoicedVat > 0 && <p className="text-[11px] font-medium text-blue-700 mt-0.5">IVA {money(totals.invoicedVat)}</p>}
+          {totals.toIssueCount > 0 && <p className="text-[11px] font-semibold text-amber-700">{totals.toIssueCount} por passar</p>}
+        </button>
+        <button type="button" onClick={() => pickStatus("no_invoice")} aria-pressed={statusFilter === "no_invoice"}
+          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "no_invoice" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sem fatura</p>
           <p className="text-xl font-bold text-navy">{totals.notInvoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.notInvoicedValue)})</span></p>
-        </div>
+          <p className="text-[11px] text-gray-500 mt-0.5">{totals.invoicedValue + totals.notInvoicedValue > 0 ? Math.round(totals.notInvoicedValue / (totals.invoicedValue + totals.notInvoicedValue) * 100) : 0}% do valor do mês</p>
+        </button>
       </div>
 
       {/* Locality breakdown */}
@@ -534,6 +636,33 @@ const CrmPanel = () => {
         </div>
       )}
 
+      {/* Filtro por estado: um de cada vez */}
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" role="group" aria-label="Filtrar pedidos por estado">
+          {STATUS_FILTERS.map(([id, label]) => {
+            const active = statusFilter === id;
+            return (
+              <button key={id} type="button" onClick={() => setStatusFilter(id)} aria-pressed={active}
+                className={`shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-navy text-white border-navy" : "bg-white text-navy border-gray-200 hover:border-navy/30"}`}>
+                {label}
+                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : id === "to_issue" && statusCounts[id] ? "text-amber-700" : id === "unpaid" && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
+              </button>
+            );
+          })}
+          <label className="shrink-0 flex items-center gap-1.5 h-8 px-3 ml-1 rounded-full text-xs font-semibold text-navy border border-dashed border-gray-300 cursor-pointer select-none">
+            <input type="checkbox" checked={allMonths} onChange={e => setAllMonths(e.target.checked)} className="rounded border-gray-300" />
+            Todos os meses
+          </label>
+        </div>
+        {(statusFilter !== "all" || allMonths) && (
+          <p className="text-xs text-gray-600">
+            {filtered.length} serviço{filtered.length === 1 ? "" : "s"}{allMonths ? " em todos os meses" : ` em ${monthLabel.toLowerCase()}`} · {money(filteredSums.billed)}
+            {filteredSums.vat > 0 && <span className="text-blue-700"> · IVA {money(filteredSums.vat)}</span>}
+            {statusFilter !== "all" && <button type="button" onClick={() => setStatusFilter("all")} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>}
+          </p>
+        )}
+      </div>
+
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
@@ -544,11 +673,6 @@ const CrmPanel = () => {
         <select value={filterLocality} onChange={e => setFilterLocality(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
           <option value="all">Todas as localidades</option>
           {LOCALITIES.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-        <select value={filterPaid} onChange={e => setFilterPaid(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
-          <option value="all">Todos os estados</option>
-          <option value="paid">Pago</option>
-          <option value="unpaid">Por pagar</option>
         </select>
         <span className="text-xs text-gray-400 ml-auto">{filtered.length} resultado{filtered.length !== 1 ? "s" : ""}</span>
       </div>
@@ -563,33 +687,35 @@ const CrmPanel = () => {
       <div className="md:hidden space-y-2">
         {loading && <p className="text-center py-6 text-sm text-gray-400">A carregar...</p>}
         {!loading && filtered.length === 0 && (
-          <p className="text-center py-6 text-sm text-gray-400">{monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}</p>
+          <p className="text-center py-6 text-sm text-gray-400">{!allMonths && monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}</p>
         )}
         {filtered.map(r => (
           <div key={r.id} className={`rounded-xl border p-3 space-y-2 ${r.paid ? "bg-white border-gray-200" : "bg-red-50/60 border-red-200"}`}>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[11px] text-gray-500">Dia {new Date(r.request_date + "T00:00:00").getDate()} · fechado {closedLabel(r.booked_at)}</p>
+                <p className="text-[11px] text-gray-500">Dia {allMonths ? dayMonth(r.request_date) : new Date(r.request_date + "T00:00:00").getDate()} · fechado {closedLabel(r.booked_at)}</p>
                 <p className="text-sm font-semibold text-navy break-words">{r.description || "-"}</p>
                 <p className="text-xs text-gray-600">{[r.client_name, r.locality ?? "Região?", r.city].filter(Boolean).join(" · ")}</p>
                 {r.phone && <a href={`tel:${r.phone}`} className="text-xs text-gray-500 flex items-center gap-1"><Phone className="w-3 h-3" />{r.phone}</a>}
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-bold text-navy">{money(r.billed_value)}</p>
+                {r.invoiced && <p className="text-[11px] font-medium text-blue-700">IVA {money(invoiceVatOf(r))}</p>}
                 <p className="text-xs font-semibold text-gold">{money(cutOf(r))}</p>
                 {r.upsell_value ? <p className={`text-[11px] font-semibold ${UPSELL_TEXT}`}>+{money(Number(r.upsell_value))}</p> : null}
               </div>
             </div>
+            {r.needs_review && <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">{r.needs_review}</p>}
             <div className="flex flex-wrap items-center gap-1.5">
               {quizSummary?.quizServiceIds.has(r.id) && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>}
               {r.calendar_missing_since && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>}
-              {r.needs_review && <button onClick={() => openEdit(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
+              {r.needs_review && <button onClick={() => editRow(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
               <button onClick={() => togglePaid(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
-              <button onClick={() => toggleInvoiced(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.invoiced ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>{r.invoiced ? "Com fatura" : "Sem fatura"}</button>
+              <button onClick={() => advanceInvoice(r)} title={invoiceTitle(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${INVOICE_CHIP[invoiceStatusOf(r)].cls}`}>{INVOICE_CHIP[invoiceStatusOf(r)].long}</button>
               <button onClick={() => toggleReview(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.review_requested ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>{r.review_requested ? "Avaliação pedida" : "Avaliação não pedida"}</button>
               <div className="ml-auto flex items-center gap-1">
                 {r.calendar_missing_since && <button onClick={() => keepMissing(r)} className="px-2 py-1 text-[11px] font-bold rounded-md border border-gray-200 text-navy">Manter</button>}
-                <button onClick={() => openEdit(r)} aria-label="Editar" className="p-2 text-gray-500 hover:text-navy rounded-md"><Pencil className="w-4 h-4" /></button>
+                <button onClick={() => editRow(r)} aria-label="Editar" className="p-2 text-gray-500 hover:text-navy rounded-md"><Pencil className="w-4 h-4" /></button>
                 <button onClick={() => handleDelete(r.id)} aria-label="Apagar" className="p-2 text-gray-500 hover:text-red-600 rounded-md"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
@@ -602,7 +728,7 @@ const CrmPanel = () => {
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
-              {["3%", "7%", "16%", "9%", "10%", "9%", "7%", "6%", "6%", "5%", "6%", "5%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+              {["4%", "7%", "14%", "9%", "9%", "9%", "7%", "7%", "6%", "5%", "6%", "7%", "5%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
@@ -617,12 +743,12 @@ const CrmPanel = () => {
               )}
               {!loading && filtered.length === 0 && (
                 <tr><td colSpan={14} className="text-center py-10 text-gray-400">
-                  {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
+                  {!allMonths && monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
                 </td></tr>
               )}
               {filtered.map((r, i) => (
                 <tr key={r.id} className={`border-b border-gray-100 ${!r.paid ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
-                  <td className="px-2 py-2 font-mono text-navy">{new Date(r.request_date + "T00:00:00").getDate()}</td>
+                  <td className="px-2 py-2 font-mono text-navy whitespace-nowrap">{allMonths ? dayMonth(r.request_date) : new Date(r.request_date + "T00:00:00").getDate()}</td>
                   <td className="px-2 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
                   <td className="px-2 py-2 text-navy font-medium">
                     <div className="flex items-center gap-1.5 min-w-0">
@@ -632,7 +758,7 @@ const CrmPanel = () => {
                         <span className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>
                       )}
                       {r.needs_review && (
-                        <button onClick={() => openEdit(r)} title={r.needs_review}
+                        <button onClick={() => editRow(r)} title={r.needs_review}
                           className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>
                       )}
                     </div>
@@ -652,7 +778,10 @@ const CrmPanel = () => {
                       ? <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>
                       : r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}
                   </td>
-                  <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
+                  <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">
+                    {money(r.billed_value)}
+                    {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>IVA {money(invoiceVatOf(r))}</span>}
+                  </td>
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={ownerUpsellOf(r) ? `${money(r.my_cut)} do serviço + ${money(ownerUpsellOf(r))} de upsell` : undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
@@ -661,9 +790,9 @@ const CrmPanel = () => {
                     </button>
                   </td>
                   <td className="px-2 py-2">
-                    <button onClick={() => toggleInvoiced(r)} title={r.invoice_ref ?? undefined}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.invoiced ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
-                      {r.invoiced ? "Sim" : "Não"}
+                    <button onClick={() => advanceInvoice(r)} title={invoiceTitle(r)}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap transition-colors ${INVOICE_CHIP[invoiceStatusOf(r)].cls}`}>
+                      {INVOICE_CHIP[invoiceStatusOf(r)].short}
                     </button>
                   </td>
                   <td className="px-2 py-2">
@@ -678,7 +807,7 @@ const CrmPanel = () => {
                         <button onClick={() => keepMissing(r)} title="O serviço fez-se: manter a linha e desligá-la do calendário"
                           className="px-1.5 py-1 text-[10px] font-bold rounded-md border border-gray-200 text-navy hover:bg-gray-50">Manter</button>
                       )}
-                      <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => editRow(r)} aria-label="Editar" className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
                       <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
@@ -736,20 +865,60 @@ const CrmPanel = () => {
               </label>
               <label className="flex items-center gap-2 h-9 ml-4 text-sm text-navy cursor-pointer select-none">
                 <input type="checkbox" checked={form.invoiced} onChange={e => setForm(f => ({ ...f, invoiced: e.target.checked }))} className="rounded border-gray-300" />
-                Com fatura
+                Com fatura (IVA)
               </label>
               <label className="flex items-center gap-2 h-9 ml-4 text-sm text-navy cursor-pointer select-none">
                 <input type="checkbox" checked={form.review_requested} onChange={e => setForm(f => ({ ...f, review_requested: e.target.checked }))} className="rounded border-gray-300" />
                 Avaliação pedida
               </label>
             </div>
-            {form.invoiced && (
-              <div className="sm:col-span-2">
-                <label className="block text-[10px] text-gray-500 mb-1">Dados da fatura (nome e NIF)</label>
-                <input type="text" value={form.invoice_ref} onChange={e => setForm(f => ({ ...f, invoice_ref: e.target.value }))}
-                  className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold" />
-              </div>
-            )}
+            {form.invoiced && (() => {
+              const billed = parseEuros(form.billed_value) || 0;
+              const part = form.invoice_value.trim() ? parseEuros(form.invoice_value) : null;
+              const upsell = parseEuros(form.upsell_value) || 0;
+              const vat = invoiceVatOf({ billed_value: billed, invoiced: true, invoice_value: part, upsell_value: upsell });
+              return (
+                <div className="col-span-2 sm:col-span-5 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-blue-50/50 border border-blue-100 rounded-lg p-3">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] text-gray-500 mb-1">Dados da fatura (nome e NIF)</label>
+                    <input type="text" value={form.invoice_ref} onChange={e => setForm(f => ({ ...f, invoice_ref: e.target.value }))}
+                      className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy bg-white focus:outline-none focus:border-gold" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-500 mb-1">Fatura passada em</label>
+                    <input type="date" value={form.invoice_issued_on} onChange={e => setForm(f => ({ ...f, invoice_issued_on: e.target.value }))}
+                      className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy bg-white focus:outline-none focus:border-gold" />
+                    <p className="text-[10px] text-gray-500 mt-0.5">{form.invoice_issued_on ? "Fatura passada" : "Vazio = fatura por passar"}</p>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-500 mb-1">Passada por</label>
+                    <select value={form.invoice_by} onChange={e => setForm(f => ({ ...f, invoice_by: e.target.value as FormState["invoice_by"] }))}
+                      className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy bg-white focus:outline-none focus:border-gold">
+                      <option value="Empresa">Empresa</option>
+                      <option value="Francisco">Francisco</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[10px] text-gray-500 mb-1">Valor na fatura, com IVA (€)</label>
+                    <input type="text" inputMode="decimal" value={form.invoice_value} onChange={e => setForm(f => ({ ...f, invoice_value: e.target.value }))}
+                      placeholder="Vazio = o serviço todo"
+                      className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy bg-white focus:outline-none focus:border-gold" />
+                    <p className="text-[10px] text-gray-500 mt-0.5">Só quando a fatura é de uma parte do serviço (ex.: só o colchão).</p>
+                  </div>
+                  <div className="col-span-2 flex flex-col justify-center gap-1.5">
+                    <p className="text-xs text-navy">
+                      O valor faturado já tem o IVA: <strong className="text-blue-700">IVA {money(vat)}</strong>
+                      {upsell > 0 && <span className="text-gray-500"> (com o upsell)</span>}
+                    </p>
+                    <button type="button" disabled={!billed}
+                      onClick={() => setForm(f => ({ ...f, billed_value: String(round2((parseEuros(f.billed_value) || 0) * (1 + INVOICE_VAT))) }))}
+                      className="self-start px-2.5 py-1 text-[11px] font-semibold rounded-md border border-blue-200 text-blue-700 bg-white hover:bg-blue-50 disabled:opacity-40">
+                      O cliente paga o IVA por cima: somar 23% ao valor
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>

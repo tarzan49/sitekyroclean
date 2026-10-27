@@ -2923,18 +2923,30 @@ function ownerUpsellOf(r) {
   return splitUpsell(value, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality), r.request_date).owner;
 }
 
+// src/lib/invoiceVat.ts
+var INVOICE_VAT = 0.23;
+var round23 = (n) => Math.round(n * 100) / 100;
+function vatInside(gross) {
+  return round23(gross - round23(gross / (1 + INVOICE_VAT)));
+}
+function serviceVatOf(r) {
+  if (!r.invoiced) return 0;
+  const billed = Number(r.billed_value) || 0;
+  const part = r.invoice_value === null || r.invoice_value === void 0 || r.invoice_value === "" ? billed : Math.min(Number(r.invoice_value) || 0, billed);
+  return vatInside(part);
+}
+
 // src/lib/teamAccounts.ts
 var REVIEW_PENALTY_SHARE = 0.05;
 var REVIEW_PENALTY_FROM = UPSELL_TIERS_FROM;
 var REVIEW_PENALTY_FROM_BY_TEAM = { "Porto 1": "", "Porto 2": "2026-10-15" };
 var REVIEW_PENALTY_LABEL = { "Porto 2": "sem fotos antes e depois e avaliação" };
-var INVOICE_VAT = 0.23;
 var REVIEW_PENALTY_ENABLED = false;
 function reviewPenaltyApplies(team, day) {
   return REVIEW_PENALTY_ENABLED && day >= (REVIEW_PENALTY_FROM_BY_TEAM[team] ?? REVIEW_PENALTY_FROM);
 }
-var round23 = (n) => Math.round(n * 100) / 100;
-var euros = (n) => `${round23(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
+var round24 = (n) => Math.round(n * 100) / 100;
+var euros = (n) => `${round24(n).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
 var dm = (date) => `${date.slice(8, 10)}/${date.slice(5, 7)}`;
 function labelOf(r) {
   const name = (r.client_name ?? "").trim();
@@ -2943,17 +2955,17 @@ function labelOf(r) {
   return name || city || "Serviço";
 }
 function ownerShareOf(r) {
-  return round23((Number(r.my_cut) || 0) + ownerUpsellOf(r));
+  return round24((Number(r.my_cut) || 0) + ownerUpsellOf(r));
 }
-var sum = (lines) => round23(lines.reduce((s, l) => s + l.amount, 0));
+var sum = (lines) => round24(lines.reduce((s, l) => s + l.amount, 0));
 function lineBlock(l, team) {
   const head = [dm(l.date), l.label, l.what].filter(Boolean).join(" · ");
   if (l.billed === void 0 || l.share === void 0) return [`${head}: ${euros(l.amount)}`];
   const parts = [`a minha parte ${euros(l.share)}`];
   if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
   if (l.vat && l.teamPart !== void 0) {
-    const net = round23(l.billed - l.vat);
-    const mine = round23(net - l.teamPart);
+    const net = round24(l.billed - l.vat);
+    const mine = round24(net - l.teamPart);
     const owed = [`a minha parte ${euros(mine)}`, `o IVA ${euros(l.vat)}`];
     if (l.upsellShare) owed.push(`a minha parte no upsell ${euros(l.upsellShare)}`);
     if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
@@ -3002,7 +3014,7 @@ function teamMessage(a) {
     for (const l of a.awaitingClient) out.push(paidToOwnerLine(l));
   }
   out.push("", `Total que me devem: ${euros(a.total)}`);
-  const vat = round23([...a.today, ...a.before].reduce((s, l) => s + (l.vat ?? 0), 0));
+  const vat = round24([...a.today, ...a.before].reduce((s, l) => s + (l.vat ?? 0), 0));
   if (vat > 0) out.push(`Dos quais IVA a entregar ao Estado: ${euros(vat)}`);
   return out.join("\n");
 }
@@ -3021,19 +3033,19 @@ function teamAccounts(rows, events, date, adjustments = []) {
     if (share <= 0) continue;
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
     const billed = Number(r.billed_value) || 0;
-    const net = r.invoiced ? round23(billed / (1 + INVOICE_VAT)) : billed;
-    const invoiceTeamPart = r.invoiced ? Math.floor(round23(net * 50)) / 100 : null;
-    const ownerUpsell = round23(share - (Number(r.my_cut) || 0));
+    const net = r.invoiced ? round24(billed - serviceVatOf(r)) : billed;
+    const invoiceTeamPart = r.invoiced ? Math.floor(round24(net * 50)) / 100 : null;
+    const ownerUpsell = round24(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
-      const teamPart = invoiceTeamPart !== null ? round23(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round23(billed + (Number(r.upsell_value) || 0) - share);
-      const invoice = r.invoiced ? { billed, vat: round23(billed - net) } : {};
+      const teamPart = invoiceTeamPart !== null ? round24(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round24(billed + (Number(r.upsell_value) || 0) - share);
+      const invoice = r.invoiced ? { billed, vat: round24(billed - net) } : {};
       if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart, ...invoice });
       continue;
     }
-    const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round23((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
-    const vat = r.invoiced ? round23(billed - net) : 0;
+    const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round24((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
+    const vat = r.invoiced ? round24(billed - net) : 0;
     const what = (r.description ?? "").trim();
-    const amount2 = invoiceTeamPart !== null ? round23(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round23(share + penalty);
+    const amount2 = invoiceTeamPart !== null ? round24(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round24(share + penalty);
     const line = {
       date: r.request_date,
       label: labelOf(r),
@@ -3053,7 +3065,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
   }
   for (const a of adjustments) {
     if (a.day > date || !Number(a.amount)) continue;
-    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round23(Number(a.amount)) });
+    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round24(Number(a.amount)) });
   }
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {
@@ -3066,7 +3078,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
       awaitingClient: b.awaitingClient,
       todayTotal: sum(b.today),
       beforeTotal: sum(b.before),
-      total: round23(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes))
+      total: round24(sum([...b.today, ...b.before, ...b.adjustments]) - sum(b.ownerOwes))
     };
     return { ...base, message: teamMessage(base) };
   }).filter((t) => t.total > 0).sort((a, b) => a.team.localeCompare(b.team));

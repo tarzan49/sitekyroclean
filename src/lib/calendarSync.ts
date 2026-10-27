@@ -26,10 +26,18 @@
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
 // - Linha apagada no CRM com o evento ainda no calendário → o evento fica em
 //   `ignored` e nunca volta a criar linha (dono, 2026-10-08).
+// - Fatura (dono, 2026-10-27: "nos serviços em que acresce IVA, estás a colocar
+//   no CRM esse valor direitinho?"). Numa linha com fatura, o valor com IVA vive
+//   no CRM: um evento que mude depois e diga o preço antes do IVA (Regina:
+//   "(209€)" no título, 257,07€ no CRM) não o apaga. Se o preço do calendário
+//   mudar mesmo, ganha o calendário e a linha fica para rever. Numa linha sem
+//   fatura, um evento que fale em IVA, fatura ou NIF deixa a linha para rever:
+//   quem decide se é com fatura é o dono, não a sincronização.
 import {
   AD_SOURCES, adSourceFromTitle, isServiceEvent, knownPlacesFrom, parseServiceEvent,
   type CalendarEvent, type CrmLocality, type ParsedService,
 } from './calendarServices';
+import { serviceVatOf } from './invoiceVat';
 
 /**
  * Só entram eventos criados a partir daqui. Os anteriores já estavam no CRM,
@@ -62,6 +70,10 @@ export interface SyncableRow {
   calendar_updated_at: string | null;
   calendar_missing_since: string | null;
   request_date?: string | null;
+  billed_value?: number | string | null;
+  my_cut?: number | string | null;
+  invoiced?: boolean | null;
+  invoice_value?: number | string | null;
 }
 
 export type CalendarInsert = ParsedService & {
@@ -90,6 +102,19 @@ const time = (iso: string | null) => (iso ? Date.parse(iso) : NaN);
 const LATE_SERVICE_MS = 60 * 60 * 1000;
 
 const BOT_BOOKED = /Marcado pelo bot/;
+
+const VAT_WORDS = /\b(iva|fatura|factura|nif|contribuinte)\b/i;
+
+/** O que fica para rever quando o evento fala em fatura e a linha não a tem. */
+export const VAT_HINT = 'O calendário fala em IVA, fatura ou NIF: confirma se é com fatura e se o valor tem o IVA';
+
+/** O evento fala em IVA, fatura ou NIF (título ou descrição). */
+export function mentionsInvoice(event: CalendarEvent): boolean {
+  return VAT_WORDS.test(`${event.summary}\n${event.description ?? ''}`);
+}
+
+const joinReview = (...notes: Array<string | null | undefined>) => notes.filter(Boolean).join(' · ') || null;
+const cents = (n: unknown) => Math.round((Number(n) || 0) * 100);
 
 /** Data de fecho de um serviço que entra agora no CRM. */
 export function closingDateOf(event: CalendarEvent): string {
@@ -134,6 +159,7 @@ export function planCalendarSync(
     if (!row) {
       plan.inserts.push({
         ...parsed,
+        needs_review: mentionsInvoice(event) ? joinReview(parsed.needs_review, VAT_HINT) : parsed.needs_review,
         booked_at: closingDateOf(event),
         calendar_event_id: event.id,
         calendar_updated_at: event.updated,
@@ -150,7 +176,7 @@ export function planCalendarSync(
       plan.counts.restored++;
     }
     if (!(time(row.calendar_updated_at) >= time(event.updated))) {
-      Object.assign(patch, parsed, { calendar_updated_at: event.updated });
+      Object.assign(patch, parsed, { calendar_updated_at: event.updated }, invoiceChanges(row, parsed, event));
       const current = row.source ?? CALENDAR_SOURCE;
       if (current !== source && SYNC_SOURCES.has(current)) patch.source = source;
       plan.counts.updated++;
@@ -173,6 +199,27 @@ export function planCalendarSync(
   }
 
   return plan;
+}
+
+/**
+ * O que muda na releitura de um evento por causa da fatura (ver o cabeçalho):
+ * com fatura, o valor com IVA do CRM fica quando o título diz o mesmo preço
+ * antes do IVA; sem fatura, um evento que fale nela fica para rever.
+ */
+function invoiceChanges(row: SyncableRow, parsed: ParsedService, event: CalendarEvent): Partial<CalendarPatch> {
+  if (!row.invoiced) {
+    return mentionsInvoice(event) ? { needs_review: joinReview(parsed.needs_review, VAT_HINT) } : {};
+  }
+  if (row.billed_value === undefined || row.billed_value === null) return {};
+  const crm = cents(row.billed_value);
+  const calendar = cents(parsed.billed_value);
+  if (calendar === crm) return {};
+  // Título com o preço antes do IVA: fica o do CRM (e a parte do dono que lá está).
+  if (Math.abs(calendar - (crm - cents(serviceVatOf(row)))) <= 2) {
+    return { billed_value: Number(row.billed_value), my_cut: Number(row.my_cut) || 0 };
+  }
+  const euros = (c: number) => `${(c / 100).toFixed(2).replace('.', ',').replace(/,00$/, '')}€`;
+  return { needs_review: joinReview(parsed.needs_review, `Com fatura: o calendário passou a dizer ${euros(calendar)} e o CRM tinha ${euros(crm)}. Confirma o valor com IVA`) };
 }
 
 /**

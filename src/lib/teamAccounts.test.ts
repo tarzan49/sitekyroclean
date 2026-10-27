@@ -147,6 +147,18 @@ describe('teamAccounts', () => {
     expect(r.teams[0].message).toContain('Total que me devem: 46,89€\nDos quais IVA a entregar ao Estado: 14,77€');
   });
 
+  it('an invoice for only part of the service: only that part has VAT (27 Oct, mattress for the condominium)', () => {
+    // 99€ sem fatura + colchão 60€ + IVA = 73,80€: o cliente paga 172,80€, IVA 13,80€.
+    const r = teamAccounts([row({ calendar_event_id: 'e3', request_date: '2026-11-03', billed_value: 172.8, my_cut: 80, invoiced: true, invoice_value: 73.8 })], events, '2026-11-03');
+    expect(r.teams[0].message).toContain([
+      'COM FATURA: o cliente paga 172,80€, IVA incluído',
+      'Valor do serviço sem IVA: 159€',
+      'IVA a entregar ao Estado: 13,80€',
+      'Vossa parte (metade do valor sem IVA): 79,50€',
+    ].join('\n'));
+    expect(r.teams[0].total).toBe(93.3);
+  });
+
   it('without an invoice there is no VAT line', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40 })], events, '2026-10-14');
     expect(r.teams[0].message).not.toContain('IVA');

@@ -43,6 +43,7 @@
 // tem no calendário dela; nunca telefones nem moradas.
 import { eventTeam, type AvailabilityEvent } from './botAvailability';
 import { ownerUpsellOf, UPSELL_TIERS_FROM } from './crmUpsell';
+import { serviceVatOf } from './invoiceVat';
 
 /** Parte do valor do serviço que a equipa perde sem pedir a avaliação. */
 export const REVIEW_PENALTY_SHARE = 0.05;
@@ -52,8 +53,8 @@ export const REVIEW_PENALTY_FROM = UPSELL_TIERS_FROM;
 const REVIEW_PENALTY_FROM_BY_TEAM: Record<string, string> = { 'Porto 1': '', 'Porto 2': '2026-10-15' };
 /** O que falta para a equipa ficar com os 5%, como aparece na mensagem. */
 const REVIEW_PENALTY_LABEL: Record<string, string> = { 'Porto 2': 'sem fotos antes e depois e avaliação' };
-/** IVA de um serviço com fatura: vai por cima do valor e é do dono. */
-export const INVOICE_VAT = 0.23;
+/** IVA de um serviço com fatura: está dentro do valor e é do dono. */
+export { INVOICE_VAT } from './invoiceVat';
 
 /** Desligado a 14/10 à noite (dono): o modelo por serviço vai ser medido pelo bot do procedimento. */
 export const REVIEW_PENALTY_ENABLED = false;
@@ -78,6 +79,8 @@ export interface AccountRow {
   review_requested?: boolean | null;
   description?: string | null;
   invoiced?: boolean | null;
+  /** Fatura de só uma parte do serviço: o valor dessa parte, com IVA. Vazio = o serviço todo. */
+  invoice_value?: number | string | null;
   /** O cliente paga ao dono (transferência): a equipa não deve nada deste serviço. */
   paid_to_owner?: boolean | null;
   /** Pago ao dono: quando o cliente pagou. Sem data, a parte da equipa ainda não se desconta. */
@@ -247,7 +250,8 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const billed = Number(r.billed_value) || 0;
     // Com fatura, o IVA (23%) está incluído no preço e divide-se a meias: a equipa fica com metade
     // do valor sem IVA (dono, 2026-10-16, Aleixo: "temos que dividir o IVA... estava incluído no valor").
-    const net = r.invoiced ? round2(billed / (1 + INVOICE_VAT)) : billed;
+    // Fatura de só uma parte do serviço (`invoice_value`): só essa parte tem IVA.
+    const net = r.invoiced ? round2(billed - serviceVatOf(r)) : billed;
     const invoiceTeamPart = r.invoiced ? Math.floor(round2(net * 50)) / 100 : null;
     const ownerUpsell = round2(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
