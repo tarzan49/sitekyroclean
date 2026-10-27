@@ -3451,7 +3451,7 @@ function bookedServices(phone, events, now) {
     const at = lisbon(t);
     const kind = m[1] ? "a confirmar" : /pr/i.test(m[2]) ? "pré-reserva" : "serviço";
     const service = (e.summary ?? "").replace(KIND, "").replace(/^[\s?\d€()]+/, "").replace(/\(an[úu]ncio[^)]*\)\s*/i, "").split(" - ")[0].replace(/^[–\s]+/, "").trim();
-    out.push({ id: e.id ?? "", title: e.summary ?? "", description: e.description ?? "", date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, "0") : ""}`, kind, service });
+    out.push({ id: e.id ?? "", title: e.summary ?? "", description: e.description ?? "", date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, "0") : ""}`, kind, service, ...e.created ? { created: e.created } : {} });
   }
   return out.sort((a, b) => (a.date + a.time.padStart(5, "0")).localeCompare(b.date + b.time.padStart(5, "0")));
 }

@@ -4,13 +4,19 @@
 // leave the function: day, hour, kind and what is done, never other clients.
 import { lisbon, type AvailabilityEvent } from './botAvailability';
 
-export interface BookedService { id: string; date: string; time: string; kind: 'serviço' | 'a confirmar' | 'pré-reserva'; service: string; title: string; description: string }
+export interface BookedService {
+  id: string; date: string; time: string; kind: 'serviço' | 'a confirmar' | 'pré-reserva'; service: string; title: string; description: string;
+  /** When the event was created (the feed's CREATED, UTC ISO), so the bot's team notice tells a new service
+   *  from an update (27 Oct 2026: a price correction on an event booked 2 days before went out as "Serviço novo").
+   *  Absent when the event has none. */
+  created?: string;
+}
 
 const digits = (s: string) => s.replace(/\D/g, '');
 const KIND = /^\s*(?:(a confirmar)\s*·\s*)?(servi[cç]o|pr[ée]-reserva)\b/i;
 
 /** The client's services from 12 h ago to 60 days ahead, by the last 9 digits of the phone. */
-export function bookedServices(phone: string, events: (AvailabilityEvent & { id?: string })[], now: Date): BookedService[] {
+export function bookedServices(phone: string, events: (AvailabilityEvent & { id?: string; created?: string })[], now: Date): BookedService[] {
   const key9 = digits(phone).slice(-9);
   if (key9.length !== 9) return [];
   const from = now.getTime() - 12 * 3_600_000, to = now.getTime() + 60 * 86_400_000;
@@ -25,7 +31,7 @@ export function bookedServices(phone: string, events: (AvailabilityEvent & { id?
     const kind = m[1] ? 'a confirmar' : /pr/i.test(m[2]) ? 'pré-reserva' : 'serviço';
     // "Serviço 108€ (215€) Impermeabilização Premium de 8 cadeiras - 965… - Adriana - Rua…" → the part before the first " - ".
     const service = (e.summary ?? '').replace(KIND, '').replace(/^[\s?\d€()]+/, '').replace(/\(an[úu]ncio[^)]*\)\s*/i, '').split(' - ')[0].replace(/^[–\s]+/, '').trim();
-    out.push({ id: e.id ?? '', title: e.summary ?? '', description: e.description ?? '', date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, '0') : ''}`, kind, service });
+    out.push({ id: e.id ?? '', title: e.summary ?? '', description: e.description ?? '', date: at.date, time: `${Math.floor(at.minutes / 60)}h${at.minutes % 60 ? String(at.minutes % 60).padStart(2, '0') : ''}`, kind, service, ...(e.created ? { created: e.created } : {}) });
   }
   return out.sort((a, b) => (a.date + a.time.padStart(5, '0')).localeCompare(b.date + b.time.padStart(5, '0')));
 }

@@ -22,4 +22,12 @@ describe('bookedServices', () => {
     expect(r.map(x => [x.kind, x.time])).toEqual([['a confirmar', '14h'], ['pré-reserva', '10h']]);
     expect(r[0].service).toBe('Limpeza de sofá de 3 lugares');
   });
+  it('passes on when the event was created, and leaves it out when the event has none', () => {
+    const r = bookedServices('351912345678', [
+      { ...ev('2026-10-28T09:00:00Z', 'Serviço 89€ (89€) Limpeza de sofá - 912345678 - Juliana'), created: '2026-10-25T14:02:11Z' },
+      { ...ev('2026-10-29T09:00:00Z', 'Pré-reserva – Juliana – Porto – sofá – 89€'), description: 'bot:351912345678@s.whatsapp.net' },
+    ], now);
+    expect(r.map(x => x.created)).toEqual(['2026-10-25T14:02:11Z', undefined]);
+    expect('created' in r[1]).toBe(false);
+  });
 });
