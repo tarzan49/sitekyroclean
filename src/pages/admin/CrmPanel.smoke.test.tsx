@@ -33,33 +33,43 @@ describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
   beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-10-27T11:00:00Z') }); updates.length = 0; });
   afterEach(() => { vi.useRealTimers(); });
 
-  it('filtra por estado, um de cada vez, e mostra o IVA incluído ou à parte', async () => {
+  it('filtra por estado, sem colunas de fatura nem de avaliação na lista', async () => {
     render(<CrmPanel />);
     await waitFor(() => expect(shown()).toHaveLength(4));
     expect(shown()).not.toContain('Setembro por passar');
-
-    expect(filters().getByRole('button', { name: /Fatura por passar\s*2/ })).toBeTruthy();
-    fireEvent.click(filters().getByRole('button', { name: /Fatura por passar/ }));
-    expect(shown()).toEqual(['Pack IVA incluído', 'Sofá IVA à parte']);
-    expect(screen.getAllByText('+ IVA 48.07€').length).toBeGreaterThan(0);
-    // O upsell vai na mesma fatura: 829€, IVA 155,02€.
-    expect(screen.getAllByText('IVA incl. 155.02€').length).toBeGreaterThan(0);
-    expect(screen.getByText(/IVA à parte: 209€ \+ 48.07€ de IVA = 257.07€/)).toBeTruthy();
+    expect(filters().queryByRole('button', { name: /fatura/i })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'Fatura' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'Avaliação' })).toBeNull();
 
     // Todos os meses: entra a de setembro.
     fireEvent.click(screen.getByLabelText('Todos os meses'));
-    expect(shown()).toEqual(['Pack IVA incluído', 'Setembro por passar', 'Sofá IVA à parte']);
+    expect(shown()).toHaveLength(5);
     fireEvent.click(screen.getByLabelText('Todos os meses'));
 
     fireEvent.click(filters().getByRole('button', { name: /Por pagar/ }));
     expect(shown()).toEqual(['Colchão por pagar']);
-
-    // Sem fatura → por passar, com um toque.
-    fireEvent.click(screen.getAllByRole('button', { name: 'Sem fatura' })[0]);
-    await waitFor(() => expect(updates).toHaveLength(1));
-    expect(updates[0]).toMatchObject({ id: 'r3', patch: { invoiced: true, invoice_by: 'Empresa', invoice_issued_on: null } });
-
     fireEvent.click(filters().getByRole('button', { name: /^Todos/ }));
     expect(shown()).toHaveLength(4);
+  });
+
+  it('Com fatura abre a aba Faturas e IVA: IVA do mês, pago e por pagar, sem o Francisco', async () => {
+    render(<CrmPanel />);
+    await waitFor(() => expect(shown()).toHaveLength(4));
+    fireEvent.click(screen.getByRole('button', { name: /Com fatura/ }));
+    expect(screen.getByRole('tab', { name: 'Faturas e IVA' }).getAttribute('aria-selected')).toBe('true');
+    // Outubro: 48,07 + 155,02 (com o upsell) = 203,09; o Francisco fica de fora.
+    expect(screen.getAllByText('203.09€').length).toBeGreaterThan(0);
+    expect(screen.getByText(/1 fatura do Francisco \(14.77€ de IVA, já entregue\)/)).toBeTruthy();
+    expect(screen.getByText('Rita Teste')).toBeTruthy();
+    expect(screen.queryByText('Joana Teste')).toBeNull();
+
+    // Setembro, por mês.
+    fireEvent.click(screen.getByText(/setembro de 2026/i));
+    expect(screen.getByText('Lia Teste')).toBeTruthy();
+
+    // Passar a fatura com um toque.
+    fireEvent.click(screen.getByRole('button', { name: 'Fatura por passar' }));
+    await waitFor(() => expect(updates).toHaveLength(1));
+    expect(updates[0]).toMatchObject({ id: 'r5', patch: { invoice_issued_on: '2026-10-27' } });
   });
 });

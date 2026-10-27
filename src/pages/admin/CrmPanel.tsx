@@ -11,7 +11,9 @@ import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmReviews from "./CrmReviews";
 import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
-import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, upsellWithoutVatOf, vatToDeliverOf, type InvoiceStatus } from "@/lib/invoiceVat";
+import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, upsellWithoutVatOf, vatToDeliverOf } from "@/lib/invoiceVat";
+import { INVOICE_CHIP, dayMonth, invoiceTitle, money, vatLine } from "./crmInvoiceUi";
+import CrmVat from "./CrmVat";
 
 interface ServiceRequest {
   id: string;
@@ -61,58 +63,25 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 // sem IVA, como nas contas das equipas, e o IVA aparece à parte (vatToDeliverOf).
 const ownerUpsellNetOf = (r: ServiceRequest) => ownerUpsellOf({ ...r, upsell_value: upsellWithoutVatOf(r) });
 const cutOf = (r: ServiceRequest) => round2((ownerServiceCutWithoutVat(r) ?? r.my_cut) + ownerUpsellNetOf(r));
-const money = (n: number) => `${n.toFixed(2).replace(/\.00$/, "")}€`;
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
 
 // Filtros da aba Pedidos (dono, 2026-10-27: "um botão de filtro [...] por pagar,
 // por fatura [...] em vez de me aparecer todas as informações, aparece só uma").
-type StatusFilter = "all" | "unpaid" | "paid" | "to_issue" | "invoiced" | "no_invoice" | "review";
+// As faturas saíram daqui para a aba "Faturas e IVA" (dono, 2026-10-27).
+type StatusFilter = "all" | "unpaid" | "paid" | "review";
 const STATUS_FILTERS: ReadonlyArray<readonly [StatusFilter, string]> = [
-  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["to_issue", "Fatura por passar"],
-  ["invoiced", "Com fatura"], ["no_invoice", "Sem fatura"], ["review", "Para rever"],
+  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["review", "Para rever"],
 ];
 const matchesStatus = (r: ServiceRequest, f: StatusFilter) => {
   switch (f) {
     case "unpaid": return !r.paid;
     case "paid": return r.paid;
-    case "to_issue": return invoiceStatusOf(r) === "to_issue";
-    case "invoiced": return r.invoiced;
-    case "no_invoice": return !r.invoiced;
     case "review": return !!r.needs_review;
     default: return true;
   }
 };
-
-const INVOICE_CHIP: Record<InvoiceStatus, { short: string; long: string; cls: string }> = {
-  none: { short: "Não", long: "Sem fatura", cls: "bg-gray-50 text-gray-500 border-gray-200" },
-  to_issue: { short: "Por passar", long: "Fatura por passar", cls: "bg-amber-50 text-amber-800 border-amber-300" },
-  issued: { short: "Passada", long: "Fatura passada", cls: "bg-blue-50 text-blue-700 border-blue-200" },
-};
-
-/**
- * Como o IVA foi combinado (dono, 2026-10-27: "coloca lá que o IVA já está
- * incluído nesse preço [...] nas outras em que eu pedi IVA à parte, tens que
- * mostrar que o IVA estava realmente à parte"). Curto para a tabela.
- */
-function vatLine(r: ServiceRequest, short = false): string {
-  const vat = invoiceVatOf(r);
-  const gross = r.billed_value + (Number(r.upsell_value) || 0);
-  if (r.vat_on_top) return short ? `+ IVA ${money(vat)}` : `IVA à parte: ${money(round2(gross - vat))} + ${money(vat)} de IVA = ${money(gross)}`;
-  return short ? `IVA incl. ${money(vat)}` : `IVA incluído no preço: ${money(gross)}, dos quais ${money(vat)} de IVA`;
-}
-
-/** "28/10", a partir de AAAA-MM-DD. */
-const dayMonth = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
-
-function invoiceTitle(r: ServiceRequest): string {
-  const status = invoiceStatusOf(r);
-  if (status === "none") return "Sem fatura. Carrega para passar a com fatura (IVA 23% incluído no valor).";
-  const vat = `${vatLine(r)}${r.invoice_value != null ? ` (fatura de ${money(Number(r.invoice_value))})` : ""}`;
-  if (status === "to_issue") return `Fatura por passar · ${vat}. Carrega quando a passares.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
-  return `Fatura passada a ${dayMonth(r.invoice_issued_on!)}${r.invoice_by ? ` (${r.invoice_by})` : ""} · ${vat}. Carrega para editar.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
-}
 
 function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -183,7 +152,7 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "servicos" | "avaliacoes" | "upsell">("pedidos");
+  const [view, setView] = useState<"pedidos" | "iva" | "servicos" | "avaliacoes" | "upsell">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
   const [waContacts, setWaContacts] = useState<WhatsAppContactRow[] | null>(null);
@@ -478,12 +447,6 @@ const CrmPanel = () => {
     setRecords(prev => prev.map(x => x.id === r.id ? { ...x, ...patch } : x));
   };
 
-  const toggleReview = async (r: ServiceRequest) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: err } = await (supabase as any).from("service_requests").update({ review_requested: !r.review_requested }).eq("id", r.id);
-    if (!err) setRecords(prev => prev.map(x => x.id === r.id ? { ...x, review_requested: !x.review_requested } : x));
-  };
-
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -566,7 +529,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto" role="tablist">
-        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["iva", "Faturas e IVA"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold whitespace-nowrap -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -587,6 +550,8 @@ const CrmPanel = () => {
           allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))}
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
+
+      {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
 
       {view === "avaliacoes" && <CrmReviews services={records} />}
 
@@ -627,19 +592,19 @@ const CrmPanel = () => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Por pagar</p>
           <p className="text-xl font-bold text-red-600">{totals.unpaidCount} <span className="text-xs font-medium text-red-500">({money(totals.unpaidValue)})</span></p>
         </button>
-        <button type="button" onClick={() => pickStatus(totals.toIssueCount ? "to_issue" : "invoiced")} aria-pressed={statusFilter === "to_issue" || statusFilter === "invoiced"}
-          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "to_issue" || statusFilter === "invoiced" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
+        <button type="button" onClick={() => setView("iva")} title="Abrir as faturas e o IVA de cada mês"
+          className="text-left bg-white border border-blue-200 rounded-xl p-4 transition-colors hover:border-blue-400">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Com fatura</p>
           <p className="text-xl font-bold text-navy">{totals.invoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.invoicedValue)})</span></p>
           {totals.invoicedVat > 0 && <p className="text-[11px] font-medium text-blue-700 mt-0.5">IVA a entregar {money(totals.invoicedVat)}</p>}
           {totals.toIssueCount > 0 && <p className="text-[11px] font-semibold text-amber-700">{totals.toIssueCount} por passar</p>}
+          <p className="text-[11px] font-semibold text-blue-700 mt-0.5">Ver faturas e IVA ›</p>
         </button>
-        <button type="button" onClick={() => pickStatus("no_invoice")} aria-pressed={statusFilter === "no_invoice"}
-          className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "no_invoice" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Sem fatura</p>
           <p className="text-xl font-bold text-navy">{totals.notInvoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.notInvoicedValue)})</span></p>
           <p className="text-[11px] text-gray-500 mt-0.5">{totals.invoicedValue + totals.notInvoicedValue > 0 ? Math.round(totals.notInvoicedValue / (totals.invoicedValue + totals.notInvoicedValue) * 100) : 0}% do valor do mês</p>
-        </button>
+        </div>
       </div>
 
       {/* Locality breakdown */}
@@ -667,7 +632,7 @@ const CrmPanel = () => {
               <button key={id} type="button" onClick={() => setStatusFilter(id)} aria-pressed={active}
                 className={`shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-navy text-white border-navy" : "bg-white text-navy border-gray-200 hover:border-navy/30"}`}>
                 {label}
-                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : id === "to_issue" && statusCounts[id] ? "text-amber-700" : id === "unpaid" && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
+                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : id === "unpaid" && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
               </button>
             );
           })}
@@ -705,7 +670,7 @@ const CrmPanel = () => {
         </div>
       )}
 
-      {/* Telemóvel: cartões em vez das 14 colunas da tabela */}
+      {/* Telemóvel: cartões em vez das 12 colunas da tabela */}
       <div className="md:hidden space-y-2">
         {loading && <p className="text-center py-6 text-sm text-gray-400">A carregar...</p>}
         {!loading && filtered.length === 0 && (
@@ -734,8 +699,6 @@ const CrmPanel = () => {
               {r.calendar_missing_since && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>}
               {r.needs_review && <button onClick={() => editRow(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
               <button onClick={() => togglePaid(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
-              <button onClick={() => advanceInvoice(r)} title={invoiceTitle(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${INVOICE_CHIP[invoiceStatusOf(r)].cls}`}>{INVOICE_CHIP[invoiceStatusOf(r)].long}</button>
-              <button onClick={() => toggleReview(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.review_requested ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>{r.review_requested ? "Avaliação pedida" : "Avaliação não pedida"}</button>
               <div className="ml-auto flex items-center gap-1">
                 {r.calendar_missing_since && <button onClick={() => keepMissing(r)} className="px-2 py-1 text-[11px] font-bold rounded-md border border-gray-200 text-navy">Manter</button>}
                 <button onClick={() => editRow(r)} aria-label="Editar" className="p-2 text-gray-500 hover:text-navy rounded-md"><Pencil className="w-4 h-4" /></button>
@@ -751,21 +714,21 @@ const CrmPanel = () => {
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
-              {["4%", "7%", "14%", "9%", "9%", "9%", "7%", "7%", "6%", "5%", "6%", "7%", "5%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+              {["4%", "7%", "19%", "10%", "10%", "10%", "8%", "8%", "7%", "6%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", "Fatura", "Avaliação", ""].map(h => (
+                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", ""].map(h => (
                   <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={14} className="text-center py-10 text-gray-400">A carregar...</td></tr>
+                <tr><td colSpan={12} className="text-center py-10 text-gray-400">A carregar...</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={14} className="text-center py-10 text-gray-400">
+                <tr><td colSpan={12} className="text-center py-10 text-gray-400">
                   {!allMonths && monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
                 </td></tr>
               )}
@@ -810,18 +773,6 @@ const CrmPanel = () => {
                   <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
                       {r.paid ? "Pago" : "Por pagar"}
-                    </button>
-                  </td>
-                  <td className="px-2 py-2">
-                    <button onClick={() => advanceInvoice(r)} title={invoiceTitle(r)}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap transition-colors ${INVOICE_CHIP[invoiceStatusOf(r)].cls}`}>
-                      {INVOICE_CHIP[invoiceStatusOf(r)].short}
-                    </button>
-                  </td>
-                  <td className="px-2 py-2">
-                    <button onClick={() => toggleReview(r)} title="A equipa pediu a avaliação? Sem isso, as contas da noite somam 5% do valor (Porto sempre, outras equipas desde 19/10)"
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.review_requested ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
-                      {r.review_requested ? "Pedida" : "Não"}
                     </button>
                   </td>
                   <td className="px-1 py-2">
