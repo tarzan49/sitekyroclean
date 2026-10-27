@@ -465,6 +465,17 @@ const CrmPanel = () => {
     setRecords(prev => prev.map(x => x.id === r.id ? { ...x, client_paid_owner_at: at } : x));
   };
 
+  // Um só botão de pagamento. Já paguei à equipa mas o cliente ainda não me pagou:
+  // "Falta receber", e carregar marca que recebi.
+  const paidButton = (r: ServiceRequest, size: string) => {
+    if (clientOwesOwner(r)) return (
+      <button onClick={() => markClientPaid(r)} title="Já paguei à equipa, falta o cliente pagar-me. Carregar = recebi." className={`${size} whitespace-nowrap rounded-full font-bold border bg-orange-50 text-orange-700 border-orange-300`}>Falta receber</button>
+    );
+    return (
+      <button onClick={() => togglePaid(r)} className={`${size} whitespace-nowrap rounded-full font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
+    );
+  };
+
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -716,8 +727,7 @@ const CrmPanel = () => {
               {quizSummary?.quizServiceIds.has(r.id) && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>}
               {r.calendar_missing_since && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>}
               {r.needs_review && <button onClick={() => editRow(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
-              {clientOwesOwner(r) && <button onClick={() => markClientPaid(r)} title="O cliente pagou-me (sai da lista Clientes devem-me)" className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-orange-50 text-orange-700 border-orange-300">Deve-me · Cliente pagou</button>}
-              <button onClick={() => togglePaid(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
+              {paidButton(r, "px-2 py-1 text-[11px]")}
               <div className="ml-auto flex items-center gap-1">
                 {r.calendar_missing_since && <button onClick={() => keepMissing(r)} className="px-2 py-1 text-[11px] font-bold rounded-md border border-gray-200 text-navy">Manter</button>}
                 <button onClick={() => editRow(r)} aria-label="Editar" className="p-2 text-gray-500 hover:text-navy rounded-md"><Pencil className="w-4 h-4" /></button>
@@ -790,10 +800,7 @@ const CrmPanel = () => {
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r, lisbonDay(new Date())))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
-                    {clientOwesOwner(r) && <button onClick={() => markClientPaid(r)} title="O cliente pagou-me (sai da lista Clientes devem-me)" className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-orange-50 text-orange-700 border-orange-300">Deve-me · Cliente pagou</button>}
-                    <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
-                      {r.paid ? "Pago" : "Por pagar"}
-                    </button>
+                    {paidButton(r, "px-2 py-0.5 text-[10px]")}
                   </td>
                   <td className="px-1 py-2">
                     <div className="flex items-center justify-end gap-0.5">
