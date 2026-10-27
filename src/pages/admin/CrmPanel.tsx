@@ -306,7 +306,7 @@ const CrmPanel = () => {
   const filteredSums = useMemo(() => ({
     billed: round2(filtered.reduce((s, r) => s + r.billed_value + (Number(r.upsell_value) || 0), 0)),
     cut: round2(filtered.reduce((s, r) => s + cutOf(r), 0)),
-    vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r), 0)),
+    vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0)),
   }), [filtered]);
 
   /** Carregar outra vez no filtro ligado volta a "Todos". */
@@ -326,7 +326,7 @@ const CrmPanel = () => {
     const noInv = monthRecords.filter(r => !r.invoiced);
     const invoicedValue = inv.reduce((s, r) => s + r.billed_value, 0);
     const notInvoicedValue = noInv.reduce((s, r) => s + r.billed_value, 0);
-    const invoicedVat = round2(inv.reduce((s, r) => s + vatToDeliverOf(r), 0));
+    const invoicedVat = round2(inv.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0));
     const toIssueCount = inv.filter(r => invoiceStatusOf(r) === "to_issue").length;
     return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
   }, [monthRecords]);
@@ -805,7 +805,7 @@ const CrmPanel = () => {
                     {money(r.billed_value)}
                     {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>{vatLine(r, true)}</span>}
                   </td>
-                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
+                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r, lisbonDay(new Date())))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>

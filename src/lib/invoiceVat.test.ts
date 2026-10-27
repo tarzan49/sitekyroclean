@@ -37,9 +37,12 @@ describe('invoiceVat', () => {
   });
 
   it('VAT to deliver: only company invoices, never Francisco\'s (already delivered)', () => {
-    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Empresa' })).toBe(23);
-    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Francisco' })).toBe(0);
-    expect(vatToDeliverOf({ billed_value: 123, invoiced: false })).toBe(0);
+    const today = '2026-10-27';
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Empresa', request_date: '2026-10-27' }, today)).toBe(23);
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Francisco', request_date: '2026-10-01' }, today)).toBe(0);
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: false, request_date: '2026-10-01' }, today)).toBe(0);
+    // ainda não feito: não conta
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Empresa', request_date: '2026-11-03' }, today)).toBe(0);
   });
 
   it('owner cut without VAT: half of the value without VAT, team gets the cent rounded down', () => {

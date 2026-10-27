@@ -27,6 +27,8 @@ export interface InvoiceRow {
   vat_on_top?: boolean | null;
   /** Quem passou a fatura: "Francisco" (até 20/10, IVA já entregue por ele) ou "Empresa". */
   invoice_by?: string | null;
+  /** Dia do serviço (AAAA-MM-DD). */
+  request_date?: string | null;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -67,9 +69,13 @@ export function priceBeforeVatOf(r: InvoiceRow): number {
  * "o valor exatamente certinho que eu tenho que entregar"): só os serviços com
  * fatura da empresa. As faturas do Francisco ficam de fora: o IVA delas já foi
  * entregue por ele, e o cut desses serviços fica como estava.
+ *
+ * Só serviços já feitos (dono, 2026-10-27: "só serviços já feitos"): um serviço
+ * marcado para depois de `today` (dia de Lisboa, AAAA-MM-DD) ainda não conta.
  */
-export function vatToDeliverOf(r: InvoiceRow): number {
+export function vatToDeliverOf(r: InvoiceRow, today: string): number {
   if (!r.invoiced || r.invoice_by === 'Francisco') return 0;
+  if (r.request_date && r.request_date > today) return 0;
   return invoiceVatOf(r);
 }
 
