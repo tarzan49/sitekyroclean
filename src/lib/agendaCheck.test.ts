@@ -57,10 +57,10 @@ describe('agendaCheck', () => {
     expect(braga.issues.filter(i => i.problem.includes('mesma hora'))).toHaveLength(2);
   });
 
-  it('flags too little travel time and hours outside 10h-21h', () => {
-    const r = agendaCheck([ev('09:00', '10:00', GOOD, 'Braga'), ev('10:10', '11:00', GOOD, 'Braga')], TOMORROW, NOW);
+  it('flags too little travel time and hours outside 8h-21h', () => {
+    const r = agendaCheck([ev('07:00', '08:00', GOOD, 'Braga'), ev('08:10', '09:00', GOOD, 'Braga')], TOMORROW, NOW);
     expect(r.issues.map(i => `${i.time} ${i.problem}`)).toEqual([
-      '9h fora do horário (10h às 21h)', '10h10 menos de 30 min de viagem desde o serviço anterior',
+      '7h fora do horário (8h às 21h)', '8h10 menos de 30 min de viagem desde o serviço anterior',
     ]);
   });
 

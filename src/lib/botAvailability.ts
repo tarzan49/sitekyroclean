@@ -16,7 +16,7 @@
  *   without a team busies one of the teams of its region;
  * - each article takes its real time (sofa 1h, mattress 45 min, chair 10 min,
  *   rug 4 min per m², waterproofing +20 min), plus a margin for the drive;
- * - teams work every day until 21h, and the bot never offers before 10h or after 18h;
+ * - teams work every day until 21h, and the bot never offers before 9h (a client's own time from 8h) or after 18h;
  * - two times, near the team's other jobs that day when possible, and at an hour
  *   with no other service in the zone (owner, 9 Oct 2026: "tenta que os pedidos
  *   sejam sempre a horas diferentes, se for a mesma hora tem que me consultar").
@@ -153,7 +153,9 @@ function zoneFromPostalCode(code: string): TeamZone | null {
 const MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
 /** Drive between two jobs of the same team. There is no maps API: a flat margin on each side. */
 export const TRAVEL_MARGIN_MIN = 30;
-export const EARLIEST_HOUR = 10;
+/** Owner, 27 Oct 2026: "qualquer equipa trabalha depois das 8h, preferencialmente 9h". The bot offers from 9h; a time the client asks for is taken from 8h. */
+export const EARLIEST_HOUR = 9;
+export const WORK_FROM_HOUR = 8;
 export const DAY_END_HOUR = 21;
 /** Latest start the bot offers on its own (owner, 8 Oct 2026: nobody books 20h). A time the client asks for is still checked up to DAY_END_HOUR. */
 export const LAST_OFFER_HOUR = 18;
@@ -318,7 +320,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
     ? (busy.some(b => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1)
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
-  const early = (t: string) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
+  const early = (t: string) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
   const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
   const staggered = teams.every(t => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter(b => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;

@@ -2256,7 +2256,8 @@ function zoneFromPostalCode(code) {
 }
 var MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
 var TRAVEL_MARGIN_MIN = 30;
-var EARLIEST_HOUR = 10;
+var EARLIEST_HOUR = 9;
+var WORK_FROM_HOUR = 8;
 var DAY_END_HOUR = 21;
 var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
@@ -2399,7 +2400,7 @@ function slotState(busy, teams, region, from, to, cleaning = true) {
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t) => (b) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
   const spare = (t) => STAGGER_TEAMS.has(t) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
-  const early = (t) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
+  const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
   const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
   const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter((b) => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
@@ -2865,7 +2866,7 @@ function agendaCheck(events, date, now, pendingDays = 7) {
     if (t.team && own && !teamWorks(t.team, t.from, t.to)) {
       add(t, `${t.team} nos dias úteis só trabalha das ${own.from}h às ${own.to}h`);
     } else {
-      const first = own && weekday2 ? Math.min(own.from, EARLIEST_HOUR) : EARLIEST_HOUR;
+      const first = own && weekday2 ? Math.min(own.from, WORK_FROM_HOUR) : WORK_FROM_HOUR;
       if (start < first * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
         add(t, `fora do horário (${first}h às ${DAY_END_HOUR}h)`);
       }

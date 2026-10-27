@@ -89,12 +89,12 @@ describe('botAvailability', () => {
     expect(chooseTeam([late], 'Porto', ...span('12:30', '13:30'))).toBeNull();
     // Saturday: Porto 2 works all day.
     expect(chooseTeam([ev('2026-10-10', '14:00', '15:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1')], 'Porto', at('2026-10-10', '15:00'), at('2026-10-10', '16:00'))).toBe('Porto 2');
-    // 8h and 9h only on weekdays, and only through Porto 2; Saturday starts at 10h.
+    // 8h and 9h only on weekdays, and only through Porto 2; Saturday starts at 9h.
     const thu = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, [], NOW));
     expect(thu.free[0].times.slice(0, 2)).toEqual(['8h', '9h']);
     const sat = ok(botAvailability({ city: 'Porto', date: '2026-10-10' }, [], NOW));
-    expect(sat.free[0].times[0]).toBe('10h');
-    expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08' }, [], NOW)).free[0].times[0]).toBe('10h');
+    expect(sat.free[0].times[0]).toBe('9h');
+    expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08' }, [], NOW)).free[0].times[0]).toBe('9h');
   });
 
   it('a service, pre-booking or "A confirmar" without a team busies one team of its region', () => {
@@ -115,7 +115,7 @@ describe('botAvailability', () => {
     ];
     const r = ok(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-08' }, events, NOW));
     expect(r.teams).toEqual(['Algarve']);
-    expect(r.free[0].times[0]).toBe('10h');
+    expect(r.free[0].times[0]).toBe('9h');
   });
 
   it('prefers a time next to a job the team already has that day', () => {
@@ -161,7 +161,7 @@ describe('botAvailability', () => {
       { ...ev('2026-10-08', '10:00', '20:00', 'Serviço 1€ - Faro', 'Equipa: Algarve'), status: 'CANCELLED' },
       { summary: 'Serviço 1€ - Faro', description: 'Equipa: Algarve', status: 'CONFIRMED', start: null, end: null },
     ];
-    expect(ok(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-08' }, events, NOW)).free[0].times[0]).toBe('10h');
+    expect(ok(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-08' }, events, NOW)).free[0].times[0]).toBe('9h');
     expect(botAvailability({ ownerTime: true, city: 'Faro', date: '8/10' }, [], NOW)).toHaveProperty('error');
     expect(botAvailability({ ownerTime: true, city: 'Faro', date: '2026-10-01' }, [], NOW)).toHaveProperty('error');
     expect(botAvailability({ ownerTime: true, city: 'Faro', time: '15h' }, [], NOW)).toHaveProperty('error');

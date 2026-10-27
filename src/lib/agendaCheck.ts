@@ -9,7 +9,7 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, EARLIEST_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
+  DAY_END_HOUR, WORK_FROM_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
   WATERPROOFING_TEAMS, teamWorks, dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent, type TeamZone,
 } from './botAvailability';
 
@@ -109,7 +109,7 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
     if (t.team && own && !teamWorks(t.team, t.from, t.to)) {
       add(t, `${t.team} nos dias úteis só trabalha das ${own.from}h às ${own.to}h`);
     } else {
-      const first = own && weekday ? Math.min(own.from, EARLIEST_HOUR) : EARLIEST_HOUR;
+      const first = own && weekday ? Math.min(own.from, WORK_FROM_HOUR) : WORK_FROM_HOUR;
       if (start < first * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
         add(t, `fora do horário (${first}h às ${DAY_END_HOUR}h)`);
       }
