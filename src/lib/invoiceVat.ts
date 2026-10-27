@@ -2,9 +2,10 @@
 // (teamAccounts.ts, que vai no pacote do bot: só imports relativos aqui).
 //
 // Com fatura (`invoiced`), o valor do serviço no CRM é o que o cliente paga e
-// tem o IVA de 23% lá dentro: IVA = valor × 23 ÷ 123 (dono, 2026-10-16). Quando
-// o cliente paga o IVA por cima, o valor do CRM já é o total com IVA (Regina,
-// 209€ + 48,07€ = 257,07€). Uma fatura de só uma parte do serviço (só o
+// tem o IVA de 23% lá dentro: IVA = valor × 23 ÷ 123 (dono, 2026-10-16). Como
+// foi combinado fica em `vat_on_top` (dono, 2026-10-27): false = IVA incluído
+// no preço (Marina, 729€); true = IVA à parte, e o valor do CRM é o total com
+// IVA (Regina, 209€ + 48,07€ = 257,07€). As contas fazem-se igual nos dois. Uma fatura de só uma parte do serviço (só o
 // colchão, para o condomínio) leva o valor dessa parte em `invoice_value`.
 //
 // O upsell de um serviço com fatura também vai na fatura (Marina, 19/10), por
@@ -22,6 +23,8 @@ export interface InvoiceRow {
   invoice_value?: number | string | null;
   invoice_issued_on?: string | null;
   upsell_value?: number | string | null;
+  /** IVA à parte (por cima do preço combinado); false = IVA incluído no preço. */
+  vat_on_top?: boolean | null;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -50,4 +53,9 @@ export function invoiceVatOf(r: InvoiceRow): number {
 export function invoiceStatusOf(r: InvoiceRow): InvoiceStatus {
   if (!r.invoiced) return 'none';
   return r.invoice_issued_on ? 'issued' : 'to_issue';
+}
+
+/** O preço combinado sem o IVA, quando o IVA foi à parte: o valor do serviço menos o IVA. */
+export function priceBeforeVatOf(r: InvoiceRow): number {
+  return round2((Number(r.billed_value) || 0) - serviceVatOf(r));
 }

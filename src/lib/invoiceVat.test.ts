@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { invoiceStatusOf, invoiceVatOf, serviceVatOf } from './invoiceVat';
+import { invoiceStatusOf, invoiceVatOf, priceBeforeVatOf, serviceVatOf } from './invoiceVat';
 
 describe('invoiceVat', () => {
   it('VAT is inside the value, 23%', () => {
@@ -28,5 +28,11 @@ describe('invoiceVat', () => {
     expect(invoiceStatusOf({ billed_value: 79, invoiced: false })).toBe('none');
     expect(invoiceStatusOf({ billed_value: 79, invoiced: true })).toBe('to_issue');
     expect(invoiceStatusOf({ billed_value: 79, invoiced: true, invoice_issued_on: '2026-10-28' })).toBe('issued');
+  });
+
+  it('VAT on top: the agreed price is the value minus the VAT', () => {
+    expect(priceBeforeVatOf({ billed_value: 257.07, invoiced: true, vat_on_top: true })).toBe(209);
+    // Só o colchão com IVA por cima: 159€ + 13,80€.
+    expect(priceBeforeVatOf({ billed_value: 172.8, invoiced: true, invoice_value: 73.8, vat_on_top: true })).toBe(159);
   });
 });

@@ -81,6 +81,8 @@ export interface AccountRow {
   invoiced?: boolean | null;
   /** Fatura de só uma parte do serviço: o valor dessa parte, com IVA. Vazio = o serviço todo. */
   invoice_value?: number | string | null;
+  /** IVA à parte (por cima do preço combinado); senão, incluído no preço. As contas são as mesmas. */
+  vat_on_top?: boolean | null;
   /** O cliente paga ao dono (transferência): a equipa não deve nada deste serviço. */
   paid_to_owner?: boolean | null;
   /** Pago ao dono: quando o cliente pagou. Sem data, a parte da equipa ainda não se desconta. */
@@ -108,6 +110,8 @@ export interface AccountLine {
   vat?: number;
   /** Com fatura: a parte da equipa, metade do valor sem IVA. */
   teamPart?: number;
+  /** Com fatura: o IVA foi à parte, por cima do preço combinado. */
+  vatOnTop?: boolean;
   /** Parte do dono no upsell, já dentro de `share`. */
   upsellShare?: number;
 }
@@ -176,7 +180,9 @@ function lineBlock(l: AccountLine, team: string): string[] {
     if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? 'sem avaliação'} ${euros(l.reviewPenalty)}`);
     return [
       head,
-      `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
+      l.vatOnTop
+        ? `COM FATURA, IVA À PARTE: o cliente paga ${euros(l.billed)} (${euros(net)} + ${euros(l.vat)} de IVA)`
+        : `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
       `Valor do serviço sem IVA: ${euros(net)}`,
       `IVA a entregar ao Estado: ${euros(l.vat)}`,
       `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
@@ -270,7 +276,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const line: AccountLine = {
       date: r.request_date!, label: labelOf(r), amount, billed, share,
       ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}),
-      ...(vat ? { vat, teamPart: invoiceTeamPart!, ...(ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {}) } : {}),
+      ...(vat ? { vat, teamPart: invoiceTeamPart!, ...(r.vat_on_top ? { vatOnTop: true } : {}), ...(ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {}) } : {}),
     };
     if (!team) { unassigned.push(line); continue; }
     const bucket = bucketOf(team);

@@ -45,6 +45,8 @@ interface ServiceRequest {
   invoice_by: string | null;
   /** Fatura de só uma parte do serviço: o valor dessa parte, com IVA. Vazio = o serviço todo. */
   invoice_value: number | null;
+  /** IVA à parte (por cima do preço combinado); false = IVA incluído no preço. O valor faturado tem sempre o IVA. */
+  vat_on_top: boolean;
   /** A equipa pediu a avaliação ao cliente; sem isso as contas da noite somam 5% do valor (src/lib/teamAccounts.ts). */
   review_requested: boolean;
 }
@@ -86,13 +88,25 @@ const INVOICE_CHIP: Record<InvoiceStatus, { short: string; long: string; cls: st
   issued: { short: "Passada", long: "Fatura passada", cls: "bg-blue-50 text-blue-700 border-blue-200" },
 };
 
+/**
+ * Como o IVA foi combinado (dono, 2026-10-27: "coloca lá que o IVA já está
+ * incluído nesse preço [...] nas outras em que eu pedi IVA à parte, tens que
+ * mostrar que o IVA estava realmente à parte"). Curto para a tabela.
+ */
+function vatLine(r: ServiceRequest, short = false): string {
+  const vat = invoiceVatOf(r);
+  const gross = r.billed_value + (Number(r.upsell_value) || 0);
+  if (r.vat_on_top) return short ? `+ IVA ${money(vat)}` : `IVA à parte: ${money(round2(gross - vat))} + ${money(vat)} de IVA = ${money(gross)}`;
+  return short ? `IVA incl. ${money(vat)}` : `IVA incluído no preço: ${money(gross)}, dos quais ${money(vat)} de IVA`;
+}
+
 /** "28/10", a partir de AAAA-MM-DD. */
 const dayMonth = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 
 function invoiceTitle(r: ServiceRequest): string {
   const status = invoiceStatusOf(r);
   if (status === "none") return "Sem fatura. Carrega para passar a com fatura (IVA 23% incluído no valor).";
-  const vat = `IVA ${money(invoiceVatOf(r))}${r.invoice_value != null ? ` (fatura de ${money(Number(r.invoice_value))})` : ""}`;
+  const vat = `${vatLine(r)}${r.invoice_value != null ? ` (fatura de ${money(Number(r.invoice_value))})` : ""}`;
   if (status === "to_issue") return `Fatura por passar · ${vat}. Carrega quando a passares.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
   return `Fatura passada a ${dayMonth(r.invoice_issued_on!)}${r.invoice_by ? ` (${r.invoice_by})` : ""} · ${vat}. Carrega para editar.${r.invoice_ref ? ` ${r.invoice_ref}` : ""}`;
 }
@@ -130,6 +144,7 @@ type FormState = {
   invoice_by: "Empresa" | "Francisco";
   /** Fatura de só uma parte do serviço; vazio = o serviço todo. */
   invoice_value: string;
+  vat_on_top: boolean;
   review_requested: boolean;
   locality: CrmLocality | "";
   phone: string;
@@ -152,6 +167,7 @@ const emptyForm = (): FormState => ({
   invoice_issued_on: "",
   invoice_by: "Empresa",
   invoice_value: "",
+  vat_on_top: false,
   review_requested: false,
   locality: "Porto",
   phone: "",
@@ -337,6 +353,7 @@ const CrmPanel = () => {
       invoice_issued_on: r.invoice_issued_on ?? "",
       invoice_by: r.invoice_by === "Francisco" ? "Francisco" : "Empresa",
       invoice_value: r.invoice_value != null ? String(r.invoice_value) : "",
+      vat_on_top: r.vat_on_top,
       review_requested: r.review_requested,
       locality: r.locality ?? "",
       phone: r.phone ?? "",
@@ -387,6 +404,7 @@ const CrmPanel = () => {
       invoice_issued_on: form.invoiced ? form.invoice_issued_on || null : null,
       invoice_by: form.invoiced ? form.invoice_by : null,
       invoice_value: invoiceValue,
+      vat_on_top: form.invoiced && form.vat_on_top,
       review_requested: form.review_requested,
       locality: form.locality,
       phone: form.phone.trim() || null,
@@ -469,12 +487,12 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "IVA", "Valor na fatura", "Fatura passada em", "Fatura passada por", "Dados da fatura", "Avaliação pedida"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago", "Fatura", "IVA", "IVA à parte", "Valor na fatura", "Fatura passada em", "Fatura passada por", "Dados da fatura", "Avaliação pedida"];
     const rows = filtered.map(r => [
       allMonths ? r.request_date : new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", quizSummary?.quizServiceIds.has(r.id) ? [r.source, QUIZ_BADGE].filter(Boolean).join(" + ") : r.source ?? "",
-      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", INVOICE_CHIP[invoiceStatusOf(r)].long, r.invoiced ? invoiceVatOf(r).toFixed(2) : "", r.invoice_value != null ? Number(r.invoice_value).toFixed(2) : "", r.invoice_issued_on ?? "", r.invoiced ? r.invoice_by ?? "" : "", r.invoice_ref ?? "", r.review_requested ? "Sim" : "Não",
+      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não", INVOICE_CHIP[invoiceStatusOf(r)].long, r.invoiced ? invoiceVatOf(r).toFixed(2) : "", r.invoiced ? (r.vat_on_top ? "Sim" : "Não, incluído no preço") : "", r.invoice_value != null ? Number(r.invoice_value).toFixed(2) : "", r.invoice_issued_on ?? "", r.invoiced ? r.invoice_by ?? "" : "", r.invoice_ref ?? "", r.review_requested ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
@@ -700,11 +718,12 @@ const CrmPanel = () => {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-bold text-navy">{money(r.billed_value)}</p>
-                {r.invoiced && <p className="text-[11px] font-medium text-blue-700">IVA {money(invoiceVatOf(r))}</p>}
+                {r.invoiced && <p className="text-[11px] font-medium text-blue-700">{vatLine(r, true)}</p>}
                 <p className="text-xs font-semibold text-gold">{money(cutOf(r))}</p>
                 {r.upsell_value ? <p className={`text-[11px] font-semibold ${UPSELL_TEXT}`}>+{money(Number(r.upsell_value))}</p> : null}
               </div>
             </div>
+            {r.invoiced && <p className="text-[11px] text-blue-800">{vatLine(r)}{r.invoice_value != null ? ` (fatura de ${money(Number(r.invoice_value))})` : ""}</p>}
             {r.needs_review && <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">{r.needs_review}</p>}
             <div className="flex flex-wrap items-center gap-1.5">
               {quizSummary?.quizServiceIds.has(r.id) && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>}
@@ -780,7 +799,7 @@ const CrmPanel = () => {
                   </td>
                   <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">
                     {money(r.billed_value)}
-                    {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>IVA {money(invoiceVatOf(r))}</span>}
+                    {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>{vatLine(r, true)}</span>}
                   </td>
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={ownerUpsellOf(r) ? `${money(r.my_cut)} do serviço + ${money(ownerUpsellOf(r))} de upsell` : undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
@@ -877,6 +896,7 @@ const CrmPanel = () => {
               const part = form.invoice_value.trim() ? parseEuros(form.invoice_value) : null;
               const upsell = parseEuros(form.upsell_value) || 0;
               const vat = invoiceVatOf({ billed_value: billed, invoiced: true, invoice_value: part, upsell_value: upsell });
+              const gross = round2(billed + upsell);
               return (
                 <div className="col-span-2 sm:col-span-5 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-blue-50/50 border border-blue-100 rounded-lg p-3">
                   <div className="col-span-2">
@@ -906,15 +926,28 @@ const CrmPanel = () => {
                     <p className="text-[10px] text-gray-500 mt-0.5">Só quando a fatura é de uma parte do serviço (ex.: só o colchão).</p>
                   </div>
                   <div className="col-span-2 flex flex-col justify-center gap-1.5">
+                    <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Como foi combinado o IVA">
+                      {([[false, "IVA incluído no preço"], [true, "IVA à parte"]] as const).map(([onTop, label]) => (
+                        <button key={label} type="button" role="radio" aria-checked={form.vat_on_top === onTop}
+                          onClick={() => setForm(f => ({ ...f, vat_on_top: onTop }))}
+                          className={`px-2.5 py-1 text-[11px] font-semibold rounded-full border ${form.vat_on_top === onTop ? "bg-blue-700 text-white border-blue-700" : "bg-white text-blue-700 border-blue-200"}`}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                     <p className="text-xs text-navy">
-                      O valor faturado já tem o IVA: <strong className="text-blue-700">IVA {money(vat)}</strong>
+                      {form.vat_on_top
+                        ? <>Preço {money(round2(gross - vat))} + <strong className="text-blue-700">IVA {money(vat)}</strong> = {money(gross)}</>
+                        : <>{money(gross)} com o IVA incluído: <strong className="text-blue-700">IVA {money(vat)}</strong></>}
                       {upsell > 0 && <span className="text-gray-500"> (com o upsell)</span>}
                     </p>
-                    <button type="button" disabled={!billed}
-                      onClick={() => setForm(f => ({ ...f, billed_value: String(round2((parseEuros(f.billed_value) || 0) * (1 + INVOICE_VAT))) }))}
-                      className="self-start px-2.5 py-1 text-[11px] font-semibold rounded-md border border-blue-200 text-blue-700 bg-white hover:bg-blue-50 disabled:opacity-40">
-                      O cliente paga o IVA por cima: somar 23% ao valor
-                    </button>
+                    {form.vat_on_top && (
+                      <button type="button" disabled={!billed}
+                        onClick={() => setForm(f => ({ ...f, billed_value: String(round2((parseEuros(f.billed_value) || 0) * (1 + INVOICE_VAT))) }))}
+                        className="self-start px-2.5 py-1 text-[11px] font-semibold rounded-md border border-blue-200 text-blue-700 bg-white hover:bg-blue-50 disabled:opacity-40">
+                        O valor faturado está sem IVA: somar 23%
+                      </button>
+                    )}
                   </div>
                 </div>
               );

@@ -2971,7 +2971,7 @@ function lineBlock(l, team) {
     if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
     return [
       head,
-      `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
+      l.vatOnTop ? `COM FATURA, IVA À PARTE: o cliente paga ${euros(l.billed)} (${euros(net)} + ${euros(l.vat)} de IVA)` : `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
       `Valor do serviço sem IVA: ${euros(net)}`,
       `IVA a entregar ao Estado: ${euros(l.vat)}`,
       `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
@@ -3054,7 +3054,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
       share,
       ...what ? { what } : {},
       ...penalty ? { reviewPenalty: penalty } : {},
-      ...vat ? { vat, teamPart: invoiceTeamPart, ...ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {} } : {}
+      ...vat ? { vat, teamPart: invoiceTeamPart, ...r.vat_on_top ? { vatOnTop: true } : {}, ...ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {} } : {}
     };
     if (!team) {
       unassigned.push(line);

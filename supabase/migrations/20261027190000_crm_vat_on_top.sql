@@ -1,0 +1,12 @@
+-- CRM: IVA incluído no preço ou IVA à parte (dono, 2026-10-27: "a Marina, eu
+-- não lhe pedi o IVA à parte [...] coloca lá que o IVA já está incluído nesse
+-- preço. Nas outras em que eu pedi IVA à parte, tens que mostrar que o IVA
+-- estava realmente à parte").
+--
+-- Nos dois casos `billed_value` é o que o cliente paga, com o IVA lá dentro
+-- (as contas das equipas não mudam). `vat_on_top` só diz como foi combinado:
+-- false = o preço já tinha o IVA; true = preço + 23% por cima (Regina,
+-- 209€ + 48,07€ = 257,07€).
+--
+-- Aplica-se com `supabase db query --linked -f`, nunca com `db push`.
+alter table public.service_requests add column if not exists vat_on_top boolean not null default false;

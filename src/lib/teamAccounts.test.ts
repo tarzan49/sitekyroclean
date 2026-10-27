@@ -159,6 +159,11 @@ describe('teamAccounts', () => {
     expect(r.teams[0].total).toBe(93.3);
   });
 
+  it('says when the VAT was on top of the agreed price (owner, 27 Oct)', () => {
+    const r = teamAccounts([row({ calendar_event_id: 'e3', request_date: '2026-10-19', billed_value: 257.07, my_cut: 105, invoiced: true, vat_on_top: true })], events, '2026-10-19');
+    expect(r.teams[0].message).toContain('COM FATURA, IVA À PARTE: o cliente paga 257,07€ (209€ + 48,07€ de IVA)');
+  });
+
   it('without an invoice there is no VAT line', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40 })], events, '2026-10-14');
     expect(r.teams[0].message).not.toContain('IVA');
