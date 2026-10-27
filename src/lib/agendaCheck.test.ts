@@ -46,14 +46,15 @@ describe('agendaCheck', () => {
     expect(JSON.stringify(r)).not.toMatch(/Ana Teste|912 345 678|Flores/);
   });
 
-  it('flags two jobs at once for a one-person team, not for a two-person team', () => {
-    const one = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 2'), ev('10:30', '11:30', GOOD, 'Porto 2')], TOMORROW, NOW);
-    expect(one.issues.filter(i => i.problem.includes('mesma hora'))).toHaveLength(2);
-    const two = agendaCheck([ev('10:00', '11:00', GOOD, 'Lisboa 1'), ev('10:30', '11:30', GOOD, 'Lisboa 1')], TOMORROW, NOW);
-    expect(two.issues).toEqual([]);
-    // Porto 1 is one job at a time since 27 Oct 2026, with an hour of drive between jobs.
-    const p1 = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 1'), ev('11:30', '12:30', GOOD, 'Porto 1')], TOMORROW, NOW);
-    expect(p1.issues.map(i => i.problem)).toEqual(['menos de 60 min de viagem desde o serviço anterior']);
+  it('Porto 1/2 and Lisboa 1: cleanings 1h30 apart, waterproofing only at any hour (owner, 27 Oct 2026); Braga one at a time', () => {
+    const close = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 2'), ev('11:00', '12:00', GOOD, 'Porto 2')], TOMORROW, NOW);
+    expect(close.issues.map(i => i.problem)).toEqual(['menos de 1h30 desde a limpeza anterior da Porto 2']);
+    expect(agendaCheck([ev('10:00', '11:00', GOOD, 'Lisboa 1'), ev('11:30', '12:30', GOOD, 'Lisboa 1')], TOMORROW, NOW).issues).toEqual([]);
+    const imper = GOOD.replace(/Limpeza de sof[aá]/i, 'Impermeabilização Premium sofá');
+    expect(imper).not.toBe(GOOD);
+    expect(agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 1'), ev('10:00', '11:00', imper, 'Porto 1')], TOMORROW, NOW).issues).toEqual([]);
+    const braga = agendaCheck([ev('10:00', '11:00', GOOD, 'Braga'), ev('10:30', '11:30', GOOD, 'Braga')], TOMORROW, NOW);
+    expect(braga.issues.filter(i => i.problem.includes('mesma hora'))).toHaveLength(2);
   });
 
   it('flags too little travel time and hours outside 10h-21h', () => {

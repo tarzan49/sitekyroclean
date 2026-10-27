@@ -9,7 +9,7 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, EARLIEST_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
+  DAY_END_HOUR, EARLIEST_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
   WATERPROOFING_TEAMS, teamWorks, dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent, type TeamZone,
 } from './botAvailability';
 
@@ -121,6 +121,14 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
   const byTeam = new Map<string, Timed[]>();
   for (const t of services) if (t.team) byTeam.set(t.team, [...(byTeam.get(t.team) ?? []), t]);
   for (const [team, list] of byTeam) {
+    if (STAGGER_TEAMS.has(team)) {
+      // Owner, 27 Oct 2026: two cleanings 1h30 apart; waterproofing only can share the hour.
+      const cleanings = list.filter(t => !eventWaterproofingOnly(t.summary));
+      for (let i = 1; i < cleanings.length; i++) {
+        if (cleanings[i].from - cleanings[i - 1].from < CLEANING_GAP_MIN * 60_000) add(cleanings[i], `menos de 1h30 desde a limpeza anterior da ${team}`);
+      }
+      continue;
+    }
     const cap = TEAM_CAPACITY[team] ?? 1;
     for (let i = 0; i < list.length; i++) {
       const t = list[i];

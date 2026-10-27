@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, cityZone, hasWaterproofing, rugPickupOwnerReason, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingOnly, rugPickupOwnerReason, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -208,7 +208,8 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   // would not parse in the CRM) stays "A confirmar".
   const team = total === null ? null
     : pickupOwner ? allowedNamed
-    : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing);
+    : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing,
+      !(/imperm/i.test(service) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(service)));
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
@@ -304,7 +305,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   // Far zone: the team already there that day (availability.sharedTrip).
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items), !waterproofingOnly(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;

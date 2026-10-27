@@ -643,7 +643,8 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   let busyTeam: string | null = null;
   if (plan.ok && plan.moved) {
     const team = eventTeam(ev);
-    if (team && teamBusyAt(cal.events.filter(e => e.id !== ev.id), team, plan.start, plan.end)) {
+    if (team && teamBusyAt(cal.events.filter(e => e.id !== ev.id), team, plan.start, plan.end,
+      !(/imperm/i.test(ev.summary) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(ev.summary)))) {
       busyTeam = team;
       plan = planBookingUpdate(ev, phone, { ...asked, date: undefined, time: undefined }, now);
       if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} está ocupada`,

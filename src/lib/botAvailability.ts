@@ -89,19 +89,35 @@ export function rugPickupOwnerReason(cityOrAddress: unknown, rugPickup: boolean)
 export function hasWaterproofing(items: unknown): boolean {
   return Array.isArray(items) && items.some(i => /essencial|premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
 }
+/** The job is waterproofing only (no item is cleaned): it may share an hour with another job (STAGGER_TEAMS). */
+export function waterproofingOnly(items: unknown): boolean {
+  return Array.isArray(items) && items.length > 0
+    && items.every(i => /^(essencial|premium)$/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
+}
+/**
+ * Porto 1, Porto 2, Lisboa 1 and Lisboa 2 (owner, 27 Oct 2026): two cleaning jobs (cleaning, or cleaning with
+ * waterproofing) start at least 1h30 apart; a cleaning and a waterproofing-only job, or two waterproofing-only
+ * jobs, can be at the same hour. Replaces, for these teams, the capacity and the travel margin.
+ */
+export const STAGGER_TEAMS: ReadonlySet<string> = new Set(['Porto 1', 'Porto 2', 'Lisboa 1', 'Lisboa 2']);
+export const CLEANING_GAP_MIN = 90;
+const staggerClash = (b: { from: number; cleaning: boolean }, from: number, cleaning: boolean) =>
+  cleaning && b.cleaning && Math.abs(b.from - from) < CLEANING_GAP_MIN * 60_000;
+/** A calendar event that is waterproofing only (title says impermeabilização and no cleaning). */
+export const eventWaterproofingOnly = (summary: string) => /impermeabiliz/.test(summary) && !/limpeza|lavagem|higieniz|anti-?acaros|desbacter/.test(summary);
 /**
  * Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo").
  * Porto 1 is back to one job at a time (owner, 27 Oct 2026: "não podes estar a marcar serviços de limpeza a cada uma hora, porque é
  * impossível eles fazerem"): with two, the bot chained cleanings at 10h, 11h, 12h… and the team ran late all day.
  */
-export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Lisboa 1': 2 };
+export const TEAM_CAPACITY: Readonly<Record<string, number>> = {};
 const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
 /**
  * The drive between two jobs of a team, when it is not TRAVEL_MARGIN_MIN. Porto 1 gets an hour on each side
  * (owner, 27 Oct 2026: "ou passas para o Porto 2, ou passas para uma hora em que seja possível"): a one-hour
  * cleaning at 10h leaves the next start at 12h at the earliest.
  */
-export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = { 'Porto 1': 60 };
+export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = {};
 const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 60_000;
 /**
  * Weekday hours of a team that does not work the whole day; weekends are open as for any team. Porto 2 (Aleixo) works
@@ -271,7 +287,7 @@ export const hourLabel = (minutes: number) => `${Math.floor(minutes / 60)}h${min
 
 // ---------- availability ----------
 
-interface Busy { from: number; to: number; team: string | null; region: TeamZone | null }
+interface Busy { from: number; to: number; team: string | null; region: TeamZone | null; cleaning: boolean }
 
 function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   const out: Busy[] = [];
@@ -282,10 +298,11 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
     const parsedEnd = e.end ? Date.parse(e.end) : NaN;
     const to = Number.isFinite(parsedEnd) && parsedEnd > from ? parsedEnd : from + 60 * 60_000;
     const team = eventTeam(e);
-    if (team) { out.push({ from, to, team, region: null }); continue; }
+    const cleaning = !eventWaterproofingOnly(fold(e.summary));
+    if (team) { out.push({ from, to, team, region: null, cleaning }); continue; }
     if (!SERVICE_LIKE.test(fold(e.summary))) continue; // the owner's own appointments do not busy a team
     const region = eventRegion(e);
-    if (region) out.push({ from, to, team: null, region });
+    if (region) out.push({ from, to, team: null, region, cleaning });
   }
   return out;
 }
@@ -293,15 +310,18 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
 /** sameTime: another service of the same zone overlaps this visit (any team): the bot books it only with the owner. */
 export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean; sameTime: boolean }
 
-function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number) {
+function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number, cleaning = true) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t: string) => (b: Busy) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
-  const spare = (t: string) => capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
+  const spare = (t: string) => STAGGER_TEAMS.has(t)
+    ? (busy.some(b => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1)
+    : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
   const early = (t: string) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
   const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
-  const unassigned = busy.filter(b => !b.team && b.region === region && overlaps(b)).length;
+  const staggered = teams.every(t => STAGGER_TEAMS.has(t));
+  const unassigned = busy.filter(b => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t: string) => busy.some(b => b.team === t
     && ((from - b.to >= 0 && from - b.to <= 90 * 60_000) || (b.from - to >= 0 && b.from - to <= 90 * 60_000)));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
@@ -314,10 +334,11 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
  * capacity). For a service the bot moves to another hour (owner, 16 Oct 2026: reschedules are the
  * bot's): the move keeps the event's team, so the zone having a free team is not enough.
  */
-export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string): boolean {
+export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string, cleaning = true): boolean {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (STAGGER_TEAMS.has(team)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter(b => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
@@ -328,7 +349,7 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
  * one already working next to it that day first (less driving), then the one
  * with fewer jobs that day, then the region's order. null when none has room.
  */
-export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false): string | null {
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false, cleaning = true): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
   if (!area) return null;
@@ -336,7 +357,7 @@ export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso:
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
   const order = teamsFor(area, waterproofing);
-  const st = slotState(busy, order, area, from, to);
+  const st = slotState(busy, order, area, from, to, cleaning);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t: string) => busy.filter(b => b.team === t && lisbon(b.from).date === day).length;
@@ -526,6 +547,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
+  const cleaning = !waterproofingOnly(req?.items);
 
   const today = lisbon(now.getTime()).date;
   let onlyDay: string | null = null;
@@ -557,7 +579,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
-      const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
+      const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
@@ -568,7 +590,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
-    const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
+    const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning);
     const open = inHours && !closedAt(onlyDay, m);
     requested = { date: onlyDay, time: hourLabel(m), free: open && st.free, teamsFree: open ? st.teamsFree : [], sameTime: st.sameTime,
       start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };

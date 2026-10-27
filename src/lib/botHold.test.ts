@@ -27,19 +27,18 @@ describe('planBotHold', () => {
     expect(eventRegion(asEvent(p, 'e1'))).toBe('Lisboa');
   });
 
-  it('busies a team, so the same time is not given to a third client in Lisbon (only Lisboa 1, two people, since 19 Oct)', () => {
+  it('busies a team: a second cleaning needs 1h30 after the first, waterproofing only can share the hour (owner, 27 Oct 2026)', () => {
     const a = plan(req({ conversationId: 'a' }));
-    const b = plan(req({ conversationId: 'b' }), [asEvent(a, 'ea')]);
-    const three = [asEvent(a, 'ea'), asEvent(b, 'eb')];
-    expect(planBotHold(req({ conversationId: 'c' }), three, NOW)).toMatchObject({ ok: false, taken: true });
-    const after = botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '15h' }, three, NOW);
-    expect('requested' in after && after.requested?.free).toBe(false);
+    expect(planBotHold(req({ conversationId: 'b' }), [asEvent(a, 'ea')], NOW)).toMatchObject({ ok: false, taken: true });
+    expect(planBotHold(req({ conversationId: 'b', time: '16h' }), [asEvent(a, 'ea')], NOW)).toMatchObject({ ok: false, taken: true });
+    expect(plan(req({ conversationId: 'b', time: '16h30' }), [asEvent(a, 'ea')]).ok).toBe(true);
+    expect(plan(req({ conversationId: 'b', items: [{ kind: 'sofa', size: '3-lugares', qty: 1, treatment: 'premium' }] }), [asEvent(a, 'ea')]).ok).toBe(true);
   });
 
   it('a conversation moving its own pre-booking is not blocked by it', () => {
     const a = plan(req({ conversationId: 'a' }));
-    const b = plan(req({ conversationId: 'b' }), [asEvent(a, 'ea')]);
-    expect(plan(req({ conversationId: 'b', time: '15h' }), [asEvent(a, 'ea'), asEvent(b, 'eb')], 'eb').ok).toBe(true);
+    const b = plan(req({ conversationId: 'b', time: '17h' }), [asEvent(a, 'ea')]);
+    expect(plan(req({ conversationId: 'b', time: '16h30' }), [asEvent(a, 'ea'), asEvent(b, 'eb')], 'eb').ok).toBe(true);
   });
 
   it('hands to the owner where the bot has no calendar, and checks its input', () => {
@@ -182,7 +181,7 @@ describe('planBotBooking', () => {
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
     expect(p.event.start).toBe('2026-10-10T14:00:00.000Z');
     expect(p.event.description).toContain('escolhida por ti');
-    const other = { id: 'o', summary: 'Serviço 45€ (89€) Sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-10T14:00:00.000Z', end: '2026-10-10T15:00:00.000Z' };
+    const other = { id: 'o', summary: 'Serviço 45€ (89€) Impermeabilização Premium sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-10T14:00:00.000Z', end: '2026-10-10T15:00:00.000Z' };
     expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: true }), [other], NOW)).toMatchObject({ ok: true });
     // Only true counts, and only on a weekend: a weekday still refuses a shared hour.
     expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: 'yes' }), [other], NOW)).toEqual({ ok: false, sameTime: true });
@@ -213,7 +212,7 @@ describe('planBotBooking', () => {
   });
 
   it('a time another service of the zone already has goes to the owner ("se for a mesma hora tem que me consultar")', () => {
-    const other = { id: 'o', summary: 'Serviço 45€ (89€) Sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' };
+    const other = { id: 'o', summary: 'Serviço 45€ (89€) Impermeabilização Premium sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' };
     expect(planBotBooking(book(), [other], NOW)).toEqual({ ok: false, sameTime: true });
     expect('ok' in planBotBooking(book({ time: '17h' }), [other], NOW) && (planBotBooking(book({ time: '17h' }), [other], NOW) as { ok: boolean }).ok).toBe(true);
   });

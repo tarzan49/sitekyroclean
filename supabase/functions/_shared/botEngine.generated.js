@@ -302,10 +302,10 @@ function customPackLine(item) {
   const option2 = options.find((p) => p.id === item.size);
   let amount2 = null;
   const size = item.kind === "rug" || item.kind === "carpet" ? `${item.width} × ${item.length} m` : item.kind === "chairs" ? `${item.qty} unidades` : option2?.label ?? "Tamanho a confirmar";
-  const waterproofingOnly = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
-  if (waterproofingOnly && item.kind === "chairs") {
+  const waterproofingOnly2 = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
+  if (waterproofingOnly2 && item.kind === "chairs") {
     amount2 = (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
-  } else if (waterproofingOnly && option2) {
+  } else if (waterproofingOnly2 && option2) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
@@ -323,18 +323,18 @@ function customPackLine(item) {
     amount2 = unit === null ? null : unit * item.qty;
   }
   return {
-    label: `${PACK_KIND_LABEL[item.kind]} · ${size}${item.kind !== "chairs" ? ` · ${item.qty} un.` : ""} · ${waterproofingOnly ? `Só impermeabilização ${item.extra === "premium" ? "Premium (até 10 anos)" : "Essencial (1 a 2 anos)"}` : EXTRA_LABEL[item.extra]}`,
+    label: `${PACK_KIND_LABEL[item.kind]} · ${size}${item.kind !== "chairs" ? ` · ${item.qty} un.` : ""} · ${waterproofingOnly2 ? `Só impermeabilização ${item.extra === "premium" ? "Premium (até 10 anos)" : "Essencial (1 a 2 anos)"}` : EXTRA_LABEL[item.extra]}`,
     amount: amount2,
     tablePrice: amount2,
     quote: amount2 === null
   };
 }
 function calculateCustomPack(items, city) {
-  const waterproofingOnly = (item) => item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial");
-  const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly(i)).reduce((sum2, i) => sum2 + i.qty, 0);
+  const waterproofingOnly2 = (item) => item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial");
+  const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly2(i)).reduce((sum2, i) => sum2 + i.qty, 0);
   const table = items.map((item) => {
     const line = customPackLine(item);
-    return item.kind === "chairs" && !waterproofingOnly(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    return item.kind === "chairs" && !waterproofingOnly2(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
   });
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({
@@ -2217,9 +2217,16 @@ function rugPickupOwnerReason(cityOrAddress, rugPickup) {
 function hasWaterproofing(items) {
   return Array.isArray(items) && items.some((i) => /essencial|premium/.test(String(i?.treatment ?? "")));
 }
-var TEAM_CAPACITY = { "Lisboa 1": 2 };
+function waterproofingOnly(items) {
+  return Array.isArray(items) && items.length > 0 && items.every((i) => /^(essencial|premium)$/.test(String(i?.treatment ?? "")));
+}
+var STAGGER_TEAMS = /* @__PURE__ */ new Set(["Porto 1", "Porto 2", "Lisboa 1", "Lisboa 2"]);
+var CLEANING_GAP_MIN = 90;
+var staggerClash = (b, from, cleaning) => cleaning && b.cleaning && Math.abs(b.from - from) < CLEANING_GAP_MIN * 6e4;
+var eventWaterproofingOnly = (summary) => /impermeabiliz/.test(summary) && !/limpeza|lavagem|higieniz|anti-?acaros|desbacter/.test(summary);
+var TEAM_CAPACITY = {};
 var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
-var TEAM_TRAVEL_MARGIN_MIN = { "Porto 1": 60 };
+var TEAM_TRAVEL_MARGIN_MIN = {};
 var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 6e4;
 var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 8, to: 13 } };
 var isWeekday = (date) => {
@@ -2376,37 +2383,40 @@ function busyIntervals(events) {
     const parsedEnd = e.end ? Date.parse(e.end) : NaN;
     const to = Number.isFinite(parsedEnd) && parsedEnd > from ? parsedEnd : from + 60 * 6e4;
     const team = eventTeam(e);
+    const cleaning = !eventWaterproofingOnly(fold3(e.summary));
     if (team) {
-      out.push({ from, to, team, region: null });
+      out.push({ from, to, team, region: null, cleaning });
       continue;
     }
     if (!SERVICE_LIKE.test(fold3(e.summary))) continue;
     const region = eventRegion(e);
-    if (region) out.push({ from, to, team: null, region });
+    if (region) out.push({ from, to, team: null, region, cleaning });
   }
   return out;
 }
-function slotState(busy, teams, region, from, to) {
+function slotState(busy, teams, region, from, to, cleaning = true) {
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t) => (b) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
-  const spare = (t) => capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
+  const spare = (t) => STAGGER_TEAMS.has(t) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
   const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
-  const unassigned = busy.filter((b) => !b.team && b.region === region && overlaps(b)).length;
+  const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
+  const unassigned = busy.filter((b) => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
   const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
-function teamBusyAt(events, team, startIso, endIso) {
+function teamBusyAt(events, team, startIso, endIso, cleaning = true) {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (STAGGER_TEAMS.has(team)) return busyIntervals(events).some((b) => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
-function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
+function chooseTeam(events, city, startIso, endIso, waterproofing = false, cleaning = true) {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold3(name)) : void 0;
   if (!area) return null;
@@ -2414,7 +2424,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
   const order = teamsFor(area, waterproofing);
-  const st = slotState(busy, order, area, from, to);
+  const st = slotState(busy, order, area, from, to, cleaning);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
@@ -2547,6 +2557,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
+  const cleaning = !waterproofingOnly(req?.items);
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
   if (req.date !== void 0) {
@@ -2572,7 +2583,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
-      const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
+      const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
@@ -2582,7 +2593,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
-    const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
+    const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning);
     const open = inHours && !closedAt(onlyDay, m);
     requested = {
       date: onlyDay,
@@ -2708,7 +2719,14 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
   const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
   const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;
-  const team = total === null ? null : pickupOwner ? allowedNamed : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing);
+  const team = total === null ? null : pickupOwner ? allowedNamed : named ?? chooseTeam(
+    events,
+    r.city ?? address,
+    startIso,
+    endIso,
+    waterproofing,
+    !(/imperm/i.test(service) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(service))
+  );
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
@@ -2765,7 +2783,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items));
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items), !waterproofingOnly(r.items));
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");
@@ -2857,6 +2875,13 @@ function agendaCheck(events, date, now, pendingDays = 7) {
   const byTeam = /* @__PURE__ */ new Map();
   for (const t of services) if (t.team) byTeam.set(t.team, [...byTeam.get(t.team) ?? [], t]);
   for (const [team, list2] of byTeam) {
+    if (STAGGER_TEAMS.has(team)) {
+      const cleanings = list2.filter((t) => !eventWaterproofingOnly(t.summary));
+      for (let i = 1; i < cleanings.length; i++) {
+        if (cleanings[i].from - cleanings[i - 1].from < CLEANING_GAP_MIN * 6e4) add(cleanings[i], `menos de 1h30 desde a limpeza anterior da ${team}`);
+      }
+      continue;
+    }
     const cap = TEAM_CAPACITY[team] ?? 1;
     for (let i = 0; i < list2.length; i++) {
       const t = list2[i];
