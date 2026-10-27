@@ -61,6 +61,8 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 // a sincronização do calendário reescreve-o a partir do título do evento.
 // Com fatura da empresa, o cut não leva o IVA (dono, 2026-10-27): é metade do valor
 // sem IVA, como nas contas das equipas, e o IVA aparece à parte (vatToDeliverOf).
+/** Faturado ao cliente: o serviço mais o upsell (dono, 27/10: o upsell entra no total faturado e no IVA). */
+const totalBilledOf = (r: ServiceRequest) => round2(r.billed_value + (Number(r.upsell_value) || 0));
 const ownerUpsellNetOf = (r: ServiceRequest) => ownerUpsellOf({ ...r, upsell_value: upsellWithoutVatOf(r) });
 const cutOf = (r: ServiceRequest) => round2((ownerServiceCutWithoutVat(r) ?? r.my_cut) + ownerUpsellNetOf(r));
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
@@ -273,7 +275,7 @@ const CrmPanel = () => {
   const filtered = useMemo(() => scoped.filter(r => matchesStatus(r, statusFilter)), [scoped, statusFilter]);
 
   const filteredSums = useMemo(() => ({
-    billed: round2(filtered.reduce((s, r) => s + r.billed_value + (Number(r.upsell_value) || 0), 0)),
+    billed: round2(filtered.reduce((s, r) => s + totalBilledOf(r), 0)),
     cut: round2(filtered.reduce((s, r) => s + cutOf(r), 0)),
     vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0)),
   }), [filtered]);
@@ -282,22 +284,22 @@ const CrmPanel = () => {
   const pickStatus = (f: StatusFilter) => setStatusFilter(prev => (prev === f ? "all" : f));
 
   const totals = useMemo(() => {
-    const billed = monthRecords.reduce((s, r) => s + r.billed_value, 0);
+    const billed = monthRecords.reduce((s, r) => s + totalBilledOf(r), 0);
     const cut = monthRecords.reduce((s, r) => s + cutOf(r), 0);
     const upsellCut = monthRecords.reduce((s, r) => s + ownerUpsellNetOf(r), 0);
     const paid = monthRecords.filter(r => r.paid);
     const unpaid = monthRecords.filter(r => !r.paid);
     const byLocality = LOCALITIES.map(loc => {
       const rows = monthRecords.filter(r => r.locality === loc);
-      return { loc, billed: rows.reduce((s, r) => s + r.billed_value, 0), cut: rows.reduce((s, r) => s + cutOf(r), 0), count: rows.length };
+      return { loc, billed: rows.reduce((s, r) => s + totalBilledOf(r), 0), cut: rows.reduce((s, r) => s + cutOf(r), 0), count: rows.length };
     }).filter(l => l.count > 0);
     const inv = monthRecords.filter(r => r.invoiced);
     const noInv = monthRecords.filter(r => !r.invoiced);
-    const invoicedValue = inv.reduce((s, r) => s + r.billed_value, 0);
-    const notInvoicedValue = noInv.reduce((s, r) => s + r.billed_value, 0);
+    const invoicedValue = inv.reduce((s, r) => s + totalBilledOf(r), 0);
+    const notInvoicedValue = noInv.reduce((s, r) => s + totalBilledOf(r), 0);
     const invoicedVat = round2(inv.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0));
     const toIssueCount = inv.filter(r => invoiceStatusOf(r) === "to_issue").length;
-    return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
+    return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + totalBilledOf(r), 0), byLocality };
   }, [monthRecords]);
 
   const maxLocalityCut = Math.max(1, ...totals.byLocality.map(l => l.cut));
@@ -686,7 +688,7 @@ const CrmPanel = () => {
                 {r.phone && <a href={`tel:${r.phone}`} className="text-xs text-gray-500 flex items-center gap-1"><Phone className="w-3 h-3" />{r.phone}</a>}
               </div>
               <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-navy">{money(r.billed_value)}</p>
+                <p className="text-sm font-bold text-navy">{money(totalBilledOf(r))}</p>
                 {r.invoiced && <p className="text-[11px] font-medium text-blue-700">{vatLine(r, true)}</p>}
                 <p className="text-xs font-semibold text-gold">{money(cutOf(r))}</p>
                 {r.upsell_value ? <p className={`text-[11px] font-semibold ${UPSELL_TEXT}`}>+{money(Number(r.upsell_value))}</p> : null}
@@ -765,7 +767,7 @@ const CrmPanel = () => {
                       : r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}
                   </td>
                   <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">
-                    {money(r.billed_value)}
+                    <span title={r.upsell_value ? `${money(r.billed_value)} do serviço + ${money(Number(r.upsell_value))} de upsell` : undefined}>{money(totalBilledOf(r))}</span>
                     {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>{vatLine(r, true)}</span>}
                   </td>
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r, lisbonDay(new Date())))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
