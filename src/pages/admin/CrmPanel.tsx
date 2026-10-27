@@ -41,6 +41,9 @@ interface ServiceRequest {
   /** Com fatura: o valor tem o IVA de 23% lá dentro (src/lib/invoiceVat.ts). invoice_ref = nome e NIF da fatura. */
   invoiced: boolean;
   invoice_ref: string | null;
+  /** O cliente paga ao dono e a parte da equipa já foi acertada; client_paid_owner_at = quando pagou. */
+  paid_to_owner?: boolean | null;
+  client_paid_owner_at?: string | null;
   /** Dia da fatura; vazio com `invoiced` = fatura por passar. */
   invoice_issued_on: string | null;
   /** Quem passou a fatura: "Empresa" ou "Francisco" (até 20/10/2026). */
@@ -72,15 +75,20 @@ const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
 // Filtros da aba Pedidos (dono, 2026-10-27: "um botão de filtro [...] por pagar,
 // por fatura [...] em vez de me aparecer todas as informações, aparece só uma").
 // As faturas saíram daqui para a aba "Faturas e IVA" (dono, 2026-10-27).
-type StatusFilter = "all" | "unpaid" | "paid" | "review";
+// "Clientes devem-me" (dono, 2026-10-27: "a lista do dinheiro que as pessoas me devem a mim e
+// que eu já paguei aos funcionários"): pago diretamente ao dono, cliente ainda sem pagar. Vê
+// todos os meses, porque uma dívida de setembro não pode ficar escondida no mês anterior.
+type StatusFilter = "all" | "unpaid" | "paid" | "review" | "clientOwes";
 const STATUS_FILTERS: ReadonlyArray<readonly [StatusFilter, string]> = [
-  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["review", "Para rever"],
+  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["review", "Para rever"], ["clientOwes", "Clientes devem-me"],
 ];
+const clientOwesOwner = (r: ServiceRequest) => !!r.paid_to_owner && !r.client_paid_owner_at && !r.calendar_missing_since;
 const matchesStatus = (r: ServiceRequest, f: StatusFilter) => {
   switch (f) {
     case "unpaid": return !r.paid;
     case "paid": return r.paid;
     case "review": return !!r.needs_review;
+    case "clientOwes": return clientOwesOwner(r);
     default: return true;
   }
 };
@@ -449,6 +457,14 @@ const CrmPanel = () => {
     setRecords(prev => prev.map(x => x.id === r.id ? { ...x, ...patch } : x));
   };
 
+  const markClientPaid = async (r: ServiceRequest) => {
+    const at = new Date().toISOString();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: err } = await (supabase as any).from("service_requests").update({ client_paid_owner_at: at }).eq("id", r.id);
+    if (err) { alert(`Erro ao guardar: ${err.message}`); return; }
+    setRecords(prev => prev.map(x => x.id === r.id ? { ...x, client_paid_owner_at: at } : x));
+  };
+
   const togglePaid = async (r: ServiceRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("service_requests").update({ paid: !r.paid }).eq("id", r.id);
@@ -631,10 +647,10 @@ const CrmPanel = () => {
           {STATUS_FILTERS.map(([id, label]) => {
             const active = statusFilter === id;
             return (
-              <button key={id} type="button" onClick={() => setStatusFilter(id)} aria-pressed={active}
+              <button key={id} type="button" onClick={() => { setStatusFilter(id); if (id === "clientOwes") setAllMonths(true); }} aria-pressed={active}
                 className={`shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-navy text-white border-navy" : "bg-white text-navy border-gray-200 hover:border-navy/30"}`}>
                 {label}
-                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : id === "unpaid" && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
+                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : (id === "unpaid" || id === "clientOwes") && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
               </button>
             );
           })}
@@ -700,6 +716,7 @@ const CrmPanel = () => {
               {quizSummary?.quizServiceIds.has(r.id) && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>}
               {r.calendar_missing_since && <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>}
               {r.needs_review && <button onClick={() => editRow(r)} title={r.needs_review} className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>}
+              {clientOwesOwner(r) && <button onClick={() => markClientPaid(r)} title="O cliente pagou-me (sai da lista Clientes devem-me)" className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-orange-50 text-orange-700 border-orange-300">Deve-me · Cliente pagou</button>}
               <button onClick={() => togglePaid(r)} className={`px-2 py-1 rounded-full text-[11px] font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
               <div className="ml-auto flex items-center gap-1">
                 {r.calendar_missing_since && <button onClick={() => keepMissing(r)} className="px-2 py-1 text-[11px] font-bold rounded-md border border-gray-200 text-navy">Manter</button>}
@@ -773,6 +790,7 @@ const CrmPanel = () => {
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r, lisbonDay(new Date())))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
+                    {clientOwesOwner(r) && <button onClick={() => markClientPaid(r)} title="O cliente pagou-me (sai da lista Clientes devem-me)" className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-orange-50 text-orange-700 border-orange-300">Deve-me · Cliente pagou</button>}
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
                       {r.paid ? "Pago" : "Por pagar"}
                     </button>
