@@ -56,15 +56,40 @@ describe('botAvailability', () => {
     const events = [
       ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2'),
       ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Porto', 'Equipa: Porto 1'),
-      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Eva - Porto', 'Equipa: Porto 1'),
     ];
     const r = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events, NOW));
-    // Both busy 10-12 (+30 min drive): 10h, 11h and 12h are gone, 13h is the first.
-    expect(r.free[0].times[0]).toBe('13h');
+    // Porto 2 takes 8h before its 10h job; Porto 1 needs an hour of drive after 12h, so 13h is its first.
+    expect(r.free[0].times.slice(0, 2)).toEqual(['8h', '13h']);
+    expect(r.free[0].times).not.toContain('12h');
     const one = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events.slice(1), NOW));
-    // 10h still has a free team, but another service of the zone is there: offered only when nothing else is.
-    expect(one.free[0].times[0]).toBe('10h');
-    expect(one.suggestion?.slots.map(s => [s.time, s.sameTime])).toEqual([['13h', false], ['16h', false]]);
+    // 10h still has Porto 2 free, but another service of the zone is there: offered only when nothing else is.
+    expect(one.free[0].times).toContain('10h');
+    expect(one.suggestion?.slots.every(s => !s.sameTime)).toBe(true);
+  });
+
+  it('Porto 1 does not chain cleanings hour after hour, and Porto 2 works weekdays 8h-13h only (owner, 27 Oct 2026)', () => {
+    const job = ev('2026-10-08', '10:00', '11:00', 'Serviço 45€ (89€) Sofá - Ana - Porto', 'Equipa: Porto 1');
+    const at11 = [at('2026-10-08', '11:00'), at('2026-10-08', '12:00')] as const;
+    const at12 = [at('2026-10-08', '12:00'), at('2026-10-08', '13:00')] as const;
+    const at14 = [at('2026-10-08', '14:00'), at('2026-10-08', '15:00')] as const;
+    // 11h right after Porto 1's 10h cleaning: Porto 2 (morning), never Porto 1 again.
+    expect(chooseTeam([job], 'Porto', ...at11)).toBe('Porto 2');
+    // 12h is an hour after the 10h-11h job: Porto 1 again, the team already working next to it. A weekday afternoon is Porto 1 only.
+    expect(chooseTeam([job], 'Porto', ...at12)).toBe('Porto 1');
+    expect(chooseTeam([], 'Porto', ...at14)).toBe('Porto 1');
+    const p1Afternoon = ev('2026-10-08', '14:00', '15:00', 'Serviço 45€ (89€) Sofá - Eva - Porto', 'Equipa: Porto 1');
+    expect(chooseTeam([p1Afternoon], 'Porto', at('2026-10-08', '15:00'), at('2026-10-08', '16:00'))).toBeNull();
+    // A job finishing after 13h does not go to Porto 2 on a weekday (Porto 1 is still on its 11h-12h job).
+    const late = ev('2026-10-08', '11:00', '12:00', 'Serviço 45€ (89€) Sofá - Rui - Porto', 'Equipa: Porto 1');
+    expect(chooseTeam([late], 'Porto', at('2026-10-08', '12:30'), at('2026-10-08', '13:30'))).toBeNull();
+    // Saturday: Porto 2 works all day.
+    expect(chooseTeam([ev('2026-10-10', '14:00', '15:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1')], 'Porto', at('2026-10-10', '15:00'), at('2026-10-10', '16:00'))).toBe('Porto 2');
+    // 8h and 9h only on weekdays, and only through Porto 2; Saturday starts at 10h.
+    const thu = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, [], NOW));
+    expect(thu.free[0].times.slice(0, 2)).toEqual(['8h', '9h']);
+    const sat = ok(botAvailability({ city: 'Porto', date: '2026-10-10' }, [], NOW));
+    expect(sat.free[0].times[0]).toBe('10h');
+    expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08' }, [], NOW)).free[0].times[0]).toBe('10h');
   });
 
   it('a service, pre-booking or "A confirmar" without a team busies one team of its region', () => {
@@ -140,27 +165,28 @@ describe('botAvailability', () => {
 describe('two-person teams and the team the bot books on', () => {
   const porto1 = (from: string, to: string, who: string) => ev('2026-10-08', from, to, `Serviço 60€ (119€) Sofá - ${who} - Porto`, 'Equipa: Porto 1');
 
-  it('Porto 1 and Porto 1 take two jobs at the same time, the other teams one', () => {
-    const one = [porto1('10:00', '12:00', 'Ana'), ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2')];
-    const r = ok(botAvailability({ city: 'Porto', date: '2026-10-08', time: '10h' }, one, NOW));
-    expect(r.requested).toMatchObject({ free: true, teamsFree: ['Porto 1'] });
-    const two = [...one, porto1('10:00', '12:00', 'Eva')];
-    expect(ok(botAvailability({ city: 'Porto', date: '2026-10-08', time: '10h' }, two, NOW)).requested?.free).toBe(false);
+  it('Lisboa 1 takes two jobs at the same time, the other teams one (Porto 1 one since 27 Oct 2026)', () => {
+    const lx = (who: string) => ev('2026-10-08', '10:00', '12:00', `Serviço 60€ (119€) Sofá - ${who} - Lisboa`, 'Equipa: Lisboa 1');
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana')], NOW)).requested).toMatchObject({ free: true, teamsFree: ['Lisboa 1'] });
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana'), lx('Eva')], NOW)).requested?.free).toBe(false);
+    const p1 = [porto1('10:00', '12:00', 'Ana'), ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2')];
+    expect(ok(botAvailability({ city: 'Porto', date: '2026-10-08', time: '10h' }, p1, NOW)).requested?.free).toBe(false);
     const braga = [ev('2026-10-08', '10:00', '12:00', 'Serviço 45€ (89€) Sofá - Braga', 'Equipa: Braga')];
     expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08', time: '10h' }, braga, NOW)).requested?.free).toBe(false);
   });
 
   it('books the team already working next to that time, then the one with fewer jobs that day', () => {
-    const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
-    // Porto 2 has a job ending at 14h: next to 15h, so it goes there.
-    const near = [ev('2026-10-08', '13:00', '14:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
-    expect(chooseTeam(near, 'Porto', ...at15)).toBe('Porto 2');
+    const at11 = [at('2026-10-08', '11:00'), at('2026-10-08', '12:00')] as const;
+    // Porto 2 has a job ending at 10h: next to 11h, so it goes there.
+    const near = [ev('2026-10-08', '09:00', '10:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    expect(chooseTeam(near, 'Porto', ...at11)).toBe('Porto 2');
     // Nothing next to it: the team with fewer jobs that day.
-    const far = [porto1('09:00', '10:00', 'Ana'), porto1('19:00', '20:00', 'Eva'), ev('2026-10-08', '19:00', '20:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
-    expect(chooseTeam(far, 'Porto', ...at15)).toBe('Porto 2');
-    expect(chooseTeam([], 'Porto', ...at15)).toBe('Porto 1');
+    const far = [porto1('16:00', '17:00', 'Ana'), porto1('19:00', '20:00', 'Eva'), ev('2026-10-08', '08:00', '08:30', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    expect(chooseTeam(far, 'Porto', ...at11)).toBe('Porto 2');
+    expect(chooseTeam([], 'Porto', ...at11)).toBe('Porto 1');
     // No room, no team; Coimbra and Figueira da Foz have their own team (10 Oct 2026).
-    const full = [porto1('15:00', '16:00', 'Ana'), porto1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
+    const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
+    const full = [porto1('15:00', '16:00', 'Ana')];
     expect(chooseTeam(full, 'Porto', ...at15)).toBeNull();
     expect(chooseTeam([], 'Coimbra', ...at15)).toBe('Coimbra');
     expect(chooseTeam([], 'Figueira da Foz', ...at15)).toBe('Coimbra');
@@ -187,7 +213,7 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     // Another zone's service at the same hour does not count.
     expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, porto, NOW)).requested?.sameTime).toBe(false);
     // A day where every free hour is shared: still two hours, flagged.
-    const busyDay = ['10', '11', '12', '13', '14', '15', '16', '17', '18'].map(h => ev('2026-10-08', `${h}:00`, `${h}:59`, 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1'));
+    const busyDay = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'].map(h => ev('2026-10-08', `${h}:00`, `${h}:59`, 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1'));
     const full = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, busyDay, NOW));
     expect(full.suggestion?.slots).toHaveLength(2);
     expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);

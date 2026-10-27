@@ -67,9 +67,39 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly strin
 export function hasWaterproofing(items: unknown): boolean {
   return Array.isArray(items) && items.some(i => /essencial|premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
 }
-/** Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo"). */
-export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Porto 1': 2, 'Lisboa 1': 2 };
+/**
+ * Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo").
+ * Porto 1 is back to one job at a time (owner, 27 Oct 2026: "não podes estar a marcar serviços de limpeza a cada uma hora, porque é
+ * impossível eles fazerem"): with two, the bot chained cleanings at 10h, 11h, 12h… and the team ran late all day.
+ */
+export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Lisboa 1': 2 };
 const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
+/**
+ * The drive between two jobs of a team, when it is not TRAVEL_MARGIN_MIN. Porto 1 gets an hour on each side
+ * (owner, 27 Oct 2026: "ou passas para o Porto 2, ou passas para uma hora em que seja possível"): a one-hour
+ * cleaning at 10h leaves the next start at 12h at the earliest.
+ */
+export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = { 'Porto 1': 60 };
+const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 60_000;
+/**
+ * Weekday hours of a team that does not work the whole day; weekends are open as for any team. Porto 2 (Aleixo) works
+ * Monday to Friday only in the morning (owner, 27 Oct 2026: "marca para Porto 2 a partir das 8 da manhã de segunda a
+ * sexta até às 13 horas", "depois disso não consegue, só sábado e ao domingo"; Aleixo himself, 18 Oct: "melhor marcar
+ * sempre pra cedo"). The job has to start and finish inside the window.
+ */
+export const TEAM_WEEKDAY_HOURS: Readonly<Record<string, { from: number; to: number }>> = { 'Porto 2': { from: 8, to: 13 } };
+const isWeekday = (date: string) => { const d = new Date(`${date}T12:00:00Z`).getUTCDay(); return d >= 1 && d <= 5; };
+/** Whether the team works over this whole visit (TEAM_WEEKDAY_HOURS). */
+export function teamWorks(team: string, from: number, to: number): boolean {
+  const hours = TEAM_WEEKDAY_HOURS[team];
+  if (!hours) return true;
+  const start = lisbon(from), end = lisbon(to);
+  if (!isWeekday(start.date)) return true;
+  return start.date === end.date && start.minutes >= hours.from * 60 && end.minutes <= hours.to * 60;
+}
+/** The earliest start a team takes on this day: its weekday hours when it has them, otherwise EARLIEST_HOUR. */
+const teamEarliestMinutes = (team: string, date: string) =>
+  (TEAM_WEEKDAY_HOURS[team] && isWeekday(date) ? Math.min(TEAM_WEEKDAY_HOURS[team].from, EARLIEST_HOUR) : EARLIEST_HOUR) * 60;
 const TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map(t => [t, region as TeamZone] as const)));
 const AREA_REGION: Record<string, TeamZone> = {
   porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'Coimbra',
@@ -244,8 +274,11 @@ export interface Slot { date: string; minutes: number; label: string; time: stri
 function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
-  const spare = (t: string) => capacity(t) - busy.filter(b => b.team === t && overlaps(b)).length;
-  const teamsFree = teams.filter(t => spare(t) > 0);
+  const overlapsFor = (t: string) => (b: Busy) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
+  const spare = (t: string) => capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
+  // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
+  const early = (t: string) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
+  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
   const unassigned = busy.filter(b => !b.team && b.region === region && overlaps(b)).length;
   const near = (t: string) => busy.some(b => b.team === t
     && ((from - b.to >= 0 && from - b.to <= 90 * 60_000) || (b.from - to >= 0 && b.from - to <= 90 * 60_000)));
@@ -262,7 +295,8 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
 export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string): boolean {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
-  const margin = TRAVEL_MARGIN_MIN * 60_000;
+  if (!teamWorks(team, from, to)) return true;
+  const margin = marginMs(team);
   return busyIntervals(events).filter(b => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
 
@@ -492,7 +526,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const slots: Slot[] = [];
   for (const date of scan) {
     const label = dayLabel(date, today);
-    for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    const firstMinutes = Math.min(...teams.map(t => teamEarliestMinutes(t, date)));
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000);

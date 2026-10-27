@@ -2203,8 +2203,23 @@ var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zon
 function hasWaterproofing(items) {
   return Array.isArray(items) && items.some((i) => /essencial|premium/.test(String(i?.treatment ?? "")));
 }
-var TEAM_CAPACITY = { "Porto 1": 2, "Lisboa 1": 2 };
+var TEAM_CAPACITY = { "Lisboa 1": 2 };
 var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
+var TEAM_TRAVEL_MARGIN_MIN = { "Porto 1": 60 };
+var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 6e4;
+var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 8, to: 13 } };
+var isWeekday = (date) => {
+  const d = (/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay();
+  return d >= 1 && d <= 5;
+};
+function teamWorks(team, from, to) {
+  const hours = TEAM_WEEKDAY_HOURS[team];
+  if (!hours) return true;
+  const start = lisbon(from), end = lisbon(to);
+  if (!isWeekday(start.date)) return true;
+  return start.date === end.date && start.minutes >= hours.from * 60 && end.minutes <= hours.to * 60;
+}
+var teamEarliestMinutes = (team, date) => (TEAM_WEEKDAY_HOURS[team] && isWeekday(date) ? Math.min(TEAM_WEEKDAY_HOURS[team].from, EARLIEST_HOUR) : EARLIEST_HOUR) * 60;
 var TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map((t) => [t, region])));
 var AREA_REGION = {
   porto: "Porto",
@@ -2360,8 +2375,10 @@ function busyIntervals(events) {
 function slotState(busy, teams, region, from, to) {
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
-  const spare = (t) => capacity(t) - busy.filter((b) => b.team === t && overlaps(b)).length;
-  const teamsFree = teams.filter((t) => spare(t) > 0);
+  const overlapsFor = (t) => (b) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
+  const spare = (t) => capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
+  const early = (t) => lisbon(from).minutes < teamEarliestMinutes(t, lisbon(from).date);
+  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
   const unassigned = busy.filter((b) => !b.team && b.region === region && overlaps(b)).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
@@ -2371,7 +2388,8 @@ function slotState(busy, teams, region, from, to) {
 function teamBusyAt(events, team, startIso, endIso) {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
-  const margin = TRAVEL_MARGIN_MIN * 6e4;
+  if (!teamWorks(team, from, to)) return true;
+  const margin = marginMs(team);
   return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
 function chooseTeam(events, city, startIso, endIso, waterproofing = false) {
@@ -2534,7 +2552,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const slots = [];
   for (const date of scan) {
     const label = dayLabel(date, today);
-    for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    const firstMinutes = Math.min(...teams.map((t) => teamEarliestMinutes(t, date)));
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
@@ -2786,8 +2805,15 @@ function agendaCheck(events, date, now, pendingDays = 7) {
     if (!t.team) add(t, "sem equipa escolhida (falta a cor)");
     for (const m of missingData(t.e)) add(t, m);
     const start = lisbon(t.from).minutes, end = lisbon(t.to).minutes;
-    if (start < EARLIEST_HOUR * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
-      add(t, `fora do horário (${EARLIEST_HOUR}h às ${DAY_END_HOUR}h)`);
+    const own = t.team ? TEAM_WEEKDAY_HOURS[t.team] : void 0;
+    const weekday2 = [1, 2, 3, 4, 5].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
+    if (t.team && own && !teamWorks(t.team, t.from, t.to)) {
+      add(t, `${t.team} nos dias úteis só trabalha das ${own.from}h às ${own.to}h`);
+    } else {
+      const first = own && weekday2 ? Math.min(own.from, EARLIEST_HOUR) : EARLIEST_HOUR;
+      if (start < first * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
+        add(t, `fora do horário (${first}h às ${DAY_END_HOUR}h)`);
+      }
     }
     if (t.team && blocks.some((b) => b.team === t.team && b.from < t.to && b.to > t.from)) add(t, "a equipa tem um bloqueio a essa hora");
   }
@@ -2800,8 +2826,9 @@ function agendaCheck(events, date, now, pendingDays = 7) {
       const overlapping = list2.filter((o) => o !== t && o.from < t.to && o.to > t.from).length;
       if (overlapping >= cap) add(t, `${team} tem outro serviço à mesma hora`);
       const next = list2[i + 1];
-      if (cap === 1 && next && next.from >= t.to && next.from - t.to < TRAVEL_MARGIN_MIN * 6e4) {
-        add(next, `menos de ${TRAVEL_MARGIN_MIN} min de viagem desde o serviço anterior`);
+      const travel = TEAM_TRAVEL_MARGIN_MIN[team] ?? TRAVEL_MARGIN_MIN;
+      if (cap === 1 && next && next.from >= t.to && next.from - t.to < travel * 6e4) {
+        add(next, `menos de ${travel} min de viagem desde o serviço anterior`);
       }
     }
   }

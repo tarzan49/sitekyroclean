@@ -12,7 +12,7 @@ const GOOD = 'Serviço 45€ (89€) Limpeza de sofá 3 lugares - 912 345 678 - 
 
 describe('agendaCheck', () => {
   it('finds nothing wrong in a well formed day', () => {
-    const r = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 2'), ev('14:00', '15:00', GOOD, 'Porto 2')], TOMORROW, NOW);
+    const r = agendaCheck([ev('10:00', '11:00', GOOD, 'Braga'), ev('14:00', '15:00', GOOD, 'Braga')], TOMORROW, NOW);
     expect(r.services).toHaveLength(2);
     expect(r.issues).toEqual([]);
     expect(r.day).toBe('amanhã (sexta)');
@@ -36,8 +36,11 @@ describe('agendaCheck', () => {
   it('flags two jobs at once for a one-person team, not for a two-person team', () => {
     const one = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 2'), ev('10:30', '11:30', GOOD, 'Porto 2')], TOMORROW, NOW);
     expect(one.issues.filter(i => i.problem.includes('mesma hora'))).toHaveLength(2);
-    const two = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 1'), ev('10:30', '11:30', GOOD, 'Porto 1')], TOMORROW, NOW);
+    const two = agendaCheck([ev('10:00', '11:00', GOOD, 'Lisboa 1'), ev('10:30', '11:30', GOOD, 'Lisboa 1')], TOMORROW, NOW);
     expect(two.issues).toEqual([]);
+    // Porto 1 is one job at a time since 27 Oct 2026, with an hour of drive between jobs.
+    const p1 = agendaCheck([ev('10:00', '11:00', GOOD, 'Porto 1'), ev('11:30', '12:30', GOOD, 'Porto 1')], TOMORROW, NOW);
+    expect(p1.issues.map(i => i.problem)).toEqual(['menos de 60 min de viagem desde o serviço anterior']);
   });
 
   it('flags too little travel time and hours outside 10h-21h', () => {
@@ -49,8 +52,8 @@ describe('agendaCheck', () => {
 
   it('flags a job on top of a team block and ignores the owner\'s own appointments', () => {
     const r = agendaCheck([
-      ev('09:00', '18:00', 'Bloqueio Porto 2', 'Porto 2'),
-      ev('15:00', '16:00', GOOD, 'Porto 2'),
+      ev('09:00', '18:00', 'Bloqueio Braga', 'Braga'),
+      ev('15:00', '16:00', GOOD, 'Braga'),
       ev('15:00', '16:00', 'Jantar com amigos'),
     ], TOMORROW, NOW);
     expect(r.services).toHaveLength(1);
@@ -72,8 +75,8 @@ describe('agendaCheck', () => {
 
   it('accepts a free redo without a value and ignores team events that are not blocks', () => {
     const r = agendaCheck([
-      ev('15:00', '16:00', 'Serviço RETIFICAÇÃO GRATUITA (sem custo, não cobrar) - 912 345 678 - Ana Teste - Rua X 3, Porto', 'Porto 2'),
-      ev('14:00', '18:00', 'Entrega de tapetes', 'Porto 2'),
+      ev('15:00', '16:00', 'Serviço RETIFICAÇÃO GRATUITA (sem custo, não cobrar) - 912 345 678 - Ana Teste - Rua X 3, Porto', 'Braga'),
+      ev('14:00', '18:00', 'Entrega de tapetes', 'Braga'),
     ], TOMORROW, NOW);
     expect(r.issues).toEqual([]);
   });

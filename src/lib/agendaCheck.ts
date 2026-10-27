@@ -9,7 +9,7 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, EARLIEST_HOUR, TEAM_CAPACITY, TRAVEL_MARGIN_MIN,
+  DAY_END_HOUR, EARLIEST_HOUR, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN, teamWorks,
   dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent,
 } from './botAvailability';
 
@@ -88,8 +88,16 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
     if (!t.team) add(t, 'sem equipa escolhida (falta a cor)');
     for (const m of missingData(t.e)) add(t, m);
     const start = lisbon(t.from).minutes, end = lisbon(t.to).minutes;
-    if (start < EARLIEST_HOUR * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
-      add(t, `fora do horário (${EARLIEST_HOUR}h às ${DAY_END_HOUR}h)`);
+    // Porto 2 works weekdays only from 8h to 13h (owner, 27 Oct 2026).
+    const own = t.team ? TEAM_WEEKDAY_HOURS[t.team] : undefined;
+    const weekday = [1, 2, 3, 4, 5].includes(new Date(`${date}T12:00:00Z`).getUTCDay());
+    if (t.team && own && !teamWorks(t.team, t.from, t.to)) {
+      add(t, `${t.team} nos dias úteis só trabalha das ${own.from}h às ${own.to}h`);
+    } else {
+      const first = own && weekday ? Math.min(own.from, EARLIEST_HOUR) : EARLIEST_HOUR;
+      if (start < first * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
+        add(t, `fora do horário (${first}h às ${DAY_END_HOUR}h)`);
+      }
     }
     if (t.team && blocks.some(b => b.team === t.team && b.from < t.to && b.to > t.from)) add(t, 'a equipa tem um bloqueio a essa hora');
   }
@@ -104,8 +112,9 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
       const overlapping = list.filter(o => o !== t && o.from < t.to && o.to > t.from).length;
       if (overlapping >= cap) add(t, `${team} tem outro serviço à mesma hora`);
       const next = list[i + 1];
-      if (cap === 1 && next && next.from >= t.to && next.from - t.to < TRAVEL_MARGIN_MIN * 60_000) {
-        add(next, `menos de ${TRAVEL_MARGIN_MIN} min de viagem desde o serviço anterior`);
+      const travel = TEAM_TRAVEL_MARGIN_MIN[team] ?? TRAVEL_MARGIN_MIN;
+      if (cap === 1 && next && next.from >= t.to && next.from - t.to < travel * 60_000) {
+        add(next, `menos de ${travel} min de viagem desde o serviço anterior`);
       }
     }
   }
