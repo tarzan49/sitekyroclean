@@ -63,6 +63,28 @@ export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> =
 /** The teams that can take this job in the zone. */
 export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly string[] =>
   (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+/**
+ * Zones whose own team does not pick up rugs (owner, 27 Oct 2026: "a equipa de braga não faz recolha
+ * de tapetes, apenas limpezas ao domicílio"). The bot had booked a rug pickup in Viana do Castelo on
+ * Braga "sem me consultar". There the owner picks the team and the time: the bot offers no hours and
+ * never closes the job, it stays a pre-booking (or "A confirmar") for him.
+ */
+export const NO_RUG_PICKUP_ZONES: ReadonlySet<TeamZone> = new Set<TeamZone>(['Braga']);
+/** The zone of a served town, or of the postal code in an address; null when neither is known. */
+export function cityZone(cityOrAddress: unknown): TeamZone | null {
+  const name = resolveBotCity(cityOrAddress);
+  const area = name ? CITY_REGION.get(fold(name)) : undefined;
+  if (area) return area;
+  const postal = typeof cityOrAddress === 'string' ? POSTAL.exec(cityOrAddress) : null;
+  return postal ? zoneFromPostalCode(postal[1]) : null;
+}
+/** A rug pickup in a zone whose team does not do pickups: the reason it is the owner's, else null. */
+export function rugPickupOwnerReason(cityOrAddress: unknown, rugPickup: boolean): string | null {
+  if (!rugPickup) return null;
+  const zone = cityZone(cityOrAddress);
+  if (!zone || !NO_RUG_PICKUP_ZONES.has(zone)) return null;
+  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].join('/')} não faz recolhas, o responsável escolhe a equipa e a hora`;
+}
 /** The job includes waterproofing: an item with Essencial/Premium (the bot's `quote` items). */
 export function hasWaterproofing(items: unknown): boolean {
   return Array.isArray(items) && items.some(i => /essencial|premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
@@ -335,6 +357,8 @@ export interface AvailabilityRequest {
   time?: unknown;
   /** The owner gave this time himself (Algarve and his weekend picks). */
   ownerTime?: unknown;
+  /** true: the client wants the rugs picked up (in NO_RUG_PICKUP_ZONES the owner decides). */
+  rugPickup?: unknown;
   /** How many days to look ahead (default 4, max 14). */
   days?: unknown;
 }
@@ -498,6 +522,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
   // offers no hours there; it books only a time he gave.
   if (area === 'Algarve' && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: 'Algarve: o responsável escolhe o horário' };
+  // Owner, 27 Oct 2026: the Braga team does not pick up rugs. No hours from its calendar, even with a time he gave.
+  const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
+  if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
 
   const today = lisbon(now.getTime()).date;

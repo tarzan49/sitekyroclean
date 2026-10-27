@@ -9,8 +9,8 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, EARLIEST_HOUR, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN, teamWorks,
-  dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent,
+  DAY_END_HOUR, EARLIEST_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
+  WATERPROOFING_TEAMS, teamWorks, dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent, type TeamZone,
 } from './botAvailability';
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -60,6 +60,19 @@ function serviceWhat(summary: string): string {
   return what || 'serviço';
 }
 
+/**
+ * Trabalho que a equipa do evento não faz (dono): recolha de tapetes na equipa de Braga (27/10/2026,
+ * "a equipa de braga não faz recolha de tapetes, apenas limpezas ao domicílio") e impermeabilização
+ * nas equipas de uma zona que a manda para outra (WATERPROOFING_TEAMS, 15/10/2026).
+ */
+function wrongTeam(team: string, summary: string): string | null {
+  const zones = (Object.keys(TEAMS_BY_REGION) as TeamZone[]).filter(z => TEAMS_BY_REGION[z].includes(team));
+  if (/\brecolh/.test(summary) && zones.some(z => NO_RUG_PICKUP_ZONES.has(z))) return `a equipa ${team} não faz recolhas de tapetes (escolhe outra equipa)`;
+  const other = zones.map(z => WATERPROOFING_TEAMS[z]).find(t => t && !t.includes(team));
+  if (/\bimperm/.test(summary) && other) return `impermeabilizações desta zona são da equipa ${other.join('/')}, não da ${team}`;
+  return null;
+}
+
 /** O que falta no título de um serviço para a equipa o conseguir fazer. */
 function missingData(e: AvailabilityEvent): string[] {
   const text = `${e.summary}\n${e.description ?? ''}`;
@@ -86,6 +99,8 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
 
   for (const t of services) {
     if (!t.team) add(t, 'sem equipa escolhida (falta a cor)');
+    const wrong = t.team ? wrongTeam(t.team, t.summary.split(/\s+[-–]\s+/)[0] ?? '') : null;
+    if (wrong) add(t, wrong);
     for (const m of missingData(t.e)) add(t, m);
     const start = lisbon(t.from).minutes, end = lisbon(t.to).minutes;
     // Porto 2 works weekdays only from 8h to 13h (owner, 27 Oct 2026).

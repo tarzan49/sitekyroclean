@@ -19,6 +19,19 @@ describe('agendaCheck', () => {
     expect(r.message).toContain('Nada a corrigir');
   });
 
+  it('flags a rug pickup on Braga and a waterproofing on Braga (owner, 27 and 15 Oct), not the same jobs on Porto 1', () => {
+    const pickup = 'Serviço 95€ (209€) Recolha de 2 tapetes com lavagem e entrega - 912 345 678 - Ana Teste - Rua das Flores 12, 4900-123 Viana do Castelo';
+    const imper = 'Serviço 60€ (119€) Impermeabilização Premium sofá 3 lugares - 912 345 678 - Ana Teste - Rua das Flores 12, 4800-123 Guimarães';
+    const onBraga = agendaCheck([ev('10:00', '11:00', pickup, 'Braga'), ev('14:00', '15:00', imper, 'Braga')], TOMORROW, NOW);
+    expect(onBraga.issues.map(i => i.problem)).toEqual([
+      'a equipa Braga não faz recolhas de tapetes (escolhe outra equipa)',
+      'impermeabilizações desta zona são da equipa Porto 1, não da Braga',
+    ]);
+    expect(agendaCheck([ev('10:00', '11:00', pickup, 'Porto 1'), ev('14:00', '15:00', imper, 'Porto 1')], TOMORROW, NOW).issues).toEqual([]);
+    // A street called "Recolha" is not a pickup: only the service part of the title counts.
+    expect(agendaCheck([ev('10:00', '11:00', `${GOOD.replace('Rua das Flores', 'Rua da Recolha')}`, 'Braga')], TOMORROW, NOW).issues).toEqual([]);
+  });
+
   it('flags a service without team, phone or street', () => {
     const r = agendaCheck([ev('10:00', '11:00', 'Serviço 30€ (59€) Colchão casal - Ana Teste - Porto')], TOMORROW, NOW);
     expect(r.issues.map(i => i.problem)).toEqual([

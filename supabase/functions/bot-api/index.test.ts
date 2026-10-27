@@ -416,8 +416,13 @@ Deno.test("book leaves prices to confirm and missing data as a pre-booking for t
   script.calls.length = 0;
   const rug = JSON.parse(await (await holdCall(book("r", { phone: "911000001", items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
   assertEquals([rug.ok, typeof rug.handToOwner, rug.hold.ok], [false, "string", true]);
-  const noAddress = JSON.parse(await (await holdCall(book("n", { address: "" }), store, script.write)).text()).booking;
+  // Another phone: the Saturday client above already has a service, and a second one of the same phone is a reschedule.
+  const noAddress = JSON.parse(await (await holdCall(book("n", { phone: "911000002", address: "" }), store, script.write)).text()).booking;
   assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
+  // A rug pickup in the Braga zone is never closed by the bot: the Braga team does not pick up rugs (owner, 27 Oct).
+  const viana = JSON.parse(await (await holdCall(book("v", { phone: "911000003", city: "Viana do Castelo", address: "Rua Inventada 1, 4900-000 Viana do Castelo",
+    items: [{ kind: "rug", width: 3, length: 2.5 }], rugPickup: true, agreedTotal: 129, service: "Recolha de tapete" }), store, script.write)).text()).booking;
+  assertEquals([viana.ok, /Braga não faz recolhas/.test(viana.handToOwner), viana.hold.ok], [false, true, true]);
   assert(script.calls.every(c => c.action === "hold"));
 });
 

@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, hasWaterproofing, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, cityZone, hasWaterproofing, rugPickupOwnerReason, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -33,6 +33,7 @@ export type BotHoldResult =
   | BotHoldPlan
   | { ok: false; taken: true; alternatives: unknown }
   | { ok: false; handToOwner: string }
+  | { ok: false; alreadyBooked: true }
   | { error: string };
 
 /**
@@ -70,6 +71,11 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   if (typeof r.date !== 'string' || typeof r.time !== 'string') return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
 
   const others = ownEventId ? events.filter(e => e.id !== ownEventId) : events;
+  // The client already has a service near that day: a new hour moves that service (marcar_servico,
+  // and the chat reading of update-booking), never a pre-booking next to it (27 Oct 2026: Viana do
+  // Castelo, a "Pré-reserva" at the very hour the service had just been moved to). All events, not
+  // `others`: after a booking the conversation's own row points at that service.
+  if (clientServiceNear(events, text(r.phone, MAX.phone), r.date)) return { ok: false, alreadyBooked: true };
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
@@ -88,8 +94,10 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   const name = text(r.name, MAX.name) || 'cliente';
   const title = `Pré-reserva – ${name} – ${city} – ${what} – ${price}`;
   const pickup = quote.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote.rugPickup.fee)}` : '';
+  const pickupOwner = rugPickupOwnerReason(r.city, r.rugPickup === true);
   const description = [
     'Pré-reserva feita pelo bot do WhatsApp: confirma (muda o título para "Serviço X€ (Y€) …") ou apaga.',
+    pickupOwner ? `${pickupOwner}: muda a cor para a equipa que faz a recolha.` : '',
     `Telefone: ${text(r.phone, MAX.phone) || 'ver conversa'}`,
     `Artigos: ${what}`,
     `Total: ${price}${quote.quote ? '' : ` (deslocação incluída)`}`,
@@ -118,6 +126,8 @@ export type OwnerBookingResult =
   | { error: string };
 
 const digitsOf = (t: string) => t.replace(/\D/g, '');
+/** Town and address together, for the zone: the town first, the address's postal code when the town is not one we know. */
+const placeOf = (city: unknown, address: string) => [city, address].filter((v): v is string => typeof v === 'string' && !!v.trim()).join(', ');
 const amount = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 && v < 10_000 ? Math.round(v * 100) / 100 : null);
 
 /**
@@ -188,11 +198,17 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const waterproofing = /imperm|premium|essencial/i.test(service);
   const namedRaw = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
   const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
+  // Owner, 27 Oct 2026: the Braga team does not pick up rugs. A pickup there takes only a team the chat
+  // named outside the zone; otherwise it stays "A confirmar" and he picks the team.
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
+  const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
+  const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;
   // Owner, 19 Oct 2026: "quando é que eu disse que os serviços que marco ficam a confirmar? remove
   // essa regra". A booking with a price is a real "Serviço"; only one without a price (the title
   // would not parse in the CRM) stays "A confirmar".
-  const team = total !== null
-    ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing) : null;
+  const team = total === null ? null
+    : pickupOwner ? allowedNamed
+    : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing);
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
@@ -207,6 +223,7 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    pickupOwner && total !== null ? `${pickupOwner}: escolhe a cor da equipa que faz a recolha.` : '',
     text(r.notes, 600),
     pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : '',
     `bot:${conversationId}`,
@@ -266,6 +283,10 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   // booking (owner, 19 Oct 2026, Filipa: moved from 19 to 20 Oct and came in twice).
   const booked = clientServiceNear(others, phone, r.date);
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
+  // Owner, 27 Oct 2026: "marcaste um serviço para recolha em viana do castelo sem me consultar [...] a
+  // equipa de braga não faz recolha de tapetes". Never closed by the bot: it stays a pre-booking for him.
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
+  if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
 
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };

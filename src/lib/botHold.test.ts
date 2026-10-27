@@ -49,6 +49,13 @@ describe('planBotHold', () => {
     expect(planBotHold(req({ date: '2026-10-01' }), [], NOW)).toHaveProperty('error');
   });
 
+  it('never a pre-booking next to a service the client already has (27 Oct: Viana do Castelo, duplicate at the same hour)', () => {
+    const booked: AvailabilityEvent & { id: string } = { id: 's1', summary: 'Serviço 45€ (89€) Limpeza de sofá - 900000000 - Ana Teste - Rua X 1, Oeiras', description: 'Equipa: Lisboa 1\n\nbot:c1', status: 'CONFIRMED', start: '2026-10-09T09:00:00Z', end: '2026-10-09T10:00:00Z' };
+    // Also when the conversation's own row points at that service (after marcar_servico it does).
+    expect(planBotHold(req(), [booked], NOW, 's1')).toEqual({ ok: false, alreadyBooked: true });
+    expect(plan(req({ phone: '+351 900 000 009' }), [booked]).ok).toBe(true);
+  });
+
   it('keeps "sob orçamento" when the engine has no price, and the name on one line', () => {
     const p = plan(req({ items: [{ kind: 'rug', width: 2, length: 3 }], name: 'Rui\nTeste', rugPickup: true }));
     expect(p.event.title).toMatch(/– sob orçamento$/);
@@ -102,6 +109,20 @@ describe('planOwnerBooking', () => {
     const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, [], NOW.getTime());
     expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · /);
   });
+  it('a rug pickup in the Braga zone stays "A confirmar" for the owner, unless the chat named a team from outside (owner, 27 Oct)', () => {
+    const viana = { ...base, confirmed: true, city: 'Viana do Castelo', address: 'Rua Inventada 1, 4900-000 Viana do Castelo', total: 209, pickupFee: 20 };
+    const p = planOwnerBooking(viana, [], NOW.getTime());
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.team).toBeUndefined();
+    expect(p.event.title).toMatch(/^A confirmar · Serviço 95€ \(209€\) Recolha/);
+    expect(p.event.description).toContain('a equipa Braga não faz recolhas');
+    expect(planOwnerBooking({ ...viana, team: 'Braga' }, [], NOW.getTime())).not.toHaveProperty('team');
+    expect(planOwnerBooking({ ...viana, team: 'Porto 1' }, [], NOW.getTime())).toMatchObject({ team: 'Porto 1', event: { colorId: '9' } });
+    // Only the town's postal code: still the Braga zone.
+    expect(planOwnerBooking({ ...viana, city: undefined }, [], NOW.getTime())).not.toHaveProperty('team');
+    // A home cleaning there is still Braga's.
+    expect(planOwnerBooking({ ...viana, service: 'Limpeza de sofá 3 lugares', pickupFee: undefined, total: 89 }, [], NOW.getTime())).toMatchObject({ team: 'Braga' });
+  });
   it('checks its input', () => {
     expect(planOwnerBooking({ ...base, time: 'amanhã' }, [], NOW.getTime())).toHaveProperty('error');
     expect(planOwnerBooking({ ...base, service: '' }, [], NOW.getTime())).toHaveProperty('error');
@@ -133,6 +154,20 @@ describe('planBotBooking', () => {
     // A rug with no engine price closes too once the price was agreed; without it, it goes to the owner.
     expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }], agreedTotal: 79 }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ agreedTotal: -5, items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false });
+  });
+
+  it('never closes a rug pickup in the Braga zone: the Braga team does not pick up rugs (owner, 27 Oct, Viana do Castelo)', () => {
+    const rugs = [{ kind: 'rug', width: 3.66, length: 2.44, material: 'lã' }, { kind: 'rug', width: 2.44, length: 3.3, material: 'lã' }];
+    const viana = { city: 'Viana do Castelo', address: 'Rua Inventada 1, 4900-000 Viana do Castelo', items: rugs, agreedTotal: 209 };
+    const reason = expect.stringMatching(/Braga não faz recolhas/);
+    expect(planBotBooking(book({ ...viana, rugPickup: true, service: 'Lavagem de 2 tapetes' }), [], NOW)).toEqual({ ok: false, handToOwner: reason });
+    // The bot forgot the flag but the service says it.
+    expect(planBotBooking(book({ ...viana, service: 'Recolha de 2 tapetes com lavagem e entrega' }), [], NOW)).toEqual({ ok: false, handToOwner: reason });
+    // Not even at an hour he gave himself: the team is his to pick.
+    expect(planBotBooking(book({ ...viana, rugPickup: true, ownerApprovedTime: true }), [], NOW)).toEqual({ ok: false, handToOwner: reason });
+    // Washing at home there, and pickups elsewhere, still close.
+    expect(planBotBooking(book({ ...viana, agreedTotal: 189, service: 'Lavagem de 2 tapetes em casa' }), [], NOW)).toMatchObject({ ok: true, team: 'Braga' });
+    expect(planBotBooking(book({ items: rugs, agreedTotal: 209, rugPickup: true, service: 'Recolha de 2 tapetes' }), [], NOW)).toMatchObject({ ok: true, team: 'Lisboa 1' });
   });
 
   it('closes Saturdays and Sundays from the calendar (owner, 18 Oct), leaves anything without an engine price', () => {

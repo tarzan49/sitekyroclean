@@ -2200,6 +2200,20 @@ var TEAMS_BY_REGION = {
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 var WATERPROOFING_TEAMS = { Braga: ["Porto 1"] };
 var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
+var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
+function cityZone(cityOrAddress) {
+  const name = resolveBotCity(cityOrAddress);
+  const area = name ? CITY_REGION.get(fold3(name)) : void 0;
+  if (area) return area;
+  const postal = typeof cityOrAddress === "string" ? POSTAL.exec(cityOrAddress) : null;
+  return postal ? zoneFromPostalCode(postal[1]) : null;
+}
+function rugPickupOwnerReason(cityOrAddress, rugPickup) {
+  if (!rugPickup) return null;
+  const zone = cityZone(cityOrAddress);
+  if (!zone || !NO_RUG_PICKUP_ZONES.has(zone)) return null;
+  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].join("/")} não faz recolhas, o responsável escolhe a equipa e a hora`;
+}
 function hasWaterproofing(items) {
   return Array.isArray(items) && items.some((i) => /essencial|premium/.test(String(i?.treatment ?? "")));
 }
@@ -2530,6 +2544,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   if (area === "Algarve" && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
+  const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
+  if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
@@ -2616,6 +2632,7 @@ function planBotHold(req, events, now, ownEventId) {
   if (!conversationId) return { error: "conversationId em falta" };
   if (typeof r.date !== "string" || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
   const others = ownEventId ? events.filter((e) => e.id !== ownEventId) : events;
+  if (clientServiceNear(events, text(r.phone, MAX.phone), r.date)) return { ok: false, alreadyBooked: true };
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
@@ -2633,8 +2650,10 @@ function planBotHold(req, events, now, ownEventId) {
   const name = text(r.name, MAX.name) || "cliente";
   const title = `Pré-reserva – ${name} – ${city} – ${what} – ${price}`;
   const pickup = quote.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote.rugPickup.fee)}` : "";
+  const pickupOwner = rugPickupOwnerReason(r.city, r.rugPickup === true);
   const description = [
     'Pré-reserva feita pelo bot do WhatsApp: confirma (muda o título para "Serviço X€ (Y€) …") ou apaga.',
+    pickupOwner ? `${pickupOwner}: muda a cor para a equipa que faz a recolha.` : "",
     `Telefone: ${text(r.phone, MAX.phone) || "ver conversa"}`,
     `Artigos: ${what}`,
     `Total: ${price}${quote.quote ? "" : ` (deslocação incluída)`}`,
@@ -2647,6 +2666,7 @@ function planBotHold(req, events, now, ownEventId) {
 }
 var OWNER_BOOKING_PREFIX = "A confirmar · ";
 var digitsOf = (t) => t.replace(/\D/g, "");
+var placeOf = (city, address) => [city, address].filter((v) => typeof v === "string" && !!v.trim()).join(", ");
 var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
 var RUG_PICKUP_TEAM_FUEL = 10;
 var pickupFuelOf = (pickupFee = 0) => pickupFee > 0 ? Math.min(pickupFee, RUG_PICKUP_TEAM_FUEL) : 0;
@@ -2685,7 +2705,10 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   const waterproofing = /imperm|premium|essencial/i.test(service);
   const namedRaw = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
   const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
-  const team = total !== null ? named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing) : null;
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
+  const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
+  const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;
+  const team = total === null ? null : pickupOwner ? allowedNamed : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing);
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
@@ -2700,6 +2723,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    pickupOwner && total !== null ? `${pickupOwner}: escolhe a cor da equipa que faz a recolha.` : "",
     text(r.notes, 600),
     pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : "",
     `bot:${conversationId}`
@@ -2725,6 +2749,8 @@ function planBotBooking(req, events, now, ownEventId) {
   if (key9.length === 9 && others.some((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
   const booked = clientServiceNear(others, phone, r.date);
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
+  if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
   const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
@@ -2782,6 +2808,13 @@ function serviceWhat(summary) {
   const what = head.replace(/\(an[uú]ncio[^)]*\)/giu, " ").replace(/^\s*(servi[cç]o|limpeza)\s+(?=\d)/iu, "").replace(/\d+(?:[.,]\d{1,2})?\s*€\s*(\(\s*\d+(?:[.,]\d{1,2})?\s*€\s*\))?/gu, " ").replace(/^\s*servi[cç]o\b/iu, "").replace(/\s{2,}/g, " ").trim();
   return what || "serviço";
 }
+function wrongTeam(team, summary) {
+  const zones = Object.keys(TEAMS_BY_REGION).filter((z) => TEAMS_BY_REGION[z].includes(team));
+  if (/\brecolh/.test(summary) && zones.some((z) => NO_RUG_PICKUP_ZONES.has(z))) return `a equipa ${team} não faz recolhas de tapetes (escolhe outra equipa)`;
+  const other = zones.map((z) => WATERPROOFING_TEAMS[z]).find((t) => t && !t.includes(team));
+  if (/\bimperm/.test(summary) && other) return `impermeabilizações desta zona são da equipa ${other.join("/")}, não da ${team}`;
+  return null;
+}
 function missingData(e) {
   const text2 = `${e.summary}
 ${e.description ?? ""}`;
@@ -2805,6 +2838,8 @@ function agendaCheck(events, date, now, pendingDays = 7) {
   const add = (t, problem) => issues.push({ time: time(t.from), team: t.team, what: serviceWhat(t.e.summary), problem });
   for (const t of services) {
     if (!t.team) add(t, "sem equipa escolhida (falta a cor)");
+    const wrong = t.team ? wrongTeam(t.team, t.summary.split(/\s+[-–]\s+/)[0] ?? "") : null;
+    if (wrong) add(t, wrong);
     for (const m of missingData(t.e)) add(t, m);
     const start = lisbon(t.from).minutes, end = lisbon(t.to).minutes;
     const own = t.team ? TEAM_WEEKDAY_HOURS[t.team] : void 0;

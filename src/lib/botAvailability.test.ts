@@ -223,6 +223,16 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(r.free).toEqual([]);
     expect(r.handToOwner).toMatch(/Algarve/);
   });
+  it('rug pickup in the Braga zone: no hours, the owner picks the team (27 Oct 2026, Viana do Castelo); home washing and other zones as before', () => {
+    const rugs = [{ kind: 'rug', qty: 2, width: 3, length: 2.5 }];
+    const pickup = ok(botAvailability({ city: 'Viana do Castelo', items: rugs, rugPickup: true }, [], NOW));
+    expect(pickup.free).toEqual([]);
+    expect(pickup.teams).toEqual([]);
+    expect(pickup.handToOwner).toMatch(/Braga não faz recolhas/);
+    expect(ok(botAvailability({ city: 'Guimarães', items: rugs, rugPickup: true, ownerTime: true }, [], NOW)).handToOwner).toMatch(/recolhas/);
+    expect(ok(botAvailability({ city: 'Viana do Castelo', items: rugs }, [], NOW))).toMatchObject({ handToOwner: null, teams: ['Braga'] });
+    expect(ok(botAvailability({ city: 'Matosinhos', items: rugs, rugPickup: true }, [], NOW)).handToOwner).toBeNull();
+  });
 });
 
 describe("the owner's rules for the next days (DAY_RULES)", () => {
