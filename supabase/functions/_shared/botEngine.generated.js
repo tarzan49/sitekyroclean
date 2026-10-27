@@ -3127,9 +3127,10 @@ var PROCEDURE_FULL_SHARE = 50;
 var PROCEDURE_REDUCED_SHARE = 45;
 var PROCEDURE_PAY_RULE = "all_or_45";
 var PROCEDURE_REVIEW_BONUS = 5;
+var mediaOk = (got) => got.before && got.after || got.video;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
+  if (rule === "all_or_45") return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   const media = got.before && got.after && got.video;
-  if (rule === "all_or_45") return media && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   if (rule === "review_compensates") {
     if (media && got.review) return { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS };
     return { teamShare: media || got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };
@@ -3179,7 +3180,8 @@ function checkProcedure(rec, reviews, endedDay) {
   const after = !!rec.after_msg_id && inTime(rec.after_at);
   const video = !!rec.video_msg_id && inTime(rec.video_at);
   const review = reviews.some((r) => !r.excluded && r.stars >= REVIEW_MIN_STARS && lisbonDayOf(r.reviewed_at) <= deadline);
-  const missing = ["before", "after", "video", "review"].filter((k) => !{ before, after, video, review }[k]);
+  const got = { before, after, video, review };
+  const missing = ["before", "after", "video", "review"].filter((k) => !got[k]).filter((k) => k === "review" || !mediaOk(got));
   const status = missing.length === 0 ? "completo" : endedDay >= deadline ? "fechado" : "em_curso";
   return {
     before,

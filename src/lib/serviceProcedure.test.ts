@@ -37,8 +37,15 @@ describe('checkProcedure', () => {
     expect(checkProcedure(rec(media), [{ ...five, reviewed_at: '2026-10-23T09:00:00Z' }], '2026-10-23').missing).toEqual(['review']);
   });
 
-  it('a video sent after the deadline does not count', () => {
-    expect(checkProcedure(rec({ ...media, video_at: '2026-10-23T10:00:00Z' }), [five], '2026-10-23').missing).toEqual(['video']);
+  it('photos alone are enough: a late video is not missing (owner 27/10)', () => {
+    const c = checkProcedure(rec({ ...media, video_at: '2026-10-23T10:00:00Z' }), [five], '2026-10-23');
+    expect(c.video).toBe(false);
+    expect(c.missing).toEqual([]);
+    expect(c.status).toBe('completo');
+  });
+  it('a video alone is enough, without the photos (owner 27/10)', () => {
+    const c = checkProcedure(rec({ ...media, before_msg_id: null, after_msg_id: null }), [five], '2026-10-23');
+    expect(c.missing).toEqual([]);
   });
 });
 
@@ -48,7 +55,10 @@ describe('the pay rule lives in one function', () => {
     expect(procedurePay(all)).toEqual({ teamShare: 50, bonus: 5 });
     // 27/10: the bot told Aleixo "sem avaliação… a equipa fica com 50%".
     expect(procedurePay({ ...all, review: false })).toEqual({ teamShare: 45, bonus: 0 });
-    expect(procedurePay({ ...all, video: false })).toEqual({ teamShare: 45, bonus: 0 });
+    // 27/10 à tarde: fotografias de antes e depois OU vídeo chegam.
+    expect(procedurePay({ ...all, video: false })).toEqual({ teamShare: 50, bonus: 5 });
+    expect(procedurePay({ ...all, before: false, after: false })).toEqual({ teamShare: 50, bonus: 5 });
+    expect(procedurePay({ ...all, after: false, video: false })).toEqual({ teamShare: 45, bonus: 0 });
     expect(procedurePay({ before: false, after: false, video: false, review: true })).toEqual({ teamShare: 45, bonus: 0 });
     expect(procedurePay({ ...all, video: false, review: false })).toEqual({ teamShare: 45, bonus: 0 });
   });

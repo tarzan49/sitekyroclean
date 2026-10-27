@@ -29,7 +29,8 @@ export const PROCEDURE_REDUCED_SHARE = 45;
  * contas mandadas aos grupos: "Se faltar uma das duas coisas, ficam mais 5% do
  * valor do serviço para mim"; e as contas de 26/10 dão +5€ a cada serviço
  * completo): fotografias de antes e depois + vídeo + avaliação de 4 ou 5
- * estrelas = 50% + 5€; falta qualquer uma = 45%. A 27/10 o bot disse ao Aleixo
+ * estrelas = 50% + 5€; falta qualquer uma = 45%. Desde 27/10 à tarde as
+ * fotografias OU o vídeo chegam (mediaOk). A 27/10 o bot disse ao Aleixo
  * "sem avaliação… a equipa fica com 50%" com a regra antiga, e o dono: "a
  * equipa fica com 50%????". Ficam as regras anteriores, por comparação:
  * 'review_compensates' (14/10 às 11h20: a avaliação compensava fotografias ou
@@ -54,9 +55,17 @@ export interface ProcedurePay {
   bonus: number;
 }
 
+/**
+ * Provas do trabalho (dono, 27/10: "nem sempre dá para gravar vídeos"): as
+ * fotografias de antes e depois OU o vídeo chegam; não se penaliza o que falta
+ * do outro lado.
+ */
+export const mediaOk = (got: { before: boolean; after: boolean; video: boolean }) => (got.before && got.after) || got.video;
+
 export function procedurePay(got: { before: boolean; after: boolean; video: boolean; review: boolean }, rule: ProcedurePayRule = PROCEDURE_PAY_RULE): ProcedurePay {
+  if (rule === 'all_or_45') return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
+  // As regras antigas, como eram: fotografias e vídeo.
   const media = got.before && got.after && got.video;
-  if (rule === 'all_or_45') return media && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   if (rule === 'review_compensates') {
     if (media && got.review) return { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS };
     return { teamShare: media || got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };
@@ -166,7 +175,10 @@ export function checkProcedure(rec: ProcedureRecord, reviews: ProcedureReview[],
   const after = !!rec.after_msg_id && inTime(rec.after_at);
   const video = !!rec.video_msg_id && inTime(rec.video_at);
   const review = reviews.some(r => !r.excluded && r.stars >= REVIEW_MIN_STARS && lisbonDayOf(r.reviewed_at) <= deadline);
-  const missing = (['before', 'after', 'video', 'review'] as const).filter(k => !{ before, after, video, review }[k]);
+  const got = { before, after, video, review };
+  const missing = (['before', 'after', 'video', 'review'] as const)
+    .filter(k => !got[k])
+    .filter(k => k === 'review' || !mediaOk(got));
   const status: ProcedureStatus = missing.length === 0 ? 'completo' : endedDay >= deadline ? 'fechado' : 'em_curso';
   return {
     before, after, video, review, missing: [...missing], deadline, status,
@@ -362,7 +374,7 @@ export function procedureWeeklySummary(
     const key = `${week}|${rec.team}`;
     const row = map.get(key) ?? { week, team: rec.team, services: 0, media: 0, review: 0, complete: 0, open: 0, closedIncomplete: 0 };
     row.services++;
-    if (c.before && c.after && c.video) row.media++;
+    if (mediaOk(c)) row.media++;
     if (c.review) row.review++;
     if (c.status === 'completo') row.complete++;
     else if (c.status === 'em_curso') row.open++;
