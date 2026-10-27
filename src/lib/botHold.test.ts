@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planBotBooking, planBotHold, planOwnerBooking, type BotHoldPlan } from './botHold';
+import { ownerShare, planBotBooking, planBotHold, planOwnerBooking, type BotHoldPlan } from './botHold';
 import { botAvailability, eventRegion, type AvailabilityEvent } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal. Invented data only: the repo is public.
@@ -70,11 +70,14 @@ describe('planOwnerBooking', () => {
     expect(p.event.description).toContain('bot:c9');
     expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
   });
-  it('rug pickup: half the total minus the pickup price he set, rounded up', () => {
-    const p = planOwnerBooking({ ...base, pickupFee: 20 }, [], NOW.getTime());
-    expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 60€ \(159€\)/);
-    const q = planOwnerBooking({ ...base, total: 119, pickupFee: 15 }, [], NOW.getTime());
-    expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 45€ \(119€\)/);
+  it('rug pickup: half the total minus 10€ of fuel for whoever picks it up, rounded up (owner, 27 Oct)', () => {
+    const p = planOwnerBooking({ ...base, total: 139, pickupFee: 20 }, [], NOW.getTime());
+    expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 60€ \(139€\)/);
+    expect('ok' in p && p.ok && p.event.description).toContain('menos 10€ de gasolina');
+    const q = planOwnerBooking({ ...base, total: 159, pickupFee: 20 }, [], NOW.getTime());
+    expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 70€ \(159€\)/);
+    expect(ownerShare(119)).toBe(60);
+    expect(ownerShare(119, 5)).toBe(55);
   });
   it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
     const p = planOwnerBooking({ ...base, total: null, fromAds: true }, [], NOW.getTime());
