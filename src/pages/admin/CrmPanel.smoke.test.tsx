@@ -59,8 +59,15 @@ describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
     expect(screen.getByRole('tab', { name: 'Faturas e IVA' }).getAttribute('aria-selected')).toBe('true');
     // Outubro: 48,07 + 155,02 (com o upsell) = 203,09; o Francisco fica de fora.
     expect(screen.getAllByText('203.09€').length).toBeGreaterThan(0);
-    expect(screen.getByText(/1 fatura do Francisco \(14.77€ de IVA, já entregue\)/)).toBeTruthy();
+    // As do Francisco aparecem na lista, com o IVA já entregue.
+    expect(screen.getByText('Ana Teste')).toBeTruthy();
+    expect(screen.getByText('IVA 14.77€ · entregue')).toBeTruthy();
     expect(screen.getByText('Rita Teste')).toBeTruthy();
+    const show = within(screen.getByRole('group', { name: 'Mostrar faturas' }));
+    fireEvent.click(show.getByRole('button', { name: /Entregues/ }));
+    expect(screen.getByText('Ana Teste')).toBeTruthy();
+    expect(screen.queryByText('Rita Teste')).toBeNull();
+    fireEvent.click(show.getByRole('button', { name: /Todas/ }));
     expect(screen.queryByText('Joana Teste')).toBeNull();
 
     // Setembro, por mês.
