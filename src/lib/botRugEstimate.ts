@@ -103,7 +103,7 @@ function comboOf(rug: Extract<RugEstimate, { ok: true }>, othersPrice: number): 
   };
 }
 
-const ASSUMED_NOTE = 'Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de lã, juta ou sisal, o valor é ajustado. Se a fotografia mostrar claramente lã, juta, sisal, seda ou persa, recalcula com esse material antes de responder. ';
+const ASSUMED_NOTE = 'Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de juta ou sisal, o valor é ajustado (a lã paga o mesmo). Se a fotografia mostrar claramente juta, sisal, seda, viscose ou persa, recalcula com esse material antes de responder. ';
 
 export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEstimate {
   if (!rugs.length) return { ok: false, reason: 'sem tapetes' };

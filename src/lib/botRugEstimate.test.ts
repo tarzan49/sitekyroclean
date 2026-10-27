@@ -31,7 +31,7 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     const r = rugEstimate([{ width: 2, length: 3, qty: 1 }], 'Porto');
     expect(r.ok && r.materialAssumed).toBe(true);
     expect(r.ok && r.homePrice).toBe((rugEstimate([{ width: 2, length: 3, qty: 1, material: 'microfibra' }], 'Porto') as { homePrice: number }).homePrice);
-    expect(r.ok && r.rule).toMatch(/lã, juta ou sisal/);
+    expect(r.ok && r.rule).toMatch(/juta ou sisal/);
     const known = rugEstimate([{ width: 2, length: 3, qty: 1, material: 'juta' }], 'Porto');
     expect(known.ok && known.materialAssumed).toBeFalsy();
   });

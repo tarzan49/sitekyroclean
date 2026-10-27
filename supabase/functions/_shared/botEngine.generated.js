@@ -502,7 +502,7 @@ function comboOf(rug, othersPrice) {
     rule: "Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas."
   };
 }
-var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de lã, juta ou sisal, o valor é ajustado. Se a fotografia mostrar claramente lã, juta, sisal, seda ou persa, recalcula com esse material antes de responder. ";
+var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de juta ou sisal, o valor é ajustado (a lã paga o mesmo). Se a fotografia mostrar claramente juta, sisal, seda, viscose ou persa, recalcula com esse material antes de responder. ";
 function rugEstimate(rugs, city) {
   if (!rugs.length) return { ok: false, reason: "sem tapetes" };
   if (!city || !(city in locationPrices)) return { ok: false, reason: "localidade não servida" };
