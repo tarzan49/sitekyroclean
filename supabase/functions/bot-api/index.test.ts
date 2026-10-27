@@ -376,9 +376,9 @@ Deno.test("hold writes one pre-booking per conversation, returns only times, and
   assertEquals(script.calls[1].eventId, "ev1");
   assertEquals(rows.size, 1);
 
-  // Oeiras: only Lisboa 1 since 19 Oct (two people), so a second client fits at 16h and a third does not.
-  assertEquals(JSON.parse(await (await holdCall(hold("b", "16h"), store, script.write)).text()).hold.ok, true);
-  const third = JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold;
+  // Oeiras: only Lisboa 1, and two cleanings 1h30 apart (owner, 27 Oct): a second client fits at 17h30, a third does not.
+  assertEquals(JSON.parse(await (await holdCall(hold("b", "17h30"), store, script.write)).text()).hold.ok, true);
+  const third = JSON.parse(await (await holdCall(hold("c", "17h30"), store, script.write)).text()).hold;
   assertEquals(third.ok, false);
   assertEquals(third.taken, true);
   assertEquals(script.calls.length, 3);
@@ -417,7 +417,7 @@ Deno.test("book leaves prices to confirm and missing data as a pre-booking for t
   const rug = JSON.parse(await (await holdCall(book("r", { phone: "911000001", items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
   assertEquals([rug.ok, typeof rug.handToOwner, rug.hold.ok], [false, "string", true]);
   // Another phone: the Saturday client above already has a service, and a second one of the same phone is a reschedule.
-  const noAddress = JSON.parse(await (await holdCall(book("n", { phone: "911000002", address: "" }), store, script.write)).text()).booking;
+  const noAddress = JSON.parse(await (await holdCall(book("n", { phone: "911000002", address: "", time: "17h" }), store, script.write)).text()).booking;
   assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
   // A rug pickup in the Braga zone is never closed by the bot: the Braga team does not pick up rugs (owner, 27 Oct).
   const viana = JSON.parse(await (await holdCall(book("v", { phone: "911000003", city: "Viana do Castelo", address: "Rua Inventada 1, 4900-000 Viana do Castelo",
@@ -430,7 +430,9 @@ Deno.test("book at an hour another service of the zone has: pre-booking for the 
   const { store } = fakeHolds();
   const script = fakeScript();
   await holdCall(book("first"), store, script.write);
-  const second = JSON.parse(await (await holdCall(book("second", { phone: "911111111" }), store, script.write)).text()).booking;
+  // Waterproofing only may share the hour of a cleaning (owner, 27 Oct); it still goes to the owner.
+  const second = JSON.parse(await (await holdCall(book("second", { phone: "911111111", service: "Impermeabilização Premium sofá 3 lugares",
+    items: [{ kind: "sofa", size: "3-lugares", qty: 1, treatment: "premium" }] }), store, script.write)).text()).booking;
   assertEquals([second.ok, second.sameTime, second.hold.ok], [false, true, true]);
   assertEquals(script.calls.map(c => c.action), ["book", "hold"]);
 });
@@ -496,7 +498,7 @@ Deno.test("conversations-upsert grava linhas válidas e recusa as inválidas", a
 
 Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour and the owner is told (16 Oct)", async () => {
   const ev = (id: string, phone: string, start: string, end: string, team: string) => ({
-    id, summary: `Serviço 108€ (215€) Impermeabilização Premium de 8 cadeiras - ${phone} - Cliente Inventado - Rua X 1, 2640-000 Mafra`,
+    id, summary: `Serviço 108€ (215€) Limpeza de 8 cadeiras - ${phone} - Cliente Inventado - Rua X 1, 2640-000 Mafra`,
     description: `Equipa: ${team}\n\nbot:${phone}@s.whatsapp.net`, location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED", start, end,
   });
   const events = [ev("mine", "900000001", "2026-10-19T09:00:00Z", "2026-10-19T10:45:00Z", "Porto 2"),
