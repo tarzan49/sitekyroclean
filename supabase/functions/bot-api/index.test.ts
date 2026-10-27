@@ -495,7 +495,7 @@ Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour a
     description: `Equipa: ${team}\n\nbot:${phone}@s.whatsapp.net`, location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED", start, end,
   });
   const events = [ev("mine", "900000001", "2026-10-19T09:00:00Z", "2026-10-19T10:45:00Z", "Porto 2"),
-    ev("other", "900000002", "2026-10-19T14:00:00Z", "2026-10-19T15:00:00Z", "Porto 2")];
+    ev("other", "900000002", "2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z", "Porto 2")];
   const writes: Record<string, unknown>[] = [], mails: string[] = [];
   const call = (time: string) => handleBotRequest(
     new Request("https://x/functions/v1/bot-api", {
@@ -508,15 +508,21 @@ Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour a
       notifyOwner: (subject: string) => { mails.push(subject); return Promise.resolve(null); } },
   ).then(r => r.json());
 
-  // 15:00 Lisbon = 14:00 UTC: Porto 2 (one person) already works then.
-  const busy = await call("15:00");
+  // Porto 2 works weekdays 8h-13h (owner, 27 Oct), so the fixture stays in the morning.
+  // 09:00 Lisbon = 08:00 UTC: Porto 2 (one person) has the 8h job until 9h, plus the drive.
+  const busy = await call("09:00");
   assertEquals([busy.update.ok, busy.update.moved, busy.update.teamBusy], [true, false, "Porto 2"]);
   assertEquals(writes[0].start, "2026-10-19T09:00:00Z");
   assert(String(writes[0].title).includes("2640-813"));
   assert(mails.some(m => m.includes("Porto 2 está ocupada")), mails.join());
 
-  // 12:00 Lisbon is free for the team: the event moves.
-  const free = await call("12:00");
+  // 11:00 Lisbon is free for the team and the 1h45 job ends by 13h: the event moves.
+  const free = await call("11:00");
   assertEquals([free.update.ok, free.update.moved, free.update.teamBusy], [true, true, undefined]);
-  assertEquals(writes[1].start, "2026-10-19T11:00:00.000Z");
+  assertEquals(writes[1].start, "2026-10-19T10:00:00.000Z");
+
+  // 15:00 Lisbon on a weekday: no other job, but Porto 2 does not work afternoons (owner, 27 Oct).
+  const afternoon = await call("15:00");
+  assertEquals([afternoon.update.ok, afternoon.update.moved, afternoon.update.teamBusy], [true, false, "Porto 2"]);
+  assertEquals(writes[2].start, "2026-10-19T09:00:00Z");
 });
