@@ -25,6 +25,8 @@ export interface InvoiceRow {
   upsell_value?: number | string | null;
   /** IVA à parte (por cima do preço combinado); false = IVA incluído no preço. */
   vat_on_top?: boolean | null;
+  /** Quem passou a fatura: "Francisco" (até 20/10, IVA já entregue por ele) ou "Empresa". */
+  invoice_by?: string | null;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -58,4 +60,34 @@ export function invoiceStatusOf(r: InvoiceRow): InvoiceStatus {
 /** O preço combinado sem o IVA, quando o IVA foi à parte: o valor do serviço menos o IVA. */
 export function priceBeforeVatOf(r: InvoiceRow): number {
   return round2((Number(r.billed_value) || 0) - serviceVatOf(r));
+}
+
+/**
+ * IVA que a empresa tem de entregar ao Estado por este serviço (dono, 2026-10-27:
+ * "o valor exatamente certinho que eu tenho que entregar"): só os serviços com
+ * fatura da empresa. As faturas do Francisco ficam de fora: o IVA delas já foi
+ * entregue por ele, e o cut desses serviços fica como estava.
+ */
+export function vatToDeliverOf(r: InvoiceRow): number {
+  if (!r.invoiced || r.invoice_by === 'Francisco') return 0;
+  return invoiceVatOf(r);
+}
+
+/**
+ * A parte do dono num serviço com fatura da empresa, sem o IVA: o valor sem IVA
+ * menos a parte da equipa, que é metade do valor sem IVA arredondada ao cêntimo
+ * para baixo (a mesma conta de teamAccounts.ts). null = não tem fatura da
+ * empresa, e o cut é o `my_cut` escrito.
+ */
+export function ownerServiceCutWithoutVat(r: InvoiceRow): number | null {
+  if (!r.invoiced || r.invoice_by === 'Francisco') return null;
+  const net = round2((Number(r.billed_value) || 0) - serviceVatOf(r));
+  return round2(net - Math.floor(round2(net * 50)) / 100);
+}
+
+/** O upsell sem o IVA, quando vai na fatura da empresa; senão o upsell como está. */
+export function upsellWithoutVatOf(r: InvoiceRow): number {
+  const value = Number(r.upsell_value) || 0;
+  if (!r.invoiced || r.invoice_by === 'Francisco') return value;
+  return round2(value - vatInside(value));
 }

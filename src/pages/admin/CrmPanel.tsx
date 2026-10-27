@@ -11,7 +11,7 @@ import { computeServiceCloseRates } from "@/lib/crmServiceCloseRate";
 import CrmReviews from "./CrmReviews";
 import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, tieredUpsell, type UpsellTeam } from "@/lib/crmUpsell";
-import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, type InvoiceStatus } from "@/lib/invoiceVat";
+import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, upsellWithoutVatOf, vatToDeliverOf, type InvoiceStatus } from "@/lib/invoiceVat";
 
 interface ServiceRequest {
   id: string;
@@ -57,7 +57,10 @@ const SOURCES = ["Website", "WhatsApp", "Instagram", "Referência", "Google Cale
 const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" });
 // O cut mostrado = my_cut + a parte do dono no upsell. Não se escreve em my_cut:
 // a sincronização do calendário reescreve-o a partir do título do evento.
-const cutOf = (r: ServiceRequest) => r.my_cut + ownerUpsellOf(r);
+// Com fatura da empresa, o cut não leva o IVA (dono, 2026-10-27): é metade do valor
+// sem IVA, como nas contas das equipas, e o IVA aparece à parte (vatToDeliverOf).
+const ownerUpsellNetOf = (r: ServiceRequest) => ownerUpsellOf({ ...r, upsell_value: upsellWithoutVatOf(r) });
+const cutOf = (r: ServiceRequest) => round2((ownerServiceCutWithoutVat(r) ?? r.my_cut) + ownerUpsellNetOf(r));
 const money = (n: number) => `${n.toFixed(2).replace(/\.00$/, "")}€`;
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -302,7 +305,8 @@ const CrmPanel = () => {
 
   const filteredSums = useMemo(() => ({
     billed: round2(filtered.reduce((s, r) => s + r.billed_value + (Number(r.upsell_value) || 0), 0)),
-    vat: round2(filtered.reduce((s, r) => s + invoiceVatOf(r), 0)),
+    cut: round2(filtered.reduce((s, r) => s + cutOf(r), 0)),
+    vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r), 0)),
   }), [filtered]);
 
   /** Carregar outra vez no filtro ligado volta a "Todos". */
@@ -311,7 +315,7 @@ const CrmPanel = () => {
   const totals = useMemo(() => {
     const billed = monthRecords.reduce((s, r) => s + r.billed_value, 0);
     const cut = monthRecords.reduce((s, r) => s + cutOf(r), 0);
-    const upsellCut = monthRecords.reduce((s, r) => s + ownerUpsellOf(r), 0);
+    const upsellCut = monthRecords.reduce((s, r) => s + ownerUpsellNetOf(r), 0);
     const paid = monthRecords.filter(r => r.paid);
     const unpaid = monthRecords.filter(r => !r.paid);
     const byLocality = LOCALITIES.map(loc => {
@@ -322,7 +326,7 @@ const CrmPanel = () => {
     const noInv = monthRecords.filter(r => !r.invoiced);
     const invoicedValue = inv.reduce((s, r) => s + r.billed_value, 0);
     const notInvoicedValue = noInv.reduce((s, r) => s + r.billed_value, 0);
-    const invoicedVat = round2(inv.reduce((s, r) => s + invoiceVatOf(r), 0));
+    const invoicedVat = round2(inv.reduce((s, r) => s + vatToDeliverOf(r), 0));
     const toIssueCount = inv.filter(r => invoiceStatusOf(r) === "to_issue").length;
     return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
   }, [monthRecords]);
@@ -627,7 +631,7 @@ const CrmPanel = () => {
           className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "to_issue" || statusFilter === "invoiced" ? "border-navy ring-1 ring-navy" : "border-gray-200 hover:border-navy/30"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Com fatura</p>
           <p className="text-xl font-bold text-navy">{totals.invoicedCount} <span className="text-xs font-medium text-gray-500">({money(totals.invoicedValue)})</span></p>
-          {totals.invoicedVat > 0 && <p className="text-[11px] font-medium text-blue-700 mt-0.5">IVA {money(totals.invoicedVat)}</p>}
+          {totals.invoicedVat > 0 && <p className="text-[11px] font-medium text-blue-700 mt-0.5">IVA a entregar {money(totals.invoicedVat)}</p>}
           {totals.toIssueCount > 0 && <p className="text-[11px] font-semibold text-amber-700">{totals.toIssueCount} por passar</p>}
         </button>
         <button type="button" onClick={() => pickStatus("no_invoice")} aria-pressed={statusFilter === "no_invoice"}
@@ -674,8 +678,8 @@ const CrmPanel = () => {
         </div>
         {(statusFilter !== "all" || allMonths) && (
           <p className="text-xs text-gray-600">
-            {filtered.length} serviço{filtered.length === 1 ? "" : "s"}{allMonths ? " em todos os meses" : ` em ${monthLabel.toLowerCase()}`} · {money(filteredSums.billed)}
-            {filteredSums.vat > 0 && <span className="text-blue-700"> · IVA {money(filteredSums.vat)}</span>}
+            {filtered.length} serviço{filtered.length === 1 ? "" : "s"}{allMonths ? " em todos os meses" : ` em ${monthLabel.toLowerCase()}`} · {money(filteredSums.billed)} · <span className="text-gold font-semibold">para ti {money(filteredSums.cut)}{filteredSums.vat > 0 ? " sem IVA" : ""}</span>
+            {filteredSums.vat > 0 && <span className="text-blue-700 font-semibold"> · IVA a entregar ao Estado {money(filteredSums.vat)}</span>}
             {statusFilter !== "all" && <button type="button" onClick={() => setStatusFilter("all")} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>}
           </p>
         )}
@@ -801,7 +805,7 @@ const CrmPanel = () => {
                     {money(r.billed_value)}
                     {r.invoiced && <span className="block text-[10px] font-medium text-blue-700 truncate" title={invoiceTitle(r)}>{vatLine(r, true)}</span>}
                   </td>
-                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={ownerUpsellOf(r) ? `${money(r.my_cut)} do serviço + ${money(ownerUpsellOf(r))} de upsell` : undefined}>{money(cutOf(r))}</td>
+                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={[ownerServiceCutWithoutVat(r) !== null && `sem IVA (IVA a entregar: ${money(vatToDeliverOf(r))})`, ownerUpsellNetOf(r) ? `${money(round2(cutOf(r) - ownerUpsellNetOf(r)))} do serviço + ${money(ownerUpsellNetOf(r))} de upsell` : null].filter(Boolean).join(" · ") || undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>

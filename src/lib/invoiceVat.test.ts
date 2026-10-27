@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { invoiceStatusOf, invoiceVatOf, priceBeforeVatOf, serviceVatOf } from './invoiceVat';
+import { invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, priceBeforeVatOf, serviceVatOf, upsellWithoutVatOf, vatToDeliverOf } from './invoiceVat';
 
 describe('invoiceVat', () => {
   it('VAT is inside the value, 23%', () => {
@@ -34,5 +34,25 @@ describe('invoiceVat', () => {
     expect(priceBeforeVatOf({ billed_value: 257.07, invoiced: true, vat_on_top: true })).toBe(209);
     // Só o colchão com IVA por cima: 159€ + 13,80€.
     expect(priceBeforeVatOf({ billed_value: 172.8, invoiced: true, invoice_value: 73.8, vat_on_top: true })).toBe(159);
+  });
+
+  it('VAT to deliver: only company invoices, never Francisco\'s (already delivered)', () => {
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Empresa' })).toBe(23);
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: true, invoice_by: 'Francisco' })).toBe(0);
+    expect(vatToDeliverOf({ billed_value: 123, invoiced: false })).toBe(0);
+  });
+
+  it('owner cut without VAT: half of the value without VAT, team gets the cent rounded down', () => {
+    // Kseniia: 98,10 + 22,56 de IVA = 120,66
+    expect(ownerServiceCutWithoutVat({ billed_value: 120.66, invoiced: true, invoice_by: 'Empresa', vat_on_top: true })).toBe(49.05);
+    // só uma parte com fatura: 172,80 com 73,80 faturado (60 + 13,80)
+    expect(ownerServiceCutWithoutVat({ billed_value: 172.8, invoiced: true, invoice_by: 'Empresa', invoice_value: 73.8 })).toBe(79.5);
+    expect(ownerServiceCutWithoutVat({ billed_value: 120, invoiced: true, invoice_by: 'Francisco' })).toBeNull();
+    expect(ownerServiceCutWithoutVat({ billed_value: 120, invoiced: false })).toBeNull();
+  });
+
+  it('upsell on a company invoice is split without its VAT', () => {
+    expect(upsellWithoutVatOf({ upsell_value: 123, invoiced: true, invoice_by: 'Empresa' })).toBe(100);
+    expect(upsellWithoutVatOf({ upsell_value: 123, invoiced: true, invoice_by: 'Francisco' })).toBe(123);
   });
 });
