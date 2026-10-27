@@ -472,6 +472,10 @@ var roundDownToNine = (value) => Math.max(9, Math.floor((value - 9) / 10) * 10 +
 function rugComboEstimate(rugs, othersPrice, city) {
   const rug = rugEstimate(rugs, city);
   if (!rug.ok) return rug;
+  const combo = comboOf(rug, othersPrice);
+  return rug.materialAssumed ? { ...combo, materialAssumed: true, rule: `${ASSUMED_NOTE}${combo.rule}` } : combo;
+}
+function comboOf(rug, othersPrice) {
   const rugsWashing = roundToNine(rug.homePrice - rug.travelFee);
   if (rug.areaM2 < RUG_ESTIMATE_MIN_AREA_M2) {
     const usualPrice2 = othersPrice + rug.travelFee + rugsWashing;
@@ -498,13 +502,11 @@ function rugComboEstimate(rugs, othersPrice, city) {
     rule: "Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas."
   };
 }
+var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de lã, juta ou sisal, o valor é ajustado. Se a fotografia mostrar claramente lã, juta, sisal, seda ou persa, recalcula com esse material antes de responder. ";
 function rugEstimate(rugs, city) {
   if (!rugs.length) return { ok: false, reason: "sem tapetes" };
   if (!city || !(city in locationPrices)) return { ok: false, reason: "localidade não servida" };
-  const rawArea = rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0);
-  if (rawArea >= RUG_ESTIMATE_MIN_AREA_M2 && rugs.some((r) => typeof r.material !== "string" || !r.material.trim())) {
-    return { ok: false, needsMaterial: true, reason: "falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular" };
-  }
+  const materialAssumed = rugs.some((r) => typeof r.material !== "string" || !r.material.trim());
   const classes = rugs.map((r) => rugMaterialClass(r.material));
   if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
@@ -522,7 +524,8 @@ function rugEstimate(rugs, city) {
     pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
     sofaUpsellPrice: RUG_VISIT_SOFA_PRICE,
     sofaUsualPrice: sofaCleaningPrice("3-lugares") + travelFee,
-    rule: "Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice."
+    ...materialAssumed ? { materialAssumed: true } : {},
+    rule: (materialAssumed ? ASSUMED_NOTE : "") + "Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice."
   };
 }
 

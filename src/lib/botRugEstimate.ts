@@ -54,14 +54,14 @@ export const roundToNine = (value: number) => Math.max(9, Math.round((value - 9)
 export type RugEstimateItem = { width: number; length: number; qty: number; material?: unknown };
 
 export type RugEstimate =
-  | { ok: true; areaM2: number; ratePerM2: number[]; travelFee: number; homePrice: number; pickupPrice: number | null; pickupFee: number | null; sofaUpsellPrice: number; sofaUsualPrice: number; rule: string }
+  | { ok: true; areaM2: number; ratePerM2: number[]; travelFee: number; homePrice: number; pickupPrice: number | null; pickupFee: number | null; sofaUpsellPrice: number; sofaUsualPrice: number; materialAssumed?: true; rule: string }
   | { ok: false; reason: string; needsMaterial?: true };
 
 /** Highest amount ending in 9 at or below the value (172 → 169, 169 → 169). */
 export const roundDownToNine = (value: number) => Math.max(9, Math.floor((value - 9) / 10) * 10 + 9);
 
 export type RugComboEstimate =
-  | { ok: true; rugsWashing: number; othersPrice: number; usualPrice: number; comboPrice: number; travelWaived: number; rule: string }
+  | { ok: true; rugsWashing: number; othersPrice: number; usualPrice: number; comboPrice: number; travelWaived: number; materialAssumed?: true; rule: string }
   | { ok: false; reason: string; needsMaterial?: true };
 
 /**
@@ -73,6 +73,11 @@ export type RugComboEstimate =
 export function rugComboEstimate(rugs: RugEstimateItem[], othersPrice: number, city: string | null): RugComboEstimate {
   const rug = rugEstimate(rugs, city);
   if (!rug.ok) return rug;
+  const combo = comboOf(rug, othersPrice);
+  return rug.materialAssumed ? { ...combo, materialAssumed: true, rule: `${ASSUMED_NOTE}${combo.rule}` } : combo;
+}
+
+function comboOf(rug: Extract<RugEstimate, { ok: true }>, othersPrice: number): Extract<RugComboEstimate, { ok: true }> {
   const rugsWashing = roundToNine(rug.homePrice - rug.travelFee);
   // Under 3 m² with other items (owner, 22 Oct 2026, Espinho: two 2-seat sofas 138€ + a 2,6 m² rug
   // → "seria 177€, fica tudo a 159€", "mais 10€ tapete"): usual = items + travel + the rug's washing,
@@ -98,18 +103,17 @@ export function rugComboEstimate(rugs: RugEstimateItem[], othersPrice: number, c
   };
 }
 
+const ASSUMED_NOTE = 'Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de lã, juta ou sisal, o valor é ajustado. Se a fotografia mostrar claramente lã, juta, sisal, seda ou persa, recalcula com esse material antes de responder. ';
+
 export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEstimate {
   if (!rugs.length) return { ok: false, reason: 'sem tapetes' };
   if (!city || !(city in locationPrices)) return { ok: false, reason: 'localidade não servida' };
-  // The quiz never asks the material (owner, 11 Oct 2026: "não compliques o questionário"), and an
-  // unknown material priced as common put a juta rug at 10€/m² and a wool one at a table price. No
-  // material, no price: the bot reads it from the photo or asks it in one line.
-  const rawArea = rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0);
-  // A small rug (under 3 m²) is priced as common when the material is unknown (owner, 22 Oct 2026:
-  // "tens que dar preço a uma merda dessas"): asking first lost a client waiting on a 2,6 m² rug.
-  if (rawArea >= RUG_ESTIMATE_MIN_AREA_M2 && rugs.some(r => typeof r.material !== 'string' || !r.material.trim())) {
-    return { ok: false, needsMaterial: true, reason: 'falta o material de cada tapete: vê-o na fotografia (microfibra, sintético, juta, sisal, lã…) ou pergunta-o numa frase, e volta a calcular' };
-  }
+  // The quiz never asks the material (owner, 11 Oct 2026: "não compliques o questionário"). From
+  // 11 to 28 Oct an unknown material gave no price, and the extra question cost rug quotes: in
+  // October rugs closed 28% (15 of 53), the lowest of any service. Since 28 Oct (owner: "muda o bot
+  // de tapetes", price in the first reply) an unknown material is priced as common, flagged
+  // materialAssumed, and the bot says in one line that wool, jute or sisal changes the value.
+  const materialAssumed = rugs.some(r => typeof r.material !== 'string' || !r.material.trim());
   const classes = rugs.map(r => rugMaterialClass(r.material));
   if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
@@ -127,6 +131,7 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
     pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
     sofaUpsellPrice: RUG_VISIT_SOFA_PRICE,
     sofaUsualPrice: sofaCleaningPrice('3-lugares') + travelFee,
-    rule: 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice.',
+    ...(materialAssumed ? { materialAssumed: true as const } : {}),
+    rule: (materialAssumed ? ASSUMED_NOTE : '') + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice.',
   };
 }

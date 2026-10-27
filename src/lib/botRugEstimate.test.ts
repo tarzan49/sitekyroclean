@@ -27,11 +27,13 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     expect(rugEstimate([{ width: 2, length: 3, qty: 1 }], null).ok).toBe(false);
   });
 
-  it('no material, no price: the bot must read it from the photo or ask', () => {
+  it('no material: priced as common in the first reply, flagged materialAssumed (owner, 28 Oct 2026)', () => {
     const r = rugEstimate([{ width: 2, length: 3, qty: 1 }], 'Porto');
-    expect(r.ok).toBe(false);
-    expect(!r.ok && r.needsMaterial).toBe(true);
-    expect(rugEstimate([{ width: 2, length: 3, qty: 1, material: ' ' }, { width: 2, length: 3, qty: 1, material: 'juta' }], 'Porto').ok).toBe(false);
+    expect(r.ok && r.materialAssumed).toBe(true);
+    expect(r.ok && r.homePrice).toBe((rugEstimate([{ width: 2, length: 3, qty: 1, material: 'microfibra' }], 'Porto') as { homePrice: number }).homePrice);
+    expect(r.ok && r.rule).toMatch(/lã, juta ou sisal/);
+    const known = rugEstimate([{ width: 2, length: 3, qty: 1, material: 'juta' }], 'Porto');
+    expect(known.ok && known.materialAssumed).toBeFalsy();
   });
 
   it('classifies materials and rounds to 9', () => {
@@ -42,13 +44,13 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     expect([68, 100, 115, 85].map(roundToNine)).toEqual([69, 99, 119, 89]);
   });
 
-  it('botQuote prices rugs-only orders itself and keeps mixed orders with the owner', () => {
+  it('botQuote prices rugs-only and mixed orders itself, also without the material', () => {
     const rugs = botQuote({ items: [{ kind: 'rug', width: 200, length: 290, material: 'microfibra' }], city: 'Póvoa de Varzim' });
     expect('ok' in rugs && rugs.ok && rugs.handToOwner).toBe(false);
     expect('ok' in rugs && rugs.ok && rugs.rugEstimate?.ok && rugs.rugEstimate.homePrice).toBe(69);
     const mixed = botQuote({ items: [{ kind: 'rug', width: 2, length: 3 }, { kind: 'sofa', size: '3-lugares' }], city: 'Porto' });
-    expect('ok' in mixed && mixed.ok && mixed.handToOwner).toBe(true);
-    expect('ok' in mixed && mixed.ok && mixed.rugEstimate).toBeNull();
+    expect('ok' in mixed && mixed.ok && mixed.handToOwner).toBe(false);
+    expect('ok' in mixed && mixed.ok && mixed.rugCombo?.ok && mixed.rugCombo.materialAssumed).toBe(true);
   });
 });
 
