@@ -44,13 +44,19 @@ describe('checkProcedure', () => {
 
 describe('the pay rule lives in one function', () => {
   const all = { before: true, after: true, video: true, review: true };
-  it("'review_compensates' (in force): the four = 50% + 5€, a review makes up for missing media, neither = 45%", () => {
+  it("'all_or_45' (in force, owner 20/10): the four = 50% + 5€, anything missing = 45%", () => {
     expect(procedurePay(all)).toEqual({ teamShare: 50, bonus: 5 });
-    expect(procedurePay({ ...all, review: false })).toEqual({ teamShare: 50, bonus: 0 });
-    expect(procedurePay({ ...all, video: false })).toEqual({ teamShare: 50, bonus: 0 });
-    expect(procedurePay({ before: false, after: false, video: false, review: true })).toEqual({ teamShare: 50, bonus: 0 });
+    // 27/10: the bot told Aleixo "sem avaliação… a equipa fica com 50%".
+    expect(procedurePay({ ...all, review: false })).toEqual({ teamShare: 45, bonus: 0 });
+    expect(procedurePay({ ...all, video: false })).toEqual({ teamShare: 45, bonus: 0 });
+    expect(procedurePay({ before: false, after: false, video: false, review: true })).toEqual({ teamShare: 45, bonus: 0 });
     expect(procedurePay({ ...all, video: false, review: false })).toEqual({ teamShare: 45, bonus: 0 });
-    expect(procedurePay({ ...all, before: false, review: false })).toEqual({ teamShare: 45, bonus: 0 });
+  });
+  it("'review_compensates' (14/10): a review makes up for missing media, neither = 45%", () => {
+    expect(procedurePay(all, 'review_compensates')).toEqual({ teamShare: 50, bonus: 5 });
+    expect(procedurePay({ ...all, review: false }, 'review_compensates')).toEqual({ teamShare: 50, bonus: 0 });
+    expect(procedurePay({ before: false, after: false, video: false, review: true }, 'review_compensates')).toEqual({ teamShare: 50, bonus: 0 });
+    expect(procedurePay({ ...all, before: false, review: false }, 'review_compensates')).toEqual({ teamShare: 45, bonus: 0 });
   });
   it("'review_in_50': the four = 50%, anything missing = 45%", () => {
     expect(procedurePay(all, 'review_in_50')).toEqual({ teamShare: 50, bonus: 0 });
@@ -66,10 +72,10 @@ describe('the pay rule lives in one function', () => {
     expect(PROCEDURE_PAY_ENABLED).toBe(false);
     expect(procedureAccountDelta(rec(), [], '2026-10-22', 80).delta).toBe(0);
   });
-  it('switched on: 5% of the service when the deadline closes with neither, the 5€ owed to the team when complete', () => {
+  it('switched on: 5% of the service when the deadline closes with anything missing, the 5€ owed to the team when complete', () => {
     expect(procedureAccountDelta(rec(), [], '2026-10-21', 80, true).delta).toBe(0);
     expect(procedureAccountDelta(rec(), [], '2026-10-22', 80, true).delta).toBe(4);
-    expect(procedureAccountDelta(rec(media), [], '2026-10-22', 80, true).delta).toBe(0);
+    expect(procedureAccountDelta(rec(media), [], '2026-10-22', 80, true).delta).toBe(4);
     expect(procedureAccountDelta(rec(media), [five], '2026-10-18', 80, true).delta).toBe(-5);
     expect(procedureAccountDelta(rec({ prompted_at: null }), [], '2026-10-22', 80, true).delta).toBe(0);
   });
@@ -125,7 +131,7 @@ describe('messages', () => {
   it('the closing message says the team share from procedurePay', () => {
     expect(procedureClosedMessage('Ana', '2026-10-15', ['video', 'review'], { teamShare: 45, bonus: 0 }))
       .toBe('O prazo do serviço Ana, 15/10, acabou sem vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.');
-    expect(procedureClosedMessage('Ana', '2026-10-15', ['review'], { teamShare: 50, bonus: 0 })).toContain('a equipa fica com 50%.');
+    expect(procedureClosedMessage('Ana', '2026-10-15', ['review'], procedurePay({ before: true, after: true, video: true, review: false }))).toContain('a equipa fica com 45%.');
   });
   it('the receipt says what arrived and what is missing', () => {
     expect(procedureReceiptMessage('Ana, Paranhos', ['before', 'after'], { missing: ['video', 'review'], deadline: '2026-10-22' }))

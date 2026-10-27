@@ -102,13 +102,22 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
   const reviews = await store.reviews(records.map(r => r.service_request_id).filter((v): v is string => !!v));
   if ("error" in reviews) return createErrorResponse(reviews.error, 502);
   const eventById = new Map(events.map(e => [e.id, e]));
+  // A service deleted from the calendar, cancelled or moved to another team is no
+  // longer this team's: no reminder and no closing notice. 27/10: Kseniia's
+  // Porto 2 copy, deleted on 26/10 (Porto 1 did it on 27/10), still sent Aleixo
+  // "Lembrete do serviço o serviço, 26/10".
+  const liveEvent = (r: Rec) => {
+    const ev = eventById.get(r.calendar_event_id);
+    return ev && ev.status !== "CANCELLED" && eventTeam(ev) === r.team ? ev : null;
+  };
   const yesterday = addDays(today, -1);
   const reminders = records.flatMap(r => {
+    const ev = liveEvent(r);
+    if (!ev) return [];
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
     const index = reminderDue(r, check, now);
     if (index === null) return [];
-    const ev = eventById.get(r.calendar_event_id);
-    const label = ev ? labelFor(serviceByEvent.get(r.calendar_event_id), ev).label : "o serviço";
+    const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
     return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, message: procedureReminderMessage(label, check, r.service_day) }];
   });
   // The state kept in the table (for the panel), and a notice when a deadline closes with something missing.
@@ -119,9 +128,10 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     if (err) { safeLog("warn", "[bot-api] procedure status", { message: err }); continue; }
     const r = records.find(x => x.calendar_event_id === change.calendar_event_id)!;
     if (change.status !== "fechado" || r.status !== "em_curso") continue;
+    const ev = liveEvent(r);
+    if (!ev) continue;
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
-    const ev = eventById.get(r.calendar_event_id);
-    const label = ev ? labelFor(serviceByEvent.get(r.calendar_event_id), ev).label : "o serviço";
+    const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
     closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, check.pay) });
   }
   return createSuccessResponse({ prompts, reminders, closed, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });

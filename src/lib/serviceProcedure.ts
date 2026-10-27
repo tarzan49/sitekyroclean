@@ -5,8 +5,8 @@
 // depois do serviço para avaliar; no fim do 7.º dia o procedimento fecha, e as
 // contas da noite aplicam o resultado (procedurePay) e avisam a equipa. Enquanto
 // o prazo corre não se soma nada. A regra de pagamento mudou duas vezes a
-// 14/10 (a final: a avaliação vale 5€ e compensa fotografias ou vídeo em
-// falta): por isso vive só em procedurePay, e as contas só a aplicam com
+// 14/10 e outra vez a 20/10 (a de agora: tudo = 50% + 5€, falta qualquer
+// coisa = 45%): por isso vive só em procedurePay, e as contas só a aplicam com
 // PROCEDURE_PAY_ENABLED, que o dono ainda não mandou ligar.
 //
 // Quando um serviço acaba, o servidor do bot manda a cada pessoa da equipa a
@@ -25,18 +25,20 @@ export const PROCEDURE_FULL_SHARE = 50;
 export const PROCEDURE_REDUCED_SHARE = 45;
 
 /**
- * A regra de pagamento, num só sítio. Em vigor: 'review_compensates' (dono,
- * 14/10 por volta das 11h20, enviada aos grupos de Lisboa e do Porto: "uma
- * avaliação vale 5 euros"): fotografias de antes e depois + vídeo + avaliação
- * de 4 ou 5 estrelas = 50% + 5€; sem fotografias ou sem vídeo E sem avaliação
- * = 45%; tudo o resto (só falta a avaliação, ou há avaliação mas faltam
- * fotografias ou vídeo) = 50%, sem os 5€. Ficam as duas regras anteriores, por
- * comparação: 'review_in_50' (as quatro = 50%, falta uma = 45%, a da manhã de
- * 14/10) e 'review_bonus' (fotografias e vídeo = 50%, avaliação +5€, sem eles
- * 45% mesmo com avaliação). Mudar a regra é mudar PROCEDURE_PAY_RULE.
+ * A regra de pagamento, num só sítio. Em vigor: 'all_or_45' (dono, 20/10, nas
+ * contas mandadas aos grupos: "Se faltar uma das duas coisas, ficam mais 5% do
+ * valor do serviço para mim"; e as contas de 26/10 dão +5€ a cada serviço
+ * completo): fotografias de antes e depois + vídeo + avaliação de 4 ou 5
+ * estrelas = 50% + 5€; falta qualquer uma = 45%. A 27/10 o bot disse ao Aleixo
+ * "sem avaliação… a equipa fica com 50%" com a regra antiga, e o dono: "a
+ * equipa fica com 50%????". Ficam as regras anteriores, por comparação:
+ * 'review_compensates' (14/10 às 11h20: a avaliação compensava fotografias ou
+ * vídeo em falta e vice-versa, só sem as duas = 45%), 'review_in_50' (as
+ * quatro = 50% sem bónus, a da manhã de 14/10) e 'review_bonus' (fotografias e
+ * vídeo = 50%, avaliação +5€). Mudar a regra é mudar PROCEDURE_PAY_RULE.
  */
-export type ProcedurePayRule = 'review_compensates' | 'review_in_50' | 'review_bonus';
-export const PROCEDURE_PAY_RULE: ProcedurePayRule = 'review_compensates';
+export type ProcedurePayRule = 'all_or_45' | 'review_compensates' | 'review_in_50' | 'review_bonus';
+export const PROCEDURE_PAY_RULE: ProcedurePayRule = 'all_or_45';
 export const PROCEDURE_REVIEW_BONUS = 5;
 /**
  * As contas da noite só aplicam o resultado do procedimento com isto ligado.
@@ -54,6 +56,7 @@ export interface ProcedurePay {
 
 export function procedurePay(got: { before: boolean; after: boolean; video: boolean; review: boolean }, rule: ProcedurePayRule = PROCEDURE_PAY_RULE): ProcedurePay {
   const media = got.before && got.after && got.video;
+  if (rule === 'all_or_45') return media && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   if (rule === 'review_compensates') {
     if (media && got.review) return { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS };
     return { teamShare: media || got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };

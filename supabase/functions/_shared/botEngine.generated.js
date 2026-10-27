@@ -3053,10 +3053,11 @@ var BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;
 // src/lib/serviceProcedure.ts
 var PROCEDURE_FULL_SHARE = 50;
 var PROCEDURE_REDUCED_SHARE = 45;
-var PROCEDURE_PAY_RULE = "review_compensates";
+var PROCEDURE_PAY_RULE = "all_or_45";
 var PROCEDURE_REVIEW_BONUS = 5;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
   const media = got.before && got.after && got.video;
+  if (rule === "all_or_45") return media && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   if (rule === "review_compensates") {
     if (media && got.review) return { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS };
     return { teamShare: media || got.review ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE, bonus: 0 };

@@ -86,3 +86,29 @@ Deno.test("the day after, a reminder; at the end of the 7th day, closed with a n
   // Next round: already closed, no second notice.
   assertEquals((await json(await procedureDue(events, late.store, new Date("2026-10-23T09:00:00Z")))).closed, []);
 });
+
+Deno.test("a service deleted from the calendar or moved to another team gets no reminder and no closing notice (Kseniia, 27/10)", async () => {
+  const rec = { calendar_event_id: "s1", service_request_id: "c1", team: "Porto 2", service_day: "2026-10-15", prompt_msg_ids: ["m1"],
+    prompted_at: "2026-10-15T17:00:00Z", before_msg_id: null, before_at: null, after_msg_id: null, after_at: null,
+    video_msg_id: null, video_at: null, reminders_sent: 0, last_reminder_at: null, status: "em_curso", closed_at: null, penalty_paid: false };
+  const services = [{ id: "c1", calendar_event_id: "s1", client_name: "Ana Teste", city: "Paranhos" }];
+  const moved = [ev("s1", "Serviço 40€ (80€) sofá", "2026-10-15T14:00:00Z", "2026-10-15T15:00:00Z", "Porto 1")];
+  for (const events of [[], moved]) {
+    const day1 = await json(await procedureDue(events, fakeStore([rec], services).store, new Date("2026-10-16T09:30:00Z")));
+    assertEquals(day1.reminders, []);
+    const day8 = await json(await procedureDue(events, fakeStore([{ ...rec, reminders_sent: 2 }], services).store, new Date("2026-10-23T00:10:00Z")));
+    assertEquals(day8.closed, []);
+  }
+});
+
+Deno.test("only the review missing: the team keeps 45% (owner's rule of 20/10; 27/10 the bot told Aleixo 50%)", async () => {
+  const rec = { calendar_event_id: "s1", service_request_id: "c1", team: "Porto 2", service_day: "2026-10-19", prompt_msg_ids: ["m1"],
+    prompted_at: "2026-10-19T11:00:00Z", before_msg_id: "p1", before_at: "2026-10-19T11:30:00Z", after_msg_id: "p2", after_at: "2026-10-19T11:31:00Z",
+    video_msg_id: "v1", video_at: "2026-10-19T11:32:00Z", reminders_sent: 2, last_reminder_at: null, status: "em_curso", closed_at: null, penalty_paid: false };
+  const events = [ev("s1", "Serviço 40€ (79€) sofá", "2026-10-19T09:00:00Z", "2026-10-19T10:30:00Z", "Porto 2")];
+  const services = [{ id: "c1", calendar_event_id: "s1", client_name: "Larry", city: "Porto" }];
+  const day8 = await json(await procedureDue(events, fakeStore([rec], services).store, new Date("2026-10-27T08:00:00Z")));
+  assertEquals((day8.closed as Row[]).map(c => c.message), [
+    "O prazo do serviço Larry, Porto, 19/10, acabou sem avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.",
+  ]);
+});
