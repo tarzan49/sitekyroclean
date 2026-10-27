@@ -62,6 +62,10 @@
 //               src/lib/serviceProcedure.ts): services that just ended (message
 //               to the team), reminders, closed deadlines; the ids of what the
 //               bot sent; the photos and video the team sent in reply.
+//   certificate the waterproofing certificate of the chat's client (2026-10-27, certificate.ts,
+//               src/lib/botCertificate.ts): the latest done job in the CRM and its fixed number
+//               (table waterproofing_certificates); the bot server prints the PDF. Name, items,
+//               town, region and date only.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -77,6 +81,7 @@ import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { procedureDue, procedureMedia, procedureSent, type ProcedureStore } from "./procedure.ts";
+import { certificateAction, type CertificateStore } from "./certificate.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 
@@ -117,6 +122,8 @@ export interface BotEnv {
   accounts?: (() => Promise<{ rows: Row[]; adjustments?: Row[] } | { error: string }>) | null;
   /** service_procedure, service_requests and google_reviews for the procedure actions. */
   procedures?: ProcedureStore | null;
+  /** service_requests (waterproofing jobs) and waterproofing_certificates for `certificate`. */
+  certificates?: CertificateStore | null;
   /** Conversas novas do WhatsApp (tabela whatsapp_conversations), escritas pelo servidor do bot. */
   conversations?: ((rows: Row[]) => Promise<{ error?: string }>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
@@ -444,6 +451,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if (res.error) return createErrorResponse("Não foi possível gravar as conversas", 500);
       return createSuccessResponse({ saved: clean.length });
     }
+    case "certificate":
+      if (!env.certificates) return createErrorResponse("Serviço indisponível", 503);
+      return await certificateAction(body, env.certificates, env.now?.() ?? new Date());
     case "procedure-due":
     case "procedure-sent":
     case "procedure-media": {
@@ -865,6 +875,32 @@ function supabaseProcedures(): ProcedureStore | null {
   };
 }
 
+const CERTIFICATE_SERVICE_COLUMNS = "id, request_date, description, client_name, city, locality, phone, billed_value, calendar_missing_since";
+function supabaseCertificates(): CertificateStore | null {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  return {
+    async waterproofingServices() {
+      const { data, error } = await client.from("service_requests").select(CERTIFICATE_SERVICE_COLUMNS).ilike("description", "%impermeabiliz%");
+      return error ? { error: error.message } : ((data ?? []) as Row[]);
+    },
+    async issued(serviceRequestId) {
+      const { data, error } = await client.from("waterproofing_certificates").select("*").eq("service_request_id", serviceRequestId).limit(1);
+      return error ? { error: error.message } : ((data?.[0] as Row | undefined) ?? null);
+    },
+    async numbersOn(serviceDate) {
+      const { data, error } = await client.from("waterproofing_certificates").select("number").eq("service_date", serviceDate);
+      return error ? { error: error.message } : (data ?? []).map(r => String((r as Row).number));
+    },
+    async insert(row) {
+      const { error } = await client.from("waterproofing_certificates").insert(row);
+      return error ? { error: error.message, code: error.code } : {};
+    },
+  };
+}
+
 function supabaseConversations(): BotEnv["conversations"] {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -965,5 +1001,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), conversations: supabaseConversations() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), certificates: supabaseCertificates(), conversations: supabaseConversations() }));
 }

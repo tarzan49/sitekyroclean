@@ -12,3 +12,4 @@ export { isTestOrder } from './testLead';
 export { labelFacts } from './labelFacts';
 export { bookedServices } from './botBookedServices';
 export { planBookingUpdate } from './botBookingUpdate';
+export { certificateItemsFromChat, certificateName, certificateNumber, pickCertificateService } from './botCertificate';

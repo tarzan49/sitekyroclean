@@ -3476,6 +3476,83 @@ var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min
 function fold6(s) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ");
 }
+
+// src/lib/botCertificate.ts
+var CERTIFICATE_YEARS = { premium: 10, essencial: 2 };
+var fold7 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+var phoneKey9 = (p) => (p ?? "").replace(/\D/g, "").slice(-9);
+var WATERPROOF = /impermeabiliz/;
+var WITHOUT = /sem impermeabiliz/;
+function certificateTier(description) {
+  const d = fold7(description ?? "");
+  if (!WATERPROOF.test(d) || WITHOUT.test(d)) return null;
+  const premium = /\bpremium\b/.test(d), essencial = /\bessencial\b/.test(d);
+  return premium === essencial ? null : premium ? "premium" : "essencial";
+}
+var isWaterproofing2 = (description) => {
+  const d = fold7(description ?? "");
+  return WATERPROOF.test(d) && !WITHOUT.test(d);
+};
+function certificateItems(description) {
+  const raw = (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
+  const withPart = /,?\s*com impermeabiliza\S*\s*(?:premium|essencial)?\s*(?:d[oa]s?\s+)(.+)$/i.exec(raw);
+  if (withPart) return tidy(withPart[1]);
+  const parts = raw.split(/\s\+\s|;/).map((s) => s.trim()).filter(Boolean);
+  const first = parts.findIndex((p) => /impermeabiliz/i.test(p));
+  const kept = first < 0 ? parts : [parts[first], ...parts.slice(first + 1).filter((p) => !/\b(limpeza|lavagem|tratamento)\b/i.test(p))];
+  return tidy(kept.join(", "));
+}
+function tidy(s) {
+  const out = s.replace(/^(?:pr[ée]-?limpeza|limpeza)\s*(?:e|\+)?\s*/i, "").replace(/\s*(?:\be\s+)?impermeabiliza\S*\s*/gi, " ").replace(/(?<![\p{L}])(?:premium|essencial)(?![\p{L}])/giu, " ").replace(/^\s*[:\-–]\s*/, "").replace(/^\s*(?:de|do|da|dos|das)\s+/i, "").replace(/\s+,/g, ",").replace(/\s+/g, " ").replace(/[\s,.]+$/, "").trim();
+  return out;
+}
+var REGION_TEAMS = /* @__PURE__ */ new Set(["Porto", "Lisboa", "Braga", "Algarve", "Coimbra"]);
+function pickCertificateService(rows, phone, today) {
+  const key = phoneKey9(phone);
+  if (key.length < 9) return { ok: false, reason: "none" };
+  const mine = rows.filter((r) => phoneKey9(r.phone) === key && r.request_date && isWaterproofing2(r.description)).filter((r) => Number(r.billed_value) > 0 && !r.calendar_missing_since).sort((a, b) => String(b.request_date).localeCompare(String(a.request_date)));
+  const done = mine.find((r) => String(r.request_date) <= today);
+  if (!done) {
+    const next = [...mine].reverse().find((r) => String(r.request_date) > today);
+    return next ? { ok: false, reason: "upcoming", serviceDate: String(next.request_date), tier: certificateTier(next.description) } : { ok: false, reason: "none" };
+  }
+  const tier = certificateTier(done.description);
+  if (!tier) return { ok: false, reason: "tier", serviceDate: String(done.request_date) };
+  const city = (done.city ?? "").replace(/[.\s]+$/, "").trim();
+  return {
+    ok: true,
+    certificate: {
+      serviceRequestId: done.id,
+      serviceDate: String(done.request_date),
+      tier,
+      years: CERTIFICATE_YEARS[tier],
+      name: (done.client_name ?? "").trim(),
+      items: certificateItems(done.description) || "Estofos",
+      place: city || null,
+      team: done.locality && REGION_TEAMS.has(done.locality) ? done.locality : null
+    }
+  };
+}
+function certificateName(crmName, chatName) {
+  const crm = crmName.trim();
+  const chat = typeof chatName === "string" ? chatName.replace(/\s+/g, " ").trim() : "";
+  if (!chat || chat.length > 60 || !/^[\p{L}][\p{L}' .-]*$/u.test(chat)) return crm;
+  if (!crm) return chat;
+  const first = fold7(crm.split(" ")[0]);
+  return fold7(chat).split(" ")[0] === first && chat.length >= crm.length ? chat : crm;
+}
+function certificateItemsFromChat(v) {
+  if (typeof v !== "string") return null;
+  const s = v.replace(/\s+/g, " ").replace(/[<>{}]/g, "").trim();
+  return s.length >= 3 && s.length <= 160 ? s : null;
+}
+function certificateNumber(serviceDate, taken) {
+  const base = `KYRO-IMP-${serviceDate.replace(/-/g, "")}-`;
+  const used = new Set(taken.filter((n2) => n2.startsWith(base)).map((n2) => Number(n2.slice(base.length))));
+  let n = 1;
+  while (used.has(n)) n++;
+  return `${base}${String(n).padStart(2, "0")}`;
+}
 export {
   PROCEDURE_NOT_A_REPLY_MESSAGE,
   TEAM_COLOR,
@@ -3484,6 +3561,9 @@ export {
   bookedServices,
   botAvailability,
   botQuote,
+  certificateItemsFromChat,
+  certificateName,
+  certificateNumber,
   checkProcedure,
   describeQuizOrder,
   eventTeam,
@@ -3492,6 +3572,7 @@ export {
   labelFacts,
   lisbonDayOf,
   listBotCities,
+  pickCertificateService,
   planBookingUpdate,
   planBotBooking,
   planBotHold,
