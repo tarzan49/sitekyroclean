@@ -140,10 +140,10 @@ describe('região e equipa de cada serviço', () => {
     expect(equipa(lisboa, undefined, 'Equipa Lisboa2')).toBe('lisboa2');
     expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 1')).toBe('lisboa');
     // Uma cor que não é de nenhuma equipa não é uma escolha.
-    expect(equipa(lisboa, '11')).toBeNull();
+    expect(equipa(lisboa, '2')).toBeNull();
     // Cada equipa com a sua cor.
-    expect(['9', '8', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
-      .toEqual(['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve', 'coimbra']);
+    expect(['9', '8', '11', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+      .toEqual(['porto', 'porto2', 'porto3', 'braga', 'lisboa', 'lisboa2', 'algarve', 'coimbra']);
   });
 
   it('não confunde o nome da rua com a cidade', () => {
