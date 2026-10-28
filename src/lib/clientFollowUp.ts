@@ -28,6 +28,7 @@ import { itemsOf, typeOf } from './crmServiceMix';
 import { addDays, lisbonDay, weekdayOf, WEEKDAY_LONG } from './crmClosings';
 import { PACK_PERK_MIN_ORDER, perkMattressPrice, perkSofaPrice } from '../constants/packPerks';
 import { formatEuro, mattressCleaningPrice, sofaCleaningPrice } from '../data/enginePrices';
+import { INSTAGRAM_URL } from '../constants/business';
 import { GOOGLE_REVIEW_LINK_LISBOA, GOOGLE_REVIEW_LINK_PORTO } from '../constants/google';
 
 // ── Regras ─────────────────────────────────────────────────────────────────
@@ -777,11 +778,11 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
           messages: orderVariants([
             {
               id: 'avaliacao-c', label: 'Versão C (11/10, personalizada)',
-              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? 'ficaram' : 'ficou'} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}\n\n${CLIENT_THANKS_DISCOUNT}${upsellCheck}`,
+              text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? 'ficaram' : 'ficou'} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}\n\n${CLIENT_THANKS_DISCOUNT}\n\nE se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:\n${INSTAGRAM_URL}${upsellCheck}`,
             },
             {
               id: 'avaliacao-d', label: 'Versão D (11/10, curta)',
-              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? 'ficaram' : 'ficou'} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}\n\n${CLIENT_THANKS_DISCOUNT}${upsellCheck}`,
+              text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? 'ficaram' : 'ficou'} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}\n\n${CLIENT_THANKS_DISCOUNT}\n\nE se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:\n${INSTAGRAM_URL}${upsellCheck}`,
             },
           ], `${c.id}:avaliacao`, ctx.variantStats),
         });

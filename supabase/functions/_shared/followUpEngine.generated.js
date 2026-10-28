@@ -292,6 +292,11 @@ var CHAIR_UNIT_MAX = Math.max(...chairUnits);
 var CHAIR_PRICE_LABEL = `Desde ${formatEuro(CHAIR_UNIT_MIN)}`;
 var CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
 
+// src/constants/business.ts
+var INSTAGRAM_URL = "https://www.instagram.com/kyrocleansolutions/";
+var BUSINESS_EMAIL = "cleansolutions.pt25@gmail.com";
+var BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;
+
 // src/constants/google.ts
 var GOOGLE_PLACE_ID = "ChIJt71NLgBlJA0RIT9kggF_3Fk";
 var GOOGLE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}`;
@@ -801,14 +806,20 @@ Só para o nosso registo: além d${job}, a equipa fez mais algum tratamento ness
               label: "Versão C (11/10, personalizada)",
               text: `${hi} Obrigado por ter feito ${job} connosco. Gostaríamos de saber a sua opinião: como ${done.plural ? "ficaram" : "ficou"} ${done.the} depois ${afterJob}? A sua avaliação ajuda não só a nós, mas também a outros clientes a escolherem bem quem chamar a sua casa: ${link}
 
-${CLIENT_THANKS_DISCOUNT}${upsellCheck}`
+${CLIENT_THANKS_DISCOUNT}
+
+E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:
+${INSTAGRAM_URL}${upsellCheck}`
             },
             {
               id: "avaliacao-d",
               label: "Versão D (11/10, curta)",
               text: `${hi} Obrigado pela confiança n${job}. Como ${done.plural ? "ficaram" : "ficou"} ${done.the}? Se tiver um minuto, a sua avaliação no Google ajuda outros clientes a escolherem com confiança: ${link}
 
-${CLIENT_THANKS_DISCOUNT}${upsellCheck}`
+${CLIENT_THANKS_DISCOUNT}
+
+E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:
+${INSTAGRAM_URL}${upsellCheck}`
             }
           ], `${c.id}:avaliacao`, ctx.variantStats)
         });
