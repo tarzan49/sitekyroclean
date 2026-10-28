@@ -278,15 +278,18 @@ describe('o que muda nos calendários das equipas', () => {
       expect(gs.moradaDoEvento(evento('m4', 'Serviço 70€ (130€) imper cadeiras'))).toBe('');
     });
 
-    it('dá à equipa a morada que o Maps encontrou quando o evento não tem local, sem mudar a equipa escolhida', () => {
+    it('dá à equipa a morada escrita, não a do Maps, sem mudar a equipa escolhida', () => {
       const mapa = mapaDeTeste({
         'Rua Inventada 376, 1º': { encontrado: true, morada: 'Rua Inventada 376, 4710-000 Braga, Portugal', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 },
       });
       const { copias } = gs.copiasDesejadas([semCidade], mapa.procurar);
       expect(copias.get('m1').equipaId).toBe('porto');
-      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4710-000 Braga, Portugal');
-      // Sem resposta do Maps, a cópia segue na mesma, sem morada.
-      expect(gs.copiasDesejadas([semCidade], mapaDeTeste({}).procurar).copias.get('m1').corpo.location).toBe('');
+      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 1º');
+      expect(copias.get('m1').corpo.description).not.toContain('ATENÇÃO');
+      // Sem resposta do Maps, a cópia leva a morada escrita e o aviso para a confirmar.
+      const semResposta = gs.copiasDesejadas([semCidade], mapaDeTeste({}).procurar).copias.get('m1').corpo;
+      expect(semResposta.location).toBe('Rua Inventada 376, 1º');
+      expect(semResposta.description).toContain('Confirmar a morada com o cliente');
       // Com local no evento, o Maps não é chamado.
       const comLocal = mapaDeTeste({});
       gs.copiasDesejadas([{ ...semCidade, location: 'Rua Inventada 376, Porto' }], comLocal.procurar);
@@ -443,6 +446,18 @@ describe('o que muda nos calendários das equipas', () => {
     expect(mensagem.texto).toContain('está no calendário da Equipa Porto 1');
     expect(mensagem.texto).toContain('não entra no CRM');
     expect(gs.mensagemParaDono([{ evento: semMorada, zona: null }], primeira.novos).assunto).toBe('Serviços para confirmar');
+  });
+
+  it('o "Onde" da cópia é a morada escrita, nunca o palpite do Maps (Joab, 28/10)', () => {
+    const origem = evento('o9', 'Serviço 50€ (99€) Lavagem de 3 tapetes - 910000000 - Cliente Inventada - Rua Inventada 222 3 A, 2775-000 Carcavelos', '2026-10-28T13:00:00+01:00', '2026-10-28T14:00:00+01:00');
+    const certo = gs.corpoDaCopia(origem, false);
+    expect(certo.location).toBe('Rua Inventada 222 3 A, 2775-000 Carcavelos');
+    expect(certo.description).not.toContain('ATENÇÃO');
+    const duvida = gs.corpoDaCopia(origem, true);
+    expect(duvida.location).toBe('Rua Inventada 222 3 A, 2775-000 Carcavelos');
+    expect(duvida.description).toContain('Confirmar a morada com o cliente');
+    const comLocal = gs.corpoDaCopia({ ...origem, location: 'Rua Escrita 5, 2775-000 Carcavelos' }, true);
+    expect(comLocal.location).toBe('Rua Escrita 5, 2775-000 Carcavelos');
   });
 
   it('passa para o evento do dono o dia mudado à mão na cópia da equipa, e só isso', () => {

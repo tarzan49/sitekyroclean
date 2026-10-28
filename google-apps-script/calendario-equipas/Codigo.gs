@@ -756,12 +756,21 @@ function edicoesNasCopias(existentes, eventosDoDono) {
   return edicoes;
 }
 
-/** `moradaNoMapa`: a morada que o Maps encontrou, que vai para o "Onde" da cópia quando o evento não tem local. */
-function corpoDaCopia(origem, moradaNoMapa) {
+/**
+ * O "Onde" da cópia é sempre a morada escrita no evento (local, ou a morada do
+ * título), nunca a resposta do Maps: quando o Maps não encontrava a morada
+ * inteira ficava com uma rua com o mesmo nome noutra freguesia, e a equipa ia
+ * para lá (Joab, Juliana em Mafra a 20/10 e Annika em Carcavelos a 28/10).
+ * `mapaDuvidoso`: o Maps não encontrou a morada completa, e a descrição avisa
+ * a equipa para a confirmar com o cliente antes de sair.
+ */
+function corpoDaCopia(origem, mapaDuvidoso) {
+  const escrita = limpar(origem.location) || moradaDoEvento(origem);
+  const aviso = mapaDuvidoso && escrita ? 'ATENÇÃO: o Google Maps não encontrou esta morada completa. Confirmar a morada com o cliente antes de sair.' : '';
   const corpo = {
     summary: origem.summary || '',
-    location: origem.location || moradaNoMapa || '',
-    description: origem.description || '',
+    location: escrita || '',
+    description: [aviso, origem.description || ''].filter(Boolean).join('\n\n'),
     start: horaEmPortugal(origem.start),
     end: horaEmPortugal(origem.end),
   };
@@ -800,9 +809,10 @@ function copiasDesejadas(origens, procurarNoMapa) {
     }
     const noMapa = origem.location ? null : procurarMorada(origem, procurarNoMapa);
     const pelaMorada = noMapa && noMapa.encontrado ? noMapa.morada : null;
+    const mapaDuvidoso = !origem.location && Boolean(procurarNoMapa) && (!noMapa || !noMapa.encontrado || Boolean(noMapa.parcial));
     copias.set(origem.id, {
       equipaId: equipa.id,
-      corpo: corpoDaCopia(origem, pelaMorada),
+      corpo: corpoDaCopia(origem, mapaDuvidoso),
       fimMs: fimEmMs(origem.end),
       pelaMorada: pelaMorada,
       origem: original,
