@@ -604,6 +604,14 @@ Porquê: a 20-26/10 só Lisboa perdia anúncios por orçamento (20%); Porto (4%)
 Braga (0%) não gastavam mais. O modelo e as regras de decisão estão no documento
 privado "Modelo de crescimento dos anúncios" (Claude Docs), fora do repositório.
 
+Verificado no mesmo dia: páginas de destino respondem 200; nenhuma das 448 negativas
+partilhadas bloqueia as palavras-chave novas, exceto "impermeabilizante para sofá
+profissional" (negativa "impermeabilizante", de propósito contra quem procura o
+produto), que ficou em pausa nas duas campanhas e saiu do gerador; o anúncio novo de
+sofás saiu com força "Fraca" (só um título com as palavras pesquisadas) e foi
+substituído por uma versão com "Impermeabilização de Sofás", "Sofá Anti-Manchas" e
+"Orçamento Grátis no WhatsApp" (força "Boa"); a versão fraca ficou em pausa.
+
 Armadilhas vistas: num carregamento, uma campanha de nome repetido pede o
 `Campaign ID` ("Valor em falta em ID da campanha"); e a tabela de grupos não se
 atualiza depois de um carregamento, por isso recarregar antes de concluir que

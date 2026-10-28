@@ -61,15 +61,17 @@ def sofas(city):
                   "proteção anti manchas sofá", "tratamento anti manchas sofá",
                   "sofá anti manchas", "proteger sofá de manchas",
                   "proteger sofá de nódoas", "sofá impermeável",
-                  "impermeabilizante para sofá profissional", "nano proteção sofá",
+                  "nano proteção sofá",
                   "limpeza e impermeabilização de sofás", "pack limpeza e impermeabilização sofá"],
         headlines=[f"Impermeabilizar Sofá {cidade(city)}", "Proteção Anti-Manchas no Sofá",
                    "Líquidos Ficam à Superfície", "Vinho, Café e Sumo no Sofá?",
-                   "Repele Água e Derrames", "Proteja Antes da Próxima Nódoa",
+                   # Força do anúncio (28/10/2026): a 1.ª versão saiu "Fraca" porque só um título
+                   # repetia o que se pesquisa; estes três dizem as palavras-chave do grupo.
+                   "Impermeabilização de Sofás", "Sofá Anti-Manchas",
                    "Crianças e Animais em Casa?", "Premium: Protege Até 10 Anos",
                    "Resiste a Até 5 Lavagens", f"Essencial Desde {ESSENC}€",
                    f"Premium Desde {PREMIUM}€", f"Limpeza + Proteção {PACK}€",
-                   NOTA, AVAL, "Aplicação ao Domicílio"],
+                   NOTA, AVAL, "Orçamento Grátis no WhatsApp"],
         descriptions=[
             "Proteção anti-manchas: vinho, café ou sumo ficam à superfície e limpam-se fácil.",
             f"Essencial desde {ESSENC}€, Premium desde {PREMIUM}€. Aplicação ao domicílio.",
