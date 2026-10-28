@@ -2209,7 +2209,12 @@ var TEAMS_BY_REGION = {
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 3"]);
-var WATERPROOFING_TEAMS = { Braga: ["Porto 1", "Porto 3"] };
+var WATERPROOFING_TEAMS = {
+  // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
+  // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
+  Porto: ["Porto 1", "Porto 2"],
+  Braga: ["Porto 1"]
+};
 var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
 function cityZone(cityOrAddress) {
@@ -2244,7 +2249,17 @@ var isWeekday = (date) => {
   const d = (/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay();
   return d >= 1 && d <= 5;
 };
+var TEAM_OFF = [
+  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel": cleanings go to Porto 3, waterproofing is not booked.
+  { team: "Porto 1", date: "2026-10-29", fromHour: 13 }
+];
+var offAt = (team, from, to) => TEAM_OFF.some((o) => {
+  if (o.team !== team) return false;
+  const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
+  return from < b && to > a;
+});
 function teamWorks(team, from, to) {
+  if (offAt(team, from, to)) return false;
   const hours = TEAM_WEEKDAY_HOURS[team];
   if (!hours) return true;
   const start = lisbon(from), end = lisbon(to);

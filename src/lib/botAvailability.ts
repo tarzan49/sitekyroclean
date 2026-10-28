@@ -65,7 +65,12 @@ export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 3']);
  * nessa zona"; "o porto por defeito é sempre porto 1"). A Guimarães waterproofing job had gone
  * to Braga and nobody turned up.
  */
-export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Braga: ['Porto 1', 'Porto 3'] };
+export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = {
+  // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
+  // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
+  Porto: ['Porto 1', 'Porto 2'],
+  Braga: ['Porto 1'],
+};
 /** The teams that can take this job in the zone. */
 export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly string[] =>
   (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
@@ -133,8 +138,23 @@ const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] 
  */
 export const TEAM_WEEKDAY_HOURS: Readonly<Record<string, { from: number; to: number }>> = { 'Porto 2': { from: 8, to: 13 } };
 const isWeekday = (date: string) => { const d = new Date(`${date}T12:00:00Z`).getUTCDay(); return d >= 1 && d <= 5; };
-/** Whether the team works over this whole visit (TEAM_WEEKDAY_HOURS). */
+/**
+ * A team off for part of one day (the owner's instruction for the next days; past dates simply never match).
+ * The job may not overlap the window [fromHour, untilHour) in Lisbon time.
+ */
+export interface TeamOff { team: string; date: string; fromHour?: number; untilHour?: number }
+export const TEAM_OFF: readonly TeamOff[] = [
+  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel": cleanings go to Porto 3, waterproofing is not booked.
+  { team: 'Porto 1', date: '2026-10-29', fromHour: 13 },
+];
+const offAt = (team: string, from: number, to: number) => TEAM_OFF.some(o => {
+  if (o.team !== team) return false;
+  const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
+  return from < b && to > a;
+});
+/** Whether the team works over this whole visit (TEAM_WEEKDAY_HOURS, TEAM_OFF). */
 export function teamWorks(team: string, from: number, to: number): boolean {
+  if (offAt(team, from, to)) return false;
   const hours = TEAM_WEEKDAY_HOURS[team];
   if (!hours) return true;
   const start = lisbon(from), end = lisbon(to);

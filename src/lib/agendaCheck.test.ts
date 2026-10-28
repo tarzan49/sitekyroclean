@@ -25,8 +25,11 @@ describe('agendaCheck', () => {
     const onBraga = agendaCheck([ev('10:00', '11:00', pickup, 'Braga'), ev('14:00', '15:00', imper, 'Braga')], TOMORROW, NOW);
     expect(onBraga.issues.map(i => i.problem)).toEqual([
       'a equipa Braga não faz recolhas de tapetes (escolhe outra equipa)',
-      'impermeabilizações desta zona são da equipa Porto 1/Porto 3, não da Braga',
+      'impermeabilizações desta zona são da equipa Porto 1, não da Braga',
     ]);
+    // Denise (Porto 3) does cleanings only (owner, 28 Oct 2026).
+    expect(agendaCheck([ev('14:00', '15:00', imper, 'Porto 3')], TOMORROW, NOW).issues.map(i => i.problem))
+      .toEqual(['impermeabilizações desta zona são da equipa Porto 1/Porto 2, não da Porto 3']);
     expect(agendaCheck([ev('10:00', '11:00', pickup, 'Porto 1'), ev('14:00', '15:00', imper, 'Porto 1')], TOMORROW, NOW).issues).toEqual([]);
     // A street called "Recolha" is not a pickup: only the service part of the title counts.
     expect(agendaCheck([ev('10:00', '11:00', `${GOOD.replace('Rua das Flores', 'Rua da Recolha')}`, 'Braga')], TOMORROW, NOW).issues).toEqual([]);

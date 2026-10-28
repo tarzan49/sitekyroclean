@@ -222,10 +222,32 @@ describe('two-person teams and the team the bot books on', () => {
     expect(chooseTeam([], 'Braga', ...at15, true)).toBe('Porto 1');
     expect(chooseTeam([], 'Porto', ...at15, true)).toBe('Porto 1');
     const premium = [{ kind: 'sofa', qty: 1, treatment: 'premium' }];
-    // Porto 3 is the backup there too (owner, 28 Oct 2026: she covers what Porto 1 and Porto 2 do not).
-    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 1', 'Porto 3']);
-    expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Guimarães', ...at15, true)).toBe('Porto 3');
+    // Denise (Porto 3) does no waterproofing (owner, 28 Oct 2026: "se for imper ou imper e limpeza tem q ser porto 1").
+    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 1']);
+    expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Guimarães', ...at15, true)).toBeNull();
+    expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Porto', ...at15, true)).toBeNull();
     expect(ok(botAvailability({ city: 'Guimarães', items: [{ kind: 'sofa', qty: 1 }], date: '2026-10-08' }, [], NOW)).teams).toEqual(['Braga']);
+  });
+});
+
+describe('Porto 1 off on the afternoon of 29 Oct 2026 (owner, 28 Oct: "amanha a tarde porto 1 n ta disponivel")', () => {
+  const day = '2026-10-29';
+  const now = new Date('2026-10-28T20:00:00Z');
+  // After 25 Oct Portugal is on winter time (UTC+0).
+  const span = (from: string, to: string) => [`${day}T${from}:00.000Z`, `${day}T${to}:00.000Z`] as const;
+  it('a cleaning in the afternoon goes to Porto 3; the morning stays with Porto 1', () => {
+    expect(chooseTeam([], 'Porto', ...span('15:00', '16:00'))).toBe('Porto 3');
+    expect(chooseTeam([], 'Porto', ...span('12:30', '13:30'))).toBe('Porto 3');
+    expect(chooseTeam([], 'Porto', ...span('10:00', '11:00'))).toBe('Porto 1');
+  });
+  it('waterproofing (alone or with cleaning) is not booked that afternoon', () => {
+    const premium = [{ kind: 'sofa', qty: 1, treatment: 'clean+premium' }];
+    expect(chooseTeam([], 'Porto', ...span('15:00', '16:30'), true)).toBeNull();
+    expect(chooseTeam([], 'Guimarães', ...span('15:00', '16:30'), true)).toBeNull();
+    const r = ok(botAvailability({ city: 'Porto', items: premium, date: day }, [], now));
+    expect(r.free.flatMap(d => d.times).every(t => Number(t.replace(/h.*/, '')) < 13)).toBe(true);
+    expect(ok(botAvailability({ city: 'Porto', items: premium, date: day, time: '15h' }, [], now)).requested).toMatchObject({ free: false });
+    expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1 }], date: day, time: '15h' }, [], now)).requested).toMatchObject({ free: true, teamsFree: ['Porto 3'] });
   });
 });
 
