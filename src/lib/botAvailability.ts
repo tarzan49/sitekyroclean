@@ -144,8 +144,9 @@ const isWeekday = (date: string) => { const d = new Date(`${date}T12:00:00Z`).ge
  */
 export interface TeamOff { team: string; date: string; fromHour?: number; untilHour?: number }
 export const TEAM_OFF: readonly TeamOff[] = [
-  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel": cleanings go to Porto 3, waterproofing is not booked.
-  { team: 'Porto 1', date: '2026-10-29', fromHour: 13 },
+  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel", "NAO ESTA DISPONIVEL PONTO": nothing from noon on (Juliana, 10h30-12h, stays).
+  // Cleanings go to Porto 3, waterproofing is not booked.
+  { team: 'Porto 1', date: '2026-10-29', fromHour: 12 },
 ];
 const offAt = (team: string, from: number, to: number) => TEAM_OFF.some(o => {
   if (o.team !== team) return false;

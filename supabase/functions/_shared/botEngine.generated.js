@@ -2250,8 +2250,9 @@ var isWeekday = (date) => {
   return d >= 1 && d <= 5;
 };
 var TEAM_OFF = [
-  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel": cleanings go to Porto 3, waterproofing is not booked.
-  { team: "Porto 1", date: "2026-10-29", fromHour: 13 }
+  // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel", "NAO ESTA DISPONIVEL PONTO": nothing from noon on (Juliana, 10h30-12h, stays).
+  // Cleanings go to Porto 3, waterproofing is not booked.
+  { team: "Porto 1", date: "2026-10-29", fromHour: 12 }
 ];
 var offAt = (team, from, to) => TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
@@ -2742,7 +2743,8 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   const address = text(r.address, MAX.address);
   const waterproofing = /imperm|premium|essencial/i.test(service);
   const namedRaw = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
-  const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
+  const namedTeam = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
+  const named = namedTeam && teamWorks(namedTeam, start, start + durationMin * 6e4) ? namedTeam : null;
   const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
   const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
   const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;

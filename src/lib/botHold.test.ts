@@ -65,6 +65,15 @@ describe('planBotHold', () => {
 
 describe('planOwnerBooking', () => {
   const base = { conversationId: 'c9', date: '2026-10-12', time: '15h', service: 'Recolha de 2 tapetes (2x3)', total: 159, phone: '+351 900 000 001', name: 'Cliente Inventado', address: 'Rua Inventada 1, Oeiras' };
+  it('never puts a job on a team the chat named while that team is off (owner, 28 Oct 2026: Porto 1 on 29/10 afternoon)', () => {
+    const off = { ...base, date: '2026-10-29', time: '15h', city: 'Porto', address: 'Rua Inventada 1, 4000-000 Porto', team: 'Porto 1' };
+    const clean = planOwnerBooking({ ...off, service: 'Limpeza de sofá 3 lugares', total: 89 }, [], NOW.getTime());
+    expect(clean).toMatchObject({ ok: true, team: 'Porto 3' });
+    const imper = planOwnerBooking({ ...off, service: 'Impermeabilização Premium de sofá 3 lugares', total: 149 }, [], NOW.getTime());
+    expect(imper).toMatchObject({ ok: true });
+    expect('team' in imper && imper.team).toBeFalsy();
+    expect(planOwnerBooking({ ...off, time: '10h', service: 'Limpeza de sofá 3 lugares', total: 89 }, [], NOW.getTime())).toMatchObject({ team: 'Porto 1' });
+  });
   it('never books an hour already gone (22 Oct: 10h booked at 19:34 the same day)', () => {
     expect(planOwnerBooking({ ...base, date: '2026-10-07', time: '9h' }, [], NOW.getTime())).toMatchObject({ error: expect.stringMatching(/já passou/) });
   });

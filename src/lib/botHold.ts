@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingOnly, rugPickupOwnerReason, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingOnly, rugPickupOwnerReason, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -197,7 +197,10 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   // also when the chat named Braga.
   const waterproofing = /imperm|premium|essencial/i.test(service);
   const namedRaw = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
-  const named = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
+  const namedTeam = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
+  // A team the chat named but that is off at that hour (TEAM_OFF, TEAM_WEEKDAY_HOURS) is not used (owner, 28 Oct 2026:
+  // "porto 1 amanha a tarde NAO ESTA DISPONIVEL PONTO"): chooseTeam picks another, or it stays "A confirmar".
+  const named = namedTeam && teamWorks(namedTeam, start, start + durationMin * 60_000) ? namedTeam : null;
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. A pickup there takes only a team the chat
   // named outside the zone; otherwise it stays "A confirmar" and he picks the team.
   const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
