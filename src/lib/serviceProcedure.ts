@@ -85,7 +85,7 @@ export function procedurePay(got: { before: boolean; after: boolean; video: bool
 // Lisboa (com o Algarve no mesmo grupo) e a Coimbra: começam a 15/10. Braga
 // (Clivia) ainda não as recebeu: fica na data do guião (UPSELL_TIERS_FROM).
 const PROCEDURE_FROM_BY_TEAM: Record<string, string> = {
-  'Porto 1': '2026-10-15', 'Porto 2': '2026-10-15', 'Lisboa 1': '2026-10-15', 'Lisboa 2': '2026-10-15', 'Algarve': '2026-10-15', 'Coimbra': '2026-10-15',
+  'Porto 1': '2026-10-15', 'Porto 2': '2026-10-15', 'Porto 3': '2026-10-28', 'Lisboa 1': '2026-10-15', 'Lisboa 2': '2026-10-15', 'Algarve': '2026-10-15', 'Coimbra': '2026-10-15',
 };
 export const procedureFrom = (team: string) => PROCEDURE_FROM_BY_TEAM[team] ?? UPSELL_TIERS_FROM;
 

@@ -413,7 +413,7 @@ describe('o que muda nos calendários das equipas', () => {
       for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
         expect(mensagem.texto).toContain(linha);
       }
-      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2", "equipa algarve" ou "equipa coimbra"');
+      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa lisboa 2", "equipa algarve" ou "equipa coimbra"');
       expect(gs.mensagemParaDono(primeira.novos.slice(0, 1)).assunto).toBe('Escolhe a equipa deste serviço');
     });
   });

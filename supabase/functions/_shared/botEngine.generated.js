@@ -2031,10 +2031,17 @@ function botQuoteInner(input) {
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail("items tem de ser uma lista com pelo menos um artigo");
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items = [];
+  const rawOf = [];
   for (const [i, raw] of rawItems.entries()) {
     const item = toItem(raw, i);
     if ("ok" in item) return item;
+    if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
+      items.push({ ...item, id: `${item.id}a`, size: "3-lugares" }, { ...item, id: `${item.id}b`, size: "2-lugares" });
+      rawOf.push(raw, raw);
+      continue;
+    }
     items.push(item);
+    rawOf.push(raw);
   }
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? "");
@@ -2045,11 +2052,11 @@ function botQuoteInner(input) {
   const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
   const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
   const rugsOnly = items.every((i) => i.kind === "rug");
-  const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawItems[n].material })), city) : null;
+  const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawOf[n].material })), city) : null;
   const rugIdx = items.flatMap((i, n) => i.kind === "rug" ? [n] : []);
   const others = items.filter((i) => i.kind !== "rug");
   const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? "") : null;
-  const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawItems[n].material })), othersResult.subtotal, city) : null;
+  const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawOf[n].material })), othersResult.subtotal, city) : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = result.quote && !rugPriced || city === null || extendedTrip && !sharedTrip;
   return {
@@ -2194,14 +2201,15 @@ function localityFromPostalCode(code) {
 
 // src/lib/botAvailability.ts
 var TEAMS_BY_REGION = {
-  Porto: ["Porto 1", "Porto 2"],
+  Porto: ["Porto 1", "Porto 2", "Porto 3"],
   Braga: ["Braga"],
   Lisboa: ["Lisboa 1"],
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
-var WATERPROOFING_TEAMS = { Braga: ["Porto 1"] };
+var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 3"]);
+var WATERPROOFING_TEAMS = { Braga: ["Porto 1", "Porto 3"] };
 var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
 function cityZone(cityOrAddress) {
@@ -2432,7 +2440,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
-  return [...st.teamsFree].sort((a, b) => Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
+  return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 var FAR_ZONES = [
   {
@@ -2753,7 +2761,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "7", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
@@ -2929,7 +2937,7 @@ function agendaMessage(day, services, issues, pending) {
 }
 
 // src/lib/crmUpsell.ts
-var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Braga", "Lisboa 1", "Lisboa 2", "Algarve", "Coimbra"];
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Lisboa 2", "Algarve", "Coimbra"];
 function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }
@@ -3145,6 +3153,7 @@ function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
 var PROCEDURE_FROM_BY_TEAM = {
   "Porto 1": "2026-10-15",
   "Porto 2": "2026-10-15",
+  "Porto 3": "2026-10-28",
   "Lisboa 1": "2026-10-15",
   "Lisboa 2": "2026-10-15",
   "Algarve": "2026-10-15",

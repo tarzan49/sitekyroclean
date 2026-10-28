@@ -46,7 +46,7 @@ export interface AvailabilityEvent {
 /** The zones the bot books by: the CRM's four regions plus Coimbra, which the CRM counts as Porto. */
 export type TeamZone = CrmLocality | 'Coimbra';
 export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
-  Porto: ['Porto 1', 'Porto 2'],
+  Porto: ['Porto 1', 'Porto 2', 'Porto 3'],
   Braga: ['Braga'],
   Lisboa: ['Lisboa 1'],
   Algarve: ['Algarve'],
@@ -54,12 +54,18 @@ export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 /**
+ * Backup teams (owner, 28 Oct 2026: "porto 3 mete a denise", "ela cobre tudo o que porto 2 e porto 1
+ * não cobrem"): Denise takes a job only when no other team of the zone can. Her free hours still count
+ * when the bot offers slots, so the Porto shows more hours; `chooseTeam` gives her the job last.
+ */
+export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 3']);
+/**
  * Waterproofing goes to another team in some zones (owner, 15 Oct 2026: "para já a equipa de
  * braga só fica com limpeza de estofos ao domicílio, a do porto fica com impermeabilizações
  * nessa zona"; "o porto por defeito é sempre porto 1"). A Guimarães waterproofing job had gone
  * to Braga and nobody turned up.
  */
-export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Braga: ['Porto 1'] };
+export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Braga: ['Porto 1', 'Porto 3'] };
 /** The teams that can take this job in the zone. */
 export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly string[] =>
   (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
@@ -364,7 +370,8 @@ export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso:
   const day = lisbon(from).date;
   const jobsThatDay = (t: string) => busy.filter(b => b.team === t && lisbon(b.from).date === day).length;
   return [...st.teamsFree].sort((a, b) =>
-    Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
+    Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b))
+    || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
     || jobsThatDay(a) - jobsThatDay(b)
     || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }

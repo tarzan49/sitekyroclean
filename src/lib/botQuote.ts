@@ -296,10 +296,22 @@ function botQuoteInner(input: unknown) {
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail('items tem de ser uma lista com pelo menos um artigo');
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items: CustomPackItem[] = [];
+  /** The raw item behind each priced item (an L sofa with waterproofing becomes two). */
+  const rawOf: unknown[] = [];
   for (const [i, raw] of rawItems.entries()) {
     const item = toItem(raw, i);
     if ('ok' in item) return item;
+    // Waterproofing an L sofa = a 3-seater plus a 2-seater (owner, 25 Oct 2026: "SOFÁ EM L … É UM SOFÁ
+    // DE 3+2 LUGARES"; 28 Oct 2026, "adiciona tb": impermeabilizar em L = 3 lugares + 2 lugares). Only
+    // the cleaning of an L has its own price (canto, 109€); before this the bot handed every waterproofing
+    // of an L to the owner as sob orçamento.
+    if (item.kind === 'sofa' && item.size === 'canto' && (item.extra === 'premium' || item.extra === 'essencial')) {
+      items.push({ ...item, id: `${item.id}a`, size: '3-lugares' }, { ...item, id: `${item.id}b`, size: '2-lugares' });
+      rawOf.push(raw, raw);
+      continue;
+    }
     items.push(item);
+    rawOf.push(raw);
   }
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
@@ -317,14 +329,14 @@ function botQuoteInner(input: unknown) {
   // Anything mixed with other items still goes to the owner.
   const rugsOnly = items.every(i => i.kind === 'rug');
   const rugPrice = rugsOnly
-    ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawItems[n] as Record<string, unknown>).material })), city)
+    ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawOf[n] as Record<string, unknown>).material })), city)
     : null;
   // Rugs mixed with priced items: one visit, travel offered (owner, 17 Oct 2026).
   const rugIdx = items.flatMap((i, n) => (i.kind === 'rug' ? [n] : []));
   const others = items.filter(i => i.kind !== 'rug');
   const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? '') : null;
   const rugCombo = othersResult && !othersResult.quote
-    ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: (rawItems[n] as Record<string, unknown>).material })), othersResult.subtotal, city)
+    ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: (rawOf[n] as Record<string, unknown>).material })), othersResult.subtotal, city)
     : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = (result.quote && !rugPriced) || city === null || (extendedTrip && !sharedTrip);
