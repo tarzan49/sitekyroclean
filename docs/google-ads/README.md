@@ -612,6 +612,14 @@ sofás saiu com força "Fraca" (só um título com as palavras pesquisadas) e fo
 substituído por uma versão com "Impermeabilização de Sofás", "Sofá Anti-Manchas" e
 "Orçamento Grátis no WhatsApp" (força "Boa"); a versão fraca ficou em pausa.
 
+Mensagens de WhatsApp: a cópia trouxe ao nível da campanha a mensagem de limpeza
+("…para limpar o meu sofá em Lisboa"), que o grupo das cadeiras herdava. Cada grupo
+tem agora a sua: sofás "…para impermeabilizar o meu sofá em Lisboa/no Porto" e
+cadeiras "…para impermeabilizar as minhas cadeiras em Lisboa/no Porto" (criadas no
+formulário "Adicionar mensagem" ao nível do grupo; o aviso "Introduza um número de
+telefone" pode ficar no ecrã depois de o número estar certo, e a gravação passa).
+Um grupo novo nestas campanhas precisa de mensagem própria, senão herda a de limpeza.
+
 Armadilhas vistas: num carregamento, uma campanha de nome repetido pede o
 `Campaign ID` ("Valor em falta em ID da campanha"); e a tabela de grupos não se
 atualiza depois de um carregamento, por isso recarregar antes de concluir que
