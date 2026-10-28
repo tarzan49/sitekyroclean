@@ -104,8 +104,8 @@ def cadeiras(city):
 
 # Orçamento proposto (dono decide antes de ligar): Lisboa primeiro, porque tem o
 # clique mais barato e mais folga nas equipas; o Porto 1 está apertado desde 27/10.
-CAMPANHAS = [("Kyro | Lisboa | Impermeabilização de Estofos | Out 2026", "Lisboa", "25"),
-             ("Kyro | Porto | Impermeabilização de Estofos | Out 2026", "Porto", "15")]
+CAMPANHAS = [("Kyro | Lisboa | Impermeabilização de Estofos | Out 2026", "Lisboa", "15"),
+             ("Kyro | Porto | Impermeabilização de Estofos | Out 2026", "Porto", "10")]
 
 cols = ["Campaign", "Campaign Type", "Campaign Status", "Budget", "Bid Strategy Type", "Networks",
         "Anúncios políticos da UE", "Ad Group", "Ad Group Status", "Max CPC", "Keyword",

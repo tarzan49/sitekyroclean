@@ -584,6 +584,31 @@ de mensagens"), não só por "Kyro | Pedido confirmado". Não impede a campanha
 de servir nem de otimizar lances — é só um problema de relatório, o mesmo tipo
 de degradação sem mentir que outras armadilhas desta lista já tiveram.
 
+## 8. Campanhas de impermeabilização (28/10/2026, dono)
+
+Duas campanhas próprias, "Kyro | Lisboa | Impermeabilização de Estofos | Out 2026"
+(ID 24404414594) e "Kyro | Porto | …" (ID 24404420300), ligadas a 28/10. **Foram
+feitas copiando as campanhas de sofás** (Editar → Copiar → Colar, em pausa), para
+levarem as mesmas localizações (37 no Porto), idioma, negativas e extensões; a
+seguir um carregamento em massa mudou o nome e o orçamento pelo `Campaign ID`, e
+outro (`campanha-impermeabilizacao.csv`, gerado por `gerar-csv-impermeabilizacao.py`)
+acrescentou os grupos "Impermeabilização de Sofás" (com as palavras anti-manchas)
+e "Impermeabilização de Cadeiras" e retirou os grupos de limpeza que vieram na cópia.
+Os grupos "Impermeabilização de Sofás" das campanhas de sofás do Porto e de Lisboa
+ficaram **em pausa**, para as duas não disputarem as mesmas pesquisas.
+
+Orçamentos (regras "Segunda volta ao normal" e "Fim de semana", que agora têm 5
+ações cada): dias úteis Porto sofás 40, Lisboa sofás 60, Braga 20, impermeabilização
+Lisboa 15 e Porto 10; fim de semana Lisboa 20 + 8, Porto 15 + 5, Braga 8.
+Porquê: a 20-26/10 só Lisboa perdia anúncios por orçamento (20%); Porto (4%) e
+Braga (0%) não gastavam mais. O modelo e as regras de decisão estão no documento
+privado "Modelo de crescimento dos anúncios" (Claude Docs), fora do repositório.
+
+Armadilhas vistas: num carregamento, uma campanha de nome repetido pede o
+`Campaign ID` ("Valor em falta em ID da campanha"); e a tabela de grupos não se
+atualiza depois de um carregamento, por isso recarregar antes de concluir que
+algo falhou (os grupos já estavam retirados).
+
 ---
 
 *`GOOGLE-ADS-PORTO-CAMPANHA.md` (agosto) tem outra estrutura e textos que já não
