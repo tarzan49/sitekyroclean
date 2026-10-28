@@ -139,6 +139,9 @@ describe('região e equipa de cada serviço', () => {
     expect(equipa(`${lisboa} equipa lisboa 2`, '6')).toBe('lisboa2');
     expect(equipa(lisboa, undefined, 'Equipa Lisboa2')).toBe('lisboa2');
     expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 1')).toBe('lisboa');
+    // Porto 3 (Denise, 28/10/2026): escrito ou pela cor Tomate, nunca lido como Porto 1.
+    expect(equipa('Serviço 74€ (148€) sofá - Rua X 1, 4470-000 Maia', '11', 'Feito pela Denise (equipa Porto 3)')).toBe('porto3');
+    expect(equipa('Serviço 74€ (148€) sofá - Rua X 1, 4470-000 Maia - equipa porto 3', '9')).toBe('porto3');
     // Uma cor que não é de nenhuma equipa não é uma escolha.
     expect(equipa(lisboa, '2')).toBeNull();
     // Cada equipa com a sua cor.

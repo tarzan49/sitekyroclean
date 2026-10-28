@@ -539,9 +539,10 @@ function origemDaRegiao(evento) {
  */
 function equipaEscrita(evento) {
   const texto = normalizar([evento.location, evento.summary, evento.description].filter(Boolean).join('\n'));
-  const escrito = /\bequipa\s+(braga|algarve|coimbra|(?:porto|lisboa)(?:\s*[12])?)\b/.exec(texto);
+  // "porto 3" (Denise, 28/10/2026): com [12] só, "equipa porto 3" lia-se "equipa porto" = Porto 1.
+  const escrito = /\bequipa\s+(braga|algarve|coimbra|(?:porto|lisboa)(?:\s*[123])?)\b/.exec(texto);
   if (!escrito) return null;
-  const nome = escrito[1].replace(/^(porto|lisboa)\s*([12])$/, '$1 $2');
+  const nome = escrito[1].replace(/^(porto|lisboa)\s*([123])$/, '$1 $2');
   return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;
 }
 
