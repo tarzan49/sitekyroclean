@@ -10,7 +10,8 @@
 // PROCEDURE_PAY_ENABLED, que o dono ainda não mandou ligar.
 //
 // Quando um serviço acaba, o servidor do bot manda a cada pessoa da equipa a
-// mensagem de `procedurePromptMessage`; a equipa responde a essa mensagem
+// mensagem de `procedurePromptMessage` e, ao cliente, o pedido de avaliação de
+// `procedureClientMessage` (`clientReviewDue` decide quando); a equipa responde a essa mensagem
 // (resposta citada) com as fotografias e o vídeo, para dois serviços seguidos
 // nunca se misturarem. Tabela service_procedure; a avaliação vem de
 // google_reviews.service_request_id.
@@ -212,9 +213,11 @@ export interface PromptFacts {
 const serviceName = (f: Pick<PromptFacts, 'label' | 'what'>) => `${f.label}${f.what ? ` (${f.what})` : ''}`;
 
 /**
- * A mensagem que cada pessoa da equipa recebe quando o serviço acaba. Logo a
- * seguir vai, sozinha, a de `procedureClientMessage`, para a equipa a
- * reencaminhar ao cliente (dono, 2026-10-14). Sem emojis nem travessões.
+ * A mensagem que a equipa recebe quando o serviço acaba. O pedido de avaliação
+ * já não passa pela equipa: o bot manda-o ao cliente (dono, 2026-10-28: "em
+ * vez de ir para a equipa vai para o cliente"), quando chega a fotografia de
+ * depois ou o vídeo, ou CLIENT_REVIEW_FALLBACK_MIN depois da hora de fim
+ * (`clientReviewDue`). Sem emojis nem travessões.
  */
 export function procedurePromptMessage(f: PromptFacts): string {
   return [
@@ -222,22 +225,26 @@ export function procedurePromptMessage(f: PromptFacts): string {
     '',
     'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.',
     '',
-    `A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
+    `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
   ].join('\n');
 }
 
 /**
- * O pedido de avaliação que a equipa reencaminha ao cliente: o primeiro nome, o
- * serviço feito e o link da ficha certa (Lisboa para as equipas de Lisboa, Porto
- * para as outras). A frase dos 10% é do dono (14/10: "não é para tirar a
- * frase"), avisado de que o Google não permite ofertas em troca de avaliações.
+ * O pedido de avaliação que o bot manda ao cliente no fim do serviço: o
+ * primeiro nome, o serviço feito, o link da ficha certa (Lisboa para as
+ * equipas de Lisboa, Porto para as outras), os 10% no próximo serviço e o
+ * Instagram (dono, 2026-10-28: "a avaliação oferece 10% no próximo serviço e
+ * na mensagem pede também para seguir no Insta"). A frase dos 10% é do dono
+ * (14/10: "não é para tirar a frase"), avisado de que o Google não permite
+ * ofertas em troca de avaliações. `sameDay` falso quando sai no dia seguinte
+ * (o serviço acabou tarde): sem "hoje".
  */
-export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what' | 'team'>): string {
+export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what' | 'team'> & { sameDay?: boolean }): string {
   const name = (f.firstName ?? '').trim();
   const what = (f.what ?? '').trim();
   const service = what ? `do serviço (${what.charAt(0).toLowerCase()}${what.slice(1)})` : 'do serviço';
   return [
-    `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
+    `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido${f.sameDay === false ? '' : ' hoje'}! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
     REVIEW_LINKS[reviewProfileOfTeam(f.team)],
     'Como agradecimento, fica com 10% de desconto no próximo serviço.',
     '',
@@ -245,6 +252,48 @@ export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what'
     INSTAGRAM_URL,
     'Obrigado!',
   ].join('\n');
+}
+
+/**
+ * Quanto tempo depois da hora de fim do calendário o pedido sai sem a
+ * fotografia de depois nem o vídeo da equipa. Duas horas de margem, para nunca
+ * chegar com a equipa ainda a trabalhar (dono, 28/10: "tens que garantir que
+ * seja no final").
+ */
+export const CLIENT_REVIEW_FALLBACK_MIN = 120;
+/** Horas de Lisboa em que o pedido pode sair (primeira mensagem nossa, não uma resposta). */
+export const CLIENT_REVIEW_HOURS = { from: 9, until: 22 } as const;
+
+/**
+ * Se o pedido de avaliação ao cliente sai agora. Sinal de que o serviço acabou:
+ * a fotografia de depois ou o vídeo da equipa, mandados depois da hora de
+ * início; sem eles, CLIENT_REVIEW_FALLBACK_MIN depois da hora de fim. Nunca
+ * antes do fim do calendário menos uma hora (uma fotografia "de depois" a meio
+ * do serviço não chega), nunca fora de CLIENT_REVIEW_HOURS.
+ */
+export function clientReviewDue(
+  ev: { start: string; end: string },
+  rec: Pick<ProcedureRecord, 'after_at' | 'video_at'>,
+  now: Date,
+): boolean {
+  const start = Date.parse(ev.start), end = Date.parse(ev.end), t = now.getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', hour: '2-digit', hourCycle: 'h23' }).format(now));
+  if (hour < CLIENT_REVIEW_HOURS.from || hour >= CLIENT_REVIEW_HOURS.until) return false;
+  if (t < end - 60 * 60_000) return false;
+  const proof = [rec.after_at, rec.video_at].some(at => at && Date.parse(at) >= start && Date.parse(at) <= t);
+  return proof || t >= end + CLIENT_REVIEW_FALLBACK_MIN * 60_000;
+}
+
+/** O telefone do cliente no título do evento ("Serviço … - 912 345 678 - Ana - Rua…"), em dígitos com o 351. */
+export function clientPhoneFromTitle(summary: string): string | null {
+  for (const part of summary.split(/\s+-\s+/)) {
+    if (!/^[+\d\s().]+$/.test(part.trim())) continue;
+    const d = part.replace(/\D/g, '').replace(/^00/, '');
+    if (/^[29]\d{8}$/.test(d)) return `351${d}`;
+    if (d.length >= 11 && d.length <= 15) return d;
+  }
+  return null;
 }
 
 /** A resposta do bot depois de receber fotografias ou vídeo. */
@@ -275,7 +324,7 @@ export function procedureReminderMessage(label: string, check: Pick<ProcedureChe
   const media = check.missing.filter(i => i !== 'review');
   const lines = [`Lembrete do serviço ${label}, ${dm(serviceDay)}. Falta: ${missingText(check.missing)}.`];
   if (media.length) lines.push('Responde à mensagem desse serviço com o que falta.');
-  if (check.missing.includes('review')) lines.push('Se o cliente ainda não avaliou, manda-lhe outra vez o link.');
+  if (check.missing.includes('review')) lines.push('O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o.');
   lines.push(`Prazo: ${dm(check.deadline)}.`);
   return lines.join(' ');
 }

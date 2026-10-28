@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkProcedure, factsFromTitle, procedureAccountDelta, procedureApplies, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
+  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, procedureAccountDelta, procedureApplies, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
   PROCEDURE_PAY_ENABLED, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
@@ -115,11 +115,12 @@ describe('photos and video sent in reply', () => {
 
 describe('messages', () => {
   const noDash = /—|–/;
-  it('the service message asks for a reply with the photos and the video and says the next one is for the client', () => {
+  it('the service message asks for the photos and the video and says the bot sends the review request to the client', () => {
     const m = procedurePromptMessage({ label: 'Ana, Paranhos', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15', time: '15h' });
     expect(m).toContain('Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.');
     expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.');
-    expect(m).toContain('A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é 22/10. Obrigado!');
+    expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é 22/10. Obrigado!');
+    expect(m).not.toContain('reencaminha');
     expect(m).not.toMatch(noDash);
   });
   it('the client message: first name, the service, the right review link, the owner\'s 10% line', () => {
@@ -137,6 +138,8 @@ describe('messages', () => {
     const lx = procedureClientMessage({ firstName: null, what: null, team: 'Lisboa 1' });
     expect(lx.startsWith('Olá, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço.')).toBe(true);
     expect(lx).toContain(REVIEW_LINKS.lisboa);
+    // Sent the morning after (service ended late): no "hoje".
+    expect(procedureClientMessage({ firstName: 'Ana', what: null, team: 'Porto 1', sameDay: false }).startsWith('Olá Ana, obrigado por nos ter recebido! Esperamos')).toBe(true);
   });
   it('the closing message says the team share from procedurePay', () => {
     expect(procedureClosedMessage('Ana', '2026-10-15', ['video', 'review'], { teamShare: 45, bonus: 0 }))
@@ -152,8 +155,34 @@ describe('messages', () => {
   });
   it('the reminder', () => {
     const m = procedureReminderMessage('Ana', { missing: ['video', 'review'], deadline: '2026-10-22' }, '2026-10-15');
-    expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo e avaliação do cliente. Responde à mensagem desse serviço com o que falta. Se o cliente ainda não avaliou, manda-lhe outra vez o link. Prazo: 22/10.');
+    expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo e avaliação do cliente. Responde à mensagem desse serviço com o que falta. O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o. Prazo: 22/10.');
     expect(m).not.toMatch(noDash);
+  });
+});
+
+describe('client review request: only at the end of the service', () => {
+  // Service 14:00-15:00 UTC on 15/10 = 15h-16h in Lisbon.
+  const ev = { start: '2026-10-15T14:00:00Z', end: '2026-10-15T15:00:00Z' };
+  const none = { after_at: null, video_at: null };
+  it('waits for the after photo or the video, or two hours after the calendar end', () => {
+    expect(clientReviewDue(ev, none, new Date('2026-10-15T15:05:00Z'))).toBe(false);
+    expect(clientReviewDue(ev, none, new Date('2026-10-15T16:59:00Z'))).toBe(false);
+    expect(clientReviewDue(ev, none, new Date('2026-10-15T17:00:00Z'))).toBe(true);
+    expect(clientReviewDue(ev, { after_at: '2026-10-15T15:10:00Z', video_at: null }, new Date('2026-10-15T15:12:00Z'))).toBe(true);
+    expect(clientReviewDue(ev, { after_at: null, video_at: '2026-10-15T15:20:00Z' }, new Date('2026-10-15T15:21:00Z'))).toBe(true);
+  });
+  it('never long before the calendar end, never at night', () => {
+    // An "after" photo an hour and a half before the end is not the end.
+    expect(clientReviewDue(ev, { after_at: '2026-10-15T13:00:00Z', video_at: null }, new Date('2026-10-15T13:30:00Z'))).toBe(false);
+    const late = { start: '2026-10-15T19:00:00Z', end: '2026-10-15T20:00:00Z' };
+    expect(clientReviewDue(late, none, new Date('2026-10-15T22:30:00Z'))).toBe(false); // 23h30 in Lisbon
+    expect(clientReviewDue(late, none, new Date('2026-10-16T07:30:00Z'))).toBe(false); // 8h30
+    expect(clientReviewDue(late, none, new Date('2026-10-16T08:05:00Z'))).toBe(true); // 9h05
+  });
+  it('reads the client phone from the event title', () => {
+    expect(clientPhoneFromTitle('Serviço 40€ (80€) Limpeza de sofá - 912 000 000 - Ana Teste - Rua Inventada 1')).toBe('351912000000');
+    expect(clientPhoneFromTitle('Serviço 40€ (80€) sofá - +44 7700 900000 - Ana')).toBe('447700900000');
+    expect(clientPhoneFromTitle('Serviço 40€ (80€) sofá - Ana - Rua 5 de Outubro 12')).toBeNull();
   });
 });
 

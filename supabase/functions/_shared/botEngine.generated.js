@@ -3221,7 +3221,7 @@ function procedurePromptMessage(f) {
     "",
     "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.",
     "",
-    `A mensagem a seguir é para mandares ao cliente: reencaminha-a ou copia-a. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+    `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
   ].join("\n");
 }
 function procedureClientMessage(f) {
@@ -3229,7 +3229,7 @@ function procedureClientMessage(f) {
   const what = (f.what ?? "").trim();
   const service = what ? `do serviço (${what.charAt(0).toLowerCase()}${what.slice(1)})` : "do serviço";
   return [
-    `Olá${name ? ` ${name}` : ""}, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
+    `Olá${name ? ` ${name}` : ""}, obrigado por nos ter recebido${f.sameDay === false ? "" : " hoje"}! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
     REVIEW_LINKS[reviewProfileOfTeam(f.team)],
     "Como agradecimento, fica com 10% de desconto no próximo serviço.",
     "",
@@ -3237,6 +3237,26 @@ function procedureClientMessage(f) {
     INSTAGRAM_URL,
     "Obrigado!"
   ].join("\n");
+}
+var CLIENT_REVIEW_FALLBACK_MIN = 120;
+var CLIENT_REVIEW_HOURS = { from: 9, until: 22 };
+function clientReviewDue(ev, rec, now) {
+  const start = Date.parse(ev.start), end = Date.parse(ev.end), t = now.getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Lisbon", hour: "2-digit", hourCycle: "h23" }).format(now));
+  if (hour < CLIENT_REVIEW_HOURS.from || hour >= CLIENT_REVIEW_HOURS.until) return false;
+  if (t < end - 60 * 6e4) return false;
+  const proof = [rec.after_at, rec.video_at].some((at) => at && Date.parse(at) >= start && Date.parse(at) <= t);
+  return proof || t >= end + CLIENT_REVIEW_FALLBACK_MIN * 6e4;
+}
+function clientPhoneFromTitle(summary) {
+  for (const part of summary.split(/\s+-\s+/)) {
+    if (!/^[+\d\s().]+$/.test(part.trim())) continue;
+    const d = part.replace(/\D/g, "").replace(/^00/, "");
+    if (/^[29]\d{8}$/.test(d)) return `351${d}`;
+    if (d.length >= 11 && d.length <= 15) return d;
+  }
+  return null;
 }
 function procedureReceiptMessage(label, received, check) {
   const got = received.length ? `Recebido para ${label}: ${missingText(received)}.` : `Para ${label}:`;
@@ -3262,7 +3282,7 @@ function procedureReminderMessage(label, check, serviceDay) {
   const media = check.missing.filter((i) => i !== "review");
   const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(check.missing)}.`];
   if (media.length) lines.push("Responde à mensagem desse serviço com o que falta.");
-  if (check.missing.includes("review")) lines.push("Se o cliente ainda não avaliou, manda-lhe outra vez o link.");
+  if (check.missing.includes("review")) lines.push("O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o.");
   lines.push(`Prazo: ${dm2(check.deadline)}.`);
   return lines.join(" ");
 }
@@ -3652,6 +3672,8 @@ export {
   certificateName,
   certificateNumber,
   checkProcedure,
+  clientPhoneFromTitle,
+  clientReviewDue,
   describeQuizOrder,
   eventTeam,
   factsFromTitle,

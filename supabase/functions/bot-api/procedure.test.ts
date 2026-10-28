@@ -6,13 +6,14 @@ type Row = Record<string, unknown>;
 const ev = (id: string, summary: string, start: string, end: string, team?: string) =>
   ({ id, summary, description: team ? `Equipa: ${team}\n\nnotas` : "", location: "", startDate: start.slice(0, 10), created: start, updated: start, status: "CONFIRMED", start, end });
 
-function fakeStore(initial: Row[] = [], services: Row[] = [], reviews: Row[] = []) {
+function fakeStore(initial: Row[] = [], services: Row[] = [], reviews: Row[] = [], clients: Row[] = []) {
   const table = new Map(initial.map(r => [String(r.calendar_event_id), { ...r }]));
   const store: ProcedureStore = {
     records: async since => [...table.values()].filter(r => String(r.service_day) >= since),
     byPrompt: async id => [...table.values()].find(r => (r.prompt_msg_ids as string[]).includes(id)) ?? null,
     services: async ids => services.filter(s => ids.includes(String(s.calendar_event_id))),
     reviews: async ids => reviews.filter(r => ids.includes(String(r.service_request_id))),
+    clients: async keys => clients.filter(c => keys.some(k => String(c.phone).endsWith(k))),
     upsert: async row => { table.set(String(row.calendar_event_id), { ...(table.get(String(row.calendar_event_id)) ?? {}), ...row }); return null; },
     update: async (id, patch) => { const r = table.get(id); if (r) Object.assign(r, patch); return null; },
   };
@@ -37,8 +38,10 @@ Deno.test("a service that just ended gets its message; revisits, other events an
   assertEquals(prompts.map(p => p.eventId), ["s1", "s6"]);
   assertEquals(prompts[0].label, "Ana, Paranhos");
   assert(String(prompts[0].message).startsWith("Serviço terminado: Ana, Paranhos (Limpeza de sofá de 3 lugares), 15/10 às 15h."));
-  assert(String(prompts[0].clientMessage).startsWith("Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares)."));
-  assert(!JSON.stringify(body).includes("912000000"), "no phone leaves");
+  // The review request no longer goes to the team (owner, 28 Oct): the bot sends it to the client.
+  assertEquals(prompts[0].clientMessage, undefined);
+  assert(!JSON.stringify(prompts).includes("912000000"), "no phone in the team prompts");
+  assertEquals(body.clientReviews, []);
 });
 
 Deno.test("prompt ids saved; photos and video in reply fill the slots once; a reply to something else is not found", async () => {
@@ -111,4 +114,41 @@ Deno.test("only the review missing: the team keeps 45% (owner's rule of 20/10; 2
   assertEquals((day8.closed as Row[]).map(c => c.message), [
     "O prazo do serviço Larry, Porto, 19/10, acabou sem avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.",
   ]);
+});
+
+Deno.test("client review request: once, at the end of the service, never to a paused, opted-out or reviewed client", async () => {
+  const base = { prompt_msg_ids: ["m1"], prompted_at: "2026-10-15T15:01:00Z", team: "Porto 2", service_day: "2026-10-15", status: "em_curso", reminders_sent: 0 };
+  const events = [
+    ev("s1", "Serviço 40€ (80€) Limpeza de sofá - 912000000 - Ana Teste - Rua Inventada 1", "2026-10-15T14:00:00Z", "2026-10-15T15:00:00Z", "Porto 2"),
+    ev("s2", "Serviço 40€ (80€) sofá - 912000001 - Rui Teste - Rua Inventada 2", "2026-10-15T14:00:00Z", "2026-10-15T15:00:00Z", "Porto 2"),
+    ev("s3", "Serviço 40€ (80€) sofá - 912000002 - Eva Teste - Rua Inventada 3", "2026-10-15T14:00:00Z", "2026-10-15T15:00:00Z", "Lisboa 1"),
+    ev("s4", "Serviço 40€ (80€) sofá - Sem Telefone - Rua Inventada 4", "2026-10-15T14:00:00Z", "2026-10-15T15:00:00Z", "Porto 2"),
+  ];
+  const { store, table } = fakeStore(
+    [
+      { ...base, calendar_event_id: "s1", after_at: "2026-10-15T15:10:00Z" },
+      { ...base, calendar_event_id: "s2" },
+      { ...base, calendar_event_id: "s3", team: "Lisboa 1" },
+      { ...base, calendar_event_id: "s4" },
+    ],
+    [{ id: "c1", calendar_event_id: "s1", client_name: "Ana Teste", city: "Paranhos", description: "Limpeza de sofá de 3 lugares" }],
+    [],
+    [{ phone: "351912000001", contact_preference: "normal", on_hold_reason: "Queixa: mancha", reviewed_google: false }],
+  );
+  // 16h15 in Lisbon: s1 has the after photo, the others are only 1h15 past the end.
+  let body = await json(await procedureDue(events, store, new Date("2026-10-15T15:15:00Z")));
+  assertEquals((body.clientReviews as Row[]).map(c => c.eventId), ["s1"]);
+  const first = (body.clientReviews as Row[])[0];
+  assertEquals(first.phone, "351912000000");
+  assert(String(first.message).startsWith("Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares)."));
+  assert(String(first.message).includes("10% de desconto no próximo serviço"));
+  assert(String(first.message).includes("instagram.com"));
+  await procedureSent({ eventId: "s1", kind: "client-review", messageIds: ["w1"] }, store, new Date("2026-10-15T15:16:00Z"));
+  assertEquals(table.get("s1")!.client_review_msg_id, "w1");
+  // Two hours after the end: s3 goes (Lisbon link), s2 is on hold and s4 has no phone; s1 is not sent again.
+  body = await json(await procedureDue(events, store, new Date("2026-10-15T17:05:00Z")));
+  assertEquals((body.clientReviews as Row[]).map(c => c.eventId), ["s3"]);
+  assert(String((body.clientReviews as Row[])[0].message).includes("g.page/r/CRc7F7lX3xcEECE/review"));
+  assert(String(table.get("s2")!.client_review_skip).startsWith("em pausa"));
+  assertEquals(table.get("s4")!.client_review_skip, "sem telefone no título");
 });

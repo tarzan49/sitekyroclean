@@ -852,7 +852,7 @@ function supabaseAccounts(): BotEnv["accounts"] {
   };
 }
 
-const PROCEDURE_COLUMNS = "calendar_event_id, service_request_id, team, service_day, prompt_msg_ids, prompted_at, before_msg_id, before_at, after_msg_id, after_at, video_msg_id, video_at, reminders_sent, last_reminder_at, status, closed_at, penalty_paid";
+const PROCEDURE_COLUMNS = "calendar_event_id, service_request_id, team, service_day, prompt_msg_ids, prompted_at, before_msg_id, before_at, after_msg_id, after_at, video_msg_id, video_at, reminders_sent, last_reminder_at, status, closed_at, penalty_paid, client_review_at, client_review_skip";
 /** service_procedure and what it reads from the CRM and the reviews. */
 function supabaseProcedures(): ProcedureStore | null {
   const url = Deno.env.get("SUPABASE_URL");
@@ -870,6 +870,10 @@ function supabaseProcedures(): ProcedureStore | null {
     async reviews(serviceIds) {
       if (!serviceIds.length) return [];
       return rows(await client.from("google_reviews").select("service_request_id, stars, reviewed_at, excluded").in("service_request_id", serviceIds));
+    },
+    async clients(keys9) {
+      if (!keys9.length) return [];
+      return rows(await client.from("clients").select("phone, contact_preference, on_hold_reason, reviewed_google").or(keys9.map(k => `phone.like.%${k}`).join(",")));
     },
     async upsert(row) { return (await client.from("service_procedure").upsert(row, { onConflict: "calendar_event_id" })).error?.message ?? null; },
     async update(eventId, patch) { return (await client.from("service_procedure").update(patch).eq("calendar_event_id", eventId)).error?.message ?? null; },

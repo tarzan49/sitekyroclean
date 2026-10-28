@@ -4,9 +4,12 @@
 // minutes, sends each team member the message of a service that just ended,
 // reports the WhatsApp ids back with `procedure-sent`, and forwards the photos
 // and videos the team sends IN REPLY to that message with `procedure-media`.
-// Times, teams, first names and the service only: no phone or address leaves.
+// Times, teams, first names and the service only: no phone or address leaves,
+// except the client's phone in `clientReviews` (2026-10-28, owner: the review
+// request goes from the bot to the client at the end of the service, no longer
+// through the team; `clientReviewDue` decides when).
 import {
-  addDays, checkProcedure, eventTeam, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
+  addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
   procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
@@ -23,6 +26,8 @@ export interface ProcedureStore {
   services(eventIds: string[]): Promise<Row[] | { error: string }>;
   /** Reviews linked to these CRM rows (stars, reviewed_at, excluded, service_request_id). */
   reviews(serviceIds: string[]): Promise<Row[] | { error: string }>;
+  /** clients rows (phone, contact_preference, on_hold_reason, reviewed_google) whose phone ends in one of these 9 digits. */
+  clients(keys9: string[]): Promise<Row[] | { error: string }>;
   upsert(row: Row): Promise<string | null>;
   update(eventId: string, patch: Row): Promise<string | null>;
 }
@@ -55,6 +60,7 @@ const asRecord = (r: Row) => ({
   reminders_sent: Number(r.reminders_sent) || 0, last_reminder_at: (r.last_reminder_at as string) ?? null,
   status: (r.status as "em_curso" | "completo" | "fechado") ?? "em_curso", closed_at: (r.closed_at as string) ?? null,
   penalty_paid: !!r.penalty_paid,
+  client_review_at: (r.client_review_at as string) ?? null, client_review_skip: (r.client_review_skip as string) ?? null,
 });
 type Rec = ReturnType<typeof asRecord>;
 
@@ -95,7 +101,6 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     return {
       eventId: e.id, team, serviceDay: day, label: facts.label,
       message: procedurePromptMessage({ label: facts.label, what: facts.what, team: team!, serviceDay: day, time: hhmm(e.start!) }),
-      clientMessage: procedureClientMessage({ firstName: facts.firstName, what: facts.what, team: team! }),
     };
   });
 
@@ -134,7 +139,37 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
     closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, check.pay) });
   }
-  return createSuccessResponse({ prompts, reminders, closed, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
+  // The review request to the client, once per service, only when it is over (clientReviewDue).
+  const reviewCands = records.flatMap(r => {
+    if (r.client_review_at || r.client_review_skip) return [];
+    const ev = liveEvent(r);
+    if (!ev?.start || !ev.end || Date.parse(ev.end) < nowMs - PROMPT_WINDOW_MS) return [];
+    if (!clientReviewDue({ start: ev.start, end: ev.end }, r, now)) return [];
+    return [{ r, ev, phone: clientPhoneFromTitle(ev.summary) }];
+  });
+  const keys9 = [...new Set(reviewCands.map(c => c.phone?.slice(-9)).filter((v): v is string => !!v))];
+  const clients = keys9.length ? await store.clients(keys9) : [];
+  if ("error" in clients) return createErrorResponse(clients.error, 502);
+  const clientReviews: { eventId: string; phone: string; firstName: string | null; serviceStart: string; message: string }[] = [];
+  for (const { r, ev, phone } of reviewCands) {
+    const c = phone ? clients.find(x => String(x.phone ?? "").replace(/\D/g, "").endsWith(phone.slice(-9))) : undefined;
+    const skip = !phone ? "sem telefone no título"
+      : c?.contact_preference === "nao_contactar" ? "não contactar"
+      : typeof c?.on_hold_reason === "string" && c.on_hold_reason.trim() ? `em pausa: ${c.on_hold_reason.trim().slice(0, 120)}`
+      : c?.reviewed_google === true || reviewsFor(reviews, r.service_request_id).length ? "já avaliou"
+      : null;
+    if (skip) {
+      const err = await store.update(r.calendar_event_id, { client_review_skip: skip, updated_at: now.toISOString() });
+      if (err) safeLog("warn", "[bot-api] client review skip", { message: err });
+      continue;
+    }
+    const facts = labelFor(serviceByEvent.get(r.calendar_event_id), ev);
+    clientReviews.push({
+      eventId: r.calendar_event_id, phone: phone!, firstName: facts.firstName, serviceStart: ev.start!,
+      message: procedureClientMessage({ firstName: facts.firstName, what: facts.what, team: r.team, sameDay: lisbonDayOf(ev.start!) === today }),
+    });
+  }
+  return createSuccessResponse({ prompts, reminders, closed, clientReviews, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
 }
 
 /** The bot sent the message of a service (or a reminder) to the team: keep the WhatsApp ids. */
@@ -142,6 +177,15 @@ export async function procedureSent(body: Row, store: ProcedureStore, now: Date)
   const eventId = typeof body.eventId === "string" && ID.test(body.eventId) ? body.eventId : null;
   if (!eventId) return createErrorResponse("eventId em falta", 400);
   const ids = Array.isArray(body.messageIds) ? body.messageIds.filter((v): v is string => typeof v === "string" && ID.test(v)).slice(0, 10) : [];
+  if (body.kind === "client-review") {
+    // Sent (messageIds[0]) or not sent and why (skipped): either way, never again for this service.
+    const skipped = typeof body.skipped === "string" ? body.skipped.trim().slice(0, 200) : "";
+    if (!ids.length && !skipped) return createErrorResponse("messageIds ou skipped em falta", 400);
+    const err = await store.update(eventId, ids.length
+      ? { client_review_at: now.toISOString(), client_review_msg_id: ids[0], updated_at: now.toISOString() }
+      : { client_review_skip: skipped, updated_at: now.toISOString() });
+    return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
+  }
   if (body.kind === "reminder") {
     const index = Number(body.reminderIndex);
     if (!Number.isInteger(index) || index < 0 || index > 5) return createErrorResponse("reminderIndex inválido", 400);
