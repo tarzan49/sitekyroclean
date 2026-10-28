@@ -2761,7 +2761,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "7", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "11", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
