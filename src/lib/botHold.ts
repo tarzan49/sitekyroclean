@@ -76,7 +76,7 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   // Castelo, a "Pré-reserva" at the very hour the service had just been moved to). All events, not
   // `others`: after a booking the conversation's own row points at that service.
   if (clientServiceNear(events, text(r.phone, MAX.phone), r.date)) return { ok: false, alreadyBooked: true };
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
@@ -292,7 +292,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
   if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
 
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;

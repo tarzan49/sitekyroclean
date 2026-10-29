@@ -2458,6 +2458,17 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
   return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
+var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Leiria", "Batalha"]);
+var SMALL_ORDER_MIN_TOTAL = 110;
+function orderTotal(req, city) {
+  const given = Number(req.total);
+  if (req.total !== void 0 && Number.isFinite(given)) return given;
+  if (!Array.isArray(req.items) || !req.items.length) return null;
+  const q = botQuote({ items: req.items, city });
+  if (!q.ok) return null;
+  if (typeof q.total === "number") return q.total;
+  return typeof q.rugEstimate?.total === "number" ? q.rugEstimate.total : null;
+}
 var FAR_ZONES = [
   {
     cities: ["Alcácer do Sal", "Grândola", "Santiago do Cacém", "Sines"],
@@ -2584,6 +2595,10 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   if (area === "Algarve" && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
+  if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {
+    const total = orderTotal(req, city);
+    if (total === null || total < SMALL_ORDER_MIN_TOTAL) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de 120€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
+  }
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const cleaning = !waterproofingOnly(req?.items);
   const today = lisbon(now.getTime()).date;
@@ -2672,7 +2687,7 @@ function planBotHold(req, events, now, ownEventId) {
   if (typeof r.date !== "string" || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
   const others = ownEventId ? events.filter((e) => e.id !== ownEventId) : events;
   if (clientServiceNear(events, text(r.phone, MAX.phone), r.date)) return { ok: false, alreadyBooked: true };
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
@@ -2798,7 +2813,7 @@ function planBotBooking(req, events, now, ownEventId) {
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
   const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
   if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
-  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;

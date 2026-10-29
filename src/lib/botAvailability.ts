@@ -32,7 +32,7 @@
 import { cities } from '../data/serviceCatalog';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { localityFromPostalCode, type CrmLocality } from './postalRegion';
-import { resolveBotCity } from './botQuote';
+import { botQuote, resolveBotCity } from './botQuote';
 
 export interface AvailabilityEvent {
   summary: string;
@@ -416,6 +416,26 @@ export interface AvailabilityRequest {
   rugPickup?: unknown;
   /** How many days to look ahead (default 4, max 14). */
   days?: unknown;
+  /** The order total in euros (from the quote); computed from items and city when missing. */
+  total?: unknown;
+}
+
+/**
+ * Cities with no one fixed there yet (owner, 29 Oct 2026: "quando é viana do castelo só dizes horas
+ * certas se o pedido for acima de 120 eur [...] margem de erro de 10 eur [...] leiria, alentejo"):
+ * below 110€ (120€ less his 10€ margin) the bot offers no hours and says we check availability.
+ * The Alentejo Litoral is already in EXTENDED_TRIP_CITIES.
+ */
+export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Leiria', 'Batalha']);
+export const SMALL_ORDER_MIN_TOTAL = 110;
+function orderTotal(req: AvailabilityRequest, city: string): number | null {
+  const given = Number(req.total);
+  if (req.total !== undefined && Number.isFinite(given)) return given;
+  if (!Array.isArray(req.items) || !req.items.length) return null;
+  const q = botQuote({ items: req.items, city }) as { ok: boolean; total?: number | null; rugEstimate?: { total?: number | null } | null };
+  if (!q.ok) return null;
+  if (typeof q.total === 'number') return q.total;
+  return typeof q.rugEstimate?.total === 'number' ? q.rugEstimate.total : null;
 }
 
 export type AvailabilityResult =
@@ -580,6 +600,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. No hours from its calendar, even with a time he gave.
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
+  if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {
+    const total = orderTotal(req, city);
+    if (total === null || total < SMALL_ORDER_MIN_TOTAL) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de 120€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
+  }
   const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
   const cleaning = !waterproofingOnly(req?.items);
 

@@ -278,7 +278,7 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(pickup.teams).toEqual([]);
     expect(pickup.handToOwner).toMatch(/Braga não faz recolhas/);
     expect(ok(botAvailability({ city: 'Guimarães', items: rugs, rugPickup: true, ownerTime: true }, [], NOW)).handToOwner).toMatch(/recolhas/);
-    expect(ok(botAvailability({ city: 'Viana do Castelo', items: rugs }, [], NOW))).toMatchObject({ handToOwner: null, teams: ['Braga'] });
+    expect(ok(botAvailability({ city: 'Viana do Castelo', items: rugs, total: 149 }, [], NOW))).toMatchObject({ handToOwner: null, teams: ['Braga'] });
     expect(ok(botAvailability({ city: 'Matosinhos', items: rugs, rugPickup: true }, [], NOW)).handToOwner).toBeNull();
   });
 });
@@ -342,5 +342,19 @@ describe("the owner's rules for the next days (DAY_RULES)", () => {
       for (const d of [...(r.closed ?? []).map(c => c.date), ...(r.prefer ?? [])]) expect(d).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(r.note.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
+  const now = new Date('2026-10-29T09:00:00Z');
+  it('abaixo de 110€ não dá horas em Viana e Leiria; a partir de 110€ dá', () => {
+    const low = botAvailability({ city: 'Viana do Castelo', total: 89 }, [], now) as { handToOwner: string | null };
+    expect(low.handToOwner).toMatch(/verificar a disponibilidade/);
+    const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { handToOwner: string | null };
+    expect(quoted.handToOwner).toMatch(/abaixo de 120/);
+    const ok = botAvailability({ city: 'Viana do Castelo', total: 115 }, [], now) as { handToOwner: string | null };
+    expect(ok.handToOwner).toBeNull();
+    const owner = botAvailability({ city: 'Viana do Castelo', total: 50, ownerTime: true }, [], now) as { handToOwner: string | null };
+    expect(owner.handToOwner).toBeNull();
   });
 });
