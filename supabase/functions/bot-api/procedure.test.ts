@@ -55,7 +55,8 @@ Deno.test("prompt ids saved; photos and video in reply fill the slots once; a re
     { kind: "image", messageId: "p2", at: "2026-10-15T17:35:05Z" },
   ] }, store, now));
   assertEquals(r1.received, ["before", "after"]);
-  assertEquals(r1.message, "Recebido para Ana: fotografia de antes e fotografia de depois. Falta: vídeo. E a avaliação do cliente até 22/10.");
+  // Since 27/10 the before and after photos OR the video are enough (mediaOk): the video no longer counts as missing.
+  assertEquals(r1.message, "Recebido para Ana: fotografia de antes e fotografia de depois. Fotografias e vídeo completos, obrigado. Falta só a avaliação do cliente até 22/10.");
 
   const r2 = await json(await procedureMedia({ quotedId: "m1", label: "Ana", items: [
     { kind: "image", messageId: "p3", caption: "antes" }, { kind: "video", messageId: "v1" },
