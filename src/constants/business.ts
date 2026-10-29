@@ -46,4 +46,5 @@ export const REVIEW_RATING = "4.9";
 export const REVIEW_COUNT = "180";
 export const CLIENTS_SERVED_LABEL = "+1100";
 
-export const SERVICES_COMPLETED_LABEL = "+1200";
+// Serviços feitos (dono, 2026-10-29: "+1350 serviços feitos"; antes +1200).
+export const SERVICES_COMPLETED_LABEL = "+1350";
