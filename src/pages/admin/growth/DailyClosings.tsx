@@ -21,6 +21,22 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
     const r = rows as any[];
     return summarizeClosings(r, addDays(today, -(days - 1)), today);
   }, [rows, today, days]);
+  const prev = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const r = rows as any[];
+    return summarizeClosings(r, addDays(today, -(2 * days - 1)), addDays(today, -days));
+  }, [rows, today, days]);
+  const delta = (cur: number, before: number, money: boolean) => {
+    const diff = cur - before;
+    const pct = before > 0 ? Math.round((diff / before) * 100) : null;
+    const cls = diff > 0 ? "text-emerald-600" : diff < 0 ? "text-red-500" : "text-gray-500";
+    return (
+      <p className="text-[11px] text-gray-500 tabular-nums">
+        <span className={cls}>{diff > 0 ? "+" : diff < 0 ? "−" : ""}{money ? euro(Math.abs(diff)) : Math.abs(diff)}{pct !== null && ` (${diff >= 0 ? "+" : "−"}${Math.abs(pct)}%)`}</span>
+        {" "}vs {days} dias anteriores: {money ? euro(before) : before}
+      </p>
+    );
+  };
   const maxBilled = Math.max(1, ...summary.perDay.map(d => d.billed));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dayRows = open ? closingsOnDay(rows as any[], open) as unknown as LiveClosing[] : [];
@@ -42,11 +58,11 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Fechos</p><p className="text-lg font-bold text-navy tabular-nums">{summary.count}</p></div>
-        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Faturado</p><p className="text-lg font-bold text-navy tabular-nums">{euro(summary.billed)}</p></div>
-        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Para ti</p><p className="text-lg font-bold text-navy tabular-nums">{euro(summary.cut)}</p></div>
+        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Fechos</p><p className="text-lg font-bold text-navy tabular-nums">{summary.count}</p>{delta(summary.count, prev.count, false)}</div>
+        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Faturado</p><p className="text-lg font-bold text-navy tabular-nums">{euro(summary.billed)}</p>{delta(summary.billed, prev.billed, true)}</div>
+        <div className="rounded-xl bg-gray-50 p-2.5"><p className="text-[11px] text-gray-500">Para ti</p><p className="text-lg font-bold text-navy tabular-nums">{euro(summary.cut)}</p>{delta(summary.cut, prev.cut, true)}</div>
       </div>
-      <p className="text-[11px] text-gray-500">Média: {euro(avg)} faturados e {(summary.count / days).toLocaleString("pt-PT", { maximumFractionDigits: 1 })} fechos por dia.</p>
+      <p className="text-[11px] text-gray-500">Média: {euro(avg)} faturados e {(summary.count / days).toLocaleString("pt-PT", { maximumFractionDigits: 1 })} fechos por dia. Os {days} dias de agora incluem hoje, ainda a meio; os anteriores são dias inteiros.</p>
 
       <div className="pt-6">
         <div className="flex items-end gap-[3px] sm:gap-1.5 h-40 border-b border-gray-200">
