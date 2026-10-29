@@ -336,7 +336,7 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   return out;
 }
 
-/** sameTime: another service of the same zone overlaps this visit (any team): the bot books it only with the owner. */
+/** sameTime: another service of the same zone starts within the same hour (any team): the bot books it only with the owner. */
 export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean; sameTime: boolean }
 
 function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number, cleaning = true) {
@@ -354,7 +354,11 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
   const near = (t: string) => busy.some(b => b.team === t
     && ((from - b.to >= 0 && from - b.to <= 90 * 60_000) || (b.from - to >= 0 && b.from - to <= 90 * 60_000)));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
-  const sameTime = busy.some(b => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
+  // "A mesma hora" is the same start hour, not any overlap (owner, 29 Oct 2026, Marlene: a 90-minute
+  // waterproofing at 16h touched a Porto 1 cleaning at 17h, the bot read it as the same hour, left a
+  // pre-booking and told the client "confirmamos-lhe ainda hoje"). Whether a team can take both is
+  // the team rules' job above.
+  const sameTime = busy.some(b => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && Math.abs(b.from - from) < 60 * 60_000);
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
 

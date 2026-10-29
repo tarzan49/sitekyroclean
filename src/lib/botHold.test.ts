@@ -224,5 +224,16 @@ describe('planBotBooking', () => {
     const other = { id: 'o', summary: 'Serviço 45€ (89€) Impermeabilização Premium sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' };
     expect(planBotBooking(book(), [other], NOW)).toEqual({ ok: false, sameTime: true });
     expect('ok' in planBotBooking(book({ time: '17h' }), [other], NOW) && (planBotBooking(book({ time: '17h' }), [other], NOW) as { ok: boolean }).ok).toBe(true);
+    // An hour the owner gave in the chat closes even next to another service (owner, 29 Oct 2026).
+    expect(planBotBooking(book({ ownerApprovedTime: true }), [other], NOW)).toMatchObject({ ok: true });
+  });
+
+  it('a visit that runs into the next hour\'s service is not "the same hour" (owner, 29 Oct 2026, Marlene: "se reservas é porque confirmas")', () => {
+    // Waterproofing at 16h (90 minutes) with a Porto 1 cleaning at 17h: Porto 1 takes both.
+    const cleaning = { id: 'o', summary: 'Serviço 75€ (149€) Limpeza de sofá e tapete - 911 111 111 - Rua Inventada 1, 4100-000 Porto', description: 'Equipa: Porto 1', status: 'CONFIRMED', start: '2026-10-08T16:00:00.000Z', end: '2026-10-08T17:00:00.000Z' };
+    const marlene = book({ city: 'São João da Madeira', address: 'Rua Inventada 2, 3700-000 São João da Madeira', items: [{ kind: 'sofa', size: '3-lugares', qty: 1, treatment: 'premium' }], service: 'Impermeabilização Premium sofá 3 lugares', time: '16h' });
+    expect(planBotBooking(marlene, [cleaning], NOW)).toMatchObject({ ok: true, team: 'Porto 1' });
+    // Starting at the same hour still goes to the owner.
+    expect(planBotBooking({ ...marlene, time: '16h30' }, [cleaning], NOW)).toEqual({ ok: false, sameTime: true });
   });
 });
