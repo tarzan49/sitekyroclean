@@ -9,10 +9,10 @@ import { dm, euro } from "./format";
 // dia" da antiga aba Fechos: fechos pelo dia de `booked_at` (Lisboa), faturado e
 // a parte do dono, e carregar num dia mostra os serviços desse dia.
 
-const RANGES = [14, 30, 60] as const;
+const RANGES = [7, 14, 30, 60] as const;
 
 export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now: Date }) {
-  const [days, setDays] = useState<(typeof RANGES)[number]>(14);
+  const [days, setDays] = useState<(typeof RANGES)[number]>(7);
   const today = lisbonDay(now);
   const [open, setOpen] = useState<string | null>(today);
 
