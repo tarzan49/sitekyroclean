@@ -320,7 +320,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const title = [`Serviço ${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
   const description = [
     ownerChose
-      ? `Marcado pelo bot do WhatsApp numa hora de fim de semana escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
+      ? `Marcado pelo bot do WhatsApp numa hora ${isWeekend(r.date) ? 'de fim de semana ' : ''}escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
       : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
     availability.sharedTrip ? `Total: ${euro(total)} (sem deslocação: a equipa já está na zona nesse dia)` : `Total: ${euro(total)} (deslocação incluída)`,

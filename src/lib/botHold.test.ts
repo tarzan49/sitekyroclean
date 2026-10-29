@@ -225,7 +225,9 @@ describe('planBotBooking', () => {
     expect(planBotBooking(book(), [other], NOW)).toEqual({ ok: false, sameTime: true });
     expect('ok' in planBotBooking(book({ time: '17h' }), [other], NOW) && (planBotBooking(book({ time: '17h' }), [other], NOW) as { ok: boolean }).ok).toBe(true);
     // An hour the owner gave in the chat closes even next to another service (owner, 29 Oct 2026).
-    expect(planBotBooking(book({ ownerApprovedTime: true }), [other], NOW)).toMatchObject({ ok: true });
+    const mine = planBotBooking(book({ ownerApprovedTime: true }), [other], NOW);
+    expect(mine).toMatchObject({ ok: true });
+    if ('ok' in mine && mine.ok) expect(mine.event.description).toContain('numa hora escolhida por ti');
   });
 
   it('a visit that runs into the next hour\'s service is not "the same hour" (owner, 29 Oct 2026, Marlene: "se reservas é porque confirmas")', () => {
