@@ -36,6 +36,7 @@ import {
 } from "@/lib/clientFollowUp";
 import ClientsToday from "./ClientsToday";
 import ClientsCampaigns from "./ClientsCampaigns";
+import ClientsFollowUps from "./ClientsFollowUps";
 import type { ClientPatch, TouchPayload } from "./FollowUpActionCard";
 
 // Separador "Clientes" (dono, 2026-10-06): fichas de todos os contactos do
@@ -58,7 +59,7 @@ const STATUS_STYLE: Record<ClientStatus, string> = {
 };
 
 type Enriched = { client: ClientRow; summary: ClientSummary; status: ClientStatus };
-type View = "hoje" | "campanhas" | "fichas";
+type View = "hoje" | "followups" | "campanhas" | "fichas";
 /** Serviço do CRM lido pelas fichas. */
 interface StrategyService extends ClientService { source?: string | null; created_at?: string | null }
 
@@ -199,6 +200,7 @@ const ClientsPanel = () => {
 
   const VIEWS: [View, string][] = [
     ["hoje", `Hoje${todayCount ? ` (${todayCount})` : ""}`],
+    ["followups", "Follow-ups"],
     ["campanhas", "Campanhas"],
     ["fichas", "Fichas"],
   ];
@@ -233,6 +235,8 @@ const ClientsPanel = () => {
       {view === "hoje" ? (
         <ClientsToday planned={planned} snapshot={snapshotAt(clients)} lastDigest={lastDigest} onSendDigest={sendDigest}
           onShowCampaigns={() => setView("campanhas")} {...handlers} />
+      ) : view === "followups" ? (
+        <ClientsFollowUps />
       ) : view === "campanhas" ? (
         <ClientsCampaigns data={followUpData} {...handlers} />
       ) : (
