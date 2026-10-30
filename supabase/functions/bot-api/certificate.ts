@@ -6,7 +6,8 @@
 // the PDF. Out go the first name (or the full name the client wrote, when it matches), the items,
 // the town, the region and the date: what the certificate shows, no phone or address.
 //
-// Body: { phone, name?, items?, dryRun? }. `name`/`items` are what the client wrote in the chat
+// Body: { phone, serviceRequestId?, name?, items?, dryRun? }. serviceRequestId (end of a service,
+// 2026-10-30) asks for that service: waterproofing or, without it, the cleaning certificate. `name`/`items` are what the client wrote in the chat
 // (a piece added after the quote, the full name); used only on the first issue. dryRun (the
 // bot's simulations) computes the number without writing it.
 import { certificateItemsFromChat, certificateName, certificateNumber, pickCertificateService } from "../_shared/botEngine.generated.js";
@@ -41,7 +42,8 @@ export async function certificateAction(body: Row, store: CertificateStore, now:
   if (phone.replace(/\D/g, "").length < 9) return createErrorResponse("phone em falta", 400);
   const rows = await store.waterproofingServices();
   if ("error" in rows) return createErrorResponse("Não foi possível ler o CRM", 502);
-  const pick = pickCertificateService(rows as never[], phone, lisbonDate(now)) as Pick;
+  const serviceRequestId = typeof body.serviceRequestId === "string" && /^[0-9a-f-]{36}$/i.test(body.serviceRequestId) ? body.serviceRequestId : null;
+  const pick = pickCertificateService(rows as never[], phone, lisbonDate(now), serviceRequestId) as Pick;
   if (!pick.ok) return createSuccessResponse({ ok: false, reason: pick.reason, ...(pick.serviceDate ? { serviceDate: pick.serviceDate } : {}), instrucao: SAY[pick.reason] });
 
   const c = pick.certificate;
@@ -57,7 +59,7 @@ export async function certificateAction(body: Row, store: CertificateStore, now:
   for (let attempt = 0; attempt < 3; attempt++) {
     const taken = await store.numbersOn(c.serviceDate);
     if (!Array.isArray(taken)) return createErrorResponse("Não foi possível ler os certificados", 502);
-    const number = certificateNumber(c.serviceDate, taken);
+    const number = certificateNumber(c.serviceDate, taken, c.tier);
     if (body.dryRun === true) return createSuccessResponse({ ok: true, dryRun: true, certificate: { ...fresh, number } });
     const res = await store.insert({ number, service_request_id: c.serviceRequestId, service_date: c.serviceDate, tier: c.tier,
       client_name: fresh.name, items: fresh.items, place: fresh.place, team: fresh.team, issued_by: "bot" });
@@ -73,7 +75,7 @@ export async function certificateAction(body: Row, store: CertificateStore, now:
 /** What was issued the first time stays: same number, name and items on every copy. */
 function fromRow(r: Row, c: { serviceDate: string; tier: string; place: string | null; team: string | null }) {
   return {
-    number: String(r.number), serviceDate: String(r.service_date ?? c.serviceDate), tier: String(r.tier ?? c.tier), years: (r.tier ?? c.tier) === "essencial" ? 2 : 10,
+    number: String(r.number), serviceDate: String(r.service_date ?? c.serviceDate), tier: String(r.tier ?? c.tier), years: (r.tier ?? c.tier) === "essencial" ? 2 : (r.tier ?? c.tier) === "limpeza" ? 0 : 10,
     name: String(r.client_name ?? ""), items: String(r.items ?? ""), place: (r.place as string | null) ?? c.place, team: (r.team as string | null) ?? c.team,
   };
 }

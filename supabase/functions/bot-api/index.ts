@@ -866,7 +866,7 @@ function supabaseAccounts(): BotEnv["accounts"] {
   };
 }
 
-const PROCEDURE_COLUMNS = "calendar_event_id, service_request_id, team, service_day, prompt_msg_ids, prompted_at, before_msg_id, before_at, after_msg_id, after_at, video_msg_id, video_at, reminders_sent, last_reminder_at, status, closed_at, penalty_paid, client_review_at, client_review_skip";
+const PROCEDURE_COLUMNS = "calendar_event_id, service_request_id, team, service_day, prompt_msg_ids, prompted_at, before_msg_id, before_at, after_msg_id, after_at, video_msg_id, video_at, reminders_sent, last_reminder_at, status, closed_at, penalty_paid, client_review_at, client_review_skip, client_certificate_at, client_certificate_skip";
 /** service_procedure and what it reads from the CRM and the reviews. */
 function supabaseProcedures(): ProcedureStore | null {
   const url = Deno.env.get("SUPABASE_URL");
@@ -902,7 +902,7 @@ function supabaseCertificates(): CertificateStore | null {
   const client = createClient(url, key);
   return {
     async waterproofingServices() {
-      const { data, error } = await client.from("service_requests").select(CERTIFICATE_SERVICE_COLUMNS).ilike("description", "%impermeabiliz%");
+      const { data, error } = await client.from("service_requests").select(CERTIFICATE_SERVICE_COLUMNS).not("phone", "is", null);
       return error ? { error: error.message } : ((data ?? []) as Row[]);
     },
     async issued(serviceRequestId) {

@@ -3720,7 +3720,7 @@ function mergedAddress(was, given, postcodeApart) {
 }
 
 // src/lib/botCertificate.ts
-var CERTIFICATE_YEARS = { premium: 10, essencial: 2 };
+var CERTIFICATE_YEARS = { premium: 10, essencial: 2, limpeza: 0 };
 var fold7 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 var phoneKey9 = (p) => (p ?? "").replace(/\D/g, "").slice(-9);
 var WATERPROOF = /impermeabiliz/;
@@ -3735,6 +3735,11 @@ var isWaterproofing2 = (description) => {
   const d = fold7(description ?? "");
   return WATERPROOF.test(d) && !WITHOUT.test(d);
 };
+var CLEANING2 = /\b(limpeza|lavagem|higieniza|anti-?acaros|desbacteriza|desinfe)/;
+var isCleaning = (description) => CLEANING2.test(fold7(description ?? ""));
+function cleaningItems(description) {
+  return (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim().replace(/^(?:pr[ée]-?limpeza|limpeza|lavagem|higieniza\S*)\s*(?:profunda|profissional)?\s*(?:de|do|da|dos|das)?\s*/i, "").replace(/[\s,.]+$/, "").trim();
+}
 function certificateItems(description) {
   const raw = (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
   const withPart = /,?\s*com impermeabiliza\S*\s*(?:premium|essencial)?\s*(?:d[oa]s?\s+)(.+)$/i.exec(raw);
@@ -3749,10 +3754,21 @@ function tidy(s) {
   return out;
 }
 var REGION_TEAMS = /* @__PURE__ */ new Set(["Porto", "Lisboa", "Braga", "Algarve", "Coimbra"]);
-function pickCertificateService(rows, phone, today) {
+function pickCertificateService(rows, phone, today, serviceRequestId) {
   const key = phoneKey9(phone);
   if (key.length < 9) return { ok: false, reason: "none" };
-  const mine = rows.filter((r) => phoneKey9(r.phone) === key && r.request_date && isWaterproofing2(r.description)).filter((r) => Number(r.billed_value) > 0 && !r.calendar_missing_since).sort((a, b) => String(b.request_date).localeCompare(String(a.request_date)));
+  const valid = (r) => !!r.request_date && Number(r.billed_value) > 0 && !r.calendar_missing_since;
+  if (serviceRequestId) {
+    const r = rows.find((x) => x.id === serviceRequestId && phoneKey9(x.phone) === key && valid(x));
+    if (!r) return { ok: false, reason: "none" };
+    if (String(r.request_date) > today) return { ok: false, reason: "upcoming", serviceDate: String(r.request_date), tier: certificateTier(r.description) };
+    if (isWaterproofing2(r.description)) {
+      const tier2 = certificateTier(r.description);
+      return tier2 ? { ok: true, certificate: facts(r, tier2) } : { ok: false, reason: "tier", serviceDate: String(r.request_date) };
+    }
+    return isCleaning(r.description) ? { ok: true, certificate: facts(r, "limpeza") } : { ok: false, reason: "none" };
+  }
+  const mine = rows.filter((r) => phoneKey9(r.phone) === key && isWaterproofing2(r.description) && valid(r)).sort((a, b) => String(b.request_date).localeCompare(String(a.request_date)));
   const done = mine.find((r) => String(r.request_date) <= today);
   if (!done) {
     const next = [...mine].reverse().find((r) => String(r.request_date) > today);
@@ -3760,19 +3776,19 @@ function pickCertificateService(rows, phone, today) {
   }
   const tier = certificateTier(done.description);
   if (!tier) return { ok: false, reason: "tier", serviceDate: String(done.request_date) };
-  const city = (done.city ?? "").replace(/[.\s]+$/, "").trim();
+  return { ok: true, certificate: facts(done, tier) };
+}
+function facts(r, tier) {
+  const city = (r.city ?? "").replace(/[.\s]+$/, "").trim();
   return {
-    ok: true,
-    certificate: {
-      serviceRequestId: done.id,
-      serviceDate: String(done.request_date),
-      tier,
-      years: CERTIFICATE_YEARS[tier],
-      name: (done.client_name ?? "").trim(),
-      items: certificateItems(done.description) || "Estofos",
-      place: city || null,
-      team: done.locality && REGION_TEAMS.has(done.locality) ? done.locality : null
-    }
+    serviceRequestId: r.id,
+    serviceDate: String(r.request_date),
+    tier,
+    years: CERTIFICATE_YEARS[tier],
+    name: (r.client_name ?? "").trim(),
+    items: (tier === "limpeza" ? cleaningItems(r.description) : certificateItems(r.description)) || "Estofos",
+    place: city || null,
+    team: r.locality && REGION_TEAMS.has(r.locality) ? r.locality : null
   };
 }
 function certificateName(crmName, chatName) {
@@ -3788,8 +3804,8 @@ function certificateItemsFromChat(v) {
   const s = v.replace(/\s+/g, " ").replace(/[<>{}]/g, "").trim();
   return s.length >= 3 && s.length <= 160 ? s : null;
 }
-function certificateNumber(serviceDate, taken) {
-  const base = `KYRO-IMP-${serviceDate.replace(/-/g, "")}-`;
+function certificateNumber(serviceDate, taken, tier = "premium") {
+  const base = `KYRO-${tier === "limpeza" ? "LIM" : "IMP"}-${serviceDate.replace(/-/g, "")}-`;
   const used = new Set(taken.filter((n2) => n2.startsWith(base)).map((n2) => Number(n2.slice(base.length))));
   let n = 1;
   while (used.has(n)) n++;

@@ -10,7 +10,10 @@
 // serviços de setembro), o certificado é do dono: a garantia muda de 2 para 10 anos.
 // Vai no pacote do bot (botEngine.ts): imports relativos só.
 
-export type CertificateTier = 'premium' | 'essencial';
+// Desde 2026-10-30 há também o certificado de limpeza (dono: "e para limpezas cria um certificado
+// também"), enviado sozinho no fim de cada serviço com o pedido de avaliação e o desconto de 10%
+// no próximo serviço. Um serviço com impermeabilização dá o de impermeabilização.
+export type CertificateTier = 'premium' | 'essencial' | 'limpeza';
 
 export interface CertificateServiceRow {
   id: string;
@@ -41,7 +44,7 @@ export type CertificatePick =
   | { ok: false; reason: 'upcoming'; serviceDate: string; tier: CertificateTier | null }
   | { ok: false; reason: 'tier'; serviceDate: string };
 
-export const CERTIFICATE_YEARS: Record<CertificateTier, number> = { premium: 10, essencial: 2 };
+export const CERTIFICATE_YEARS: Record<CertificateTier, number> = { premium: 10, essencial: 2, limpeza: 0 };
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 export const phoneKey9 = (p: string | null | undefined) => (p ?? '').replace(/\D/g, '').slice(-9);
@@ -61,6 +64,15 @@ const isWaterproofing = (description: string | null | undefined) => {
   const d = fold(description ?? '');
   return WATERPROOF.test(d) && !WITHOUT.test(d);
 };
+const CLEANING = /\b(limpeza|lavagem|higieniza|anti-?acaros|desbacteriza|desinfe)/;
+const isCleaning = (description: string | null | undefined) => CLEANING.test(fold(description ?? ''));
+
+/** Cleaning certificate items: "Limpeza de sofá 3 lugares e colchão" → "sofá 3 lugares e colchão". */
+export function cleaningItems(description: string | null | undefined): string {
+  return (description ?? '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim()
+    .replace(/^(?:pr[ée]-?limpeza|limpeza|lavagem|higieniza\S*)\s*(?:profunda|profissional)?\s*(?:de|do|da|dos|das)?\s*/i, '')
+    .replace(/[\s,.]+$/, '').trim();
+}
 
 /**
  * What was protected, from the CRM line: "Pré-limpeza e impermeabilização Premium: sofá, 2 puffs…"
@@ -91,13 +103,27 @@ function tidy(s: string): string {
 
 const REGION_TEAMS = new Set(['Porto', 'Lisboa', 'Braga', 'Algarve', 'Coimbra']);
 
-/** The latest done waterproofing service of this phone, or why there is none yet. `today` = AAAA-MM-DD in Lisbon. */
-export function pickCertificateService(rows: CertificateServiceRow[], phone: string, today: string): CertificatePick {
+/**
+ * The latest done waterproofing service of this phone, or why there is none yet. `today` = AAAA-MM-DD
+ * in Lisbon. With `serviceRequestId` (the end of a service), that service: waterproofing if it has
+ * it, otherwise a cleaning certificate.
+ */
+export function pickCertificateService(rows: CertificateServiceRow[], phone: string, today: string, serviceRequestId?: string | null): CertificatePick {
   const key = phoneKey9(phone);
   if (key.length < 9) return { ok: false, reason: 'none' };
+  const valid = (r: CertificateServiceRow) => !!r.request_date && Number(r.billed_value) > 0 && !r.calendar_missing_since;
+  if (serviceRequestId) {
+    const r = rows.find(x => x.id === serviceRequestId && phoneKey9(x.phone) === key && valid(x));
+    if (!r) return { ok: false, reason: 'none' };
+    if (String(r.request_date) > today) return { ok: false, reason: 'upcoming', serviceDate: String(r.request_date), tier: certificateTier(r.description) };
+    if (isWaterproofing(r.description)) {
+      const tier = certificateTier(r.description);
+      return tier ? { ok: true, certificate: facts(r, tier) } : { ok: false, reason: 'tier', serviceDate: String(r.request_date) };
+    }
+    return isCleaning(r.description) ? { ok: true, certificate: facts(r, 'limpeza') } : { ok: false, reason: 'none' };
+  }
   const mine = rows
-    .filter(r => phoneKey9(r.phone) === key && r.request_date && isWaterproofing(r.description))
-    .filter(r => Number(r.billed_value) > 0 && !r.calendar_missing_since)
+    .filter(r => phoneKey9(r.phone) === key && isWaterproofing(r.description) && valid(r))
     .sort((a, b) => String(b.request_date).localeCompare(String(a.request_date)));
   const done = mine.find(r => String(r.request_date) <= today);
   if (!done) {
@@ -106,19 +132,20 @@ export function pickCertificateService(rows: CertificateServiceRow[], phone: str
   }
   const tier = certificateTier(done.description);
   if (!tier) return { ok: false, reason: 'tier', serviceDate: String(done.request_date) };
-  const city = (done.city ?? '').replace(/[.\s]+$/, '').trim();
+  return { ok: true, certificate: facts(done, tier) };
+}
+
+function facts(r: CertificateServiceRow, tier: CertificateTier): CertificateFacts {
+  const city = (r.city ?? '').replace(/[.\s]+$/, '').trim();
   return {
-    ok: true,
-    certificate: {
-      serviceRequestId: done.id,
-      serviceDate: String(done.request_date),
-      tier,
-      years: CERTIFICATE_YEARS[tier],
-      name: (done.client_name ?? '').trim(),
-      items: certificateItems(done.description) || 'Estofos',
-      place: city || null,
-      team: done.locality && REGION_TEAMS.has(done.locality) ? done.locality : null,
-    },
+    serviceRequestId: r.id,
+    serviceDate: String(r.request_date),
+    tier,
+    years: CERTIFICATE_YEARS[tier],
+    name: (r.client_name ?? '').trim(),
+    items: (tier === 'limpeza' ? cleaningItems(r.description) : certificateItems(r.description)) || 'Estofos',
+    place: city || null,
+    team: r.locality && REGION_TEAMS.has(r.locality) ? r.locality : null,
   };
 }
 
@@ -143,9 +170,9 @@ export function certificateItemsFromChat(v: unknown): string | null {
   return s.length >= 3 && s.length <= 160 ? s : null;
 }
 
-/** KYRO-IMP-AAAAMMDD-NN: the next free number of that service day (Tânia's was KYRO-IMP-20261009-01). */
-export function certificateNumber(serviceDate: string, taken: string[]): string {
-  const base = `KYRO-IMP-${serviceDate.replace(/-/g, '')}-`;
+/** KYRO-IMP-AAAAMMDD-NN (KYRO-LIM- for cleaning): the next free number of that service day (Tânia's was KYRO-IMP-20261009-01). */
+export function certificateNumber(serviceDate: string, taken: string[], tier: CertificateTier = 'premium'): string {
+  const base = `KYRO-${tier === 'limpeza' ? 'LIM' : 'IMP'}-${serviceDate.replace(/-/g, '')}-`;
   const used = new Set(taken.filter(n => n.startsWith(base)).map(n => Number(n.slice(base.length))));
   let n = 1;
   while (used.has(n)) n++;

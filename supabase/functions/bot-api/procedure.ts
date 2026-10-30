@@ -61,6 +61,7 @@ const asRecord = (r: Row) => ({
   status: (r.status as "em_curso" | "completo" | "fechado") ?? "em_curso", closed_at: (r.closed_at as string) ?? null,
   penalty_paid: !!r.penalty_paid,
   client_review_at: (r.client_review_at as string) ?? null, client_review_skip: (r.client_review_skip as string) ?? null,
+  client_certificate_at: (r.client_certificate_at as string) ?? null, client_certificate_skip: (r.client_certificate_skip as string) ?? null,
 });
 type Rec = ReturnType<typeof asRecord>;
 
@@ -169,7 +170,36 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
       message: procedureClientMessage({ firstName: facts.firstName, what: facts.what, team: r.team, sameDay: lisbonDayOf(ev.start!) === today }),
     });
   }
-  return createSuccessResponse({ prompts, reminders, closed, clientReviews, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
+  // The certificate (cleaning or waterproofing) goes to every client at the end of the service, also
+  // to those who already reviewed (owner, 2026-10-30: "envia no fim do serviço sempre o pedido de
+  // avaliação e de seguir no insta + o certificado com o desconto lá para a próxima").
+  const certCands = records.flatMap(r => {
+    if (r.client_certificate_at || r.client_certificate_skip) return [];
+    const ev = liveEvent(r);
+    if (!ev?.start || !ev.end || Date.parse(ev.end) < nowMs - PROMPT_WINDOW_MS) return [];
+    if (!clientReviewDue({ start: ev.start, end: ev.end }, r, now)) return [];
+    return [{ r, ev, phone: clientPhoneFromTitle(ev.summary) }];
+  });
+  const certKeys = [...new Set(certCands.map(c => c.phone?.slice(-9)).filter((v): v is string => !!v && !keys9.includes(v)))];
+  const certClients = certKeys.length ? await store.clients(certKeys) : [];
+  if ("error" in certClients) return createErrorResponse(certClients.error, 502);
+  const allClients = [...clients, ...certClients];
+  const clientCertificates: { eventId: string; phone: string; serviceRequestId: string | null; firstName: string | null; serviceStart: string }[] = [];
+  for (const { r, ev, phone } of certCands) {
+    const c = phone ? allClients.find(x => String(x.phone ?? "").replace(/\D/g, "").endsWith(phone.slice(-9))) : undefined;
+    const skip = !phone ? "sem telefone no título"
+      : c?.contact_preference === "nao_contactar" ? "não contactar"
+      : typeof c?.on_hold_reason === "string" && c.on_hold_reason.trim() ? `em pausa: ${c.on_hold_reason.trim().slice(0, 120)}`
+      : null;
+    if (skip) {
+      const err = await store.update(r.calendar_event_id, { client_certificate_skip: skip, updated_at: now.toISOString() });
+      if (err) safeLog("warn", "[bot-api] client certificate skip", { message: err });
+      continue;
+    }
+    clientCertificates.push({ eventId: r.calendar_event_id, phone: phone!, serviceRequestId: r.service_request_id,
+      firstName: labelFor(serviceByEvent.get(r.calendar_event_id), ev).firstName, serviceStart: ev.start! });
+  }
+  return createSuccessResponse({ prompts, reminders, closed, clientReviews, clientCertificates, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
 }
 
 /** The bot sent the message of a service (or a reminder) to the team: keep the WhatsApp ids. */
@@ -184,6 +214,14 @@ export async function procedureSent(body: Row, store: ProcedureStore, now: Date)
     const err = await store.update(eventId, ids.length
       ? { client_review_at: now.toISOString(), client_review_msg_id: ids[0], updated_at: now.toISOString() }
       : { client_review_skip: skipped, updated_at: now.toISOString() });
+    return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
+  }
+  if (body.kind === "client-certificate") {
+    const skipped = typeof body.skipped === "string" ? body.skipped.trim().slice(0, 200) : "";
+    if (!ids.length && !skipped) return createErrorResponse("messageIds ou skipped em falta", 400);
+    const err = await store.update(eventId, ids.length
+      ? { client_certificate_at: now.toISOString(), updated_at: now.toISOString() }
+      : { client_certificate_skip: skipped, updated_at: now.toISOString() });
     return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
   }
   if (body.kind === "reminder") {

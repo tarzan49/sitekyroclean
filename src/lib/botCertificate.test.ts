@@ -101,3 +101,18 @@ describe('certificateNumber', () => {
     expect(certificateNumber('2026-10-19', ['KYRO-IMP-20261019-02'])).toBe('KYRO-IMP-20261019-01');
   });
 });
+
+describe('cleaning certificate (end of a service, 2026-10-30)', () => {
+  const today = '2026-10-30';
+  it('gives that service: cleaning without waterproofing, waterproofing when it has it', () => {
+    const rows = [row({ id: 'c', request_date: '2026-10-30', description: 'Limpeza de sofá 3 lugares e colchão de casal' }), row({ id: 'w', request_date: '2026-10-29' })];
+    const c = pickCertificateService(rows, '911222333', today, 'c');
+    expect(c.ok && c.certificate).toMatchObject({ tier: 'limpeza', years: 0, items: 'sofá 3 lugares e colchão de casal' });
+    const w = pickCertificateService(rows, '911222333', today, 'w');
+    expect(w.ok && w.certificate.tier).toBe('premium');
+    expect(pickCertificateService(rows, '911000000', today, 'c')).toEqual({ ok: false, reason: 'none' });
+  });
+  it('numbers cleaning certificates apart', () => {
+    expect(certificateNumber('2026-10-30', ['KYRO-IMP-20261030-01'], 'limpeza')).toBe('KYRO-LIM-20261030-01');
+  });
+});
