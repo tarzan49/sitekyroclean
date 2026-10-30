@@ -1975,7 +1975,17 @@ function botQuote(input) {
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
-  return withBigOrder(botQuoteInner(input));
+  return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+}
+function withAntiMiteGift(input, r) {
+  const b = r.bigOrder;
+  const raw = input.items;
+  if (!b || !Array.isArray(raw) || !raw.some((i) => i?.treatment === "clean+anti-acaros")) return { ...r, antiMiteGift: null };
+  const clean = botQuoteInner({ ...input, items: raw.map((i) => i.treatment === "clean+anti-acaros" ? { ...i, treatment: "clean" } : i) });
+  if (!clean.ok || typeof clean.total !== "number") return { ...r, antiMiteGift: null };
+  const gift = cents(b.normal - clean.total);
+  if (gift <= 0) return { ...r, antiMiteGift: null };
+  return { ...r, antiMiteGift: gift, bigOrder: { ...b, special: cents(b.normal - gift), savings: gift } };
 }
 var BIG_ORDER_MIN = 300;
 var BIG_ORDER_CUT = { cleaning: 0.07, waterproofing: 0.04 };

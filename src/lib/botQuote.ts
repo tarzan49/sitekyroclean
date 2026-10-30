@@ -243,7 +243,24 @@ export function botQuote(input: unknown) {
     const u = uWaterproofingQuote(input as Record<string, unknown>);
     if (u) return withBigOrder(u);
   }
-  return withBigOrder(botQuoteInner(input));
+  return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+}
+
+/**
+ * Big order with anti-mites: the special condition is the anti-mites offered, not the % cut (owner,
+ * 30 Oct 2026, Flávio, sofá + 3 colchões com desinfeção, 384€: "numa situação destas ofereces como brinde o
+ * tratamento anti ácaros"). Gift = the quote with anti-mites minus the same quote with cleaning only; the
+ * travel stays as quoted.
+ */
+function withAntiMiteGift<T extends { ok: boolean; bigOrder: unknown }>(input: unknown, r: T): T & { antiMiteGift: number | null } {
+  const b = r.bigOrder as { normal: number; special: number; savings: number; tiers: unknown } | null;
+  const raw = (input as { items?: unknown }).items;
+  if (!b || !Array.isArray(raw) || !raw.some(i => (i as Record<string, unknown>)?.treatment === 'clean+anti-acaros')) return { ...r, antiMiteGift: null };
+  const clean = botQuoteInner({ ...(input as object), items: raw.map(i => ((i as Record<string, unknown>).treatment === 'clean+anti-acaros' ? { ...(i as object), treatment: 'clean' } : i)) }) as { ok: boolean; total?: number | null };
+  if (!clean.ok || typeof clean.total !== 'number') return { ...r, antiMiteGift: null };
+  const gift = cents(b.normal - clean.total);
+  if (gift <= 0) return { ...r, antiMiteGift: null };
+  return { ...r, antiMiteGift: gift, bigOrder: { ...b, special: cents(b.normal - gift), savings: gift } };
 }
 
 /**
