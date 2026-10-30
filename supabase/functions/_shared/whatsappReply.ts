@@ -114,7 +114,27 @@ export function detailLines(details: string | undefined): string[] {
 
 const pickupOf = (details: string | undefined) => /Recolha(?:, entrega e deslocação| e entrega)/.test(details ?? "");
 
-export function buildWhatsAppMessage(lead: Record<string, string>): string {
+/** Preço do motor (botQuote) para um pedido com preço de tabela; null quando é sob orçamento. */
+export interface QuotedPrice { lines: { label: string; amount: number }[]; travel: number; total: number }
+
+const euro = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".", ",")}€`;
+
+/**
+ * Com preço, a primeira mensagem já o dá (dono, 30/10/2026: "porque é que quando o bot envia msg depois do
+ * pedido sem estar lá o preço?"): artigo a artigo, a deslocação e o total, e o passo seguinte do funil.
+ */
+function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedPrice): string {
+  return [
+    `Olá ${firstName(lead.name)}, tudo bem?`,
+    `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${loc}. O seu orçamento:`,
+    [...price.lines.map(l => `• ${l.label.replace(/ · 1 un\./, "").replace(/ · (\d+) (?:un\.|unidades)/, " · $1").replace("Só limpeza", "limpeza")}: ${euro(l.amount)}`),
+      price.travel > 0 ? `• Deslocação: ${euro(price.travel)}` : "• Deslocação incluída"].join("\n"),
+    `Total: ${euro(price.total)}`,
+    "Já lhe envio de seguida as horas que temos livres.",
+  ].join("\n\n");
+}
+
+export function buildWhatsAppMessage(lead: Record<string, string>, price: QuotedPrice | null = null): string {
   const items = leadItems(lead.service ?? "", lead.service_type ?? "");
   const service = items.length ? ` para ${servicePhrase(items)}` : "";
   const loc = lead.location
@@ -122,6 +142,7 @@ export function buildWhatsAppMessage(lead: Record<string, string>): string {
     : "";
   // Primeira pessoa do plural: quem presta o serviço é a equipa. O nome do
   // António fica só na apresentação, para a pessoa saber com quem fala.
+  if (price && price.lines.length) return pricedMessage(lead, loc, price);
   const lines = detailLines(lead.details);
   if (lines.length) {
     return [

@@ -77,7 +77,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { agendaCheck, teamAccounts, botAvailability, bookedServices, eventTeam, planBookingUpdate, teamBusyAt, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
-import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
+import { buildWhatsAppMessage, type QuotedPrice } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { procedureDue, procedureMedia, procedureSent, type ProcedureStore } from "./procedure.ts";
@@ -243,7 +243,7 @@ async function findOrder(body: Row, leads: LeadsStore): Promise<Response> {
   });
 }
 
-const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, service, service_type, details, location";
+const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, service, service_type, details, location, value, quiz_order";
 /** How far back the bot server may ask for new orders (it asks every minute; this only bounds a restart). */
 const NEW_ORDERS_MAX_HOURS = 48;
 
@@ -254,6 +254,19 @@ const NEW_ORDERS_MAX_HOURS = 48;
  * it) and the same text as the email's "Responder no WhatsApp" button. Test
  * orders are left out. The bot server decides whether and when to send.
  */
+/** The engine's price for a quiz order with table prices; null for anything on quote (rugs, U sofas, unknown city). */
+export function orderPrice(r: Row): QuotedPrice | null {
+  try {
+    const brief = describeQuizOrder(r as never);
+    if (!brief.quoteRequest || !brief.quoteExact) return null;
+    const q = botQuote(brief.quoteRequest) as any;
+    if (!q?.ok || q.quote || q.handToOwner || typeof q.total !== "number" || q.rugEstimate) return null;
+    const lines = (q.lines ?? []) as { label: string; amount: number | null; quote?: boolean }[];
+    if (!lines.length || lines.some(l => l.quote || typeof l.amount !== "number")) return null;
+    return { lines: lines.map(l => ({ label: l.label, amount: l.amount as number })), travel: Number(q.travel) || 0, total: q.total };
+  } catch { return null; }
+}
+
 async function newOrders(body: Row, leads: LeadsStore): Promise<Response> {
   if (!leads.recentQuiz) return createErrorResponse("Pedidos indisponíveis", 503);
   const sinceMs = typeof body.since === "string" ? Date.parse(body.since) : NaN;
@@ -272,7 +285,7 @@ async function newOrders(body: Row, leads: LeadsStore): Promise<Response> {
       number: r.booking_id,
       createdAt: r.created_at,
       phone: String(r.phone),
-      message: buildWhatsAppMessage(Object.fromEntries(Object.entries(r).map(([k, v]) => [k, typeof v === "string" ? v : ""]))),
+      message: buildWhatsAppMessage(Object.fromEntries(Object.entries(r).map(([k, v]) => [k, typeof v === "string" ? v : ""])), orderPrice(r)),
     }));
   return createSuccessResponse({ orders });
 }
