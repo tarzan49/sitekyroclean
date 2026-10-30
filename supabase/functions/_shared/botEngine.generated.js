@@ -1887,7 +1887,8 @@ function waterproofingTiers(items, city) {
   const essencial = calculateCustomPack(withTier(items, "essencial"), city);
   if (premium.travel === null) return null;
   const baseFee = locationPrices[city] ?? 0;
-  const travel = baseFee > WATERPROOFING_TRAVEL_MAX ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  const aloneSmall = items.every((i) => i.primary === "waterproofing" || !isWaterproofing(i)) && !items.some((i) => i.primary === "cleaning") && premium.subtotal <= 200;
+  const travel = baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal + travel),

@@ -42,8 +42,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
       expect(r.travel).toBe(10);
     }
     expect(q('3-lugares', 'essencial', 'Setúbal').total).toBe(99);
-    // Porto (10€): the bot sent 139€ / 109€.
-    expect(q('3-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 0, premium: 149, essencial: 89 });
+    // 10€ towns: never the waiver (owner, 30 Oct 2026, Rio Meão: "159€ e a outra 99€").
+    expect(q('3-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 159, essencial: 99 });
+    expect(q('3-lugares', 'premium', 'Santa Maria da Feira').waterproofingTiers).toEqual({ travel: 10, premium: 159, essencial: 99 });
     // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
     expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 129, essencial: 79 });
     expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 49 });

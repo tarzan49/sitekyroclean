@@ -126,10 +126,13 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   const premium = calculateCustomPack(withTier(items, 'premium'), city);
   const essencial = calculateCustomPack(withTier(items, 'essencial'), city);
   if (premium.travel === null) return null;
-  // Farther towns (15€ and 20€) always carry 10€ on both versions (owner, 15 Oct 2026: "em Setúbal, que já é
-  // mais longe, podes fazer a 149 e a 109"); 10€ towns keep the waiver, read from the Premium.
+  // Waterproofing alone (no cleaning in the order) always carries 10€ on both versions, in every town,
+  // up to a 200€ Premium (owner, 30 Oct 2026, Rio Meão: the bot sent "Premium 149€ com deslocação
+  // incluída"; "tens que fazer 159€ e a outra 99€"). Farther towns carry 10€ on any order (owner,
+  // 15 Oct 2026, Setúbal 149/109); otherwise 10€ towns read the waiver from the Premium.
   const baseFee = locationPrices[city] ?? 0;
-  const travel = baseFee > WATERPROOFING_TRAVEL_MAX ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  const aloneSmall = items.every(i => i.primary === 'waterproofing' || !isWaterproofing(i)) && !items.some(i => i.primary === 'cleaning') && premium.subtotal <= 200;
+  const travel = baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal + travel),
