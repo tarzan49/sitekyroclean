@@ -126,6 +126,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(resolveBotCity('Ericeira')).toBe('Mafra');
     // Part of a union parish (Cascais e Estoril), 22 Oct 2026.
     expect(resolveBotCity('Estoril')).toBe('Cascais');
+    // Parish of Mafra with no page on the site, 30 Oct 2026.
+    expect(resolveBotCity('Santo Isidoro')).toBe('Mafra');
     expect(resolveBotCity('Parede')).toBe('Cascais');
     expect(resolveBotCity('ericeira, mafra')).toBe('Mafra');
     expect(resolveBotCity('Paranhos (Porto)')).toBe('Porto');

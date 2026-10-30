@@ -66,3 +66,21 @@ for (const m of municipiosComFreguesias) {
   }
 }
 for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToMunicipio.delete(key);
+
+/**
+ * For the bot only: parishes of served municipalities that have no page on
+ * the site (freguesiaList.ts only lists the ones with SEO pages, and adding
+ * one there creates pages). On 30 Oct 2026 a client in Santo Isidoro, Mafra,
+ * was handed to the owner as "localidade fora da lista". Only names that are
+ * not shared with another served municipality.
+ */
+const BOT_ONLY_PARISHES: Record<string, string[]> = {
+  Mafra: ['Santo Isidoro', 'Encarnação', 'Enxara do Bispo', 'Gradil', 'Vila Franca do Rosário', 'Igreja Nova', 'Cheleiros', 'Milharado', 'Azueira', 'Sobral da Abelheira'],
+};
+for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
+  if (!(municipality in locationPrices)) continue;
+  for (const name of names) {
+    const key = normalizeCity(name);
+    if (!freguesiaToMunicipio.has(key) && !parishPartToMunicipio.has(key)) parishPartToMunicipio.set(key, municipality);
+  }
+}
