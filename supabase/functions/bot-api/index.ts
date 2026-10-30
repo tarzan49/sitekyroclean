@@ -260,7 +260,8 @@ export function orderPrice(r: Row): QuotedPrice | null {
     const brief = describeQuizOrder(r as never);
     if (!brief.quoteRequest || !brief.quoteExact) return null;
     const q = botQuote(brief.quoteRequest) as any;
-    if (!q?.ok || q.quote || q.handToOwner || typeof q.total !== "number" || q.rugEstimate) return null;
+    // Extended-trip cities (Aveiro, Alentejo Litoral) hand the TIME to the owner, never the price.
+    if (!q?.ok || q.quote || (q.handToOwner && !(q.extendedTrip && q.cityKnown)) || typeof q.total !== "number" || q.rugEstimate) return null;
     const lines = (q.lines ?? []) as { label: string; amount: number | null; quote?: boolean }[];
     if (!lines.length || lines.some(l => l.quote || typeof l.amount !== "number")) return null;
     return { lines: lines.map(l => ({ label: l.label, amount: l.amount as number })), travel: Number(q.travel) || 0, total: q.total };
