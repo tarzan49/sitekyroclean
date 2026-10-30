@@ -68,7 +68,8 @@ export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 3']);
 export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
   // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
-  Porto: ['Porto 1', 'Porto 2'],
+  // Owner, 31 Oct 2026: Porto 2 does not know how to waterproof, so only Porto 1 takes it.
+  Porto: ['Porto 1'],
   Braga: ['Porto 1'],
 };
 /** The teams that can take this job in the zone. */

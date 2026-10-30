@@ -2233,7 +2233,8 @@ var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 3"]);
 var WATERPROOFING_TEAMS = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
   // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
-  Porto: ["Porto 1", "Porto 2"],
+  // Owner, 31 Oct 2026: Porto 2 does not know how to waterproof, so only Porto 1 takes it.
+  Porto: ["Porto 1"],
   Braga: ["Porto 1"]
 };
 var teamsFor = (zone, waterproofing) => waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
