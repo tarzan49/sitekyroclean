@@ -2263,7 +2263,11 @@ var staggerClash = (b, from, cleaning) => cleaning && b.cleaning && Math.abs(b.f
 var eventWaterproofingOnly = (summary) => /impermeabiliz/.test(summary) && !/limpeza|lavagem|higieniz|anti-?acaros|desbacter/.test(summary);
 var TEAM_CAPACITY = {};
 var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
-var TEAM_TRAVEL_MARGIN_MIN = {};
+var TEAM_TRAVEL_MARGIN_MIN = {
+  // Owner, 30 Oct 2026: in the Algarve the bot books "com pensamento sempre na logística de transporte":
+  // Portimão to Tavira is ~1 h, so a job there leaves 45 min of road on each side, not 30.
+  Algarve: 45
+};
 var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 6e4;
 var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 8, to: 13 } };
 var isWeekday = (date) => {
@@ -2311,6 +2315,7 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
+var ALGARVE_BOT_DAYS = ["2026-11-03"];
 var DAY_RULES = [
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
   {
@@ -2613,7 +2618,12 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
-  if (area === "Algarve" && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
+  const algarveBotDay = area === "Algarve" && req.ownerTime !== true && (req.date === void 0 ? ALGARVE_BOT_DAYS.some((d) => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
+  if (algarveBotDay && req.date === void 0) {
+    const day = ALGARVE_BOT_DAYS.find((d) => d >= lisbon(now.getTime()).date);
+    return botAvailability({ ...req, date: day }, events, now, rules);
+  }
+  if (area === "Algarve" && req.ownerTime !== true && !algarveBotDay) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {

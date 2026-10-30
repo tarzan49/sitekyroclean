@@ -128,7 +128,11 @@ const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
  * (owner, 27 Oct 2026: "ou passas para o Porto 2, ou passas para uma hora em que seja possível"): a one-hour
  * cleaning at 10h leaves the next start at 12h at the earliest.
  */
-export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = {};
+export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = {
+  // Owner, 30 Oct 2026: in the Algarve the bot books "com pensamento sempre na logística de transporte":
+  // Portimão to Tavira is ~1 h, so a job there leaves 45 min of road on each side, not 30.
+  Algarve: 45,
+};
 const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 60_000;
 /**
  * Weekday hours of a team that does not work the whole day; weekends are open as for any team. Porto 2 (Aleixo) works
@@ -210,6 +214,9 @@ export interface DayRule {
   /** For the bot: what to tell a client who asks for a closed day. */
   note: string;
 }
+/** Days the bot books the Algarve itself (owner, 30 Oct 2026). */
+export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-03'];
+
 export const DAY_RULES: readonly DayRule[] = [
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
   { zone: 'Porto', from: '2026-10-26', until: '2026-10-27', closed: [{ date: '2026-10-27' }], prefer: ['2026-10-28'], onlyPreferred: true,
@@ -596,7 +603,16 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
   // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
   // offers no hours there; it books only a time he gave.
-  if (area === 'Algarve' && req.ownerTime !== true) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: 'Algarve: o responsável escolhe o horário' };
+  // Owner, 30 Oct 2026: "na terça o Algarve tens de ser tu a marcar as coisas direito e com pensamento
+  // sempre na logística de transporte". On these days the bot offers Algarve hours from the calendar,
+  // only on these days, with the Algarve travel margin; any other day stays with him.
+  const algarveBotDay = area === 'Algarve' && req.ownerTime !== true
+    && (req.date === undefined ? ALGARVE_BOT_DAYS.some(d => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
+  if (algarveBotDay && req.date === undefined) {
+    const day = ALGARVE_BOT_DAYS.find(d => d >= lisbon(now.getTime()).date)!;
+    return botAvailability({ ...req, date: day }, events, now, rules);
+  }
+  if (area === 'Algarve' && req.ownerTime !== true && !algarveBotDay) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: 'Algarve: o responsável escolhe o horário' };
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. No hours from its calendar, even with a time he gave.
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
