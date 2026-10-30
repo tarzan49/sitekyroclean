@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, lisbonDay } from "@/lib/crmClosings";
+import { addDays, lisbonDay, serviceTotal } from "@/lib/crmClosings";
 import { syncCalendarIntoCrm } from "@/lib/crmCalendarSync";
 import { ADS_FROM, adsExtra, buildWeeks, ORGANIC_FROM, ORGANIC_TO, organicBaseline, type WeeklyConversationRow } from "@/lib/adsVsOrganic";
 import {
@@ -112,7 +112,7 @@ const GrowthPanel = () => {
       if (lastLoadRef.current !== null) {
         const since = lastLoadRef.current;
         const added = rows.filter(r => r.booked_at && Date.parse(r.booked_at) > since && ((Number(r.billed_value) || 0) > 0 || (Number(r.upsell_value) || 0) > 0));
-        setFresh(added.length ? { count: added.length, billed: added.reduce((s, r) => s + (Number(r.billed_value) || 0), 0) } : null);
+        setFresh(added.length ? { count: added.length, billed: added.reduce((s, r) => s + serviceTotal(r), 0) } : null);
       }
       lastLoadRef.current = at.getTime();
       setLoaded({

@@ -22,6 +22,20 @@ export interface ClosingRow {
   phone?: string | null;
   paid?: boolean;
   upsell_value?: number | null;
+  invoiced?: boolean | null;
+  vat_on_top?: boolean | null;
+}
+
+/**
+ * Tudo o que o cliente paga por um serviço (dono, 2026-10-30: "tem que estar lá
+ * tudo"): o faturado mais o upsell, com o IVA por cima quando a fatura é com IVA
+ * à parte. O upsell fica numa coluna própria por causa da divisão com a equipa,
+ * mas é faturação: somar só `billed_value` escondia 270€ num serviço de 339€.
+ */
+export function serviceTotal(r: { billed_value: number | string | null; upsell_value?: number | string | null; invoiced?: boolean | null; vat_on_top?: boolean | null }): number {
+  const upsell = Number(r.upsell_value) || 0;
+  const vat = r.invoiced && r.vat_on_top ? 1.23 : 1;
+  return Math.round(((Number(r.billed_value) || 0) + upsell * vat) * 100) / 100;
 }
 
 export interface DayTotals { day: string; count: number; billed: number; cut: number }
@@ -106,11 +120,11 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string, 
     const bucket = perDayMap.get(lisbonDay(r.booked_at));
     if (!bucket) continue;
     bucket.count++;
-    bucket.billed += Number(r.billed_value) || 0;
+    bucket.billed += serviceTotal(r);
     bucket.cut += Number(r.my_cut) || 0;
     if (r.request_date && r.request_date > aheadAfter) {
       ahead.count++;
-      ahead.billed += Number(r.billed_value) || 0;
+      ahead.billed += serviceTotal(r);
       ahead.cut += Number(r.my_cut) || 0;
     }
   }

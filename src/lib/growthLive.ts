@@ -1,4 +1,4 @@
-import { addDays, countsAsClosing, lisbonDay, weekdayOf, WEEKDAY_LONG } from './crmClosings';
+import { addDays, countsAsClosing, lisbonDay, serviceTotal, weekdayOf, WEEKDAY_LONG } from './crmClosings';
 import { lisbonMidnight } from './lisbonTime';
 import type { ClosingInput, WeekStats, WeeklyConversationRow } from './adsVsOrganic';
 
@@ -137,7 +137,7 @@ export function liveWeek(input: {
   const thenC = between(prevStart, prevCut);
   const fullPrevC = between(prevStart, start);
   const sum = (rows: ClosingInput[], f: (c: ClosingInput) => number) => rows.reduce((s, c) => s + f(c), 0);
-  const billedOf = (c: ClosingInput) => Number(c.billed_value) || 0;
+  const billedOf = (c: ClosingInput) => serviceTotal(c);
 
   // Gasto: o dia de hoje no Google Ads já é o gasto até agora; o mesmo dia da semana passada conta só a parte do dia já passada.
   const dayFraction = Math.min(1, Math.max(0, (nowMs - lisbonMidnight(today)) / DAY_MS));
@@ -186,7 +186,7 @@ export function sinceVisit(closings: ClosingInput[], server: ServerConversation[
   return {
     hours: Math.max(0, (now.getTime() - sinceMs) / HOUR_MS),
     closings: rows.length,
-    billed: rows.reduce((s, c) => s + (Number(c.billed_value) || 0), 0),
+    billed: rows.reduce((s, c) => s + serviceTotal(c), 0),
     share: rows.reduce((s, c) => s + closingShare(c), 0),
     conversations: inbound(server).filter(r => Date.parse(r.first_at) > sinceMs).length,
   };

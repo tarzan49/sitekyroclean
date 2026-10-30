@@ -1,4 +1,4 @@
-import { addDays, countsAsClosing, lisbonDay, weekdayOf } from './crmClosings';
+import { addDays, countsAsClosing, lisbonDay, serviceTotal, weekdayOf } from './crmClosings';
 import { lisbonMidnight } from './lisbonTime';
 
 // O que os anúncios trazem a mais (dono, 2026-10-17: "termos dados para perceber
@@ -20,7 +20,7 @@ export const ORGANIC_TO = '2026-09-20';
 export const ADS_FROM = '2026-09-28';
 
 export interface WeeklyConversationRow { week: string; source: 'whatsapp_web' | 'servidor'; new_people: number; people_wrote: number; counted_at: string }
-export interface ClosingInput { booked_at: string | null; billed_value: number | null; upsell_value?: number | null; my_cut: number | null }
+export interface ClosingInput { booked_at: string | null; billed_value: number | null; upsell_value?: number | null; my_cut: number | null; invoiced?: boolean | null; vat_on_top?: boolean | null }
 export interface SpendInput { stat_date: string; cost: number }
 
 export interface WeekStats {
@@ -68,7 +68,7 @@ export function buildWeeks(closings: ClosingInput[], spend: SpendInput[], conver
       peopleWrote: conv ? conv.people_wrote : null,
       conversationsSource: conv ? conv.source : null,
       closings: done.length,
-      billed: done.reduce((s, c) => s + (Number(c.billed_value) || 0), 0),
+      billed: done.reduce((s, c) => s + serviceTotal(c), 0),
       share: done.reduce((s, c) => s + (Number(c.my_cut) || 0), 0),
     });
   }

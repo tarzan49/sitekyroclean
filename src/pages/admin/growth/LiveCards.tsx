@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AlertTriangle, ArrowRight, Bell, Lightbulb, Megaphone, Receipt, TrendingDown, TrendingUp } from "lucide-react";
 import { ADS_FROM, type ExtraWeek } from "@/lib/adsVsOrganic";
-import { WEEKDAY_SHORT } from "@/lib/crmClosings";
+import { serviceTotal, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import { campaignLabel, timeAgo, type CampaignTrend, type LiveClosing, type LiveWeek, type SinceVisit } from "@/lib/growthLive";
 import type { Insight } from "@/lib/growthInsights";
 import { dm, euro, euro2, one, signedEuro, signedPct } from "./format";
@@ -236,7 +236,7 @@ export function RecentClosingsList({ rows, now, newSince }: { rows: LiveClosing[
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-bold text-navy tabular-nums">{euro(Number(r.billed_value) || 0)}</p>
+                  <p className="text-sm font-bold text-navy tabular-nums">{euro(serviceTotal(r))}</p>
                   <p className="text-[11px] text-gray-500 tabular-nums">{euro(Number(r.my_cut) || 0)} para ti</p>
                 </div>
               </li>

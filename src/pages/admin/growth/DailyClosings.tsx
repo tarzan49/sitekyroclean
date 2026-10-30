@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { CalendarDays } from "lucide-react";
-import { addDays, closingsOnDay, lisbonDay, summarizeClosings, WEEKDAY_SHORT, weekdayOf } from "@/lib/crmClosings";
+import { addDays, closingsOnDay, lisbonDay, serviceTotal, summarizeClosings, WEEKDAY_SHORT, weekdayOf } from "@/lib/crmClosings";
 import type { LiveClosing } from "@/lib/growthLive";
 import { dm, euro } from "./format";
 
@@ -116,7 +116,7 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-xs font-bold text-navy tabular-nums">{euro(Number(r.billed_value) || 0)}</p>
+                      <p className="text-xs font-bold text-navy tabular-nums">{euro(serviceTotal(r))}</p>
                       <p className="text-[11px] text-gray-500 tabular-nums">{euro(Number(r.my_cut) || 0)} para ti</p>
                     </div>
                   </li>

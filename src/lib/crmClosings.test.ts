@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, closingsOnDay, lisbonDay, monthBounds, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
+import { addDays, closingsOnDay, lisbonDay, monthBounds, serviceTotal, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
 
 describe('calendar helpers', () => {
   it('counts the day in Lisbon, not in UTC or Copenhagen', () => {
@@ -77,7 +77,14 @@ describe('free revisits', () => {
       { booked_at: '2026-10-13T14:26:32Z', billed_value: 119, my_cut: 60 },
       { booked_at: '2026-10-13T15:00:00Z', billed_value: 0, my_cut: 0, upsell_value: 40 },
     ];
-    expect(summarizeClosings(rows, '2026-10-13', '2026-10-13')).toMatchObject({ count: 2, billed: 119 });
+    expect(summarizeClosings(rows, '2026-10-13', '2026-10-13')).toMatchObject({ count: 2, billed: 159 });
     expect(closingsOnDay(rows, '2026-10-13')).toHaveLength(2);
+  });
+});
+
+describe('serviceTotal', () => {
+  it('soma o upsell ao faturado, com IVA quando a fatura é com IVA à parte', () => {
+    expect(serviceTotal({ billed_value: 68.88, upsell_value: 220, invoiced: true, vat_on_top: true })).toBe(339.48);
+    expect(serviceTotal({ billed_value: 119, upsell_value: 40 })).toBe(159);
   });
 });
