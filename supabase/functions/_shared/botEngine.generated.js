@@ -2278,7 +2278,10 @@ var isWeekday = (date) => {
 var TEAM_OFF = [
   // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel", "NAO ESTA DISPONIVEL PONTO": nothing from noon on (Juliana, 10h30-12h, stays).
   // Cleanings go to Porto 3, waterproofing is not booked.
-  { team: "Porto 1", date: "2026-10-29", fromHour: 12 }
+  { team: "Porto 1", date: "2026-10-29", fromHour: 12 },
+  // Owner, 31 Oct 2026 at 01:30: "qualquer serviço q exista no porto para segunda tem q ser porto 2 ou 3 a fazer,
+  // se for imper passa para o dia a seguir". Porto 1 is the only Porto team that waterproofs, so none on Monday.
+  { team: "Porto 1", date: "2026-11-02" }
 ];
 var offAt = (team, from, to) => TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
@@ -2344,6 +2347,15 @@ var DAY_RULES = [
     until: "2026-11-02",
     prefer: ["2026-11-01", "2026-11-02"],
     note: "Sábado (dia 31) em Lisboa já está muito preenchido: oferece primeiro domingo (dia 1) e segunda (dia 2)."
+  },
+  // Owner, 31 Oct 2026 at 01:30: "no porto fecha para domingo ou amanha de manha".
+  {
+    zone: "Porto",
+    from: "2026-10-31",
+    until: "2026-11-01",
+    closed: [{ date: "2026-10-31", fromHour: 13 }],
+    prefer: ["2026-10-31", "2026-11-01"],
+    note: "Sábado (dia 31) no Porto só há vaga de manhã: oferece sábado de manhã ou domingo (dia 1). Na segunda a impermeabilização não se faz no Porto, só a partir de terça."
   }
 ];
 var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
