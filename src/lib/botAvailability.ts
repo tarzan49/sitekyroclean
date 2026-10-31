@@ -73,9 +73,18 @@ export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> =
   Porto: ['Porto 1'],
   Braga: ['Porto 1'],
 };
-/** The teams that can take this job in the zone. */
-export const teamsFor = (zone: TeamZone, waterproofing: boolean): readonly string[] =>
-  (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+/**
+ * Porto cleanings below 100€ go to Porto 2 (Aleixo) or Porto 3 (Denise); Porto 1 only takes jobs
+ * of 100€ or more (owner, 31 Oct 2026: "serviços de ticket abaixo de 100€ [...] Porto 2 ou Porto 3,
+ * e passes para o Porto 1 apenas serviços de 100€ para cima"). Waterproofing stays with Porto 1.
+ */
+export const PORTO1_MIN_TOTAL = 100;
+/** The teams that can take this job in the zone (`total` in euros, when known). */
+export const teamsFor = (zone: TeamZone, waterproofing: boolean, total?: number | null): readonly string[] => {
+  const teams = (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+  if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
+  return teams;
+};
 /**
  * Zones whose own team does not pick up rugs (owner, 27 Oct 2026: "a equipa de braga não faz recolha
  * de tapetes, apenas limpezas ao domicílio"). The bot had booked a rug pickup in Viana do Castelo on
@@ -439,14 +448,14 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
  * one already working next to it that day first (less driving), then the one
  * with fewer jobs that day, then the region's order. null when none has room.
  */
-export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false, cleaning = true): string | null {
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false, cleaning = true, total?: number | null): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing);
+  const order = teamsFor(area, waterproofing, total);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -674,7 +683,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const total = orderTotal(req, city);
     if (total === null || total < SMALL_ORDER_MIN_TOTAL) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de 120€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
-  const teams = [...teamsFor(area, hasWaterproofing(req?.items))];
+  const teams = [...teamsFor(area, hasWaterproofing(req?.items), area === 'Porto' ? orderTotal(req, city) : null)];
   const cleaning = !waterproofingOnly(req?.items);
 
   const today = lisbon(now.getTime()).date;
