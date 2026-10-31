@@ -2118,6 +2118,89 @@ function botQuoteInner(input) {
   };
 }
 
+// src/constants/cityCoords.ts
+var CITY_COORDS = {
+  "Porto": [41.1502, -8.6103],
+  "Matosinhos": [41.1807, -8.6822],
+  "Maia": [41.2373, -8.63],
+  "Vila Nova de Gaia": [41.1292, -8.6057],
+  "Gondomar": [41.1398, -8.5326],
+  "Valongo": [41.191, -8.4981],
+  "Póvoa de Varzim": [41.3794, -8.7599],
+  "Vila do Conde": [41.354, -8.7435],
+  "Paredes": [41.2079, -8.3332],
+  "Penafiel": [41.2062, -8.2856],
+  "Lousada": [41.2774, -8.2826],
+  "Paços de Ferreira": [41.2901, -8.3782],
+  "Felgueiras": [41.3649, -8.1989],
+  "Santo Tirso": [41.344, -8.4772],
+  "Trofa": [41.3363, -8.5585],
+  "Espinho": [41.0084, -8.6394],
+  "Arouca": [40.9289, -8.2442],
+  "Santa Maria da Feira": [40.9254, -8.5427],
+  "São João da Madeira": [40.8974, -8.4907],
+  "Oliveira de Azeméis": [40.839, -8.4778],
+  "Ovar": [40.8595, -8.6252],
+  "Aveiro": [40.6405, -8.6538],
+  "Coimbra": [40.2112, -8.4291],
+  "Figueira da Foz": [40.1486, -8.8557],
+  "Leiria": [39.7438, -8.8071],
+  "Batalha": [39.6579, -8.8244],
+  "Braga": [41.5511, -8.428],
+  "Guimarães": [41.4418, -8.2956],
+  "Vila Nova de Famalicão": [41.4065, -8.5188],
+  "Barcelos": [41.5314, -8.6192],
+  "Viana do Castelo": [41.7181, -8.7637],
+  "Póvoa de Lanhoso": [41.576, -8.27],
+  "Fafe": [41.4514, -8.1709],
+  "Esposende": [41.5315, -8.7793],
+  "Lisboa": [38.7078, -9.1366],
+  "Amadora": [38.759, -9.2365],
+  "Odivelas": [38.7904, -9.1793],
+  "Oeiras": [38.6926, -9.3123],
+  "Cascais": [38.6969, -9.4204],
+  "Sintra": [38.8355, -9.3522],
+  "Loures": [38.8309, -9.1685],
+  "Almada": [38.6831, -9.1576],
+  "Seixal": [38.6422, -9.1073],
+  "Vila Franca de Xira": [38.9121, -8.9889],
+  "Barreiro": [38.6341, -9.0479],
+  "Moita": [38.6524, -8.9935],
+  "Mafra": [38.937, -9.3282],
+  "Setúbal": [38.5242, -8.8932],
+  "Montijo": [38.7061, -8.9746],
+  "Alcochete": [38.756, -8.9608],
+  "Palmela": [38.5696, -8.9012],
+  "Sesimbra": [38.4437, -9.0996],
+  "Alcácer do Sal": [38.373, -8.5123],
+  "Grândola": [38.1766, -8.567],
+  "Santiago do Cacém": [38.0185, -8.6938],
+  "Sines": [37.9565, -8.869],
+  "Faro": [37.0163, -7.9352],
+  "Loulé": [37.14, -8.0233],
+  "Albufeira": [37.0882, -8.2526],
+  "Olhão": [37.027, -7.8411],
+  "São Brás de Alportel": [37.153, -7.8879],
+  "Silves": [37.264, -8.3487],
+  "Lagoa": [37.1326, -8.4551],
+  "Tavira": [37.1262, -7.6499],
+  "Portimão": [37.1376, -8.5368],
+  "Lagos": [37.1028, -8.6729],
+  "Vila Real de Santo António": [37.1946, -7.4156],
+  "Castro Marim": [37.2179, -7.4457],
+  "Monchique": [37.318, -8.5559],
+  "Aljezur": [37.3152, -8.8041],
+  "Vila do Bispo": [37.083, -8.9096],
+  "Alcoutim": [37.4023, -7.669]
+};
+function driveMinutes(a, b) {
+  const r = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * r, dLon = (b[1] - a[1]) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLon / 2) ** 2;
+  const km = 2 * 6371 * Math.asin(Math.sqrt(h)) * 1.35;
+  return Math.round(km) + 10;
+}
+
 // src/data/serviceCatalog.ts
 var cities = [
   // Área Metropolitana do Porto: Primary
@@ -2365,6 +2448,7 @@ var DAY_RULES = [
 ];
 var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 var CITY_REGION = new Map(cities.map((c) => [fold3(c.name), AREA_REGION[c.area]]));
+var CITY_PLACE = new Map(cities.filter((c) => CITY_COORDS[c.name]).map((c) => [fold3(c.name), CITY_COORDS[c.name]]));
 var CITY_NAMES = cities.map((c) => ({ key: fold3(c.name), region: AREA_REGION[c.area] })).filter((c) => c.key.length >= 4).sort((a, b) => b.key.length - a.key.length);
 var SERVICE_LIKE = /^(servico|limpeza|pre-? ?reserva|a confirmar)\b/;
 var TEAM_LINE = /^\s*Equipa:\s*([^\n<]*)/im;
@@ -2454,6 +2538,27 @@ function dayLabel(date, today) {
   return `${weekday(date)} (dia ${Number(date.slice(8))})`;
 }
 var hourLabel = (minutes) => `${Math.floor(minutes / 60)}h${minutes % 60 ? String(minutes % 60).padStart(2, "0") : ""}`;
+function eventPlace(e) {
+  for (const text2 of [fold3(e.summary), fold3(e.description ?? "")]) {
+    for (const c of CITY_NAMES) {
+      if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`).test(text2)) return CITY_PLACE.get(c.key) ?? null;
+    }
+  }
+  return null;
+}
+var placeOf = (city) => city ? CITY_PLACE.get(fold3(city)) ?? null : null;
+function travelClash(busy, team, from, to, place) {
+  if (!place || staggers(team, from)) return false;
+  return busy.some((b) => {
+    if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
+    const drive = driveMinutes(b.place, place);
+    if (drive * 6e4 <= marginMs(team)) return false;
+    const need = drive * 6e4;
+    if (b.to <= from) return from - b.to < need;
+    if (b.from >= to) return b.from - to < need;
+    return false;
+  });
+}
 function busyIntervals(events) {
   const out = [];
   for (const e of events) {
@@ -2464,23 +2569,24 @@ function busyIntervals(events) {
     const to = Number.isFinite(parsedEnd) && parsedEnd > from ? parsedEnd : from + 60 * 6e4;
     const team = eventTeam(e);
     const cleaning = !eventWaterproofingOnly(fold3(e.summary));
+    const place = eventPlace(e);
     if (team) {
-      out.push({ from, to, team, region: null, cleaning });
+      out.push({ from, to, team, region: null, cleaning, place });
       continue;
     }
     if (!SERVICE_LIKE.test(fold3(e.summary))) continue;
     const region = eventRegion(e);
-    if (region) out.push({ from, to, team: null, region, cleaning });
+    if (region) out.push({ from, to, team: null, region, cleaning, place });
   }
   return out;
 }
-function slotState(busy, teams, region, from, to, cleaning = true) {
+function slotState(busy, teams, region, from, to, cleaning = true, place = null) {
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t) => (b) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
   const spare = (t) => staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
+  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
   const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter((b) => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
@@ -2488,10 +2594,11 @@ function slotState(busy, teams, region, from, to, cleaning = true) {
   const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && Math.abs(b.from - from) < 60 * 6e4);
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
-function teamBusyAt(events, team, startIso, endIso, cleaning = true) {
+function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: "" }) : null))) return true;
   if (staggers(team, from)) return busyIntervals(events).some((b) => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
@@ -2504,11 +2611,13 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
   const order = teamsFor(area, waterproofing);
-  const st = slotState(busy, order, area, from, to, cleaning);
+  const place = placeOf(name);
+  const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
-  return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
+  const closest = (t) => Math.min(Infinity, ...busy.filter((b) => b.team === t && b.place && place && lisbon(b.from).date === day).map((b) => driveMinutes(b.place, place)));
+  return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Leiria", "Batalha"]);
 var SMALL_ORDER_MIN_TOTAL = 110;
@@ -2675,6 +2784,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const dayOrder = onlyDay ? [onlyDay] : [...preferred, ...ahead.filter((d) => !preferred.includes(d))];
   const scan = onlyDay ? [onlyDay, ...preferred.filter((d) => d !== onlyDay)] : dayOrder;
   const busy = busyIntervals(events);
+  const place = placeOf(city);
   const earliestToday = now.getTime() + LEAD_TIME_MIN * 6e4;
   const slots = [];
   for (const date of scan) {
@@ -2683,7 +2793,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
-      const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning);
+      const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
@@ -2693,7 +2803,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
-    const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning);
+    const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);
     const open = inHours && !closedAt(onlyDay, m);
     requested = {
       date: onlyDay,
@@ -2777,7 +2887,7 @@ function planBotHold(req, events, now, ownEventId) {
 }
 var OWNER_BOOKING_PREFIX = "A confirmar · ";
 var digitsOf = (t) => t.replace(/\D/g, "");
-var placeOf = (city, address) => [city, address].filter((v) => typeof v === "string" && !!v.trim()).join(", ");
+var placeOf2 = (city, address) => [city, address].filter((v) => typeof v === "string" && !!v.trim()).join(", ");
 var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
 var RUG_PICKUP_TEAM_FUEL = 10;
 var pickupFuelOf = (pickupFee = 0) => pickupFee > 0 ? Math.min(pickupFee, RUG_PICKUP_TEAM_FUEL) : 0;
@@ -2817,8 +2927,8 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   const namedRaw = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
   const namedTeam = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
   const named = namedTeam && teamWorks(namedTeam, start, start + durationMin * 6e4) ? namedTeam : null;
-  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
-  const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
+  const pickupOwner = rugPickupOwnerReason(placeOf2(r.city, address), pickupFee > 0 || /recolh/i.test(service));
+  const pickupZone = pickupOwner ? cityZone(placeOf2(r.city, address)) : null;
   const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;
   const team = total === null ? null : pickupOwner ? allowedNamed : named ?? chooseTeam(
     events,
@@ -2868,7 +2978,7 @@ function planBotBooking(req, events, now, ownEventId) {
   if (key9.length === 9 && others.some((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
   const booked = clientServiceNear(others, phone, r.date);
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
-  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
+  const pickupOwner = rugPickupOwnerReason(placeOf2(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
   if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
   const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ("error" in availability) return { error: String(availability.error) };

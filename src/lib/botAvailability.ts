@@ -29,6 +29,7 @@
  * botQuote.ts), so this file must not import anything that pulls the site's
  * page data in.
  */
+import { CITY_COORDS, driveMinutes } from '../constants/cityCoords';
 import { cities } from '../data/serviceCatalog';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { localityFromPostalCode, type CrmLocality } from './postalRegion';
@@ -245,6 +246,7 @@ export const DAY_RULES: readonly DayRule[] = [
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 const CITY_REGION = new Map(cities.map(c => [fold(c.name), AREA_REGION[c.area]] as const));
+const CITY_PLACE = new Map(cities.filter(c => CITY_COORDS[c.name]).map(c => [fold(c.name), CITY_COORDS[c.name]] as const));
 const CITY_NAMES = cities
   .map(c => ({ key: fold(c.name), region: AREA_REGION[c.area] }))
   .filter(c => c.key.length >= 4)
@@ -340,7 +342,36 @@ export const hourLabel = (minutes: number) => `${Math.floor(minutes / 60)}h${min
 
 // ---------- availability ----------
 
-interface Busy { from: number; to: number; team: string | null; region: TeamZone | null; cleaning: boolean }
+interface Busy { from: number; to: number; team: string | null; region: TeamZone | null; cleaning: boolean; place: Place }
+type Place = readonly [number, number] | null;
+/** The served municipality named in an event (title first, then description), for travel time. */
+function eventPlace(e: AvailabilityEvent): Place {
+  for (const text of [fold(e.summary), fold(e.description ?? '')]) {
+    for (const c of CITY_NAMES) {
+      if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(text)) return CITY_PLACE.get(c.key) ?? null;
+    }
+  }
+  return null;
+}
+const placeOf = (city: string | null | undefined): Place => (city ? CITY_PLACE.get(fold(city)) ?? null : null);
+/**
+ * Travel logistics (owner, 31 Oct 2026: "ter mais em conta as logísticas de viagem", "em serviços que são
+ * mais longe ter tudo isso em conta"): a team's job right before or after this one, on the same day, must
+ * leave the driving time between the two towns, not only the fixed margin. Unknown towns keep the margin.
+ */
+function travelClash(busy: Busy[], team: string, from: number, to: number, place: Place): boolean {
+  // Two-person teams (STAGGER_TEAMS): the job next to this one can be the other person's.
+  if (!place || staggers(team, from)) return false;
+  return busy.some(b => {
+    if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
+    const drive = driveMinutes(b.place, place);
+    if (drive * 60_000 <= marginMs(team)) return false; // the fixed margin already covers it
+    const need = drive * 60_000;
+    if (b.to <= from) return from - b.to < need;
+    if (b.from >= to) return b.from - to < need;
+    return false; // overlapping jobs are the team-capacity rules' business
+  });
+}
 
 function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   const out: Busy[] = [];
@@ -352,10 +383,11 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
     const to = Number.isFinite(parsedEnd) && parsedEnd > from ? parsedEnd : from + 60 * 60_000;
     const team = eventTeam(e);
     const cleaning = !eventWaterproofingOnly(fold(e.summary));
-    if (team) { out.push({ from, to, team, region: null, cleaning }); continue; }
+    const place = eventPlace(e);
+    if (team) { out.push({ from, to, team, region: null, cleaning, place }); continue; }
     if (!SERVICE_LIKE.test(fold(e.summary))) continue; // the owner's own appointments do not busy a team
     const region = eventRegion(e);
-    if (region) out.push({ from, to, team: null, region, cleaning });
+    if (region) out.push({ from, to, team: null, region, cleaning, place });
   }
   return out;
 }
@@ -363,7 +395,7 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
 /** sameTime: another service of the same zone starts within the same hour (any team): the bot books it only with the owner. */
 export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean; sameTime: boolean }
 
-function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number, cleaning = true) {
+function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number, cleaning = true, place: Place = null) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t: string) => (b: Busy) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
@@ -372,7 +404,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
   const early = (t: string) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0);
+  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
   const staggered = teams.every(t => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter(b => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t: string) => busy.some(b => b.team === t
@@ -391,10 +423,11 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
  * capacity). For a service the bot moves to another hour (owner, 16 Oct 2026: reschedules are the
  * bot's): the move keeps the event's team, so the zone having a free team is not enough.
  */
-export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string, cleaning = true): boolean {
+export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: string, endIso: string, cleaning = true, city?: string): boolean {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: '' } as AvailabilityEvent) : null))) return true;
   if (staggers(team, from)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter(b => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
@@ -414,13 +447,17 @@ export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso:
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
   const order = teamsFor(area, waterproofing);
-  const st = slotState(busy, order, area, from, to, cleaning);
+  const place = placeOf(name);
+  const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
   const day = lisbon(from).date;
   const jobsThatDay = (t: string) => busy.filter(b => b.team === t && lisbon(b.from).date === day).length;
+  // The team already working closest to this town that day drives least.
+  const closest = (t: string) => Math.min(Infinity, ...busy.filter(b => b.team === t && b.place && place && lisbon(b.from).date === day).map(b => driveMinutes(b.place!, place!)));
   return [...st.teamsFree].sort((a, b) =>
     Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b))
     || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
+    || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0)
     || jobsThatDay(a) - jobsThatDay(b)
     || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
@@ -662,6 +699,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const scan = onlyDay ? [onlyDay, ...preferred.filter(d => d !== onlyDay)] : dayOrder;
 
   const busy = busyIntervals(events);
+  const place = placeOf(city);
   const earliestToday = now.getTime() + LEAD_TIME_MIN * 60_000;
   const slots: Slot[] = [];
   for (const date of scan) {
@@ -670,7 +708,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
-      const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning);
+      const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
@@ -681,7 +719,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
-    const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning);
+    const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);
     const open = inHours && !closedAt(onlyDay, m);
     requested = { date: onlyDay, time: hourLabel(m), free: open && st.free, teamsFree: open ? st.teamsFree : [], sameTime: st.sameTime,
       start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };
