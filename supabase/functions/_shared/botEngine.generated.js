@@ -1998,8 +1998,42 @@ function uWaterproofingQuote(input) {
     closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: base.handToOwner, rug: null })
   };
 }
+var RUG_WATERPROOFING_PER_M2 = { premium: 15, essencial: 10 };
+function rugWaterproofingQuote(input) {
+  const raw = input.items;
+  if (!Array.isArray(raw)) return null;
+  const isRw = (r) => !!r && typeof r === "object" && r.kind === "rug" && ["premium", "essencial"].includes(String(r.treatment));
+  const rugs = raw.filter(isRw);
+  const others = raw.filter((r) => !isRw(r));
+  if (!rugs.length || !others.length) return null;
+  const base = botQuote({ ...input, items: others });
+  if (!base.ok || base.quote || base.total === null || base.handToOwner) return null;
+  const lines = [];
+  let amount2 = 0;
+  for (const r of rugs) {
+    const w = typeof r.width === "number" ? rugSide(r.width) : null;
+    const l = typeof r.length === "number" ? rugSide(r.length) : null;
+    if (!w || !l) return null;
+    const qty = typeof r.qty === "number" && Number.isInteger(r.qty) && r.qty > 0 ? r.qty : 1;
+    const tier = r.treatment;
+    const a = Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[tier] + 1e-9);
+    amount2 += a;
+    lines.push({ label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} tapete ${w.meters} x ${l.meters} m (mesma visita, sem deslocação extra)`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
+  }
+  const total = cents(base.total + amount2);
+  return {
+    ...base,
+    lines: [...base.lines, ...lines],
+    subtotal: cents(base.subtotal + amount2),
+    total,
+    rugWaterproofing: { amount: amount2, sameVisit: true, travelExtra: 0 },
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null })
+  };
+}
 function botQuote(input) {
   if (input && typeof input === "object") {
+    const rw = rugWaterproofingQuote(input);
+    if (rw) return rw;
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
@@ -3436,6 +3470,9 @@ function procedurePromptMessage(f) {
     `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`,
     "",
     "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.",
+    "",
+    // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
+    "Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista). É para o TikTok e o Instagram.",
     "",
     `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
   ].join("\n");

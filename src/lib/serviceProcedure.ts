@@ -225,6 +225,9 @@ export function procedurePromptMessage(f: PromptFacts): string {
     '',
     'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.',
     '',
+    // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
+    'Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista). É para o TikTok e o Instagram.',
+    '',
     `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
   ].join('\n');
 }
