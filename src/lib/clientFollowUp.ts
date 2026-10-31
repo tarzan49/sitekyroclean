@@ -788,7 +788,9 @@ export function planClient(input: PlanInput, ctx: PlanContext): ClientPlan {
         });
       }
     } else {
-      const first = asks[asks.length - 1];
+      // The bot's "correu tudo bem?" is a skipped ask (dono, 31/10/2026): it blocks a new request, and the
+      // reminder only follows a real request, sent after a yes.
+      const first = asks.filter(t => !t.skipped).at(-1) ?? asks[asks.length - 1];
       const reminded = asks.some(t => t.kind === 'avaliacao_lembrete');
       const askedDay = lisbonDay(first.created_at);
       const remUntil = addDays(askedDay, R.reviewReminderUntilDays);

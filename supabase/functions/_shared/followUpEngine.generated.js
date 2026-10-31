@@ -831,7 +831,7 @@ ${INSTAGRAM_URL}${upsellCheck}`
         });
       }
     } else {
-      const first = asks[asks.length - 1];
+      const first = asks.filter((t) => !t.skipped).at(-1) ?? asks[asks.length - 1];
       const reminded = asks.some((t) => t.kind === "avaliacao_lembrete");
       const askedDay = lisbonDay(first.created_at);
       const remUntil = addDays(askedDay, R.reviewReminderUntilDays);
