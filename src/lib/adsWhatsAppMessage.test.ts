@@ -162,3 +162,17 @@ describe('adsWhatsAppMark (Meta)', () => {
     }
   });
 });
+
+describe('adsWhatsAppMark (bio das redes, orgânico)', () => {
+  it('marca a bio do Instagram e do TikTok com "vídeo"', () => {
+    expect(adsWhatsAppMark('?utm_source=instagram&utm_medium=bio')).toBe('Vi o vosso vídeo no Instagram');
+    expect(adsWhatsAppMark('?utm_source=tiktok&utm_medium=bio')).toBe('Vi o vosso vídeo no TikTok');
+    expect(markAdsWhatsAppText(buildGeneralWaMessage(), 'Vi o vosso vídeo no TikTok')).toMatch(/^Olá! Vi o vosso vídeo no TikTok e gostaria/);
+  });
+
+  it('não confunde com os anúncios pagos da Meta nem com outras origens', () => {
+    expect(adsWhatsAppMark('?utm_source=instagram&utm_medium=paid_social')).toBe(INSTAGRAM_ADS_WHATSAPP_MARK);
+    expect(adsWhatsAppMark('?utm_source=instagram')).toBeNull();
+    expect(adsWhatsAppMark('?utm_source=facebook&utm_medium=bio')).toBeNull();
+  });
+});

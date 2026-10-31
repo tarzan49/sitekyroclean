@@ -28,6 +28,9 @@ export const ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Google';
 export const FACEBOOK_ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Facebook';
 export const INSTAGRAM_ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Instagram';
 
+export const INSTAGRAM_ORGANIC_WHATSAPP_MARK = 'Vi o vosso vídeo no Instagram';
+export const TIKTOK_ORGANIC_WHATSAPP_MARK = 'Vi o vosso vídeo no TikTok';
+
 const BUSINESS_WHATSAPP_PATH = new URL(WHATSAPP_BASE).pathname;
 const WHATSAPP_HOSTS = ['wa.me', 'api.whatsapp.com', 'web.whatsapp.com'];
 
@@ -65,12 +68,31 @@ export function metaAdsPlatform(search: string): 'facebook' | 'instagram' | null
   return source === 'ig' || source === 'instagram' ? 'instagram' : 'facebook';
 }
 
+/**
+ * Redes sociais orgânicas (dono, 2026-10-31: saber quantos clientes vêm das
+ * redes sem anúncio). Só a ligação da bio, que leva `utm_medium=bio` (ou
+ * `organic`/`social`): um anúncio pago da Meta (`paid_social`) já foi apanhado
+ * por `metaAdsPlatform` antes de chegar aqui.
+ */
+export function organicSocialPlatform(search: string): 'instagram' | 'tiktok' | null {
+  const params = new URLSearchParams(search);
+  const source = params.get('utm_source')?.toLowerCase() ?? '';
+  const medium = params.get('utm_medium')?.toLowerCase() ?? '';
+  if (!['bio', 'organic', 'social', 'organic_social'].includes(medium)) return null;
+  if (source === 'ig' || source === 'instagram') return 'instagram';
+  if (source === 'tiktok' || source === 'tt') return 'tiktok';
+  return null;
+}
+
 /** A frase que abre a mensagem nesta visita, ou `null` se não veio de um anúncio. */
 export function adsWhatsAppMark(search: string): string | null {
   if (isGoogleAdsVisit(search)) return ADS_WHATSAPP_MARK;
   const meta = metaAdsPlatform(search);
   if (meta === 'instagram') return INSTAGRAM_ADS_WHATSAPP_MARK;
   if (meta === 'facebook') return FACEBOOK_ADS_WHATSAPP_MARK;
+  const organic = organicSocialPlatform(search);
+  if (organic === 'instagram') return INSTAGRAM_ORGANIC_WHATSAPP_MARK;
+  if (organic === 'tiktok') return TIKTOK_ORGANIC_WHATSAPP_MARK;
   return null;
 }
 
