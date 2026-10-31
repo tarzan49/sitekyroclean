@@ -113,6 +113,13 @@ export function waterproofingOnly(items: unknown): boolean {
  */
 export const STAGGER_TEAMS: ReadonlySet<string> = new Set(['Porto 1', 'Porto 2', 'Lisboa 1', 'Lisboa 2']);
 export const CLEANING_GAP_MIN = 90;
+/** Days a staggered team works with one person only: one job at a time, with the travel margin. */
+export const SOLO_DAYS: ReadonlyArray<{ team: string; date: string }> = [
+  // Owner, 31 Oct 2026: "lisboa 1 so vai ter 1 membro da equipa la na segunda pq o outro vai pro algarve".
+  { team: 'Lisboa 1', date: '2026-11-02' },
+];
+const staggers = (team: string, from: number) =>
+  STAGGER_TEAMS.has(team) && !SOLO_DAYS.some(d => d.team === team && d.date === lisbon(from).date);
 const staggerClash = (b: { from: number; cleaning: boolean }, from: number, cleaning: boolean) =>
   cleaning && b.cleaning && Math.abs(b.from - from) < CLEANING_GAP_MIN * 60_000;
 /** A calendar event that is waterproofing only (title says impermeabilização and no cleaning). */
@@ -360,7 +367,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t: string) => (b: Busy) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
-  const spare = (t: string) => STAGGER_TEAMS.has(t)
+  const spare = (t: string) => staggers(t, from)
     ? (busy.some(b => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1)
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
@@ -388,7 +395,7 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
-  if (STAGGER_TEAMS.has(team)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
+  if (staggers(team, from)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter(b => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
