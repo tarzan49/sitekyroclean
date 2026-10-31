@@ -225,6 +225,9 @@ export const DAY_RULES: readonly DayRule[] = [
   // "E para Lisboa podes marcar para a parte da tarde, mas … principalmente serviços para quarta-feira".
   { zone: 'Lisboa', from: '2026-10-26', until: '2026-10-27', closed: [{ date: '2026-10-27', fromHour: 14 }], prefer: ['2026-10-28'],
     note: 'Terça (dia 27) em Lisboa só há vaga à tarde, a partir das 14h: oferece primeiro quarta (dia 28).' },
+  // Owner, 31 Oct 2026 at 01:20: "em lisboa tenta fechar serviços para domingo e para segunda, amanha ja ta mt preenchido".
+  { zone: 'Lisboa', from: '2026-10-31', until: '2026-11-02', prefer: ['2026-11-01', '2026-11-02'],
+    note: 'Sábado (dia 31) em Lisboa já está muito preenchido: oferece primeiro domingo (dia 1) e segunda (dia 2).' },
 ];
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();

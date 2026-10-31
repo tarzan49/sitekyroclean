@@ -2336,6 +2336,14 @@ var DAY_RULES = [
     closed: [{ date: "2026-10-27", fromHour: 14 }],
     prefer: ["2026-10-28"],
     note: "Terça (dia 27) em Lisboa só há vaga à tarde, a partir das 14h: oferece primeiro quarta (dia 28)."
+  },
+  // Owner, 31 Oct 2026 at 01:20: "em lisboa tenta fechar serviços para domingo e para segunda, amanha ja ta mt preenchido".
+  {
+    zone: "Lisboa",
+    from: "2026-10-31",
+    until: "2026-11-02",
+    prefer: ["2026-11-01", "2026-11-02"],
+    note: "Sábado (dia 31) em Lisboa já está muito preenchido: oferece primeiro domingo (dia 1) e segunda (dia 2)."
   }
 ];
 var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
