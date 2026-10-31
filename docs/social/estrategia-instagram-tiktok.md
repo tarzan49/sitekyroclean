@@ -102,7 +102,7 @@ Formato de cada guião: gancho (0 a 2 s), texto no ecrã, narração, legenda, h
 
 ### 6. As letras da etiqueta
 - **Gancho:** zoom na etiqueta com um "X". Texto: "Esta letra decide tudo."
-- **Texto no ecrã:** "W água" / "S solvente" / "WS os dois" / "X só aspirar e chamar profissional"
+- **Texto no ecrã:** "W água" / "S solvente" / "WS os dois" / "X sem líquidos, chamar profissional"
 - **Narração:** "Antes de limpar um sofá, procure a etiqueta. W quer dizer que aceita água. S, só solvente. W S, os dois. X, nada de líquidos em casa. Se tiver X, não arrisque."
 - **Legenda:** Vá ver a etiqueta do seu sofá agora e diga-nos a letra nos comentários.
 - **Hashtags:** #etiqueta #cuidadoscomotecido #sofa #dicasdecasa #limpeza
