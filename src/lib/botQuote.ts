@@ -242,8 +242,49 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
   };
 }
 
+/**
+ * Rug waterproofing, bot only (owner, 30 Oct 2026: Premium 15€/m², Essencial 10€/m², rounded down;
+ * 200x300 = 90€ Premium). Priced only in the same visit as other items (the service already booked,
+ * passed in the same call), with no extra travel; a rug waterproofing on its own stays with the owner.
+ */
+export const RUG_WATERPROOFING_PER_M2 = { premium: 15, essencial: 10 } as const;
+
+function rugWaterproofingQuote(input: Record<string, unknown>): ReturnType<typeof botQuoteInner> & { rugWaterproofing: { amount: number; sameVisit: true; travelExtra: 0 } } | null {
+  const raw = input.items;
+  if (!Array.isArray(raw)) return null;
+  const isRw = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'rug' && ['premium', 'essencial'].includes(String((r as Record<string, unknown>).treatment));
+  const rugs = raw.filter(isRw) as Record<string, unknown>[];
+  const others = raw.filter(r => !isRw(r));
+  if (!rugs.length || !others.length) return null;
+  const base = botQuote({ ...input, items: others });
+  if (!base.ok || base.quote || base.total === null || base.handToOwner) return null;
+  const lines: typeof base.lines = [];
+  let amount = 0;
+  for (const r of rugs) {
+    const w = typeof r.width === 'number' ? rugSide(r.width) : null;
+    const l = typeof r.length === 'number' ? rugSide(r.length) : null;
+    if (!w || !l) return null;
+    const qty = typeof r.qty === 'number' && Number.isInteger(r.qty) && r.qty > 0 ? r.qty : 1;
+    const tier = r.treatment as 'premium' | 'essencial';
+    const a = Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[tier] + 1e-9);
+    amount += a;
+    lines.push({ label: `Impermeabilização ${tier === 'premium' ? 'Premium' : 'Essencial'} tapete ${w.meters} x ${l.meters} m (mesma visita, sem deslocação extra)`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined as string | undefined, quote: false });
+  }
+  const total = cents(base.total + amount);
+  return {
+    ...base,
+    lines: [...base.lines, ...lines],
+    subtotal: cents(base.subtotal + amount),
+    total,
+    rugWaterproofing: { amount, sameVisit: true, travelExtra: 0 },
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
+  };
+}
+
 export function botQuote(input: unknown) {
   if (input && typeof input === 'object') {
+    const rw = rugWaterproofingQuote(input as Record<string, unknown>);
+    if (rw) return rw;
     const u = uWaterproofingQuote(input as Record<string, unknown>);
     if (u) return withBigOrder(u);
   }
