@@ -155,6 +155,12 @@ function weekdayOf(day) {
   return (new Date(toUtcNoon(day)).getUTCDay() + 6) % 7;
 }
 
+// src/constants/campaigns.ts
+var BLACK_FRIDAY_2026 = {
+  from: Date.parse("2026-11-27T00:00:00Z"),
+  until: Date.parse("2026-12-01T00:00:00Z")
+};
+
 // src/constants/packPerks.ts
 var PACK_PERK_MIN_ORDER = 100;
 var PACK_PERK_MATTRESS_OFF = 14;

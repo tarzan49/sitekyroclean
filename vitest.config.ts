@@ -16,5 +16,8 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
     environment: "jsdom",
     globals: true,
+    // As campanhas com data (src/constants/campaigns.ts) ficam desligadas nos
+    // testes; o teste da campanha passa a data.
+    env: { KYRO_CAMPAIGNS: "off" },
   },
 });

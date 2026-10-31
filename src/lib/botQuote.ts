@@ -15,6 +15,7 @@
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { isBlackFriday } from '../constants/campaigns';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugComboEstimate, rugEstimate } from './botRugEstimate';
@@ -132,7 +133,7 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   // 15 Oct 2026, Setúbal 149/109); otherwise 10€ towns read the waiver from the Premium.
   const baseFee = locationPrices[city] ?? 0;
   const aloneSmall = items.every(i => i.primary === 'waterproofing' || !isWaterproofing(i)) && !items.some(i => i.primary === 'cleaning') && premium.subtotal <= 200;
-  const travel = baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  const travel = isBlackFriday() ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal + travel),
@@ -164,7 +165,7 @@ export const PUFF_SAME_VISIT_PRICE = 20;
 function puffQuote(qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) {
   const unitPrice = withOthers ? PUFF_SAME_VISIT_PRICE : PUFF_PRICE;
   const amount = qty * unitPrice;
-  const travel = withOthers ? 0 : city !== null ? (locationPrices[city] ?? null) : null;
+  const travel = withOthers ? 0 : city !== null ? (locationPrices[city] === undefined ? null : isBlackFriday() ? 0 : locationPrices[city]) : null;
   return {
     qty,
     tablePrice: PUFF_PRICE,

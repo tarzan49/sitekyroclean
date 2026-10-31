@@ -1,4 +1,20 @@
 // GERADO por `npm run build:bot-engine` a partir de src/lib/botEngine.ts. Não editar à mão.
+// src/constants/campaigns.ts
+var BLACK_FRIDAY_2026 = {
+  from: Date.parse("2026-11-27T00:00:00Z"),
+  until: Date.parse("2026-12-01T00:00:00Z")
+};
+function campaignNow(now) {
+  if (now) return now.getTime();
+  const env = typeof process !== "undefined" ? process.env?.KYRO_CAMPAIGNS : void 0;
+  if (env === "off") return null;
+  return Date.now();
+}
+function isBlackFriday(now) {
+  const t = campaignNow(now);
+  return t !== null && t >= BLACK_FRIDAY_2026.from && t < BLACK_FRIDAY_2026.until;
+}
+
 // src/constants/travel.ts
 var locationPrices = {
   // ═══ Porto/Norte (equipa Porto) ═══
@@ -120,6 +136,7 @@ var EXTENDED_TRIP_CITIES = /* @__PURE__ */ new Set([
   "Sines"
 ]);
 function calculateTravelFee(baseFee, servicesTotal) {
+  if (isBlackFriday()) return 0;
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
   const cents2 = Math.round(servicesTotal * 100);
   if (baseFee === 10 && cents2 > 12e3 || baseFee === 15 && cents2 > 13500 || baseFee === 20 && cents2 >= 15e3) return 0;
@@ -196,7 +213,7 @@ function perkChairsFree(qty) {
 var round2 = (n) => Math.round(n * 100) / 100;
 function priceWithPackPerks(lines, mainKind = lines[0]?.kind) {
   const tableSubtotal = round2(lines.reduce((sum2, line) => sum2 + (line.tablePrice ?? 0), 0));
-  const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER;
+  const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER || isBlackFriday();
   const results = lines.map((line) => {
     const isMain = line.kind === mainKind;
     const table = { amount: line.tablePrice, tablePrice: line.tablePrice, isMain, perkApplied: false, perkNote: null };
@@ -1888,7 +1905,7 @@ function waterproofingTiers(items, city) {
   if (premium.travel === null) return null;
   const baseFee = locationPrices[city] ?? 0;
   const aloneSmall = items.every((i) => i.primary === "waterproofing" || !isWaterproofing(i)) && !items.some((i) => i.primary === "cleaning") && premium.subtotal <= 200;
-  const travel = baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
+  const travel = isBlackFriday() ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal + travel),
@@ -1906,7 +1923,7 @@ var PUFF_SAME_VISIT_PRICE = 20;
 function puffQuote(qty, city, withOthers, othersTotal) {
   const unitPrice = withOthers ? PUFF_SAME_VISIT_PRICE : PUFF_PRICE;
   const amount2 = qty * unitPrice;
-  const travel = withOthers ? 0 : city !== null ? locationPrices[city] ?? null : null;
+  const travel = withOthers ? 0 : city !== null ? locationPrices[city] === void 0 ? null : isBlackFriday() ? 0 : locationPrices[city] : null;
   return {
     qty,
     tablePrice: PUFF_PRICE,

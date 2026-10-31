@@ -1,3 +1,5 @@
+import { isBlackFriday } from './campaigns';
+
 // Fonte única de deslocações para o formulário e as páginas geradas.
 export const locationPrices: Record<string, number> = {
   // ═══ Porto/Norte (equipa Porto) ═══
@@ -126,6 +128,7 @@ export const EXTENDED_TRIP_CITIES: ReadonlySet<string> = new Set([
 
 /** Services and extras at their actual quoted prices, excluding travel. */
 export function calculateTravelFee(baseFee: number, servicesTotal: number): number {
+  if (isBlackFriday()) return 0;
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
   const cents = Math.round(servicesTotal * 100);
   if ((baseFee === 10 && cents > 12000) ||

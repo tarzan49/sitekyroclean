@@ -17,6 +17,8 @@
 //
 // Ficheiro sem imports com alias `@/`, de propósito: o prerender lê-o em Node.
 
+import { isBlackFriday } from './campaigns';
+
 /** Preço de pack só se pratica a partir deste subtotal de tabela (artigo
  * principal + tudo o resto, sempre ao preço de tabela, artigos sob
  * orçamento não contam por não terem preço para somar). Pedido explícito do
@@ -113,7 +115,8 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
  */
 export function priceWithPackPerks(lines: PerkLineInput[], mainKind: string | undefined = lines[0]?.kind) {
   const tableSubtotal = round2(lines.reduce((sum, line) => sum + (line.tablePrice ?? 0), 0));
-  const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER;
+  // Na Black Friday o preço de pack vale mesmo abaixo dos 100€ (campaigns.ts).
+  const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER || isBlackFriday();
   const results: PerkLineResult[] = lines.map(line => {
     const isMain = line.kind === mainKind;
     const table: PerkLineResult = { amount: line.tablePrice, tablePrice: line.tablePrice, isMain, perkApplied: false, perkNote: null };
