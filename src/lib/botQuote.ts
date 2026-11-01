@@ -162,22 +162,32 @@ function rugPickupFor(items: CustomPackItem[]) {
  */
 export const PUFF_PRICE = 25;
 export const PUFF_SAME_VISIT_PRICE = 20;
+/**
+ * Armchairs, "cadeirão" (owner, 1 Nov 2026, Ana: the bot quoted 49€, the 1-seater sofa price; "o cadeirão ficam 29€").
+ * His own quotes: 39€ on its own (15 Oct), 29€ when it goes in the same visit as other items. Bot only.
+ */
+export const ARMCHAIR_PRICE = 39;
+export const ARMCHAIR_SAME_VISIT_PRICE = 29;
 
-function puffQuote(qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) {
-  const unitPrice = withOthers ? PUFF_SAME_VISIT_PRICE : PUFF_PRICE;
+function extraQuote(qty: number, tablePrice: number, sameVisitPrice: number, city: string | null, withOthers: boolean, othersTotal: number | null) {
+  const unitPrice = withOthers ? sameVisitPrice : tablePrice;
   const amount = qty * unitPrice;
   const travel = withOthers ? 0 : city !== null ? (locationPrices[city] === undefined ? null : isBlackFriday() ? 0 : locationPrices[city]) : null;
   return {
     qty,
-    tablePrice: PUFF_PRICE,
+    tablePrice,
     unitPrice,
     specialCondition: withOthers,
     amount,
     travel,
-    // Order total with the puffs; null when the rest of the order has no price.
+    // Order total with these items; null when the rest of the order has no price.
     total: withOthers ? (othersTotal === null ? null : cents(othersTotal + amount)) : travel === null ? null : amount + travel,
   };
 }
+const puffQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
+  extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
+const armchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
+  extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 
 /**
  * Waterproofing on a U sofa, bot only.
@@ -225,6 +235,7 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
       travel: base && base.ok ? base.travel : 0, total, waterproofingTiers: { travel: base && base.ok ? base.travel : 0, premium, essencial },
       quote: false, handToOwner: false, rugPickup: null, rugEstimate: null, rugCombo: null,
       puff: base && base.ok ? base.puff : null,
+      armchair: base && base.ok ? base.armchair : null,
       closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
     };
   }
@@ -340,20 +351,25 @@ function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal
 
 function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs } = input as Record<string, unknown>;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== 'number' || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail('puffs tem de ser um inteiro entre 0 e 20');
+  const armchairs = rawArmchairs ?? 0;
+  if (typeof armchairs !== 'number' || !Number.isInteger(armchairs) || armchairs < 0 || armchairs > 20) return fail('armchairs tem de ser um inteiro entre 0 e 20');
   const rawItems = rawItemsIn ?? [];
-  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0) {
+  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0 && armchairs > 0) return fail('Puffs e cadeirões sem outro artigo: orçamenta cada um à parte');
+  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0)) {
     const city = resolveBotCity(rawCity);
-    const puff = puffQuote(puffs, city, false, null);
+    const puff = puffs > 0 ? puffQuote(puffs, city, false, null) : null;
+    const armchair = armchairs > 0 ? armchairQuote(armchairs, city, false, null) : null;
+    const extra = (puff ?? armchair)!;
     const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
     return {
       ok: true as const, city, cityKnown: city !== null, extendedTrip, sharedTrip: false,
       lines: [] as { label: string; amount: number | null; tablePrice: number | null; perkApplied: boolean; perkNote?: string; quote: boolean }[],
-      subtotal: puff.amount, savings: 0, perkEligible: false, travel: puff.travel ?? 0, total: puff.total ?? puff.amount,
+      subtotal: extra.amount, savings: 0, perkEligible: false, travel: extra.travel ?? 0, total: extra.total ?? extra.amount,
       waterproofingTiers: null, quote: false, handToOwner: city === null || extendedTrip,
-      rugPickup: null, rugEstimate: null, rugCombo: null, puff, closeNow: closeNowOffer({ total: puff.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
+      rugPickup: null, rugEstimate: null, rugCombo: null, puff, armchair, closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
     };
   }
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail('items tem de ser uma lista com pelo menos um artigo');
@@ -431,6 +447,8 @@ function botQuoteInner(input: unknown) {
     rugCombo,
     // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
+    // Armchairs (cadeirões) on the same visit: 29€ each. Add armchair.amount to the price you quote.
+    armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,

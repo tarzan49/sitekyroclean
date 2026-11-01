@@ -1921,21 +1921,25 @@ function rugPickupFor(items) {
 }
 var PUFF_PRICE = 25;
 var PUFF_SAME_VISIT_PRICE = 20;
-function puffQuote(qty, city, withOthers, othersTotal) {
-  const unitPrice = withOthers ? PUFF_SAME_VISIT_PRICE : PUFF_PRICE;
+var ARMCHAIR_PRICE = 39;
+var ARMCHAIR_SAME_VISIT_PRICE = 29;
+function extraQuote(qty, tablePrice, sameVisitPrice, city, withOthers, othersTotal) {
+  const unitPrice = withOthers ? sameVisitPrice : tablePrice;
   const amount2 = qty * unitPrice;
   const travel = withOthers ? 0 : city !== null ? locationPrices[city] === void 0 ? null : isBlackFriday() ? 0 : locationPrices[city] : null;
   return {
     qty,
-    tablePrice: PUFF_PRICE,
+    tablePrice,
     unitPrice,
     specialCondition: withOthers,
     amount: amount2,
     travel,
-    // Order total with the puffs; null when the rest of the order has no price.
+    // Order total with these items; null when the rest of the order has no price.
     total: withOthers ? othersTotal === null ? null : cents(othersTotal + amount2) : travel === null ? null : amount2 + travel
   };
 }
+var puffQuote = (qty, city, withOthers, othersTotal) => extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
+var armchairQuote = (qty, city, withOthers, othersTotal) => extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 90 };
 var U_WATERPROOFING_ALONE = { premium: 179, essencial: 129 };
 function uWaterproofingQuote(input) {
@@ -1982,6 +1986,7 @@ function uWaterproofingQuote(input) {
       rugEstimate: null,
       rugCombo: null,
       puff: base2 && base2.ok ? base2.puff : null,
+      armchair: base2 && base2.ok ? base2.armchair : null,
       closeNow: closeNowOffer({ total: total2, waterproofing: true, handToOwner: false, rug: null })
     };
   }
@@ -2071,13 +2076,18 @@ function withBigOrder(r) {
 }
 function botQuoteInner(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs } = input;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs } = input;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== "number" || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail("puffs tem de ser um inteiro entre 0 e 20");
+  const armchairs = rawArmchairs ?? 0;
+  if (typeof armchairs !== "number" || !Number.isInteger(armchairs) || armchairs < 0 || armchairs > 20) return fail("armchairs tem de ser um inteiro entre 0 e 20");
   const rawItems = rawItemsIn ?? [];
-  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0) {
+  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0 && armchairs > 0) return fail("Puffs e cadeirões sem outro artigo: orçamenta cada um à parte");
+  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0)) {
     const city2 = resolveBotCity(rawCity);
-    const puff = puffQuote(puffs, city2, false, null);
+    const puff = puffs > 0 ? puffQuote(puffs, city2, false, null) : null;
+    const armchair = armchairs > 0 ? armchairQuote(armchairs, city2, false, null) : null;
+    const extra = puff ?? armchair;
     const extendedTrip2 = city2 !== null && EXTENDED_TRIP_CITIES.has(city2);
     return {
       ok: true,
@@ -2086,11 +2096,11 @@ function botQuoteInner(input) {
       extendedTrip: extendedTrip2,
       sharedTrip: false,
       lines: [],
-      subtotal: puff.amount,
+      subtotal: extra.amount,
       savings: 0,
       perkEligible: false,
-      travel: puff.travel ?? 0,
-      total: puff.total ?? puff.amount,
+      travel: extra.travel ?? 0,
+      total: extra.total ?? extra.amount,
       waterproofingTiers: null,
       quote: false,
       handToOwner: city2 === null || extendedTrip2,
@@ -2098,7 +2108,8 @@ function botQuoteInner(input) {
       rugEstimate: null,
       rugCombo: null,
       puff,
-      closeNow: closeNowOffer({ total: puff.total, waterproofing: false, handToOwner: city2 === null || extendedTrip2, rug: null })
+      armchair,
+      closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city2 === null || extendedTrip2, rug: null })
     };
   }
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail("items tem de ser uma lista com pelo menos um artigo");
@@ -2160,6 +2171,8 @@ function botQuoteInner(input) {
     rugCombo,
     // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
+    // Armchairs (cadeirões) on the same visit: 29€ each. Add armchair.amount to the price you quote.
+    armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,

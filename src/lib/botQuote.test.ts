@@ -166,6 +166,15 @@ describe('puffs (owner, 21 Oct 2026)', () => {
     expect(mixed.ok && mixed.puff?.unitPrice).toBe(20);
     expect(mixed.ok && mixed.puff?.total).toBe((mixed.ok ? mixed.total : 0) + 20);
   });
+  it('armchairs (cadeirões): 39€ alone plus travel, 29€ on the same visit, never the 1-seater sofa price (owner, 1 Nov 2026)', () => {
+    const alone = botQuote({ items: [], city: 'Porto', armchairs: 1 });
+    expect(alone.ok && alone.armchair?.unitPrice).toBe(39);
+    expect(alone.ok && alone.total).toBe(49);
+    const mixed = botQuote({ items: [{ kind: 'sofa', size: '2-lugares' }], city: 'Vila do Conde', armchairs: 1 });
+    expect(mixed.ok && mixed.armchair?.unitPrice).toBe(29);
+    expect(mixed.ok && mixed.armchair?.total).toBe((mixed.ok ? mixed.total : 0) + 29);
+    expect(botQuote({ items: [], city: 'Porto', armchairs: 1, puffs: 1 }).ok).toBe(false);
+  });
   it('orders above 300€ carry the owner\'s special condition: travel off, 7% off cleaning (4% with waterproofing), ending in 9, at least 20€ (25 Oct 2026)', () => {
     expect(bigOrderPrice(415, 0, false)).toBe(379);
     expect(bigOrderPrice(441, 15, true)).toBe(399);
