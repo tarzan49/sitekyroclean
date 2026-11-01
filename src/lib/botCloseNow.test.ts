@@ -3,9 +3,9 @@ import { botQuote } from './botQuote';
 import { CLOSE_NOW_CONDITION, closeNowDiscount, closeNowOffer } from './botCloseNow';
 
 describe('condição para fechar já (dono, 13/10/2026)', () => {
-  it('euros off by price band: 10€ up to 150€, +5€ for every 50€ above', () => {
-    expect([79, 99, 150, 151, 189, 200, 209, 250, 299, 399].map(closeNowDiscount))
-      .toEqual([10, 10, 10, 15, 15, 15, 20, 20, 25, 35]);
+  it('euros off by price band: 10% under 100€ (1 Nov), 10€ up to 150€, +5€ for every 50€ above', () => {
+    expect([49, 79, 99, 100, 150, 151, 189, 200, 209, 250, 299, 399].map(closeNowDiscount))
+      .toEqual([5, 8, 10, 10, 10, 15, 15, 15, 20, 20, 25, 35]);
   });
   it('a cleaning order takes the euros off, with the condition', () => {
     const q = botQuote({ city: 'Porto', items: [{ kind: 'sofa', size: '3-lugares' }] });
@@ -23,7 +23,7 @@ describe('condição para fechar já (dono, 13/10/2026)', () => {
   });
   it('rugs: the same euros off the home and the pickup price', () => {
     expect(closeNowOffer({ total: null, handToOwner: true, rug: { homePrice: 69, pickupPrice: 89 } }))
-      .toMatchObject({ ok: true, homePrice: 59, pickupPrice: 79 });
+      .toMatchObject({ ok: true, homePrice: 62, pickupPrice: 80 });
   });
 });
 

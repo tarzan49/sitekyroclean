@@ -31,9 +31,12 @@ const OWNER_DECIDES = `acima de ${CLOSE_NOW_MAX_TOTAL}€: a condição é decid
 export const CLOSE_NOW_CONDITION =
   `Só se ficar marcado já, nesta conversa, para um dos dias que temos livres nos próximos ${CLOSE_NOW_DAYS} dias.`;
 
-/** Euros off a price: 10€ up to 150€, then 5€ more for every 50€ (or part) above it. */
+/**
+ * Euros off a price: 10% under 100€ (owner, 1 Nov 2026: the bot took 10€ off a 49€ rug, 20%, "nunca te deixei fazer esse
+ * tipo de desconto"); from 100€ to 150€ 10€, then 5€ more for every 50€ (or part) above it.
+ */
 export const closeNowDiscount = (price: number) =>
-  price <= 150 ? 10 : 10 + 5 * Math.ceil((price - 150) / 50);
+  price < 100 ? Math.round(price * 0.1) : price <= 150 ? 10 : 10 + 5 * Math.ceil((price - 150) / 50);
 
 export const closeNowPrice = (price: number, waterproofing = false) =>
   waterproofing

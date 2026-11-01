@@ -552,7 +552,7 @@ var CLOSE_NOW_DAYS = 7;
 var CLOSE_NOW_MAX_TOTAL = 200;
 var OWNER_DECIDES = `acima de ${CLOSE_NOW_MAX_TOTAL}€: a condição é decidida pelo responsável (handoff "pediu desconto, acima de ${CLOSE_NOW_MAX_TOTAL}€: decides tu")`;
 var CLOSE_NOW_CONDITION = `Só se ficar marcado já, nesta conversa, para um dos dias que temos livres nos próximos ${CLOSE_NOW_DAYS} dias.`;
-var closeNowDiscount = (price) => price <= 150 ? 10 : 10 + 5 * Math.ceil((price - 150) / 50);
+var closeNowDiscount = (price) => price < 100 ? Math.round(price * 0.1) : price <= 150 ? 10 : 10 + 5 * Math.ceil((price - 150) / 50);
 var closeNowPrice = (price, waterproofing = false) => waterproofing ? Math.round(price * (1 - CLOSE_NOW_WATERPROOFING_RATE)) : Math.max(0, price - closeNowDiscount(price));
 var RULE = "Usa só quando o cliente disse que o problema é o preço, uma vez por conversa, e diz sempre a condição.";
 function closeNowOffer(q) {
