@@ -13,7 +13,8 @@
 // combinados ficam `settled_at`, por isso a semana seguinte começa a zero. Só se fecha
 // num domingo (dia de Lisboa); a tabela `team_settlements` repete a regra numa
 // restrição, para nenhum outro caminho a contornar.
-import { teamAccounts, type AccountAdjustment, type AccountEvent, type AccountLine, type AccountRow, type TeamAccount } from './teamAccounts';
+import { eventTeam as teamOfEvent } from './botAvailability';
+import { ownerShareOf, teamAccounts, type AccountAdjustment, type AccountEvent, type AccountLine, type AccountRow, type TeamAccount } from './teamAccounts';
 
 export interface SettlementGroupDef { id: string; label: string; teams: readonly string[] }
 
@@ -98,4 +99,55 @@ export function weeklySettlement(rows: AccountRow[], events: AccountEvent[], adj
   }
 
   return { today, cycleStart, cycleEnd, canSettle: isSettlementDay(today), groups, unassigned: report.unassigned };
+}
+
+// Vista por equipa e por semana (dono, 2026-11-01: "não está seccionado por equipas",
+// "não existe um CRM de contas para a semana em específico corrente").
+
+export const SETTLEMENT_TEAMS = ['Porto 1', 'Porto 2', 'Porto 3', 'Lisboa 1', 'Algarve', 'Braga', 'Coimbra'] as const;
+
+export type WeekServiceStatus = 'pago' | 'por_pagar' | 'por_fazer' | 'cliente_paga_dono';
+
+export interface WeekService {
+  id?: string;
+  date: string;
+  label: string;
+  what: string;
+  billed: number;
+  /** O que a equipa te deve deste serviço (com o IVA da fatura, se houver). */
+  amount: number;
+  status: WeekServiceStatus;
+}
+
+/** Segunda-feira da semana de `day`. */
+export const weekStartOf = (day: string) => fromDayNumber(dayNumber(day) - ((weekdayOf(day) + 6) % 7));
+export const addDays = (day: string, n: number) => fromDayNumber(dayNumber(day) + n);
+
+/** Todos os serviços de uma equipa numa semana (segunda a domingo), pagos ou não. */
+export function teamWeek(rows: AccountRow[], events: AccountEvent[], team: string, weekStart: string, today: string): WeekService[] {
+  const weekEnd = addDays(weekStart, 6);
+  const teamOf = new Map(events.map(e => [e.id, e]));
+  const owedLines = new Map<string, AccountLine>();
+  for (const t of teamAccounts(rows, events, today).teams) {
+    if (t.team !== team) continue;
+    for (const l of [...t.today, ...t.before]) if (l.id) owedLines.set(l.id, l);
+  }
+  const out: WeekService[] = [];
+  for (const r of rows) {
+    const d = r.request_date;
+    if (!d || d < weekStart || d > weekEnd || r.calendar_missing_since) continue;
+    const billed = Number(r.billed_value) || 0;
+    if (billed <= 0 && !(Number(r.upsell_value) > 0)) continue;
+    const ev = r.calendar_event_id ? teamOf.get(r.calendar_event_id) : undefined;
+    if (!ev || teamOfEvent(ev) !== team) continue;
+    const owed = r.id ? owedLines.get(r.id) : undefined;
+    const status: WeekServiceStatus = r.paid ? 'pago' : r.paid_to_owner ? 'cliente_paga_dono' : d > today ? 'por_fazer' : 'por_pagar';
+    out.push({
+      ...(r.id ? { id: r.id } : {}), date: d,
+      label: (r.client_name ?? '').trim() ? `${r.client_name!.trim()}${r.city ? `, ${r.city}` : ''}` : (r.city ?? 'Serviço'),
+      what: (r.description ?? '').trim(), billed,
+      amount: owed?.amount ?? ownerShareOf(r), status,
+    });
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
 }

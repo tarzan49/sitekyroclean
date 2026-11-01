@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, ChevronDown, Copy, Lock } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Copy, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lisbonDay } from "@/lib/crmClosings";
 import { CALENDAR_FETCH_SINCE } from "@/lib/calendarSync";
 import type { CalendarEvent } from "@/lib/calendarServices";
 import { euros, type AccountAdjustment, type AccountEvent, type AccountRow } from "@/lib/teamAccounts";
-import { weeklySettlement, type SettlementGroup } from "@/lib/weeklySettlement";
+import { addDays, groupOfTeam, SETTLEMENT_TEAMS, teamWeek, weekStartOf, weeklySettlement, type WeekServiceStatus } from "@/lib/weeklySettlement";
 import { dayMonth } from "./crmInvoiceUi";
 
 // Aba "Contas" do CRM (dono, 2026-11-01): o que cada grupo de equipas deve nesta
@@ -30,7 +30,6 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
   const [history, setHistory] = useState<SettlementRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [open, setOpen] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const today = lisbonDay(new Date());
 
@@ -64,15 +63,50 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
     [records, events, adjustments, today],
   );
 
-  const copyMessages = async (g: SettlementGroup) => {
-    await navigator.clipboard.writeText(g.teams.map(t => t.message).join("\n\n---\n\n"));
-    setCopied(g.id);
-    setTimeout(() => setCopied(c => (c === g.id ? null : c)), 2000);
+  const teamTotals = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const g of settlement?.groups ?? []) for (const t of g.teams) m.set(t.team, t.total);
+    return m;
+  }, [settlement]);
+
+  const [team, setTeam] = useState<string | null>(null);
+  const [weekStart, setWeekStart] = useState(() => weekStartOf(today));
+  useEffect(() => {
+    if (team || !settlement) return;
+    const top = [...teamTotals.entries()].sort((a, b) => b[1] - a[1])[0];
+    setTeam(top?.[0] ?? SETTLEMENT_TEAMS[0]);
+  }, [settlement, teamTotals, team]);
+
+  const week = useMemo(
+    () => events && team ? teamWeek(records, events, team, weekStart, today) : [],
+    [records, events, team, weekStart, today],
+  );
+
+  if (!settlement || !team) return <p className="text-center py-10 text-sm text-gray-400">{error ?? "A carregar as contas..."}</p>;
+
+  const account = settlement.groups.flatMap(g => g.teams).find(t => t.team === team) ?? null;
+  const group = settlement.groups.find(g => g.id === groupOfTeam(team).id)!;
+  const owedNow = account?.total ?? 0;
+  const weekEnd = addDays(weekStart, 6);
+  const earlier = account ? [...account.before, ...account.today].filter(l => l.date < weekStart) : [];
+  const weekBilled = week.reduce((s, w) => s + w.billed, 0);
+  const weekShare = week.reduce((s, w) => s + w.amount, 0);
+  const weekOwed = week.filter(w => w.status === "por_pagar").reduce((s, w) => s + w.amount, 0);
+  const groupHistory = history.filter(h => h.group_id === group.id);
+  const isCurrentWeek = weekStart === weekStartOf(today);
+
+  const copyMessage = async () => {
+    if (!account) return;
+    await navigator.clipboard.writeText(account.message);
+    setCopied(team);
+    setTimeout(() => setCopied(c => (c === team ? null : c)), 2000);
   };
 
-  const settle = async (g: SettlementGroup) => {
-    if (!settlement?.canSettle) return;
-    if (!confirm(`${g.label} pagou ${euros(g.total)}? Os ${g.serviceCount} serviços ficam dados como pagos e as contas voltam a zero.`)) return;
+  const settle = async () => {
+    const g = group;
+    if (!settlement.canSettle) return;
+    const who = g.teams.map(t => t.team).join(" + ");
+    if (!confirm(`${who} pagou ${euros(g.total)}? Os ${g.serviceCount} serviços ficam dados como pagos e as contas voltam a zero.`)) return;
     setBusy(g.id);
     setError(null);
     try {
@@ -100,99 +134,150 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
     }
   };
 
-  if (!settlement) return <p className="text-center py-10 text-sm text-gray-400">{error ?? "A carregar as contas..."}</p>;
-
-  const grand = settlement.groups.reduce((s, g) => s + g.total, 0);
+  const sharedGroup = group.id !== "porto1" && group.teams.length > 1;
 
   return (
     <div className="space-y-4">
-      <div className="bg-navy text-white rounded-xl px-4 py-4">
-        <p className="text-xs uppercase tracking-wide text-white/60">Acerto de domingo {dayMonth(settlement.cycleEnd)}</p>
-        <p className="text-3xl font-bold mt-1">{euros(grand)}</p>
-        <p className="text-xs text-white/70 mt-1">
-          De {dayMonth(settlement.cycleStart)} a {dayMonth(settlement.cycleEnd)}, mais o que ficou por pagar de antes.{" "}
-          {settlement.canSettle ? "Hoje é dia de acerto." : "Só se fecha ao domingo."}
-        </p>
-      </div>
-
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
 
-      {settlement.unassigned.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
-          {settlement.unassigned.length} serviço{settlement.unassigned.length === 1 ? "" : "s"} por pagar sem equipa no calendário ({euros(settlement.unassigned.reduce((s, l) => s + l.amount, 0))}) não entra{settlement.unassigned.length === 1 ? "" : "m"} em nenhum grupo: {settlement.unassigned.map(l => `${l.label} a ${dayMonth(l.date)}`).join("; ")}.
+      {/* Equipas */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {SETTLEMENT_TEAMS.map(t => {
+          const owed = teamTotals.get(t) ?? 0;
+          const active = t === team;
+          return (
+            <button key={t} onClick={() => setTeam(t)}
+              className={`shrink-0 rounded-xl border px-3.5 py-2 text-left transition ${active ? "bg-navy border-navy text-white" : "bg-white border-gray-200 text-navy hover:border-navy/40"}`}>
+              <span className="block text-xs font-semibold">{t}</span>
+              <span className={`block text-sm font-bold ${owed > 0 ? (active ? "text-[#D4AF37]" : "text-red-600") : (active ? "text-white/60" : "text-gray-400")}`}>
+                {owed > 0 ? euros(owed) : "Em dia"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* O que a equipa deve */}
+      <div className="bg-navy text-white rounded-2xl p-5">
+        <p className="text-xs uppercase tracking-wide text-white/60">{team} deve-te</p>
+        <p className="text-4xl font-bold mt-1">{euros(owedNow)}</p>
+        <p className="text-xs text-white/70 mt-1">
+          Acerto de domingo {dayMonth(settlement.cycleEnd)}. {settlement.canSettle ? "Hoje é dia de acerto." : "Só se fecha ao domingo."}
+        </p>
+        {account?.awaitingClient.length ? (
+          <p className="text-xs text-white/70 mt-1">
+            Fora do total: {account.awaitingClient.map(l => `${l.label} (${euros(l.amount)} da equipa, o cliente paga-te a ti)`).join("; ")}.
+          </p>
+        ) : null}
+        <div className="flex gap-2 mt-4">
+          <button onClick={settle} disabled={!settlement.canSettle || group.total <= 0 || busy !== null}
+            title={settlement.canSettle ? "Dar como pago e repor as contas a zero" : "Só se pode fechar ao domingo"}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-bold rounded-lg bg-[#D4AF37] text-navy disabled:opacity-40 disabled:cursor-not-allowed">
+            {settlement.canSettle ? <Check className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+            {busy === group.id ? "A fechar..." : sharedGroup ? `${group.teams.map(t => t.team).join(" + ")} pagaram ${euros(group.total)}` : "Equipa pagou"}
+          </button>
+          <button onClick={copyMessage} disabled={!account}
+            className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-lg border border-white/20 disabled:opacity-40">
+            {copied === team ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Mensagem
+          </button>
+        </div>
+      </div>
+
+      {/* Semana */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <button onClick={() => setWeekStart(w => addDays(w, -7))} className="p-1.5 rounded-lg hover:bg-gray-100" aria-label="Semana anterior"><ChevronLeft className="w-4 h-4" /></button>
+          <div className="text-center">
+            <p className="text-sm font-semibold text-navy">{dayMonth(weekStart)} a {dayMonth(weekEnd)}</p>
+            <p className="text-[11px] text-gray-400">{isCurrentWeek ? "Esta semana" : "Segunda a domingo"}</p>
+          </div>
+          <button onClick={() => setWeekStart(w => addDays(w, 7))} className="p-1.5 rounded-lg hover:bg-gray-100" aria-label="Semana seguinte"><ChevronRight className="w-4 h-4" /></button>
+        </div>
+
+        <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100 text-center">
+          <div className="py-3"><p className="text-[11px] text-gray-400">Serviços</p><p className="text-lg font-bold text-navy">{week.length}</p></div>
+          <div className="py-3"><p className="text-[11px] text-gray-400">Faturado</p><p className="text-lg font-bold text-navy">{euros(weekBilled)}</p></div>
+          <div className="py-3"><p className="text-[11px] text-gray-400">A tua parte</p><p className="text-lg font-bold text-navy">{euros(weekShare)}</p></div>
+        </div>
+
+        {week.length === 0
+          ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço da {team} nesta semana.</p>
+          : week.map((w, i) => (
+            <div key={w.id ?? i} className="px-4 py-3 border-b border-gray-50 last:border-0 flex items-start gap-3">
+              <div className="w-11 shrink-0 text-xs font-semibold text-gray-500 pt-0.5">{dayMonth(w.date)}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-navy truncate">{w.label}</p>
+                {w.what && <p className="text-xs text-gray-500 line-clamp-2">{w.what}</p>}
+                <p className="text-[11px] text-gray-400 mt-0.5">Serviço {euros(w.billed)}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-sm font-bold text-navy">{euros(w.amount)}</p>
+                <StatusPill status={w.status} />
+              </div>
+            </div>
+          ))}
+
+        {weekOwed > 0 && (
+          <div className="px-4 py-2.5 bg-red-50 text-xs font-semibold text-red-700 flex justify-between">
+            <span>Por pagar desta semana</span><span>{euros(weekOwed)}</span>
+          </div>
+        )}
+      </div>
+
+      {earlier.length > 0 && (
+        <div className="bg-white border border-red-200 rounded-2xl">
+          <p className="px-4 py-3 text-sm font-semibold text-red-700 border-b border-red-100">Por pagar de antes de {dayMonth(weekStart)}</p>
+          {earlier.map((l, i) => (
+            <div key={l.id ?? i} className="px-4 py-2 text-sm flex justify-between gap-3 border-b border-gray-50 last:border-0">
+              <span className="text-gray-600 min-w-0 truncate">{dayMonth(l.date)} · {l.label}</span>
+              <span className="font-semibold text-navy">{euros(l.amount)}</span>
+            </div>
+          ))}
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-3">
-        {settlement.groups.map(g => (
-          <div key={g.id} className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
-            <div>
-              <p className="text-sm font-semibold text-navy">{g.label}</p>
-              <p className="text-2xl font-bold text-navy mt-0.5">{euros(g.total)}</p>
-              <p className="text-xs text-gray-500">
-                {g.serviceCount} serviço{g.serviceCount === 1 ? "" : "s"}
-                {g.vat > 0 && <> · dos quais {euros(g.vat)} de IVA a entregar ao Estado</>}
-              </p>
-              {g.overdue > 0 && (
-                <p className="mt-1 inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-300">
-                  {euros(g.overdue)} de semanas anteriores por pagar
-                </p>
-              )}
-            </div>
+      {account && (account.adjustments.length > 0 || account.ownerOwes.length > 0) && (
+        <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 space-y-1 text-sm">
+          {account.adjustments.map((l, i) => (
+            <p key={l.id ?? i} className="flex justify-between gap-3 text-gray-600"><span>{l.label}</span><span className="font-semibold text-navy">{euros(l.amount)}</span></p>
+          ))}
+          {account.ownerOwes.map((l, i) => (
+            <p key={l.id ?? `o${i}`} className="flex justify-between gap-3 text-gray-600"><span>{l.label} · pago a ti, desconta a parte da equipa</span><span className="font-semibold text-green-700">−{euros(l.amount)}</span></p>
+          ))}
+        </div>
+      )}
 
-            <div className="flex gap-2">
-              <button onClick={() => settle(g)} disabled={!settlement.canSettle || g.total <= 0 || busy !== null}
-                title={settlement.canSettle ? "Dar como pago e repor as contas a zero" : "Só se pode fechar ao domingo"}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-[#D4AF37] text-navy disabled:opacity-40 disabled:cursor-not-allowed">
-                {settlement.canSettle ? <Check className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-                {busy === g.id ? "A fechar..." : "Equipa pagou"}
-              </button>
-              <button onClick={() => copyMessages(g)} disabled={!g.teams.length} title="Copiar a mensagem das contas para enviar"
-                className="px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy disabled:opacity-40">
-                {copied === g.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
-            </div>
+      {settlement.unassigned.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800">
+          Sem equipa no calendário (não conta para ninguém): {settlement.unassigned.map(l => `${l.label} a ${dayMonth(l.date)}, ${euros(l.amount)}`).join("; ")}.
+        </div>
+      )}
 
-            {g.teams.length > 0 && (
-              <button onClick={() => setOpen(o => (o === g.id ? null : g.id))} className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-navy">
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open === g.id ? "rotate-180" : ""}`} /> Ver serviços
-              </button>
-            )}
-            {open === g.id && g.teams.map(t => (
-              <div key={t.team} className="border-t border-gray-100 pt-2 space-y-1">
-                <p className="text-xs font-bold text-navy">{t.team} · {euros(t.total)}</p>
-                {[...t.before, ...t.today].map((l, i) => (
-                  <p key={l.id ?? i} className="text-xs text-gray-600 flex justify-between gap-2">
-                    <span>{dayMonth(l.date)} · {l.label}</span><span className="font-medium">{euros(l.amount)}</span>
-                  </p>
-                ))}
-                {t.adjustments.map((l, i) => (
-                  <p key={l.id ?? `a${i}`} className="text-xs text-gray-600 flex justify-between gap-2">
-                    <span>{l.label}</span><span className="font-medium">{euros(l.amount)}</span>
-                  </p>
-                ))}
-                {t.ownerOwes.length > 0 && (
-                  <p className="text-xs text-gray-500">Descontado: {euros(t.ownerOwes.reduce((s, l) => s + l.amount, 0))} pagos diretamente a ti</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl">
-        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos registados</p>
-        {history.length === 0
-          ? <p className="px-4 py-6 text-sm text-gray-400 text-center">Ainda nenhum acerto fechado.</p>
-          : history.map(h => (
+      <div className="bg-white border border-gray-200 rounded-2xl">
+        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos da {sharedGroup ? group.label : team}</p>
+        {groupHistory.length === 0
+          ? <p className="px-4 py-6 text-sm text-gray-400 text-center">Ainda nenhum acerto registado aqui.</p>
+          : groupHistory.map(h => (
             <div key={h.id} className="px-4 py-2 text-sm flex justify-between gap-3 border-b border-gray-50 last:border-0">
-              <span className="text-gray-600">Domingo {dayMonth(h.cycle_end)} · {h.group_label} · {h.service_count} serviço{h.service_count === 1 ? "" : "s"}</span>
+              <span className="text-gray-600">Domingo {dayMonth(h.cycle_end)} · {h.service_count} serviço{h.service_count === 1 ? "" : "s"}</span>
               <span className="font-semibold text-navy">{euros(Number(h.amount))}</span>
             </div>
           ))}
       </div>
     </div>
   );
+}
+
+const STATUS: Record<WeekServiceStatus, [string, string]> = {
+  pago: ["Pago", "bg-green-50 text-green-700 border-green-200"],
+  por_pagar: ["Por pagar", "bg-red-50 text-red-700 border-red-200"],
+  por_fazer: ["Por fazer", "bg-gray-50 text-gray-500 border-gray-200"],
+  cliente_paga_dono: ["Paga-te a ti", "bg-blue-50 text-blue-700 border-blue-200"],
+};
+
+function StatusPill({ status }: { status: WeekServiceStatus }) {
+  const [label, cls] = STATUS[status];
+  return <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${cls}`}>{label}</span>;
 }
 
 export default CrmSettlements;
