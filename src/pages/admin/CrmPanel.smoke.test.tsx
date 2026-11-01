@@ -69,7 +69,7 @@ describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
     expect(screen.queryByText('Joana Teste')).toBeNull();
 
     // Passar a fatura com um toque.
-    fireEvent.click(screen.getAllByRole("button", { name: "Passei" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Marcar como passada" })[0]);
     await waitFor(() => expect(updates).toHaveLength(1));
     expect(updates[0]).toMatchObject({ id: 'r5', patch: { invoice_issued_on: '2026-10-27' } });
   });

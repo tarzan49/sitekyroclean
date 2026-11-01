@@ -130,12 +130,12 @@ function CrmVat<T extends Row>({ records, onTogglePaid, onMarkClientPaid, onAdva
         <section className="bg-white border border-amber-300 rounded-xl overflow-hidden">
           <div className="px-3 pt-3 pb-2">
             <p className="text-sm font-bold text-navy">Faturas por passar ({toIssue.length})</p>
-            <p className="text-xs text-gray-500">De todos os meses. Quando a passares, carrega em "Passei".</p>
+            <p className="text-xs text-gray-500">Nenhuma destas está passada. De todos os meses; depois de passares uma, carrega em "Marcar como passada" e ela sai daqui.</p>
           </div>
           <div className="divide-y divide-gray-100 border-t border-gray-100">
             {toIssue.map(r => invoiceRow(r, (
               <button onClick={() => onAdvanceInvoice(r)} title={invoiceTitle(r)}
-                className={`${chip} bg-amber-500 text-white border-amber-500 hover:bg-amber-600`}>Passei</button>
+                className={`${chip} bg-white text-navy border-gray-300 hover:border-navy`}>Marcar como passada</button>
             )))}
           </div>
         </section>

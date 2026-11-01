@@ -536,7 +536,7 @@ Dono: "estás-me a mandar demasiados alertas por e-mail e os e-mails estão a fi
 ## CRM: "Por pagar", faturas e abas que não dão reset (dono, 2026-11-01)
 
 - **"Por pagar" = todo o dinheiro que falta chegar ao dono, de todos os meses** (`src/lib/crmDebts.ts`): equipas que ainda não pagaram (`paid` false) **e clientes que pagam ao dono e ainda não pagaram** (`paid_to_owner` sem `client_paid_owner_at`), mesmo com `paid` true, porque o acerto de domingo marca a linha como paga. Só serviços já feitos. O cliente deve o serviço todo; a equipa deve a parte do dono mais o IVA da fatura. O filtro "Clientes devem-me" foi absorvido. "Pagos" já não conta um cliente em dívida.
-- **Aba "Faturas e IVA" reorganizada:** três números (faturas por passar, IVA a entregar do mês, IVA de dinheiro ainda não recebido), a lista das faturas por passar de todos os meses com o botão "Passei", o IVA por mês e as faturas do mês. As do Francisco ficam todas juntas, fechadas, no fim.
+- **Aba "Faturas e IVA" reorganizada:** três números (faturas por passar, IVA a entregar do mês, IVA de dinheiro ainda não recebido), a lista das faturas por passar de todos os meses com o botão "Marcar como passada" (branco: é uma ação, não um estado; o laranja "Passei" parecia dizer que já estavam passadas), o IVA por mês e as faturas do mês. As do Francisco ficam todas juntas, fechadas, no fim.
 - **A sub-aba do CRM fica no endereço (`?crm=`)** e o `useAdminSession` só volta a verificar o administrador quando muda a pessoa: antes, a renovação do token ao voltar ao separador do browser punha o ecrã de carregamento, desmontava o painel e o CRM voltava aos Pedidos.
 
 ## Acerto semanal das equipas, aba "Contas" do CRM (dono, 2026-11-01)
