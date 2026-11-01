@@ -129,8 +129,11 @@ Formato de cada guião: gancho (0 a 2 s), texto no ecrã, narração, legenda, h
 
 ### 10. Avaliação real
 - **Gancho:** ecrã com 4.9★ e 180 avaliações. Texto: "180 pessoas disseram isto."
-- **Texto no ecrã:** uma avaliação real do Google, copiada sem alterar, com o primeiro nome e o mês
-- **Narração:** "Quatro vírgula nove estrelas, cento e oitenta avaliações no Google. Não somos nós a dizer. São eles."
+- **Texto no ecrã (avaliações reais do Google, copiadas sem alterar, uma por ecrã):**
+  - "O meu sofá ficou como novo!! Com um cheirinho incrível." Rita, outubro 2026
+  - "O colchão estava muito manchado e ficou irreconhecível. Recomendo." Sofia, outubro 2026
+  - "Ótimo serviço e disponibilidade total, o sofá além de limpo ficou como novo" Sandra, outubro 2026
+- **Narração:** "Quatro vírgula nove estrelas, cento e oitenta avaliações no Google. Não somos nós a dizer. São eles. O meu sofá ficou como novo. O colchão estava muito manchado e ficou irreconhecível. Ótimo serviço e disponibilidade total."
 - **Legenda:** Obrigado a cada cliente que deixou a sua opinião. Já somos +1350 serviços feitos.
 - **Hashtags:** #avaliacoes #clientesatisfeito #google #limpezadesofas #confianca
 
