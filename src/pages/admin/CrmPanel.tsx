@@ -14,6 +14,7 @@ import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam,
 import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, upsellWithoutVatOf, vatToDeliverOf } from "@/lib/invoiceVat";
 import { INVOICE_CHIP, dayMonth, invoiceTitle, money, vatLine } from "./crmInvoiceUi";
 import CrmVat from "./CrmVat";
+import CrmSettlements from "./CrmSettlements";
 
 interface ServiceRequest {
   id: string;
@@ -162,7 +163,7 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "iva" | "servicos" | "avaliacoes" | "upsell">("pedidos");
+  const [view, setView] = useState<"pedidos" | "iva" | "servicos" | "avaliacoes" | "upsell" | "contas">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
   const [waContacts, setWaContacts] = useState<WhatsAppContactRow[] | null>(null);
@@ -558,7 +559,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto" role="tablist">
-        {([["pedidos", "Pedidos"], ["iva", "Faturas e IVA"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["contas", "Contas"], ["iva", "Faturas e IVA"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold whitespace-nowrap -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -579,6 +580,8 @@ const CrmPanel = () => {
           allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))}
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
+
+      {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} />}
 
       {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
 

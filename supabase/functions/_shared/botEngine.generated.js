@@ -1876,6 +1876,7 @@ function toItem(raw, index) {
   if (typeof qty !== "number" || !Number.isInteger(qty) || qty < 1 || qty > 100) return fail(`items[${index}].qty tem de ser um inteiro entre 1 e 100`);
   const { extra, primary } = TREATMENT_TO_ITEM[treatment];
   if (kind === "mattress" && (extra === "premium" || extra === "essencial")) return fail(`items[${index}]: colchões não se impermeabilizam`);
+  if (kind === "rug" && (treatment === "premium" || treatment === "essencial")) return fail(`items[${index}]: a impermeabilização de tapete só tem preço na mesma visita de outro serviço: chama de novo com os artigos já marcados (ex.: o sofá, com o mesmo tratamento) e o tapete na mesma lista de items; sozinho passa ao dono`);
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   let size = "";
   if (kind === "sofa" && r.size === "u") {
@@ -1998,8 +1999,42 @@ function uWaterproofingQuote(input) {
     closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: base.handToOwner, rug: null })
   };
 }
+var RUG_WATERPROOFING_PER_M2 = { premium: 15, essencial: 10 };
+function rugWaterproofingQuote(input) {
+  const raw = input.items;
+  if (!Array.isArray(raw)) return null;
+  const isRw = (r) => !!r && typeof r === "object" && r.kind === "rug" && ["premium", "essencial"].includes(String(r.treatment));
+  const rugs = raw.filter(isRw);
+  const others = raw.filter((r) => !isRw(r));
+  if (!rugs.length || !others.length) return null;
+  const base = botQuote({ ...input, items: others });
+  if (!base.ok || base.quote || base.total === null || base.handToOwner) return null;
+  const lines = [];
+  let amount2 = 0;
+  for (const r of rugs) {
+    const w = typeof r.width === "number" ? rugSide(r.width) : null;
+    const l = typeof r.length === "number" ? rugSide(r.length) : null;
+    if (!w || !l) return null;
+    const qty = typeof r.qty === "number" && Number.isInteger(r.qty) && r.qty > 0 ? r.qty : 1;
+    const tier = r.treatment;
+    const a = Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[tier] + 1e-9);
+    amount2 += a;
+    lines.push({ label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} tapete ${w.meters} x ${l.meters} m (mesma visita, sem deslocação extra)`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
+  }
+  const total = cents(base.total + amount2);
+  return {
+    ...base,
+    lines: [...base.lines, ...lines],
+    subtotal: cents(base.subtotal + amount2),
+    total,
+    rugWaterproofing: { amount: amount2, sameVisit: true, travelExtra: 0 },
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null })
+  };
+}
 function botQuote(input) {
   if (input && typeof input === "object") {
+    const rw = rugWaterproofingQuote(input);
+    if (rw) return rw;
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
@@ -3298,7 +3333,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
     if (r.paid_to_owner) {
       const teamPart = invoiceTeamPart !== null ? round24(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round24(billed + (Number(r.upsell_value) || 0) - share);
       const invoice = r.invoiced ? { billed, vat: round24(billed - net) } : {};
-      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart, ...invoice });
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date, label: labelOf(r), amount: teamPart, ...invoice, ...r.id ? { id: r.id } : {} });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date) ? round24((Number(r.billed_value) || 0) * REVIEW_PENALTY_SHARE) : 0;
@@ -3306,6 +3341,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
     const what = (r.description ?? "").trim();
     const amount2 = invoiceTeamPart !== null ? round24(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round24(share + penalty);
     const line = {
+      ...r.id ? { id: r.id } : {},
       date: r.request_date,
       label: labelOf(r),
       amount: amount2,
@@ -3324,7 +3360,7 @@ function teamAccounts(rows, events, date, adjustments = []) {
   }
   for (const a of adjustments) {
     if (a.day > date || !Number(a.amount)) continue;
-    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round24(Number(a.amount)) });
+    bucketOf(a.team).adjustments.push({ ...a.id ? { id: a.id } : {}, date: a.day, label: a.label, amount: round24(Number(a.amount)) });
   }
   const teams = [...byTeam.entries()].map(([team, b]) => {
     const base = {

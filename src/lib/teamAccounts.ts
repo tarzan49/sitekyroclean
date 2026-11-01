@@ -65,6 +65,8 @@ export function reviewPenaltyApplies(team: string, day: string): boolean {
 }
 
 export interface AccountRow {
+  /** Só para o painel saber que linhas fechar num pagamento semanal. */
+  id?: string;
   request_date: string | null;
   client_name: string | null;
   city: string | null;
@@ -90,11 +92,13 @@ export interface AccountRow {
 }
 
 /** Um valor combinado com a equipa que não é um serviço (team_account_adjustments, por saldar). */
-export interface AccountAdjustment { team: string; day: string; label: string; amount: number }
+export interface AccountAdjustment { id?: string; team: string; day: string; label: string; amount: number }
 
 export interface AccountEvent extends AvailabilityEvent { id: string }
 
 export interface AccountLine {
+  /** Linha do CRM (ou acerto) de onde vem. */
+  id?: string;
   date: string;
   label: string;
   amount: number;
@@ -265,7 +269,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
         ? round2(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell))
         : round2(billed + (Number(r.upsell_value) || 0) - share);
       const invoice = r.invoiced ? { billed, vat: round2(billed - net) } : {};
-      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart, ...invoice });
+      if (team && teamPart > 0) (r.client_paid_owner_at ? bucketOf(team).ownerOwes : bucketOf(team).awaitingClient).push({ date: r.request_date!, label: labelOf(r), amount: teamPart, ...invoice, ...(r.id ? { id: r.id } : {}) });
       continue;
     }
     const penalty = team && !r.review_requested && reviewPenaltyApplies(team, r.request_date!)
@@ -274,7 +278,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     const what = (r.description ?? '').trim();
     const amount = invoiceTeamPart !== null ? round2(billed - invoiceTeamPart + Math.max(0, ownerUpsell) + penalty) : round2(share + penalty);
     const line: AccountLine = {
-      date: r.request_date!, label: labelOf(r), amount, billed, share,
+      ...(r.id ? { id: r.id } : {}), date: r.request_date!, label: labelOf(r), amount, billed, share,
       ...(what ? { what } : {}), ...(penalty ? { reviewPenalty: penalty } : {}),
       ...(vat ? { vat, teamPart: invoiceTeamPart!, ...(r.vat_on_top ? { vatOnTop: true } : {}), ...(ownerUpsell > 0 ? { upsellShare: ownerUpsell } : {}) } : {}),
     };
@@ -285,7 +289,7 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
 
   for (const a of adjustments) {
     if (a.day > date || !Number(a.amount)) continue; // negativo = pagamento já feito pela equipa
-    bucketOf(a.team).adjustments.push({ date: a.day, label: a.label, amount: round2(Number(a.amount)) });
+    bucketOf(a.team).adjustments.push({ ...(a.id ? { id: a.id } : {}), date: a.day, label: a.label, amount: round2(Number(a.amount)) });
   }
 
   const teams = [...byTeam.entries()].map(([team, b]) => {
