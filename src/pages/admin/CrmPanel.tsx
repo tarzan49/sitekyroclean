@@ -15,6 +15,7 @@ import { INVOICE_VAT, invoiceStatusOf, invoiceVatOf, ownerServiceCutWithoutVat, 
 import { INVOICE_CHIP, dayMonth, invoiceTitle, money, vatLine } from "./crmInvoiceUi";
 import CrmVat from "./CrmVat";
 import CrmSettlements from "./CrmSettlements";
+import { clientOwesOwner, debtKindOf, type DebtKind } from "@/lib/crmDebts";
 
 interface ServiceRequest {
   id: string;
@@ -69,6 +70,9 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 const totalBilledOf = (r: ServiceRequest) => round2(r.billed_value + (Number(r.upsell_value) || 0));
 const ownerUpsellNetOf = (r: ServiceRequest) => ownerUpsellOf({ ...r, upsell_value: upsellWithoutVatOf(r) });
 const cutOf = (r: ServiceRequest) => round2((ownerServiceCutWithoutVat(r) ?? r.my_cut) + ownerUpsellNetOf(r));
+/** O que me falta receber: o cliente deve o serviço todo; a equipa deve a minha parte mais o IVA da fatura. */
+const owedOf = (r: ServiceRequest, kind: DebtKind, today: string) =>
+  kind === "client" ? totalBilledOf(r) : round2(cutOf(r) + vatToDeliverOf(r, today));
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
@@ -76,20 +80,19 @@ const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
 // Filtros da aba Pedidos (dono, 2026-10-27: "um botão de filtro [...] por pagar,
 // por fatura [...] em vez de me aparecer todas as informações, aparece só uma").
 // As faturas saíram daqui para a aba "Faturas e IVA" (dono, 2026-10-27).
-// "Clientes devem-me" (dono, 2026-10-27: "a lista do dinheiro que as pessoas me devem a mim e
-// que eu já paguei aos funcionários"): pago diretamente ao dono, cliente ainda sem pagar. Vê
-// todos os meses, porque uma dívida de setembro não pode ficar escondida no mês anterior.
-type StatusFilter = "all" | "unpaid" | "paid" | "review" | "clientOwes";
+// "Por pagar" = todo o dinheiro que me falta receber, de todos os meses (dono, 2026-11-01):
+// as equipas que ainda não me pagaram e os clientes que me pagam diretamente e ainda não
+// pagaram, mesmo com a equipa já acertada (src/lib/crmDebts.ts). Absorveu o antigo filtro
+// "Clientes devem-me". Um serviço por fazer ainda não é dívida.
+type StatusFilter = "all" | "unpaid" | "paid" | "review";
 const STATUS_FILTERS: ReadonlyArray<readonly [StatusFilter, string]> = [
-  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["review", "Para rever"], ["clientOwes", "Clientes devem-me"],
+  ["all", "Todos"], ["unpaid", "Por pagar"], ["paid", "Pagos"], ["review", "Para rever"],
 ];
-const clientOwesOwner = (r: ServiceRequest) => !!r.paid_to_owner && !r.client_paid_owner_at && !r.calendar_missing_since;
-const matchesStatus = (r: ServiceRequest, f: StatusFilter) => {
+const matchesStatus = (r: ServiceRequest, f: StatusFilter, today: string) => {
   switch (f) {
-    case "unpaid": return !r.paid;
-    case "paid": return r.paid;
+    case "unpaid": return debtKindOf(r, today) !== null;
+    case "paid": return r.paid && !clientOwesOwner(r);
     case "review": return !!r.needs_review;
-    case "clientOwes": return clientOwesOwner(r);
     default: return true;
   }
 };
@@ -159,11 +162,25 @@ const emptyForm = (): FormState => ({
   upsell_team: "Porto 1",
 });
 
+const CRM_VIEWS = ["pedidos", "contas", "iva", "servicos", "avaliacoes", "upsell"] as const;
+type CrmView = typeof CRM_VIEWS[number];
+const crmViewFromUrl = (): CrmView => {
+  const v = new URLSearchParams(window.location.search).get("crm");
+  return CRM_VIEWS.includes(v as CrmView) ? (v as CrmView) : "pedidos";
+};
+
 const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "iva" | "servicos" | "avaliacoes" | "upsell" | "contas">("pedidos");
+  // A aba fica no endereço (?crm=), para sair e voltar não abrir sempre os Pedidos (dono, 2026-11-01).
+  const [view, setView] = useState<CrmView>(crmViewFromUrl);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if ((url.searchParams.get("crm") ?? "pedidos") === view) return;
+    if (view === "pedidos") url.searchParams.delete("crm"); else url.searchParams.set("crm", view);
+    window.history.replaceState(null, "", url);
+  }, [view]);
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
   const [waContacts, setWaContacts] = useState<WhatsAppContactRow[] | null>(null);
@@ -276,12 +293,31 @@ const CrmPanel = () => {
     });
   }, [allMonths, records, monthRecords, search, filterLocality]);
 
+  const today = lisbonDay(new Date());
   const statusCounts = useMemo(
-    () => Object.fromEntries(STATUS_FILTERS.map(([id]) => [id, scoped.filter(r => matchesStatus(r, id)).length])) as Record<StatusFilter, number>,
-    [scoped]
+    () => Object.fromEntries(STATUS_FILTERS.map(([id]) => [id, scoped.filter(r => matchesStatus(r, id, today)).length])) as Record<StatusFilter, number>,
+    [scoped, today]
   );
 
-  const filtered = useMemo(() => scoped.filter(r => matchesStatus(r, statusFilter)), [scoped, statusFilter]);
+  // Por pagar: primeiro os clientes que me devem, depois as equipas, do mais antigo para o mais recente.
+  const filtered = useMemo(() => {
+    const rows = scoped.filter(r => matchesStatus(r, statusFilter, today));
+    if (statusFilter !== "unpaid") return rows;
+    const rank = (r: ServiceRequest) => (debtKindOf(r, today) === "client" ? 0 : 1);
+    return [...rows].sort((a, b) => rank(a) - rank(b) || a.request_date.localeCompare(b.request_date));
+  }, [scoped, statusFilter, today]);
+
+  /** Tudo o que me falta receber, em todos os meses (o cartão "Por pagar"). */
+  const debts = useMemo(() => {
+    const out = { client: { count: 0, value: 0 }, team: { count: 0, value: 0 } };
+    for (const r of records) {
+      const kind = debtKindOf(r, today);
+      if (!kind) continue;
+      out[kind].count++;
+      out[kind].value = round2(out[kind].value + owedOf(r, kind, today));
+    }
+    return out;
+  }, [records, today]);
 
   const filteredSums = useMemo(() => ({
     billed: round2(filtered.reduce((s, r) => s + totalBilledOf(r), 0)),
@@ -289,15 +325,19 @@ const CrmPanel = () => {
     vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0)),
   }), [filtered]);
 
-  /** Carregar outra vez no filtro ligado volta a "Todos". */
-  const pickStatus = (f: StatusFilter) => setStatusFilter(prev => (prev === f ? "all" : f));
+  /** Carregar outra vez no filtro ligado volta a "Todos". "Por pagar" olha sempre para todos os meses. */
+  const pickStatus = (f: StatusFilter) => {
+    const next = statusFilter === f ? "all" : f;
+    setStatusFilter(next);
+    if (next === "unpaid") setAllMonths(true);
+    else if (statusFilter === "unpaid") setAllMonths(false);
+  };
 
   const totals = useMemo(() => {
     const billed = monthRecords.reduce((s, r) => s + totalBilledOf(r), 0);
     const cut = monthRecords.reduce((s, r) => s + cutOf(r), 0);
     const upsellCut = monthRecords.reduce((s, r) => s + ownerUpsellNetOf(r), 0);
-    const paid = monthRecords.filter(r => r.paid);
-    const unpaid = monthRecords.filter(r => !r.paid);
+    const paid = monthRecords.filter(r => r.paid && !clientOwesOwner(r));
     const byLocality = LOCALITIES.map(loc => {
       const rows = monthRecords.filter(r => r.locality === loc);
       return { loc, billed: rows.reduce((s, r) => s + totalBilledOf(r), 0), cut: rows.reduce((s, r) => s + cutOf(r), 0), count: rows.length };
@@ -308,7 +348,7 @@ const CrmPanel = () => {
     const notInvoicedValue = noInv.reduce((s, r) => s + totalBilledOf(r), 0);
     const invoicedVat = round2(inv.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0));
     const toIssueCount = inv.filter(r => invoiceStatusOf(r) === "to_issue").length;
-    return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + totalBilledOf(r), 0), byLocality };
+    return { invoicedCount: inv.length, invoicedValue, invoicedVat, toIssueCount, notInvoicedCount: noInv.length, notInvoicedValue, billed, cut, upsellCut, paidCount: paid.length, byLocality };
   }, [monthRecords]);
 
   const maxLocalityCut = Math.max(1, ...totals.byLocality.map(l => l.cut));
@@ -470,7 +510,7 @@ const CrmPanel = () => {
   // "Falta receber", e carregar marca que recebi.
   const paidButton = (r: ServiceRequest, size: string) => {
     if (clientOwesOwner(r)) return (
-      <button onClick={() => markClientPaid(r)} title="Já paguei à equipa, falta o cliente pagar-me. Carregar = recebi." className={`${size} whitespace-nowrap rounded-full font-bold border bg-orange-50 text-orange-700 border-orange-300`}>Falta receber</button>
+      <button onClick={() => markClientPaid(r)} title="Já paguei à equipa, falta o cliente pagar-me. Carregar = recebi." className={`${size} whitespace-nowrap rounded-full font-bold border bg-orange-50 text-orange-700 border-orange-300`}>Cliente deve</button>
     );
     return (
       <button onClick={() => togglePaid(r)} className={`${size} whitespace-nowrap rounded-full font-bold border ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>{r.paid ? "Pago" : "Por pagar"}</button>
@@ -561,7 +601,7 @@ const CrmPanel = () => {
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto" role="tablist">
         {([["pedidos", "Pedidos"], ["contas", "Contas"], ["iva", "Faturas e IVA"], ["servicos", "Serviços"], ["avaliacoes", "Avaliações"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
-            className={`px-4 py-2 text-sm font-semibold whitespace-nowrap -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
+            className={`shrink-0 px-4 py-2 text-sm font-semibold whitespace-nowrap -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
           </button>
         ))}
@@ -583,7 +623,7 @@ const CrmPanel = () => {
 
       {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} />}
 
-      {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
+      {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onMarkClientPaid={markClientPaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
 
       {view === "avaliacoes" && <CrmReviews services={records} />}
 
@@ -619,10 +659,12 @@ const CrmPanel = () => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pagos</p>
           <p className="text-xl font-bold text-green-600">{totals.paidCount}</p>
         </button>
-        <button type="button" onClick={() => pickStatus("unpaid")} aria-pressed={statusFilter === "unpaid"}
+        <button type="button" onClick={() => pickStatus("unpaid")} aria-pressed={statusFilter === "unpaid"} title="Tudo o que te falta receber, de todos os meses"
           className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "unpaid" ? "border-red-500 ring-1 ring-red-500" : "border-red-200 hover:border-red-300"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Por pagar</p>
-          <p className="text-xl font-bold text-red-600">{totals.unpaidCount} <span className="text-xs font-medium text-red-500">({money(totals.unpaidValue)})</span></p>
+          <p className="text-xl font-bold text-red-600">{money(round2(debts.client.value + debts.team.value))}</p>
+          {debts.client.count > 0 && <p className="text-[11px] font-semibold text-orange-700">{debts.client.count} cliente{debts.client.count === 1 ? "" : "s"}: {money(debts.client.value)}</p>}
+          {debts.team.count > 0 && <p className="text-[11px] font-medium text-red-600">{debts.team.count} das equipas: {money(debts.team.value)}</p>}
         </button>
         <button type="button" onClick={() => setView("iva")} title="Abrir as faturas e o IVA de cada mês"
           className="text-left bg-white border border-blue-200 rounded-xl p-4 transition-colors hover:border-blue-400">
@@ -661,10 +703,10 @@ const CrmPanel = () => {
           {STATUS_FILTERS.map(([id, label]) => {
             const active = statusFilter === id;
             return (
-              <button key={id} type="button" onClick={() => { setStatusFilter(id); if (id === "clientOwes") setAllMonths(true); }} aria-pressed={active}
+              <button key={id} type="button" onClick={() => { if (!active) pickStatus(id); }} aria-pressed={active}
                 className={`shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-navy text-white border-navy" : "bg-white text-navy border-gray-200 hover:border-navy/30"}`}>
                 {label}
-                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : (id === "unpaid" || id === "clientOwes") && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
+                <span className={`text-[10.5px] font-bold ${active ? "text-white/75" : id === "unpaid" && statusCounts[id] ? "text-red-600" : "text-gray-400"}`}>{statusCounts[id]}</span>
               </button>
             );
           })}
@@ -673,11 +715,20 @@ const CrmPanel = () => {
             Todos os meses
           </label>
         </div>
-        {(statusFilter !== "all" || allMonths) && (
+        {statusFilter === "unpaid" && (
+          <p className="text-xs text-gray-700">
+            Falta-te receber <strong className="text-red-600">{money(round2(debts.client.value + debts.team.value))}</strong>:
+            {" "}<span className="text-orange-700 font-semibold">clientes {money(debts.client.value)} ({debts.client.count})</span>, o serviço todo, porque te pagam a ti;
+            {" "}<span className="text-red-600 font-semibold">equipas {money(debts.team.value)} ({debts.team.count})</span>, a tua parte{debts.team.value > 0 ? " mais o IVA das faturas" : ""}.
+            {" "}Só serviços já feitos, de todos os meses.
+            <button type="button" onClick={() => pickStatus("unpaid")} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>
+          </p>
+        )}
+        {statusFilter !== "unpaid" && (statusFilter !== "all" || allMonths) && (
           <p className="text-xs text-gray-600">
             {filtered.length} serviço{filtered.length === 1 ? "" : "s"}{allMonths ? " em todos os meses" : ` em ${monthLabel.toLowerCase()}`} · {money(filteredSums.billed)} · <span className="text-gold font-semibold">para ti {money(filteredSums.cut)}{filteredSums.vat > 0 ? " sem IVA" : ""}</span>
             {filteredSums.vat > 0 && <span className="text-blue-700 font-semibold"> · IVA a entregar ao Estado {money(filteredSums.vat)}</span>}
-            {statusFilter !== "all" && <button type="button" onClick={() => setStatusFilter("all")} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>}
+            {statusFilter !== "all" && <button type="button" onClick={() => pickStatus(statusFilter)} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>}
           </p>
         )}
       </div>
@@ -709,7 +760,7 @@ const CrmPanel = () => {
           <p className="text-center py-6 text-sm text-gray-400">{!allMonths && monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}</p>
         )}
         {filtered.map(r => (
-          <div key={r.id} className={`rounded-xl border p-3 space-y-2 ${r.paid ? "bg-white border-gray-200" : "bg-red-50/60 border-red-200"}`}>
+          <div key={r.id} className={`rounded-xl border p-3 space-y-2 ${debtKindOf(r, today) ? "bg-red-50/60 border-red-200" : "bg-white border-gray-200"}`}>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-[11px] text-gray-500">Dia {allMonths ? dayMonth(r.request_date) : new Date(r.request_date + "T00:00:00").getDate()} · fechado {closedLabel(r.booked_at)}</p>
@@ -746,7 +797,7 @@ const CrmPanel = () => {
         <div>
           <table className="w-full table-fixed text-xs">
             <colgroup>
-              {["4%", "7%", "19%", "10%", "10%", "10%", "8%", "8%", "7%", "6%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+              {["4%", "7%", "17%", "10%", "10%", "10%", "7%", "8%", "7%", "5%", "9%", "6%"].map((w, i) => <col key={i} style={{ width: w }} />)}
             </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
@@ -765,7 +816,7 @@ const CrmPanel = () => {
                 </td></tr>
               )}
               {filtered.map((r, i) => (
-                <tr key={r.id} className={`border-b border-gray-100 ${!r.paid ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
+                <tr key={r.id} className={`border-b border-gray-100 ${debtKindOf(r, today) ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
                   <td className="px-2 py-2 font-mono text-navy whitespace-nowrap">{allMonths ? dayMonth(r.request_date) : new Date(r.request_date + "T00:00:00").getDate()}</td>
                   <td className="px-2 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
                   <td className="px-2 py-2 text-navy font-medium">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { vatByMonth } from './crmVat';
+import { invoicesToIssue, vatByMonth } from './crmVat';
 
 // Dados inventados: o repositório é público.
 const today = '2026-10-27';
@@ -38,5 +38,20 @@ describe('vatByMonth', () => {
   it('a month with only future services has nothing to deliver yet', () => {
     expect(months[0].vat).toBe(0);
     expect(months[0].vatUpcoming).toBe(23);
+  });
+});
+
+describe('dinheiro por receber e faturas por passar (dono, 1/11)', () => {
+  it('a client who pays the owner directly and has not paid counts as unpaid, even with the team settled', () => {
+    const [oct] = vatByMonth([
+      { id: 'x', request_date: '2026-10-14', billed_value: 123, invoiced: true, invoice_by: 'Empresa', paid: true, paid_to_owner: true },
+      { id: 'y', request_date: '2026-10-15', billed_value: 123, invoiced: true, invoice_by: 'Empresa', paid: true, paid_to_owner: true, client_paid_owner_at: '2026-10-16' },
+    ], today);
+    expect(oct.vatUnpaid).toBe(23);
+    expect(oct.vatPaid).toBe(23);
+  });
+
+  it('lists company invoices to issue from every month, done services first, never Francisco', () => {
+    expect(invoicesToIssue(rows, today).map(r => r.id)).toEqual(['f', 'a', 'c', 'g']);
   });
 });

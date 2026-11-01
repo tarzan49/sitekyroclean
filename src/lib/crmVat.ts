@@ -7,11 +7,14 @@
 // ser feito (vatToDeliverOf). As contas do IVA estão em invoiceVat.ts.
 
 import { invoiceStatusOf, invoiceVatOf, vatToDeliverOf, type InvoiceRow } from './invoiceVat';
+import { moneyReceived } from './crmDebts';
 
 export interface VatRow extends InvoiceRow {
   id: string;
   request_date: string;
   paid?: boolean | null;
+  paid_to_owner?: boolean | null;
+  client_paid_owner_at?: string | null;
 }
 
 export interface VatMonth<T extends VatRow = VatRow> {
@@ -23,7 +26,7 @@ export interface VatMonth<T extends VatRow = VatRow> {
   francisco: T[];
   /** IVA a entregar ao Estado (serviços já feitos). */
   vat: number;
-  /** Desse IVA, o dos serviços já pagos e o dos que ainda não. */
+  /** Desse IVA, o de serviços cujo dinheiro já me chegou e o dos que ainda não (equipa ou cliente por pagar). */
   vatPaid: number;
   vatUnpaid: number;
   /** IVA dos serviços com fatura ainda por fazer: entra no dia do serviço. */
@@ -59,11 +62,22 @@ export function vatByMonth<T extends VatRow>(rows: T[], today: string): VatMonth
     const due = vatToDeliverOf(r, today);
     if (r.request_date > today) { m.vatUpcoming = round2(m.vatUpcoming + invoiceVatOf(r)); continue; }
     m.vat = round2(m.vat + due);
-    if (r.paid) m.vatPaid = round2(m.vatPaid + due); else m.vatUnpaid = round2(m.vatUnpaid + due);
+    if (moneyReceived({ ...r, paid: !!r.paid })) m.vatPaid = round2(m.vatPaid + due); else m.vatUnpaid = round2(m.vatUnpaid + due);
   }
   for (const m of byMonth.values()) {
     m.services.sort((a, b) => a.request_date.localeCompare(b.request_date));
     m.francisco.sort((a, b) => a.request_date.localeCompare(b.request_date));
   }
   return [...byMonth.values()].sort((a, b) => b.month.localeCompare(a.month));
+}
+
+/**
+ * Faturas da empresa por passar, de todos os meses (dono, 2026-11-01: "é muito
+ * importante dar tracking a isso"): primeiro as dos serviços já feitos, do mais
+ * antigo para o mais recente, depois as dos serviços por fazer.
+ */
+export function invoicesToIssue<T extends VatRow>(rows: T[], today: string): T[] {
+  return rows
+    .filter(r => invoiceStatusOf(r) === 'to_issue' && r.invoice_by !== 'Francisco')
+    .sort((a, b) => Number(a.request_date > today) - Number(b.request_date > today) || a.request_date.localeCompare(b.request_date));
 }

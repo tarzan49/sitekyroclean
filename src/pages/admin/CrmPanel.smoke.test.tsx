@@ -30,7 +30,7 @@ const descriptions = () => screen.queryAllByText(/Sofá IVA à parte|Pack IVA in
 const shown = () => [...new Set(descriptions())].sort();
 
 describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-10-27T11:00:00Z') }); updates.length = 0; });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-10-27T11:00:00Z') }); updates.length = 0; window.history.replaceState(null, '', '/'); });
   afterEach(() => { vi.useRealTimers(); });
 
   it('filtra por estado, sem colunas de fatura nem de avaliação na lista', async () => {
@@ -52,31 +52,39 @@ describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
     expect(shown()).toHaveLength(4);
   });
 
-  it('Com fatura abre a aba Faturas e IVA: IVA do mês, pago e por pagar, sem o Francisco', async () => {
+  it('Com fatura abre a aba Faturas e IVA: por passar de todos os meses, IVA do mês, Francisco à parte', async () => {
     render(<CrmPanel />);
     await waitFor(() => expect(shown()).toHaveLength(4));
     fireEvent.click(screen.getByRole('button', { name: /Com fatura/ }));
     expect(screen.getByRole('tab', { name: 'Faturas e IVA' }).getAttribute('aria-selected')).toBe('true');
+    // A aba fica no endereço, para voltar à página não abrir os Pedidos.
+    expect(new URL(window.location.href).searchParams.get('crm')).toBe('iva');
     // Outubro: 48,07 + 155,02 (com o upsell) = 203,09; o Francisco fica de fora.
     expect(screen.getAllByText('203.09€').length).toBeGreaterThan(0);
-    // As do Francisco aparecem na lista, com o IVA já entregue.
-    expect(screen.getByText('Ana Teste')).toBeTruthy();
-    expect(screen.getByText('IVA 14.77€ · entregue')).toBeTruthy();
-    expect(screen.getByText('Rita Teste')).toBeTruthy();
-    const show = within(screen.getByRole('group', { name: 'Mostrar faturas' }));
-    fireEvent.click(show.getByRole('button', { name: /Entregues/ }));
-    expect(screen.getByText('Ana Teste')).toBeTruthy();
-    expect(screen.queryByText('Rita Teste')).toBeNull();
-    fireEvent.click(show.getByRole('button', { name: /Todas/ }));
+    // Faturas por passar: a de setembro aparece já, sem mudar de mês.
+    expect(screen.getByText(/Faturas por passar \(3\)/)).toBeTruthy();
+    expect(screen.getAllByText("Lia Teste").length).toBeGreaterThan(0);
+    // As do Francisco ficam fechadas à parte.
+    expect(screen.getByText(/Faturas do Francisco \(1\)/)).toBeTruthy();
     expect(screen.queryByText('Joana Teste')).toBeNull();
 
-    // Setembro, por mês.
-    fireEvent.click(screen.getByText(/setembro de 2026/i));
-    expect(screen.getByText('Lia Teste')).toBeTruthy();
-
     // Passar a fatura com um toque.
-    fireEvent.click(screen.getByRole('button', { name: 'Fatura por passar' }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Passei" })[0]);
     await waitFor(() => expect(updates).toHaveLength(1));
     expect(updates[0]).toMatchObject({ id: 'r5', patch: { invoice_issued_on: '2026-10-27' } });
+  });
+
+  it('Por pagar mostra todos os meses e os clientes que me devem, mesmo com a equipa acertada', async () => {
+    rows.push({ ...base, id: 'r6', request_date: '2026-09-20', description: 'Cliente paga-me a mim', client_name: 'Rui Teste', billed_value: 150, my_cut: 75, paid: true, invoiced: false, paid_to_owner: true } as typeof rows[number]);
+    try {
+      render(<CrmPanel />);
+      await waitFor(() => expect(shown()).toHaveLength(4));
+      fireEvent.click(filters().getByRole('button', { name: /Por pagar/ }));
+      expect(screen.getAllByText('Cliente paga-me a mim').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Colchão por pagar').length).toBeGreaterThan(0);
+      expect(screen.getByText(/clientes 150€ \(1\)/)).toBeTruthy();
+    } finally {
+      rows.pop();
+    }
   });
 });

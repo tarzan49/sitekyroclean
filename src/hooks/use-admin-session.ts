@@ -55,8 +55,13 @@ export function useAdminSession() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Só quando muda a pessoa, não a cada objeto de sessão novo. O Supabase renova o
+  // token quando se volta ao separador do browser e manda uma sessão nova; antes,
+  // isso voltava a pôr o ecrã de carregamento, desmontava o painel e o CRM abria
+  // outra vez nos Pedidos (dono, 2026-11-01: "a página dá reset").
+  const userId = session?.user.id ?? null;
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       setIsAdmin(false);
       setCheckingAdmin(false);
       return;
@@ -66,7 +71,7 @@ export function useAdminSession() {
       setIsAdmin(!error && data === true);
       setCheckingAdmin(false);
     });
-  }, [session]);
+  }, [userId]);
 
   return { session, loading, isAuthed: !!session, isAdmin, checkingAdmin };
 }
