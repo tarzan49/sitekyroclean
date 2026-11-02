@@ -153,6 +153,15 @@ export const TEAM_TRAVEL_MARGIN_MIN: Readonly<Record<string, number>> = {
 };
 const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 60_000;
 /**
+ * Teams whose gap between two jobs is the real drive between the two addresses (at least ROAD_MARGIN_MIN_MIN),
+ * not the fixed margin (owner, 2 Nov 2026, Liliya in Tavira: with 45 min fixed, a free 10h-14h on the Algarve's
+ * Tuesday gave "sem horas", although the 14h job was 10 minutes away).
+ */
+const ROAD_MARGIN_TEAMS: ReadonlySet<string> = new Set(['Algarve']);
+const ROAD_MARGIN_MIN_MIN = 15;
+const pairMarginMs = (team: string, b: { place: Place }, place: Place) =>
+  ROAD_MARGIN_TEAMS.has(team) && b.place && place ? Math.max(ROAD_MARGIN_MIN_MIN, driveMinutes(b.place, place)) * 60_000 : marginMs(team);
+/**
  * Weekday hours of a team that does not work the whole day; weekends are open as for any team. Porto 2 (Aleixo) works
  * Monday to Friday only in the morning (owner, 27 Oct 2026: "marca para Porto 2 a partir das 8 da manhã de segunda a
  * sexta até às 13 horas", "depois disso não consegue, só sábado e ao domingo"; Aleixo himself, 18 Oct: "melhor marcar
@@ -377,7 +386,7 @@ function travelClash(busy: Busy[], team: string, from: number, to: number, place
   return busy.some(b => {
     if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
     const drive = driveMinutes(b.place, place);
-    if (drive * 60_000 <= marginMs(team)) return false; // the fixed margin already covers it
+    if (!ROAD_MARGIN_TEAMS.has(team) && drive * 60_000 <= marginMs(team)) return false; // the fixed margin already covers it
     const need = drive * 60_000;
     if (b.to <= from) return from - b.to < need;
     if (b.from >= to) return b.from - to < need;
@@ -410,7 +419,7 @@ export interface Slot { date: string; minutes: number; label: string; time: stri
 function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, from: number, to: number, cleaning = true, place: Place = null) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
-  const overlapsFor = (t: string) => (b: Busy) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
+  const overlapsFor = (t: string) => (b: Busy) => b.from < to + pairMarginMs(t, b, place) && b.to > from - pairMarginMs(t, b, place);
   const spare = (t: string) => staggers(t, from)
     ? (busy.some(b => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1)
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
@@ -717,7 +726,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   for (const date of scan) {
     const label = dayLabel(date, today);
     const firstMinutes = Math.min(...teams.map(t => teamEarliestMinutes(t, date)));
-    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    // Algarve bot days: half hours too, the gaps between far-apart jobs are rarely on the hour (owner, 2 Nov 2026).
+    const step = area === 'Algarve' && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);

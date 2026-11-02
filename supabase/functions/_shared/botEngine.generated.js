@@ -2428,6 +2428,9 @@ var TEAM_TRAVEL_MARGIN_MIN = {
   Algarve: 45
 };
 var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 6e4;
+var ROAD_MARGIN_TEAMS = /* @__PURE__ */ new Set(["Algarve"]);
+var ROAD_MARGIN_MIN_MIN = 15;
+var pairMarginMs = (team, b, place) => ROAD_MARGIN_TEAMS.has(team) && b.place && place ? Math.max(ROAD_MARGIN_MIN_MIN, driveMinutes(b.place, place)) * 6e4 : marginMs(team);
 var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 8, to: 13 } };
 var isWeekday = (date) => {
   const d = (/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay();
@@ -2625,7 +2628,7 @@ function travelClash(busy, team, from, to, place) {
   return busy.some((b) => {
     if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
     const drive = driveMinutes(b.place, place);
-    if (drive * 6e4 <= marginMs(team)) return false;
+    if (!ROAD_MARGIN_TEAMS.has(team) && drive * 6e4 <= marginMs(team)) return false;
     const need = drive * 6e4;
     if (b.to <= from) return from - b.to < need;
     if (b.from >= to) return b.from - to < need;
@@ -2656,7 +2659,7 @@ function busyIntervals(events) {
 function slotState(busy, teams, region, from, to, cleaning = true, place = null) {
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
-  const overlapsFor = (t) => (b) => b.from < to + marginMs(t) && b.to > from - marginMs(t);
+  const overlapsFor = (t) => (b) => b.from < to + pairMarginMs(t, b, place) && b.to > from - pairMarginMs(t, b, place);
   const spare = (t) => staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
   const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
@@ -2863,7 +2866,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   for (const date of scan) {
     const label = dayLabel(date, today);
     const firstMinutes = Math.min(...teams.map((t) => teamEarliestMinutes(t, date)));
-    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    const step = area === "Algarve" && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);
