@@ -659,3 +659,8 @@ O bot de WhatsApp do dono (feito pelo irmão, num servidor à parte) fala com o 
 ## Antes de terminar qualquer sessão neste projeto
 
 Atualiza este ficheiro se alguma regra ou facto de negócio mudou; atualiza `CONTEXT.md` se a arquitetura mudou. Commit + push antes de trocar de máquina.
+
+
+## Descontos (2/11/2026)
+
+O dono: "desconto só quando o preço é o motivo não existe". Quando o preço pesa, oferece-se sempre uma opção mais barata (ex.: Essencial em vez de Premium) e fazem-se perguntas para perceber se a pessoa está só a ver pelo preço ou pela qualidade do serviço e pela garantia que isso lhe dá. Substitui a regra de 11/10 (máx. 10€) e a ronda de 26-27/10 ("condição especial se fechar hoje").
