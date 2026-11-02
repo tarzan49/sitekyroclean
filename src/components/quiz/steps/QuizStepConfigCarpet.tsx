@@ -17,7 +17,7 @@ const formatArea = (area: number) => area.toLocaleString('pt-PT', { maximumFract
 const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete', rugPickup = false, onRugPickupChange }: Props) => {
   const fieldPrefix = useId();
   const totalArea = carpetTotalArea(carpetItems);
-  // Recolha: só tapetes (a alcatifa está fixa ao chão), de 3 a 20 m²
+  // Recolha: só tapetes (a alcatifa está fixa ao chão), de 3 a 12 m²
   // somados (dono, 2026-10-10), com o acréscimo de rugPickupFee (dono, 2026-10-05).
   const pickupFee = rugPickupFee(totalArea);
   const pickupChosen = rugPickup && pickupFee !== null;

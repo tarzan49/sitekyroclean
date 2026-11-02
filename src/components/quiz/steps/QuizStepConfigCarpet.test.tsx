@@ -29,10 +29,10 @@ describe('recolha no passo dos tapetes', () => {
     expect(screen.getByText(/a lavagem é feita em sua casa/)).toBeTruthy();
   });
 
-  it('acima de 20 m² somados não oferece recolha (dono, 2026-10-10)', () => {
+  it('acima de 12 m² somados não oferece recolha (dono, 2026-11-02)', () => {
     render(<Harness items={[{ id: 'a', largura: '4', comprimento: '2.8' }, { id: 'b', largura: '5', comprimento: '3.8' }]} />);
     expect(screen.queryByRole('radio')).toBeNull();
-    expect(screen.getByText(/Com mais de 20 m² no total, a lavagem é feita em sua casa/)).toBeTruthy();
+    expect(screen.getByText(/Com mais de 12 m² no total, a lavagem é feita em sua casa/)).toBeTruthy();
   });
 
   it('a alcatifa nunca oferece recolha', () => {

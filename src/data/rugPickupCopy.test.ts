@@ -69,8 +69,9 @@ describe('recolha dos tapetes', () => {
     expect(rugPickupFee(6.01)).toBe(20);
     expect(rugPickupFee(9.99)).toBe(20);
     expect(rugPickupFee(10)).toBe(20);
-    expect(rugPickupFee(20)).toBe(20);
-    expect(rugPickupFee(20.01)).toBeNull();
+    expect(rugPickupFee(12)).toBe(20);
+    expect(rugPickupFee(12.01)).toBeNull();
+    expect(rugPickupFee(20)).toBeNull();
     expect(rugPickupFee(30.2)).toBeNull();
     expect(rugPickupFee(Number.NaN)).toBeNull();
   });

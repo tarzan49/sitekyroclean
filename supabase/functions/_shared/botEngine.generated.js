@@ -392,7 +392,7 @@ var AVAILABILITY_PROMISE = "Procuramos realizar o serviço no próprio dia ou no
 var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.";
 var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
 var RUG_PICKUP_MIN_AREA_M2 = 3;
-var RUG_PICKUP_MAX_AREA_M2 = 20;
+var RUG_PICKUP_MAX_AREA_M2 = 12;
 var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
 var RUG_PICKUP_FEE = 20;
 function rugPickupFee(totalAreaM2) {

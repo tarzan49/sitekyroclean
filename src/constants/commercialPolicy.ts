@@ -21,10 +21,10 @@ export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibra
 // 2026-09-30). Conta a soma dos tapetes do pedido, não cada um: dois tapetes
 // de 2 m² (4 m² no total) já podem ser recolhidos.
 export const RUG_PICKUP_MIN_AREA_M2 = 3;
-// Acima de 20 m² somados também não há recolha, só lavagem em casa (dono,
+// Acima de 12 m² somados não há recolha, só lavagem em casa (dono, 2026-11-02: "se for acima de 12 m² não ofereces recolha"; antes 20 m², dono,
 // 2026-10-10: "para de oferecer recolha para tapetes que sejam acima de 20 m2";
 // "o total dos tapetes").
-export const RUG_PICKUP_MAX_AREA_M2 = 20;
+export const RUG_PICKUP_MAX_AREA_M2 = 12;
 export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
 
 // Recolha e entrega: mais 20€ do que a lavagem em casa, em qualquer área em
