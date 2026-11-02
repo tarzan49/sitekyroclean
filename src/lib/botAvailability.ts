@@ -263,6 +263,11 @@ export const DAY_RULES: readonly DayRule[] = [
   // Owner, 31 Oct 2026 at 01:30: "no porto fecha para domingo ou amanha de manha".
   { zone: 'Porto', from: '2026-10-31', until: '2026-11-01', closed: [{ date: '2026-10-31', fromHour: 13 }], prefer: ['2026-10-31', '2026-11-01'],
     note: 'Sábado (dia 31) no Porto só há vaga de manhã: oferece sábado de manhã ou domingo (dia 1). Na segunda a impermeabilização não se faz no Porto, só a partir de terça.' },
+  // Owner, 2 Nov 2026: "AMANHA quero te a marcar serviços apenas para os restantes dias da semana, estao mt vazios".
+  ...(['Porto', 'Lisboa', 'Braga', 'Coimbra'] as const).map((zone): DayRule => ({
+    zone, from: '2026-11-03', until: '2026-11-03', onlyPreferred: true,
+    prefer: ['2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07', '2026-11-08'],
+    note: 'Esta semana há mais vaga de quarta (dia 4) a domingo (dia 8): oferece primeiro esses dias.' })),
 ];
 
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
