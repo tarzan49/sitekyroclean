@@ -49,7 +49,10 @@ const EnFooter = () => {
         </div>
 
         <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/80">
-          <p>© {new Date().getFullYear()} Kyro Clean Solutions. All rights reserved.</p>
+          <div>
+            <p>© {new Date().getFullYear()} Kyro Clean Solutions. All rights reserved.</p>
+            <p className="text-xs text-white/60">Prices shown exclude VAT, charged at the applicable legal rate.</p>
+          </div>
           <div className="flex items-center gap-4">
             <Link to="/politica-de-privacidade" className="hover:text-white/70 transition-colors">Privacy Policy</Link>
             <Link to="/termos-e-condicoes" className="hover:text-white/70 transition-colors">Terms</Link>

@@ -87,6 +87,9 @@ const Footer = () => {
               © {new Date().getFullYear()} Kyro Clean Solutions. Todos os direitos reservados.
               {BUSINESS_TAX_ID && <> NIF {BUSINESS_TAX_ID}.</>}
             </p>
+            <p className="text-xs text-white/60 text-center">
+              Aos preços apresentados acresce IVA à taxa legal em vigor.
+            </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
               {FOOTER_LEGAL_LINKS.map(link => (
                 <Link
