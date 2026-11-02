@@ -637,6 +637,13 @@ de lance diretamente"). Lisboa já estava em Maximizar cliques. O grupo
 "Impermeabilização de Sofás" desta campanha já estava em pausa; o grupo
 "Limpeza de Colchões" continua ativo (CPC 4,19 €, 0 conversões), por decidir.
 
+Negativa `seco` (ampla) nas campanhas de sofás do Porto e de Lisboa, no mesmo dia:
+"limpeza de sofá a seco" custou 10,27 € num clique e é um serviço que não fazemos.
+Ficou decidido manter a configuração da semana de 26/10 (Porto 48, Lisboa 60 nos
+dias úteis, impermeabilização em campanhas próprias): foi a melhor semana desde
+05/10 pelo critério do dono (+1.756 € de lucro dos anúncios, Porto 14 fechos e
+1.405 € de parte do dono, máximo de sempre). Rever ao fim de 1 a 2 semanas.
+
 ---
 
 *`GOOGLE-ADS-PORTO-CAMPANHA.md` (agosto) tem outra estrutura e textos que já não
