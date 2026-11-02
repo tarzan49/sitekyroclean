@@ -625,6 +625,18 @@ Armadilhas vistas: num carregamento, uma campanha de nome repetido pede o
 atualiza depois de um carregamento, por isso recarregar antes de concluir que
 algo falhou (os grupos já estavam retirados).
 
+## 9. Porto sofás voltou a Maximizar cliques (02/11/2026, dono)
+
+A 28/10 a campanha "Kyro | Porto | Limpeza e Proteção de Sofás" (ID 24286916320)
+tinha passado para **Maximizar as conversões**, que não aceita limite de CPC. Na
+semana de 26/10 o CPC médio do Porto foi 2,70 € (1,05 € na semana de 28/09), com
+cliques isolados a 10,27 €, 6,42 € e 5,07 €, e os cliques caíram de 233 para 106
+por semana com mais gasto. Reposto a 02/11: **Maximizar cliques com limite de
+CPC de 2,50 €** (Definições → Lances → "Em alternativa, selecione uma estratégia
+de lance diretamente"). Lisboa já estava em Maximizar cliques. O grupo
+"Impermeabilização de Sofás" desta campanha já estava em pausa; o grupo
+"Limpeza de Colchões" continua ativo (CPC 4,19 €, 0 conversões), por decidir.
+
 ---
 
 *`GOOGLE-ADS-PORTO-CAMPANHA.md` (agosto) tem outra estrutura e textos que já não
