@@ -366,11 +366,20 @@ export const hourLabel = (minutes: number) => `${Math.floor(minutes / 60)}h${min
 interface Busy { from: number; to: number; team: string | null; region: TeamZone | null; cleaning: boolean; place: Place }
 type Place = readonly [number, number] | null;
 /** The served municipality named in an event (title first, then description), for travel time. */
+/**
+ * The town of a job: the city name that comes LAST in the title (titles end with the address's town), not the
+ * first one found (owner, 2 Nov 2026: "Aldeamento Porto Dona Maria, Praia da Luz, 8600-123 Lagos" was read as
+ * Porto, six hours of road on paper, and the Algarve's whole Tuesday showed "sem horas").
+ */
 function eventPlace(e: AvailabilityEvent): Place {
   for (const text of [fold(e.summary), fold(e.description ?? '')]) {
+    let best: { at: number; key: string } | null = null;
     for (const c of CITY_NAMES) {
-      if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(text)) return CITY_PLACE.get(c.key) ?? null;
+      const re = new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=[^a-z]|$)`, 'g');
+      // By where the name ENDS, longer first on a tie: "Vila Real de Santo António" beats the "Santo António" inside it.
+      for (const m of text.matchAll(re)) { const end = m.index + m[0].length; if (!best || end > best.at) best = { at: end, key: c.key }; }
     }
+    if (best) return CITY_PLACE.get(best.key) ?? null;
   }
   return null;
 }

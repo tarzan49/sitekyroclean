@@ -2616,9 +2616,15 @@ function dayLabel(date, today) {
 var hourLabel = (minutes) => `${Math.floor(minutes / 60)}h${minutes % 60 ? String(minutes % 60).padStart(2, "0") : ""}`;
 function eventPlace(e) {
   for (const text2 of [fold3(e.summary), fold3(e.description ?? "")]) {
+    let best = null;
     for (const c of CITY_NAMES) {
-      if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`).test(text2)) return CITY_PLACE.get(c.key) ?? null;
+      const re = new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=[^a-z]|$)`, "g");
+      for (const m of text2.matchAll(re)) {
+        const end = m.index + m[0].length;
+        if (!best || end > best.at) best = { at: end, key: c.key };
+      }
     }
+    if (best) return CITY_PLACE.get(best.key) ?? null;
   }
   return null;
 }
