@@ -2439,7 +2439,10 @@ var TEAM_OFF = [
   { team: "Porto 1", date: "2026-10-29", fromHour: 12 },
   // Owner, 31 Oct 2026 at 01:30: "qualquer serviço q exista no porto para segunda tem q ser porto 2 ou 3 a fazer,
   // se for imper passa para o dia a seguir". Porto 1 is the only Porto team that waterproofs, so none on Monday.
-  { team: "Porto 1", date: "2026-11-02" }
+  { team: "Porto 1", date: "2026-11-02" },
+  // Owner, 2 Nov 2026: "Porto 2 não pode hoje, ponto"; "a Porto 3 esta semana não vai trabalhar, pelo menos até eu dizer".
+  { team: "Porto 2", date: "2026-11-02" },
+  ...["2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08"].map((date) => ({ team: "Porto 3", date }))
 ];
 var offAt = (team, from, to) => TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
