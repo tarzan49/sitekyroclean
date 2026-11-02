@@ -55,8 +55,7 @@ const Estudo = () => {
         size: STUDY_TOTAL_REQUESTS,
         variables: tables.map(table => table.heading),
         datePublished: STUDY_RUN_ON,
-        authorSlug: DEFAULT_AUTHOR.slug,
-      }).map((schema, index) => (
+              }).map((schema, index) => (
         <script
           key={index}
           type="application/ld+json"
@@ -86,7 +85,7 @@ const Estudo = () => {
 
             <p className="text-white/60 text-sm mb-4">
               Por{" "}
-              <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline underline-offset-4 hover:text-gold">
+              <Link to={DEFAULT_AUTHOR.href} className="underline underline-offset-4 hover:text-gold">
                 {DEFAULT_AUTHOR.name}
               </Link>
               {" · "}
@@ -139,7 +138,7 @@ const Estudo = () => {
               indicando o período ({formatStudyDate(STUDY_PERIOD.start)} a {formatStudyDate(STUDY_PERIOD.end)},
               {" "}{studyPeriodDays()} dias) e o número de pedidos ({STUDY_TOTAL_REQUESTS}).
               Se algum valor for atualizado, a data desta página muda com ele.{" "}
-              <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline underline-offset-4 hover:text-gold">
+              <Link to={DEFAULT_AUTHOR.href} className="underline underline-offset-4 hover:text-gold">
                 Como escrevemos o que está aqui
               </Link>
               {" · "}

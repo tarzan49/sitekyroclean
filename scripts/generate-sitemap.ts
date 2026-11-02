@@ -1,5 +1,4 @@
 import { getTreatmentRoutes } from '../src/data/treatmentSeoData';
-import { DEFAULT_AUTHOR } from '../src/data/authors';
 /**
  * Sitemap Generator for Kyro Clean Solutions
  * Generates a Sitemap Index + sub-sitemaps covering all ~1700+ URLs
@@ -81,7 +80,6 @@ const DATES = {
   glossario: getContentDate(['src/pages/GlossarioEstofos.tsx', 'src/data/glossaryTerms.ts']),
   areas: getContentDate(['src/pages/AreasDeServico.tsx', 'src/data/locationSeoData.ts']),
   sobre: getContentDate(['src/pages/Sobre.tsx', 'src/constants/commercialPolicy.ts']),
-  autor: getContentDate(['src/pages/Autor.tsx', 'src/data/authors.ts', 'src/constants/editorialPolicy.ts']),
   estudo: getContentDate(['src/data/studyData.ts', 'src/pages/Estudo.tsx']),
   antesDepois: getContentDate(['src/data/beforeAfterPool.ts']),
   blogIndex: getContentDate(['src/data/blogData.ts']),
@@ -149,7 +147,6 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/guia-de-packs', 'monthly', '0.7', DATES.packs),
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
     xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),
-    xmlUrl(`/autor/${DEFAULT_AUTHOR.slug}`, 'monthly', '0.5', DATES.autor),
     xmlUrl(STUDY_ROUTE, 'monthly', '0.6', DATES.estudo),
     xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];

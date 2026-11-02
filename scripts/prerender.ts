@@ -12,7 +12,7 @@ import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionP
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
-import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStudySchemas } from '../src/lib/seoSchema';
+import { buildAboutPageSchema, buildStudySchemas } from '../src/lib/seoSchema';
 /**
  * Static prerender for Kyro Clean Solutions
  *
@@ -68,7 +68,6 @@ import {
   STUDY_METHOD_POINTS, STUDY_LIMIT_POINTS, STUDY_PERIOD, STUDY_RUN_ON,
   STUDY_TOTAL_REQUESTS, buildStudyTables, formatStudyDate,
 } from '../src/data/studyData';
-import { EDITORIAL_RULES } from '../src/constants/editorialPolicy';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -1262,24 +1261,6 @@ export function prerenderRoutes(outDir: string): number {
         extraSchemas: [buildAboutPageSchema()],
       },
       {
-        // Página de autor. O prerender é o que os motores leem, por isso a
-        // política editorial tem de sair aqui inteira: é ela que torna a
-        // assinatura verificável em vez de decorativa.
-        path: `/autor/${DEFAULT_AUTHOR.slug}`,
-        title: `${DEFAULT_AUTHOR.name} | Kyro Clean Solutions`,
-        desc: DEFAULT_AUTHOR.summary,
-        content: {
-          h1: DEFAULT_AUTHOR.name,
-          intro: `${DEFAULT_AUTHOR.jobTitle}. ${DEFAULT_AUTHOR.bio.join(' ')}`,
-          definitions: EDITORIAL_RULES.map(rule => ({ term: rule.title, definition: rule.detail })),
-          links: [
-            { href: '/blog', label: 'Artigos publicados' },
-            { href: '/sobre', label: 'Sobre a Kyro Clean Solutions' },
-          ],
-        },
-        extraSchemas: [buildProfilePageSchema(DEFAULT_AUTHOR)],
-      },
-      {
         // Estudo com dados próprios. Sai inteiro no HTML estático de propósito:
         // um estudo que só existe depois do JavaScript correr não é lido por
         // nenhum motor generativo, e era exatamente para esses que foi escrito.
@@ -1291,7 +1272,7 @@ export function prerenderRoutes(outDir: string): number {
         content: {
           h1: STUDY_H1,
           intro: STUDY_INTRO,
-          byline: { author: DEFAULT_AUTHOR.name, authorHref: `/autor/${DEFAULT_AUTHOR.slug}`, published: STUDY_RUN_ON },
+          byline: { author: DEFAULT_AUTHOR.name, authorHref: DEFAULT_AUTHOR.href, published: STUDY_RUN_ON },
           articleSections: [{
             heading: 'Método',
             body: 'Está primeiro, e não no fim, porque um número sem método não é verificável. Quem quiser contestar qualquer valor desta página precisa de saber isto antes de o ler.\n\n'
@@ -1312,7 +1293,6 @@ export function prerenderRoutes(outDir: string): number {
             body: `Os números desta página podem ser citados com atribuição à Kyro Clean Solutions, indicando o período (${formatStudyDate(STUDY_PERIOD.start)} a ${formatStudyDate(STUDY_PERIOD.end)}) e o número de pedidos (${STUDY_TOTAL_REQUESTS}). Se algum valor for atualizado, a data desta página muda com ele.`,
           }],
           links: [
-            { href: `/autor/${DEFAULT_AUTHOR.slug}`, label: 'Como escrevemos o que está aqui' },
             { href: '/sobre', label: 'Sobre a Kyro Clean Solutions' },
           ],
         },
@@ -1325,7 +1305,6 @@ export function prerenderRoutes(outDir: string): number {
             size: STUDY_TOTAL_REQUESTS,
             variables: buildStudyTables().map(table => table.heading),
             datePublished: STUDY_RUN_ON,
-            authorSlug: DEFAULT_AUTHOR.slug,
           }),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
@@ -1453,7 +1432,7 @@ export function prerenderRoutes(outDir: string): number {
         // mesmo nome não se liga ao negócio, e era esta a versão que os
         // crawlers liam (a página React já apontava para `#business`). Assim o
         // artigo passa a creditar a entidade que o resto do grafo descreve.
-        author: { '@id': `${BASE_URL}/autor/${DEFAULT_AUTHOR.slug}#person` },
+        author: { '@id': `${BASE_URL}/#business` },
         publisher: { '@id': `${BASE_URL}/#business` },
         mainEntityOfPage: `${pageUrl}#webpage`,
         ...(postSources.length > 0 && {
@@ -1472,7 +1451,6 @@ export function prerenderRoutes(outDir: string): number {
           { name: post.title, url: pageUrl },
         ]),
         blogPostingSchema,
-        { '@context': 'https://schema.org', ...buildPersonNode(DEFAULT_AUTHOR) },
       ];
       if (post.faq?.length) {
         schemas.push(buildFaqSchema(post.faq.map(f => ({ question: f.q, answer: f.a }))));
@@ -1487,7 +1465,7 @@ export function prerenderRoutes(outDir: string): number {
           resourceCommercial: getResourceCommercial(post),
           resourceOffer: { ...getResourceOffer(post), whatsapp: getResourceWhatsapp(post) },
           links: [{ href: post.relatedService.href, label: post.relatedService.label }, ...post.relatedPosts.map(slug => ({ href: `/blog/${slug}`, label: getAllPosts().find(p => p.slug === slug)?.title ?? slug }))],
-          byline: { author: post.author, authorHref: `/autor/${DEFAULT_AUTHOR.slug}`, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
+          byline: { author: post.author, authorHref: DEFAULT_AUTHOR.href, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
           articleSections: [{ heading: 'O que precisa de saber', body: post.intro }, ...post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip }))],
           sources: postSources,
           faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),

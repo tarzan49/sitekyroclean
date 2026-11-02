@@ -28,3 +28,7 @@
 # sem nenhuma regra a apanhar o "/*", qualquer pedido que não seja um destes
 # nem um ficheiro real cai automaticamente no dist/404.html (gerado pelo
 # scripts/prerender.ts), servido com estado HTTP 404 a sério.
+
+# Página de autor removida em 2026-11-02 (dono): os conteúdos são assinados
+# pela equipa. Quem tinha o link vai para /sobre.
+/autor/*                                     /sobre                                 301

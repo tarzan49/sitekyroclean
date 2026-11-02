@@ -19,7 +19,7 @@ import { SITE_URL } from "@/constants/business";
 import { renderBlogBody } from "@/lib/blogMarkdown";
 import { getBlogSources } from "@/data/blogSources";
 import { DEFAULT_AUTHOR } from "@/data/authors";
-import { clearPrerenderedFaqSchema, buildPersonNode } from "@/lib/seoSchema";
+import { clearPrerenderedFaqSchema } from "@/lib/seoSchema";
 
 import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
@@ -92,13 +92,12 @@ const BlogPost = () => {
         "datePublished": post.publishDate,
         "dateModified": post.updatedDate,
         "inLanguage": "pt-PT",
-        "author": { "@id": `${SITE_URL}/autor/${DEFAULT_AUTHOR.slug}#person` },
+        "author": { "@id": `${SITE_URL}/#business` },
         "publisher": { "@id": `${SITE_URL}/#business` },
         "mainEntityOfPage": { "@id": `${pageUrl}#webpage` },
         ...(heroImg && { "image": heroImg }),
         ...(sources.length > 0 && { "citation": sources.map(source => ({ "@type": "CreativeWork", "name": source.label, "publisher": { "@type": "Organization", "name": source.publisher }, "url": source.url })) }),
       },
-      buildPersonNode(DEFAULT_AUTHOR),
       {
         "@type": "FAQPage",
         "mainEntity": post.faq.map(f => ({
@@ -132,7 +131,7 @@ const BlogPost = () => {
         {/* ── Conteúdo ── */}
         <article id="guia" className="container mx-auto px-5 max-w-4xl py-12 sm:py-16 scroll-mt-20">
           <SectionHeader overline="Guia prático" heading="O que precisa de" goldWord="saber" subtitle={post.intro} />
-          <p className="text-sm text-[#505650] mb-7">Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline">{post.author}</Link></p>
+          <p className="text-sm text-[#505650] mb-7">Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={DEFAULT_AUTHOR.href} className="underline">{post.author}</Link></p>
           <nav aria-label="Neste guia" className="mb-8 border-b border-[#dfe5df] pb-6">
             <h2 className="text-base font-semibold text-[#173e2b] mb-3">Neste guia</h2>
             <ol className="grid sm:grid-cols-2 gap-x-6 gap-y-1">{post.sections.map((section,i)=><li key={section.heading}><a href={`#passo-${i+1}`} className="flex gap-3 py-2 min-h-11 text-base text-[#435449] underline underline-offset-4"><span className="text-[#49664d]">{i+1}.</span>{section.heading}</a></li>)}</ol>

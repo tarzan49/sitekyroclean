@@ -1,4 +1,3 @@
-import { DEFAULT_AUTHOR } from './authors';
 import { STUDY_ROUTE } from './studyData';
 
 /**
@@ -49,7 +48,6 @@ export const FOOTER_NAV: FooterNavGroup[] = [
       { href: '/glossario-limpeza-estofos', label: 'Glossário' },
       { href: '/sobre', label: 'Sobre nós' },
       { href: STUDY_ROUTE, label: 'Estudo: o que as pessoas pedem' },
-      { href: `/autor/${DEFAULT_AUTHOR.slug}`, label: 'Quem assina o que escrevemos' },
       { href: '/guia-de-packs', label: 'Packs por Cidade' },
     ],
   },
