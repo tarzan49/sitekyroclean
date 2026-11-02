@@ -214,8 +214,9 @@ const serviceName = (f: Pick<PromptFacts, 'label' | 'what'>) => `${f.label}${f.w
 
 /**
  * A mensagem que a equipa recebe quando o serviço acaba. O pedido de avaliação
- * já não passa pela equipa: o bot manda-o ao cliente (dono, 2026-10-28: "em
- * vez de ir para a equipa vai para o cliente"), quando chega a fotografia de
+ * já não passa pela equipa: o bot pergunta primeiro ao cliente como correu e só
+ * manda o link depois de uma resposta positiva (kyro-bot reviewCheckin.ts, dono
+ * 31/10), a partir de quando chega a fotografia de
  * depois ou o vídeo, ou CLIENT_REVIEW_FALLBACK_MIN depois da hora de fim
  * (`clientReviewDue`). Sem emojis nem travessões.
  */
@@ -228,7 +229,7 @@ export function procedurePromptMessage(f: PromptFacts): string {
     // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
     'Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista).',
     '',
-    `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
+    `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
   ].join('\n');
 }
 

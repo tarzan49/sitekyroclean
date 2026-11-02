@@ -3498,7 +3498,7 @@ function procedurePromptMessage(f) {
     // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
     "Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista).",
     "",
-    `Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+    `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
   ].join("\n");
 }
 function procedureClientMessage(f) {

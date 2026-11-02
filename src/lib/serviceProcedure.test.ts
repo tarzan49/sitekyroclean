@@ -119,7 +119,7 @@ describe('messages', () => {
     const m = procedurePromptMessage({ label: 'Ana, Paranhos', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15', time: '15h' });
     expect(m).toContain('Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.');
     expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.');
-    expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot manda ao cliente o pedido de avaliação. O prazo para a avaliação é 22/10. Obrigado!');
+    expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é 22/10. Obrigado!');
     expect(m).not.toContain('reencaminha');
     expect(m).not.toMatch(noDash);
   });
