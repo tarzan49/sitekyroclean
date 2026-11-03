@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingOnly, rugPickupOwnerReason, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingKind, waterproofingOnly, rugPickupOwnerReason, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -195,7 +195,7 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const address = text(r.address, MAX.address);
   // Owner, 19 Oct 2026: "todos os serviços de braga q precisem de imper colocas no porto 1",
   // also when the chat named Braga.
-  const waterproofing = /imperm|premium|essencial/i.test(service);
+  const waterproofing: boolean | 'premium' = /premium/i.test(service) ? 'premium' : /imperm|essencial/i.test(service);
   const namedRaw = typeof r.team === 'string' && TEAM_COLOR[r.team] ? r.team : null;
   const namedTeam = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
   // A team the chat named but that is off at that hour (TEAM_OFF, TEAM_WEEKDAY_HOURS) is not used (owner, 28 Oct 2026:
@@ -308,7 +308,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   // Far zone: the team already there that day (availability.sharedTrip).
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items), !waterproofingOnly(r.items), total);
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total);
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;

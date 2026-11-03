@@ -79,12 +79,25 @@ export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> =
  * e passes para o Porto 1 apenas serviços de 100€ para cima"). Waterproofing stays with Porto 1.
  */
 export const PORTO1_MIN_TOTAL = 100;
-/** The teams that can take this job in the zone (`total` in euros, when known). */
-export const teamsFor = (zone: TeamZone, waterproofing: boolean, total?: number | null): readonly string[] => {
+/**
+ * Porto 1 only takes Premium waterproofing (owner, 3 Nov 2026: "NAO E PARA MARCARES MAIS SERVIÇOS PARA
+ * PORTO 1 ABAIXO DE 130 EUROS, SO MARCAS PARA ELES IMPER PREMIUM"; "Limpezas nao marcas mais"). No
+ * cleaning and no Essencial waterproofing goes to Porto 1; an Essencial waterproofing in Porto or Braga
+ * has no team, so the owner decides.
+ */
+export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
+/** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). */
+export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string): readonly string[] => {
   const teams = (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+  if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
 };
+/** The waterproofing of the job for `teamsFor`: 'premium' when an item is Premium. */
+export function waterproofingKind(items: unknown): boolean | 'premium' {
+  if (Array.isArray(items) && items.some(i => /premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
+  return hasWaterproofing(items);
+}
 /**
  * Zones whose own team does not pick up rugs (owner, 27 Oct 2026: "a equipa de braga não faz recolha
  * de tapetes, apenas limpezas ao domicílio"). The bot had booked a rug pickup in Viana do Castelo on
@@ -183,7 +196,8 @@ export const TEAM_OFF: readonly TeamOff[] = [
   { team: 'Porto 1', date: '2026-11-02' },
   // Owner, 2 Nov 2026: "Porto 2 não pode hoje, ponto"; "a Porto 3 esta semana não vai trabalhar, pelo menos até eu dizer".
   { team: 'Porto 2', date: '2026-11-02' },
-  ...['2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07', '2026-11-08'].map(date => ({ team: 'Porto 3', date })),
+  // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
+  ...['2026-11-02', '2026-11-03'].map(date => ({ team: 'Porto 3', date })),
 ];
 const offAt = (team: string, from: number, to: number) => TEAM_OFF.some(o => {
   if (o.team !== team) return false;
@@ -474,14 +488,14 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
  * one already working next to it that day first (less driving), then the one
  * with fewer jobs that day, then the region's order. null when none has room.
  */
-export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing = false, cleaning = true, total?: number | null): string | null {
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing: boolean | 'premium' = false, cleaning = true, total?: number | null): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing, total);
+  const order = teamsFor(area, waterproofing, total, lisbon(from).date);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -712,7 +726,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const min = SMALL_ORDER_MIN_BY_CITY[city] ?? SMALL_ORDER_MIN_TOTAL;
     if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
-  const teams = [...teamsFor(area, hasWaterproofing(req?.items), area === 'Porto' ? orderTotal(req, city) : null)];
+  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, addDays(lisbon(now.getTime()).date, 1))];
+  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização Essencial nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
 
   const today = lisbon(now.getTime()).date;

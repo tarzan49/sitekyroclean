@@ -2386,11 +2386,17 @@ var WATERPROOFING_TEAMS = {
   Braga: ["Porto 1"]
 };
 var PORTO1_MIN_TOTAL = 100;
-var teamsFor = (zone, waterproofing, total) => {
+var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
+var teamsFor = (zone, waterproofing, total, day) => {
   const teams = waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
+  if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
 };
+function waterproofingKind(items) {
+  if (Array.isArray(items) && items.some((i) => /premium/.test(String(i?.treatment ?? "")))) return "premium";
+  return hasWaterproofing(items);
+}
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
 function cityZone(cityOrAddress) {
   const name = resolveBotCity(cityOrAddress);
@@ -2445,7 +2451,8 @@ var TEAM_OFF = [
   { team: "Porto 1", date: "2026-11-02" },
   // Owner, 2 Nov 2026: "Porto 2 não pode hoje, ponto"; "a Porto 3 esta semana não vai trabalhar, pelo menos até eu dizer".
   { team: "Porto 2", date: "2026-11-02" },
-  ...["2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08"].map((date) => ({ team: "Porto 3", date }))
+  // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
+  ...["2026-11-02", "2026-11-03"].map((date) => ({ team: "Porto 3", date }))
 ];
 var offAt = (team, from, to) => TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
@@ -2701,7 +2708,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing, total);
+  const order = teamsFor(area, waterproofing, total, lisbon(from).date);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -2858,7 +2865,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     const min = SMALL_ORDER_MIN_BY_CITY[city] ?? SMALL_ORDER_MIN_TOTAL;
     if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
-  const teams = [...teamsFor(area, hasWaterproofing(req?.items), area === "Porto" ? orderTotal(req, city) : null)];
+  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === "Porto" ? orderTotal(req, city) : null, addDays(lisbon(now.getTime()).date, 1))];
+  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização Essencial nesta zona: o responsável escolhe a equipa e a hora" };
   const cleaning = !waterproofingOnly(req?.items);
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
@@ -3017,7 +3025,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   if (start < nowMs) return { error: "A hora já passou: não se marca um serviço no passado" };
   const startIso = new Date(start).toISOString(), endIso = new Date(start + durationMin * 6e4).toISOString();
   const address = text(r.address, MAX.address);
-  const waterproofing = /imperm|premium|essencial/i.test(service);
+  const waterproofing = /premium/i.test(service) ? "premium" : /imperm|essencial/i.test(service);
   const namedRaw = typeof r.team === "string" && TEAM_COLOR[r.team] ? r.team : null;
   const namedTeam = namedRaw && waterproofing && TEAMS_BY_REGION.Braga.includes(namedRaw) ? WATERPROOFING_TEAMS.Braga?.[0] ?? namedRaw : namedRaw;
   const named = namedTeam && teamWorks(namedTeam, start, start + durationMin * 6e4) ? namedTeam : null;
@@ -3089,7 +3097,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, hasWaterproofing(r.items), !waterproofingOnly(r.items), total);
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total);
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");
