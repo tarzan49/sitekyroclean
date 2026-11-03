@@ -120,11 +120,16 @@ export interface PriceOption {
 // Essencial menos 10€ em todos os tamanhos, sozinha e no pack (dono, 2026-10-25: "baixes em todas as imper essenciais, 10 eur em cada");
 // a Premium fica igual, por isso o packPremiumDelta passou de 30 para 40. 1 lugar: Essencial 39€.
 // Impermeabilização do sofá de 1 lugar: Essencial 49€ e Premium 69€ (dono, 2026-10-17; a 15/10 tinha baixado para 49€ e 79€, antes 59€ e 89€).
+// Pack limpeza + impermeabilização = limpeza + impermeabilização sozinha - 10€, nas duas versões (dono, 2026-11-03:
+// o Premium de 3 lugares saía a 199€ com a impermeabilização sozinha a 159€, a limpeza a 40€; "não faz sentido o
+// preço aumentar e a pessoa pagar o mesmo"). bothPrice = soma separada limpeza + Essencial, packPremiumDelta =
+// Premium - Essencial sozinhas: uma subida da impermeabilização passa para o pack. 2/3/4 lugares: Essencial
+// 128/158/198€, Premium 178/218/268€. O de 1 lugar ficou como estava (78/118€ seria descer 1€).
 export const sofaPrices: PriceOption[] = [
   { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89,  originalBothPrice: 88, waterproofingPremiumPrice: 79 },
-  { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 129, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
-  { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 159, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 50 },
-  { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 199, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 50 },
+  { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 138, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
+  { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 168, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
+  { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 208, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 70 },
   { id: '5-lugares',  label: '5+ Lugares', cleaningPrice: 119, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
   { id: 'canto',      label: 'Canto',      cleaningPrice: 109, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
   { id: '4+-lugares', label: 'Em\u00A0U ou modular', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },

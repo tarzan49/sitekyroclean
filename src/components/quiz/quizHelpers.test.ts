@@ -115,13 +115,12 @@ describe('sofa waterproofing upsell reduction', () => {
     }
   });
   // 4 lugares (dono, 2026-10-06): limpeza 99€, Essencial 119€ (109€ desde 25/10), Premium 169€;
-  // o pack segue o degrau dos 3 lugares (soma separada menos 9, menos 10 de
-  // redução, Premium mais 30).
+  // pack = limpeza + impermeabilização sozinha - 10€ (dono, 2026-11-03).
   it('prices the 4-seat sofa like the other sizes', () => {
     const four = sofaPrices.find(p => p.id === '4-lugares')!;
     expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 109, 179]);
-    expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(189);
-    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(239);
+    expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(198);
+    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(268);
     expect(calcSofaUnitPrice(four, false, 'waterproofing', 'essencial', false)).toBe(109);
     expect(calcSofaUnitPrice(four, false, 'waterproofing', 'premium', false)).toBe(179);
   });

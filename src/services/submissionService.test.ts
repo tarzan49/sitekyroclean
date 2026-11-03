@@ -77,10 +77,10 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
 });
 
 describe('specific regressions and delivery failures', () => {
-  it('3-seat Premium pack uses the approved 30€ override, not the 40€ standalone difference', () => {
+  it('3-seat Premium pack = cleaning + Premium alone - 10€ (owner, 3 Nov)', () => {
     const p = payload({ service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' }, [{ sizeId: '3-lugares', qty: 1, packEnabled: true }]);
-    expect(p.calculateServicePrice).toBe(199);
-    expect(buildReceiptLines(p)[0].total).toBe(199);
+    expect(p.calculateServicePrice).toBe(218);
+    expect(buildReceiptLines(p)[0].total).toBe(218);
   });
   it('4+ sofa pack never invents a 40€ fixed price', () => {
     const p = payload({ service: 'sofa', serviceType: 'cleaning' }, [{ sizeId: '4+-lugares', qty: 1, packEnabled: true }]);

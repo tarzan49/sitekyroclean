@@ -24,9 +24,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' });
     expect([r.subtotal, r.travel, r.total, r.handToOwner]).toEqual([79, 10, 89, false]);
   });
-  it('the same sofa with Essencial is 149€ and travel is on us (reply 2.1)', () => {
+  it('the same sofa with Essencial is 158€ and travel is on us (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+essencial' }], city: 'Oeiras' });
-    expect([r.subtotal, r.travel, r.total]).toEqual([149, 0, 149]);
+    expect([r.subtotal, r.travel, r.total]).toEqual([158, 0, 158]);
   });
   it('waterproofing alone: Essencial 39/69/89/109, Premium 79/119/149/179 (reply 3.2)', () => {
     const price = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' }).subtotal;
@@ -54,9 +54,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(pack?.travel).toBeLessThanOrEqual(10);
     expect(ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Sines' }).travel).toBe(20);
   });
-  it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 189€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
+  it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
     const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
-    expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 189, 239, 159]);
+    expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 198, 268, 159]);
     expect(ok({ items: [{ kind: 'sofa', size: '4-lugares' }], city: 'Porto' }).handToOwner).toBe(false);
     const pack = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '4-lugares' }], city: 'Porto' });
     expect(pack.lines.map(l => l.amount)).toEqual([69, 79]);
