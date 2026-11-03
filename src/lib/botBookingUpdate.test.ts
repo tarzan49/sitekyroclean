@@ -98,3 +98,23 @@ describe('an address update never drops the floor, door or postcode the event ha
     expect(mergedAddress('Rua das Camélias 41, 3º AB', 'Rua das Camélias 41, 3º AB', false)).toBeNull();
   });
 });
+
+describe('planBookingUpdate: items added after booking (Diana, 3 Nov 2026)', () => {
+  const diana = {
+    id: 'd1',
+    summary: 'Serviço 75€ (149€) Impermeabilização Premium de sofá 3 lugares - 919326650 - Diana - Rua Henrique Barros, lote 11, 3020-266 Coimbra',
+    description: 'Equipa: Coimbra\n\nArtigos: Sofá · 3 Lugares · 1 un. · Só impermeabilização Premium\nTotal: 149€ (deslocação incluída)\n\nbot:351919326650@s.whatsapp.net',
+    start: '2026-11-07T14:00:00Z', end: '2026-11-07T15:30:00Z',
+  };
+  const at = new Date('2026-11-03T12:41:00Z');
+  it('rewrites the price, the service and the items, keeping phone, name and address', () => {
+    const p = planBookingUpdate(diana, '351919326650', { requote: { total: 269, what: 'Sofá 3 lugares Premium + 4 cadeiras Premium', service: 'Impermeabilização Premium de sofá 3 lugares + 4 cadeiras' } }, at);
+    if (!p.ok) throw new Error(p.reason);
+    expect(p.title).toBe('Serviço 135€ (269€) Impermeabilização Premium de sofá 3 lugares + 4 cadeiras - 919326650 - Diana - Rua Henrique Barros, lote 11, 3020-266 Coimbra');
+    expect(p.description).toContain('Artigos: Sofá 3 lugares Premium + 4 cadeiras Premium\nTotal: 269€');
+    expect(p.summary[0]).toContain('total 269€ (era 149€)');
+  });
+  it('never lowers a booked price by itself', () => {
+    expect(planBookingUpdate(diana, '919326650', { requote: { total: 99, what: 'x' } }, at)).toMatchObject({ ok: false });
+  });
+});

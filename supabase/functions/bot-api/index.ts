@@ -651,7 +651,16 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   const str = (k: string) => typeof changes[k] === "string" ? String(changes[k]) : undefined;
   const now = env.now?.() ?? new Date();
   const asked = { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") };
-  let plan = planBookingUpdate(ev, phone, asked, now);
+  // Items added after booking (Diana, 3 Nov 2026): the whole list after the change, priced by the engine.
+  let requote: { total: number; what: string; service?: string } | undefined;
+  if (Array.isArray(changes.items) && changes.items.length) {
+    const q = botQuote({ items: changes.items, city: str("city") ?? null }) as any;
+    if (!q?.ok || q.quote || q.handToOwner || !(q.total > 0)) {
+      return createSuccessResponse({ update: { ok: false, reason: q?.error ? String(q.error) : "artigos sob orçamento: o dono atualiza", handToOwner: true } });
+    }
+    requote = { total: q.total, what: (q.lines ?? []).map((l: { label: string }) => l.label).join(" + "), service: str("service") };
+  }
+  let plan = planBookingUpdate(ev, phone, { ...asked, requote }, now);
   // Reschedules are the bot's (owner, 16 Oct 2026). A move keeps the event's team, so the new hour has to
   // have room for that team, not only for the zone: otherwise the hour stays and the owner picks the team.
   let busyTeam: string | null = null;
@@ -660,7 +669,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     if (team && teamBusyAt(cal.events.filter(e => e.id !== ev.id), team, plan.start, plan.end,
       !(/imperm/i.test(ev.summary) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(ev.summary)), ev.summary)) {
       busyTeam = team;
-      plan = planBookingUpdate(ev, phone, { ...asked, date: undefined, time: undefined }, now);
+      plan = planBookingUpdate(ev, phone, { ...asked, requote, date: undefined, time: undefined }, now);
       if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} está ocupada`,
         `O cliente combinou ${asked.date} às ${asked.time}, mas a equipa ${team} já tem um serviço a essa hora. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
     }
@@ -679,6 +688,9 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   }
   if (!written.ok) return createErrorResponse(`Não foi possível atualizar o calendário (${written.error.slice(0, 200)})`, 502);
   calendarCache = null;
+  if (requote && plan.ok && env.notifyOwner) {
+    await env.notifyOwner(`Artigos acrescentados: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.`).catch(() => null);
+  }
   if ((plan.cancel || plan.moved) && env.notifyOwner) {
     await env.notifyOwner(plan.cancel ? `Cliente pediu para desmarcar: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
       `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " (não foi apagado: decides tu)" : ""}.\n\n${plan.title}`).catch(() => null);

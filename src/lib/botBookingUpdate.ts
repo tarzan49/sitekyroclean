@@ -3,6 +3,7 @@
 // meter nada no calendário"). The bot server reads the chat and sends the changes; this turns them
 // into the event's new title, description and time. Pure, so the rules are tested here.
 import { lisbon, lisbonToUtc } from './botAvailability';
+import { ownerShare } from './botHold';
 
 export interface BookingChanges {
   /** Both or neither: a new day and hour the client and we agreed. */
@@ -12,6 +13,12 @@ export interface BookingChanges {
   note?: string;
   /** The client asked to cancel or postpone without a new hour. */
   cancel?: string;
+  /**
+   * The whole service after the client added items, priced by the engine (bot-api runs botQuote on
+   * the items the bot sends). Diana, 3 Nov 2026: "também com as cadeiras", the bot said "fica
+   * anotado" and the event stayed at the sofa alone, 149€ instead of 269€.
+   */
+  requote?: { total: number; what: string; service?: string };
 }
 export interface BookingEvent { id: string; summary: string; description: string; start: string | null; end: string | null }
 export type BookingUpdatePlan =
@@ -70,16 +77,33 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
       said.push(`mudou de ${was.date.slice(8)}/${was.date.slice(5, 7)} às ${hm(was.minutes)} para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time}`);
     }
   }
+  let title = parts.join(' - ');
+  let description = ev.description;
+  if (c.requote) {
+    const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
+    const was = head ? Number(head[2].replace(',', '.')) : NaN;
+    const total = Math.round(c.requote.total * 100) / 100;
+    // Adding items only: a lower total is a price talk, which is the owner's.
+    if (!head || !(total > 0)) return { ok: false, reason: 'título sem preço: o dono atualiza' };
+    if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
+    if (total !== was) {
+      const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','));
+      const service = clean(c.requote.service) || clean(c.requote.what);
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
+      description = description.split('\n').map(l => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote!.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join('\n');
+      said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
+    }
+  }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);
   if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
   if (!said.length) return { ok: false, reason: 'nada de novo' };
 
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join('; ')}.`;
-  const lines = ev.description.split('\n');
+  const lines = description.split('\n');
   // Keep "Equipa: X" first and the "bot:" mark last; the new line goes before the mark.
   const markAt = lines.findIndex(l => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, ''); else lines.push('', line);
-  return { ok: true, title: parts.join(' - '), description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancel, summary: said };
+  return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancel, summary: said };
 }
 
 const hm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;

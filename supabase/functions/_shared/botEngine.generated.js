@@ -3870,15 +3870,31 @@ function planBookingUpdate(ev, phone, c, now) {
       said.push(`mudou de ${was.date.slice(8)}/${was.date.slice(5, 7)} às ${hm(was.minutes)} para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time}`);
     }
   }
+  let title = parts.join(" - ");
+  let description = ev.description;
+  if (c.requote) {
+    const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
+    const was = head ? Number(head[2].replace(",", ".")) : NaN;
+    const total = Math.round(c.requote.total * 100) / 100;
+    if (!head || !(total > 0)) return { ok: false, reason: "título sem preço: o dono atualiza" };
+    if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
+    if (total !== was) {
+      const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",");
+      const service = clean(c.requote.service) || clean(c.requote.what);
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
+      description = description.split("\n").map((l) => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join("\n");
+      said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
+    }
+  }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
   if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
   if (!said.length) return { ok: false, reason: "nada de novo" };
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join("; ")}.`;
-  const lines = ev.description.split("\n");
+  const lines = description.split("\n");
   const markAt = lines.findIndex((l) => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, "");
   else lines.push("", line);
-  return { ok: true, title: parts.join(" - "), description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said };
+  return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said };
 }
 var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 function fold6(s) {
