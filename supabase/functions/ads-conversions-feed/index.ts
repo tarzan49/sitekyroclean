@@ -38,14 +38,13 @@ export function e164(phone: unknown): string | null {
 
 const key9 = (phone: string) => phone.replace(/\D/g, "").slice(-9);
 
-/** "2026-11-03 14:05:00" na hora de Lisboa (o cabeçalho do ficheiro diz o fuso). */
-export function lisbonTime(iso: string): string {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
-  }).formatToParts(new Date(iso));
-  const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
-  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+/**
+ * "2026-11-03 14:05:00+00:00": hora UTC com o fuso escrito. Sem linha
+ * "Parameters:TimeZone" no topo, porque o Gestor de dados do Google Ads lê a
+ * primeira linha como os nomes das colunas.
+ */
+export function utcTime(iso: string): string {
+  return `${new Date(iso).toISOString().slice(0, 19).replace("T", " ")}+00:00`;
 }
 
 const money = (v: unknown) => Math.round((Number(v) || 0) * 100) / 100;
@@ -70,7 +69,7 @@ export function buildConversionsCsv({ services, extras, conversations, clicks, n
     const click = ref ? clickByRef.get(ref) : undefined;
     const gclid = click?.gclid && Date.parse(String(click.created_at)) <= t ? String(click.gclid) : "";
     if (gclid) withClick++;
-    lines.push([gclid, phone, CONVERSION_NAME, lisbonTime(at), value.toFixed(2), "EUR", id].map(csvCell).join(","));
+    lines.push([gclid, phone, CONVERSION_NAME, utcTime(at), value.toFixed(2), "EUR", id].map(csvCell).join(","));
   };
 
   for (const s of services) {
@@ -91,8 +90,7 @@ export function buildConversionsCsv({ services, extras, conversations, clicks, n
     push(String(s.id), phone, String(s.booked_at), cut, billed);
   }
 
-  const header = ["Parameters:TimeZone=Europe/Lisbon",
-    "Google Click ID,Phone Number,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID"];
+  const header = ["Google Click ID,Phone Number,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID"];
   return { csv: [...header, ...lines].join("\n") + "\n", rows: lines.length, withClick };
 }
 
