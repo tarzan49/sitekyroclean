@@ -668,3 +668,7 @@ Atualiza este ficheiro se alguma regra ou facto de negócio mudou; atualiza `CON
 O dono: "desconto só quando o preço é o motivo não existe". Quando o preço pesa, oferece-se sempre uma opção mais barata (ex.: Essencial em vez de Premium) e fazem-se perguntas para perceber se a pessoa está só a ver pelo preço ou pela qualidade do serviço e pela garantia que isso lhe dá. Substitui a regra de 11/10 (máx. 10€) e a ronda de 26-27/10 ("condição especial se fechar hoje").
 
 Esclarecimento do dono (3/11/2026): o bot pode baixar o preço, mas só nas condições especiais (ex.: várias peças na mesma visita, pedido grande). Nunca baixa só porque o cliente pediu, nem dá mais depois de uma condição especial já feita (caso do Filipe, 20/10, apagado).
+
+## Porto 1 só impermeabilização Premium (dono, 3 Nov 2026)
+
+"NAO E PARA MARCARES MAIS SERVIÇOS PARA PORTO 1 ABAIXO DE 130 EUROS, SO MARCAS PARA ELES IMPER PREMIUM"; "Limpezas nao marcas mais, eles a partir de domingo ficam so com imper premium". O bot tinha posto uma limpeza de colchão de 109€ (Laurinda, Nogueira da Regedoura) na Porto 1; era da Porto 3. Em `src/lib/botAvailability.ts` (`teamsFor`, `PORTO1_PREMIUM_ONLY_FROM = 2026-11-04`): a Porto 1 só entra quando há um artigo Premium; uma Essencial no Porto/Braga não tem equipa e vai ao dono. A Porto 3 volta a trabalhar a 4/11 (estava de folga a semana toda, por isso o bot só oferecia sábado à tarde).
