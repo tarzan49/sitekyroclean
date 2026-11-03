@@ -50,7 +50,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 
 - O bot (servidor kyro-bot) fala com o site só pela `bot-api`. Ações principais: `quote`, `availability`, `hold`, `book`, `update-booking`, `booked-services`, `find-order`, `team-accounts`, `procedure-*`, `certificate`.
 - Fecha sozinho quando há hora aceite, preço do motor e morada completa; sob orçamento, Algarve, zonas alargadas, mesma hora de outro serviço da zona, recolha na zona de Braga, Viana/Leiria/Batalha abaixo de 110€ e acima de 300€ sem regra → dono.
-- Nunca desconto: quando o preço pesa, oferecer a opção mais barata e perguntar se escolhe pelo preço ou pela qualidade e garantia; acima de 200€ decide o dono.
+- Preço só desce nas condições especiais escritas (várias peças, pedido grande); nunca porque o cliente pediu, nem mais depois de uma condição dada: oferecer a opção mais barata e perguntar preço vs qualidade/garantia; acima de 200€ decide o dono.
 - Equipas: Porto 1 (≥100€ e todas as impermeabilizações do Porto e de Braga), Porto 2 (dias úteis 8h–13h), Porto 3 (reserva, só limpezas), Braga (só limpezas), Lisboa 1, Algarve, Coimbra. Lisboa 2 fora do bot. Referir sempre pelo nome da equipa, nunca da pessoa.
 - Pedido de avaliação só depois de o cliente dizer que correu bem.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
