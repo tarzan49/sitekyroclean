@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, closingsOnDay, lisbonDay, monthBounds, serviceTotal, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
+import { addDays, closingRows, closingsOnDay, lisbonDay, monthBounds, serviceTotal, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
 
 describe('calendar helpers', () => {
   it('counts the day in Lisbon, not in UTC or Copenhagen', () => {
@@ -86,5 +86,16 @@ describe('serviceTotal', () => {
   it('soma o upsell ao faturado, com IVA quando a fatura é com IVA à parte', () => {
     expect(serviceTotal({ billed_value: 68.88, upsell_value: 220, invoiced: true, vat_on_top: true })).toBe(339.48);
     expect(serviceTotal({ billed_value: 119, upsell_value: 40 })).toBe(159);
+  });
+});
+
+describe('closingRows (dono, 3 Nov 2026)', () => {
+  const diana = { id: 'r1', calendar_event_id: 'ev1', booked_at: '2026-10-30T16:53:00Z', billed_value: 269, my_cut: 135, description: 'Sofá + 4 cadeiras' };
+  it('artigos acrescentados contam no dia em que o cliente os aceitou', () => {
+    const out = closingRows([diana], [{ id: 'x1', calendar_event_id: 'ev1', added_at: '2026-11-03T12:41:00Z', value: '120', my_cut: '60', description: '4 cadeiras' }]);
+    expect(out.map(r => [r.booked_at, r.billed_value, r.my_cut])).toEqual([['2026-10-30T16:53:00Z', 149, 75], ['2026-11-03T12:41:00Z', 120, 60]]);
+  });
+  it('um serviço fora do calendário (desmarcado) não é fecho', () => {
+    expect(closingRows([{ ...diana, calendar_missing_since: '2026-11-03T17:00:00Z' }], [])).toEqual([]);
   });
 });

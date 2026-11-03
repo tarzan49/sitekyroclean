@@ -158,3 +158,32 @@ export function closingsOnDay<T extends ClosingRow>(rows: T[], day: string): T[]
     .filter(r => r.booked_at && countsAsClosing(r) && lisbonDay(r.booked_at) === day)
     .sort((a, b) => a.booked_at!.localeCompare(b.booked_at!));
 }
+
+export interface ServiceExtra { id: string; calendar_event_id: string; added_at: string; value: number | string; my_cut: number | string; description?: string | null }
+
+/**
+ * As linhas que contam como fechos no painel (dono, 2026-11-03):
+ * - Um serviço que saiu do calendário (apagado, ou desmarcado pelo cliente, que o bot renomeia
+ *   "Desmarcado · Serviço…") não é um fecho, como nas contas das equipas.
+ * - Artigos acrescentados depois de marcar (`service_extras`, escritos pela bot-api) contam no dia em
+ *   que o cliente os aceitou: saem da linha do serviço e entram como fecho próprio.
+ */
+export function closingRows<T extends { id?: string; booked_at: string | null; billed_value: number | string | null; my_cut: number | string | null; upsell_value?: number | string | null; description?: string | null; calendar_event_id?: string | null; calendar_missing_since?: string | null }>(rows: T[], extras: ServiceExtra[]): T[] {
+  const byEvent = new Map<string, ServiceExtra[]>();
+  for (const x of extras) byEvent.set(x.calendar_event_id, [...(byEvent.get(x.calendar_event_id) ?? []), x]);
+  const out: T[] = [];
+  for (const r of rows) {
+    if (r.calendar_missing_since) continue;
+    const mine = r.calendar_event_id ? byEvent.get(r.calendar_event_id) : undefined;
+    if (!mine?.length) { out.push(r); continue; }
+    const value = mine.reduce((s, x) => s + (Number(x.value) || 0), 0);
+    const cut = mine.reduce((s, x) => s + (Number(x.my_cut) || 0), 0);
+    // A linha ainda sem o total novo (o calendário não sincronizou): fica como está.
+    if ((Number(r.billed_value) || 0) <= value) { out.push(r); continue; }
+    out.push({ ...r, billed_value: Math.round(((Number(r.billed_value) || 0) - value) * 100) / 100, my_cut: Math.round(((Number(r.my_cut) || 0) - cut) * 100) / 100 });
+    for (const x of mine) {
+      out.push({ ...r, id: x.id, booked_at: x.added_at, billed_value: Number(x.value) || 0, my_cut: Number(x.my_cut) || 0, upsell_value: 0, description: x.description || `Acrescento: ${r.description ?? ''}` });
+    }
+  }
+  return out;
+}

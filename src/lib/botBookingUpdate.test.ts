@@ -29,12 +29,16 @@ describe('planBookingUpdate', () => {
     expect(planBookingUpdate({ ...ev, summary: 'Pré-reserva – Liliana – 914000111' }, '914000111', { postcode: '4500-266' }, now)).toMatchObject({ ok: false });
     expect(planBookingUpdate({ ...ev, summary: ev.summary + ', 4500-266' }, '914000111', { postcode: '4500-266' }, now)).toMatchObject({ ok: false, reason: 'nada de novo' });
   });
-  it('a cancel request is written for the owner, the event stays', () => {
+  it('a cancel stays in the calendar, renamed out of the accounts; a new hour puts it back (Carla, 3 Nov)', () => {
     const p = planBookingUpdate(ev, '914000111', { cancel: 'teve um imprevisto, volta a falar para a semana' }, now);
     if (!p.ok) throw new Error(p.reason);
     expect(p.cancel).toBe(true);
-    expect(p.title).toBe(ev.summary);
+    expect(p.title).toBe(`Desmarcado · ${ev.summary}`);
     expect(p.description).toContain('PEDIU PARA DESMARCAR: teve um imprevisto');
+    const back = planBookingUpdate({ ...ev, summary: p.title, description: p.description }, '914000111', { date: '2026-10-22', time: '10:00' }, now);
+    if (!back.ok) throw new Error(back.reason);
+    expect(back.title).toBe(ev.summary);
+    expect(back.summary).toContain('voltou a marcar');
   });
   it('fills a missing name and replaces a changed address', () => {
     const bare = { ...ev, summary: 'Serviço 45€ (89€) Limpeza de sofá - +351 914 000 111' };
@@ -113,6 +117,11 @@ describe('planBookingUpdate: items added after booking (Diana, 3 Nov 2026)', () 
     expect(p.title).toBe('Serviço 135€ (269€) Impermeabilização Premium de sofá 3 lugares + 4 cadeiras - 919326650 - Diana - Rua Henrique Barros, lote 11, 3020-266 Coimbra');
     expect(p.description).toContain('Artigos: Sofá 3 lugares Premium + 4 cadeiras Premium\nTotal: 269€');
     expect(p.summary[0]).toContain('total 269€ (era 149€)');
+  });
+  it('the extra is a closing of its own, with the share it adds', () => {
+    const p = planBookingUpdate(diana, '919326650', { requote: { total: 269, what: 'Sofá 3 lugares Premium + 4 cadeiras Premium' } }, at);
+    if (!p.ok) throw new Error(p.reason);
+    expect(p.added).toEqual({ value: 120, cut: 60, what: 'Sofá 3 lugares Premium + 4 cadeiras Premium' });
   });
   it('never lowers a booked price by itself', () => {
     expect(planBookingUpdate(diana, '919326650', { requote: { total: 99, what: 'x' } }, at)).toMatchObject({ ok: false });

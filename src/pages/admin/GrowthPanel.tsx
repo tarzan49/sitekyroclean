@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, lisbonDay, serviceTotal } from "@/lib/crmClosings";
+import { addDays, closingRows, lisbonDay, serviceTotal, type ServiceExtra } from "@/lib/crmClosings";
 import { syncCalendarIntoCrm } from "@/lib/crmCalendarSync";
 import { ADS_FROM, adsExtra, buildWeeks, ORGANIC_FROM, ORGANIC_TO, organicBaseline, type WeeklyConversationRow } from "@/lib/adsVsOrganic";
 import {
@@ -103,11 +103,14 @@ const GrowthPanel = () => {
       }
       const at = new Date();
       const serverFrom = [SERVER_CONVERSATIONS_FROM, addDays(lisbonDay(at), -SERVER_WINDOW_DAYS)].sort().pop()!;
-      const [weekly, ads, server] = await Promise.all([
+      const [weekly, ads, server, extras] = await Promise.all([
         fetchAll<WeeklyConversationRow>(() => db.from("whatsapp_weekly_stats").select("week, source, new_people, people_wrote, counted_at")),
         fetchAll<AdsRow>(() => db.from("ads_daily_stats").select("stat_date, cost, clicks, conversions, campaign_name")),
         fetchAll<ServerConversation>(() => db.from("whatsapp_conversations").select("first_at, started_by_us, origin, updated_at").gte("first_at", `${serverFrom}T00:00:00Z`)),
+        // Sem a tabela, os acréscimos ficam no dia do serviço, como antes.
+        fetchAll<ServiceExtra>(() => db.from("service_extras").select("id, calendar_event_id, added_at, value, my_cut, description")).catch(() => [] as ServiceExtra[]),
       ]);
+      rows = closingRows(rows, extras);
       // Fechos que entraram desde a atualização anterior (não na primeira).
       if (lastLoadRef.current !== null) {
         const since = lastLoadRef.current;

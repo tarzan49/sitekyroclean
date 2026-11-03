@@ -3816,7 +3816,8 @@ function bookedServices(phone, events, now) {
 
 // src/lib/botBookingUpdate.ts
 var digits2 = (s) => s.replace(/\D/g, "");
-var SERVICE_TITLE = /^\s*(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
+var SERVICE_TITLE = /^\s*(?:desmarcado\s*·\s*)?(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
+var CANCELLED = /^\s*desmarcado\s*·\s*/i;
 var POSTCODE = /\b\d{4}-\d{3}\b/;
 function stamp(now) {
   return new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(now);
@@ -3874,6 +3875,11 @@ function planBookingUpdate(ev, phone, c, now) {
   }
   let title = parts.join(" - ");
   let description = ev.description;
+  let added;
+  if (CANCELLED.test(title) && moved && !cancel) {
+    title = title.replace(CANCELLED, "");
+    said.push("voltou a marcar");
+  }
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(",", ".")) : NaN;
@@ -3885,18 +3891,25 @@ function planBookingUpdate(ev, phone, c, now) {
       const service = clean(c.requote.service) || clean(c.requote.what);
       title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
       description = description.split("\n").map((l) => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join("\n");
+      if (Number.isFinite(was) && total > was) {
+        const wasCut = Number(head[0].match(/[\d,.]+(?=€)/)?.[0].replace(",", "."));
+        added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: clean(c.requote.what) };
+      }
       said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
-  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+  if (cancel) {
+    said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+    if (!CANCELLED.test(title)) title = `Desmarcado · ${title}`;
+  }
   if (!said.length) return { ok: false, reason: "nada de novo" };
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join("; ")}.`;
   const lines = description.split("\n");
   const markAt = lines.findIndex((l) => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, "");
   else lines.push("", line);
-  return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said };
+  return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said, added };
 }
 var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 function fold6(s) {

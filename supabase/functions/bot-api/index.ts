@@ -126,6 +126,8 @@ export interface BotEnv {
   certificates?: CertificateStore | null;
   /** Conversas novas do WhatsApp (tabela whatsapp_conversations), escritas pelo servidor do bot. */
   conversations?: ((rows: Row[]) => Promise<{ error?: string }>) | null;
+  /** service_extras: items added to a booked service, a closing on the day the client took them. */
+  extras?: ((row: Row) => Promise<string | null>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string, html?: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -688,12 +690,16 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   }
   if (!written.ok) return createErrorResponse(`Não foi possível atualizar o calendário (${written.error.slice(0, 200)})`, 502);
   calendarCache = null;
+  let extraError: string | null = null;
+  if (plan.added && env.extras) {
+    extraError = await env.extras({ calendar_event_id: eventId, added_at: now.toISOString(), value: plan.added.value, my_cut: plan.added.cut, description: `Acrescento: ${plan.added.what}`.slice(0, 300) }).catch(e => String(e));
+  }
   if (requote && plan.ok && env.notifyOwner) {
-    await env.notifyOwner(`Artigos acrescentados: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.`).catch(() => null);
+    await env.notifyOwner(`Artigos acrescentados: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.${extraError ? `\n\nO acréscimo não ficou nos fechos de hoje (${extraError.slice(0, 200)}): conta no dia em que o serviço foi marcado.` : ""}`).catch(() => null);
   }
   if ((plan.cancel || plan.moved) && env.notifyOwner) {
     await env.notifyOwner(plan.cancel ? `Cliente pediu para desmarcar: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
-      `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " (não foi apagado: decides tu)" : ""}.\n\n${plan.title}`).catch(() => null);
+      `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " e passou a \"Desmarcado\": saiu dos fechos e das contas da equipa e a hora ficou livre. Não foi apagado; se o cliente voltar a marcar, o bot repõe-no" : ""}.\n\n${plan.title}`).catch(() => null);
   }
   return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, summary: plan.summary, ...(busyTeam ? { teamBusy: busyTeam } : {}) } });
 }
@@ -858,6 +864,14 @@ function supabaseLeads(): LeadsStore | null {
       return { data: data as Row[] | null, error };
     },
   };
+}
+
+function supabaseExtras(): BotEnv["extras"] {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  return async row => (await client.from("service_extras").insert(row)).error?.message ?? null;
 }
 
 const ACCOUNT_COLUMNS = "request_date, client_name, city, locality, billed_value, my_cut, upsell_value, upsell_team, paid, calendar_event_id, calendar_missing_since, review_requested, description, invoiced, invoice_value, vat_on_top, paid_to_owner, client_paid_owner_at";
@@ -1032,5 +1046,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), certificates: supabaseCertificates(), conversations: supabaseConversations() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), certificates: supabaseCertificates(), conversations: supabaseConversations(), extras: supabaseExtras() }));
 }

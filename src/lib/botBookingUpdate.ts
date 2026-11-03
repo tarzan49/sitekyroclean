@@ -22,11 +22,17 @@ export interface BookingChanges {
 }
 export interface BookingEvent { id: string; summary: string; description: string; start: string | null; end: string | null }
 export type BookingUpdatePlan =
-  | { ok: true; title: string; description: string; start: string; end: string; moved: boolean; cancel: boolean; summary: string[] }
+  | { ok: true; title: string; description: string; start: string; end: string; moved: boolean; cancel: boolean; summary: string[]; added?: { value: number; cut: number; what: string } }
   | { ok: false; reason: string };
 
 const digits = (s: string) => s.replace(/\D/g, '');
-const SERVICE_TITLE = /^\s*(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
+const SERVICE_TITLE = /^\s*(?:desmarcado\s*·\s*)?(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
+// A client who cancels takes the service out of the accounts by itself (owner, 3 Nov 2026, Carla:
+// "remove o de 79€ do Porto que a cliente cancelou, não entendo como é que o bot não fez isso
+// automaticamente"). The event stays, renamed: no longer "Serviço", so the CRM marks the row as gone
+// from the calendar (out of the closings and the team accounts) and the hour is free again. A new
+// day and hour from the same client puts the name back.
+const CANCELLED = /^\s*desmarcado\s*·\s*/i;
 const POSTCODE = /\b\d{4}-\d{3}\b/;
 
 function stamp(now: Date) {
@@ -79,6 +85,8 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   }
   let title = parts.join(' - ');
   let description = ev.description;
+  let added: { value: number; cut: number; what: string } | undefined;
+  if (CANCELLED.test(title) && moved && !cancel) { title = title.replace(CANCELLED, ''); said.push('voltou a marcar'); }
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(',', '.')) : NaN;
@@ -91,11 +99,20 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
       const service = clean(c.requote.service) || clean(c.requote.what);
       title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
       description = description.split('\n').map(l => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote!.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join('\n');
+      // The extra counts as a closing on the day the client took it, not on the day of the booking
+      // (Diana, 3 Nov 2026: 4 chairs for 120€ fell on 30/10, when the sofa was booked).
+      if (Number.isFinite(was) && total > was) {
+        const wasCut = Number(head[0].match(/[\d,.]+(?=€)/)?.[0].replace(',', '.'));
+        added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: clean(c.requote.what) };
+      }
       said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);
-  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+  if (cancel) {
+    said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+    if (!CANCELLED.test(title)) title = `Desmarcado · ${title}`;
+  }
   if (!said.length) return { ok: false, reason: 'nada de novo' };
 
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join('; ')}.`;
@@ -103,7 +120,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   // Keep "Equipa: X" first and the "bot:" mark last; the new line goes before the mark.
   const markAt = lines.findIndex(l => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, ''); else lines.push('', line);
-  return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancel, summary: said };
+  return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancel, summary: said, added };
 }
 
 const hm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
