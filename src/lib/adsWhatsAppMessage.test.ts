@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage } from './whatsappMessages';
-import { ADS_WHATSAPP_MARK, FACEBOOK_ADS_WHATSAPP_MARK, INSTAGRAM_ADS_WHATSAPP_MARK, adsWhatsAppMark, initAdsWhatsAppMessage, pageWhatsAppText, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
+import { ADS_WHATSAPP_MARK, FACEBOOK_ADS_WHATSAPP_MARK, INSTAGRAM_ADS_WHATSAPP_MARK, adsWhatsAppMark, googleClickIds, initAdsWhatsAppMessage, newAdRef, pageWhatsAppText, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
 
 const waHref = (text: string) => `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
 const textOf = (href: string) => new URL(href).searchParams.get('text');
@@ -120,6 +120,24 @@ describe('initAdsWhatsAppMessage', () => {
     expect(click('sticky')).toBe(buildGeneralWaMessage());
   });
 
+  it('adds a click reference and registers it once when the ad visit has a real gclid', () => {
+    const beacon = vi.fn().mockReturnValue(true);
+    vi.stubGlobal('navigator', { ...navigator, sendBeacon: beacon });
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.invalid');
+    cleanup = initAdsWhatsAppMessage('?utm_source=google&utm_medium=cpc&gclid=CjwKCAjw-abc_123');
+    const link = clickLink(waHref(buildServiceWaMessage('limpeza-sofas', 'Lisboa')));
+    const text = textOf(link.href)!;
+    expect(text).toMatch(/^Olá! Vi o vosso anúncio no Google \(ref\. [A-HJ-NP-Z2-9]{5}\) e gostaria de saber o preço/);
+    expect(text.endsWith('É um sofá de ')).toBe(true);
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(beacon).toHaveBeenCalledTimes(1);
+    const [url, body] = beacon.mock.calls[0];
+    expect(url).toBe('https://example.invalid/functions/v1/ad-click');
+    expect(JSON.parse(body)).toMatchObject({ ref: /\(ref\. (\w{5})\)/.exec(text)![1], gclid: 'CjwKCAjw-abc_123' });
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
   it('does nothing on an organic visit', () => {
     cleanup = initAdsWhatsAppMessage('?utm_source=google&utm_medium=organic');
     const href = waHref(buildServiceWaMessage('limpeza-sofas', 'Porto'));
@@ -174,5 +192,18 @@ describe('adsWhatsAppMark (bio das redes, orgânico)', () => {
     expect(adsWhatsAppMark('?utm_source=instagram&utm_medium=paid_social')).toBe(INSTAGRAM_ADS_WHATSAPP_MARK);
     expect(adsWhatsAppMark('?utm_source=instagram')).toBeNull();
     expect(adsWhatsAppMark('?utm_source=facebook&utm_medium=bio')).toBeNull();
+  });
+});
+
+describe('ad click reference', () => {
+  it('uses only unambiguous characters', () => {
+    expect(newAdRef(b => b.fill(0))).toBe('AAAAA');
+    for (let i = 0; i < 50; i++) expect(newAdRef()).toMatch(/^[A-HJ-NP-Z2-9]{5}$/);
+  });
+
+  it('reads only well-formed Google click ids', () => {
+    expect(googleClickIds('?gclid=CjwKCAjw-abc_123&gbraid=0AAAAAx9yz')).toEqual({ gclid: 'CjwKCAjw-abc_123', gbraid: '0AAAAAx9yz' });
+    expect(googleClickIds('?gclid=test')).toBeNull();
+    expect(googleClickIds('')).toBeNull();
   });
 });

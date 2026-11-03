@@ -20,7 +20,7 @@ const PoliticaPrivacidade = () => (
           <h1 className="type-page-title font-playfair    text-[#111111] ">
             Política de Privacidade
           </h1>
-          <p className="text-base text-[#555] mt-3">Última atualização: setembro de 2026</p>
+          <p className="text-base text-[#555] mt-3">Última atualização: novembro de 2026</p>
         </div>
 
         <Section title="1. Quem somos">
@@ -85,6 +85,7 @@ const PoliticaPrivacidade = () => (
           </p>
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Google LLC</strong>: através do GA4 e do Google Ads, com o seu consentimento, para análise de tráfego e medição de campanhas; sem consentimento, apenas os sinais sem cookies descritos na secção 4;</li>
+            <li><strong>Google LLC, medição de serviços contratados (Google Ads)</strong>: se chegou ao site por um anúncio do Google, a mensagem de WhatsApp leva uma referência curta (por exemplo "ref. K7F2Q"), que guardamos no nosso servidor com o identificador do clique no anúncio, sem gravar nada no seu dispositivo. Se contratar um serviço, enviamos à Google esse identificador ou o seu número de telefone em formato cifrado (hash), com a data e o valor do serviço, para medir quais os anúncios que trazem clientes. A Google só usa estes dados para essa medição. Base legal: interesse legítimo em medir a eficácia da publicidade. Pode opor-se a qualquer momento através do contacto indicado nesta política;</li>
             <li><strong>Meta Platforms Ireland Limited</strong>: através do Pixel da Meta, mediante consentimento, para medição de visitas e campanhas;</li>
             <li><strong>Google reCAPTCHA</strong> (Google LLC): só no momento em que envia um pedido de orçamento, para distinguir pedidos reais de envios automáticos (spam). O reCAPTCHA recolhe informação técnica do browser e da interação com a página, tratada pela Google segundo a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline">Política de Privacidade</a> e os <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline">Termos de Serviço</a> da Google. Base legal: interesse legítimo na segurança do formulário. Um resultado duvidoso nunca impede o pedido de nos chegar;</li>
             <li><strong>Resend</strong>: plataforma utilizada para o envio de emails com os pedidos de orçamento de forma segura;</li>

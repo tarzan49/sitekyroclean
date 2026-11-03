@@ -175,6 +175,42 @@ export function withPageWhatsAppText(href: string, root: ParentNode = document, 
 }
 
 /**
+/**
+ * Código curto que liga a conversa ao clique do anúncio (dono, 2026-11-03: o
+ * Google Ads só via cliques no botão e nunca quem fechou). Vai na mensagem logo
+ * a seguir à marca, "Vi o vosso anúncio no Google (ref. K7F2Q)", e o site
+ * regista-o no servidor com o identificador do clique (função `ad-click`,
+ * tabela `ad_clicks`). Nada fica no telemóvel da pessoa. O export das conversas
+ * do bot lê o código e a função `ads-conversions-feed` devolve ao Google Ads os
+ * serviços fechados com o valor. Sem letras que se confundem (0/O, 1/I).
+ */
+const AD_REF_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const CLICK_ID = /^[\w-]{10,200}$/;
+
+export function newAdRef(random: (bytes: Uint8Array) => Uint8Array = b => crypto.getRandomValues(b)): string {
+  return Array.from(random(new Uint8Array(5)), n => AD_REF_ALPHABET[n % AD_REF_ALPHABET.length]).join('');
+}
+
+/** Os identificadores de clique do Google na entrada; `null` sem nenhum válido. */
+export function googleClickIds(search: string): { gclid?: string; gbraid?: string; wbraid?: string } | null {
+  const params = new URLSearchParams(search);
+  const ids: Record<string, string> = {};
+  for (const key of ['gclid', 'gbraid', 'wbraid']) {
+    const value = params.get(key);
+    if (value && CLICK_ID.test(value)) ids[key] = value;
+  }
+  return Object.keys(ids).length ? ids : null;
+}
+
+function registerAdRef(ref: string, ids: Record<string, string>): void {
+  const base = import.meta.env.VITE_SUPABASE_URL;
+  if (!base || typeof navigator === 'undefined' || !navigator.sendBeacon) return;
+  try {
+    navigator.sendBeacon(`${base}/functions/v1/ad-click`, JSON.stringify({ ref, ...ids, page: window.location.pathname }));
+  } catch { /* a medição nunca trava o clique */ }
+}
+
+/**
  * Chamado uma vez, no arranque, antes de qualquer navegação: o parâmetro do
  * anúncio só está no endereço de entrada. Troca o `href` da âncora durante a
  * fase de captura; o browser segue o `href` que a âncora tiver no fim do
@@ -183,8 +219,12 @@ export function withPageWhatsAppText(href: string, root: ParentNode = document, 
  * `initContactTracking`.
  */
 export function initAdsWhatsAppMessage(search = window.location.search): () => void {
-  const adMark = adsWhatsAppMark(search);
-  if (!adMark) return () => {};
+  const baseMark = adsWhatsAppMark(search);
+  if (!baseMark) return () => {};
+  const ids = baseMark === ADS_WHATSAPP_MARK ? googleClickIds(search) : null;
+  const ref = ids ? newAdRef() : null;
+  const adMark = ref ? `${baseMark} (ref. ${ref})` : baseMark;
+  let registered = false;
   const mark = (event: MouseEvent) => {
     if (event.type === 'auxclick' && event.button !== 1) return;
     if (/^\/admin(?:\/|$)/.test(window.location.pathname)) return;
@@ -192,6 +232,10 @@ export function initAdsWhatsAppMessage(search = window.location.search): () => v
     if (!(link instanceof HTMLAnchorElement)) return;
     const marked = markAdsWhatsAppHref(withPageWhatsAppText(link.href, document, adMark), adMark);
     if (marked !== link.href) link.href = marked;
+    if (ref && ids && !registered && businessWhatsAppText(link.href) !== null) {
+      registered = true;
+      registerAdRef(ref, ids);
+    }
   };
   document.addEventListener('click', mark, true);
   document.addEventListener('auxclick', mark, true);

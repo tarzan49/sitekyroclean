@@ -460,8 +460,11 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
         if (!/^\d{6,20}$/.test(key) || Number.isNaN(at.getTime()) || !CONVERSATION_ORIGINS.includes(String(r.origin))) {
           return createErrorResponse("linha inválida", 400);
         }
+        // ad_ref: o código "ref." da primeira mensagem de quem veio de um anúncio (ver ads-conversions-feed).
+        const adRef = /^[A-HJ-NP-Z2-9]{5}$/.test(String(r.ad_ref ?? "")) ? String(r.ad_ref) : null;
         clean.push({ contact_key: key, is_lid: r.is_lid === true, first_at: at.toISOString(), origin: String(r.origin),
-          started_by_us: r.started_by_us === true, inbound_count: Math.max(0, Math.floor(Number(r.inbound_count) || 0)), updated_at: new Date().toISOString() });
+          started_by_us: r.started_by_us === true, inbound_count: Math.max(0, Math.floor(Number(r.inbound_count) || 0)), updated_at: new Date().toISOString(),
+          ad_ref: adRef });
       }
       const res = await env.conversations(clean);
       if (res.error) return createErrorResponse("Não foi possível gravar as conversas", 500);

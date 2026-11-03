@@ -375,7 +375,16 @@ construtores de `whatsappMessages.ts` nem nas páginas. **Uma mensagem nova de
 WhatsApp não precisa de fazer nada: herda a marca**, desde que comece por
 "Olá". A deteção é só Google (`gclid`, ou `utm_source=google` pago), não o
 `isAdsVisit`, que aceita qualquer `cpc`: um anúncio da Meta não pode dizer
-"Google". Não usa cookies nem armazenamento, e é assim que tem de ficar.
+"Google". Não usa cookies nem armazenamento no dispositivo, e é assim que tem de ficar.
+**Desde 03/11/2026 (dono: "o google anda a otimizar coisas sem sentido") a
+marca do Google leva um código: "Vi o vosso anúncio no Google (ref. K7F2Q)".**
+O site regista o código com o `gclid` no servidor (função `ad-click`, tabela
+`ad_clicks`; nada no telemóvel), o `conversations-export.ts` do kyro-bot lê-o
+para `whatsapp_conversations.ad_ref`, e a função `ads-conversions-feed` dá ao
+Google Ads, todos os dias, os fechos dos últimos 90 dias de todas as cidades
+(clique pelo código, ou telefone cifrado) com o valor "para ti", na conversão
+"Serviço fechado", que passa a principal; o clique no WhatsApp passa a
+secundário (substitui a exceção de 24/09). Linha na política de privacidade.
 **Desde 28/09/2026 os anúncios da Meta também marcam** ("Vi o vosso anúncio no
 Facebook" / "…no Instagram", pelo `utm_source` = `{{site_source_name}}`), no
 mesmo ficheiro (`adsWhatsAppMark`). Só com os parâmetros de URL da campanha
