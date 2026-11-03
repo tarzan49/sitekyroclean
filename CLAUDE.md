@@ -53,6 +53,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Preço só desce nas condições especiais escritas (várias peças, pedido grande); nunca porque o cliente pediu, nem mais depois de uma condição dada: oferecer a opção mais barata e perguntar preço vs qualidade/garantia; acima de 200€ decide o dono.
 - Equipas: Porto 1 (só impermeabilização Premium no Porto e em Braga, desde 4/11; Essencial no Porto/Braga = dono), Porto 2 (dias úteis 8h–13h), Porto 3 (reserva, só limpezas), Braga (só limpezas), Lisboa 1, Algarve, Coimbra. Lisboa 2 fora do bot. Referir sempre pelo nome da equipa, nunca da pessoa.
 - Cliente desmarca → o bot apaga o evento (sai dos fechos e das contas); artigos acrescentados contam como fecho no dia em que foram aceites (`service_extras`), o serviço fica no mesmo dia.
+- Cliente com serviço marcado pede para remarcar → o bot serve-o sozinho, mesmo com a conversa em pausa; se a equipa já não faz esse serviço no dia novo, passa para outra equipa livre da zona; a equipa que já tinha sido avisada sabe sempre da mudança.
 - Pedido de avaliação só depois de o cliente dizer que correu bem.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 

@@ -533,3 +533,45 @@ Deno.test("a reschedule keeps the event's team: a busy team keeps the old hour a
   assertEquals([afternoon.update.ok, afternoon.update.moved, afternoon.update.teamBusy], [true, false, "Porto 2"]);
   assertEquals(writes[2].start, "2026-10-19T09:00:00Z");
 });
+
+Deno.test("a reschedule to a day the team no longer takes the job goes to a free team of the zone, with its colour (Laurinda, 3 Nov)", async () => {
+  const title = "Serviço 55€ (109€) Limpeza e tratamento anti-odor de colchão de casal - 900000003 - Cliente Inventada - Avenida X 1, Nogueira da Regedoura";
+  const ev = (id: string, summary: string, description: string, start: string, end: string) => ({
+    id, summary, description, location: "", startDate: start.slice(0, 10), created: "", updated: "", status: "CONFIRMED", start, end,
+  });
+  const mine = ev("mine", title, "Equipa: Porto 1\n\nNota.\n\nbot:900000003@s.whatsapp.net", "2026-11-03T16:00:00Z", "2026-11-03T17:00:00Z");
+  const handWritten = ev("hand", title.replace("900000003", "900000004"), "Equipa: Porto 1", "2026-11-03T10:00:00Z", "2026-11-03T11:00:00Z");
+  const writes: Record<string, unknown>[] = [], mails: string[] = [];
+  const call = (eventId: string, phone: string, extra: Row = {}) => handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.4.${++ip % 250}` },
+      body: JSON.stringify({ action: "update-booking", eventId, phone, changes: { date: "2026-11-05", time: "16:30" }, ...extra }),
+    }),
+    { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events: [mine, handWritten] }), now: () => new Date("2026-11-03T19:40:00Z"),
+      writeCalendar: p => { writes.push(p); return Promise.resolve({ ok: true, eventId }); },
+      notifyOwner: (subject: string) => { mails.push(subject); return Promise.resolve(null); } },
+  ).then(r => r.json());
+
+  // The bot's own event: Porto 1 only does Premium waterproofing from 4/11, Porto 2 only mornings: Porto 3 (Tomate 11).
+  const moved = await call("mine", "900000003", { conversationId: "900000003@s.whatsapp.net" });
+  assertEquals([moved.update.ok, moved.update.moved, moved.update.team], [true, true, "Porto 3"]);
+  assertEquals([writes[0].action, writes[0].colorId, writes[0].start], ["book", "11", "2026-11-05T16:30:00.000Z"]);
+  assert(String(writes[0].description).startsWith("Equipa: Porto 3"), String(writes[0].description));
+  assert(String(writes[0].description).includes("Equipa mudada de Porto 1 para Porto 3"));
+  assert(String(writes[0].description).endsWith("bot:900000003@s.whatsapp.net"));
+
+  // An event without this conversation's mark cannot be recoloured: old hour, the owner is told why.
+  const hand = await call("hand", "900000004", { conversationId: "900000004@s.whatsapp.net" });
+  assertEquals([hand.update.ok, hand.update.teamBusy, writes.length], [false, "Porto 1", 1]);
+  assert(mails.some(m => m.includes("Porto 1 já não faz este serviço")), mails.join());
+
+  // A Premium waterproofing stays on Porto 1.
+  const premium = ev("prem", "Serviço 75€ (149€) Impermeabilização Premium de sofá 3 lugares - 900000005 - Outra - Rua Y 2, Porto", "Equipa: Porto 1\n\nbot:900000005@s.whatsapp.net", "2026-11-03T15:00:00Z", "2026-11-03T16:00:00Z");
+  const r = await handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+    method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.4.${++ip % 250}` },
+    body: JSON.stringify({ action: "update-booking", eventId: "prem", phone: "900000005", conversationId: "900000005@s.whatsapp.net", changes: { date: "2026-11-05", time: "16:30" } }),
+  }), { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events: [premium] }), now: () => new Date("2026-11-03T19:40:00Z"),
+    writeCalendar: p => { writes.push(p); return Promise.resolve({ ok: true, eventId: "prem" }); }, notifyOwner: () => Promise.resolve(null) }).then(r => r.json());
+  assertEquals([r.update.moved, r.update.team, writes[1].action, writes[1].start], [true, undefined, "update", "2026-11-05T16:30:00.000Z"]);
+});

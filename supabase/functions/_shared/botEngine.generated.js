@@ -2701,6 +2701,26 @@ function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
   const margin = marginMs(team);
   return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
 }
+function eventJob(e) {
+  const text2 = `${e.summary}
+${e.description ?? ""}`;
+  const waterproofing = /imperm/i.test(text2) ? /essencial/i.test(text2) && !/premium/i.test(text2) ? true : "premium" : false;
+  const total = /\((\d+(?:[.,]\d+)?)\s*€\)/.exec(e.summary)?.[1];
+  return { waterproofing, total: total ? Number(total.replace(",", ".")) : null };
+}
+var zoneOfTeam = (team) => Object.keys(TEAMS_BY_REGION).find((z) => TEAMS_BY_REGION[z].includes(team)) ?? null;
+function teamTakesJob(team, e, startIso) {
+  const zone = zoneOfTeam(team);
+  if (!zone) return true;
+  const { waterproofing, total } = eventJob(e);
+  return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date).includes(team);
+}
+function replacementTeam(events, team, e, startIso, endIso, cleaning = true) {
+  const zone = zoneOfTeam(team);
+  if (!zone) return null;
+  const { waterproofing, total } = eventJob(e);
+  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date)].filter((t) => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary)).sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
+}
 function chooseTeam(events, city, startIso, endIso, waterproofing = false, cleaning = true, total) {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold3(name)) : void 0;
@@ -4110,8 +4130,10 @@ export {
   procedureReminderMessage,
   procedureStatusChanges,
   reminderDue,
+  replacementTeam,
   resolveBotCity,
   slotForMedia,
   teamAccounts,
-  teamBusyAt
+  teamBusyAt,
+  teamTakesJob
 };

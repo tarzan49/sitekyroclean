@@ -483,6 +483,37 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
 }
 
 /**
+ * A booked service moved to a day its team no longer takes that job (owner, 3 Nov 2026, Laurinda: a mattress
+ * cleaning on Porto 1, moved to Thursday 5/11, when Porto 1 only does Premium waterproofing). The job is read from
+ * the event: waterproofing with no tier written counts as Premium, so only a clear case changes the team.
+ */
+function eventJob(e: Pick<AvailabilityEvent, 'summary' | 'description'>): { waterproofing: boolean | 'premium'; total: number | null } {
+  const text = `${e.summary}\n${e.description ?? ''}`;
+  const waterproofing = /imperm/i.test(text) ? (/essencial/i.test(text) && !/premium/i.test(text) ? true : 'premium') : false;
+  const total = /\((\d+(?:[.,]\d+)?)\s*€\)/.exec(e.summary)?.[1];
+  return { waterproofing, total: total ? Number(total.replace(',', '.')) : null };
+}
+const zoneOfTeam = (team: string) => (Object.keys(TEAMS_BY_REGION) as TeamZone[]).find(z => TEAMS_BY_REGION[z].includes(team)) ?? null;
+
+/** The team still takes this event's job on the day of `startIso`. */
+export function teamTakesJob(team: string, e: Pick<AvailabilityEvent, 'summary' | 'description'>, startIso: string): boolean {
+  const zone = zoneOfTeam(team);
+  if (!zone) return true;
+  const { waterproofing, total } = eventJob(e);
+  return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date).includes(team);
+}
+
+/** Another team of the same zone that takes the job that day and is free then; the backup team last. null: none. */
+export function replacementTeam(events: AvailabilityEvent[], team: string, e: Pick<AvailabilityEvent, 'summary' | 'description'>, startIso: string, endIso: string, cleaning = true): string | null {
+  const zone = zoneOfTeam(team);
+  if (!zone) return null;
+  const { waterproofing, total } = eventJob(e);
+  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date)]
+    .filter(t => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary))
+    .sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
+}
+
+/**
  * The team the bot books a job on (owner, 9 Oct 2026: on weekdays the bot closes
  * by itself "nas vagas que não estão ocupadas"): one with room at that time, the
  * one already working next to it that day first (less driving), then the one
