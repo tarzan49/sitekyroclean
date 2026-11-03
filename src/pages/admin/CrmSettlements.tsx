@@ -5,7 +5,7 @@ import { lisbonDay } from "@/lib/crmClosings";
 import { CALENDAR_FETCH_SINCE } from "@/lib/calendarSync";
 import type { CalendarEvent } from "@/lib/calendarServices";
 import { euros, type AccountAdjustment, type AccountEvent, type AccountRow } from "@/lib/teamAccounts";
-import { addDays, groupOfTeam, SETTLEMENT_TEAMS, teamWeek, weekStartOf, weeklySettlement, type WeekServiceStatus } from "@/lib/weeklySettlement";
+import { addDays, groupOfTeam, SETTLEMENT_TEAMS, teamWeek, weekStartOf, weeklySettlement, type WeekService, type WeekServiceStatus } from "@/lib/weeklySettlement";
 import { dayMonth } from "./crmInvoiceUi";
 
 // Aba "Contas" do CRM (dono, 2026-11-01): o que cada grupo de equipas deve nesta
@@ -134,6 +134,24 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
     }
   };
 
+  // Marcar um serviço como pago ou por pagar (dono, 3/11). Grava o mesmo `paid`
+  // do CRM, por isso a ficha do cliente e o total da equipa mudam juntos.
+  const togglePaid = async (w: WeekService) => {
+    if (!w.id || (w.status !== "pago" && w.status !== "por_pagar")) return;
+    setBusy(w.id);
+    setError(null);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: e } = await (supabase as any).from("service_requests").update({ paid: w.status !== "pago" }).eq("id", w.id);
+      if (e) throw e;
+      await onChanged();
+    } catch (e) {
+      setError(`Não consegui mudar o pagamento: ${e instanceof Error ? e.message : (e as { message?: string })?.message ?? "erro"}.`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const sharedGroup = group.id !== "porto1" && group.teams.length > 1;
 
   return (
@@ -212,7 +230,12 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-bold text-navy">{euros(w.amount)}</p>
-                <StatusPill status={w.status} />
+                {w.id && (w.status === "pago" || w.status === "por_pagar")
+                  ? <button onClick={() => togglePaid(w)} disabled={busy !== null}
+                      title={w.status === "pago" ? "Marcar como por pagar" : "Marcar como pago"} className="disabled:opacity-50">
+                      <StatusPill status={busy === w.id ? (w.status === "pago" ? "por_pagar" : "pago") : w.status} />
+                    </button>
+                  : <StatusPill status={w.status} />}
               </div>
             </div>
           ))}
