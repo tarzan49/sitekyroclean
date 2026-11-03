@@ -347,11 +347,15 @@ describe("the owner's rules for the next days (DAY_RULES)", () => {
 
 describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
   const now = new Date('2026-10-29T09:00:00Z');
-  it('abaixo de 110€ não dá horas em Viana e Leiria; a partir de 110€ dá', () => {
+  it('Viana abaixo de 100€ e Leiria abaixo de 110€ não dão horas; acima dá (dono, 3 Nov)', () => {
     const low = botAvailability({ city: 'Viana do Castelo', total: 89 }, [], now) as { handToOwner: string | null };
     expect(low.handToOwner).toMatch(/verificar a disponibilidade/);
     const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { handToOwner: string | null };
-    expect(quoted.handToOwner).toMatch(/abaixo de 120/);
+    expect(quoted.handToOwner).toMatch(/abaixo de 110/);
+    const viana100 = botAvailability({ city: 'Viana do Castelo', total: 100 }, [], now) as { handToOwner: string | null };
+    expect(viana100.handToOwner).toBeNull();
+    const viana95 = botAvailability({ city: 'Viana do Castelo', total: 95 }, [], now) as { handToOwner: string | null };
+    expect(viana95.handToOwner).toMatch(/abaixo de 100/);
     const ok = botAvailability({ city: 'Viana do Castelo', total: 115 }, [], now) as { handToOwner: string | null };
     expect(ok.handToOwner).toBeNull();
     const owner = botAvailability({ city: 'Viana do Castelo', total: 50, ownerTime: true }, [], now) as { handToOwner: string | null };

@@ -524,6 +524,8 @@ export interface AvailabilityRequest {
  */
 export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Leiria', 'Batalha']);
 export const SMALL_ORDER_MIN_TOTAL = 110;
+/** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
+const SMALL_ORDER_MIN_BY_CITY: Readonly<Record<string, number>> = { 'Viana do Castelo': 100 };
 function orderTotal(req: AvailabilityRequest, city: string): number | null {
   const given = Number(req.total);
   if (req.total !== undefined && Number.isFinite(given)) return given;
@@ -707,7 +709,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {
     const total = orderTotal(req, city);
-    if (total === null || total < SMALL_ORDER_MIN_TOTAL) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de 120€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
+    const min = SMALL_ORDER_MIN_BY_CITY[city] ?? SMALL_ORDER_MIN_TOTAL;
+    if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
   const teams = [...teamsFor(area, hasWaterproofing(req?.items), area === 'Porto' ? orderTotal(req, city) : null)];
   const cleaning = !waterproofingOnly(req?.items);

@@ -2712,6 +2712,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
 }
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Leiria", "Batalha"]);
 var SMALL_ORDER_MIN_TOTAL = 110;
+var SMALL_ORDER_MIN_BY_CITY = { "Viana do Castelo": 100 };
 function orderTotal(req, city) {
   const given = Number(req.total);
   if (req.total !== void 0 && Number.isFinite(given)) return given;
@@ -2854,7 +2855,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {
     const total = orderTotal(req, city);
-    if (total === null || total < SMALL_ORDER_MIN_TOTAL) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de 120€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
+    const min = SMALL_ORDER_MIN_BY_CITY[city] ?? SMALL_ORDER_MIN_TOTAL;
+    if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
   const teams = [...teamsFor(area, hasWaterproofing(req?.items), area === "Porto" ? orderTotal(req, city) : null)];
   const cleaning = !waterproofingOnly(req?.items);

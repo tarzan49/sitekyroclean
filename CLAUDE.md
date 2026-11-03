@@ -42,14 +42,14 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Cadeiras "Desde 12,50€"; impermeabilização de cadeiras 30/23€ (1–4) e 25/18€ (5+).
 - **Tapetes e alcatifas nunca mostram preço no site.** Lavagem em casa por defeito; recolha +20€, só entre 3 e 12 m² somados, fora da zona de Braga, entrega até 5 dias úteis. Alcatifa nunca tem recolha. Impermeabilização de tapetes não se vende no site, mas faz-se (no WhatsApp passa ao dono).
 - Sem preço próprio no site: puffs, cabeceira, 5+ impermeabilização. Chaise longue não é opção. Manchas, tecido e sujidade não mudam o preço (pele pode).
-- Secagem 2 a 5 h em tudo. Resposta em menos de 5 minutos. Preços sem IVA; IVA 23% só quando pedem fatura.
+- Secagem 2 a 5 h em tudo. Resposta em menos de 5 minutos. Preços sem IVA; com fatura acresce IVA 23%, a empresa e o particular.
 - O desconto de 10% acima de 149€ não existe. Nunca mecânicas de urgência não pedidas.
 - Avaliações nas páginas: só as reais de `src/data/reviewsPool.ts`. Testemunhos B2B: nunca inventar.
 
 ## 4. Bot de WhatsApp (resumo; detalhe em `docs/regras-detalhadas.md`, secção "API do bot")
 
 - O bot (servidor kyro-bot) fala com o site só pela `bot-api`. Ações principais: `quote`, `availability`, `hold`, `book`, `update-booking`, `booked-services`, `find-order`, `team-accounts`, `procedure-*`, `certificate`.
-- Fecha sozinho quando há hora aceite, preço do motor e morada completa; sob orçamento, Algarve, zonas alargadas, mesma hora de outro serviço da zona, recolha na zona de Braga, Viana/Leiria/Batalha abaixo de 110€ e acima de 300€ sem regra → dono.
+- Fecha sozinho quando há hora aceite, preço do motor e morada completa; sob orçamento, Algarve, zonas alargadas, mesma hora de outro serviço da zona, Viana abaixo de 100€, Leiria/Batalha abaixo de 110€ e acima de 300€ sem regra → dono.
 - Preço só desce nas condições especiais escritas (várias peças, pedido grande); nunca porque o cliente pediu, nem mais depois de uma condição dada: oferecer a opção mais barata e perguntar preço vs qualidade/garantia; acima de 200€ decide o dono.
 - Equipas: Porto 1 (≥100€ e todas as impermeabilizações do Porto e de Braga), Porto 2 (dias úteis 8h–13h), Porto 3 (reserva, só limpezas), Braga (só limpezas), Lisboa 1, Algarve, Coimbra. Lisboa 2 fora do bot. Referir sempre pelo nome da equipa, nunca da pessoa.
 - Pedido de avaliação só depois de o cliente dizer que correu bem.
