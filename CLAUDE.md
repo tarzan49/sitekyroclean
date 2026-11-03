@@ -52,7 +52,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Fecha sozinho quando há hora aceite, preço do motor e morada completa; sob orçamento, Algarve, zonas alargadas, mesma hora de outro serviço da zona, Viana abaixo de 100€, Leiria/Batalha abaixo de 110€ e acima de 300€ sem regra → dono.
 - Preço só desce nas condições especiais escritas (várias peças, pedido grande); nunca porque o cliente pediu, nem mais depois de uma condição dada: oferecer a opção mais barata e perguntar preço vs qualidade/garantia; acima de 200€ decide o dono.
 - Equipas: Porto 1 (só impermeabilização Premium no Porto e em Braga, desde 4/11; Essencial no Porto/Braga = dono), Porto 2 (dias úteis 8h–13h), Porto 3 (reserva, só limpezas), Braga (só limpezas), Lisboa 1, Algarve, Coimbra. Lisboa 2 fora do bot. Referir sempre pelo nome da equipa, nunca da pessoa.
-- Cliente desmarca → o bot renomeia o evento "Desmarcado · Serviço…" (sai dos fechos e das contas, nunca apaga); artigos acrescentados contam como fecho no dia em que foram aceites (`service_extras`).
+- Cliente desmarca → o bot apaga o evento (sai dos fechos e das contas); artigos acrescentados contam como fecho no dia em que foram aceites (`service_extras`), o serviço fica no mesmo dia.
 - Pedido de avaliação só depois de o cliente dizer que correu bem.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 

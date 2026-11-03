@@ -29,16 +29,11 @@ describe('planBookingUpdate', () => {
     expect(planBookingUpdate({ ...ev, summary: 'Pré-reserva – Liliana – 914000111' }, '914000111', { postcode: '4500-266' }, now)).toMatchObject({ ok: false });
     expect(planBookingUpdate({ ...ev, summary: ev.summary + ', 4500-266' }, '914000111', { postcode: '4500-266' }, now)).toMatchObject({ ok: false, reason: 'nada de novo' });
   });
-  it('a cancel stays in the calendar, renamed out of the accounts; a new hour puts it back (Carla, 3 Nov)', () => {
+  it('a cancel request is flagged, so bot-api deletes the event (Carla, 3 Nov)', () => {
     const p = planBookingUpdate(ev, '914000111', { cancel: 'teve um imprevisto, volta a falar para a semana' }, now);
     if (!p.ok) throw new Error(p.reason);
     expect(p.cancel).toBe(true);
-    expect(p.title).toBe(`Desmarcado · ${ev.summary}`);
     expect(p.description).toContain('PEDIU PARA DESMARCAR: teve um imprevisto');
-    const back = planBookingUpdate({ ...ev, summary: p.title, description: p.description }, '914000111', { date: '2026-10-22', time: '10:00' }, now);
-    if (!back.ok) throw new Error(back.reason);
-    expect(back.title).toBe(ev.summary);
-    expect(back.summary).toContain('voltou a marcar');
   });
   it('fills a missing name and replaces a changed address', () => {
     const bare = { ...ev, summary: 'Serviço 45€ (89€) Limpeza de sofá - +351 914 000 111' };

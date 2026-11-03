@@ -26,13 +26,7 @@ export type BookingUpdatePlan =
   | { ok: false; reason: string };
 
 const digits = (s: string) => s.replace(/\D/g, '');
-const SERVICE_TITLE = /^\s*(?:desmarcado\s*·\s*)?(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
-// A client who cancels takes the service out of the accounts by itself (owner, 3 Nov 2026, Carla:
-// "remove o de 79€ do Porto que a cliente cancelou, não entendo como é que o bot não fez isso
-// automaticamente"). The event stays, renamed: no longer "Serviço", so the CRM marks the row as gone
-// from the calendar (out of the closings and the team accounts) and the hour is free again. A new
-// day and hour from the same client puts the name back.
-const CANCELLED = /^\s*desmarcado\s*·\s*/i;
+const SERVICE_TITLE = /^\s*(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
 const POSTCODE = /\b\d{4}-\d{3}\b/;
 
 function stamp(now: Date) {
@@ -86,7 +80,6 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   let title = parts.join(' - ');
   let description = ev.description;
   let added: { value: number; cut: number; what: string } | undefined;
-  if (CANCELLED.test(title) && moved && !cancel) { title = title.replace(CANCELLED, ''); said.push('voltou a marcar'); }
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(',', '.')) : NaN;
@@ -109,10 +102,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     }
   }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);
-  if (cancel) {
-    said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
-    if (!CANCELLED.test(title)) title = `Desmarcado · ${title}`;
-  }
+  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
   if (!said.length) return { ok: false, reason: 'nada de novo' };
 
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join('; ')}.`;

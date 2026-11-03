@@ -697,11 +697,20 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   if (requote && plan.ok && env.notifyOwner) {
     await env.notifyOwner(`Artigos acrescentados: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.${extraError ? `\n\nO acréscimo não ficou nos fechos de hoje (${extraError.slice(0, 200)}): conta no dia em que o serviço foi marcado.` : ""}`).catch(() => null);
   }
-  if ((plan.cancel || plan.moved) && env.notifyOwner) {
-    await env.notifyOwner(plan.cancel ? `Cliente pediu para desmarcar: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
-      `${plan.summary.join("\n")}\n\nO evento já foi atualizado no calendário${plan.cancel ? " e passou a \"Desmarcado\": saiu dos fechos e das contas da equipa e a hora ficou livre. Não foi apagado; se o cliente voltar a marcar, o bot repõe-no" : ""}.\n\n${plan.title}`).catch(() => null);
+  // The client cancelled: the bot deletes the service (owner, 3 Nov 2026, Carla: "o bot apaga o evento").
+  // The CRM marks the row as gone from the calendar, out of the closings and the team accounts; the
+  // owner's email keeps the title and the description, so nothing is lost.
+  let deleted = false, deleteError = "";
+  if (plan.cancel) {
+    const gone = await env.writeCalendar!({ action: "cancel", eventId, phone });
+    if (gone.ok) deleted = true; else deleteError = gone.error.slice(0, 200);
+    calendarCache = null;
   }
-  return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, summary: plan.summary, ...(busyTeam ? { teamBusy: busyTeam } : {}) } });
+  if ((plan.cancel || plan.moved) && env.notifyOwner) {
+    await env.notifyOwner(plan.cancel ? `Cliente desmarcou: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
+      `${plan.summary.join("\n")}\n\n${plan.cancel ? (deleted ? "O evento foi apagado do calendário: saiu dos fechos e das contas da equipa, e a hora ficou livre." : `Não consegui apagar o evento (${deleteError}): apaga-o tu.`) : "O evento já foi atualizado no calendário."}\n\n${plan.title}\n\n${plan.description}`).catch(() => null);
+  }
+  return createSuccessResponse({ update: { ok: true, moved: plan.moved, cancel: plan.cancel, ...(plan.cancel ? { deleted } : {}), summary: plan.summary, ...(busyTeam ? { teamBusy: busyTeam } : {}) } });
 }
 
 async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {

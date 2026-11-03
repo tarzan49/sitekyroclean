@@ -3824,8 +3824,7 @@ function bookedServices(phone, events, now) {
 
 // src/lib/botBookingUpdate.ts
 var digits2 = (s) => s.replace(/\D/g, "");
-var SERVICE_TITLE = /^\s*(?:desmarcado\s*·\s*)?(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
-var CANCELLED = /^\s*desmarcado\s*·\s*/i;
+var SERVICE_TITLE = /^\s*(?:a confirmar\s*·\s*)?servi[cç]o\b/i;
 var POSTCODE = /\b\d{4}-\d{3}\b/;
 function stamp(now) {
   return new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(now);
@@ -3884,10 +3883,6 @@ function planBookingUpdate(ev, phone, c, now) {
   let title = parts.join(" - ");
   let description = ev.description;
   let added;
-  if (CANCELLED.test(title) && moved && !cancel) {
-    title = title.replace(CANCELLED, "");
-    said.push("voltou a marcar");
-  }
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(",", ".")) : NaN;
@@ -3907,10 +3902,7 @@ function planBookingUpdate(ev, phone, c, now) {
     }
   }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
-  if (cancel) {
-    said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
-    if (!CANCELLED.test(title)) title = `Desmarcado · ${title}`;
-  }
+  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
   if (!said.length) return { ok: false, reason: "nada de novo" };
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join("; ")}.`;
   const lines = description.split("\n");
