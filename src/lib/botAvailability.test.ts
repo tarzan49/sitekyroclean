@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAY_RULES, botAvailability, chooseTeam, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
+import { DAY_RULES, botAvailability, chooseTeam, teamBusyAt, teamsFor, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -55,6 +55,21 @@ describe('botAvailability', () => {
     expect(r.free[0].times[0]).toBe('12h');
   });
 
+  it('Porto 2 takes at most two jobs on a weekday (Aleixo, 4 Nov 2026)', () => {
+    const two = [
+      ev('2026-10-08', '09:00', '10:00', 'Serviço 45€ (89€) Sofá - Rui - Porto', 'Equipa: Porto 2'),
+      ev('2026-10-08', '11:30', '12:30', 'Serviço 45€ (89€) Sofá - Ana - Porto', 'Equipa: Porto 2'),
+    ];
+    expect(teamBusyAt(two, 'Porto 2', at('2026-10-08', '10:30'), at('2026-10-08', '11:30'))).toBe(true);
+    expect(teamBusyAt(two.slice(0, 1), 'Porto 2', at('2026-10-08', '11:30'), at('2026-10-08', '12:30'))).toBe(false);
+  });
+
+  it('Porto 1 takes cleaning + waterproofing or Premium, not Essencial alone', () => {
+    expect(teamsFor('Porto', waterproofingKind([{ treatment: 'clean+essencial' }]), 100, '2026-11-05')).toContain('Porto 1');
+    expect(teamsFor('Porto', waterproofingKind([{ treatment: 'premium' }]), 100, '2026-11-05')).toContain('Porto 1');
+    expect(teamsFor('Porto', waterproofingKind([{ treatment: 'essencial' }]), 100, '2026-11-05')).not.toContain('Porto 1');
+  });
+
   it('a time is free while one of the two teams of the zone is free', () => {
     const events = [
       ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Porto', 'Equipa: Porto 2'),
@@ -62,8 +77,8 @@ describe('botAvailability', () => {
       p3(),
     ];
     const r = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events, NOW));
-    // Two cleanings of a team start 1h30 apart: Porto 2 takes 8h before its 10h job, Porto 1 12h after it.
-    expect(r.free[0].times.slice(0, 2)).toEqual(['8h', '12h']);
+    // Two cleanings of a team start 1h30 apart; Porto 2 starts at 9h (Aleixo, 4 Nov 2026) and has no room before its 10h job.
+    expect(r.free[0].times.slice(0, 2)).toEqual(['12h', '13h']);
     expect(r.free[0].times).not.toContain('11h');
     const one = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, events.slice(1, 2), NOW));
     // 10h still has Porto 2 free, but another service of the zone is there: offered only when nothing else is.
@@ -94,9 +109,9 @@ describe('botAvailability', () => {
     expect(chooseTeam([late, busy3], 'Porto', ...span('12:30', '13:30'))).toBeNull();
     // Saturday: Porto 2 works all day.
     expect(chooseTeam([ev('2026-10-10', '14:00', '15:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1'), busy3Sat], 'Porto', at('2026-10-10', '15:00'), at('2026-10-10', '16:00'))).toBe('Porto 2');
-    // 8h and 9h only on weekdays, and only through Porto 2; Saturday starts at 9h.
+    // Weekdays start at 9h (Porto 2 from 9h, Aleixo 4 Nov 2026); never 8h.
     const thu = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, [], NOW));
-    expect(thu.free[0].times.slice(0, 2)).toEqual(['8h', '9h']);
+    expect(thu.free[0].times.slice(0, 2)).toEqual(['9h', '10h']);
     const sat = ok(botAvailability({ city: 'Porto', date: '2026-10-10' }, [], NOW));
     expect(sat.free[0].times[0]).toBe('9h');
     expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08' }, [], NOW)).free[0].times[0]).toBe('9h');

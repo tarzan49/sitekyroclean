@@ -80,7 +80,7 @@ export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> =
  */
 export const PORTO1_MIN_TOTAL = 100;
 /**
- * Porto 1 only takes Premium waterproofing (owner, 3 Nov 2026: "NAO E PARA MARCARES MAIS SERVIÇOS PARA
+ * Porto 1 only takes Premium waterproofing or cleaning + waterproofing (owner, 4 Nov 2026; 3 Nov 2026: "NAO E PARA MARCARES MAIS SERVIÇOS PARA
  * PORTO 1 ABAIXO DE 130 EUROS, SO MARCAS PARA ELES IMPER PREMIUM"; "Limpezas nao marcas mais"). No
  * cleaning and no Essencial waterproofing goes to Porto 1; an Essencial waterproofing in Porto or Braga
  * has no team, so the owner decides.
@@ -93,9 +93,12 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
 };
-/** The waterproofing of the job for `teamsFor`: 'premium' when an item is Premium. */
+/**
+ * The waterproofing of the job for `teamsFor`: 'premium' (Porto 1 may take it) when an item is Premium or is cleaning
+ * plus waterproofing (owner, 4 Nov 2026: "porto 1 fica apenas com imper + limpeza ou imper premium").
+ */
 export function waterproofingKind(items: unknown): boolean | 'premium' {
-  if (Array.isArray(items) && items.some(i => /premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
+  if (Array.isArray(items) && items.some(i => /premium|^clean\+/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
   return hasWaterproofing(items);
 }
 /**
@@ -180,7 +183,17 @@ const pairMarginMs = (team: string, b: { place: Place }, place: Place) =>
  * sexta até às 13 horas", "depois disso não consegue, só sábado e ao domingo"; Aleixo himself, 18 Oct: "melhor marcar
  * sempre pra cedo"). The job has to start and finish inside the window.
  */
-export const TEAM_WEEKDAY_HOURS: Readonly<Record<string, { from: number; to: number }>> = { 'Porto 2': { from: 8, to: 13 } };
+export const TEAM_WEEKDAY_HOURS: Readonly<Record<string, { from: number; to: number }>> = { 'Porto 2': { from: 9, to: 13 } };
+/**
+ * Most jobs a team takes on one weekday. Porto 2 (Aleixo, audios of 4 Nov 2026): jobs "a partir das 9 e até meio-dia o
+ * último" (he is done by 13h for his remote job), "no máximo um atendimento por dia, ou dois nesses horários".
+ * Everything outside this goes to Porto 3.
+ */
+export const TEAM_MAX_JOBS_PER_WEEKDAY: Readonly<Record<string, number>> = { 'Porto 2': 2 };
+const weekdayFull = (busy: { team?: string | null; from: number }[], team: string, from: number) => {
+  const max = TEAM_MAX_JOBS_PER_WEEKDAY[team], day = lisbon(from).date;
+  return max !== undefined && isWeekday(day) && busy.filter(b => b.team === team && lisbon(b.from).date === day).length >= max;
+};
 const isWeekday = (date: string) => { const d = new Date(`${date}T12:00:00Z`).getUTCDay(); return d >= 1 && d <= 5; };
 /**
  * A team off for part of one day (the owner's instruction for the next days; past dates simply never match).
@@ -453,7 +466,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
   const early = (t: string) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
+  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
   const staggered = teams.every(t => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter(b => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t: string) => busy.some(b => b.team === t
@@ -476,6 +489,7 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (weekdayFull(busyIntervals(events).filter(b => !(b.from < to && b.to > from)), team, from)) return true;
   if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: '' } as AvailabilityEvent) : null))) return true;
   if (staggers(team, from)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);

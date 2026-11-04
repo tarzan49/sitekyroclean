@@ -2394,7 +2394,7 @@ var teamsFor = (zone, waterproofing, total, day) => {
   return teams;
 };
 function waterproofingKind(items) {
-  if (Array.isArray(items) && items.some((i) => /premium/.test(String(i?.treatment ?? "")))) return "premium";
+  if (Array.isArray(items) && items.some((i) => /premium|^clean\+/.test(String(i?.treatment ?? "")))) return "premium";
   return hasWaterproofing(items);
 }
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
@@ -2437,7 +2437,12 @@ var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_
 var ROAD_MARGIN_TEAMS = /* @__PURE__ */ new Set(["Algarve"]);
 var ROAD_MARGIN_MIN_MIN = 15;
 var pairMarginMs = (team, b, place) => ROAD_MARGIN_TEAMS.has(team) && b.place && place ? Math.max(ROAD_MARGIN_MIN_MIN, driveMinutes(b.place, place)) * 6e4 : marginMs(team);
-var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 8, to: 13 } };
+var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 9, to: 13 } };
+var TEAM_MAX_JOBS_PER_WEEKDAY = { "Porto 2": 2 };
+var weekdayFull = (busy, team, from) => {
+  const max = TEAM_MAX_JOBS_PER_WEEKDAY[team], day = lisbon(from).date;
+  return max !== void 0 && isWeekday(day) && busy.filter((b) => b.team === team && lisbon(b.from).date === day).length >= max;
+};
 var isWeekday = (date) => {
   const d = (/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay();
   return d >= 1 && d <= 5;
@@ -2684,7 +2689,7 @@ function slotState(busy, teams, region, from, to, cleaning = true, place = null)
   const overlapsFor = (t) => (b) => b.from < to + pairMarginMs(t, b, place) && b.to > from - pairMarginMs(t, b, place);
   const spare = (t) => staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
+  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
   const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter((b) => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
@@ -2696,6 +2701,7 @@ function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
+  if (weekdayFull(busyIntervals(events).filter((b) => !(b.from < to && b.to > from)), team, from)) return true;
   if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: "" }) : null))) return true;
   if (staggers(team, from)) return busyIntervals(events).some((b) => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
@@ -3083,7 +3089,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "11", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "3", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
