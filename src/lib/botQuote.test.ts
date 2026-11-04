@@ -176,6 +176,18 @@ describe('puffs (owner, 21 Oct 2026)', () => {
     expect(mixed.ok && mixed.armchair?.total).toBe((mixed.ok ? mixed.total : 0) + 29);
     expect(botQuote({ items: [], city: 'Porto', armchairs: 1, puffs: 1 }).ok).toBe(false);
   });
+  it('headboards (cabeceiras): solteiro 29€, casal 39€, queen/king 45€, travel only when alone (owner, 4 Nov 2026)', () => {
+    const alone = botQuote({ items: [], city: 'Lisboa', headboards: ['casal'] });
+    expect(alone.ok && alone.headboard?.amount).toBe(39);
+    expect(alone.ok && alone.total).toBe(39 + (alone.ok ? alone.travel : 0));
+    const two = botQuote({ items: [], city: 'Lisboa', headboards: ['solteiro', 'king'] });
+    expect(two.ok && two.headboard?.amount).toBe(74);
+    const mixed = botQuote({ items: [{ kind: 'sofa', size: '2-lugares' }], city: 'Vila do Conde', headboards: ['queen'] });
+    expect(mixed.ok && mixed.headboard?.amount).toBe(45);
+    expect(mixed.ok && mixed.headboard?.total).toBe((mixed.ok ? mixed.total : 0) + 45);
+    expect(botQuote({ items: [], city: 'Lisboa', headboards: ['gigante'] }).ok).toBe(false);
+    expect(botQuote({ items: [], city: 'Lisboa', headboards: ['casal'], puffs: 1 }).ok).toBe(false);
+  });
   it('orders above 300€ carry the owner\'s special condition: travel off, 7% off cleaning (4% with waterproofing), ending in 9, at least 20€ (25 Oct 2026)', () => {
     expect(bigOrderPrice(415, 0, false)).toBe(379);
     expect(bigOrderPrice(441, 15, true)).toBe(399);

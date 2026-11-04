@@ -169,6 +169,14 @@ export const PUFF_SAME_VISIT_PRICE = 20;
 export const ARMCHAIR_PRICE = 39;
 export const ARMCHAIR_SAME_VISIT_PRICE = 29;
 
+/**
+ * Upholstered headboards, "cabeceira" (owner, 4 Nov 2026, +351 936 376 201: the bot stayed silent because the
+ * headboard was sob orçamento; "solteiro 29 casal 39 queen e king 45"). By bed size, travel as for the others.
+ * The "desconto se tiver muitas peças" he mentioned has no number yet: none is coded. Bot only.
+ */
+export const HEADBOARD_PRICES = { solteiro: 29, casal: 39, queen: 45, king: 45 } as const;
+export type HeadboardSize = keyof typeof HEADBOARD_PRICES;
+
 function extraQuote(qty: number, tablePrice: number, sameVisitPrice: number, city: string | null, withOthers: boolean, othersTotal: number | null) {
   const unitPrice = withOthers ? sameVisitPrice : tablePrice;
   const amount = qty * unitPrice;
@@ -188,6 +196,10 @@ const puffQuote = (qty: number, city: string | null, withOthers: boolean, others
   extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 const armchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
   extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
+const headboardQuote = (sizes: HeadboardSize[], city: string | null, withOthers: boolean, othersTotal: number | null) => {
+  const amount = sizes.reduce((sum, size) => sum + HEADBOARD_PRICES[size], 0);
+  return { ...extraQuote(1, amount, amount, city, withOthers, othersTotal), qty: sizes.length, sizes, specialCondition: false };
+};
 
 /**
  * Waterproofing on a U sofa, bot only.
@@ -236,6 +248,7 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
       quote: false, handToOwner: false, rugPickup: null, rugEstimate: null, rugCombo: null,
       puff: base && base.ok ? base.puff : null,
       armchair: base && base.ok ? base.armchair : null,
+      headboard: base && base.ok ? base.headboard : null,
       closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
     };
   }
@@ -351,25 +364,28 @@ function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal
 
 function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs } = input as Record<string, unknown>;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== 'number' || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail('puffs tem de ser um inteiro entre 0 e 20');
   const armchairs = rawArmchairs ?? 0;
   if (typeof armchairs !== 'number' || !Number.isInteger(armchairs) || armchairs < 0 || armchairs > 20) return fail('armchairs tem de ser um inteiro entre 0 e 20');
+  const headboards = rawHeadboards ?? [];
+  if (!Array.isArray(headboards) || headboards.length > 20 || headboards.some(h => typeof h !== 'string' || !(h in HEADBOARD_PRICES))) return fail('headboards tem de ser uma lista de tamanhos: solteiro, casal, queen ou king');
   const rawItems = rawItemsIn ?? [];
-  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0 && armchairs > 0) return fail('Puffs e cadeirões sem outro artigo: orçamenta cada um à parte');
-  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0)) {
+  if (Array.isArray(rawItems) && rawItems.length === 0 && [puffs > 0, armchairs > 0, headboards.length > 0].filter(Boolean).length > 1) return fail('Puffs, cadeirões e cabeceiras sem outro artigo: orçamenta cada um à parte');
+  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0 || headboards.length > 0)) {
     const city = resolveBotCity(rawCity);
     const puff = puffs > 0 ? puffQuote(puffs, city, false, null) : null;
     const armchair = armchairs > 0 ? armchairQuote(armchairs, city, false, null) : null;
-    const extra = (puff ?? armchair)!;
+    const headboard = headboards.length > 0 ? headboardQuote(headboards as HeadboardSize[], city, false, null) : null;
+    const extra = (puff ?? armchair ?? headboard)!;
     const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
     return {
       ok: true as const, city, cityKnown: city !== null, extendedTrip, sharedTrip: false,
       lines: [] as { label: string; amount: number | null; tablePrice: number | null; perkApplied: boolean; perkNote?: string; quote: boolean }[],
       subtotal: extra.amount, savings: 0, perkEligible: false, travel: extra.travel ?? 0, total: extra.total ?? extra.amount,
       waterproofingTiers: null, quote: false, handToOwner: city === null || extendedTrip,
-      rugPickup: null, rugEstimate: null, rugCombo: null, puff, armchair, closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
+      rugPickup: null, rugEstimate: null, rugCombo: null, puff, armchair, headboard, closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
     };
   }
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail('items tem de ser uma lista com pelo menos um artigo');
@@ -449,6 +465,8 @@ function botQuoteInner(input: unknown) {
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Armchairs (cadeirões) on the same visit: 29€ each. Add armchair.amount to the price you quote.
     armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
+    // Headboards (cabeceiras) on the same visit: 29€ solteiro, 39€ casal, 45€ queen/king, no travel. Add headboard.amount to the price you quote.
+    headboard: headboards.length > 0 ? headboardQuote(headboards as HeadboardSize[], city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,

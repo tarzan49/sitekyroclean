@@ -1923,6 +1923,7 @@ var PUFF_PRICE = 25;
 var PUFF_SAME_VISIT_PRICE = 20;
 var ARMCHAIR_PRICE = 39;
 var ARMCHAIR_SAME_VISIT_PRICE = 29;
+var HEADBOARD_PRICES = { solteiro: 29, casal: 39, queen: 45, king: 45 };
 function extraQuote(qty, tablePrice, sameVisitPrice, city, withOthers, othersTotal) {
   const unitPrice = withOthers ? sameVisitPrice : tablePrice;
   const amount2 = qty * unitPrice;
@@ -1940,6 +1941,10 @@ function extraQuote(qty, tablePrice, sameVisitPrice, city, withOthers, othersTot
 }
 var puffQuote = (qty, city, withOthers, othersTotal) => extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 var armchairQuote = (qty, city, withOthers, othersTotal) => extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
+var headboardQuote = (sizes, city, withOthers, othersTotal) => {
+  const amount2 = sizes.reduce((sum2, size) => sum2 + HEADBOARD_PRICES[size], 0);
+  return { ...extraQuote(1, amount2, amount2, city, withOthers, othersTotal), qty: sizes.length, sizes, specialCondition: false };
+};
 var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 90 };
 var U_WATERPROOFING_ALONE = { premium: 179, essencial: 129 };
 function uWaterproofingQuote(input) {
@@ -1987,6 +1992,7 @@ function uWaterproofingQuote(input) {
       rugCombo: null,
       puff: base2 && base2.ok ? base2.puff : null,
       armchair: base2 && base2.ok ? base2.armchair : null,
+      headboard: base2 && base2.ok ? base2.headboard : null,
       closeNow: closeNowOffer({ total: total2, waterproofing: true, handToOwner: false, rug: null })
     };
   }
@@ -2076,18 +2082,21 @@ function withBigOrder(r) {
 }
 function botQuoteInner(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs } = input;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards } = input;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== "number" || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail("puffs tem de ser um inteiro entre 0 e 20");
   const armchairs = rawArmchairs ?? 0;
   if (typeof armchairs !== "number" || !Number.isInteger(armchairs) || armchairs < 0 || armchairs > 20) return fail("armchairs tem de ser um inteiro entre 0 e 20");
+  const headboards = rawHeadboards ?? [];
+  if (!Array.isArray(headboards) || headboards.length > 20 || headboards.some((h) => typeof h !== "string" || !(h in HEADBOARD_PRICES))) return fail("headboards tem de ser uma lista de tamanhos: solteiro, casal, queen ou king");
   const rawItems = rawItemsIn ?? [];
-  if (Array.isArray(rawItems) && rawItems.length === 0 && puffs > 0 && armchairs > 0) return fail("Puffs e cadeirões sem outro artigo: orçamenta cada um à parte");
-  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0)) {
+  if (Array.isArray(rawItems) && rawItems.length === 0 && [puffs > 0, armchairs > 0, headboards.length > 0].filter(Boolean).length > 1) return fail("Puffs, cadeirões e cabeceiras sem outro artigo: orçamenta cada um à parte");
+  if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0 || headboards.length > 0)) {
     const city2 = resolveBotCity(rawCity);
     const puff = puffs > 0 ? puffQuote(puffs, city2, false, null) : null;
     const armchair = armchairs > 0 ? armchairQuote(armchairs, city2, false, null) : null;
-    const extra = puff ?? armchair;
+    const headboard = headboards.length > 0 ? headboardQuote(headboards, city2, false, null) : null;
+    const extra = puff ?? armchair ?? headboard;
     const extendedTrip2 = city2 !== null && EXTENDED_TRIP_CITIES.has(city2);
     return {
       ok: true,
@@ -2109,6 +2118,7 @@ function botQuoteInner(input) {
       rugCombo: null,
       puff,
       armchair,
+      headboard,
       closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city2 === null || extendedTrip2, rug: null })
     };
   }
@@ -2173,6 +2183,8 @@ function botQuoteInner(input) {
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Armchairs (cadeirões) on the same visit: 29€ each. Add armchair.amount to the price you quote.
     armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
+    // Headboards (cabeceiras) on the same visit: 29€ solteiro, 39€ casal, 45€ queen/king, no travel. Add headboard.amount to the price you quote.
+    headboard: headboards.length > 0 ? headboardQuote(headboards, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
     closeNow: closeNowOffer({
       total: result.quote ? null : total,
