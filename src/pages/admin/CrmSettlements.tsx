@@ -250,17 +250,12 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
           <button onClick={() => setWeekStart(w => addDays(w, 7))} className="p-1.5 rounded-lg hover:bg-gray-100" aria-label="Semana seguinte"><ChevronRight className="w-4 h-4" /></button>
         </div>
 
-        <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-gray-100 border-b border-gray-100 text-center">
           <div className="py-3"><p className="text-[11px] text-gray-400">Serviços</p><p className="text-lg font-bold text-navy">{week.length}</p></div>
           <div className="py-3"><p className="text-[11px] text-gray-400">Faturado</p><p className="text-lg font-bold text-navy">{euros(weekBilled)}</p></div>
           <div className="py-3"><p className="text-[11px] text-gray-400">A tua parte</p><p className="text-lg font-bold text-navy">{euros(weekShare)}</p></div>
+          <div className="py-3"><p className="text-[11px] text-gray-400">Falta faturar ({todo.length})</p><p className="text-lg font-bold text-navy">{euros(todoBilled)}</p><p className="text-[11px] text-gray-400">a tua parte {euros(todoShare)}</p></div>
         </div>
-        {todo.length > 0 && (
-          <p className="px-4 py-2 border-b border-gray-100 text-xs text-gray-500 flex justify-between gap-3">
-            <span>Falta fazer nesta semana ({todo.length})</span>
-            <span className="font-semibold text-navy">{euros(todoBilled)} · a tua parte {euros(todoShare)}</span>
-          </p>
-        )}
 
         {week.length === 0
           ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço da {team} nesta semana.</p>
