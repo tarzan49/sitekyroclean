@@ -733,3 +733,4 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 
 ## Prioridade Porto 3 (Denise) sobre Porto 2 (Aleixo) (dono, 4 Nov 2026)
 "A Denise fica como prioridade e o Aleixo perde prioridade nos serviços; só lhe passas serviços se a Denise estiver ocupada." `BACKUP_TEAMS` em `src/lib/botAvailability.ts` passou de Porto 3 para Porto 2: `chooseTeam` e `replacementTeam` dão o serviço a Porto 2 em último. As horas livres de Porto 2 continuam a contar nas horas oferecidas.
+Limpezas do Porto abaixo de 200€ ficam para Porto 3 (dono, 4 Nov): `PORTO1_MIN_TOTAL` 100 → 200.

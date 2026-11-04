@@ -2397,7 +2397,7 @@ var WATERPROOFING_TEAMS = {
   Porto: ["Porto 1"],
   Braga: ["Porto 1"]
 };
-var PORTO1_MIN_TOTAL = 100;
+var PORTO1_MIN_TOTAL = 200;
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var teamsFor = (zone, waterproofing, total, day) => {
   const teams = waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];

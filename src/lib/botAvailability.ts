@@ -75,11 +75,10 @@ export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> =
   Braga: ['Porto 1'],
 };
 /**
- * Porto cleanings below 100€ go to Porto 2 (Aleixo) or Porto 3 (Denise); Porto 1 only takes jobs
- * of 100€ or more (owner, 31 Oct 2026: "serviços de ticket abaixo de 100€ [...] Porto 2 ou Porto 3,
- * e passes para o Porto 1 apenas serviços de 100€ para cima"). Waterproofing stays with Porto 1.
+ * Porto cleanings below 200€ go to Porto 3 (Denise), then Porto 2 (Aleixo); Porto 1 only takes jobs
+ * of 200€ or more (owner, 4 Nov 2026: "limpeza abaixo de 200 euros ficam para porto 3"; was 100€ on 31 Oct 2026). Waterproofing stays with Porto 1.
  */
-export const PORTO1_MIN_TOTAL = 100;
+export const PORTO1_MIN_TOTAL = 200;
 /**
  * Porto 1 only takes Premium waterproofing or cleaning + waterproofing (owner, 4 Nov 2026; 3 Nov 2026: "NAO E PARA MARCARES MAIS SERVIÇOS PARA
  * PORTO 1 ABAIXO DE 130 EUROS, SO MARCAS PARA ELES IMPER PREMIUM"; "Limpezas nao marcas mais"). No
