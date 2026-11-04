@@ -129,7 +129,7 @@ describe('região e equipa de cada serviço', () => {
     const lisboa = 'Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa';
     expect(equipa(lisboa)).toBeNull();
     expect(equipa(lisboa, '6')).toBe('lisboa');
-    expect(equipa(lisboa, '3')).toBe('lisboa2');
+    expect(equipa(lisboa, '1')).toBe('lisboa2');
     // A cor escolhe, mesmo que a morada seja de outra região.
     expect(equipa(lisboa, '10')).toBe('braga');
     expect(equipa('Serviço 45€ (89€) sofá, 8600-000 Lagos', '5')).toBe('algarve');
@@ -139,13 +139,13 @@ describe('região e equipa de cada serviço', () => {
     expect(equipa(`${lisboa} equipa lisboa 2`, '6')).toBe('lisboa2');
     expect(equipa(lisboa, undefined, 'Equipa Lisboa2')).toBe('lisboa2');
     expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 1')).toBe('lisboa');
-    // Porto 3 (Denise, 28/10/2026): escrito ou pela cor Tomate, nunca lido como Porto 1.
-    expect(equipa('Serviço 74€ (148€) sofá - Rua X 1, 4470-000 Maia', '11', 'Feito pela Denise (equipa Porto 3)')).toBe('porto3');
+    // Porto 3 (Denise, 28/10/2026): escrito ou pela cor Uva, nunca lido como Porto 1.
+    expect(equipa('Serviço 74€ (148€) sofá - Rua X 1, 4470-000 Maia', '3', 'Feito pela Denise (equipa Porto 3)')).toBe('porto3');
     expect(equipa('Serviço 74€ (148€) sofá - Rua X 1, 4470-000 Maia - equipa porto 3', '9')).toBe('porto3');
     // Uma cor que não é de nenhuma equipa não é uma escolha.
     expect(equipa(lisboa, '2')).toBeNull();
     // Cada equipa com a sua cor.
-    expect(['9', '8', '11', '10', '6', '3', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+    expect(['9', '8', '3', '10', '6', '1', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
       .toEqual(['porto', 'porto2', 'porto3', 'braga', 'lisboa', 'lisboa2', 'algarve', 'coimbra']);
   });
 
@@ -336,7 +336,7 @@ describe('o que muda nos calendários das equipas', () => {
   it('escreve a equipa na descrição do serviço do dono, sem isso mudar a equipa nem a cópia', () => {
     // Dono, 28/09/2026: "eu assim não vejo que equipa vai".
     const marca = gs.marcaDaEquipa(lisboa, 'lisboa2', AGORA);
-    expect(marca).toEqual({ colorId: '3', description: 'Equipa: Lisboa 2' });
+    expect(marca).toEqual({ colorId: '1', description: 'Equipa: Lisboa 2' });
     expect(gs.descricaoComEquipa('Portão verde', 'porto')).toBe('Equipa: Porto 1\n\nPortão verde');
     expect(gs.descricaoComEquipa('Portão verde', 'porto2')).toBe('Equipa: Porto 2\n\nPortão verde');
     expect(gs.descricaoComEquipa('Equipa: Porto\n\nPortão verde', 'braga')).toBe('Equipa: Braga\n\nPortão verde');
@@ -416,7 +416,7 @@ describe('o que muda nos calendários das equipas', () => {
       expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
       expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
       expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
-      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Lavanda = Equipa Lisboa 2', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
         expect(mensagem.texto).toContain(linha);
       }
       expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa lisboa 2", "equipa algarve" ou "equipa coimbra"');

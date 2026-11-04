@@ -22,7 +22,7 @@
 // (latitude, longitude) só decide as moradas fora de todas as regiões
 // (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
 // serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
-// 8 Grafite, 11 Tomate, 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva, 4 Flamingo) e `corDoCalendario` é a mesma
+// 8 Grafite, 3 Uva, 10 Basílico, 6 Tangerina, 5 Banana, 1 Lavanda, 4 Flamingo) e `corDoCalendario` é a mesma
 // cor no calendário da equipa, para as duas coisas baterem certo.
 // `escrito` é o que o dono escreve depois de "equipa" para escolher a equipa.
 // Desde 29/09/2026 o dono escolhe sempre a equipa, em todas as regiões, pela
@@ -35,11 +35,11 @@ const EQUIPAS = [
   { id: 'porto', nome: 'Kyro · Equipa Porto 1', escrito: ['porto', 'porto 1'], regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', nomeDaCor: 'Mirtilo', corDoCalendario: '#3f51b5' },
   { id: 'porto2', nome: 'Kyro · Equipa Porto 2', escrito: ['porto 2'], regioes: [], base: null, cor: '8', nomeDaCor: 'Grafite', corDoCalendario: '#616161' },
   // Denise (dono, 28/10/2026: "porto 3 mete a denise", cobre o que o Porto 1 e o Porto 2 não cobrem).
-  // Tomate (11), nunca usada: o Pavão (7) foi a cor do Porto 2 até 12/10/2026.
-  { id: 'porto3', nome: 'Kyro · Equipa Porto 3', escrito: ['porto 3'], regioes: [], base: null, cor: '11', nomeDaCor: 'Tomate', corDoCalendario: '#d50000' },
+  // Uva (3) desde 4/11/2026 (dono: o Tomate parecia a Lisboa 1); a Lisboa 2 passou a Lavanda (1).
+  { id: 'porto3', nome: 'Kyro · Equipa Porto 3', escrito: ['porto 3'], regioes: [], base: null, cor: '3', nomeDaCor: 'Uva', corDoCalendario: '#8e24aa' },
   { id: 'braga', nome: 'Kyro · Equipa Braga', escrito: ['braga'], regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', nomeDaCor: 'Basílico', corDoCalendario: '#0b8043' },
   { id: 'lisboa', nome: 'Kyro · Equipa Lisboa 1', escrito: ['lisboa', 'lisboa 1'], regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', nomeDaCor: 'Tangerina', corDoCalendario: '#f4511e' },
-  { id: 'lisboa2', nome: 'Kyro · Equipa Lisboa 2', escrito: ['lisboa 2'], regioes: [], base: null, cor: '3', nomeDaCor: 'Uva', corDoCalendario: '#8e24aa' },
+  { id: 'lisboa2', nome: 'Kyro · Equipa Lisboa 2', escrito: ['lisboa 2'], regioes: [], base: null, cor: '1', nomeDaCor: 'Lavanda', corDoCalendario: '#7986cb' },
   { id: 'algarve', nome: 'Kyro · Equipa Algarve', escrito: ['algarve'], regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', nomeDaCor: 'Banana', corDoCalendario: '#f6bf26' },
   // Coimbra e Figueira da Foz (dono, 10/10/2026: "cria o calendário da equipa de coimbra"); região própria
   // no CRM desde 11/10/2026.

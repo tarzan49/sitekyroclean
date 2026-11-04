@@ -553,10 +553,10 @@ Deno.test("a reschedule to a day the team no longer takes the job goes to a free
       notifyOwner: (subject: string) => { mails.push(subject); return Promise.resolve(null); } },
   ).then(r => r.json());
 
-  // The bot's own event: Porto 1 only does Premium waterproofing from 4/11, Porto 2 only mornings: Porto 3 (Tomate 11).
+  // The bot's own event: Porto 1 only does Premium waterproofing from 4/11, Porto 2 only mornings: Porto 3 (Uva 11).
   const moved = await call("mine", "900000003", { conversationId: "900000003@s.whatsapp.net" });
   assertEquals([moved.update.ok, moved.update.moved, moved.update.team], [true, true, "Porto 3"]);
-  assertEquals([writes[0].action, writes[0].colorId, writes[0].start], ["book", "11", "2026-11-05T16:30:00.000Z"]);
+  assertEquals([writes[0].action, writes[0].colorId, writes[0].start], ["book", "3", "2026-11-05T16:30:00.000Z"]);
   assert(String(writes[0].description).startsWith("Equipa: Porto 3"), String(writes[0].description));
   assert(String(writes[0].description).includes("Equipa mudada de Porto 1 para Porto 3"));
   assert(String(writes[0].description).endsWith("bot:900000003@s.whatsapp.net"));
