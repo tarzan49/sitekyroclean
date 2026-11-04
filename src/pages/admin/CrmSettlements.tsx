@@ -24,6 +24,8 @@ interface SettlementRow {
 
 type AdjustmentRow = AccountAdjustment & { id: string };
 
+const ALL_TEAMS = "Todas as equipas";
+
 export interface PastDebt { id: string; date: string; description: string; kind: "client" | "team"; value: number }
 
 function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: AccountRow[]; onChanged: () => Promise<unknown> | void; pastDebts?: PastDebt[] }) {
@@ -91,24 +93,33 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
   }, [settlement, teamTotals, team]);
 
   const week = useMemo(
-    () => events && team ? teamWeek(records, events, team, weekStart, today) : [],
+    () => !events || !team ? []
+      : team === ALL_TEAMS
+        ? SETTLEMENT_TEAMS.flatMap(t => teamWeek(records, events, t, weekStart, today).map(w => ({ ...w, label: `${w.label} · ${t}` })))
+            .sort((a, b) => a.date.localeCompare(b.date))
+        : teamWeek(records, events, team, weekStart, today),
     [records, events, team, weekStart, today],
   );
 
   if (!settlement || !team) return <p className="text-center py-10 text-sm text-gray-400">{error ?? "A carregar as contas..."}</p>;
 
-  const account = settlement.groups.flatMap(g => g.teams).find(t => t.team === team) ?? null;
-  const group = settlement.groups.find(g => g.id === groupOfTeam(team).id)!;
-  const owedNow = account?.total ?? 0;
+  const isAll = team === ALL_TEAMS;
+  const allAccounts = settlement.groups.flatMap(g => g.teams);
+  const account = isAll ? null : allAccounts.find(t => t.team === team) ?? null;
+  const group = isAll ? null : settlement.groups.find(g => g.id === groupOfTeam(team).id)!;
+  const owedNow = isAll ? allAccounts.reduce((s, t) => s + t.total, 0) : account?.total ?? 0;
   const weekEnd = addDays(weekStart, 6);
-  const earlier = account ? [...account.before, ...account.today].filter(l => l.date < weekStart) : [];
+  const sel = isAll ? allAccounts : account ? [account] : [];
+  const adjSum = sel.reduce((s, t) => s + t.adjustments.reduce((x, l) => x + l.amount, 0), 0);
+  const oweSum = sel.reduce((s, t) => s + t.ownerOwes.reduce((x, l) => x + l.amount, 0), 0);
+  const earlier = sel.flatMap(a => [...a.before, ...a.today]).filter(l => l.date < weekStart);
   const weekBilled = week.reduce((s, w) => s + w.billed, 0);
   const weekShare = week.reduce((s, w) => s + w.amount, 0);
   const todo = week.filter(w => w.status === "por_fazer");
   const todoBilled = todo.reduce((s, w) => s + w.billed, 0);
   const todoShare = todo.reduce((s, w) => s + w.amount, 0);
   const weekOwed = week.filter(w => w.status === "por_pagar").reduce((s, w) => s + w.amount, 0);
-  const groupHistory = history.filter(h => h.group_id === group.id);
+  const groupHistory = history.filter(h => isAll || h.group_id === group?.id);
   const isCurrentWeek = weekStart === weekStartOf(today);
 
   const copyMessage = async () => {
@@ -120,7 +131,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
 
   const settle = async () => {
     const g = group;
-    if (!settlement.canSettle) return;
+    if (!g || !settlement.canSettle) return;
     const who = g.teams.map(t => t.team).join(" + ");
     if (!confirm(`${who} pagou ${euros(g.total)}? Os ${g.serviceCount} serviços ficam dados como pagos e as contas voltam a zero.`)) return;
     setBusy(g.id);
@@ -192,6 +203,13 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
 
       {/* Equipas */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <button onClick={() => setTeam(ALL_TEAMS)}
+          className={`shrink-0 rounded-xl border px-3.5 py-2 text-left transition ${isAll ? "bg-navy border-navy text-white" : "bg-white border-gray-200 text-navy hover:border-navy/40"}`}>
+          <span className="block text-xs font-semibold">{ALL_TEAMS}</span>
+          <span className={`block text-sm font-bold ${isAll ? "text-[#D4AF37]" : "text-red-600"}`}>
+            {euros([...teamTotals.values()].reduce((s, v) => s + v, 0))}
+          </span>
+        </button>
         {SETTLEMENT_TEAMS.map(t => {
           const owed = teamTotals.get(t) ?? 0;
           const active = t === team;
@@ -209,12 +227,12 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
 
       {/* O que a equipa deve */}
       <div className="bg-navy text-white rounded-2xl p-5">
-        <p className="text-xs uppercase tracking-wide text-white/60">{team} deve-te</p>
+        <p className="text-xs uppercase tracking-wide text-white/60">{isAll ? "As equipas devem-te" : `${team} deve-te`}</p>
         <p className="text-4xl font-bold mt-1">{euros(owedNow)}</p>
         <div className="mt-3 space-y-1 text-xs text-white/80 border-t border-white/10 pt-3">
-          <p className="flex justify-between"><span>Serviços até hoje por pagar</span><span>{euros(account?.todayTotal ?? 0)} + {euros(account?.beforeTotal ?? 0)}</span></p>
-          {(account?.adjustments.length ?? 0) > 0 && <p className="flex justify-between"><span>Acertos e dívidas combinadas</span><span>+{euros(account!.adjustments.reduce((s, l) => s + l.amount, 0))}</span></p>}
-          {(account?.ownerOwes.length ?? 0) > 0 && <p className="flex justify-between"><span>Pagos a ti (parte da equipa)</span><span>−{euros(account!.ownerOwes.reduce((s, l) => s + l.amount, 0))}</span></p>}
+          <p className="flex justify-between"><span>Serviços até hoje por pagar</span><span>{euros(sel.reduce((s, t) => s + t.todayTotal, 0))} + {euros(sel.reduce((s, t) => s + t.beforeTotal, 0))}</span></p>
+          {adjSum > 0 && <p className="flex justify-between"><span>Acertos e dívidas combinadas</span><span>+{euros(adjSum)}</span></p>}
+          {oweSum > 0 && <p className="flex justify-between"><span>Pagos a ti (parte da equipa)</span><span>−{euros(oweSum)}</span></p>}
           {earlier.length > 0 && <p className="flex justify-between text-[#D4AF37]"><span>Dos quais de semanas anteriores</span><span>{euros(earlier.reduce((s, l) => s + l.amount, 0))}</span></p>}
         </div>
         <p className="text-xs text-white/70 mt-1">
@@ -225,18 +243,18 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
             Fora do total: {account.awaitingClient.map(l => `${l.label} (${euros(l.amount)} da equipa, o cliente paga-te a ti)`).join("; ")}.
           </p>
         ) : null}
-        <div className="flex gap-2 mt-4">
-          <button onClick={settle} disabled={!settlement.canSettle || group.total <= 0 || busy !== null}
+        {!isAll && <div className="flex gap-2 mt-4">
+          <button onClick={settle} disabled={!settlement.canSettle || !group || group.total <= 0 || busy !== null}
             title={settlement.canSettle ? "Dar como pago e repor as contas a zero" : "Só se pode fechar ao domingo"}
             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-bold rounded-lg bg-[#D4AF37] text-navy disabled:opacity-40 disabled:cursor-not-allowed">
             {settlement.canSettle ? <Check className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-            {busy === group.id ? "A fechar..." : `${team} pagou ${euros(group.total)}`}
+            {busy === group?.id ? "A fechar..." : `${team} pagou ${euros(group?.total ?? 0)}`}
           </button>
           <button onClick={copyMessage} disabled={!account}
             className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-lg border border-white/20 disabled:opacity-40">
             {copied === team ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Mensagem
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Semana */}
@@ -258,7 +276,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
         </div>
 
         {week.length === 0
-          ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço da {team} nesta semana.</p>
+          ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço {isAll ? "" : `da ${team} `}nesta semana.</p>
           : week.map((w, i) => {
             const key = w.id ?? `w${i}`;
             const m = w.id ? media.get(w.id) : undefined;
@@ -339,7 +357,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
       )}
 
       <div className="bg-white border border-gray-200 rounded-2xl">
-        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos da {team}</p>
+        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos {isAll ? "das equipas" : `da ${team}`}</p>
         {groupHistory.length === 0
           ? <p className="px-4 py-6 text-sm text-gray-400 text-center">Ainda nenhum acerto registado aqui.</p>
           : groupHistory.map(h => (
