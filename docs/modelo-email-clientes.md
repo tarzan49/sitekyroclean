@@ -12,8 +12,8 @@ Assunto: resposta no mesmo fio do email da pessoa, com quem ela pôs em cópia.
 
     Para [peças], em [localidade] e com a deslocação incluída:
 
-    [Opção Premium]: [total]€. Dura até 10 anos, conforme o uso, e tem garantia.
-    [Opção Essencial]: [total]€. Dura 1 a 2 anos, com garantia de 2 anos.
+    [Opção Premium]: [total]€. Dura até 10 anos, conforme o uso, com garantia, e inclui 5 lavagens: se cair um líquido, limpa sozinha com um pano, até 5 vezes no mesmo sítio.
+    [Opção Essencial]: [total]€. Dura 1 a 2 anos, com garantia de 2 anos, e inclui 2 lavagens no mesmo sítio.
     [Só limpeza]: [total]€.
 
     [Uma frase sobre o problema dela, sem prometer resultado.]
