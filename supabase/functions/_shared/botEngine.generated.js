@@ -3339,8 +3339,8 @@ function lineBlock(l, team) {
       l.vatOnTop ? `COM FATURA, IVA À PARTE: o cliente paga ${euros(l.billed)} (${euros(net)} + ${euros(l.vat)} de IVA)` : `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
       `Valor do serviço sem IVA: ${euros(net)}`,
       `IVA a entregar ao Estado: ${euros(l.vat)}`,
-      `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
-      `Minha parte (metade do valor sem IVA): ${euros(mine)}`,
+      `Vossa parte (${Math.abs(l.teamPart - mine) <= 1 ? "metade do valor sem IVA" : "o que sobra"}): ${euros(l.teamPart)}`,
+      `Minha parte (${Math.abs(l.teamPart - mine) <= 1 ? "metade do valor sem IVA" : "combinada"}): ${euros(mine)}`,
       `Deves-me ${euros(l.amount)} (${owed.join(" + ")})`
     ];
   }
@@ -3399,7 +3399,9 @@ function teamAccounts(rows, events, date, adjustments = []) {
     const team = r.calendar_event_id ? teamOfEvent.get(r.calendar_event_id) ?? null : null;
     const billed = Number(r.billed_value) || 0;
     const net = r.invoiced ? round24(billed - serviceVatOf(r)) : billed;
-    const invoiceTeamPart = r.invoiced ? Math.floor(round24(net * 50)) / 100 : null;
+    const halfTeamPart = Math.floor(round24(net * 50)) / 100;
+    const agreedTeamPart = round24(net - (Number(r.my_cut) || 0));
+    const invoiceTeamPart = r.invoiced ? (Number(r.my_cut) || 0) > Math.ceil(billed / 2) + 1 ? Math.max(0, agreedTeamPart) : halfTeamPart : null;
     const ownerUpsell = round24(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
       const teamPart = invoiceTeamPart !== null ? round24(invoiceTeamPart + (Number(r.upsell_value) || 0) - Math.max(0, ownerUpsell)) : round24(billed + (Number(r.upsell_value) || 0) - share);
