@@ -706,3 +706,5 @@ Esclarecimento do dono (3/11/2026): o bot pode baixar o preço, mas só nas cond
 ## Avaliação sem Instagram (dono, 4 Nov 2026)
 
 Conclusão do dono: não temos mais avaliações porque não mostramos ao cliente o quanto são necessárias, nem dizemos que demoram 10 segundos. O pedido passa a dizer isso e vai sem Instagram. O Instagram só sai depois de o cliente dizer que avaliou ("já avaliei", "feito"), uma vez por serviço (`onReviewDone` em `kyro-bot/src/bot/reviewCheckin.ts`). O bot não vê o Google: quem avalia sem dizer nada não recebe o Instagram. Textos do painel em `src/lib/clientFollowUp.ts`. Substitui a regra de 28/10 (Instagram sempre no pedido).
+
+Seguimento às 24 h (`processReviewNudges`): uma pergunta "Conseguiu deixar a sua avaliação?" com o link, das 10h às 20h, uma vez por serviço. Só a quem não disse nada depois do pedido ("obrigado" e "ok" contam como nada); nunca a quem disse que vai avaliar, numa conversa em pausa ou que já seguiu para outro assunto. Um "sim" recebe o agradecimento e o Instagram. Pedidos anteriores a 4/11 12h15 UTC ficam de fora, porque já levaram o Instagram.
