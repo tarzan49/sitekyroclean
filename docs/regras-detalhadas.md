@@ -727,3 +727,6 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 - As três páginas dizem logo no `intro` e na `metaDescription` que só tratamos tapetes, alcatifas, sofás e colchões, nunca paredes, chão nem madeira (`problemSeoData.ts`, lido também pelo prerender).
 - Bot: secção S69b de `respostas-bot-whatsapp.md` (resposta curta, sem preço, `handoff` em silêncio). Ficheiro atualizado em 4/11; falta publicar com o `deploy.sh` do kyro-bot.
 - Search Console (conta `u/1` do Chrome, `sc-domain:cleansolutions.com.pt`, 90 dias): páginas que acabam em "mofo" = 6 cliques e 194 impressões; consultas acabadas em "mofo" = 4 impressões, 0 cliques. O tráfego orgânico de mofo é desprezável, por isso o cliente do chão provavelmente não veio da pesquisa orgânica. Google Ads (conta 786-035-1125, Performance Max): a campanha serviu pesquisas com mofo/bolor. Dono, 4/11: mofo, bolor e parede NÃO são negativas (são problemas e localizações dos nossos clientes). Negativas postas ao nível da conta: madeira, chão, chao.
+
+## Garantia de impermeabilização (dono, 4 Nov)
+- A impermeabilização tem garantia de 10 anos (dono, 4 Nov: "Sim, tem"), por isso "O pacote inclui uma garantia de impermeabilização de 10 anos" fica nas páginas. Por confirmar: se cobre só a Premium, porque a Essencial dura 1 a 2 anos.
