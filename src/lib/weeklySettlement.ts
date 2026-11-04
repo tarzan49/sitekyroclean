@@ -138,18 +138,22 @@ export function breakdownOf(r: AccountRow, status: WeekServiceStatus, line?: Acc
   if (!line && r.invoiced) {
     const vat = round2(serviceVatOf(r));
     if (vat > 0) {
-      const teamPart = Math.floor(round2((billed - vat) * 50)) / 100;
+      const net = round2(billed - vat);
+      const half = Math.floor(round2(net * 50)) / 100;
+      const agreed = round2(net - (Number(r.my_cut) || 0));
+      const teamPart = (Number(r.my_cut) || 0) > Math.ceil(billed / 2) + 1 ? Math.max(0, agreed) : half;
       line = { date: r.request_date ?? '', label: '', billed, share, vat, teamPart, amount: round2(billed - teamPart), ...(r.vat_on_top ? { vatOnTop: true } : {}) };
     }
   }
   if (line?.vat && line.teamPart !== undefined) {
     const net = round2(line.billed! - line.vat);
+    const even = Math.abs(line.teamPart - round2(net - line.teamPart)) <= 1;
     out.push(
       { label: line.vatOnTop ? 'Cliente paga (valor + IVA à parte)' : 'Cliente paga (IVA incluído)', value: eur(line.billed!) },
       { label: 'Valor do serviço sem IVA', value: eur(net) },
       { label: 'IVA a entregar ao Estado (23%)', value: eur(line.vat) },
-      { label: 'Parte da equipa (metade do valor sem IVA)', value: eur(line.teamPart) },
-      { label: 'A tua parte (metade do valor sem IVA)', value: eur(round2(net - line.teamPart)) },
+      { label: even ? 'Parte da equipa (metade do valor sem IVA)' : 'Parte da equipa (o que sobra)', value: eur(line.teamPart) },
+      { label: even ? 'A tua parte (metade do valor sem IVA)' : 'A tua parte combinada (sem IVA)', value: eur(round2(net - line.teamPart)) },
     );
     if (line.upsellShare) out.push({ label: 'A tua parte no upsell', value: eur(line.upsellShare) });
     if (line.reviewPenalty) out.push({ label: '5% por falta de procedimento', value: eur(line.reviewPenalty) });

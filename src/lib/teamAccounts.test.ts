@@ -131,6 +131,11 @@ describe('teamAccounts', () => {
     expect(r.teams[0].message).toContain('13/10 Sofia Teste, Porto · a vossa parte 32,11€ (com fatura: 79€ = 64,23€ sem IVA + 14,77€ de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)');
   });
 
+  it('with an invoice and a share agreed above half, the owner gets that share + all the VAT (Verónica, 4 Nov)', () => {
+    const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 249, my_cut: 150, invoiced: true })], events, '2026-10-14');
+    expect(r.teams[0].before[0]).toMatchObject({ vat: 46.56, teamPart: 52.44, amount: 196.56 });
+  });
+
   it('with an invoice the VAT is inside the price and split in half', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 79, my_cut: 40, invoiced: true })], events, '2026-10-14');
     // IVA incluído no preço e dividido a meias (16/10): base 64,23€, a equipa fica com 32,11€.

@@ -189,8 +189,8 @@ function lineBlock(l: AccountLine, team: string): string[] {
         : `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
       `Valor do serviço sem IVA: ${euros(net)}`,
       `IVA a entregar ao Estado: ${euros(l.vat)}`,
-      `Vossa parte (metade do valor sem IVA): ${euros(l.teamPart)}`,
-      `Minha parte (metade do valor sem IVA): ${euros(mine)}`,
+      `Vossa parte (${Math.abs(l.teamPart - mine) <= 1 ? 'metade do valor sem IVA' : 'o que sobra'}): ${euros(l.teamPart)}`,
+      `Minha parte (${Math.abs(l.teamPart - mine) <= 1 ? 'metade do valor sem IVA' : 'combinada'}): ${euros(mine)}`,
       `Deves-me ${euros(l.amount)} (${owed.join(' + ')})`,
     ];
   }
@@ -262,7 +262,11 @@ export function teamAccounts(rows: AccountRow[], events: AccountEvent[], date: s
     // do valor sem IVA (dono, 2026-10-16, Aleixo: "temos que dividir o IVA... estava incluído no valor").
     // Fatura de só uma parte do serviço (`invoice_value`): só essa parte tem IVA.
     const net = r.invoiced ? round2(billed - serviceVatOf(r)) : billed;
-    const invoiceTeamPart = r.invoiced ? Math.floor(round2(net * 50)) / 100 : null;
+    // Parte da equipa = metade do valor sem IVA, salvo parte do dono combinada acima disso
+    // (dono, 2026-11-04, Verónica: "150€ + IVA"): aí a equipa fica com o que sobra.
+    const halfTeamPart = Math.floor(round2(net * 50)) / 100;
+    const agreedTeamPart = round2(net - (Number(r.my_cut) || 0));
+    const invoiceTeamPart = r.invoiced ? ((Number(r.my_cut) || 0) > Math.ceil(billed / 2) + 1 ? Math.max(0, agreedTeamPart) : halfTeamPart) : null;
     const ownerUpsell = round2(share - (Number(r.my_cut) || 0));
     if (r.paid_to_owner) {
       const teamPart = invoiceTeamPart !== null
