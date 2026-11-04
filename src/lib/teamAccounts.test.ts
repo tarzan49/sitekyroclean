@@ -132,7 +132,7 @@ describe('teamAccounts', () => {
   });
 
   it('with an invoice and a share agreed above half, the owner gets that share + all the VAT (Verónica, 4 Nov)', () => {
-    const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 249, my_cut: 150, invoiced: true })], events, '2026-10-14');
+    const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-14', billed_value: 249, my_cut: 150, invoiced: true })], events, '2026-10-15');
     expect(r.teams[0].before[0]).toMatchObject({ vat: 46.56, teamPart: 52.44, amount: 196.56 });
   });
 
