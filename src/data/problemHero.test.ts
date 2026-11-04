@@ -70,6 +70,10 @@ describe('problem hero content', () => {
         if (mould.includes(item.slug)) expect(hero.intro, item.slug).toContain(notice);
         else expect(hero.intro, item.slug).not.toContain(notice);
       }
+      if (mould.includes(item.slug)) {
+        expect(item.metaDescription, item.slug).toContain(notice);
+        expect(getProblemHero(item).intro, item.slug).toMatch(/^.{0,120}paredes, chão nem madeira/);
+      }
     }
   });
   it('keeps the Porto heading on the national page only', () => {
