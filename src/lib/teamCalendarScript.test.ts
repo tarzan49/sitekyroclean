@@ -513,3 +513,39 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.calendarioPorArrumar({ selected: false }, null, false)).toBe(true);
   });
 });
+
+describe('ReservasBot: o telefone de um serviço, para as fotografias do cliente', () => {
+  const ctx = vm.createContext({});
+  vm.runInContext(readFileSync(path.join(DIR, 'ReservasBot.gs'), 'utf8'), ctx);
+  const telefone = (titulo: string, descricao = ''): string | null => ctx.telefoneDoEvento(titulo, descricao);
+  const titulo = (numero: string) => `Serviço 45€ (89€) Limpeza de sofá 3 lugares - ${numero} - Cliente - Rua Inventada 12, 4000-123 Porto`;
+
+  it('a marca "bot:" ganha a qualquer número, com o jid inteiro', () => {
+    expect(telefone(titulo('900000001'), 'Nota\n\nbot:380900000001@s.whatsapp.net')).toBe('380900000001@s.whatsapp.net');
+    expect(telefone(titulo('900000001'), 'bot:111122223333@lid')).toBe('111122223333@lid');
+    expect(telefone('Serviço 45€ (89€) – cliente – Cascais', 'Telefone: 351900000001<br>bot:351900000001@s.whatsapp.net<br>')).toBe('351900000001@s.whatsapp.net');
+  });
+
+  it('sem marca, lê qualquer indicativo no título', () => {
+    expect(telefone(titulo('+380900000001'))).toBe('380900000001');
+    expect(telefone(titulo('15550000001'))).toBe('15550000001');
+    expect(telefone(titulo('972500000001'))).toBe('972500000001');
+    expect(telefone(titulo('+44 7000 000001'))).toBe('447000000001');
+    expect(telefone(titulo('+1 (555) 000-0001'))).toBe('15550000001');
+    expect(telefone(titulo('00447000000001'))).toBe('00447000000001');
+    expect(telefone(titulo('351900000001'))).toBe('351900000001');
+    expect(telefone(titulo('+351 900 000 001'))).toBe('351900000001');
+  });
+
+  it('os 9 algarismos portugueses continuam a funcionar', () => {
+    expect(telefone(titulo('910000001'))).toBe('910000001');
+    expect(telefone(titulo('910 000 001'))).toBe('910000001');
+    expect(telefone('Serviço 45€ (89€) Sofá', 'Telefone: 910000001')).toBe('910000001');
+  });
+
+  it('o número do título ganha ao da descrição, e o resto do título não é um número', () => {
+    expect(telefone(titulo('+447000000001'), 'Contacto da filha: 910000002')).toBe('447000000001');
+    expect(telefone('Serviço 45€ (89€) Sofá - Cliente - Rua 5 de Outubro 123, 4000-123 Porto')).toBeNull();
+    expect(telefone('Serviço 75€ (149€) Tapete 1 × 2 m - Cliente - Rua Inventada, 651 - 1 esq., 3880-353 Furadouro')).toBeNull();
+  });
+});

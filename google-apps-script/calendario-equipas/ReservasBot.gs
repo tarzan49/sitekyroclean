@@ -41,7 +41,8 @@
  *     O dono recebe da bot-api um email com o título e a descrição do evento.
  *   { key, action: 'needPhotos' }
  *     os serviços dos próximos 14 dias que ainda não têm a linha "Fotos:" na
- *     descrição e com telefone: [{ eventId, phone }] (os 9 algarismos). Dono, 2026-10-11: "anexar ao calendário
+ *     descrição e com telefone: [{ eventId, phone }] (phone = o jid da marca "bot:", ou o número: algarismos
+ *     com o indicativo, ou os 9 algarismos portugueses). Dono, 2026-10-11: "anexar ao calendário
  *     sempre uma foto daquilo que se vai limpar".
  *   { key, action: 'photos', eventId, images: [{ base64, mime, name }] }
  *     guarda as fotografias que o cliente mandou no WhatsApp numa pasta do
@@ -212,6 +213,22 @@ function respostaBot(objeto) {
 const LINHA_FOTOS = /^Fotos:/m;
 const PASTA_FOTOS = 'Kyro · Fotos dos serviços';
 const TELEFONE = /(?:\+?351[\s-]?)?\b(9[1236]\d)[\s-]?(\d{3})[\s-]?(\d{3})\b/;
+const TELEFONE_INDICATIVO = /(?:^|\D)(\+\d(?:(?:[\s.-]|\s?\(|\)\s?)?\d){8,14}|\d{10,15})(?!\d)/;
+const MARCA_CONVERSA = /\bbot:(\d+@(?:s\.whatsapp\.net|lid))\b/;
+
+// A marca "bot:" é a própria conversa; sem ela, o número do título, e só depois o da descrição.
+function telefoneDoEvento(titulo, descricao) {
+  const marca = MARCA_CONVERSA.exec(descricao);
+  if (marca) return marca[1];
+  const textos = [titulo, descricao];
+  for (let i = 0; i < textos.length; i++) {
+    const indicativo = TELEFONE_INDICATIVO.exec(textos[i]);
+    if (indicativo) return indicativo[1].replace(/\D/g, '');
+    const nacional = TELEFONE.exec(textos[i]);
+    if (nacional) return nacional[1] + nacional[2] + nacional[3];
+  }
+  return null;
+}
 
 function servicosSemFotos() {
   const agora = Date.now();
@@ -222,8 +239,8 @@ function servicosSemFotos() {
     if (!SERVICO_DO_BOT.test(ev.getTitle())) continue;
     const descricao = String(ev.getDescription() || '');
     if (LINHA_FOTOS.test(descricao)) continue;
-    const tel = TELEFONE.exec(ev.getTitle() + '\n' + descricao);
-    if (tel) lista.push({ eventId: ev.getId().replace(/@google\.com$/, ''), phone: tel[1] + tel[2] + tel[3] });
+    const telefone = telefoneDoEvento(ev.getTitle(), descricao);
+    if (telefone) lista.push({ eventId: ev.getId().replace(/@google\.com$/, ''), phone: telefone });
   }
   return { ok: true, events: lista };
 }
