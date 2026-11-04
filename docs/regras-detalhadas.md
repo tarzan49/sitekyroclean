@@ -385,8 +385,9 @@ marca do Google leva um código: "Vi o vosso anúncio no Google (ref. K7F2Q)".**
 O site regista o código com o `gclid` no servidor (função `ad-click`, tabela
 `ad_clicks`; nada no telemóvel), o `conversations-export.ts` do kyro-bot lê-o
 para `whatsapp_conversations.ad_ref`, e a função `ads-conversions-feed` dá ao
-Google Ads, todos os dias, os fechos dos últimos 90 dias de todas as cidades
-(clique pelo código, ou telefone cifrado) com o valor "para ti", na conversão
+Google Ads, todos os dias, só os fechos de quem veio com código "ref." (desde
+04/11, por causa do RGPD; sem orgânicos nem clientes antigos), com o gclid ou,
+sem gclid, o telefone em SHA-256, e o valor "para ti", na conversão
 "Serviço fechado", que passa a principal; o clique no WhatsApp passa a
 secundário (substitui a exceção de 24/09). Linha na política de privacidade.
 **Desde 28/09/2026 os anúncios da Meta também marcam** ("Vi o vosso anúncio no
