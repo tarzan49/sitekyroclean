@@ -202,12 +202,12 @@ describe('two-person teams and the team the bot books on', () => {
 
   it('books the team already working next to that time, then the one with fewer jobs that day', () => {
     const at11 = [at('2026-10-08', '11:00'), at('2026-10-08', '12:00')] as const;
-    // Porto 2 has a job ending at 10h: next to 11h, so it goes there.
-    const near = [ev('2026-10-08', '09:00', '10:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
-    expect(chooseTeam(near, 'Porto', ...at11)).toBe('Porto 2');
+    // Porto 1 has a job ending at 10h: next to 11h, so it goes there (Porto 2 is the backup since 4 Nov).
+    const near = [ev('2026-10-08', '09:00', '10:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1')];
+    expect(chooseTeam(near, 'Porto', ...at11)).toBe('Porto 1');
     // Nothing next to it: the team with fewer jobs that day.
     const far = [porto1('16:00', '17:00', 'Ana'), porto1('19:00', '20:00', 'Eva'), ev('2026-10-08', '08:00', '08:30', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 2')];
-    expect(chooseTeam(far, 'Porto', ...at11)).toBe('Porto 2');
+    expect(chooseTeam(far, 'Porto', ...at11)).toBe('Porto 3');
     expect(chooseTeam([], 'Porto', ...at11)).toBe('Porto 1');
     // No room, no team; Coimbra and Figueira da Foz have their own team (10 Oct 2026).
     const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
@@ -217,13 +217,15 @@ describe('two-person teams and the team the bot books on', () => {
     expect(chooseTeam([], 'Figueira da Foz', ...at15)).toBe('Coimbra');
   });
 
-  it('Porto 3 (Denise) takes a Porto job only when Porto 1 and Porto 2 cannot (owner, 28 Oct 2026)', () => {
+  it('Porto 2 (Aleixo) takes a Porto job only when Porto 1 and Porto 3 (Denise) cannot (owner, 4 Nov 2026)', () => {
     const at11 = [at('2026-10-08', '11:00'), at('2026-10-08', '12:00')] as const;
     const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
     // Free day: Porto 1 first, never the backup.
     expect(chooseTeam([], 'Porto', ...at15)).toBe('Porto 1');
-    // Even when Porto 1 has more jobs that day, Porto 2 comes before Porto 3.
-    expect(chooseTeam([porto1('16:00', '17:00', 'Ana'), porto1('19:00', '20:00', 'Eva')], 'Porto', ...at11)).toBe('Porto 2');
+    // Even when Porto 1 has more jobs that day, Denise comes before Porto 2.
+    expect(chooseTeam([porto1('16:00', '17:00', 'Ana'), porto1('19:00', '20:00', 'Eva')], 'Porto', ...at11)).toBe('Porto 3');
+    // Denise busy all day: Porto 2 takes the morning job.
+    expect(chooseTeam([porto1('11:00', '12:00', 'Ana'), p3()], 'Porto', ...at11)).toBe('Porto 2');
     // Weekday afternoon with Porto 1 busy: Porto 2 only works mornings, so it goes to Denise.
     expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Porto', ...at15)).toBe('Porto 3');
     // Her free hours count when the bot offers slots.
@@ -253,7 +255,7 @@ describe('Porto 1 off on the afternoon of 29 Oct 2026 (owner, 28 Oct: "amanha a 
   it('a cleaning in the afternoon goes to Porto 3; the morning stays with Porto 1', () => {
     expect(chooseTeam([], 'Porto', ...span('15:00', '16:00'))).toBe('Porto 3');
     expect(chooseTeam([], 'Porto', ...span('12:30', '13:30'))).toBe('Porto 3');
-    expect(chooseTeam([], 'Porto', ...span('11:30', '12:30'))).toBe('Porto 2');
+    expect(chooseTeam([], 'Porto', ...span('11:30', '12:30'))).toBe('Porto 3');
     expect(chooseTeam([], 'Porto', ...span('10:00', '11:00'))).toBe('Porto 1');
   });
   it('waterproofing (alone or with cleaning) is not booked that afternoon', () => {

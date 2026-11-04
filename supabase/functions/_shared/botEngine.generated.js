@@ -2389,7 +2389,7 @@ var TEAMS_BY_REGION = {
   Coimbra: ["Coimbra"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
-var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 3"]);
+var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 2"]);
 var WATERPROOFING_TEAMS = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
   // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.

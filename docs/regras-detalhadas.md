@@ -730,3 +730,6 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 
 ## Garantia de impermeabilização (dono, 4 Nov)
 - A impermeabilização tem garantia de 10 anos (dono, 4 Nov: "Sim, tem"), por isso "O pacote inclui uma garantia de impermeabilização de 10 anos" fica nas páginas. Por confirmar: se cobre só a Premium, porque a Essencial dura 1 a 2 anos.
+
+## Prioridade Porto 3 (Denise) sobre Porto 2 (Aleixo) (dono, 4 Nov 2026)
+"A Denise fica como prioridade e o Aleixo perde prioridade nos serviços; só lhe passas serviços se a Denise estiver ocupada." `BACKUP_TEAMS` em `src/lib/botAvailability.ts` passou de Porto 3 para Porto 2: `chooseTeam` e `replacementTeam` dão o serviço a Porto 2 em último. As horas livres de Porto 2 continuam a contar nas horas oferecidas.

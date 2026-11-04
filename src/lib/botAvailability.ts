@@ -55,11 +55,12 @@ export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 /**
- * Backup teams (owner, 28 Oct 2026: "porto 3 mete a denise", "ela cobre tudo o que porto 2 e porto 1
- * não cobrem"): Denise takes a job only when no other team of the zone can. Her free hours still count
- * when the bot offers slots, so the Porto shows more hours; `chooseTeam` gives her the job last.
+ * Backup teams (owner, 4 Nov 2026: "a denise fica como prioridade e o aleixo perde prioridade [...] apenas
+ * passas lhe serviços se a denise estiver ocupada"): Porto 2 (Aleixo) takes a job only when Denise (Porto 3)
+ * and the other teams of the zone cannot. Its free hours still count when the bot offers slots; `chooseTeam`
+ * gives it the job last.
  */
-export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 3']);
+export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 2']);
 /**
  * Waterproofing goes to another team in some zones (owner, 15 Oct 2026: "para já a equipa de
  * braga só fica com limpeza de estofos ao domicílio, a do porto fica com impermeabilizações
