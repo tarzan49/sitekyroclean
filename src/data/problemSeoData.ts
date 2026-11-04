@@ -642,9 +642,9 @@ const problemDefinitions: ProblemPage[] = [
     category: "protecao",
     keyword: "tirar mofo do tapete",
     title: "Tirar Mofo do Tapete | Tratamento Antifúngico | Kyro",
-    metaDescription: "Remoção profissional de mofo e bolor de tapetes. Tratamento antifúngico. Lavagem completa. Orçamento grátis.",
+    metaDescription: "Mofo e bolor só em tapetes (não tratamos paredes, chão nem madeira). Tratamento antifúngico e lavagem completa. Orçamento grátis.",
     h1: "Remoção de Mofo e Bolor de Tapetes",
-    intro: "Mofo e bolor nos tapetes representam um risco para a saúde e danificam as fibras. A Kyro Clean Solutions avalia primeiro se o tapete pode ser intervencionado e, quando pode, faz o tratamento antifúngico e a lavagem completa.",
+    intro: "Tratamos mofo e bolor apenas em tapetes, alcatifas, sofás e colchões. Não limpamos paredes, chão nem madeira. Mofo e bolor nos tapetes representam um risco para a saúde e danificam as fibras. A Kyro Clean Solutions avalia primeiro se o tapete pode ser intervencionado e, quando pode, faz o tratamento antifúngico e a lavagem completa.",
     problemDetail: "O mofo desenvolve-se em tapetes expostos a humidade: divisões mal ventiladas, inundações, derrames não tratados. Os esporos de mofo causam problemas respiratórios e reações alérgicas. O mofo também degrada as fibras do tapete, podendo causar danos irreversíveis se não tratado.",
     solutionDetail: "Avaliamos primeiro se o tapete pode ser intervencionado. Quando pode, fazemos o tratamento antifúngico e a lavagem completa para remover manchas de bolor e resíduos acessíveis, com secagem controlada em ambiente ventilado. Se houver deterioração ou contaminação extensa, explicamos os limites. A limpeza não resolve a causa da humidade: sem a corrigir, o mofo pode voltar.",
     benefits: [
@@ -669,9 +669,9 @@ const problemDefinitions: ProblemPage[] = [
     category: "protecao",
     keyword: "tirar mofo da alcatifa",
     title: "Tirar Mofo da Alcatifa | Tratamento Antifúngico | Kyro",
-    metaDescription: "Remoção de mofo e bolor de alcatifas com tratamento antifúngico. Limpeza profissional. Orçamento grátis.",
+    metaDescription: "Mofo e bolor só em alcatifas (não tratamos paredes, chão nem madeira). Tratamento antifúngico e limpeza profissional. Orçamento grátis.",
     h1: "Remoção de Mofo e Bolor de Alcatifas",
-    intro: "Alcatifas com mofo podem comprometer a saúde de toda a família. A Kyro Clean Solutions remove mofo de alcatifas com tratamento antifúngico profissional.",
+    intro: "Tratamos mofo e bolor apenas em alcatifas, tapetes, sofás e colchões. Não limpamos paredes, chão nem madeira. Alcatifas com mofo podem comprometer a saúde de toda a família. A Kyro Clean Solutions remove mofo de alcatifas com tratamento antifúngico profissional.",
     problemDetail: "As alcatifas cobrem grandes áreas e podem reter humidade na base, criando condições ideais para mofo. O cheiro de humidade é frequentemente o primeiro sinal de mofo na alcatifa. Sem tratamento, o mofo pode espalhar-se e causar danos estruturais.",
     solutionDetail: "Limpeza profunda da alcatifa com tratamento antifúngico. Extração de humidade e sujidade com equipamento profissional. Aplicação de produto preventivo contra reaparecimento de mofo.",
     benefits: [
@@ -1446,7 +1446,7 @@ const problemDefinitions: ProblemPage[] = [
     title: "Cheiro a Mofo no Sofá: Causa e o que Resolve | Kyro Clean Solutions",
     metaDescription: "Cheiro a mofo no sofá vem de humidade retida, não de falta de limpeza. Perfumar mascara e o cheiro volta. Saiba o que resolve e o que não resolve.",
     h1: "Cheiro a Mofo no Sofá",
-    intro: "Cheiro a mofo num sofá é quase sempre um sintoma de humidade, não de sujidade. É por isso que perfumar resolve durante um dia e o cheiro volta: a origem continua lá, dentro do enchimento ou na divisão.",
+    intro: "Falamos de sofás e estofos: não tratamos mofo em paredes, chão nem madeira. Cheiro a mofo num sofá é quase sempre um sintoma de humidade, não de sujidade. É por isso que perfumar resolve durante um dia e o cheiro volta: a origem continua lá, dentro do enchimento ou na divisão.",
     problemDetail: "O odor vem de crescimento microbiano em material que ficou húmido tempo suficiente. As causas mais comuns são uma limpeza anterior em que entrou muita água e saiu pouca, uma divisão com humidade alta e pouca ventilação, um sofá encostado a parede fria com condensação, ou um derrame que nunca secou por completo por dentro. A Organização Mundial de Saúde trata a humidade persistente no interior como um problema de saúde ambiental por si só, associado a sintomas respiratórios, e é significativo que a recomendação principal seja prevenir a humidade e não tratar o cheiro. Ou seja: enquanto a causa estiver ativa, qualquer limpeza é temporária.",
     solutionDetail: "Começamos por perceber se a origem está na peça ou no espaço, porque muda tudo. Se estiver na peça, limpamos com humidade controlada e forçamos a secagem, em vez de acrescentar mais água a um problema de água. Se houver sinais de que a humidade vem da divisão, do pavimento ou da parede, dizemos-lhe com franqueza que a limpeza não resolve a causa e que o cheiro vai regressar enquanto a origem não for tratada. Quando há deterioração extensa dentro do enchimento, explicamos os limites em vez de prometer recuperação.",
     benefits: [
