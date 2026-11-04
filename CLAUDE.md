@@ -76,6 +76,15 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Ao corrigir um valor, mudar só esse valor; não extrapolar sem perguntar.
 - Mensagens a clientes/equipas: rascunho ao dono primeiro, várias mensagens curtas, com espaçamento.
 
-## 7. Antes de terminar
+## 7. Poupar contexto (dono, 4 Nov)
+
+- Antes de ler um ficheiro inteiro, procurar com grep e ler só o necessário.
+- Para explorar o projeto, usar um subagente e trazer só o resumo.
+- Mostrar o diff, nunca o ficheiro completo.
+- Não repetir o que já foi decidido nesta sessão.
+- Se mudarmos de tarefa, propor /compact ou uma sessão nova.
+- Respostas curtas por defeito; mais detalhe só se o dono pedir.
+
+## 8. Antes de terminar
 
 Atualiza este ficheiro só se uma regra em vigor mudou (uma linha), e acrescenta o detalhe em `docs/regras-detalhadas.md`. Commit + push.
