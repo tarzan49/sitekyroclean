@@ -58,6 +58,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Pedido de avaliação só depois de o cliente dizer que correu bem; vai sem Instagram e diz que demora 10 segundos e ajuda a mostrar o nosso valor; o Instagram só depois de o cliente dizer que avaliou; 24 h depois do pedido, uma pergunta a quem não disse nada (dono, 4 Nov).
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
+- Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script).
 
 ## 5. Site e SEO
 
