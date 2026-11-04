@@ -243,7 +243,9 @@ function idDaPasta(nome, cor) {
 }
 
 function criarFiltro(criterio, acao) {
-  var existentes = Gmail.Users.Settings.Filters.list('me').filter || [];
+  // Sem filtros nenhuns, a lista vem a null e não um objeto vazio.
+  var lista = Gmail.Users.Settings.Filters.list('me');
+  var existentes = (lista && lista.filter) || [];
   var igual = existentes.some(function (f) {
     return f.criteria && f.criteria.from === criterio.from && f.criteria.query === criterio.query;
   });
