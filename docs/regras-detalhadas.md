@@ -724,7 +724,7 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 
 ## Mofo e bolor: só estofos (dono, 4 Nov)
 - "Mofo" é termo brasileiro e a pesquisa é genérica ("tirar mofo"): traz quem quer limpar chão, madeira e paredes para as páginas `mofo-tapete`, `mofo-alcatifa` e `cheiro-mofo-sofa`. Pedido real: mofo em chão de madeira. Não é serviço nosso.
-- As três páginas dizem logo no `intro` e na `metaDescription` que só tratamos tapetes, alcatifas, sofás e colchões, nunca paredes, chão nem madeira (`problemSeoData.ts`, lido também pelo prerender).
+- As três páginas, nacionais e por cidade, dizem no hero que só tratamos estofos, nunca paredes, chão nem madeira: campo `heroNotice` de `problemSeoData.ts`, que o `getProblemHero` acrescenta à introdução (React e HTML estático). O campo `intro` não é desenhado em lado nenhum. `mofo-tapete` e `mofo-alcatifa` dizem-no também na `metaDescription`; a de `cheiro-mofo-sofa` não.
 - Bot: secção S69b de `respostas-bot-whatsapp.md` (resposta curta, sem preço, `handoff` em silêncio). Ficheiro atualizado em 4/11; falta publicar com o `deploy.sh` do kyro-bot.
 - Search Console (conta `u/1` do Chrome, `sc-domain:cleansolutions.com.pt`, 90 dias): páginas que acabam em "mofo" = 6 cliques e 194 impressões; consultas acabadas em "mofo" = 4 impressões, 0 cliques. O tráfego orgânico de mofo é desprezável, por isso o cliente do chão provavelmente não veio da pesquisa orgânica. Google Ads (conta 786-035-1125, Performance Max): a campanha serviu pesquisas com mofo/bolor. Dono, 4/11: mofo, bolor e parede NÃO são negativas (são problemas e localizações dos nossos clientes). Negativas postas ao nível da conta: madeira, chão, chao.
 

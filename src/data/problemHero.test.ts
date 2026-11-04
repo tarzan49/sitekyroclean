@@ -62,6 +62,16 @@ describe('problem hero content', () => {
   it('makes urgent availability conditional', () => {
     expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('sob confirmação');
   });
+  it('says on the mould pages, and only there, that walls, floors and wood are not treated', () => {
+    const notice = 'paredes, chão nem madeira';
+    const mould = ['mofo-tapete', 'mofo-alcatifa', 'cheiro-mofo-sofa'];
+    for (const item of getAllProblems()) {
+      for (const hero of [getProblemHero(item), getProblemHero(item, 'Lisboa')]) {
+        if (mould.includes(item.slug)) expect(hero.intro, item.slug).toContain(notice);
+        else expect(hero.intro, item.slug).not.toContain(notice);
+      }
+    }
+  });
   it('keeps the Porto heading on the national page only', () => {
     // A página nacional de limpeza-sofa-domicilio é sobre o Porto de propósito;
     // as de cidade diziam "… no Porto e Arredores em Lisboa" (até 30/09/2026).

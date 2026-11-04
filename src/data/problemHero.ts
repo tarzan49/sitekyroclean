@@ -63,7 +63,7 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
     heading: city ? headingWithCity(problemCityName(problem), city) : problem.h1,
     title: problem.h1,
     location,
-    intro: introductions[problem.category],
+    intro: problem.heroNotice ? `${introductions[problem.category]} ${problem.heroNotice}` : introductions[problem.category],
     eyebrow: 'Cuidado profissional ao domicílio',
     priceLabel,
     travelLabel,
