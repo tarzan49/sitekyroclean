@@ -734,3 +734,5 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 ## Prioridade Porto 3 (Denise) sobre Porto 2 (Aleixo) (dono, 4 Nov 2026)
 "A Denise fica como prioridade e o Aleixo perde prioridade nos serviços; só lhe passas serviços se a Denise estiver ocupada." `BACKUP_TEAMS` em `src/lib/botAvailability.ts` passou de Porto 3 para Porto 2: `chooseTeam` e `replacementTeam` dão o serviço a Porto 2 em último. As horas livres de Porto 2 continuam a contar nas horas oferecidas.
 Limpezas do Porto abaixo de 200€ ficam para Porto 3 (dono, 4 Nov): `PORTO1_MIN_TOTAL` 100 → 200.
+
+- **Pagamento de serviços com fatura (dono, 2026-11-04).** Tudo o que leva IVA, a empresa ou particular, é pago por transferência para a conta Revolut Business da Kyro (dono recebe e entrega o IVA ao Estado); a equipa nunca recebe esse pagamento. O IVA é dividido com a equipa nas contas. As equipas dão o IBAN ao cliente no fim do serviço; o aviso vai antes do serviço, a quem o faz (para o grupo, se a equipa tem grupo). O bot tem a regra em S43 de `respostas-bot-whatsapp.md` (IBAN lá; não vai para este repositório público). MB Way não existe na Revolut Business (a confirmar).
