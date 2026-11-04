@@ -11,8 +11,8 @@
  * Checked against his own quotes: microfibra 2,00 × 2,90 m in Póvoa de Varzim
  * 69€ (Sandra, 10 Oct), juta 3 × 2,5 m in Gaia 99€ (Liliana, 10 Oct), juta
  * 2,50 × 3,50 m in Gaia 119€ (Sónia). With pickup the bot says the home price
- * plus rugPickupFee: 20€ wherever a pickup exists, 3 to 20 m² (owner, 10 Oct
- * 2026: "deixa mais 20 euros", the same on the site).
+ * plus rugPickupFee: 20€ wherever a pickup exists, 3 to 12 m² (owner, 10 Oct
+ * 2026: "deixa mais 20 euros", the same on the site; limit 2 Nov 2026).
  *
  * Wool is priced as common (owner, 22 Oct 2026: "cobra a lã como o sintético"). Delicate rugs (seda, viscose, persa, Arraiolos, feito à mão, kilim) stay
  * with the owner. Under 3 m²: no pickup, priced at home (owner, 22 Oct 2026).

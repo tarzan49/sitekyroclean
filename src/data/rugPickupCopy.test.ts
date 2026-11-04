@@ -24,8 +24,8 @@ import { getProblemBySlug } from './problemSeoData';
  * explicam a recolha dizem-no, a partir de `RUG_PICKUP_RULE`.
  *
  * Desde 2026-10-05 o custo da recolha está escrito (dono); desde 2026-10-10 são 20€ em
- * qualquer área com recolha, a partir de `RUG_PICKUP_FEE_RULE`. Acima de 20 m²
- * somados não há recolha (dono, 2026-10-10).
+ * qualquer área com recolha, a partir de `RUG_PICKUP_FEE_RULE`. Acima de 12 m²
+ * somados não há recolha (dono, 2026-11-02).
  */
 const ROOTS = ['src/data', 'src/constants', 'src/pages', 'src/components', 'scripts'];
 const PICKUP_AS_DEFAULT = /recolha e entrega (ao domic[íi]lio|inclu[íi]das)|recolha e entrega\.|recolha ao domic[íi]lio|recolhemos e entregamos tapetes em toda|sem necessidade de recolha|n[ãa]o s[ãa]o anunciadas como servi[çc]o geral/i;

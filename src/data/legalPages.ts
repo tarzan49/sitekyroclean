@@ -37,7 +37,7 @@ export const LEGAL_PAGES: LegalPage[] = [
     title: 'Política de Privacidade | Kyro Clean Solutions',
     description: 'Consulte a Política de Privacidade da Kyro Clean Solutions. Saiba como recolhemos, utilizamos e protegemos os seus dados pessoais.',
     h1: 'Política de Privacidade',
-    updated: 'setembro de 2026',
+    updated: 'novembro de 2026',
     intro: 'Como a Kyro Clean Solutions recolhe, utiliza, partilha e protege os dados pessoais recolhidos através deste website, ao abrigo do RGPD (Regulamento UE 2016/679). Inclui as ferramentas de medição usadas, a base legal de cada tratamento, os prazos de conservação e como exercer os seus direitos.',
     sections: [
       '1. Quem somos',

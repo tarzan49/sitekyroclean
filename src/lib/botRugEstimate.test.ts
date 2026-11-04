@@ -12,10 +12,10 @@ describe('rugEstimate (owner, 10 Oct 2026)', () => {
     expect(sonia.ok && sonia.homePrice).toBe(119);
   });
 
-  it('adds the site pickup fee (20€) where a pickup exists, and no pickup above 20 m²', () => {
+  it('adds the site pickup fee (20€) where a pickup exists, and no pickup above 12 m²', () => {
     const r = rugEstimate([{ width: 2, length: 2.9, qty: 1, material: 'microfibra' }], 'Porto');
     expect(r.ok && [r.pickupFee, r.pickupPrice]).toEqual([20, 89]);
-    const big = rugEstimate([{ width: 4, length: 6, qty: 1, material: 'sintético' }], 'Porto');
+    const big = rugEstimate([{ width: 3, length: 4.5, qty: 1, material: 'sintético' }], 'Porto');
     expect(big.ok && big.pickupPrice).toBeNull();
   });
 
