@@ -54,7 +54,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Equipas: Porto 1 (só impermeabilização + limpeza ou impermeabilização Premium no Porto e em Braga, desde 4/11; Essencial sozinha = dono), Porto 2 (dias úteis 9h–13h, último serviço às 12h, máx. 2 por dia; o resto Porto 3), Porto 3 (reserva, só limpezas), Braga (só limpezas), Lisboa 1, Algarve, Coimbra. Referir sempre pelo nome da equipa, nunca da pessoa.
 - Cliente desmarca → o bot apaga o evento (sai dos fechos e das contas); artigos acrescentados contam como fecho no dia em que foram aceites (`service_extras`), o serviço fica no mesmo dia.
 - Cliente com serviço marcado pede para remarcar → o bot serve-o sozinho, mesmo com a conversa em pausa; se a equipa já não faz esse serviço no dia novo, passa para outra equipa livre da zona; a equipa que já tinha sido avisada sabe sempre da mudança.
-- Pedido de avaliação só depois de o cliente dizer que correu bem.
+- Pedido de avaliação só depois de o cliente dizer que correu bem; vai sem Instagram e diz que demora 10 segundos e ajuda a mostrar o nosso valor; o Instagram só depois de o cliente dizer que avaliou (dono, 4 Nov).
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 
