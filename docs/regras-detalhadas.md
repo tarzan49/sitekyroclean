@@ -552,6 +552,16 @@ Dono: "estás-me a mandar demasiados alertas por e-mail e os e-mails estão a fi
 - **Aba "Faturas e IVA" reorganizada:** três números (faturas por passar, IVA a entregar do mês, IVA de dinheiro ainda não recebido), a lista das faturas por passar de todos os meses com o botão "Marcar como passada" (branco: é uma ação, não um estado; o laranja "Passei" parecia dizer que já estavam passadas), o IVA por mês e as faturas do mês. As do Francisco ficam todas juntas, fechadas, no fim.
 - **A sub-aba do CRM fica no endereço (`?crm=`)** e o `useAdminSession` só volta a verificar o administrador quando muda a pessoa: antes, a renovação do token ao voltar ao separador do browser punha o ecrã de carregamento, desmontava o painel e o CRM voltava aos Pedidos.
 
+## Vídeos que se pedem às equipas (dono, 2026-11-04)
+
+O dono: "pede como o processo como um todo", com "a parte da escovação q nunca mandam"; na impermeabilização "o processo q faz sentido"; e "sempre a pedir para enviarem fotos em HD no WhatsApp". Serve para o conteúdo em massa (TikTok e Reels).
+
+- Limpeza: antes (artigo inteiro), antes (pior mancha, de perto), pulverização, escovação, extração de perto com som, água suja a sair da máquina (não na sanita), depois do mesmo sítio.
+- Impermeabilização: antes, aplicação com a névoa à vista, teste com água, pano a tirar a água, depois do mesmo sítio. É o que as equipas já fazem nos vídeos que mandam. O teste de cor numa zona discreta, antes da aplicação, faz-se na mesma mas não se pede em vídeo.
+- Limpeza e impermeabilização na mesma visita: as duas listas seguidas. Serviço sem descrição: a lista de limpeza, com uma linha sobre a impermeabilização.
+- A mensagem sai no fim do serviço, tarde para filmar o antes desse serviço: a lista serve para o serviço seguinte. Foi também enviada aos grupos Porto e Lisboa/Algarve a 4/11. Algarve, Porto 2, Porto 3, Coimbra e Braga só a recebem na mensagem de cada serviço.
+- A regra do pagamento não mudou: continua a contar fotografia de antes, fotografia de depois, um vídeo e a avaliação. Todos os vídeos caem no mesmo campo e o recibo sai por conjunto de ficheiros, por isso mais vídeos não trazem mais mensagens.
+
 ## Acerto semanal das equipas, aba "Contas" do CRM (dono, 2026-11-01)
 
 Dono: "todos os domingos todas as equipas têm de pagar", "de domingo a domingo e dá reset quando a equipa paga (obrigatório ser ao domingo)". Aba **Contas** no CRM (`CrmSettlements.tsx`, contas em `src/lib/weeklySettlement.ts`), por cima de `teamAccounts.ts` (as mesmas contas das mensagens da noite). **Três grupos: Porto 1, Lisboa 1 + Algarve (para já), e "Outras equipas"** (Porto 2, Porto 3, Braga, Coimbra, juntas porque o volume é menor e pagam o serviço quando acaba). **"Equipa pagou" só funciona ao domingo** (dia de Lisboa) e a regra está também na tabela `team_settlements` (restrições `team_settlements_sunday` e `_same_day`, migração `20261101120000`, aplicada). **O reset é: serviços incluídos ficam `paid` no CRM e os acertos `settled_at`**; semanas anteriores por pagar aparecem como atrasadas e entram no ciclo seguinte. Fecha-se o total certo; um pagamento parcial ainda não tem fluxo. `AccountRow`/`AccountLine` ganharam `id` opcional, por isso o pacote do bot foi reconstruído (`build:bot-engine`); a `bot-api` não precisa de ser publicada.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, procedureAccountDelta, procedureApplies, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
+  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
   PROCEDURE_PAY_ENABLED, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
@@ -118,10 +118,33 @@ describe('messages', () => {
   it('the service message asks for the photos and the video and says the bot sends the review request to the client', () => {
     const m = procedurePromptMessage({ label: 'Ana, Paranhos', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15', time: '15h' });
     expect(m).toContain('Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.');
-    expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.');
+    expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo');
+    expect(m).toContain('sempre em HD no WhatsApp');
+    expect(m).toContain('4. Escovação');
     expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é 22/10. Obrigado!');
     expect(m).not.toContain('reencaminha');
     expect(m).not.toMatch(noDash);
+  });
+  it('the shots follow the service: waterproofing only, cleaning only, or both in one visit', () => {
+    const only = procedureShots('Impermeabilização Premium sofá 2 lugares');
+    expect(only[0]).toBe('Antes: o artigo inteiro');
+    expect(only).toContain('O pano a tirar a água');
+    expect(only).not.toContain('Escovação');
+    const cleaning = procedureShots('Limpeza de sofá de 3 lugares');
+    expect(cleaning).toContain('Escovação');
+    expect(cleaning.join()).not.toContain('Aplicação');
+    for (const what of ['Limpeza e impermeabilização Premium de sofá 3 lugares', 'Pré-limpeza e impermeabilização Premium: sofá']) {
+      const both = procedureShots(what);
+      expect(both).toContain('Escovação');
+      expect(both).toContain('O pano a tirar a água');
+      expect(both.at(-1)).toBe('Depois: o artigo inteiro, do mesmo sítio do plano 1');
+    }
+  });
+  it('a service with no description also mentions the waterproofing shots', () => {
+    const m = procedurePromptMessage({ label: 'Ana, Paranhos', team: 'Porto 2', serviceDay: '2026-10-15' });
+    expect(m).toContain('4. Escovação');
+    expect(m).toContain('Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água.');
+    expect(procedurePromptMessage({ label: 'Ana', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15' })).not.toContain('Se houve impermeabilização');
   });
   it('the client message: first name, the service, the right review link, the owner\'s 10% line', () => {
     const m = procedureClientMessage({ firstName: 'Ana', what: 'Limpeza de sofá de 3 lugares', team: 'Porto 2' });

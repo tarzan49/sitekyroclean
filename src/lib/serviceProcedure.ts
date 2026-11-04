@@ -212,6 +212,33 @@ export interface PromptFacts {
 
 const serviceName = (f: Pick<PromptFacts, 'label' | 'what'>) => `${f.label}${f.what ? ` (${f.what})` : ''}`;
 
+// Dono, 4/11/2026: "pede como o processo como um todo", com a escovação "q nunca mandam", e na impermeabilização
+// "o processo q faz sentido". Os vídeos são para o TikTok e os Reels (31/10: "precisamos de conteúdo infinito").
+const CLEANING_SHOTS = [
+  'Antes: o artigo inteiro',
+  'Antes: a pior mancha, de perto',
+  'Pulverização',
+  'Escovação',
+  'Extração, de perto, com o som da máquina',
+  'A água suja a sair da máquina (não na sanita)',
+];
+const WATERPROOFING_SHOTS = [
+  'Aplicação, de perto, com a névoa à vista',
+  'Teste: água a ser deitada no tecido, até se ver que fica à superfície',
+  'O pano a tirar a água',
+];
+
+/** Os vídeos a pedir, pelo que o serviço leva: só impermeabilização, limpeza, ou as duas na mesma visita. */
+export function procedureShots(what: string | null | undefined): string[] {
+  const imper = /impermeab/i.test(what ?? '');
+  const clean = !imper || /limpeza|lavagem/i.test(what ?? '');
+  return [
+    ...(clean ? CLEANING_SHOTS : ['Antes: o artigo inteiro']),
+    ...(imper ? WATERPROOFING_SHOTS : []),
+    'Depois: o artigo inteiro, do mesmo sítio do plano 1',
+  ];
+}
+
 /**
  * A mensagem que a equipa recebe quando o serviço acaba. O pedido de avaliação
  * já não passa pela equipa: o bot pergunta primeiro ao cliente como correu e só
@@ -221,13 +248,16 @@ const serviceName = (f: Pick<PromptFacts, 'label' | 'what'>) => `${f.label}${f.w
  * (`clientReviewDue`). Sem emojis nem travessões.
  */
 export function procedurePromptMessage(f: PromptFacts): string {
+  const shots = procedureShots(f.what);
   return [
     `Serviço terminado: ${serviceName(f)}, ${dm(f.serviceDay)}${f.time ? ` às ${f.time}` : ''}.`,
     '',
-    'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.',
+    'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo (telemóvel na vertical, sem caras, 5 a 10 segundos cada):',
+    ...shots.map((s, i) => `${i + 1}. ${s}`),
+    ...(f.what ? [] : ['', 'Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água.']),
     '',
-    // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
-    'Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista).',
+    // Dono, 4/11/2026: "sempre a pedir para enviarem fotos em HD no WhatsApp".
+    'Manda as fotografias e os vídeos sempre em HD no WhatsApp (carrega em HD antes de enviar).',
     '',
     `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
   ].join('\n');

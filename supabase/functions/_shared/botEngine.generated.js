@@ -3544,14 +3544,39 @@ function slotForMedia(rec, kind, caption) {
   return rec.before_msg_id ? "after" : "before";
 }
 var serviceName = (f) => `${f.label}${f.what ? ` (${f.what})` : ""}`;
+var CLEANING_SHOTS = [
+  "Antes: o artigo inteiro",
+  "Antes: a pior mancha, de perto",
+  "Pulverização",
+  "Escovação",
+  "Extração, de perto, com o som da máquina",
+  "A água suja a sair da máquina (não na sanita)"
+];
+var WATERPROOFING_SHOTS = [
+  "Aplicação, de perto, com a névoa à vista",
+  "Teste: água a ser deitada no tecido, até se ver que fica à superfície",
+  "O pano a tirar a água"
+];
+function procedureShots(what) {
+  const imper = /impermeab/i.test(what ?? "");
+  const clean = !imper || /limpeza|lavagem/i.test(what ?? "");
+  return [
+    ...clean ? CLEANING_SHOTS : ["Antes: o artigo inteiro"],
+    ...imper ? WATERPROOFING_SHOTS : [],
+    "Depois: o artigo inteiro, do mesmo sítio do plano 1"
+  ];
+}
 function procedurePromptMessage(f) {
+  const shots = procedureShots(f.what);
   return [
     `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`,
     "",
-    "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e o vídeo.",
+    "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo (telemóvel na vertical, sem caras, 5 a 10 segundos cada):",
+    ...shots.map((s, i) => `${i + 1}. ${s}`),
+    ...f.what ? [] : ["", "Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água."],
     "",
-    // Dono, 31/10/2026: "começa a pedir vídeos a despejar a sujidade de cada serviço, precisamos de conteúdo infinito" (TikTok e Reels).
-    "Manda também um vídeo a despejar a água suja da máquina (telemóvel na vertical, 5 a 10 segundos, a água bem à vista).",
+    // Dono, 4/11/2026: "sempre a pedir para enviarem fotos em HD no WhatsApp".
+    "Manda as fotografias e os vídeos sempre em HD no WhatsApp (carrega em HD antes de enviar).",
     "",
     `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
   ].join("\n");
