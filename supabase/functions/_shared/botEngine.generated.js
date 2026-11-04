@@ -2417,7 +2417,7 @@ function hasWaterproofing(items) {
 function waterproofingOnly(items) {
   return Array.isArray(items) && items.length > 0 && items.every((i) => /^(essencial|premium)$/.test(String(i?.treatment ?? "")));
 }
-var STAGGER_TEAMS = /* @__PURE__ */ new Set(["Porto 1", "Porto 2", "Lisboa 1", "Lisboa 2"]);
+var STAGGER_TEAMS = /* @__PURE__ */ new Set(["Porto 1", "Porto 2", "Lisboa 1"]);
 var CLEANING_GAP_MIN = 90;
 var SOLO_DAYS = [
   // Owner, 31 Oct 2026: "lisboa 1 so vai ter 1 membro da equipa la na segunda pq o outro vai pro algarve".
@@ -3265,7 +3265,7 @@ function agendaMessage(day, services, issues, pending) {
 }
 
 // src/lib/crmUpsell.ts
-var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Lisboa 2", "Algarve", "Coimbra"];
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Algarve", "Coimbra"];
 function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }

@@ -1,6 +1,6 @@
 # Calendários das equipas
 
-Desde 28/09/2026 cada equipa (Porto 1, Porto 2, Braga, Lisboa 1, Lisboa 2 e Algarve) tem o seu
+Desde 28/09/2026 cada equipa (Porto 1, Porto 2, Braga, Lisboa 1 e Algarve) tem o seu
 próprio Google Calendar. O dono continua a marcar os serviços só no calendário dele. Um
 script da Google (Apps Script), a correr na conta do dono, copia cada serviço
 para o calendário da equipa que o vai fazer e manda um email a essa equipa
@@ -56,7 +56,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **O dono escolhe sempre a equipa, em todas as regiões** (dono, 29/09/2026:
   "eu quero agora escolher sempre a equipa"). Escolhe pela **cor do evento**
   no calendário dele: Mirtilo = Porto 1, Grafite = Porto 2, Basílico = Braga,
-  Tangerina = Lisboa 1, Uva = Lisboa 2, Banana = Algarve. Ou escrevendo
+  Tangerina = Lisboa 1, Banana = Algarve. Ou escrevendo
   "equipa porto 1" (porto 2, braga, lisboa 1, lisboa 2, algarve) no evento, que
   ganha à cor ("equipa porto" sozinho é a Porto 1, "equipa lisboa" a Lisboa 1).
   A morada não escolhe: sem cor de equipa nem "equipa X", o serviço não é
@@ -93,8 +93,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Cores no calendário do dono** (dono, 28/09/2026: "quero o meu com cores
   em vez de ser tudo azul", "pinta só os serviços para a frente"): cada
   serviço que ainda não acabou fica com a cor da equipa (Porto 1
-  azul Mirtilo, Porto 2 cinzento Grafite, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
-  roxo Uva, Algarve amarelo Banana). A cor é a escolha do dono; o script só a
+  azul Mirtilo, Porto 2 cinzento Grafite, Braga verde Basílico, Lisboa 1 laranja Tangerina,
+  Algarve amarelo Banana). A cor é a escolha do dono; o script só a
   põe quando a equipa foi escolhida por escrito ("equipa X"). **Cuidado com o
   CRM:** mudar a cor mexe na data de alteração do evento, e o CRM
   (`calendarSync.ts`) relê um evento alterado depois da linha e escreve por
@@ -106,7 +106,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **A equipa escrita no serviço do dono** (dono, 28/09/2026: "eu assim não
   vejo que equipa vai"): a primeira linha da descrição de cada serviço que
   ainda não acabou passa a ser "Equipa: Porto 1" (ou Porto 2, Braga, Lisboa 1,
-  Lisboa 2, Algarve), escrita pelo script ao mesmo tempo que a cor. É só informação: é
+  Algarve), escrita pelo script ao mesmo tempo que a cor. É só informação: é
   tirada antes de decidir a equipa (senão, ao mudar a morada, o serviço
   ficava preso à equipa antiga), não vai para a cópia (senão as equipas
   recebiam "Serviço alterado" de todos) e não conta para os avisos. Os dois
@@ -127,7 +127,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   calendário de equipa passa para o do dono com a cor dessa equipa, que é a
   escolha dele. **Escolher um calendário de equipa na app volta a pô-lo à
   vista**, e o dono passa a ver cada serviço a dobrar no telemóvel (30/09/2026,
-  Lisboa 2 e Algarve): o script confirma a cada volta que estão escondidos, em
+  e Algarve): o script confirma a cada volta que estão escondidos, em
   vez de uma vez só. **Uma cópia mudada no telemóvel chega ao evento do dono
   em segundos**: desde 30/09 há um gatilho de alteração em cada calendário de
   equipa, além do dele (antes só a volta de 15 minutos o apanhava, e o PC

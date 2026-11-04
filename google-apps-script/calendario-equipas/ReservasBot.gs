@@ -54,8 +54,8 @@
 // "A confirmar": o evento preparado depois de o dono escrever "fica agendado" (2026-10-09).
 const PRE_RESERVA = /^(pr[ée]-?\s?reserva|a confirmar)\b/i;
 const SERVICO_DO_BOT = /^servi[cç]o\b/i;
-// As cores das equipas (Mirtilo 9 Porto 1, Grafite 8 Porto 2, Uva 3 Porto 3, Basílico 10 Braga, Tangerina 6 Lisboa 1, Lavanda 1 Lisboa 2, Banana 5 Algarve, Flamingo 4 Coimbra).
-const CORES_DAS_EQUIPAS = ['9', '8', '3', '10', '6', '1', '5', '4'];
+// As cores das equipas (Mirtilo 9 Porto 1, Grafite 8 Porto 2, Uva 3 Porto 3, Basílico 10 Braga, Tangerina 6 Lisboa 1, Banana 5 Algarve, Flamingo 4 Coimbra).
+const CORES_DAS_EQUIPAS = ['9', '8', '3', '10', '6', '5', '4'];
 
 function doPost(e) {
   let pedido;

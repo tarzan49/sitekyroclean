@@ -133,11 +133,11 @@ export function waterproofingOnly(items: unknown): boolean {
     && items.every(i => /^(essencial|premium)$/.test(String((i as { treatment?: unknown })?.treatment ?? '')));
 }
 /**
- * Porto 1, Porto 2, Lisboa 1 and Lisboa 2 (owner, 27 Oct 2026): two cleaning jobs (cleaning, or cleaning with
+ * Porto 1, Porto 2 and Lisboa 1 (owner, 27 Oct 2026): two cleaning jobs (cleaning, or cleaning with
  * waterproofing) start at least 1h30 apart; a cleaning and a waterproofing-only job, or two waterproofing-only
  * jobs, can be at the same hour. Replaces, for these teams, the capacity and the travel margin.
  */
-export const STAGGER_TEAMS: ReadonlySet<string> = new Set(['Porto 1', 'Porto 2', 'Lisboa 1', 'Lisboa 2']);
+export const STAGGER_TEAMS: ReadonlySet<string> = new Set(['Porto 1', 'Porto 2', 'Lisboa 1']);
 export const CLEANING_GAP_MIN = 90;
 /** Days a staggered team works with one person only: one job at a time, with the travel margin. */
 export const SOLO_DAYS: ReadonlyArray<{ team: string; date: string }> = [
