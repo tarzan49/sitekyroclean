@@ -67,6 +67,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Google Ads otimiza para "Serviço fechado" (fechos reais, valor "para ti", via `ads-conversions-feed` + código "ref." na mensagem); o clique no WhatsApp é secundário (dono, 3 Nov).
 - Cliques de contacto medem-se só pelo delegado global (`data-tracking-source`), nunca `onClick` com tracking.
 - Plugins do Vite que escrevem no `dist` levam `apply: 'build'`.
+- Instagram e Facebook: 5 publicações por dia (dono, 4 Nov), hora de Lisboa: 09:00 Reel de clips, 12:30 antes e depois, 16:00 e 21:00 limpezas do dia, 18:30 carrossel (`kyro-social`, `src/pick.ts`). Reel feito em lote só entra na fila depois de visto imagem a imagem: sem sanita, sem material de outras empresas. Detalhe em `docs/regras-detalhadas.md`.
 
 ## 6. Estilo
 
