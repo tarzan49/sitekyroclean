@@ -207,7 +207,8 @@ function verificar() {
     var chave = deles ? 'pessoa:' + enderecoDe(deles.de) : '';
     var ultimaRespostaAPessoa = chave ? Number(props.getProperty(chave) || 0) : 0;
     var d = decidir(dados, agora, instaladoEm, ultimaRespostaAPessoa);
-    if (d.responder && principais[conversa.getId()]) {
+    // Com o bot de email ligado (kyro-bot src/email.ts) é ele que responde: o texto automático calava-se à segunda mensagem.
+    if (d.responder && principais[conversa.getId()] && props.getProperty('botEmail') !== 'on') {
       var ultima = mensagens[mensagens.length - 1];
       ultima.reply(respostaAutomatica(primeiroNome(ultima.getFrom()), emIngles(ultima.getSubject() + ' ' + ultima.getPlainBody())), { name: 'Kyro Clean Solutions' });
       conversa.addLabel(respostaAuto);
@@ -229,6 +230,88 @@ function verificar() {
     conversa.removeLabel(porResponder);
     mensagens.forEach(function (m) { if (m.isStarred()) m.unstar(); });
   });
+}
+
+// ---------------------------------------------------------------- ponte para o bot
+
+/**
+ * Publicado como aplicação Web, para o servidor do bot ler e responder a emails sem ter a
+ * palavra-passe da conta. Só aceita pedidos com a chave `ponteKey` das propriedades do script.
+ */
+function respostaPonte(dados) {
+  return ContentService.createTextOutput(JSON.stringify(dados)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function clienteDaConversa(mensagens) {
+  var deles = mensagens.filter(function (m) { return !ehNosso(enderecoDe(m.getFrom())); }).pop();
+  if (deles) return enderecoDe(deles.getFrom());
+  return enderecoDe(String(mensagens[0].getTo()).split(',')[0]);
+}
+
+function ponteListar(desde) {
+  var base = 'newer_than:2d -in:spam -in:trash -from:' + REMETENTE_BOT;
+  var principais = {};
+  GmailApp.search(base + ' category:primary', 0, 50).forEach(function (c) { principais[c.getId()] = true; });
+  var saida = [];
+  GmailApp.search(base, 0, 50).forEach(function (conversa) {
+    var mensagens = conversa.getMessages();
+    var cliente = clienteDaConversa(mensagens);
+    mensagens.forEach(function (m) {
+      if (m.getDate().getTime() < desde || m.isDraft()) return;
+      var de = enderecoDe(m.getFrom());
+      var nossa = ehNosso(de);
+      if (nossa && ehRespostaAutomatica(m.getPlainBody())) return;
+      saida.push({
+        id: m.getId(), threadId: conversa.getId(), client: cliente, name: nossa ? '' : primeiroNome(m.getFrom()), fromMe: nossa,
+        subject: m.getSubject(), date: m.getDate().getTime(), body: m.getPlainBody(),
+        primary: !!principais[conversa.getId()],
+        automatic: !nossa && (remetenteAutomatico(de) || cabecalhosAutomaticos(cabecalhosDe(m))),
+        attachments: m.getAttachments().map(function (a) { return { name: a.getName(), mime: a.getContentType() }; })
+      });
+    });
+  });
+  saida.sort(function (a, b) { return a.date - b.date; });
+  return { ok: true, messages: saida };
+}
+
+function ponteResponder(p) {
+  var anexos = (p.attachments || []).map(function (a) {
+    return Utilities.newBlob(Utilities.base64Decode(a.base64), a.mime, a.name);
+  });
+  var opcoes = { name: 'Kyro Clean Solutions', attachments: anexos };
+  if (!p.threadId) {
+    GmailApp.sendEmail(p.to, p.subject || 'Kyro Clean Solutions', p.body, opcoes);
+    Utilities.sleep(2000);
+    var enviada = GmailApp.search('in:sent to:' + p.to, 0, 1)[0].getMessages().pop();
+    return { ok: true, id: enviada.getId() };
+  }
+  var conversa = GmailApp.getThreadById(p.threadId);
+  var deles = conversa.getMessages().filter(function (m) { return enderecoDe(m.getFrom()) === String(p.to).toLowerCase(); }).pop();
+  if (!deles) return { ok: false, error: 'conversa sem mensagens de ' + p.to };
+  deles.reply(p.body, opcoes);
+  Utilities.sleep(2000);
+  return { ok: true, id: GmailApp.getThreadById(p.threadId).getMessages().pop().getId() };
+}
+
+function doPost(e) {
+  var p;
+  try { p = JSON.parse(e.postData.contents); } catch (err) { return respostaPonte({ ok: false, error: 'pedido inválido' }); }
+  var chave = PropertiesService.getScriptProperties().getProperty('ponteKey');
+  if (!chave || p.key !== chave) return respostaPonte({ ok: false, error: 'chave errada' });
+  try {
+    if (p.action === 'list') return respostaPonte(ponteListar(Number(p.since) || 0));
+    if (p.action === 'reply') return respostaPonte(ponteResponder(p));
+    if (p.action === 'attachment') {
+      var anexo = GmailApp.getMessageById(p.messageId).getAttachments()[Number(p.index) || 0];
+      return respostaPonte({ ok: true, base64: Utilities.base64Encode(anexo.getBytes()), mime: anexo.getContentType() });
+    }
+    return respostaPonte({ ok: false, error: 'ação desconhecida' });
+  } catch (err) { return respostaPonte({ ok: false, error: String(err) }); }
+}
+
+/** Correr uma vez à mão, com a chave escrita aqui só nesse momento; nunca fazer commit dela. */
+function definirPonte(chave) {
+  PropertiesService.getScriptProperties().setProperties({ ponteKey: chave, botEmail: 'on' });
 }
 
 // ---------------------------------------------------------------- instalação
