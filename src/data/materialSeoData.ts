@@ -205,17 +205,17 @@ const materialDefinitions: MaterialDefinition[] = [
     title: "Limpeza de Sofá em Camurça | Cuidado Especializado | Kyro",
     metaDescription: "Limpeza de sofás em camurça com técnica especializada. Preservamos a textura aveludada. Remoção segura de manchas. Orçamento grátis.",
     h1: "Limpeza de Sofá em Camurça",
-    intro: "A camurça é um material delicado que necessita de limpeza especializada. Utilizamos técnicas a seco e vapor controlado para limpar profundamente sem danificar a textura aveludada.",
+    intro: "A camurça é um material delicado que necessita de limpeza especializada. Testamos uma zona discreta e ajustamos o produto e a humidade à avaliação, para limpar sem forçar a textura aveludada.",
     characteristics: [
       "Superfície aveludada sensível à água",
       "Marca facilmente com líquidos e gordura",
-      "Requer limpeza a seco ou vapor controlado",
+      "Requer produto e humidade ajustados ao estado do material",
       "Cor pode desbotar com produtos inadequados",
     ],
     cleaningProcess: [
       "Avaliação do estado e tipo de camurça",
       "Limpeza a seco com espuma específica",
-      "Remoção de manchas com vapor controlado",
+      "Tratamento de manchas com humidade controlada",
       "Escovagem final para restaurar a textura",
     ],
     tips: [
@@ -225,7 +225,7 @@ const materialDefinitions: MaterialDefinition[] = [
       "Guarde longe de humidade e luz solar",
     ],
     faqs: [
-      { question: "Posso limpar camurça com água?", answer: "Não recomendamos. A água pode manchar permanentemente a camurça. Utilizamos técnicas a seco e vapor controlado que são seguras para este material." },
+      { question: "Posso limpar camurça com água?", answer: "Não recomendamos. A água pode manchar permanentemente a camurça. Ajustamos o produto e a humidade à avaliação do material, depois de testar uma zona discreta." },
       { question: "A camurça pode ser impermeabilizada?", answer: "Sim, e recomendamos. A impermeabilização cria uma barreira protetora contra líquidos e manchas, prolongando a vida útil do sofá em camurça." },
     ],
     relatedMaterials: ["limpeza-sofa-pele", "limpeza-sofa-veludo", "limpeza-sofa-tecido"],
@@ -380,7 +380,7 @@ const materialDefinitions: MaterialDefinition[] = [
     characteristics: [
       "Fibras naturais sensíveis à água",
       "Podem manchar e deformar com excesso de humidade",
-      "Requerem limpeza a seco ou vapor",
+      "Requerem limpeza a seco",
       "Biodegradáveis e ecológicos",
     ],
     cleaningProcess: [
@@ -396,7 +396,7 @@ const materialDefinitions: MaterialDefinition[] = [
       "Mantenha em ambiente com humidade controlada",
     ],
     faqs: [
-      { question: "Posso lavar o tapete de sisal com água?", answer: "Não recomendamos. O sisal e a juta são muito sensíveis à humidade e podem deformar. Utilizamos limpeza a seco ou vapor controlado." },
+      { question: "Posso lavar o tapete de sisal com água?", answer: "Não recomendamos. O sisal e a juta são muito sensíveis à humidade e podem deformar. Utilizamos limpeza a seco." },
     ],
     relatedMaterials: ["limpeza-tapete-la", "limpeza-tapete-sintetico"],
   },

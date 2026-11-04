@@ -99,7 +99,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
       "Bicarbonato neutraliza o cheiro de animal temporariamente",
       "Urina: absorva imediatamente sem esfregar e não improvise misturas, podem deixar resíduos e acrescentar humidade",
     ],
-    warning: "Dander e alérgenos de animais penetram nas fibras, só extração profissional os remove completamente",
+    warning: "Pelos e resíduos de animais alojam-se nas fibras, a extração profissional ajuda a retirar o que a aspiração não alcança",
   },
   urgencia: {
     title: "Protocolo de emergência",

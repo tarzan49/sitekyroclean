@@ -121,19 +121,19 @@ export const MARCA_PROCESS_STEPS: Record<MarcaKind, { title: string; desc: strin
   sofa: [
     { title: 'Inspeção do tecido', desc: 'Avaliação do material, estado das fibras e manchas antes de qualquer intervenção.' },
     { title: 'Pré-tratamento', desc: 'Aplicação de produto específico para dissolver manchas e sujidade incrustada.' },
-    { title: 'Extração profissional', desc: 'Limpeza em profundidade com equipamento de vapor e água quente calibrado ao tecido.' },
+    { title: 'Extração profissional', desc: 'Limpeza em profundidade com equipamento de extração e água quente calibrado ao tecido.' },
     { title: 'Verificação final', desc: 'Inspeção do resultado, escovagem e recolocação das almofadas.' },
   ],
   colchao: [
     { title: 'Inspeção do colchão', desc: 'Avaliação do tipo de núcleo (espuma ou molas), tecido exterior e manchas antes de qualquer intervenção.' },
     { title: 'Pré-tratamento', desc: 'Aplicação de produto específico para dissolver manchas e sujidade incrustada no tecido acolchoado.' },
-    { title: 'Extração profissional', desc: 'Vapor de baixa humidade calibrado ao núcleo interior, com tratamento anti-ácaros certificado.' },
+    { title: 'Extração profissional', desc: 'Extração com água e humidade controlada para o núcleo interior, com tratamento anti-ácaros certificado.' },
     { title: 'Secagem e verificação', desc: 'Ventilação assistida e inspeção final antes de o colchão voltar a estar pronto a usar.' },
   ],
   cadeiras: [
     { title: 'Inspeção das cadeiras', desc: 'Avaliação do tipo de estofo (tecido, mesh ou couro) e manchas antes de qualquer intervenção.' },
     { title: 'Pré-tratamento', desc: 'Aplicação de produto específico para dissolver manchas e sujidade incrustada no estofo.' },
-    { title: 'Extração profissional', desc: 'Vapor calibrado ao tipo de material, com atenção redobrada a costuras e rodízios.' },
+    { title: 'Extração profissional', desc: 'Extração com água ajustada ao tipo de material, com atenção redobrada a costuras e rodízios.' },
     { title: 'Secagem e verificação', desc: 'Ventilação assistida e inspeção final antes de as cadeiras voltarem a estar prontas a usar.' },
   ],
 };

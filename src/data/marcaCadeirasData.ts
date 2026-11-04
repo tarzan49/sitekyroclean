@@ -23,7 +23,7 @@ export const marcasCadeiras: MarcaCadeiras[] = [
     slug: "ikea",
     material: "Tecido, mesh respirável ou couro sintético, escritório e sala de jantar",
     materialDescription: "As cadeiras IKEA (como a POÄNG, KAUSTBY ou a linha de escritório MARKUS) usam tecido, mesh respirável ou couro sintético. Mesmo em cadeiras de uso ocasional, o assento e o encosto acumulam gordura, sujidade e ácaros com o tempo.",
-    cleaningProcess: "Extração a vapor calibrada ao tipo de tecido, com pré-tratamento de manchas de uso quotidiano. Aspiração profunda das costuras e zonas de maior contacto.",
+    cleaningProcess: "Extração com água calibrada ao tipo de tecido, com pré-tratamento de manchas de uso quotidiano. Aspiração profunda das costuras e zonas de maior contacto.",
     doNots: [
       "Não usar produtos alcalinos em tecido: pode descolorar de forma permanente",
       "Não ensopar cadeiras de escritório com espuma no assento: o núcleo demora a secar",
@@ -111,7 +111,7 @@ export const marcasCadeiras: MarcaCadeiras[] = [
     slug: "moviflor",
     material: "Tecido ou couro (genuíno ou sintético) em cadeiras de sala de jantar",
     materialDescription: "As cadeiras de sala de jantar Moviflor cobrem tecido, couro genuíno e couro sintético, com uma gama que vai do económico ao premium. A avaliação prévia do revestimento é essencial para definir o tratamento correto.",
-    cleaningProcess: "Avaliação do tipo de revestimento antes da intervenção. Técnica diferenciada: vapor controlado para tecido, produtos específicos para couro genuíno e técnica suave para couro sintético.",
+    cleaningProcess: "Avaliação do tipo de revestimento antes da intervenção. Técnica diferenciada: extração com água para tecido, produtos específicos para couro genuíno e técnica suave para couro sintético.",
     doNots: [
       "Não usar o mesmo produto em couro e tecido: são tratamentos completamente diferentes",
       "Não tratar couro genuíno com produtos de couro sintético e vice-versa",
@@ -133,7 +133,7 @@ export const marcasCadeiras: MarcaCadeiras[] = [
     slug: "el-corte-ingles",
     material: "Tecido de alta qualidade e couro premium",
     materialDescription: "As cadeiras El Corte Inglés combinam tecidos de alta qualidade (algodão, linho, misturas) e couro premium. São duráveis e respondem muito bem à limpeza profissional, mantendo o aspeto original por mais tempo.",
-    cleaningProcess: "Extração a vapor controlada para tecidos de qualidade, com produto específico que preserva as cores. Hidratação adicional para acabamentos em couro.",
+    cleaningProcess: "Extração com água controlada para tecidos de qualidade, com produto específico que preserva as cores. Hidratação adicional para acabamentos em couro.",
     doNots: [
       "Não usar água muito quente em tecidos de linho: pode encolher a fibra",
       "Não usar branqueadores em tecidos coloridos: descolora de forma permanente",

@@ -30,7 +30,7 @@ export const marcas: MarcaSofa[] = [
     slug: "ikea",
     material: "Microfibra e algodão",
     materialDescription: "Os sofás IKEA (EKTORP, KIVIK, SÖDERHAMN, FRIHETEN) são maioritariamente revestidos em microfibra, algodão ou poliéster. São acessíveis mas acumulam sujidade nas fibras e exigem limpeza regular para manter o aspeto original.",
-    cleaningProcess: "Limpeza a vapor a baixa pressão para preservar as fibras sintéticas. Uso de detergente neutro específico para microfibra. Extração de sujidade acumulada nas fibras.",
+    cleaningProcess: "Extração com água a baixa pressão para preservar as fibras sintéticas. Uso de detergente neutro específico para microfibra. Extração de sujidade acumulada nas fibras.",
     doNots: [
       "Não usar produtos alcalinos: danificam a microfibra permanentemente",
       "Não esfregar com força: as fibras ficam com aspeto felpudo",
@@ -43,7 +43,7 @@ export const marcas: MarcaSofa[] = [
     faqs: [
       {
         question: "Conseguem tirar as manchas dos sofás IKEA?",
-        answer: "Sim. A maioria dos tecidos IKEA responde muito bem à limpeza a vapor. Manchas antigas de comida, café ou gordura respondem bem na maioria das situações, embora o resultado dependa do tempo que a mancha esteve na fibra e do que já foi aplicado antes.",
+        answer: "Sim. A maioria dos tecidos IKEA responde muito bem à extração com água. Manchas antigas de comida, café ou gordura respondem bem na maioria das situações, embora o resultado dependa do tempo que a mancha esteve na fibra e do que já foi aplicado antes.",
       },
       {
         question: "O sofá IKEA precisa de ser desmontado para limpeza?",
@@ -123,7 +123,7 @@ export const marcas: MarcaSofa[] = [
     slug: "conforama",
     material: "Tecido e couro sintético (PU)",
     materialDescription: "Os sofás Conforama usam maioritariamente tecidos sintéticos e couro ecológico (PU ou couro sintético). São económicos mas o PU exige cuidados especiais para não descascar durante a limpeza.",
-    cleaningProcess: "Limpeza suave com spray desengordurante e vapor moderado. Atenção especial nas costuras do couro PU. Produto específico para tecidos sintéticos. Evitamos humidade excessiva para preservar as emendas.",
+    cleaningProcess: "Limpeza suave com spray desengordurante e pouca humidade. Atenção especial nas costuras do couro PU. Produto específico para tecidos sintéticos. Evitamos humidade excessiva para preservar as emendas.",
     doNots: [
       "Não usar vapor a alta pressão em couro PU: descasca e não tem recuperação",
       "Evitar produtos com álcool em tecidos sintéticos: dissolve o PU",
@@ -154,7 +154,7 @@ export const marcas: MarcaSofa[] = [
     slug: "el-corte-ingles",
     material: "Tecido de alta qualidade (algodão, linho e mistos)",
     materialDescription: "Os sofás El Corte Inglés combinam tecidos de algodão, linho e misturas de fibras naturais e sintéticas. São duráveis, de boa qualidade e respondem muito bem à limpeza profissional.",
-    cleaningProcess: "Extração a vapor controlada para fibras naturais e mistas. Tratamento com produto específico para tecidos de qualidade. Resultado final com cores mais vivas e tecido renovado.",
+    cleaningProcess: "Extração com água controlada para fibras naturais e mistas. Tratamento com produto específico para tecidos de qualidade. Resultado final com tecido mais limpo e renovado.",
     doNots: [
       "Não usar água muito quente em linho: pode encolher o tecido",
       "Não usar branqueadores em tecidos coloridos: descolora permanentemente",
@@ -192,7 +192,7 @@ export const marcas: MarcaSofa[] = [
     ],
     doThis: [
       "Escovamos o veludo sempre na direção do pelo com fibras profissionais suaves, sem deixar marcas",
-      "Usamos vapor a pressão mínima e temperatura controlada para preservar a textura característica do boucle",
+      "Usamos pouca humidade e pressão mínima para preservar a textura característica do boucle",
     ],
     serviceSlug: "limpeza-sofas",
     faqs: [
@@ -201,8 +201,8 @@ export const marcas: MarcaSofa[] = [
         answer: "Sim. Temos técnicas específicas para veludo: escova profissional suave na direção do pelo e extração muito controlada. O veludo Kave Home recupera o aspeto original sem marcas.",
       },
       {
-        question: "O boucle do sofá Kave Home pode ser limpo a vapor?",
-        answer: "Com muito cuidado, sim. Usamos vapor a pressão mínima e temperatura controlada para preservar a textura característica do boucle.",
+        question: "O boucle do sofá Kave Home pode ser limpo por extração?",
+        answer: "Com muito cuidado, sim. Usamos pouca humidade e pressão mínima para preservar a textura característica do boucle.",
       },
       {
         question: "Com que frequência devo limpar um sofá Kave Home de veludo?",
@@ -216,20 +216,20 @@ export const marcas: MarcaSofa[] = [
     slug: "leroy-merlin",
     material: "Poliéster e tecido resistente",
     materialDescription: "Os sofás Leroy Merlin são práticos e resistentes, com revestimentos em poliéster e microfibra de boa qualidade. São adequados para uso intenso e respondem muito bem à limpeza profissional regular.",
-    cleaningProcess: "Limpeza a vapor standard a temperatura moderada. Produto desengordurante para manchas de uso quotidiano. Extração de humidade para acabamento limpo. Processo direto e eficaz para tecidos de poliéster.",
+    cleaningProcess: "Extração com água, ajustada ao tecido. Produto desengordurante para manchas de uso quotidiano. Extração de humidade para acabamento limpo. Processo direto e eficaz para tecidos de poliéster.",
     doNots: [
       "Não usar produtos de limpeza agressivos em poliéster: podem alterar as cores",
       "Não deixar humidade por tempo prolongado: risco de bolor nas costuras",
     ],
     doThis: [
       "Removemos manchas de uso quotidiano com desengordurante específico para poliéster, sem alterar as cores",
-      "Extraímos a humidade por completo, eliminando o risco de bolor nas costuras",
+      "Extraímos a humidade e deixamos secar, para reduzir o risco de bolor nas costuras",
     ],
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
         question: "Os sofás Leroy Merlin são fáceis de limpar profissionalmente?",
-        answer: "Sim, os tecidos sintéticos do Leroy Merlin respondem muito bem à limpeza profissional a vapor. É um dos materiais mais acessíveis de tratar com resultado excelente.",
+        answer: "Sim, os tecidos sintéticos do Leroy Merlin respondem muito bem à limpeza profissional por extração. É um dos materiais mais acessíveis de tratar com resultado excelente.",
       },
       {
         question: "Vale a pena investir em limpeza num sofá Leroy Merlin?",
@@ -247,7 +247,7 @@ export const marcas: MarcaSofa[] = [
     slug: "moviflor",
     material: "Tecido e couro (genuíno e sintético)",
     materialDescription: "O Moviflor oferece sofás em tecido, couro genuíno e couro sintético. A gama varia muito, desde económicos a premium. A avaliação prévia do material é essencial para definir o tratamento correto.",
-    cleaningProcess: "Avaliação do tipo de revestimento antes da intervenção. Técnica diferenciada: vapor controlado para tecido, produtos específicos para couro genuíno, técnica suave para couro sintético.",
+    cleaningProcess: "Avaliação do tipo de revestimento antes da intervenção. Técnica diferenciada: extração com água para tecido, produtos específicos para couro genuíno, técnica suave para couro sintético.",
     doNots: [
       "Não usar o mesmo produto em couro e tecido: são tratamentos completamente diferentes",
       "Não tratar couro genuíno com produtos de couro sintético e vice-versa",

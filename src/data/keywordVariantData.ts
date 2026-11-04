@@ -304,12 +304,12 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
     ],
     problems: pick([
       [
-        { title: "Cheiro a bafio ou mofo em dias húmidos", description: `Fungos proliferam nas fibras densas das alcatifas quando há humidade acumulada em ${loc}. A higienização com agentes antifúngicos elimina o problema na raiz, não o mascara.` },
+        { title: "Cheiro a bafio ou mofo em dias húmidos", description: `Fungos proliferam nas fibras densas das alcatifas quando há humidade acumulada em ${loc}. A higienização com agentes antifúngicos atua no problema em vez de o mascarar, mas a origem da humidade tem de ser resolvida.` },
         { title: "Funcionários com sintomas respiratórios no espaço", description: "Alcatifas comerciais são o maior reservatório de alergénios em espaços fechados. A qualidade do ar interior melhora significativamente após higienização profissional." },
         { title: "Auditoria de qualidade do ar ou certificação pendente", description: "Emitimos relatório de higienização com ficha técnica dos produtos, aceite em auditorias de qualidade do ar interior e certificações de espaços de trabalho." },
       ],
       [
-        { title: "Cheiro a mofo que aparece em dias de mais humidade", description: `A humidade acumulada nas fibras densas das alcatifas em ${loc} favorece a proliferação de fungos. Só agentes antifúngicos na higienização eliminam o problema, não apenas o mascaram.` },
+        { title: "Cheiro a mofo que aparece em dias de mais humidade", description: `A humidade acumulada nas fibras densas das alcatifas em ${loc} favorece a proliferação de fungos. Os agentes antifúngicos na higienização atuam no problema, mas a origem da humidade tem de ser resolvida.` },
         { title: "Queixas respiratórias entre quem trabalha no espaço", description: "Numa alcatifa comercial acumula-se o maior reservatório de alergénios de todo o espaço fechado. A qualidade do ar melhora de forma visível após a higienização." },
         { title: "Certificação ou auditoria de qualidade do ar a caminho", description: "O relatório de higienização com ficha técnica dos produtos usados é aceite em auditorias de qualidade do ar e em certificações de espaços de trabalho." },
       ],
