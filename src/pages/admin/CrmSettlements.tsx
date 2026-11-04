@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Copy, Lock } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Lock, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lisbonDay } from "@/lib/crmClosings";
 import { CALENDAR_FETCH_SINCE } from "@/lib/calendarSync";
@@ -24,10 +24,14 @@ interface SettlementRow {
 
 type AdjustmentRow = AccountAdjustment & { id: string };
 
-function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChanged: () => Promise<unknown> | void }) {
+export interface PastDebt { id: string; date: string; description: string; kind: "client" | "team"; value: number }
+
+function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: AccountRow[]; onChanged: () => Promise<unknown> | void; pastDebts?: PastDebt[] }) {
   const [events, setEvents] = useState<AccountEvent[] | null>(null);
   const [adjustments, setAdjustments] = useState<AdjustmentRow[]>([]);
   const [history, setHistory] = useState<SettlementRow[]>([]);
+  const [media, setMedia] = useState<Map<string, { photos: boolean; video: boolean }>>(new Map());
+  const [open, setOpen] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -38,14 +42,23 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
-      const [cal, adj, hist] = await Promise.all([
+      const [cal, adj, proc, hist] = await Promise.all([
         supabase.functions.invoke("calendar-events", { body: { since: CALENDAR_FETCH_SINCE } }),
         db.from("team_account_adjustments").select("id, team, day, label, amount").is("settled_at", null),
+        db.from("service_procedure").select("service_request_id, before_at, after_at, video_at").gte("service_day", "2026-10-01"),
         db.from("team_settlements").select("id, group_id, group_label, cycle_end, amount, service_count, paid_at").order("paid_at", { ascending: false }).limit(30),
       ]);
       if (cal.error || !cal.data?.success) throw new Error(cal.data?.error ?? cal.error?.message ?? "Erro ao ler o calendário");
       if (adj.error) throw adj.error;
       if (hist.error) throw hist.error;
+      // A falta da tabela do procedimento não impede as contas: só deixa as fotos e o vídeo por saber.
+      const m = new Map<string, { photos: boolean; video: boolean }>();
+      for (const r of (proc.error ? [] : proc.data ?? []) as { service_request_id: string | null; before_at: string | null; after_at: string | null; video_at: string | null }[]) {
+        if (!r.service_request_id) continue;
+        const prev = m.get(r.service_request_id);
+        m.set(r.service_request_id, { photos: !!(r.before_at && r.after_at) || !!prev?.photos, video: !!r.video_at || !!prev?.video });
+      }
+      setMedia(m);
       setEvents((cal.data.events as CalendarEvent[]).map(e => ({
         id: e.id, summary: e.summary, description: e.description, status: e.status, start: null, end: null,
       })));
@@ -152,11 +165,27 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
     }
   };
 
-  const sharedGroup = group.id !== "porto1" && group.teams.length > 1;
-
   return (
     <div className="space-y-4">
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
+
+      {pastDebts.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+          <p className="text-sm font-bold text-red-700">
+            Meses anteriores por fechar: {euros(Math.round(pastDebts.reduce((s, d) => s + d.value, 0) * 100) / 100)} ({pastDebts.length})
+          </p>
+          <ul className="mt-2 space-y-1 text-xs text-gray-700">
+            {pastDebts.map(d => (
+              <li key={d.id} className="flex gap-2">
+                <span className="font-mono text-navy shrink-0">{dayMonth(d.date)}</span>
+                <span className="truncate flex-1">{d.description}</span>
+                <span className="shrink-0 text-gray-500">{d.kind === "client" ? "cliente" : "equipa"}</span>
+                <span className="shrink-0 font-semibold text-red-600">{euros(d.value)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Equipas */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
@@ -179,6 +208,12 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
       <div className="bg-navy text-white rounded-2xl p-5">
         <p className="text-xs uppercase tracking-wide text-white/60">{team} deve-te</p>
         <p className="text-4xl font-bold mt-1">{euros(owedNow)}</p>
+        <div className="mt-3 space-y-1 text-xs text-white/80 border-t border-white/10 pt-3">
+          <p className="flex justify-between"><span>Serviços até hoje por pagar</span><span>{euros(account?.todayTotal ?? 0)} + {euros(account?.beforeTotal ?? 0)}</span></p>
+          {(account?.adjustments.length ?? 0) > 0 && <p className="flex justify-between"><span>Acertos e dívidas combinadas</span><span>+{euros(account!.adjustments.reduce((s, l) => s + l.amount, 0))}</span></p>}
+          {(account?.ownerOwes.length ?? 0) > 0 && <p className="flex justify-between"><span>Pagos a ti (parte da equipa)</span><span>−{euros(account!.ownerOwes.reduce((s, l) => s + l.amount, 0))}</span></p>}
+          {earlier.length > 0 && <p className="flex justify-between text-[#D4AF37]"><span>Dos quais de semanas anteriores</span><span>{euros(earlier.reduce((s, l) => s + l.amount, 0))}</span></p>}
+        </div>
         <p className="text-xs text-white/70 mt-1">
           Acerto de domingo {dayMonth(settlement.cycleEnd)}. {settlement.canSettle ? "Hoje é dia de acerto." : "Só se fecha ao domingo."}
         </p>
@@ -192,7 +227,7 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
             title={settlement.canSettle ? "Dar como pago e repor as contas a zero" : "Só se pode fechar ao domingo"}
             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-bold rounded-lg bg-[#D4AF37] text-navy disabled:opacity-40 disabled:cursor-not-allowed">
             {settlement.canSettle ? <Check className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-            {busy === group.id ? "A fechar..." : sharedGroup ? `${group.teams.map(t => t.team).join(" + ")} pagaram ${euros(group.total)}` : "Equipa pagou"}
+            {busy === group.id ? "A fechar..." : `${team} pagou ${euros(group.total)}`}
           </button>
           <button onClick={copyMessage} disabled={!account}
             className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-lg border border-white/20 disabled:opacity-40">
@@ -220,25 +255,48 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
 
         {week.length === 0
           ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço da {team} nesta semana.</p>
-          : week.map((w, i) => (
-            <div key={w.id ?? i} className="px-4 py-3 border-b border-gray-50 last:border-0 flex items-start gap-3">
-              <div className="w-11 shrink-0 text-xs font-semibold text-gray-500 pt-0.5">{dayMonth(w.date)}</div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-navy truncate">{w.label}</p>
-                {w.what && <p className="text-xs text-gray-500 line-clamp-2">{w.what}</p>}
-                <p className="text-[11px] text-gray-400 mt-0.5">Serviço {euros(w.billed)}</p>
+          : week.map((w, i) => {
+            const key = w.id ?? `w${i}`;
+            const m = w.id ? media.get(w.id) : undefined;
+            const isOpen = open === key;
+            return (
+              <div key={key} className="border-b border-gray-50 last:border-0">
+                <div className="px-4 py-3 flex items-start gap-3">
+                  <div className="w-11 shrink-0 text-xs font-semibold text-gray-500 pt-0.5">{dayMonth(w.date)}</div>
+                  <button onClick={() => setOpen(isOpen ? null : key)} className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-semibold text-navy truncate">{w.label}</p>
+                    {w.what && <p className="text-xs text-gray-500 line-clamp-2">{w.what}</p>}
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400">
+                      <span>Serviço {euros(w.billed)}</span>
+                      {w.date <= today && (
+                        <>
+                          <span className={`inline-flex items-center gap-0.5 ${m?.photos ? "text-green-700" : "text-red-600"}`}><Camera className="w-3 h-3" />{m?.photos ? "Fotos" : "Sem fotos"}</span>
+                          <span className={`inline-flex items-center gap-0.5 ${m?.video ? "text-green-700" : "text-red-600"}`}><Video className="w-3 h-3" />{m?.video ? "Vídeo" : "Sem vídeo"}</span>
+                        </>
+                      )}
+                      <ChevronDown className={`w-3 h-3 transition ${isOpen ? "rotate-180" : ""}`} />
+                    </div>
+                  </button>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-navy">{euros(w.amount)}</p>
+                    {w.id && (w.status === "pago" || w.status === "por_pagar")
+                      ? <button onClick={() => togglePaid(w)} disabled={busy !== null}
+                          title={w.status === "pago" ? "Marcar como por pagar" : "Marcar como pago"} className="disabled:opacity-50">
+                          <StatusPill status={busy === w.id ? (w.status === "pago" ? "por_pagar" : "pago") : w.status} />
+                        </button>
+                      : <StatusPill status={w.status} />}
+                  </div>
+                </div>
+                {isOpen && (
+                  <div className="mx-4 mb-3 rounded-lg bg-gray-50 px-3 py-2 space-y-1 text-xs">
+                    {w.breakdown.map((b, j) => (
+                      <p key={j} className={`flex justify-between gap-3 ${b.strong ? "font-bold text-navy border-t border-gray-200 pt-1 mt-1" : "text-gray-600"}`}><span>{b.label}</span><span>{b.value}</span></p>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-navy">{euros(w.amount)}</p>
-                {w.id && (w.status === "pago" || w.status === "por_pagar")
-                  ? <button onClick={() => togglePaid(w)} disabled={busy !== null}
-                      title={w.status === "pago" ? "Marcar como por pagar" : "Marcar como pago"} className="disabled:opacity-50">
-                      <StatusPill status={busy === w.id ? (w.status === "pago" ? "por_pagar" : "pago") : w.status} />
-                    </button>
-                  : <StatusPill status={w.status} />}
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
         {weekOwed > 0 && (
           <div className="px-4 py-2.5 bg-red-50 text-xs font-semibold text-red-700 flex justify-between">
@@ -249,7 +307,7 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
 
       {earlier.length > 0 && (
         <div className="bg-white border border-red-200 rounded-2xl">
-          <p className="px-4 py-3 text-sm font-semibold text-red-700 border-b border-red-100">Por pagar de antes de {dayMonth(weekStart)}</p>
+          <p className="px-4 py-3 text-sm font-semibold text-red-700 border-b border-red-100">Dívida de semanas anteriores (antes de {dayMonth(weekStart)}): {euros(earlier.reduce((s, l) => s + l.amount, 0))}</p>
           {earlier.map((l, i) => (
             <div key={l.id ?? i} className="px-4 py-2 text-sm flex justify-between gap-3 border-b border-gray-50 last:border-0">
               <span className="text-gray-600 min-w-0 truncate">{dayMonth(l.date)} · {l.label}</span>
@@ -277,7 +335,7 @@ function CrmSettlements({ records, onChanged }: { records: AccountRow[]; onChang
       )}
 
       <div className="bg-white border border-gray-200 rounded-2xl">
-        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos da {sharedGroup ? group.label : team}</p>
+        <p className="px-4 py-3 text-sm font-semibold text-navy border-b border-gray-100">Pagamentos da {team}</p>
         {groupHistory.length === 0
           ? <p className="px-4 py-6 text-sm text-gray-400 text-center">Ainda nenhum acerto registado aqui.</p>
           : groupHistory.map(h => (

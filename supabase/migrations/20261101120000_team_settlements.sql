@@ -14,7 +14,7 @@ begin;
 
 create table if not exists public.team_settlements (
   id uuid primary key default gen_random_uuid(),
-  group_id text not null check (group_id in ('porto1', 'lisboa1', 'outras')),
+  group_id text not null, -- uma equipa por grupo (dono, 4/11)
   group_label text not null,
   cycle_end date not null,
   amount numeric(10,2) not null,

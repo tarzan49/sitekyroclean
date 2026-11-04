@@ -24,11 +24,13 @@ describe('ciclo de domingo a domingo', () => {
 });
 
 describe('grupos', () => {
-  it('Algarve vai com a Lisboa 1; Porto 2, Braga e Coimbra vão juntas', () => {
+  it('cada equipa tem o seu grupo, sem somar Porto 2 a mais ninguém', () => {
     expect(groupOfTeam('Porto 1').id).toBe('porto1');
     expect(groupOfTeam('Lisboa 1').id).toBe('lisboa1');
-    expect(groupOfTeam('Algarve').id).toBe('lisboa1');
-    for (const t of ['Porto 2', 'Porto 3', 'Braga', 'Coimbra']) expect(groupOfTeam(t).id).toBe('outras');
+    expect(groupOfTeam('Algarve').id).toBe('algarve');
+    expect(groupOfTeam('Porto 2').id).toBe('porto2');
+    expect(groupOfTeam('Braga').id).toBe('braga');
+    expect(groupOfTeam('Coimbra').id).toBe('coimbra');
   });
 });
 
@@ -49,10 +51,12 @@ describe('weeklySettlement', () => {
 
   it('soma cada grupo e ignora o que já está pago ou ainda não aconteceu', () => {
     expect(g('porto1').total).toBe(75);
-    expect(g('lisboa1').total).toBe(50);
-    expect(g('outras').total).toBe(40);
+    expect(g('lisboa1').total).toBe(20);
+    expect(g('algarve').total).toBe(30);
+    expect(g('braga').total).toBe(25);
+    expect(g('porto2').total).toBe(15);
     expect(g('porto1').serviceIds.sort()).toEqual(['r1', 'r2']);
-    expect(g('outras').serviceIds.sort()).toEqual(['r5', 'r6']);
+    expect(g('porto2').serviceIds).toEqual(['r6']);
   });
   it('marca o que vem de semanas anteriores como atrasado', () => {
     // Ciclo de 26/10 a 01/11: r1 (27/10) está dentro; nada atrasado.

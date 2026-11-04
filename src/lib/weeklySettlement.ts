@@ -5,22 +5,27 @@
 // As contas em si são as de `teamAccounts.ts` (as mesmas das mensagens da noite: parte
 // do dono, upsell, IVA das faturas, pagos ao dono, acertos). Aqui só se juntam por
 // grupo e por ciclo:
-//   - Porto 1 e Lisboa 1 (com o Algarve, para já) têm cada um o seu acerto;
-//   - as restantes equipas (Porto 2, Porto 3, Braga, Coimbra...) vão juntas, porque o
-//     volume é menor e pagam o serviço quando ele acaba (dono).
+//   - cada equipa tem o seu acerto e o seu painel (dono, 2026-11-04: "para de somar
+//     mais Porto 2... cada equipa tem o seu painel").
 //
 // O reset é fechar o ciclo: os serviços incluídos ficam `paid` no CRM e os acertos
 // combinados ficam `settled_at`, por isso a semana seguinte começa a zero. Só se fecha
 // num domingo (dia de Lisboa); a tabela `team_settlements` repete a regra numa
 // restrição, para nenhum outro caminho a contornar.
 import { eventTeam as teamOfEvent } from './botAvailability';
+import { serviceVatOf } from './invoiceVat';
 import { ownerShareOf, teamAccounts, type AccountAdjustment, type AccountEvent, type AccountLine, type AccountRow, type TeamAccount } from './teamAccounts';
 
 export interface SettlementGroupDef { id: string; label: string; teams: readonly string[] }
 
 export const SETTLEMENT_GROUPS: readonly SettlementGroupDef[] = [
   { id: 'porto1', label: 'Porto 1', teams: ['Porto 1'] },
-  { id: 'lisboa1', label: 'Lisboa 1 e Algarve', teams: ['Lisboa 1', 'Algarve'] },
+  { id: 'porto2', label: 'Porto 2', teams: ['Porto 2'] },
+  { id: 'porto3', label: 'Porto 3', teams: ['Porto 3'] },
+  { id: 'lisboa1', label: 'Lisboa 1', teams: ['Lisboa 1'] },
+  { id: 'algarve', label: 'Algarve', teams: ['Algarve'] },
+  { id: 'braga', label: 'Braga', teams: ['Braga'] },
+  { id: 'coimbra', label: 'Coimbra', teams: ['Coimbra'] },
 ];
 /** Tudo o que não está nos grupos acima. */
 export const OTHER_GROUP: SettlementGroupDef = { id: 'outras', label: 'Outras equipas', teams: [] };
@@ -117,6 +122,45 @@ export interface WeekService {
   /** O que a equipa te deve deste serviço (com o IVA da fatura, se houver). */
   amount: number;
   status: WeekServiceStatus;
+  /** As contas todas do serviço, linha a linha (valor, IVA, partes, o que a equipa deve). */
+  breakdown: BreakdownLine[];
+}
+
+export interface BreakdownLine { label: string; value: string; strong?: boolean }
+
+const eur = (n: number) => `${round2(n).toFixed(2).replace(/\.00$/, '').replace('.', ',')}€`;
+
+/** As contas de um serviço, uma linha por valor, para não haver enganos. */
+export function breakdownOf(r: AccountRow, status: WeekServiceStatus, line?: AccountLine): BreakdownLine[] {
+  const billed = Number(r.billed_value) || 0;
+  const share = ownerShareOf(r);
+  const out: BreakdownLine[] = [];
+  if (!line && r.invoiced) {
+    const vat = round2(serviceVatOf(r));
+    if (vat > 0) {
+      const teamPart = Math.floor(round2((billed - vat) * 50)) / 100;
+      line = { date: r.request_date ?? '', label: '', billed, share, vat, teamPart, amount: round2(billed - teamPart), ...(r.vat_on_top ? { vatOnTop: true } : {}) };
+    }
+  }
+  if (line?.vat && line.teamPart !== undefined) {
+    const net = round2(line.billed! - line.vat);
+    out.push(
+      { label: line.vatOnTop ? 'Cliente paga (valor + IVA à parte)' : 'Cliente paga (IVA incluído)', value: eur(line.billed!) },
+      { label: 'Valor do serviço sem IVA', value: eur(net) },
+      { label: 'IVA a entregar ao Estado (23%)', value: eur(line.vat) },
+      { label: 'Parte da equipa (metade do valor sem IVA)', value: eur(line.teamPart) },
+      { label: 'A tua parte (metade do valor sem IVA)', value: eur(round2(net - line.teamPart)) },
+    );
+    if (line.upsellShare) out.push({ label: 'A tua parte no upsell', value: eur(line.upsellShare) });
+    if (line.reviewPenalty) out.push({ label: '5% por falta de procedimento', value: eur(line.reviewPenalty) });
+    out.push({ label: 'A equipa deve-te (a tua parte + o IVA)', value: eur(line.amount), strong: true });
+    return out;
+  }
+  out.push({ label: 'Cliente paga', value: eur(billed) }, { label: 'A tua parte', value: eur(share) });
+  if (line?.reviewPenalty) out.push({ label: '5% por falta de procedimento', value: eur(line.reviewPenalty) });
+  const amount = line?.amount ?? share;
+  out.push({ label: status === 'cliente_paga_dono' ? 'Paga-te a ti: a equipa não te deve' : status === 'pago' ? 'Já pago' : 'A equipa deve-te', value: eur(amount), strong: true });
+  return out;
 }
 
 /** Segunda-feira da semana de `day`. */
@@ -147,6 +191,7 @@ export function teamWeek(rows: AccountRow[], events: AccountEvent[], team: strin
       label: (r.client_name ?? '').trim() ? `${r.client_name!.trim()}${r.city ? `, ${r.city}` : ''}` : (r.city ?? 'Serviço'),
       what: (r.description ?? '').trim(), billed,
       amount: owed?.amount ?? ownerShareOf(r), status,
+      breakdown: breakdownOf(r, status, owed),
     });
   }
   return out.sort((a, b) => a.date.localeCompare(b.date));
