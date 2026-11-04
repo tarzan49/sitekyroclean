@@ -77,7 +77,7 @@ const materialDefinitions: MaterialDefinition[] = [
     cleaningProcess: [
       "Avaliação da direção do pelo do veludo",
       "Aspiração suave com bocal de veludo",
-      "Limpeza com vapor controlado a baixa pressão",
+      "Extração com água, com humidade e pressão controladas",
       "Escovagem final no sentido do pelo",
     ],
     tips: [

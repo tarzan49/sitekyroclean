@@ -16,7 +16,7 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   ],
   odores: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
-    { value: "24-48h", label: "Resultado permanente", icon: ShieldCheck },
+    { value: "2 a 5h", label: "Tempo de secagem", icon: Timer },
     { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
@@ -57,7 +57,7 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
   ],
   protecao: [
-    { value: "12-18m", label: "Duração da proteção", icon: ShieldCheck },
+    { value: "Até 10 anos", label: "Premium (Essencial: 1 a 2 anos)", icon: ShieldCheck },
     { value: "24h", label: "Proteção já ativa", icon: Clock },
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: CLIENTS_SERVED_LABEL, label: "Clientes satisfeitos", icon: Users },
@@ -81,14 +81,14 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
       "Bicarbonato de sódio seco sobre o tecido absorve odores temporariamente (30 min, depois aspire)",
       "Evite produtos perfumados, mascaram o odor mas não o eliminam na raiz",
     ],
-    warning: "Odores orgânicos (urina, suor, mofo) só são eliminados definitivamente com extração profissional",
+    warning: "Odores orgânicos (urina, suor, mofo) pedem extração profissional, e resíduos no interior da peça podem manter o cheiro",
   },
   saude: {
     title: "Redução imediata da carga alergénica",
     steps: [
       "Aspire com filtro HEPA em movimentos lentos e sobrepostos (2 passagens)",
       "Capa anti-ácaros reduz exposição mas não elimina os ácaros existentes",
-      "Mantenha humidade interior abaixo de 50%, ácaros proliferam acima desse valor",
+      "Reduza a humidade no interior da casa, os ácaros preferem ambientes húmidos",
     ],
     warning: "O tratamento anti-ácaros é um complemento específico à limpeza; não prometemos eliminação permanente",
   },
@@ -97,7 +97,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     steps: [
       "Remova pelos visíveis com fita adesiva ou luva de borracha húmida",
       "Bicarbonato neutraliza o cheiro de animal temporariamente",
-      "Urina: absorva imediatamente e aplique solução de água e vinagre branco (50/50)",
+      "Urina: absorva imediatamente sem esfregar e não improvise misturas, podem deixar resíduos e acrescentar humidade",
     ],
     warning: "Dander e alérgenos de animais penetram nas fibras, só extração profissional os remove completamente",
   },
@@ -114,8 +114,8 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     title: "Como preparar os estofos para impermeabilização",
     steps: [
       "Limpe profissionalmente antes de impermeabilizar, a sujidade bloqueia a proteção",
-      "Aguarde 24-48h após aplicação para ativação completa, evite uso intenso",
-      "Reaplique a cada 12-18 meses ou após cada limpeza profissional",
+      "Respeite o tempo de cura, que pode exigir 24 horas, e não teste a proteção com líquidos antes disso",
+      "A Essencial dura 1 a 2 anos e aguenta até 2 lavagens, a Premium dura até 10 anos e aguenta até 5 lavagens",
     ],
     warning: "Impermeabilização em tecido sujo é ineficaz, a ordem correta é sempre: limpar primeiro, proteger depois",
   },

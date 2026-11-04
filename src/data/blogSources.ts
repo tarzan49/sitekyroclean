@@ -29,9 +29,9 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
     label: "Ácaros do pó da casa: perguntas frequentes",
     publisher: "Sociedade Portuguesa de Alergologia e Imunologia Clínica (SPAIC)",
     url: "https://www.spaic.pt/perguntas-frequentes?id=13",
-    checkedOn: "2026-09-17",
+    checkedOn: "2026-11-04",
     supports:
-      "Ácaros como principal causa de alergias respiratórias; preferência por ambientes húmidos e temperaturas amenas; lavagem da roupa de cama acima de 55 ºC; necessidade de combinar várias medidas.",
+      "Ácaros como principal causa de alergias respiratórias; proteínas do corpo e dos excrementos como causa da alergia; preferência por ambientes húmidos e temperaturas amenas; outono como altura de maior proliferação; redução da humidade relativa em casa, sem valor em percentagem; lavagem da roupa de cama acima de 55 ºC; necessidade de combinar várias medidas.",
   },
   "spaic-rinite-asma": {
     id: "spaic-rinite-asma",
