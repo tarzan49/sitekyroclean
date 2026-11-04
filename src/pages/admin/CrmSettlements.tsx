@@ -104,6 +104,9 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
   const earlier = account ? [...account.before, ...account.today].filter(l => l.date < weekStart) : [];
   const weekBilled = week.reduce((s, w) => s + w.billed, 0);
   const weekShare = week.reduce((s, w) => s + w.amount, 0);
+  const todo = week.filter(w => w.status === "por_fazer");
+  const todoBilled = todo.reduce((s, w) => s + w.billed, 0);
+  const todoShare = todo.reduce((s, w) => s + w.amount, 0);
   const weekOwed = week.filter(w => w.status === "por_pagar").reduce((s, w) => s + w.amount, 0);
   const groupHistory = history.filter(h => h.group_id === group.id);
   const isCurrentWeek = weekStart === weekStartOf(today);
@@ -252,6 +255,12 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
           <div className="py-3"><p className="text-[11px] text-gray-400">Faturado</p><p className="text-lg font-bold text-navy">{euros(weekBilled)}</p></div>
           <div className="py-3"><p className="text-[11px] text-gray-400">A tua parte</p><p className="text-lg font-bold text-navy">{euros(weekShare)}</p></div>
         </div>
+        {todo.length > 0 && (
+          <p className="px-4 py-2 border-b border-gray-100 text-xs text-gray-500 flex justify-between gap-3">
+            <span>Falta fazer nesta semana ({todo.length})</span>
+            <span className="font-semibold text-navy">{euros(todoBilled)} · a tua parte {euros(todoShare)}</span>
+          </p>
+        )}
 
         {week.length === 0
           ? <p className="px-4 py-8 text-sm text-gray-400 text-center">Nenhum serviço da {team} nesta semana.</p>
