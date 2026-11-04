@@ -721,3 +721,8 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 - **Carrossel:** `scripts/carrossel.py` no Mac (as fotos do iCloud só existem lá), 7 a 8 cartões de 1080 x 1350. O dono aprova os textos por lote. Saúde só com fonte lida em `blogSources.ts`.
 - **Alerta:** um email por dia, no máximo, quando uma fila tem menos de 7 dias (3 Reels, 1 foto e 1 carrossel por dia), e outro se uma publicação não sair por falta de material.
 - **Fila antiga:** ao ver os 30 Reels que ainda não tinham saído, 6 do lote de TikToks de 31/10 tinham sanita (3), material de outra empresa (2) ou o ecrã de uma app (1). Ficaram em `held`, com o motivo no campo `error`. Um lote gerado a partir de pastas antigas não está visto só por já estar na fila.
+
+## Mofo e bolor: só estofos (dono, 4 Nov)
+- "Mofo" é termo brasileiro e a pesquisa é genérica: pedido real de mofo em chão de madeira, que não é serviço nosso. As páginas `mofo-tapete`, `mofo-alcatifa` e `cheiro-mofo-sofa` dizem no `intro` e na `metaDescription` que só tratamos tapetes, alcatifas, sofás e colchões, nunca paredes, chão nem madeira (`problemSeoData.ts`, lido também pelo prerender).
+- Bot: secção S69b de `respostas-bot-whatsapp.md` (resposta curta, sem preço, `handoff` em silêncio). Atualizado em 4/11; falta publicar com o `deploy.sh` do kyro-bot.
+- Search Console (conta `u/1` do Chrome, `sc-domain:cleansolutions.com.pt`, 90 dias): páginas que acabam em "mofo" = 6 cliques e 194 impressões; consultas acabadas em "mofo" = 4 impressões, 0 cliques. O tráfego orgânico de mofo é desprezável, por isso o cliente do chão provavelmente não veio da pesquisa orgânica. Por ver: termos de pesquisa do Google Ads com "mofo" e negativas (mofo, bolor, madeira, chão, parede).
