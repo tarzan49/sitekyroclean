@@ -726,3 +726,9 @@ Dono: "os reels tem que ser duas limpezas do dia depois quero mais 1 reels de co
 - "Mofo" é termo brasileiro e a pesquisa é genérica: pedido real de mofo em chão de madeira, que não é serviço nosso. As páginas `mofo-tapete`, `mofo-alcatifa` e `cheiro-mofo-sofa` dizem no `intro` e na `metaDescription` que só tratamos tapetes, alcatifas, sofás e colchões, nunca paredes, chão nem madeira (`problemSeoData.ts`, lido também pelo prerender).
 - Bot: secção S69b de `respostas-bot-whatsapp.md` (resposta curta, sem preço, `handoff` em silêncio). Atualizado em 4/11; falta publicar com o `deploy.sh` do kyro-bot.
 - Search Console (conta `u/1` do Chrome, `sc-domain:cleansolutions.com.pt`, 90 dias): páginas que acabam em "mofo" = 6 cliques e 194 impressões; consultas acabadas em "mofo" = 4 impressões, 0 cliques. O tráfego orgânico de mofo é desprezável, por isso o cliente do chão provavelmente não veio da pesquisa orgânica. Por ver: termos de pesquisa do Google Ads com "mofo" e negativas (mofo, bolor, madeira, chão, parede).
+
+## Mofo e bolor: só estofos (dono, 4 Nov)
+- "Mofo" é termo brasileiro e a pesquisa é genérica ("tirar mofo"): traz quem quer limpar chão, madeira e paredes para as páginas `mofo-tapete`, `mofo-alcatifa` e `cheiro-mofo-sofa`. Pedido real: mofo em chão de madeira. Não é serviço nosso.
+- As três páginas dizem logo no `intro` e na `metaDescription` que só tratamos tapetes, alcatifas, sofás e colchões, nunca paredes, chão nem madeira (`problemSeoData.ts`, lido também pelo prerender).
+- Bot: secção S69b de `respostas-bot-whatsapp.md` (resposta curta, sem preço, `handoff` em silêncio). Ficheiro atualizado em 4/11; falta publicar com o `deploy.sh` do kyro-bot.
+- Origem do tráfego por confirmar: o Search Console de `cleansolutions.com.pt` não abre com a conta do Chrome (`cleansolutions.pt25@gmail.com`); a exportação `~/Downloads/cleansolutions-5` não está neste Mac.
