@@ -77,11 +77,17 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
   const recs = await store.records(addDays(today, -10));
   if ("error" in recs) return createErrorResponse(recs.error, 502);
   const records = recs.map(asRecord);
-  const known = new Set(records.map(r => r.calendar_event_id));
+  // A service moved to another day keeps its calendar event: the message of the old day does not
+  // count for the new one, unless the team already sent files (5/11: Fernanda, moved from 31/10, Porto 2 got nothing).
+  const known = new Map(records.map(r => [r.calendar_event_id, r]));
+  const alreadyPrompted = (id: string, day: string) => {
+    const r = known.get(id);
+    return !!r && (r.service_day === day || !!(r.before_at || r.after_at || r.video_at));
+  };
 
   const candidates = ended
     .map(e => ({ e, team: eventTeam(e) as string | null, day: lisbonDayOf(e.start!) }))
-    .filter(c => c.team && !known.has(c.e.id) && c.day >= procedureFrom(c.team));
+    .filter(c => c.team && !alreadyPrompted(c.e.id, c.day) && c.day >= procedureFrom(c.team));
   const eventIds = [...new Set([...candidates.map(c => c.e.id), ...records.map(r => r.calendar_event_id)])];
   const services = eventIds.length ? await store.services(eventIds) : [];
   if ("error" in services) return createErrorResponse(services.error, 502);
@@ -108,13 +114,13 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
   const reviews = await store.reviews(records.map(r => r.service_request_id).filter((v): v is string => !!v));
   if ("error" in reviews) return createErrorResponse(reviews.error, 502);
   const eventById = new Map(events.map(e => [e.id, e]));
-  // A service deleted from the calendar, cancelled or moved to another team is no
-  // longer this team's: no reminder and no closing notice. 27/10: Kseniia's
+  // A service deleted from the calendar, cancelled or moved to another team or day is no
+  // longer this record's: no reminder and no closing notice. 27/10: Kseniia's
   // Porto 2 copy, deleted on 26/10 (Porto 1 did it on 27/10), still sent Aleixo
   // "Lembrete do serviço o serviço, 26/10".
   const liveEvent = (r: Rec) => {
     const ev = eventById.get(r.calendar_event_id);
-    return ev && ev.status !== "CANCELLED" && eventTeam(ev) === r.team ? ev : null;
+    return ev?.start && ev.status !== "CANCELLED" && eventTeam(ev) === r.team && lisbonDayOf(ev.start) === r.service_day ? ev : null;
   };
   const yesterday = addDays(today, -1);
   const reminders = records.flatMap(r => {
@@ -235,7 +241,10 @@ export async function procedureSent(body: Row, store: ProcedureStore, now: Date)
   if (!team || !day || !ids.length) return createErrorResponse("team, serviceDay e messageIds são obrigatórios", 400);
   const err = await store.upsert({
     calendar_event_id: eventId, team, service_day: day, prompt_msg_ids: ids, prompted_at: now.toISOString(),
-    status: "em_curso", updated_at: now.toISOString(),
+    status: "em_curso", closed_at: null, reminders_sent: 0, last_reminder_at: null,
+    // Only a new service or one moved to another day gets here: the client messages start again too.
+    client_review_at: null, client_review_skip: null, client_certificate_at: null, client_certificate_skip: null,
+    updated_at: now.toISOString(),
   });
   return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
 }

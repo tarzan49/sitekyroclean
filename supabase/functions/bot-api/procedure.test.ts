@@ -153,3 +153,24 @@ Deno.test("client review request: once, at the end of the service, never to a pa
   assert(String(table.get("s2")!.client_review_skip).startsWith("em pausa"));
   assertEquals(table.get("s4")!.client_review_skip, "sem telefone no título");
 });
+
+Deno.test("a service moved to another day gets the message again, for the team of the new day; files already sent keep it (5/11)", async () => {
+  const now = new Date("2026-11-05T12:00:00Z");
+  const old = { calendar_event_id: "m1", team: "Porto 1", service_day: "2026-10-31", prompt_msg_ids: ["w1"], prompted_at: "2026-10-31T16:00:00Z", reminders_sent: 1, status: "em_curso", client_review_at: "2026-10-31T17:00:00Z" };
+  const events = [ev("m1", "Serviço 42€ (84€) sofá - 912000000 - Ana Teste - Rua Inventada 1", "2026-11-05T10:00:00Z", "2026-11-05T11:00:00Z", "Porto 2")];
+  const { store, table } = fakeStore([old]);
+  const body = await json(await procedureDue(events, store, now));
+  assertEquals((body.prompts as Row[]).map(p => [p.eventId, p.team, p.serviceDay]), [["m1", "Porto 2", "2026-11-05"]]);
+  await procedureSent({ eventId: "m1", team: "Porto 2", serviceDay: "2026-11-05", messageIds: ["w2"] }, store, now);
+  const saved = table.get("m1")!;
+  assertEquals([saved.team, saved.reminders_sent, saved.client_review_at], ["Porto 2", 0, null]);
+  assertEquals(((await json(await procedureDue(events, store, now))).prompts as Row[]).length, 0);
+
+  // Moved to a later day, not done yet: the old record sends no reminder meanwhile.
+  const later = [ev("m2", "Serviço 42€ (84€) sofá", "2026-11-09T10:00:00Z", "2026-11-09T11:00:00Z", "Porto 2")];
+  const moved = fakeStore([{ ...old, calendar_event_id: "m2", team: "Porto 2", service_day: "2026-11-03", prompted_at: "2026-11-03T12:00:00Z", reminders_sent: 0, client_review_at: null }]);
+  assertEquals((await json(await procedureDue(later, moved.store, now))).reminders, []);
+
+  const withFiles = fakeStore([{ ...old, before_at: "2026-10-31T16:30:00Z" }]);
+  assertEquals(((await json(await procedureDue(events, withFiles.store, now))).prompts as Row[]).length, 0);
+});
