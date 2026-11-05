@@ -411,7 +411,12 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       // Never guess: without the calendar the bot hands the date to the owner (replies 2.6).
       if ("error" in cal) return createErrorResponse(cal.error, 502);
       const now = env.now?.() ?? new Date();
-      const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
+      // The client's own pre-booking never busies their own new time (owner, 5 Nov 2026: 18h refused to the client holding 18h).
+      const ownId = typeof body.conversationId === "string" && body.conversationId ? body.conversationId : null;
+      const own = ownId && env.holds ? await env.holds.get(ownId) : null;
+      const ownEvent = own && !("error" in own) && !own.released_at ? own.event_id : null;
+      const events = await withRecentHolds(cal.events, env.holds, now);
+      const result = botAvailability(body, ownEvent ? events.filter(e => e.id !== ownEvent) : events, now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
     }
     case "booked-services": {

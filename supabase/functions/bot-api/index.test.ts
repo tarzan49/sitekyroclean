@@ -338,6 +338,22 @@ function fakeHolds() {
   };
   return { rows, store };
 }
+Deno.test("availability: the client's own pre-booking does not busy their own time, another client's does", async () => {
+  const { store } = fakeHolds();
+  const own = {
+    id: "ev1", summary: "Pré-reserva – Cliente – Braga – Sofá – 89€", description: "Equipa: Braga", location: "", startDate: "2026-10-08",
+    created: "", updated: "", status: "CONFIRMED", start: "2026-10-08T15:00:00Z", end: "2026-10-08T16:00:00Z",
+  };
+  await store.save({ conversation_id: "a", event_id: "ev1", title: own.summary, starts_at: own.start, ends_at: own.end });
+  const ask = (conversationId: string) => handleBotRequest(
+    new Request("https://x/bot-api", { method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json" },
+      body: JSON.stringify({ action: "availability", city: "Braga", date: "2026-10-08", time: "15h", items: [{ kind: "sofa", qty: 1 }], conversationId }) }),
+    { botKey: KEY, leads: null, holds: store, calendar: () => Promise.resolve({ events: [own] }), now: () => new Date("2026-10-07T08:45:00Z") },
+  ).then(r => r.json());
+  assertEquals((await ask("a")).availability.requested.free, true);
+  assertEquals((await ask("b")).availability.requested.free, false);
+});
+
 function fakeScript() {
   const calls: Record<string, unknown>[] = [];
   let n = 0;
