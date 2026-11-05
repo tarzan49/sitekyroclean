@@ -42,7 +42,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Cadeiras "Desde 12,50€"; impermeabilização de cadeiras 30/23€ (1–4) e 25/18€ (5+).
 - **Tapetes e alcatifas nunca mostram preço no site.** Lavagem em casa por defeito; recolha +20€, só entre 3 e 12 m² somados, fora da zona de Braga, entrega até 5 dias úteis. Alcatifa nunca tem recolha. Impermeabilização de tapetes não se vende no site, mas faz-se (no WhatsApp passa ao dono).
 - Sem preço próprio no site: puffs, cabeceira, 5+ impermeabilização. Chaise longue não é opção. Manchas, tecido e sujidade não mudam o preço (pele pode).
-- Secagem 2 a 5 h em tudo. Resposta em menos de 5 minutos. Preços sem IVA; com fatura acresce IVA 23%, a empresa e o particular.
+- Secagem 2 a 5 h em tudo. Resposta em menos de 5 minutos. Preços sem IVA; com fatura, a empresa paga mais 23% e no particular o IVA fica dentro do preço; o valor sem IVA divide-se sempre a meias com a equipa (dono, 5 Nov).
 - Serviço com fatura/IVA (empresa ou particular): o cliente paga SEMPRE por transferência à conta da empresa (IBAN no ficheiro do bot, S43), nunca à equipa; quem recebe é o dono; o IVA é todo do dono; só o valor sem IVA se divide com a equipa. Aviso às equipas antes do serviço, a quem o faz (grupo se houver grupo) (dono, 4 Nov).
 - O desconto de 10% acima de 149€ não existe. Nunca mecânicas de urgência não pedidas.
 - Avaliações nas páginas: só as reais de `src/data/reviewsPool.ts`. Testemunhos B2B: nunca inventar.
