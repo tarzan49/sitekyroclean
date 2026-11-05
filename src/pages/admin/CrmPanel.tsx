@@ -80,7 +80,8 @@ const parseEuros = (v: string) => parseFloat(v.replace(",", "."));
 // Filtros da aba Pedidos (dono, 2026-10-27: "um botão de filtro [...] por pagar,
 // por fatura [...] em vez de me aparecer todas as informações, aparece só uma").
 // As faturas saíram daqui para a aba "Faturas e IVA" (dono, 2026-10-27).
-// "Por pagar" = todo o dinheiro que me falta receber, de todos os meses (dono, 2026-11-01):
+// "Por pagar" = o dinheiro que me falta receber, do mês aberto (dono, 2026-11-04: o de meses
+// anteriores vai para a aba Contas) (dono, 2026-11-01):
 // as equipas que ainda não me pagaram e os clientes que me pagam diretamente e ainda não
 // pagaram, mesmo com a equipa já acertada (src/lib/crmDebts.ts). Absorveu o antigo filtro
 // "Clientes devem-me". Um serviço por fazer ainda não é dívida.
@@ -307,16 +308,27 @@ const CrmPanel = () => {
     return [...rows].sort((a, b) => rank(a) - rank(b) || a.request_date.localeCompare(b.request_date));
   }, [scoped, statusFilter, today]);
 
-  /** Tudo o que me falta receber, em todos os meses (o cartão "Por pagar"). */
+  /** O que me falta receber no mês aberto (o cartão "Por pagar"). */
   const debts = useMemo(() => {
     const out = { client: { count: 0, value: 0 }, team: { count: 0, value: 0 } };
-    for (const r of records) {
+    for (const r of monthRecords) {
       const kind = debtKindOf(r, today);
       if (!kind) continue;
       out[kind].count++;
       out[kind].value = round2(out[kind].value + owedOf(r, kind, today));
     }
     return out;
+  }, [monthRecords, today]);
+
+  /** Dívidas de meses já passados: não entram no CRM, aparecem na aba Contas. */
+  const pastDebts = useMemo(() => {
+    const thisMonth = today.slice(0, 7);
+    return records
+      .filter(r => r.request_date.slice(0, 7) < thisMonth)
+      .map(r => ({ r, kind: debtKindOf(r, today) }))
+      .filter((x): x is { r: ServiceRequest; kind: DebtKind } => x.kind !== null)
+      .map(({ r, kind }) => ({ id: r.id, date: r.request_date, description: r.description, kind, value: owedOf(r, kind, today) }))
+      .sort((a, b) => a.date.localeCompare(b.date));
   }, [records, today]);
 
   const filteredSums = useMemo(() => ({
@@ -325,12 +337,10 @@ const CrmPanel = () => {
     vat: round2(filtered.reduce((s, r) => s + vatToDeliverOf(r, lisbonDay(new Date())), 0)),
   }), [filtered]);
 
-  /** Carregar outra vez no filtro ligado volta a "Todos". "Por pagar" olha sempre para todos os meses. */
+  /** Carregar outra vez no filtro ligado volta a "Todos". */
   const pickStatus = (f: StatusFilter) => {
     const next = statusFilter === f ? "all" : f;
     setStatusFilter(next);
-    if (next === "unpaid") setAllMonths(true);
-    else if (statusFilter === "unpaid") setAllMonths(false);
   };
 
   const totals = useMemo(() => {
@@ -621,7 +631,7 @@ const CrmPanel = () => {
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
 
-      {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} />}
+      {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} pastDebts={pastDebts} />}
 
       {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onMarkClientPaid={markClientPaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
 
@@ -659,7 +669,7 @@ const CrmPanel = () => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pagos</p>
           <p className="text-xl font-bold text-green-600">{totals.paidCount}</p>
         </button>
-        <button type="button" onClick={() => pickStatus("unpaid")} aria-pressed={statusFilter === "unpaid"} title="Tudo o que te falta receber, de todos os meses"
+        <button type="button" onClick={() => pickStatus("unpaid")} aria-pressed={statusFilter === "unpaid"} title="O que te falta receber neste mês (os meses anteriores estão em Contas)"
           className={`text-left bg-white border rounded-xl p-4 transition-colors ${statusFilter === "unpaid" ? "border-red-500 ring-1 ring-red-500" : "border-red-200 hover:border-red-300"}`}>
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Por pagar</p>
           <p className="text-xl font-bold text-red-600">{money(round2(debts.client.value + debts.team.value))}</p>
@@ -720,7 +730,7 @@ const CrmPanel = () => {
             Falta-te receber <strong className="text-red-600">{money(round2(debts.client.value + debts.team.value))}</strong>:
             {" "}<span className="text-orange-700 font-semibold">clientes {money(debts.client.value)} ({debts.client.count})</span>, o serviço todo, porque te pagam a ti;
             {" "}<span className="text-red-600 font-semibold">equipas {money(debts.team.value)} ({debts.team.count})</span>, a tua parte{debts.team.value > 0 ? " mais o IVA das faturas" : ""}.
-            {" "}Só serviços já feitos, de todos os meses.
+            {" "}Só serviços já feitos, deste mês. Os meses anteriores estão em Contas.
             <button type="button" onClick={() => pickStatus("unpaid")} className="ml-2 text-gold font-semibold hover:underline">Ver todos</button>
           </p>
         )}
