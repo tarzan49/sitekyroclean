@@ -558,8 +558,8 @@ Dono: "estás-me a mandar demasiados alertas por e-mail e os e-mails estão a fi
 
 O dono: "pede como o processo como um todo", com "a parte da escovação q nunca mandam"; na impermeabilização "o processo q faz sentido"; e "sempre a pedir para enviarem fotos em HD no WhatsApp". Serve para o conteúdo em massa (TikTok e Reels).
 
-- Limpeza: antes (artigo inteiro), antes (pior mancha, de perto), pulverização, escovação, extração de perto com som, água suja a sair da máquina (não na sanita), depois do mesmo sítio.
-- Impermeabilização: antes, aplicação com a névoa à vista, teste com água, pano a tirar a água, depois do mesmo sítio. É o que as equipas já fazem nos vídeos que mandam. O teste de cor numa zona discreta, antes da aplicação, faz-se na mesma mas não se pede em vídeo.
+- Limpeza: antes (artigo inteiro), antes (pior mancha, de perto), pulverização, escovação, extração de perto com som, água suja na máquina, depois do mesmo sítio.
+- Impermeabilização: antes, a pessoa a impermeabilizar, teste com água, pano a tirar a água, depois do mesmo sítio. É o que as equipas já fazem nos vídeos que mandam. O teste de cor numa zona discreta, antes da aplicação, faz-se na mesma mas não se pede em vídeo.
 - Limpeza e impermeabilização na mesma visita: as duas listas seguidas. Serviço sem descrição: a lista de limpeza, com uma linha sobre a impermeabilização.
 - A mensagem sai no fim do serviço, tarde para filmar o antes desse serviço: a lista serve para o serviço seguinte. Foi também enviada aos grupos Porto e Lisboa/Algarve a 4/11. Algarve, Porto 2, Porto 3, Coimbra e Braga só a recebem na mensagem de cada serviço.
 - A regra do pagamento não mudou: continua a contar fotografia de antes, fotografia de depois, um vídeo e a avaliação. Todos os vídeos caem no mesmo campo e o recibo sai por conjunto de ficheiros, por isso mais vídeos não trazem mais mensagens.

@@ -220,11 +220,11 @@ const CLEANING_SHOTS = [
   'Pulverização',
   'Escovação',
   'Extração, de perto, com o som da máquina',
-  'A água suja a sair da máquina (não na sanita)',
+  'A água suja na máquina',
 ];
 const WATERPROOFING_SHOTS = [
-  'Aplicação, de perto, com a névoa à vista',
-  'Teste: água a ser deitada no tecido, até se ver que fica à superfície',
+  'A pessoa a impermeabilizar',
+  'Teste da impermeabilização com água',
   'O pano a tirar a água',
 ];
 

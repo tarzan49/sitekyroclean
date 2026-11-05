@@ -132,7 +132,7 @@ describe('messages', () => {
     expect(only).not.toContain('Escovação');
     const cleaning = procedureShots('Limpeza de sofá de 3 lugares');
     expect(cleaning).toContain('Escovação');
-    expect(cleaning.join()).not.toContain('Aplicação');
+    expect(cleaning.join()).not.toContain('A pessoa a impermeabilizar');
     for (const what of ['Limpeza e impermeabilização Premium de sofá 3 lugares', 'Pré-limpeza e impermeabilização Premium: sofá']) {
       const both = procedureShots(what);
       expect(both).toContain('Escovação');
