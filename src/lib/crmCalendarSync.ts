@@ -11,6 +11,15 @@ export type CrmSyncResult =
   | { status: "not-configured" }
   | { status: "done"; changed: boolean; counts: SyncPlan["counts"] };
 
+/** O motivo que a função devolveu e o estado HTTP, em vez do "non-2xx" genérico do supabase-js. */
+export async function calendarErrorMessage(data: { error?: string } | null | undefined, fnError: unknown): Promise<string> {
+  if (data?.error) return data.error;
+  const { context, message } = (fnError ?? {}) as { context?: Response; message?: string };
+  if (typeof context?.status !== "number") return message ?? "Erro ao ler o calendário";
+  const body = await context.clone().json().catch(() => null) as { error?: string; message?: string } | null;
+  return `${body?.error ?? body?.message ?? "Erro ao ler o calendário"} (HTTP ${context.status})`;
+}
+
 /** Lança em caso de erro; "not-configured" quando falta a secret do calendário. */
 export async function syncCalendarIntoCrm(rows: Array<SyncableRow & { phone: string | null }>): Promise<CrmSyncResult> {
   const { data, error: fnError } = await supabase.functions.invoke("calendar-events", {
@@ -18,7 +27,7 @@ export async function syncCalendarIntoCrm(rows: Array<SyncableRow & { phone: str
   });
   if (fnError || !data?.success) {
     if ((fnError as { context?: Response } | null)?.context?.status === 503) return { status: "not-configured" };
-    throw new Error(data?.error ?? fnError?.message ?? "Erro ao ler o calendário");
+    throw new Error(await calendarErrorMessage(data, fnError));
   }
   const events = (data.events ?? []) as CalendarEvent[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

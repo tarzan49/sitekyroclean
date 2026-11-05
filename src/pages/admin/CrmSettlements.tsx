@@ -1,3 +1,4 @@
+import { calendarErrorMessage } from "@/lib/crmCalendarSync";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Camera, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Lock, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,7 +51,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
         db.from("service_procedure").select("service_request_id, before_at, after_at, video_at").gte("service_day", "2026-10-01"),
         db.from("team_settlements").select("id, group_id, group_label, cycle_end, amount, service_count, paid_at").order("paid_at", { ascending: false }).limit(30),
       ]);
-      if (cal.error || !cal.data?.success) throw new Error(cal.data?.error ?? cal.error?.message ?? "Erro ao ler o calendário");
+      if (cal.error || !cal.data?.success) throw new Error(await calendarErrorMessage(cal.data, cal.error));
       if (adj.error) throw adj.error;
       if (hist.error) throw hist.error;
       // A falta da tabela do procedimento não impede as contas: só deixa as fotos e o vídeo por saber.
