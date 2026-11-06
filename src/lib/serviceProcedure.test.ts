@@ -101,6 +101,8 @@ describe('the pay rule lives in one function', () => {
     const none = { pay: { teamShare: 45, bonus: 0 } };
     expect(procedureAdjustment(rec({ service_day: '2026-11-05' }), none, 80, 'Ana')).toBeNull();
     expect(procedureAdjustment(rec({ service_day: '2026-11-06', team: 'Coimbra' }), none, 80, 'Ana')).toBeNull();
+    expect(procedureAdjustment(rec({ service_day: '2026-11-06', team: 'Coimbra' }), { pay: { teamShare: 45, bonus: 5 } }, 80, 'Ana')).toMatchObject({ amount: -5, label: 'Ana: avaliação +5€' });
+    expect(procedureAdjustment(rec({ service_day: '2026-11-05', team: 'Coimbra' }), { pay: { teamShare: 45, bonus: 5 } }, 80, 'Ana')).toBeNull();
   });
   it('switched on: 5% of the service when the deadline closes with anything missing, the 5€ owed to the team when complete', () => {
     expect(procedureAccountDelta(rec(), [], '2026-10-21', 80, true).delta).toBe(0);

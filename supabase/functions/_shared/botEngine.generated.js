@@ -3494,6 +3494,7 @@ var PROCEDURE_PAY_RULE = "all_or_45";
 var PROCEDURE_REVIEW_BONUS = 5;
 var PROCEDURE_MEDIA_RULE_FROM = "2026-11-06";
 var PROCEDURE_MEDIA_RULE_TEAMS = ["Lisboa 1", "Algarve", "Braga", "Porto 2", "Porto 3"];
+var PROCEDURE_REVIEW_BONUS_ONLY_TEAMS = ["Coimbra"];
 var usesMediaRule = (serviceDay) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 var mediaOk = (got) => got.before && got.after || got.video;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
@@ -3699,8 +3700,9 @@ function factsFromTitle(summary) {
   return { what: what || null, firstName: nameish ? nameish.split(/\s+/)[0] : null };
 }
 function procedureAdjustment(rec, check, netValue, label) {
-  if (!check.pay || !usesMediaRule(rec.service_day) || !PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team)) return null;
-  const lost = (PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100 * netValue;
+  const bonusOnly = PROCEDURE_REVIEW_BONUS_ONLY_TEAMS.includes(rec.team);
+  if (!check.pay || !usesMediaRule(rec.service_day) || !(bonusOnly || PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team))) return null;
+  const lost = bonusOnly ? 0 : (PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100 * netValue;
   const parts = [...lost > 0 ? ["5% sem fotografias e vídeo"] : [], ...check.pay.bonus ? [`avaliação +${check.pay.bonus}€`] : []];
   if (!parts.length) return null;
   return { team: rec.team, day: rec.service_day, label: `${label}: ${parts.join(", ")}`, amount: Math.round((lost - check.pay.bonus) * 100) / 100 };

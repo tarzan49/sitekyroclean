@@ -45,11 +45,12 @@ export const PROCEDURE_REVIEW_BONUS = 5;
 /**
  * Dono, 6/11/2026, mandado a Lisboa (com o Algarve no mesmo grupo), Braga, Porto 2 e Porto 3: fotografias e
  * vídeo = 50%; sem eles = 45%; uma avaliação de 4 ou 5 estrelas vale sempre mais
- * 5€, pagos pelo dono. Só em serviços a partir desse dia. A equipa que não
- * recebeu a mensagem (Coimbra) fica de fora.
+ * 5€, pagos pelo dono. Só em serviços a partir desse dia. Coimbra não recebeu
+ * essa mensagem: só tem os 5€ da avaliação, nunca perde os 5% (dono, 6/11).
  */
 export const PROCEDURE_MEDIA_RULE_FROM = '2026-11-06';
 export const PROCEDURE_MEDIA_RULE_TEAMS = ['Lisboa 1', 'Algarve', 'Braga', 'Porto 2', 'Porto 3'];
+export const PROCEDURE_REVIEW_BONUS_ONLY_TEAMS = ['Coimbra'];
 const usesMediaRule = (serviceDay: string) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 /** O painel: as contas já aplicam o procedimento (procedureAdjustment). */
 export const PROCEDURE_PAY_ENABLED = true;
@@ -435,8 +436,9 @@ export function procedureAccountDelta(
 export function procedureAdjustment(
   rec: Pick<ProcedureRecord, 'team' | 'service_day'>, check: Pick<ProcedureCheck, 'pay'>, netValue: number, label: string,
 ): { team: string; day: string; label: string; amount: number } | null {
-  if (!check.pay || !usesMediaRule(rec.service_day) || !PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team)) return null;
-  const lost = ((PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100) * netValue;
+  const bonusOnly = PROCEDURE_REVIEW_BONUS_ONLY_TEAMS.includes(rec.team);
+  if (!check.pay || !usesMediaRule(rec.service_day) || !(bonusOnly || PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team))) return null;
+  const lost = bonusOnly ? 0 : ((PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100) * netValue;
   const parts = [...(lost > 0 ? ['5% sem fotografias e vídeo'] : []), ...(check.pay.bonus ? [`avaliação +${check.pay.bonus}€`] : [])];
   if (!parts.length) return null;
   return { team: rec.team, day: rec.service_day, label: `${label}: ${parts.join(', ')}`, amount: Math.round((lost - check.pay.bonus) * 100) / 100 };
