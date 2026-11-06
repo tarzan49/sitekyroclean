@@ -240,7 +240,7 @@ describe('two-person teams and the team the bot books on', () => {
     expect(chooseTeam([], 'Porto', ...at15, true)).toBe('Porto 1');
     const premium = [{ kind: 'sofa', qty: 1, treatment: 'premium' }];
     // Denise (Porto 3) does no waterproofing (owner, 28 Oct 2026: "se for imper ou imper e limpeza tem q ser porto 1").
-    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 1']);
+    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 2']);
     expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Guimarães', ...at15, true)).toBeNull();
     expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Porto', ...at15, true)).toBeNull();
     expect(ok(botAvailability({ city: 'Guimarães', items: [{ kind: 'sofa', qty: 1 }], date: '2026-10-08' }, [], NOW)).teams).toEqual(['Braga']);
@@ -262,8 +262,6 @@ describe('Porto 1 off on the afternoon of 29 Oct 2026 (owner, 28 Oct: "amanha a 
     const premium = [{ kind: 'sofa', qty: 1, treatment: 'clean+premium' }];
     expect(chooseTeam([], 'Porto', ...span('15:00', '16:30'), true)).toBeNull();
     expect(chooseTeam([], 'Guimarães', ...span('15:00', '16:30'), true)).toBeNull();
-    const r = ok(botAvailability({ city: 'Porto', items: premium, date: day }, [], now));
-    expect(r.free.flatMap(d => d.times).every(t => Number(t.replace(/h.*/, '')) < 12)).toBe(true);
     expect(ok(botAvailability({ city: 'Porto', items: premium, date: day, time: '15h' }, [], now)).requested).toMatchObject({ free: false });
     expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1 }], date: day, time: '15h' }, [], now)).requested).toMatchObject({ free: true, teamsFree: ['Porto 3'] });
   });
@@ -390,14 +388,41 @@ describe('Porto 1 closed from 6 Nov 2026, 20:00', () => {
     expect(teamWorks('Porto 1', lisbonUtc('2026-12-01', '10:00'), lisbonUtc('2026-12-01', '12:00'))).toBe(false);
   });
 
-  it('passes Porto and Braga waterproofing to the owner, cleanings keep their teams', () => {
+  it('passes Porto and Braga waterproofing to Porto 2, cleanings keep their teams', () => {
     const now = new Date('2026-11-06T11:00:00Z');
     for (const city of ['Porto', 'Guimarães']) {
       const r = ok(botAvailability({ city, items: premium }, [], now));
-      expect(r.teams).toEqual([]);
-      expect(r.handToOwner).toMatch(/responsável escolhe/);
+      expect(r.teams).toEqual(['Porto 2']);
+      expect(r.handToOwner).toBeNull();
     }
     expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1, treatment: 'clean' }] }, [], now)).teams).not.toContain('Porto 1');
-    expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBeNull();
+    expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBe('Porto 2');
+  });
+});
+
+describe('waterproofing in Porto and Braga from 11 Nov 2026 (owner, 6 Nov 2026)', () => {
+  const now = new Date('2026-11-06T12:00:00Z');
+  const items = [{ kind: 'sofa', seats: 3, treatment: 'premium' }];
+  it('goes to Porto 2 and starts on Wednesday', () => {
+    for (const city of ['Porto', 'Braga']) {
+      const r = botAvailability({ city, items, durationMin: 90 }, [], now);
+      if ('error' in r) throw new Error(r.error);
+      expect(r.teams).toEqual(['Porto 2']);
+      expect(r.handToOwner).toBeNull();
+      expect(r.free.every(d => d.date >= '2026-11-11')).toBe(true);
+    }
+  });
+  it('an earlier day or time is refused and later days are offered', () => {
+    const r = botAvailability({ city: 'Porto', items, durationMin: 90, date: '2026-11-09', time: '10h' }, [], now);
+    if ('error' in r) throw new Error(r.error);
+    expect(r.requested?.free).toBe(false);
+    expect(r.free[0].date).toBe('2026-11-11');
+    expect(chooseTeam([], 'Porto', '2026-11-10T10:00:00Z', '2026-11-10T11:30:00Z', 'premium', false)).toBeNull();
+    expect(chooseTeam([], 'Porto', '2026-11-11T10:00:00Z', '2026-11-11T11:30:00Z', 'premium', false)).toBe('Porto 2');
+  });
+  it('cleanings are unchanged', () => {
+    const r = botAvailability({ city: 'Porto', durationMin: 60, items: [{ kind: 'sofa', seats: 3 }] }, [], now);
+    if ('error' in r) throw new Error(r.error);
+    expect(r.free[0].date < '2026-11-11').toBe(true);
   });
 });

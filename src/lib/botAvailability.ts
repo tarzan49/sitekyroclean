@@ -70,10 +70,12 @@ export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 2']);
 export const WATERPROOFING_TEAMS: Partial<Record<TeamZone, readonly string[]>> = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
   // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
-  // Owner, 31 Oct 2026: Porto 2 does not know how to waterproof, so only Porto 1 takes it.
-  Porto: ['Porto 1'],
-  Braga: ['Porto 1'],
+  // Owner, 6 Nov 2026: Porto 1 closed, waterproofing goes to Porto 2 (from WATERPROOFING_FROM).
+  Porto: ['Porto 1', 'Porto 2'],
+  Braga: ['Porto 1', 'Porto 2'],
 };
+/** First day Porto 2 waterproofs in Porto and Braga (owner, 6 Nov 2026: "tudo que seja impermeabilização no Porto ou Braga, quarta-feira para a frente"). */
+export const WATERPROOFING_FROM: Partial<Record<TeamZone, string>> = { Porto: '2026-11-11', Braga: '2026-11-11' };
 /**
  * Porto cleanings below 200€ go to Porto 3 (Denise), then Porto 2 (Aleixo); Porto 1 only takes jobs
  * of 200€ or more (owner, 4 Nov 2026: "limpeza abaixo de 200 euros ficam para porto 3"; was 100€ on 31 Oct 2026). Waterproofing stays with Porto 1.
@@ -89,7 +91,8 @@ export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
 /** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). */
 export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string): readonly string[] => {
   const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
-    .filter(t => !TEAM_CLOSED_FROM[t] || (day && day <= TEAM_CLOSED_FROM[t].date));
+    .filter(t => !TEAM_CLOSED_FROM[t] || (day && day <= TEAM_CLOSED_FROM[t].date))
+    .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
@@ -781,7 +784,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const min = SMALL_ORDER_MIN_BY_CITY[city] ?? SMALL_ORDER_MIN_TOTAL;
     if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
-  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, addDays(lisbon(now.getTime()).date, 1))];
+  // Waterproofing in a zone that only starts on a later day: the hours start on that day.
+  const tomorrow = addDays(lisbon(now.getTime()).date, 1);
+  const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? '' : '';
+  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow)];
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
 
@@ -801,10 +807,12 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const closedAt = (date: string, m: number) => active.some(r => r.closed?.some(c => c.date === date && (c.fromHour === undefined || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap(r => r.prefer ?? []))].filter(d => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some(r => r.onlyPreferred);
-  const ahead = Array.from({ length: span }, (_, i) => addDays(today, i));
-  const dayOrder = onlyDay ? [onlyDay] : [...preferred, ...ahead.filter(d => !preferred.includes(d))];
+  const firstDay = waterproofingFrom > today ? waterproofingFrom : today;
+  const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
+  const tooEarly = (date: string) => date < firstDay;
+  const dayOrder = onlyDay && !tooEarly(onlyDay) ? [onlyDay] : [...preferred, ...ahead.filter(d => !preferred.includes(d))];
   // A client who asks for a day the owner closed gets the preferred days instead.
-  const scan = onlyDay ? [onlyDay, ...preferred.filter(d => d !== onlyDay)] : dayOrder;
+  const scan = onlyDay && !tooEarly(onlyDay) ? [onlyDay, ...preferred.filter(d => d !== onlyDay)] : dayOrder;
 
   const busy = busyIntervals(events);
   const place = placeOf(city);
@@ -817,7 +825,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const step = area === 'Algarve' && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
       const from = lisbonToUtc(date, m);
-      if (from < earliestToday || closedAt(date, m)) continue;
+      if (from < earliestToday || closedAt(date, m) || tooEarly(date)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
@@ -830,7 +838,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);
-    const open = inHours && !closedAt(onlyDay, m);
+    const open = inHours && !closedAt(onlyDay, m) && !tooEarly(onlyDay);
     requested = { date: onlyDay, time: hourLabel(m), free: open && st.free, teamsFree: open ? st.teamsFree : [], sameTime: st.sameTime,
       start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };
   }
