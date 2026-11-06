@@ -78,7 +78,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Dourado `#D4AF37` em tudo; `#8B6914` só em texto pequeno sobre fundo claro.
 - Afirmações de saúde só com fonte lida (`src/data/blogSources.ts`). Nada de "elimina 100%", "mata", percentagens de eficácia.
 - Ao corrigir um valor, mudar só esse valor; não extrapolar sem perguntar.
-- Mensagens a clientes/equipas: rascunho ao dono primeiro, várias mensagens curtas, com espaçamento.
+- Mensagens a clientes/equipas: rascunho ao dono primeiro e sai UMA só mensagem, nunca partida em 4 ou 5 (dono, 6 Nov).
 
 ## 7. Poupar contexto (dono, 4 Nov)
 

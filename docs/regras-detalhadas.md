@@ -743,3 +743,5 @@ Limpezas do Porto abaixo de 200€ ficam para Porto 3 (dono, 4 Nov): `PORTO1_MIN
 ## Porto 1 fechada (dono, 2026-11-06)
 
 A equipa Porto 1 deixou de existir às 20:00 de 6/11 (`TEAM_CLOSED_FROM`, `botAvailability.ts`): nenhum serviço pode acabar depois disso e o bot deixa de a oferecer. Como era a única a impermeabilizar no Porto e em Braga, esses pedidos passam ao dono (`handToOwner`). Os serviços passados, o calendário e as contas da equipa ficam. A "Porto 4" de que se falou não existe. O serviço de 1/12 saiu da Porto 1 e ficou só no calendário do dono, sem equipa. Tirar um serviço de uma equipa em silêncio: tirar cor e texto "equipa X" do evento do dono e apagar a cópia (só tirar a cor deixa a cópia ficar, ver `planear`).
+
+- **Uma só mensagem (dono, 2026-11-06: "acabar a cena das 4/5 msg, isso não existe").** Mensagens escritas à mão a clientes ou equipas saem numa única mensagem, nunca em várias bolhas. Substitui a regra antiga das várias mensagens curtas. Nasceu do aviso às equipas sobre os 50%/45% e os 5€ por avaliação.
