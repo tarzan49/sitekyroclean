@@ -43,13 +43,13 @@ export type ProcedurePayRule = 'media_50_review_5' | 'all_or_45' | 'review_compe
 export const PROCEDURE_PAY_RULE: ProcedurePayRule = 'all_or_45';
 export const PROCEDURE_REVIEW_BONUS = 5;
 /**
- * Dono, 6/11/2026, mandado a Lisboa, Braga, Porto 2 e Porto 3: fotografias e
+ * Dono, 6/11/2026, mandado a Lisboa (com o Algarve no mesmo grupo), Braga, Porto 2 e Porto 3: fotografias e
  * vídeo = 50%; sem eles = 45%; uma avaliação de 4 ou 5 estrelas vale sempre mais
- * 5€, pagos pelo dono. Só em serviços a partir desse dia. As equipas que não
- * receberam a mensagem (Algarve, Coimbra) ficam de fora até o dono dizer.
+ * 5€, pagos pelo dono. Só em serviços a partir desse dia. A equipa que não
+ * recebeu a mensagem (Coimbra) fica de fora.
  */
 export const PROCEDURE_MEDIA_RULE_FROM = '2026-11-06';
-export const PROCEDURE_MEDIA_RULE_TEAMS = ['Lisboa 1', 'Braga', 'Porto 2', 'Porto 3'];
+export const PROCEDURE_MEDIA_RULE_TEAMS = ['Lisboa 1', 'Algarve', 'Braga', 'Porto 2', 'Porto 3'];
 const usesMediaRule = (serviceDay: string) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 /** O painel: as contas já aplicam o procedimento (procedureAdjustment). */
 export const PROCEDURE_PAY_ENABLED = true;

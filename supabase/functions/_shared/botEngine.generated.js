@@ -3488,7 +3488,7 @@ var PROCEDURE_REDUCED_SHARE = 45;
 var PROCEDURE_PAY_RULE = "all_or_45";
 var PROCEDURE_REVIEW_BONUS = 5;
 var PROCEDURE_MEDIA_RULE_FROM = "2026-11-06";
-var PROCEDURE_MEDIA_RULE_TEAMS = ["Lisboa 1", "Braga", "Porto 2", "Porto 3"];
+var PROCEDURE_MEDIA_RULE_TEAMS = ["Lisboa 1", "Algarve", "Braga", "Porto 2", "Porto 3"];
 var usesMediaRule = (serviceDay) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 var mediaOk = (got) => got.before && got.after || got.video;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
