@@ -746,7 +746,7 @@ A equipa Porto 1 deixou de existir às 20:00 de 6/11 (`TEAM_CLOSED_FROM`, `botAv
 
 - **Uma só mensagem (dono, 2026-11-06: "acabar a cena das 4/5 msg, isso não existe").** Mensagens escritas à mão a clientes ou equipas saem numa única mensagem, nunca em várias bolhas. Substitui a regra antiga das várias mensagens curtas. Nasceu do aviso às equipas sobre os 50%/45% e os 5€ por avaliação.
 
-- **Pagamento às equipas desde 6/11 (dono, 2026-11-06):** fotografias de antes e depois e vídeo = 50%; sem eles = 45%; avaliação de 4 ou 5 estrelas = mais 5€ pagos pelo dono, com ou sem fotografias. Vale para Lisboa 1, Algarve (no mesmo grupo de Lisboa), Braga, Porto 2 e Porto 3; Coimbra fica de fora. Os valores entram como acertos (`team_account_adjustments`, `procedureAdjustment`) quando o procedimento fecha, porque o serviço pode já estar pago ao fim dos 7 dias. A avaliação já não dá lembretes às equipas.
+- **Pagamento às equipas desde 6/11 (dono, 2026-11-06):** fotografias de antes e depois e vídeo = 50%; sem eles = 45%; avaliação de 4 ou 5 estrelas = mais 5€ pagos pelo dono, com ou sem fotografias. Vale para Lisboa 1, Algarve (no mesmo grupo de Lisboa), Braga, Porto 2 e Porto 3; Coimbra só tem os 5€ da avaliação e nunca perde os 5% (dono, 6 Nov, parceria com o Bruno). Os valores entram como acertos (`team_account_adjustments`, `procedureAdjustment`) quando o procedimento fecha, porque o serviço pode já estar pago ao fim dos 7 dias. A avaliação já não dá lembretes às equipas.
 
 ## Impermeabilização no Porto e em Braga: Porto 2, a partir de 11/11 (dono, 2026-11-06)
 
