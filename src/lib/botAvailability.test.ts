@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAY_RULES, botAvailability, chooseTeam, teamBusyAt, teamsFor, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
+import { DAY_RULES, botAvailability, chooseTeam, teamBusyAt, teamWorks, teamsFor, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -377,5 +377,27 @@ describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
     expect(ok.handToOwner).toBeNull();
     const owner = botAvailability({ city: 'Viana do Castelo', total: 50, ownerTime: true }, [], now) as { handToOwner: string | null };
     expect(owner.handToOwner).toBeNull();
+  });
+});
+
+describe('Porto 1 closed from 6 Nov 2026, 20:00', () => {
+  const premium = [{ kind: 'sofa', qty: 1, treatment: 'premium' }];
+  const lisbonUtc = (date: string, hhmm: string) => Date.parse(`${date}T${hhmm}:00Z`); // November = UTC
+
+  it('works until 20:00 and takes nothing that ends later', () => {
+    expect(teamWorks('Porto 1', lisbonUtc('2026-11-06', '18:00'), lisbonUtc('2026-11-06', '20:00'))).toBe(true);
+    expect(teamWorks('Porto 1', lisbonUtc('2026-11-06', '19:00'), lisbonUtc('2026-11-06', '20:30'))).toBe(false);
+    expect(teamWorks('Porto 1', lisbonUtc('2026-12-01', '10:00'), lisbonUtc('2026-12-01', '12:00'))).toBe(false);
+  });
+
+  it('passes Porto and Braga waterproofing to the owner, cleanings keep their teams', () => {
+    const now = new Date('2026-11-06T11:00:00Z');
+    for (const city of ['Porto', 'Guimarães']) {
+      const r = ok(botAvailability({ city, items: premium }, [], now));
+      expect(r.teams).toEqual([]);
+      expect(r.handToOwner).toMatch(/responsável escolhe/);
+    }
+    expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1, treatment: 'clean' }] }, [], now)).teams).not.toContain('Porto 1');
+    expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBeNull();
   });
 });

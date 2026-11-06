@@ -2400,7 +2400,7 @@ var WATERPROOFING_TEAMS = {
 var PORTO1_MIN_TOTAL = 200;
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var teamsFor = (zone, waterproofing, total, day) => {
-  const teams = waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone];
+  const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !TEAM_CLOSED_FROM[t] || day && day <= TEAM_CLOSED_FROM[t].date);
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
@@ -2471,7 +2471,12 @@ var TEAM_OFF = [
   // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
   ...["2026-11-02", "2026-11-03"].map((date) => ({ team: "Porto 3", date }))
 ];
-var offAt = (team, from, to) => TEAM_OFF.some((o) => {
+var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20 } };
+var closedAt = (team, to) => {
+  const closed = TEAM_CLOSED_FROM[team];
+  return Boolean(closed) && to > lisbonToUtc(closed.date, closed.hour * 60);
+};
+var offAt = (team, from, to) => closedAt(team, to) || TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
   const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
   return from < b && to > a;
@@ -2904,7 +2909,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
   const teams = [...teamsFor(area, waterproofingKind(req?.items), area === "Porto" ? orderTotal(req, city) : null, addDays(lisbon(now.getTime()).date, 1))];
-  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização Essencial nesta zona: o responsável escolhe a equipa e a hora" };
+  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização nesta zona: o responsável escolhe a equipa e a hora" };
   const cleaning = !waterproofingOnly(req?.items);
   const today = lisbon(now.getTime()).date;
   let onlyDay = null;
@@ -2916,7 +2921,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const daysRaw = Math.floor(Number(req.days));
   const span = Number.isFinite(daysRaw) && daysRaw >= 1 ? Math.min(MAX_DAYS, daysRaw) : DEFAULT_DAYS;
   const active = req.ownerTime === true ? [] : rules.filter((r) => r.from <= today && today <= r.until && (r.zone === area || teams.every((t) => TEAMS_BY_REGION[r.zone].includes(t))));
-  const closedAt = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
+  const closedAt2 = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap((r) => r.prefer ?? []))].filter((d) => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some((r) => r.onlyPreferred);
   const ahead = Array.from({ length: span }, (_, i) => addDays(today, i));
@@ -2932,7 +2937,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     const step = area === "Algarve" && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
     for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
       const from = lisbonToUtc(date, m);
-      if (from < earliestToday || closedAt(date, m)) continue;
+      if (from < earliestToday || closedAt2(date, m)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);
       if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
@@ -2944,7 +2949,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);
-    const open = inHours && !closedAt(onlyDay, m);
+    const open = inHours && !closedAt2(onlyDay, m);
     requested = {
       date: onlyDay,
       time: hourLabel(m),

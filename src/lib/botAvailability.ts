@@ -88,7 +88,8 @@ export const PORTO1_MIN_TOTAL = 200;
 export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
 /** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). */
 export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string): readonly string[] => {
-  const teams = (waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone];
+  const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
+    .filter(t => !TEAM_CLOSED_FROM[t] || (day && day <= TEAM_CLOSED_FROM[t].date));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
@@ -212,7 +213,16 @@ export const TEAM_OFF: readonly TeamOff[] = [
   // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
   ...['2026-11-02', '2026-11-03'].map(date => ({ team: 'Porto 3', date })),
 ];
-const offAt = (team: string, from: number, to: number) => TEAM_OFF.some(o => {
+/**
+ * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends
+ * at 20:00; its past services stay. It was the only team waterproofing in Porto and Braga, so those go to the owner.
+ */
+export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number }>> = { 'Porto 1': { date: '2026-11-06', hour: 20 } };
+const closedAt = (team: string, to: number) => {
+  const closed = TEAM_CLOSED_FROM[team];
+  return Boolean(closed) && to > lisbonToUtc(closed.date, closed.hour * 60);
+};
+const offAt = (team: string, from: number, to: number) => closedAt(team, to) || TEAM_OFF.some(o => {
   if (o.team !== team) return false;
   const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
   return from < b && to > a;
@@ -772,7 +782,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     if (total === null || total < min) return { ...base, region: area, teams: [], handToOwner: `${city}: pedido abaixo de ${min}€, sem horas certas. Dizer ao cliente que vamos verificar a disponibilidade` };
   }
   const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, addDays(lisbon(now.getTime()).date, 1))];
-  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização Essencial nesta zona: o responsável escolhe a equipa e a hora' };
+  if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
 
   const today = lisbon(now.getTime()).date;
