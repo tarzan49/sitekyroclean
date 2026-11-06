@@ -3487,8 +3487,15 @@ var PROCEDURE_FULL_SHARE = 50;
 var PROCEDURE_REDUCED_SHARE = 45;
 var PROCEDURE_PAY_RULE = "all_or_45";
 var PROCEDURE_REVIEW_BONUS = 5;
+var PROCEDURE_MEDIA_RULE_FROM = "2026-11-06";
+var PROCEDURE_MEDIA_RULE_TEAMS = ["Lisboa 1", "Braga", "Porto 2", "Porto 3"];
+var usesMediaRule = (serviceDay) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 var mediaOk = (got) => got.before && got.after || got.video;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
+  if (rule === "media_50_review_5") return {
+    teamShare: got.before && got.after && got.video ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE,
+    bonus: got.review ? PROCEDURE_REVIEW_BONUS : 0
+  };
   if (rule === "all_or_45") return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   const media = got.before && got.after && got.video;
   if (rule === "review_compensates") {
@@ -3542,6 +3549,20 @@ function checkProcedure(rec, reviews, endedDay) {
   const video = !!rec.video_msg_id && inTime(rec.video_at);
   const review = reviews.some((r) => !r.excluded && r.stars >= REVIEW_MIN_STARS && lisbonDayOf(r.reviewed_at) <= deadline);
   const got = { before, after, video, review };
+  if (usesMediaRule(rec.service_day)) {
+    const missing2 = ["before", "after", "video"].filter((k) => !got[k]);
+    const status2 = endedDay >= deadline ? missing2.length ? "fechado" : "completo" : !missing2.length && review ? "completo" : "em_curso";
+    return {
+      before,
+      after,
+      video,
+      review,
+      missing: [...missing2],
+      deadline,
+      status: status2,
+      pay: status2 === "em_curso" ? null : procedurePay(got, "media_50_review_5")
+    };
+  }
   const missing = ["before", "after", "video", "review"].filter((k) => !got[k]).filter((k) => k === "review" || !mediaOk(got));
   const status = missing.length === 0 ? "completo" : endedDay >= deadline ? "fechado" : "em_curso";
   return {
@@ -3644,7 +3665,7 @@ function procedureReceiptMessage(label, received, check) {
 var REMINDER_DAYS = [1, 5];
 var REMINDER_HOUR = 10;
 function reminderDue(rec, check, now) {
-  if (!rec.prompted_at || check.status !== "em_curso" || check.missing.length === 0) return null;
+  if (!rec.prompted_at || check.status !== "em_curso" || !check.missing.some((i) => i !== "review")) return null;
   const today = lisbonDayOf(now);
   const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Lisbon", hour: "2-digit", hourCycle: "h23" }).format(now));
   if (hour < REMINDER_HOUR) return null;
@@ -3656,9 +3677,8 @@ function reminderDue(rec, check, now) {
 }
 function procedureReminderMessage(label, check, serviceDay) {
   const media = check.missing.filter((i) => i !== "review");
-  const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(check.missing)}.`];
-  if (media.length) lines.push("Responde à mensagem desse serviço com o que falta.");
-  if (check.missing.includes("review")) lines.push("O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o.");
+  const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(media)}.`];
+  lines.push("Responde à mensagem desse serviço com o que falta.");
   lines.push(`Prazo: ${dm2(check.deadline)}.`);
   return lines.join(" ");
 }
@@ -3672,6 +3692,13 @@ function factsFromTitle(summary) {
   const what = (parts[0] ?? "").replace(/^(a confirmar\s*·\s*)?(servi[cç]o|limpeza)\b/i, (m) => /limpeza/i.test(m) ? "Limpeza" : "").replace(/\d+(?:[.,]\d+)?\s*€/g, "").replace(/\((?:\s*|an[uú]ncio[^)]*)\)/gi, "").replace(/\s+/g, " ").trim();
   const nameish = parts.slice(1).find((p) => /^[\p{L} '.]+$/u.test(p) && p.split(/\s+/).length <= 4 && !/^(rua|av|avenida|travessa|largo|praça|estrada)\b/i.test(p));
   return { what: what || null, firstName: nameish ? nameish.split(/\s+/)[0] : null };
+}
+function procedureAdjustment(rec, check, netValue, label) {
+  if (!check.pay || !usesMediaRule(rec.service_day) || !PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team)) return null;
+  const lost = (PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100 * netValue;
+  const parts = [...lost > 0 ? ["5% sem fotografias e vídeo"] : [], ...check.pay.bonus ? [`avaliação +${check.pay.bonus}€`] : []];
+  if (!parts.length) return null;
+  return { team: rec.team, day: rec.service_day, label: `${label}: ${parts.join(", ")}`, amount: Math.round((lost - check.pay.bonus) * 100) / 100 };
 }
 function procedureStatusChanges(records, reviews, endedDay, nowIso) {
   const out = [];
@@ -4171,6 +4198,7 @@ export {
   planBotBooking,
   planBotHold,
   planOwnerBooking,
+  procedureAdjustment,
   procedureApplies,
   procedureClientMessage,
   procedureClosedMessage,
@@ -4182,6 +4210,7 @@ export {
   reminderDue,
   replacementTeam,
   resolveBotCity,
+  serviceVatOf,
   slotForMedia,
   teamAccounts,
   teamBusyAt,

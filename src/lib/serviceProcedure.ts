@@ -6,8 +6,8 @@
 // contas da noite aplicam o resultado (procedurePay) e avisam a equipa. Enquanto
 // o prazo corre não se soma nada. A regra de pagamento mudou duas vezes a
 // 14/10 e outra vez a 20/10 (a de agora: tudo = 50% + 5€, falta qualquer
-// coisa = 45%): por isso vive só em procedurePay, e as contas só a aplicam com
-// PROCEDURE_PAY_ENABLED, que o dono ainda não mandou ligar.
+// coisa = 45%): por isso vive só em procedurePay. Desde 6/11 (dono) vale
+// 'media_50_review_5': ver PROCEDURE_MEDIA_RULE_FROM e procedureAdjustment.
 //
 // Quando um serviço acaba, o servidor do bot manda a cada pessoa da equipa a
 // mensagem de `procedurePromptMessage` e, ao cliente, o pedido de avaliação de
@@ -39,15 +39,20 @@ export const PROCEDURE_REDUCED_SHARE = 45;
  * quatro = 50% sem bónus, a da manhã de 14/10) e 'review_bonus' (fotografias e
  * vídeo = 50%, avaliação +5€). Mudar a regra é mudar PROCEDURE_PAY_RULE.
  */
-export type ProcedurePayRule = 'all_or_45' | 'review_compensates' | 'review_in_50' | 'review_bonus';
+export type ProcedurePayRule = 'media_50_review_5' | 'all_or_45' | 'review_compensates' | 'review_in_50' | 'review_bonus';
 export const PROCEDURE_PAY_RULE: ProcedurePayRule = 'all_or_45';
 export const PROCEDURE_REVIEW_BONUS = 5;
 /**
- * As contas da noite só aplicam o resultado do procedimento com isto ligado.
- * Desligado até o dono confirmar a regra: o bot já recolhe as fotografias, o
- * vídeo e a avaliação de cada serviço, e o painel mostra-os.
+ * Dono, 6/11/2026, mandado a Lisboa, Braga, Porto 2 e Porto 3: fotografias e
+ * vídeo = 50%; sem eles = 45%; uma avaliação de 4 ou 5 estrelas vale sempre mais
+ * 5€, pagos pelo dono. Só em serviços a partir desse dia. As equipas que não
+ * receberam a mensagem (Algarve, Coimbra) ficam de fora até o dono dizer.
  */
-export const PROCEDURE_PAY_ENABLED = false;
+export const PROCEDURE_MEDIA_RULE_FROM = '2026-11-06';
+export const PROCEDURE_MEDIA_RULE_TEAMS = ['Lisboa 1', 'Braga', 'Porto 2', 'Porto 3'];
+const usesMediaRule = (serviceDay: string) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
+/** O painel: as contas já aplicam o procedimento (procedureAdjustment). */
+export const PROCEDURE_PAY_ENABLED = true;
 
 export interface ProcedurePay {
   /** % do valor do serviço que fica para a equipa. */
@@ -64,6 +69,10 @@ export interface ProcedurePay {
 export const mediaOk = (got: { before: boolean; after: boolean; video: boolean }) => (got.before && got.after) || got.video;
 
 export function procedurePay(got: { before: boolean; after: boolean; video: boolean; review: boolean }, rule: ProcedurePayRule = PROCEDURE_PAY_RULE): ProcedurePay {
+  if (rule === 'media_50_review_5') return {
+    teamShare: got.before && got.after && got.video ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE,
+    bonus: got.review ? PROCEDURE_REVIEW_BONUS : 0,
+  };
   if (rule === 'all_or_45') return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
   // As regras antigas, como eram: fotografias e vídeo.
   const media = got.before && got.after && got.video;
@@ -177,6 +186,15 @@ export function checkProcedure(rec: ProcedureRecord, reviews: ProcedureReview[],
   const video = !!rec.video_msg_id && inTime(rec.video_at);
   const review = reviews.some(r => !r.excluded && r.stars >= REVIEW_MIN_STARS && lisbonDayOf(r.reviewed_at) <= deadline);
   const got = { before, after, video, review };
+  if (usesMediaRule(rec.service_day)) {
+    // A avaliação é um extra: não falta, mas o procedimento fica aberto até ao prazo, porque ainda pode chegar.
+    const missing = (['before', 'after', 'video'] as const).filter(k => !got[k]);
+    const status: ProcedureStatus = endedDay >= deadline ? (missing.length ? 'fechado' : 'completo') : !missing.length && review ? 'completo' : 'em_curso';
+    return {
+      before, after, video, review, missing: [...missing], deadline, status,
+      pay: status === 'em_curso' ? null : procedurePay(got, 'media_50_review_5'),
+    };
+  }
   const missing = (['before', 'after', 'video', 'review'] as const)
     .filter(k => !got[k])
     .filter(k => k === 'review' || !mediaOk(got));
@@ -345,7 +363,8 @@ export const REMINDER_HOUR = 10;
 
 /** Qual lembrete toca agora (índice em REMINDER_DAYS), ou null. */
 export function reminderDue(rec: Pick<ProcedureRecord, 'service_day' | 'reminders_sent' | 'prompted_at'>, check: Pick<ProcedureCheck, 'missing' | 'status'>, now: Date): number | null {
-  if (!rec.prompted_at || check.status !== 'em_curso' || check.missing.length === 0) return null;
+  // A avaliação já não se cobra à equipa (dono, 6/11): só a falta de fotografias ou vídeo dá lembrete.
+  if (!rec.prompted_at || check.status !== 'em_curso' || !check.missing.some(i => i !== 'review')) return null;
   const today = lisbonDayOf(now);
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', hour: '2-digit', hourCycle: 'h23' }).format(now));
   if (hour < REMINDER_HOUR) return null;
@@ -356,9 +375,8 @@ export function reminderDue(rec: Pick<ProcedureRecord, 'service_day' | 'reminder
 
 export function procedureReminderMessage(label: string, check: Pick<ProcedureCheck, 'missing' | 'deadline'>, serviceDay: string): string {
   const media = check.missing.filter(i => i !== 'review');
-  const lines = [`Lembrete do serviço ${label}, ${dm(serviceDay)}. Falta: ${missingText(check.missing)}.`];
-  if (media.length) lines.push('Responde à mensagem desse serviço com o que falta.');
-  if (check.missing.includes('review')) lines.push('O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o.');
+  const lines = [`Lembrete do serviço ${label}, ${dm(serviceDay)}. Falta: ${missingText(media)}.`];
+  lines.push('Responde à mensagem desse serviço com o que falta.');
   lines.push(`Prazo: ${dm(check.deadline)}.`);
   return lines.join(' ');
 }
@@ -406,6 +424,22 @@ export function procedureAccountDelta(
   if (!check.pay) return { delta: 0, check };
   const lost = ((PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100) * billed;
   return { delta: Math.round((lost - check.pay.bonus) * 100) / 100, check };
+}
+
+/**
+ * O acerto nas contas quando o procedimento de um serviço fecha: positivo = a
+ * equipa deve os 5% do valor sem IVA, negativo = o dono deve os 5€ da avaliação.
+ * Vai para team_account_adjustments porque o serviço já pode estar pago quando
+ * o prazo de 7 dias acaba. null fora da regra de 6/11 ou sem nada a acertar.
+ */
+export function procedureAdjustment(
+  rec: Pick<ProcedureRecord, 'team' | 'service_day'>, check: Pick<ProcedureCheck, 'pay'>, netValue: number, label: string,
+): { team: string; day: string; label: string; amount: number } | null {
+  if (!check.pay || !usesMediaRule(rec.service_day) || !PROCEDURE_MEDIA_RULE_TEAMS.includes(rec.team)) return null;
+  const lost = ((PROCEDURE_FULL_SHARE - check.pay.teamShare) / 100) * netValue;
+  const parts = [...(lost > 0 ? ['5% sem fotografias e vídeo'] : []), ...(check.pay.bonus ? [`avaliação +${check.pay.bonus}€`] : [])];
+  if (!parts.length) return null;
+  return { team: rec.team, day: rec.service_day, label: `${label}: ${parts.join(', ')}`, amount: Math.round((lost - check.pay.bonus) * 100) / 100 };
 }
 
 export interface ProcedureStatusChange { calendar_event_id: string; status: ProcedureStatus; closed_at: string | null }

@@ -16,6 +16,7 @@ function fakeStore(initial: Row[] = [], services: Row[] = [], reviews: Row[] = [
     clients: async keys => clients.filter(c => keys.some(k => String(c.phone).endsWith(k))),
     upsert: async row => { table.set(String(row.calendar_event_id), { ...(table.get(String(row.calendar_event_id)) ?? {}), ...row }); return null; },
     update: async (id, patch) => { const r = table.get(id); if (r) Object.assign(r, patch); return null; },
+    addAdjustment: async () => null,
   };
   return { store, table };
 }
@@ -84,7 +85,7 @@ Deno.test("the day after, a reminder; at the end of the 7th day, closed with a n
   const day8 = await json(await procedureDue(events, late.store, new Date("2026-10-23T00:10:00Z")));
   assertEquals(day8.reminders, []);
   assertEquals((day8.closed as Row[]).map(c => c.message), [
-    "O prazo do serviço Ana, Paranhos, 15/10, acabou sem fotografia de depois, vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.",
+    "O prazo do serviço Ana, Paranhos, 15/10, acabou sem fotografia de depois, vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto.",
   ]);
   assertEquals(late.table.get("s1")?.status, "fechado");
   // Next round: already closed, no second notice.
@@ -105,16 +106,30 @@ Deno.test("a service deleted from the calendar or moved to another team gets no 
   }
 });
 
-Deno.test("only the review missing: the team keeps 45% (owner's rule of 20/10; 27/10 the bot told Aleixo 50%)", async () => {
+Deno.test("only the review missing: no notice to the team (owner, 6 Nov)", async () => {
   const rec = { calendar_event_id: "s1", service_request_id: "c1", team: "Porto 2", service_day: "2026-10-19", prompt_msg_ids: ["m1"],
     prompted_at: "2026-10-19T11:00:00Z", before_msg_id: "p1", before_at: "2026-10-19T11:30:00Z", after_msg_id: "p2", after_at: "2026-10-19T11:31:00Z",
     video_msg_id: "v1", video_at: "2026-10-19T11:32:00Z", reminders_sent: 2, last_reminder_at: null, status: "em_curso", closed_at: null, penalty_paid: false };
   const events = [ev("s1", "Serviço 40€ (79€) sofá", "2026-10-19T09:00:00Z", "2026-10-19T10:30:00Z", "Porto 2")];
   const services = [{ id: "c1", calendar_event_id: "s1", client_name: "Larry", city: "Porto" }];
   const day8 = await json(await procedureDue(events, fakeStore([rec], services).store, new Date("2026-10-27T08:00:00Z")));
-  assertEquals((day8.closed as Row[]).map(c => c.message), [
-    "O prazo do serviço Larry, Porto, 19/10, acabou sem avaliação do cliente. O procedimento deste serviço ficou incompleto. Neste serviço a equipa fica com 45%.",
-  ]);
+  assertEquals(day8.closed, []);
+});
+
+Deno.test("from 6/11 a closed procedure writes one adjustment: 5% of the value without VAT, and tells the team", async () => {
+  const rec = { calendar_event_id: "s1", service_request_id: "c1", team: "Braga", service_day: "2026-11-06", prompt_msg_ids: ["m1"],
+    prompted_at: "2026-11-06T11:00:00Z", before_msg_id: null, before_at: null, after_msg_id: null, after_at: null,
+    video_msg_id: null, video_at: null, reminders_sent: 2, last_reminder_at: null, status: "em_curso", closed_at: null, penalty_paid: false };
+  const events = [ev("s1", "Serviço 40€ (80€) sofá", "2026-11-06T09:00:00Z", "2026-11-06T10:30:00Z", "Braga")];
+  const services = [{ id: "c1", calendar_event_id: "s1", client_name: "Larry", city: "Braga", billed_value: 80 }];
+  const { store } = fakeStore([rec], services);
+  const added: Row[] = [];
+  store.addAdjustment = async row => { added.push(row); return null; };
+  const day8 = await json(await procedureDue(events, store, new Date("2026-11-14T08:00:00Z")));
+  assertEquals(added, [{ team: "Braga", day: "2026-11-06", label: "Larry, Braga: 5% sem fotografias e vídeo", amount: 4 }]);
+  assertEquals((day8.closed as Row[]).length, 1);
+  await procedureDue(events, store, new Date("2026-11-14T09:00:00Z"));
+  assertEquals(added.length, 1);
 });
 
 Deno.test("client review request: once, at the end of the service, never to a paused, opted-out or reviewed client", async () => {

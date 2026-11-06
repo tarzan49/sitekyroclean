@@ -940,7 +940,7 @@ function supabaseProcedures(): ProcedureStore | null {
       const r = rows(await client.from("service_procedure").select(PROCEDURE_COLUMNS).contains("prompt_msg_ids", [messageId]).limit(1));
       return "error" in r ? r : r[0] ?? null;
     },
-    async services(eventIds) { return rows(await client.from("service_requests").select("id, calendar_event_id, client_name, city, description").in("calendar_event_id", eventIds)); },
+    async services(eventIds) { return rows(await client.from("service_requests").select("id, calendar_event_id, client_name, city, description, billed_value, invoiced, invoice_value").in("calendar_event_id", eventIds)); },
     async reviews(serviceIds) {
       if (!serviceIds.length) return [];
       return rows(await client.from("google_reviews").select("service_request_id, stars, reviewed_at, excluded").in("service_request_id", serviceIds));
@@ -951,6 +951,7 @@ function supabaseProcedures(): ProcedureStore | null {
     },
     async upsert(row) { return (await client.from("service_procedure").upsert(row, { onConflict: "calendar_event_id" })).error?.message ?? null; },
     async update(eventId, patch) { return (await client.from("service_procedure").update(patch).eq("calendar_event_id", eventId)).error?.message ?? null; },
+    async addAdjustment(row) { return (await client.from("team_account_adjustments").insert(row)).error?.message ?? null; },
   };
 }
 

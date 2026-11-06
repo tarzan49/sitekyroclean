@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
-  PROCEDURE_PAY_ENABLED, REVIEW_LINKS, type ProcedureRecord,
+  procedureAdjustment, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
 
 // Invented data only: the repo is public.
@@ -78,9 +78,30 @@ describe('the pay rule lives in one function', () => {
     expect(procedurePay({ ...all, review: false }, 'review_bonus')).toEqual({ teamShare: 50, bonus: 0 });
     expect(procedurePay({ ...all, video: false, review: false }, 'review_bonus')).toEqual({ teamShare: 45, bonus: 0 });
   });
-  it('the accounts get nothing until the owner confirms the rule', () => {
-    expect(PROCEDURE_PAY_ENABLED).toBe(false);
-    expect(procedureAccountDelta(rec(), [], '2026-10-22', 80).delta).toBe(0);
+  it('from 6/11: photos and video = 50%, without them 45%, a review always adds 5€', () => {
+    const day = { service_day: '2026-11-06', team: 'Braga' };
+    const got = { ...media, before_at: '2026-11-06T17:05:00Z', after_at: '2026-11-06T17:05:10Z', video_at: '2026-11-06T17:06:00Z' };
+    const review = { stars: 5, reviewed_at: '2026-11-07T10:00:00Z' };
+    const open = checkProcedure(rec({ ...day, ...got }), [], '2026-11-07');
+    expect(open.status).toBe('em_curso');
+    expect(open.missing).toEqual([]);
+    const full = checkProcedure(rec({ ...day, ...got }), [], '2026-11-13');
+    expect(full.status).toBe('completo');
+    expect(procedureAdjustment(rec(day), full, 80, 'Ana')).toBeNull();
+    const bonus = checkProcedure(rec({ ...day, ...got }), [review], '2026-11-07');
+    expect(procedureAdjustment(rec(day), bonus, 80, 'Ana')).toMatchObject({ amount: -5, label: 'Ana: avaliação +5€' });
+    const noVideo = checkProcedure(rec({ ...day, ...got, video_msg_id: null, video_at: null }), [], '2026-11-13');
+    expect(noVideo.status).toBe('fechado');
+    expect(noVideo.missing).toEqual(['video']);
+    expect(procedureAdjustment(rec(day), noVideo, 80, 'Ana')).toMatchObject({ amount: 4, label: 'Ana: 5% sem fotografias e vídeo' });
+    const both = checkProcedure(rec(day), [review], '2026-11-13');
+    expect(procedureAdjustment(rec(day), both, 80, 'Ana')?.amount).toBe(-1);
+  });
+  it('the 6/11 rule leaves out older services and the teams that were not told', () => {
+    const none = { pay: { teamShare: 45, bonus: 0 } };
+    expect(procedureAdjustment(rec({ service_day: '2026-11-05' }), none, 80, 'Ana')).toBeNull();
+    expect(procedureAdjustment(rec({ service_day: '2026-11-06', team: 'Coimbra' }), none, 80, 'Ana')).toBeNull();
+    expect(procedureAdjustment(rec({ service_day: '2026-11-06', team: 'Algarve' }), none, 80, 'Ana')).toBeNull();
   });
   it('switched on: 5% of the service when the deadline closes with anything missing, the 5€ owed to the team when complete', () => {
     expect(procedureAccountDelta(rec(), [], '2026-10-21', 80, true).delta).toBe(0);
@@ -178,7 +199,7 @@ describe('messages', () => {
   });
   it('the reminder', () => {
     const m = procedureReminderMessage('Ana', { missing: ['video', 'review'], deadline: '2026-10-22' }, '2026-10-15');
-    expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo e avaliação do cliente. Responde à mensagem desse serviço com o que falta. O bot já mandou o pedido de avaliação ao cliente; se falares com ele, lembra-o. Prazo: 22/10.');
+    expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo. Responde à mensagem desse serviço com o que falta. Prazo: 22/10.');
     expect(m).not.toMatch(noDash);
   });
 });

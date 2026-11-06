@@ -10,7 +10,7 @@
 // through the team; `clientReviewDue` decides when).
 import {
   addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
-  procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
+  procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
 import { createErrorResponse, createSuccessResponse, safeLog } from "../_shared/security.ts";
@@ -30,6 +30,8 @@ export interface ProcedureStore {
   clients(keys9: string[]): Promise<Row[] | { error: string }>;
   upsert(row: Row): Promise<string | null>;
   update(eventId: string, patch: Row): Promise<string | null>;
+  /** A line in team_account_adjustments, for the nightly accounts. */
+  addAdjustment(row: { team: string; day: string; label: string; amount: number }): Promise<string | null>;
 }
 
 /** How long after a service ends the bot still sends its message (a bot that was off does not flood the teams). */
@@ -139,12 +141,21 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const err = await store.update(change.calendar_event_id, { status: change.status, closed_at: change.closed_at, updated_at: now.toISOString() });
     if (err) { safeLog("warn", "[bot-api] procedure status", { message: err }); continue; }
     const r = records.find(x => x.calendar_event_id === change.calendar_event_id)!;
-    if (change.status !== "fechado" || r.status !== "em_curso") continue;
+    if (change.status === "em_curso" || r.status !== "em_curso") continue;
     const ev = liveEvent(r);
     if (!ev) continue;
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
-    const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
-    closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, check.pay) });
+    const service = serviceByEvent.get(r.calendar_event_id);
+    const label = labelFor(service, ev).label;
+    const billed = Number(service?.billed_value) || 0;
+    const adjustment = procedureAdjustment(r, check, billed - serviceVatOf(service ?? {}), label);
+    if (adjustment) {
+      const adjErr = await store.addAdjustment(adjustment);
+      if (adjErr) safeLog("warn", "[bot-api] procedure adjustment", { message: adjErr });
+    }
+    // Only photos or video count against the team; a missing review is no notice (owner, 6 Nov).
+    if (change.status !== "fechado" || !check.missing.some((i: string) => i !== "review")) continue;
+    closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, adjustment ? check.pay : null) });
   }
   // The review request to the client, once per service, only when it is over (clientReviewDue).
   const reviewCands = records.flatMap(r => {
