@@ -5,7 +5,7 @@
 Tenho uma empresa de higienização de estofos premium em Portugal chamada **Kyro Clean Solutions**.
 - Site: cleansolutions.com.pt
 - Contacto: 925 530 647 | cleansolutions.pt25@gmail.com
-- Localização base: Porto (R. de António Cardoso 263, 4150-081)
+- Localização base: Porto (Rua de Ferreira Cardoso 174, 4300-197)
 - Zona de atuação: Porto, Lisboa, Braga e arredores (todas as suas freguesias)
 
 ## O negócio

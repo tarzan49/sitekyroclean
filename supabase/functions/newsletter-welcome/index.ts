@@ -369,7 +369,7 @@ serve(async (req) => {
                       
                       <!-- Legal -->
                       <p style="color: #999999; font-size: 12px; line-height: 1.5; margin: 0;">
-                        Kyro Clean Solutions · R. de António Cardoso 263, 4150-081 Porto
+                        Kyro Clean Solutions · Rua de Ferreira Cardoso 174, 4300-197 Porto
                       </p>
                       <p style="color: #bbbbbb; font-size: 11px; line-height: 1.5; margin: 16px 0 0;">
                         Recebeu este email porque subscreveu a nossa newsletter.<br>

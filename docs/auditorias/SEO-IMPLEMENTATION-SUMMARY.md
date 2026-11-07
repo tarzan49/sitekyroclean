@@ -155,9 +155,9 @@ Added JSON-LD schema markup in `index.html` including:
   "telephone": "+351932956558",
   "email": "cleansolutions.pt25@gmail.com",
   "address": {
-    "streetAddress": "R. de António Cardoso 263",
+    "streetAddress": "Rua de Ferreira Cardoso 174",
     "addressLocality": "Porto",
-    "postalCode": "4150-081",
+    "postalCode": "4300-197",
     "addressCountry": "PT"
   }
 }
