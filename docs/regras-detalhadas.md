@@ -751,3 +751,12 @@ A equipa Porto 1 deixou de existir às 20:00 de 6/11 (`TEAM_CLOSED_FROM`, `botAv
 ## Impermeabilização no Porto e em Braga: Porto 2, a partir de 11/11 (dono, 2026-11-06)
 
 "Tudo que seja impermeabilização no Porto ou Braga, quarta-feira para a frente", marcado para a Porto 2. `WATERPROOFING_TEAMS` + `WATERPROOFING_FROM` (`botAvailability.ts`): antes dessa data a `availability` não dá horas e o `chooseTeam` não dá equipa; um pedido para um dia anterior recebe `requested.free=false` e as horas a partir de 11/11. Vale a janela da Porto 2 (dias úteis até às 13h, máx. 2 por dia). As limpezas não mudam. Aveiro continua sob consulta no motor; a cliente de Aveiro de 6/11 marca-se à mão, de quarta para a frente.
+
+## Vídeos de prova no orçamento do WhatsApp (2026-11-07)
+
+- O dono quis trocar a foto antes/depois e o vídeo fixo da água/Pepsi por vídeos que mostram o processo e vendem um sentimento. A v1 (montagem minha, música à escolha, 5 sofás de casas diferentes) e a v2 (clips novos, sem narrador) foram rejeitadas: "não inventes, faz aquilo que já funciona e que eu já dei approval".
+- Fórmula aprovada: os anúncios Meta aprovados (`META-VARIACOES/APROVADOS`, montador `monta2.py` da sessão das variações) com a mesma imagem, a mesma voz (cache da ElevenLabs) e a música mais baixa (0,22). Muda só: a 1.ª frase, que nomeia o problema do cliente ("Antes de esfregar essa mancha de café, veja isto."), uma frase nova com os benefícios e 3 pontos no ecrã a entrar um a um, e o fim, que diz "diga-nos o dia que lhe dá mais jeito" em vez de "carregue no botão".
+- Pontos: impermeabilização "Não altera a cor / Não altera a textura / Pronto a usar em 24 horas" (do dono); limpezas "Feito em sua casa / Sem tirar nada do sítio / Seco em 2 a 5 horas".
+- Bases: sofá = 06 "a mancha" (Marta), colchão = 05 "onde dorme" (Leonor; o 04 abre na sanita), impermeabilização = 10 "respire fundo" (Inês). Cadeiras, tapetes e alcatifas: a fórmula do 06 com clips desses artigos.
+- No bot: uma limpeza cotada leva um vídeo do problema (o último nomeado pelo cliente; sem nenhum, o geral) antes do antes/depois, uma vez por conversa; a impermeabilização de sofá leva o vídeo da situação (crianças, animais, refeições, geral) no fim; um pedido só de impermeabilização não leva antes/depois. Acabou o teste A/B água vs Pepsi.
+- Ficheiros: originais em `KYRO_AD_FACTORY/WHATSAPP-PROVAS/videos`, guiões em `_lab/montagem/guioes-whatsapp.json`, no servidor em `/opt/kyro/data/bot-media/<nome>.mp4`.
