@@ -34,7 +34,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 
 ## 3. Factos de negócio (importar sempre, nunca escrever à mão)
 
-- Avaliações, clientes, serviços: `src/constants/business.ts` (4.9★, 180 avaliações, +1350 clientes, +1350 serviços). NIPC 519720318 (falta pôr no site).
+- Avaliações, clientes, serviços: `src/constants/business.ts` (4.9★, 185+ avaliações, +1350 clientes, +1350 serviços). NIPC 519720318 (falta pôr no site).
 - Deslocação: `src/constants/travel.ts` (`locationPrices`, mínimo 10€; isenção acima de 120/135/150€). Uma cidade nova entra em `locationPrices` **e** `cities` ao mesmo tempo. `EXTENDED_TRIP_CITIES` = Aveiro + Alentejo Litoral (sob consulta).
 - Coimbra 10€ com equipa própria; Figueira da Foz 20€; Aveiro 15€ (equipa Porto).
 - Preços em texto: `src/data/enginePrices.ts`; regras comerciais: `src/constants/commercialPolicy.ts`; packs: `src/constants/packPerks.ts` (`priceWithPackPerks`, regalias só a partir de 100€); anti-ácaros: `src/constants/antiAcarosPricing.ts`; cadeiras: `src/constants/chairPricing.ts`.

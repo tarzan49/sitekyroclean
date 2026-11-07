@@ -42,8 +42,8 @@ export const BUSINESS_GEO = {
 } as const;
 
 export const REVIEW_RATING = "4.9";
-// "mais de 160 avaliações no Google" (dono, 2026-10-09: "não são 150"; eram 150 desde 05/10, antes 125).
-export const REVIEW_COUNT = "180";
+// Avaliações Google (dono, 2026-11-07: "185+ avaliações"; antes 180 desde 23/10).
+export const REVIEW_COUNT = "185";
 // Clientes (dono, 2026-10-29: "muda os clientes também para +1350"; antes +1100).
 export const CLIENTS_SERVED_LABEL = "+1350";
 
