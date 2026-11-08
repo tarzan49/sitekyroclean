@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingKind, waterproofingOnly, rugPickupOwnerReason, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingKind, waterproofingOnly, rugPickupOwnerReason, RUG_PICKUP_TEAMS, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
 
@@ -203,16 +203,21 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   const named = namedTeam && teamWorks(namedTeam, start, start + durationMin * 60_000) ? namedTeam : null;
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. A pickup there takes only a team the chat
   // named outside the zone; otherwise it stays "A confirmar" and he picks the team.
-  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), pickupFee > 0 || /recolh/i.test(service));
+  const rugPickup = pickupFee > 0 || /recolh/i.test(service);
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), rugPickup);
   const pickupZone = pickupOwner ? cityZone(placeOf(r.city, address)) : null;
   const allowedNamed = named && !(pickupZone && TEAMS_BY_REGION[pickupZone].includes(named)) ? named : null;
+  // Owner, 8 Nov 2026: in Porto only Porto 3 picks up rugs; another Porto team named for a pickup is not used.
+  const zone = rugPickup ? cityZone(placeOf(r.city, address)) : null;
+  const pickupTeams = zone ? RUG_PICKUP_TEAMS[zone] : undefined;
+  const namedForJob = named && pickupTeams && TEAMS_BY_REGION[zone!].includes(named) && !pickupTeams.includes(named) ? null : named;
   // Owner, 19 Oct 2026: "quando é que eu disse que os serviços que marco ficam a confirmar? remove
   // essa regra". A booking with a price is a real "Serviço"; only one without a price (the title
   // would not parse in the CRM) stays "A confirmar".
   const team = total === null ? null
     : pickupOwner ? allowedNamed
-    : named ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing,
-      !(/imperm/i.test(service) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(service)), total);
+    : namedForJob ?? chooseTeam(events, r.city ?? address, startIso, endIso, waterproofing,
+      !(/imperm/i.test(service) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(service)), total, rugPickup);
   if (team) {
     const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
     const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
@@ -289,10 +294,11 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (booked?.id) return { ok: false, reschedule: { eventId: booked.id, date: r.date, time: r.time } };
   // Owner, 27 Oct 2026: "marcaste um serviço para recolha em viana do castelo sem me consultar [...] a
   // equipa de braga não faz recolha de tapetes". Never closed by the bot: it stays a pre-booking for him.
-  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), r.rugPickup === true || /recolh/i.test(text(r.service, 120)));
+  const rugPickup = r.rugPickup === true || /recolh/i.test(text(r.service, 120));
+  const pickupOwner = rugPickupOwnerReason(placeOf(r.city, address), rugPickup);
   if (pickupOwner) return { ok: false, handToOwner: pickupOwner };
 
-  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
+  const availability = botAvailability({ city: r.city, items: r.items, total: r.agreedTotal ?? r.total, date: r.date, time: r.time, rugPickup, ownerTime: r.ownerApprovedWeekend === true || r.ownerApprovedTime === true }, others, now);
   if ('error' in availability) return { error: String(availability.error) };
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
@@ -308,7 +314,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   // Far zone: the team already there that day (availability.sharedTrip).
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total);
+  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup);
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;

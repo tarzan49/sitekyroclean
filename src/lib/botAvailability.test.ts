@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAY_RULES, botAvailability, chooseTeam, teamBusyAt, teamWorks, teamsFor, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
+import { DAY_RULES, botAvailability, chooseTeam, teamBusyAt, teamWorks, teamsFor, teamTakesJob, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -295,6 +295,15 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(ok(botAvailability({ city: 'Guimarães', items: rugs, rugPickup: true, ownerTime: true }, [], NOW)).handToOwner).toMatch(/recolhas/);
     expect(ok(botAvailability({ city: 'Viana do Castelo', items: rugs, total: 149 }, [], NOW))).toMatchObject({ handToOwner: null, teams: ['Braga'] });
     expect(ok(botAvailability({ city: 'Matosinhos', items: rugs, rugPickup: true }, [], NOW)).handToOwner).toBeNull();
+  });
+  it('rug pickup in Porto: only Porto 3 (owner, 8 Nov 2026); home washing keeps the other teams', () => {
+    const rugs = [{ kind: 'rug', qty: 2, width: 3, length: 2.5 }];
+    expect(ok(botAvailability({ city: 'Matosinhos', items: rugs, rugPickup: true }, [], NOW)).teams).toEqual(['Porto 3']);
+    expect(ok(botAvailability({ city: 'Matosinhos', items: rugs }, [], NOW)).teams).toContain('Porto 2');
+    expect(teamsFor('Porto', false, 100, '2026-11-12', true)).toEqual(['Porto 3']);
+    expect(teamsFor('Lisboa', false, 100, '2026-11-12', true)).toEqual(['Lisboa 1']);
+    expect(teamTakesJob('Porto 2', { summary: 'Serviço 60€ (120€) Recolha de 2 tapetes - 912345678', description: '' }, '2026-11-12T10:00:00Z')).toBe(false);
+    expect(teamTakesJob('Porto 3', { summary: 'Serviço 60€ (120€) Recolha de 2 tapetes - 912345678', description: '' }, '2026-11-12T10:00:00Z')).toBe(true);
   });
 });
 

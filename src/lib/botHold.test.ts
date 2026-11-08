@@ -178,6 +178,13 @@ describe('planBotBooking', () => {
     expect(planBotBooking(book({ items: rugs, agreedTotal: 209, rugPickup: true, service: 'Recolha de 2 tapetes' }), [], NOW)).toMatchObject({ ok: true, team: 'Lisboa 1' });
   });
 
+  it('a rug pickup in Porto goes to Porto 3 only (owner, 8 Nov 2026)', () => {
+    const rugs = [{ kind: 'rug', width: 3, length: 2.5 }];
+    const porto = { city: 'Matosinhos', address: 'Rua Inventada 1, 4450-000 Matosinhos', items: rugs, agreedTotal: 129, rugPickup: true, service: 'Recolha de tapete' };
+    const r = planBotBooking(book(porto), [], NOW);
+    expect(r).toMatchObject({ ok: true, team: 'Porto 3' });
+  });
+
   it('closes Saturdays and Sundays from the calendar (owner, 18 Oct), leaves anything without an engine price', () => {
     expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toMatchObject({ ok: true });

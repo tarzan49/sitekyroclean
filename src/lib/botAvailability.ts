@@ -88,9 +88,16 @@ export const PORTO1_MIN_TOTAL = 200;
  * has no team, so the owner decides.
  */
 export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
-/** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). */
-export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string): readonly string[] => {
+/**
+ * The only teams of a zone that pick up rugs (owner, 8 Nov 2026: "porto 3 pode recolher tapetes";
+ * "e a unica equipa no porto q pode recolher"). A Porto pickup goes to Porto 3 or, when it cannot, to the owner.
+ */
+export const RUG_PICKUP_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Porto: ['Porto 3'] };
+/** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). `rugPickup`: the job has a rug pickup. */
+export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] => {
+  const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : undefined;
   const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
+    .filter(t => !pickupTeams || pickupTeams.includes(t))
     .filter(t => !TEAM_CLOSED_FROM[t] || (day && day <= TEAM_CLOSED_FROM[t].date))
     .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
@@ -514,11 +521,11 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
  * cleaning on Porto 1, moved to Thursday 5/11, when Porto 1 only does Premium waterproofing). The job is read from
  * the event: waterproofing with no tier written counts as Premium, so only a clear case changes the team.
  */
-function eventJob(e: Pick<AvailabilityEvent, 'summary' | 'description'>): { waterproofing: boolean | 'premium'; total: number | null } {
+function eventJob(e: Pick<AvailabilityEvent, 'summary' | 'description'>): { waterproofing: boolean | 'premium'; total: number | null; rugPickup: boolean } {
   const text = `${e.summary}\n${e.description ?? ''}`;
   const waterproofing = /imperm/i.test(text) ? (/essencial/i.test(text) && !/premium/i.test(text) ? true : 'premium') : false;
   const total = /\((\d+(?:[.,]\d+)?)\s*€\)/.exec(e.summary)?.[1];
-  return { waterproofing, total: total ? Number(total.replace(',', '.')) : null };
+  return { waterproofing, total: total ? Number(total.replace(',', '.')) : null, rugPickup: /recolh/i.test(text) };
 }
 const zoneOfTeam = (team: string) => (Object.keys(TEAMS_BY_REGION) as TeamZone[]).find(z => TEAMS_BY_REGION[z].includes(team)) ?? null;
 
@@ -526,16 +533,16 @@ const zoneOfTeam = (team: string) => (Object.keys(TEAMS_BY_REGION) as TeamZone[]
 export function teamTakesJob(team: string, e: Pick<AvailabilityEvent, 'summary' | 'description'>, startIso: string): boolean {
   const zone = zoneOfTeam(team);
   if (!zone) return true;
-  const { waterproofing, total } = eventJob(e);
-  return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date).includes(team);
+  const { waterproofing, total, rugPickup } = eventJob(e);
+  return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup).includes(team);
 }
 
 /** Another team of the same zone that takes the job that day and is free then; the backup team last. null: none. */
 export function replacementTeam(events: AvailabilityEvent[], team: string, e: Pick<AvailabilityEvent, 'summary' | 'description'>, startIso: string, endIso: string, cleaning = true): string | null {
   const zone = zoneOfTeam(team);
   if (!zone) return null;
-  const { waterproofing, total } = eventJob(e);
-  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date)]
+  const { waterproofing, total, rugPickup } = eventJob(e);
+  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)]
     .filter(t => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary))
     .sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
 }
@@ -546,14 +553,14 @@ export function replacementTeam(events: AvailabilityEvent[], team: string, e: Pi
  * one already working next to it that day first (less driving), then the one
  * with fewer jobs that day, then the region's order. null when none has room.
  */
-export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing: boolean | 'premium' = false, cleaning = true, total?: number | null): string | null {
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string, waterproofing: boolean | 'premium' = false, cleaning = true, total?: number | null, rugPickup = false): string | null {
   const name = resolveBotCity(city);
   const area = name ? CITY_REGION.get(fold(name)) : undefined;
   if (!area) return null;
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing, total, lisbon(from).date);
+  const order = teamsFor(area, waterproofing, total, lisbon(from).date, rugPickup);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -580,7 +587,7 @@ export interface AvailabilityRequest {
   time?: unknown;
   /** The owner gave this time himself (Algarve and his weekend picks). */
   ownerTime?: unknown;
-  /** true: the client wants the rugs picked up (in NO_RUG_PICKUP_ZONES the owner decides). */
+  /** true: the client wants the rugs picked up (in NO_RUG_PICKUP_ZONES the owner decides; in Porto only RUG_PICKUP_TEAMS). */
   rugPickup?: unknown;
   /** How many days to look ahead (default 4, max 14). */
   days?: unknown;
@@ -787,7 +794,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // Waterproofing in a zone that only starts on a later day: the hours start on that day.
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? '' : '';
-  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow)];
+  const rugPickup = req.rugPickup === true;
+  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area]!.join('/')} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
 

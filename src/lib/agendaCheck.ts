@@ -9,7 +9,7 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, WORK_FROM_HOUR, NO_RUG_PICKUP_ZONES, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
+  DAY_END_HOUR, WORK_FROM_HOUR, NO_RUG_PICKUP_ZONES, RUG_PICKUP_TEAMS, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
   WATERPROOFING_TEAMS, teamWorks, dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent, type TeamZone,
 } from './botAvailability';
 
@@ -68,6 +68,9 @@ function serviceWhat(summary: string): string {
 function wrongTeam(team: string, summary: string): string | null {
   const zones = (Object.keys(TEAMS_BY_REGION) as TeamZone[]).filter(z => TEAMS_BY_REGION[z].includes(team));
   if (/\brecolh/.test(summary) && zones.some(z => NO_RUG_PICKUP_ZONES.has(z))) return `a equipa ${team} não faz recolhas de tapetes (escolhe outra equipa)`;
+  // Dono, 8/11/2026: no Porto só a Porto 3 recolhe tapetes.
+  const pickupTeams = zones.map(z => RUG_PICKUP_TEAMS[z]).find(t => t && !t.includes(team));
+  if (/\brecolh/.test(summary) && pickupTeams) return `recolhas de tapetes desta zona são da equipa ${pickupTeams.join('/')}, não da ${team}`;
   const other = zones.map(z => WATERPROOFING_TEAMS[z]).find(t => t && !t.includes(team));
   if (/\bimperm/.test(summary) && other) return `impermeabilizações desta zona são da equipa ${other.join('/')}, não da ${team}`;
   return null;
