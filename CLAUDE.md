@@ -61,7 +61,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 - Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script).
-- Resposta parada à espera do dono: nunca só "Obrigado pela mensagem!"; sem preço novo nem horas, sai inteira e o dono recebe o aviso do preço (dono, 8 Nov).
+- Resposta parada à espera do dono: nunca só "Obrigado pela mensagem!", nem só o cumprimento ou o upsell (a ponte leva as respostas às perguntas, dono 9 Nov); sem preço novo nem horas, sai inteira e o dono recebe o aviso do preço (dono, 8 Nov).
 
 ## 5. Site e SEO
 
