@@ -338,6 +338,14 @@ export function clientReviewDue(
   return proof || t >= end + CLIENT_REVIEW_FALLBACK_MIN * 60_000;
 }
 
+/**
+ * Visita de recolha de tapete: no fim dela o tapete ainda não foi lavado nem entregue, por isso o
+ * "Como correu?" e o certificado não saem (dono, 9 Nov 2026: Dany, recolha às 9h, pergunta às 12h45).
+ */
+export function isRugPickupVisit(...texts: (string | null | undefined)[]): boolean {
+  return texts.some(t => typeof t === 'string' && /recolh/i.test(t));
+}
+
 /** O telefone do cliente no título do evento ("Serviço … - 912 345 678 - Ana - Rua…"), em dígitos com o 351. */
 export function clientPhoneFromTitle(summary: string): string | null {
   for (const part of summary.split(/\s+-\s+/)) {

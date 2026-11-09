@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
+  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, isRugPickupVisit, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
   procedureAdjustment, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
@@ -202,6 +202,14 @@ describe('messages', () => {
     const m = procedureReminderMessage('Ana', { missing: ['video', 'review'], deadline: '2026-10-22' }, '2026-10-15');
     expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo. Responde à mensagem desse serviço com o que falta. Prazo: 22/10.');
     expect(m).not.toMatch(noDash);
+  });
+});
+
+describe('rug pickup visit: no review question at pickup', () => {
+  it('finds the pickup in the title or the description', () => {
+    expect(isRugPickupVisit('Serviço 35€ (69€) lavagem de tapete com recolha e entrega - 632 155 968 - Dany')).toBe(true);
+    expect(isRugPickupVisit(null, 'Recolha e entrega: 20€')).toBe(true);
+    expect(isRugPickupVisit('Serviço 50€ (99€) limpeza de sofá 4 lugares', null)).toBe(false);
   });
 });
 

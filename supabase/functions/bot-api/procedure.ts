@@ -9,7 +9,7 @@
 // request goes from the bot to the client at the end of the service, no longer
 // through the team; `clientReviewDue` decides when).
 import {
-  addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
+  addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, isRugPickupVisit, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
   procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
@@ -157,6 +157,13 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     if (change.status !== "fechado" || !check.missing.some((i: string) => i !== "review")) continue;
     closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, adjustment ? check.pay : null) });
   }
+  // A rug pickup visit is not the end of the service: the rug is not washed nor delivered yet, so no
+  // "Como correu?" and no certificate then (owner, 9 Nov 2026).
+  const PICKUP_SKIP = "recolha de tapete: só depois da entrega";
+  const isRugPickup = (r: Rec, ev: CalendarEvent) => {
+    const s = serviceByEvent.get(r.calendar_event_id);
+    return isRugPickupVisit(ev.summary, ev.description, typeof s?.description === "string" ? s.description : null);
+  };
   // The review request to the client, once per service, only when it is over (clientReviewDue).
   const reviewCands = records.flatMap(r => {
     if (r.client_review_at || r.client_review_skip) return [];
@@ -171,7 +178,8 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
   const clientReviews: { eventId: string; phone: string; firstName: string | null; serviceStart: string; message: string }[] = [];
   for (const { r, ev, phone } of reviewCands) {
     const c = phone ? clients.find(x => String(x.phone ?? "").replace(/\D/g, "").endsWith(phone.slice(-9))) : undefined;
-    const skip = !phone ? "sem telefone no título"
+    const skip = isRugPickup(r, ev) ? PICKUP_SKIP
+      : !phone ? "sem telefone no título"
       : c?.contact_preference === "nao_contactar" ? "não contactar"
       : typeof c?.on_hold_reason === "string" && c.on_hold_reason.trim() ? `em pausa: ${c.on_hold_reason.trim().slice(0, 120)}`
       : c?.reviewed_google === true || reviewsFor(reviews, r.service_request_id).length ? "já avaliou"
@@ -204,7 +212,8 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
   const clientCertificates: { eventId: string; phone: string; serviceRequestId: string | null; firstName: string | null; serviceStart: string }[] = [];
   for (const { r, ev, phone } of certCands) {
     const c = phone ? allClients.find(x => String(x.phone ?? "").replace(/\D/g, "").endsWith(phone.slice(-9))) : undefined;
-    const skip = !phone ? "sem telefone no título"
+    const skip = isRugPickup(r, ev) ? PICKUP_SKIP
+      : !phone ? "sem telefone no título"
       : c?.contact_preference === "nao_contactar" ? "não contactar"
       : typeof c?.on_hold_reason === "string" && c.on_hold_reason.trim() ? `em pausa: ${c.on_hold_reason.trim().slice(0, 120)}`
       : null;

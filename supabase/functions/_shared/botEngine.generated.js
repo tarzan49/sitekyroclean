@@ -3662,6 +3662,9 @@ function clientReviewDue(ev, rec, now) {
   const proof = [rec.after_at, rec.video_at].some((at) => at && Date.parse(at) >= start && Date.parse(at) <= t);
   return proof || t >= end + CLIENT_REVIEW_FALLBACK_MIN * 6e4;
 }
+function isRugPickupVisit(...texts) {
+  return texts.some((t) => typeof t === "string" && /recolh/i.test(t));
+}
 function clientPhoneFromTitle(summary) {
   for (const part of summary.split(/\s+-\s+/)) {
     if (!/^[+\d\s().]+$/.test(part.trim())) continue;
@@ -4206,6 +4209,7 @@ export {
   describeQuizOrder,
   eventTeam,
   factsFromTitle,
+  isRugPickupVisit,
   isTestOrder,
   labelFacts,
   lisbonDayOf,
