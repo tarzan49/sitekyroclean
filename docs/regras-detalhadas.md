@@ -762,3 +762,7 @@ A equipa Porto 1 deixou de existir às 20:00 de 6/11 (`TEAM_CLOSED_FROM`, `botAv
 - Bases: sofá = 06 "a mancha" (Marta), colchão = 05 "onde dorme" (Leonor; o 04 abre na sanita), impermeabilização = 10 "respire fundo" (Inês). Cadeiras, tapetes e alcatifas: a fórmula do 06 com clips desses artigos.
 - No bot: uma limpeza cotada leva um vídeo do problema (o último nomeado pelo cliente; sem nenhum, o geral) antes do antes/depois, uma vez por conversa; a impermeabilização de sofá leva o vídeo da situação (crianças, animais, refeições, geral) no fim; um pedido só de impermeabilização não leva antes/depois. Acabou o teste A/B água vs Pepsi.
 - Ficheiros: originais em `KYRO_AD_FACTORY/WHATSAPP-PROVAS/videos`, guiões em `_lab/montagem/guioes-whatsapp.json`, no servidor em `/opt/kyro/data/bot-media/<nome>.mp4`.
+
+## Recolha de tapete: sem "Como correu?" na recolha (dono, 9 Nov 2026)
+
+A Dany (Porto, tapete 1,80 x 2,00, 69€ com recolha e entrega) teve a recolha às 9h e às 12h45 o bot perguntou "Como correu a lavagem de tapete com recolha e entrega?". O dono: "não faz sentido, só recolhemos o tapete". A `bot-api` (procedure.ts) agora marca `client_review_skip` e `client_certificate_skip` = "recolha de tapete: só depois da entrega" quando o título, a descrição do evento ou a descrição do serviço têm "recolh" (`isRugPickupVisit` em src/lib/serviceProcedure.ts). A entrega não tem evento próprio no calendário: a pergunta depois da entrega ainda não sai sozinha.
