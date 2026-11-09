@@ -2472,7 +2472,9 @@ var TEAM_OFF = [
   // Owner, 2 Nov 2026: "Porto 2 não pode hoje, ponto"; "a Porto 3 esta semana não vai trabalhar, pelo menos até eu dizer".
   { team: "Porto 2", date: "2026-11-02" },
   // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
-  ...["2026-11-02", "2026-11-03"].map((date) => ({ team: "Porto 3", date }))
+  ...["2026-11-02", "2026-11-03"].map((date) => ({ team: "Porto 3", date })),
+  // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
+  ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` }))
 ];
 var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20 } };
 var closedAt = (team, to) => {
