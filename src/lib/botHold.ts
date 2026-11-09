@@ -131,20 +131,13 @@ const placeOf = (city: unknown, address: string) => [city, address].filter((v): 
 const amount = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 && v < 10_000 ? Math.round(v * 100) / 100 : null);
 
 /**
- * With a rug pickup the team gets this much more, for the fuel of whoever goes
- * to fetch it (owner, 27 Oct 2026: "a partir de agora em recolhas eu pago somente
- * 10 eur a mais a quem vai buscar para compensar a gasolina"). From 9 Oct it was
- * the whole pickup price (20€): 139€ gave him 50€, now 60€.
+ * Owner share = half the total, a ",5" rounded up (owner, 6 Oct 2026: 119€ → 60€),
+ * rug pickups included (owner, 9 Nov 2026: "a meias"; 69€ → 35€). From 27 Oct to
+ * 9 Nov the team got 10€ more for fuel on pickups, from 9 Oct the whole 20€.
+ * `pickupFee` stays in the signature so older callers keep compiling.
  */
-export const RUG_PICKUP_TEAM_FUEL = 10;
-
-/**
- * Owner share = half the total, a ",5" rounded up (owner, 6 Oct 2026: 119€ → 60€).
- * With rug pickup, minus the fuel money for whoever picks it up, never more than
- * the pickup the client paid (139€ with pickup → 69,5 − 10 = 59,5 → 60€).
- */
-export const pickupFuelOf = (pickupFee = 0) => (pickupFee > 0 ? Math.min(pickupFee, RUG_PICKUP_TEAM_FUEL) : 0);
-export const ownerShare = (total: number, pickupFee = 0) => Math.ceil(total / 2 - pickupFuelOf(pickupFee));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const ownerShare = (total: number, _pickupFee = 0) => Math.ceil(total / 2);
 
 /** A "Serviço" (or "A confirmar · Serviço") of this phone within 60 days of `date`, the nearest one. */
 export function clientServiceNear<E extends AvailabilityEvent & { id?: string }>(events: E[], phone: string, date: string): E | undefined {
@@ -224,7 +217,6 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
     const description = [
       `Marcado pelo bot a partir da conversa do WhatsApp, equipa ${team} (muda a cor para trocar).`,
       text(r.notes, 600),
-      pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : '',
       `bot:${conversationId}`,
     ].filter(Boolean).join('\n\n');
     return { ok: true, team, event: { title, description, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
@@ -234,7 +226,6 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     pickupOwner && total !== null ? `${pickupOwner}: escolhe a cor da equipa que faz a recolha.` : '',
     text(r.notes, 600),
-    pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : '',
     `bot:${conversationId}`,
   ].filter(Boolean).join('\n\n');
   return { ok: true, event: { title: parts.join(' - '), description, start: startIso, end: endIso } };

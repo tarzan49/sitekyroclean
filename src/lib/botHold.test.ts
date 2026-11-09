@@ -85,14 +85,14 @@ describe('planOwnerBooking', () => {
     expect(p.event.description).toContain('bot:c9');
     expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
   });
-  it('rug pickup: half the total minus 10€ of fuel for whoever picks it up, rounded up (owner, 27 Oct)', () => {
+  it('rug pickup: half the total, rounded up, no fuel deduction (owner, 9 Nov)', () => {
     const p = planOwnerBooking({ ...base, total: 139, pickupFee: 20 }, [], NOW.getTime());
-    expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 60€ \(139€\)/);
-    expect('ok' in p && p.ok && p.event.description).toContain('menos 10€ de gasolina');
+    expect('ok' in p && p.ok && p.event.title).toMatch(/^Serviço 70€ \(139€\)/);
+    expect('ok' in p && p.ok && p.event.description).not.toContain('gasolina');
     const q = planOwnerBooking({ ...base, total: 159, pickupFee: 20 }, [], NOW.getTime());
-    expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 70€ \(159€\)/);
+    expect('ok' in q && q.ok && q.event.title).toMatch(/^Serviço 80€ \(159€\)/);
     expect(ownerShare(119)).toBe(60);
-    expect(ownerShare(119, 5)).toBe(55);
+    expect(ownerShare(69, 20)).toBe(35);
   });
   it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
     const p = planOwnerBooking({ ...base, total: null, fromAds: true }, [], NOW.getTime());
@@ -122,7 +122,7 @@ describe('planOwnerBooking', () => {
     const p = planOwnerBooking(viana, [], NOW.getTime());
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
     expect(p.team).toBeUndefined();
-    expect(p.event.title).toMatch(/^A confirmar · Serviço 95€ \(209€\) Recolha/);
+    expect(p.event.title).toMatch(/^A confirmar · Serviço 105€ \(209€\) Recolha/);
     expect(p.event.description).toContain('a equipa Braga não faz recolhas');
     expect(planOwnerBooking({ ...viana, team: 'Braga' }, [], NOW.getTime())).not.toHaveProperty('team');
     expect(planOwnerBooking({ ...viana, team: 'Porto 1' }, [], NOW.getTime())).toMatchObject({ team: 'Porto 1', event: { colorId: '9' } });

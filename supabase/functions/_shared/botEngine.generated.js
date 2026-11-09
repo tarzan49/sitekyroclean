@@ -3045,9 +3045,7 @@ var OWNER_BOOKING_PREFIX = "A confirmar · ";
 var digitsOf = (t) => t.replace(/\D/g, "");
 var placeOf2 = (city, address) => [city, address].filter((v) => typeof v === "string" && !!v.trim()).join(", ");
 var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
-var RUG_PICKUP_TEAM_FUEL = 10;
-var pickupFuelOf = (pickupFee = 0) => pickupFee > 0 ? Math.min(pickupFee, RUG_PICKUP_TEAM_FUEL) : 0;
-var ownerShare = (total, pickupFee = 0) => Math.ceil(total / 2 - pickupFuelOf(pickupFee));
+var ownerShare = (total, _pickupFee = 0) => Math.ceil(total / 2);
 function clientServiceNear(events, phone, date) {
   const key9 = digitsOf(phone).slice(-9);
   if (key9.length !== 9) return void 0;
@@ -3106,7 +3104,6 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
     const description2 = [
       `Marcado pelo bot a partir da conversa do WhatsApp, equipa ${team} (muda a cor para trocar).`,
       text(r.notes, 600),
-      pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : "",
       `bot:${conversationId}`
     ].filter(Boolean).join("\n\n");
     return { ok: true, team, event: { title, description: description2, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
@@ -3116,7 +3113,6 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     pickupOwner && total !== null ? `${pickupOwner}: escolhe a cor da equipa que faz a recolha.` : "",
     text(r.notes, 600),
-    pickupFee && total !== null ? `Parte do dono: metade do total menos ${formatAmount(pickupFuelOf(pickupFee))}€ de gasolina para quem faz a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFuelOf(pickupFee))}€).` : "",
     `bot:${conversationId}`
   ].filter(Boolean).join("\n\n");
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
