@@ -62,6 +62,10 @@ export function listBotCities() {
   return Object.entries(locationPrices).map(([name, travelFee]) => ({ name, travelFee, extendedTrip: EXTENDED_TRIP_CITIES.has(name) }));
 }
 
+/** Cleaning of a 6 or 7 seat sofa, judged on the photo (owner, 9 Nov 2026), travel apart. */
+export const SEAT6_LOOK_PRICES = { compacto: 129, medio: 139, grande: 149 } as const;
+export const SEAT6_LOOK_GUIDE = 'compacto (129€: assentos normais, braços finos, peça simples), medio (139€: assentos fundos ou almofadas soltas), grande (149€: modular com módulos soltos, peça extra ao centro ou chaise, assentos muito fundos, ou ocupa a sala)';
+
 export const BOT_SIZES = {
   sofa: sofaPrices.map(p => p.id),
   mattress: mattressPrices.map(p => p.id),
@@ -84,9 +88,10 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   if (kind === 'rug' && (treatment === 'premium' || treatment === 'essencial')) return fail(`items[${index}]: a impermeabilização de tapete só tem preço na mesma visita de outro serviço: chama de novo com os artigos já marcados (ex.: o sofá, com o mesmo tratamento) e o tapete na mesma lista de items; sozinho passa ao dono`);
   if ((kind === 'rug' || kind === 'carpet') && treatment !== 'clean') return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   let size = '';
+  let unitPrice: number | undefined;
   if (kind === 'sofa' && r.size === 'u') {
     // A U sofa is counted by its seats in the photo (owner, 16 Oct 2026): the cleaning costs as 4 lugares
-    // up to 4 seats and as 5+ from 5. Waterproofing and anti-mites on a U stay with him (sob orçamento).
+    // up to 4 seats and as 5+ at 5. Waterproofing and anti-mites on a U stay with him (sob orçamento).
     const seats = r.seats;
     if (typeof seats !== 'number' || !Number.isInteger(seats) || seats < 2 || seats > 15) return fail(`items[${index}].seats (lugares contados na fotografia, 2 a 15) é obrigatório num sofá em U`);
     size = treatment !== 'clean' ? '4+-lugares' : seats <= 4 ? '4-lugares' : '5-lugares';
@@ -94,12 +99,25 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
     size = typeof r.size === 'string' ? r.size : '';
     if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(', ')}${kind === 'sofa' ? ', ou u (sofá em U, com seats)' : ''}`);
   }
+  // 6 or more seats (owner, 9 Nov 2026, Helena: a modular 3+3 with a centre piece went out at 119€ + travel;
+  // "um sofá de 6 lugares tem que ser entre 129 e 149, tens que saber perceber"): the cleaning is judged on
+  // the photo, `look` compacto 129€ / medio 139€ / grande 149€ (travel apart); with waterproofing +170€ / +110€
+  // (customPack SEAT6_WATERPROOFING_EXTRA). 8+ seats go to the owner.
+  const seats = typeof r.seats === 'number' && Number.isInteger(r.seats) ? r.seats : 0;
+  if (kind === 'sofa' && size === '5-lugares' && ['clean', 'clean+premium', 'clean+essencial'].includes(treatment) && seats >= 6) {
+    if (seats >= 8) size = '4+-lugares';
+    else {
+      const look = r.look as keyof typeof SEAT6_LOOK_PRICES;
+      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares: ${SEAT6_LOOK_GUIDE}`);
+      unitPrice = SEAT6_LOOK_PRICES[look];
+    }
+  }
   // Same reading as the quiz (rugSide): "230" is 2,30 m, never a 230 m rug.
   const dim = (v: unknown) => { const side = typeof v === 'number' ? rugSide(v) : null; return side ? String(side.meters) : ''; };
   const width = kind === 'rug' || kind === 'carpet' ? dim(r.width) : '';
   const length = kind === 'rug' || kind === 'carpet' ? dim(r.length) : '';
   if ((kind === 'rug' || kind === 'carpet') && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
-  return { id: String(index), kind, size, qty, extra, primary, width, length };
+  return { id: String(index), kind, size, qty, extra, primary, width, length, ...(unitPrice ? { unitPrice } : {}) };
 }
 
 /**

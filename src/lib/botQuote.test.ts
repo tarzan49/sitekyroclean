@@ -12,13 +12,14 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('a U sofa is priced by the seats counted in the photo: up to 4 as 4 lugares, 5+ as 5+; waterproofing = cleaning + 150€ Premium / + 90€ Essencial; alone 179€ / 129€ with travel (25 Oct 2026)', () => {
     const u = (seats: number, treatment = 'clean') => ok({ items: [{ kind: 'sofa', size: 'u', seats, treatment }], city: 'Porto' });
     expect([u(4).subtotal, u(4).handToOwner]).toEqual([99, false]);
-    expect([u(6).subtotal, u(6).handToOwner]).toEqual([119, false]);
-    const p = u(6, 'clean+premium');
+    expect([u(5).subtotal, u(5).handToOwner]).toEqual([119, false]);
+    const p = u(5, 'clean+premium');
     expect([p.total, p.handToOwner, p.waterproofingTiers]).toEqual([279, false, { travel: 10, premium: 279, essencial: 219 }]);
     const a = u(6, 'premium');
     expect([a.total, a.handToOwner, a.waterproofingTiers]).toEqual([179, false, { travel: 0, premium: 179, essencial: 129 }]);
     expect(u(3, 'essencial').total).toBe(129);
     expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);
+    expect(ok({ items: [{ kind: 'sofa', size: 'u', seats: 6, look: 'grande', treatment: 'clean+premium' }], city: 'Porto' }).waterproofingTiers).toEqual({ travel: 0, premium: 299, essencial: 239 });
   });
   it('sofa 3 seats in Oeiras: 79€ + 10€ travel (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' });
@@ -206,5 +207,21 @@ describe('puffs (owner, 21 Oct 2026)', () => {
       expect(l.subtotal).toBe(solo('3-lugares', t).subtotal + solo('2-lugares', t).subtotal);
     }
     expect(ok({ items: [{ kind: 'sofa', size: 'canto' }], city: 'Porto' }).subtotal).toBe(solo('canto', 'clean').subtotal);
+  });
+});
+
+describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
+  const sub = (item: Record<string, unknown>) => ok({ items: [{ kind: 'sofa', ...item }], city: 'Porto' }).subtotal;
+  it('cleaning is 129/139/149 by look, U or not; waterproofing +170/+110', () => {
+    expect(sub({ size: '5-lugares', seats: 6, look: 'compacto' })).toBe(129);
+    expect(sub({ size: '5-lugares', seats: 7, look: 'medio' })).toBe(139);
+    expect(sub({ size: 'u', seats: 6, look: 'grande' })).toBe(149);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+premium' })).toBe(319);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+essencial' })).toBe(259);
+  });
+  it('needs the look, keeps 5 seats at 119 and sends 8+ to the owner', () => {
+    expect(botQuote({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6 }], city: 'Porto' }).ok).toBe(false);
+    expect(sub({ size: '5-lugares', seats: 5 })).toBe(119);
+    expect(ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 8 }], city: 'Porto' }).quote).toBe(true);
   });
 });

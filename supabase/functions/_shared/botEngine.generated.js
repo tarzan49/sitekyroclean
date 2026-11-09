@@ -313,6 +313,7 @@ function packItemValid(item) {
   if (item.kind === "rug" || item.kind === "carpet") return [item.width, item.length].every((s) => Number.isFinite(dimension(s)) && dimension(s) > 0);
   return item.kind === "chairs" || (item.kind === "sofa" ? sofaPrices : mattressPrices).some((p) => p.id === item.size);
 }
+var SEAT6_WATERPROOFING_EXTRA = { premium: 170, essencial: 110 };
 var PERK_TREATMENT = { none: "none", premium: "waterproofing", essencial: "waterproofing", "anti-acaros": "anti-acaros" };
 function customPackLine(item) {
   const options = item.kind === "sofa" ? sofaPrices : mattressPrices;
@@ -332,6 +333,9 @@ function customPackLine(item) {
       if (item.extra === "essencial") amount2 += calcChairWaterproof(item.qty) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
     }
+  } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
+    const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
+    amount2 = (item.unitPrice + wp) * item.qty;
   } else if (item.kind === "sofa" && option2) {
     const unit = calcSofaUnitPrice(option2, item.extra !== "none", "cleaning", item.extra === "premium" ? "premium" : "essencial", item.extra === "anti-acaros");
     amount2 = unit === null ? null : unit * item.qty;
@@ -1860,6 +1864,8 @@ function resolveBotCity(input) {
 function listBotCities() {
   return Object.entries(locationPrices).map(([name, travelFee]) => ({ name, travelFee, extendedTrip: EXTENDED_TRIP_CITIES.has(name) }));
 }
+var SEAT6_LOOK_PRICES = { compacto: 129, medio: 139, grande: 149 };
+var SEAT6_LOOK_GUIDE = "compacto (129€: assentos normais, braços finos, peça simples), medio (139€: assentos fundos ou almofadas soltas), grande (149€: modular com módulos soltos, peça extra ao centro ou chaise, assentos muito fundos, ou ocupa a sala)";
 var BOT_SIZES = {
   sofa: sofaPrices.map((p) => p.id),
   mattress: mattressPrices.map((p) => p.id)
@@ -1879,13 +1885,23 @@ function toItem(raw, index) {
   if (kind === "rug" && (treatment === "premium" || treatment === "essencial")) return fail(`items[${index}]: a impermeabilização de tapete só tem preço na mesma visita de outro serviço: chama de novo com os artigos já marcados (ex.: o sofá, com o mesmo tratamento) e o tapete na mesma lista de items; sozinho passa ao dono`);
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   let size = "";
+  let unitPrice;
   if (kind === "sofa" && r.size === "u") {
-    const seats = r.seats;
-    if (typeof seats !== "number" || !Number.isInteger(seats) || seats < 2 || seats > 15) return fail(`items[${index}].seats (lugares contados na fotografia, 2 a 15) é obrigatório num sofá em U`);
-    size = treatment !== "clean" ? "4+-lugares" : seats <= 4 ? "4-lugares" : "5-lugares";
+    const seats2 = r.seats;
+    if (typeof seats2 !== "number" || !Number.isInteger(seats2) || seats2 < 2 || seats2 > 15) return fail(`items[${index}].seats (lugares contados na fotografia, 2 a 15) é obrigatório num sofá em U`);
+    size = treatment !== "clean" ? "4+-lugares" : seats2 <= 4 ? "4-lugares" : "5-lugares";
   } else if (kind === "sofa" || kind === "mattress") {
     size = typeof r.size === "string" ? r.size : "";
     if (!BOT_SIZES[kind].includes(size)) return fail(`items[${index}].size tem de ser um de: ${BOT_SIZES[kind].join(", ")}${kind === "sofa" ? ", ou u (sofá em U, com seats)" : ""}`);
+  }
+  const seats = typeof r.seats === "number" && Number.isInteger(r.seats) ? r.seats : 0;
+  if (kind === "sofa" && size === "5-lugares" && ["clean", "clean+premium", "clean+essencial"].includes(treatment) && seats >= 6) {
+    if (seats >= 8) size = "4+-lugares";
+    else {
+      const look = r.look;
+      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares: ${SEAT6_LOOK_GUIDE}`);
+      unitPrice = SEAT6_LOOK_PRICES[look];
+    }
   }
   const dim = (v) => {
     const side = typeof v === "number" ? rugSide(v) : null;
@@ -1894,7 +1910,7 @@ function toItem(raw, index) {
   const width = kind === "rug" || kind === "carpet" ? dim(r.width) : "";
   const length = kind === "rug" || kind === "carpet" ? dim(r.length) : "";
   if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
-  return { id: String(index), kind, size, qty, extra, primary, width, length };
+  return { id: String(index), kind, size, qty, extra, primary, width, length, ...unitPrice ? { unitPrice } : {} };
 }
 var WATERPROOFING_TRAVEL_MAX = 10;
 var isWaterproofing = (i) => i.extra === "essencial" || i.extra === "premium";

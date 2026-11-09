@@ -11,7 +11,7 @@ export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros';
  * cleaning (sofas and chairs, with `extra` premium or essencial). The
  * configurator never sets it; the WhatsApp bot's quote uses it
  * (`src/lib/botQuote.ts`), so both price through this one engine. */
-export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; }
+export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; }
 export const PACK_KIND_LABEL: Record<PackKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 export const EXTRA_LABEL: Record<PackExtra, string> = { none: 'Só limpeza', premium: 'Limpeza + impermeabilização Premium (até 10 anos)', essencial: 'Limpeza + impermeabilização Essencial (1 a 2 anos)', 'anti-acaros': 'Limpeza + tratamento anti-ácaros' };
 export function makePackItem(kind: PackKind, id: string): CustomPackItem {
@@ -23,6 +23,9 @@ export function packItemValid(item: CustomPackItem) {
   if (item.kind === 'rug' || item.kind === 'carpet') return [item.width, item.length].every(s => Number.isFinite(dimension(s)) && dimension(s) > 0);
   return item.kind === 'chairs' || (item.kind === 'sofa' ? sofaPrices : mattressPrices).some(p => p.id === item.size);
 }
+
+/** Waterproofing on top of the cleaning of a 6 or 7 seat sofa, bot only (owner, 9 Nov 2026). */
+export const SEAT6_WATERPROOFING_EXTRA = { premium: 170, essencial: 110 } as const;
 
 const PERK_TREATMENT: Record<PackExtra, PerkTreatment> = { none: 'none', premium: 'waterproofing', essencial: 'waterproofing', 'anti-acaros': 'anti-acaros' };
 
@@ -47,6 +50,11 @@ export function customPackLine(item: CustomPackItem) {
       if (item.extra === 'essencial') amount += calcChairWaterproof(item.qty) ?? 0;
       if (item.extra === 'anti-acaros') amount += chairAntiAcarosTotal(item.qty) ?? 0;
     }
+  } else if (item.kind === 'sofa' && item.unitPrice && item.primary !== 'waterproofing' && item.extra !== 'anti-acaros') {
+    // Bot only: a sofa of 6 or 7 seats, cleaning judged on the photo (botQuote SEAT6_LOOK_PRICES), plus
+    // the waterproofing the owner gave for one (9 Nov 2026, Helena: +170€ Premium / +110€ Essencial).
+    const wp = item.extra === 'premium' || item.extra === 'essencial' ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
+    amount = (item.unitPrice + wp) * item.qty;
   } else if (item.kind === 'sofa' && option) {
     const unit = calcSofaUnitPrice(option, item.extra !== 'none', 'cleaning', item.extra === 'premium' ? 'premium' : 'essencial', item.extra === 'anti-acaros');
     amount = unit === null ? null : unit * item.qty;
