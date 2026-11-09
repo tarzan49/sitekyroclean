@@ -296,8 +296,8 @@ export interface DayRule {
   /** For the bot: what to tell a client who asks for a closed day. */
   note: string;
 }
-/** Days the bot books the Algarve itself (owner, 30 Oct 2026). */
-export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-03'];
+/** Days the bot books the Algarve itself (owner, 30 Oct 2026; 9 Nov: só quarta 18/11, o dia em que a equipa já lá vai). */
+export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-18'];
 
 export const DAY_RULES: readonly DayRule[] = [
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".

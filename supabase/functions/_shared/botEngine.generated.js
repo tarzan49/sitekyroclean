@@ -2533,7 +2533,7 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
-var ALGARVE_BOT_DAYS = ["2026-11-03"];
+var ALGARVE_BOT_DAYS = ["2026-11-18"];
 var DAY_RULES = [
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
   {
