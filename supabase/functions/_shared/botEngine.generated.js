@@ -2819,7 +2819,7 @@ function sharedTripAvailability(req, city, area, durationMin, events, now) {
   const zone = farZoneOf(city);
   const today = lisbon(now.getTime()).date;
   const last = addDays(today, MAX_DAYS - 1);
-  const earliest = now.getTime() + LEAD_TIME_MIN * 6e4;
+  const earliest = Math.max(now.getTime() + LEAD_TIME_MIN * 6e4, lisbonToUtc(addDays(today, 1), 0));
   const anchors = zone ? events.filter((e) => e.start && e.end && String(e.status).toUpperCase() !== "CANCELLED" && /^servico\b/.test(fold3(e.summary)) && eventTeam(e) && inFarZone(e, zone)).map((e) => ({ team: eventTeam(e), from: Date.parse(e.start), to: Date.parse(e.end) })).filter((a) => Number.isFinite(a.to) && a.to > now.getTime() && lisbon(a.from).date <= last).sort((a, b) => a.from - b.from) : [];
   const onlyDay = typeof req.date === "string" && DATE.test(req.date) ? req.date : null;
   const usable = anchors.filter((a) => !onlyDay || lisbon(a.from).date === onlyDay);
@@ -2950,7 +2950,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const closedAt2 = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap((r) => r.prefer ?? []))].filter((d) => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some((r) => r.onlyPreferred);
-  const firstDay = waterproofingFrom > today ? waterproofingFrom : today;
+  const firstDay = waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow;
   const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
   const tooEarly = (date) => date < firstDay;
   const dayOrder = onlyDay && !tooEarly(onlyDay) ? [onlyDay] : [...preferred, ...ahead.filter((d) => !preferred.includes(d))];

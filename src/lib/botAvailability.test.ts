@@ -49,10 +49,10 @@ describe('botAvailability', () => {
     expect(r.region).toBe('Lisboa');
     expect(r.teams).toEqual(['Lisboa 1']);
     expect(r.handToOwner).toBeNull();
-    // 09:45 now + 90 min lead → first whole hour is 12h.
-    expect(r.suggestion?.slots.map(s => [s.date, s.time])).toEqual([['2026-10-07', '12h'], ['2026-10-07', '15h']]);
-    expect(r.suggestion?.text).toBe('hoje (quarta) às 12h ou às 15h');
-    expect(r.free[0].times[0]).toBe('12h');
+    // Never today (owner, 11 Nov 2026): first day offered is tomorrow.
+    expect(r.suggestion?.slots.every(s => s.date >= '2026-10-08')).toBe(true);
+    expect(r.suggestion?.text).toMatch(/^amanhã \(quinta\)/);
+    expect(r.free.every(f => f.date !== '2026-10-07')).toBe(true);
   });
 
   it('Porto 2 takes at most two jobs on a weekday (Aleixo, 4 Nov 2026)', () => {
@@ -355,7 +355,7 @@ describe("the owner's rules for the next days (DAY_RULES)", () => {
     expect(ok(botAvailability({ city: 'Porto', items: sofa, date: '2026-10-08', time: '11h', ownerTime: true }, [], NOW, rules)).requested?.free).toBe(true);
     const braga = ok(botAvailability({ city: 'Braga', items: sofa, days: 4 }, [], NOW, rules));
     expect(braga.dayRule).toBeUndefined();
-    expect(braga.free[0].date).toBe('2026-10-07');
+    expect(braga.free[0].date).toBe('2026-10-08');
     const later = ok(botAvailability({ city: 'Porto', items: sofa, days: 4 }, [], new Date('2026-10-09T08:45:00Z'), rules));
     expect(later.dayRule).toBeUndefined();
   });
