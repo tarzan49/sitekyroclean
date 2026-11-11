@@ -22,26 +22,13 @@ describe('teamAccounts', () => {
     ], events, '2026-10-13');
     expect(r.teams.map(t => [t.team, t.todayTotal, t.beforeTotal, t.total])).toEqual([['Lisboa 1', 125, 35, 160]]);
     expect(r.teams[0].message).toBe([
-      'Contas até 13/10 (Lisboa 1)',
+      'Contas até 13/10 (Lisboa 1): tens de me enviar *160€*.',
       '',
-      'Serviços de 13/10:',
+      '13/10 · Ana Teste, Odivelas · Limpeza de sofá de 3 lugares: 40€',
+      '13/10 · Barcarena · Impermeabilização de sofá: 85€',
+      '29/09 · Rita Teste, Pinhal Novo · Recolha de tapete: 35€',
       '',
-      '13/10 · Ana Teste, Odivelas · Limpeza de sofá de 3 lugares',
-      'Serviço 79€ · a minha parte 40€ = deves-me 40€',
-      '',
-      '13/10 · Barcarena · Impermeabilização de sofá',
-      'Serviço 169€ · a minha parte 85€ = deves-me 85€',
-      '',
-      'Total de 13/10: 125€',
-      '',
-      'Por pagar de dias anteriores:',
-      '',
-      '29/09 · Rita Teste, Pinhal Novo · Recolha de tapete',
-      'Serviço 70€ · a minha parte 35€ = deves-me 35€',
-      '',
-      'Total de dias anteriores: 35€',
-      '',
-      'Total que me devem: 160€',
+      'Total: 160€.',
     ].join('\n'));
     expect(r.teams[0].message).not.toMatch(/segunda|terça|quarta|quinta|sexta|sábado|domingo/);
   });
@@ -59,15 +46,14 @@ describe('teamAccounts', () => {
 
   it('only what is left from before still sends, and says the day had nothing', () => {
     const r = teamAccounts([row({ request_date: '2026-10-09', my_cut: 60 })], events, '2026-10-13');
-    expect(r.teams[0].message).toContain('13/10: nenhum serviço por pagar.');
-    expect(r.teams[0].message).toContain('09/10 · Ana Teste, Odivelas · Limpeza de sofá de 3 lugares');
+        expect(r.teams[0].message).toContain('09/10 · Ana Teste, Odivelas · Limpeza de sofá de 3 lugares: ');
     expect(r.teams[0].total).toBe(60);
   });
 
   it('adds the owner share of the upsell, as the CRM cut does', () => {
     const r = teamAccounts([row({ my_cut: 40, upsell_value: 40, upsell_team: 'Lisboa 1' })], events, '2026-10-13');
     expect(r.teams[0].todayTotal).toBe(52);
-    expect(r.teams[0].message).toContain('a minha parte 52€ = deves-me 52€');
+    expect(r.teams[0].message).toContain(': 52€');
   });
 
   it('a service without a team in the calendar goes to nobody, only to the owner summary', () => {
@@ -89,7 +75,7 @@ describe('teamAccounts', () => {
     ]);
     expect(r.teams[0].todayTotal).toBe(40);
     expect(r.teams[0].total).toBe(125);
-    expect(r.teams[0].message).toContain('Acertos combinados:\nAvaliações, lote até 10/10: 85€');
+    expect(r.teams[0].message).toContain('Avaliações, lote até 10/10: 85€');
     expect(r.teams[0].message).not.toContain('Ainda não');
     expect(r.teams[0].message).not.toContain('5%');
   });
@@ -101,7 +87,7 @@ describe('teamAccounts', () => {
     ], events, '2026-10-13');
     expect(r.teams[0].total).toBe(15);
     expect(r.teams[0].ownerOwes).toEqual([{ date: '2026-10-13', label: 'Sofia Teste, Porto', amount: 25 }]);
-    expect(r.teams[0].message).toContain('Soma: 40€\n\nPagos diretamente a mim (desconto a vossa parte):\n13/10 Sofia Teste, Porto · a vossa parte 25€\n\nTotal que me devem: 15€');
+    expect(r.teams[0].message).toContain('Menos 25€ de Sofia Teste, Porto, que me pagou diretamente\n\nTotal: 15€.');
   });
 
   it('nothing is sent when what the owner received covers what the team owes', () => {
@@ -119,7 +105,7 @@ describe('teamAccounts', () => {
     ], events, '2026-10-13');
     expect(r.teams[0].total).toBe(40);
     expect(r.teams[0].ownerOwes).toEqual([]);
-    expect(r.teams[0].message).toContain('ainda não pagou (desconto a vossa parte quando pagar):\n13/10 Sofia Teste, Porto · a vossa parte 25€\n\nTotal que me devem: 40€');
+    expect(r.teams[0].message).toContain('Total: 40€.\nAinda não conta: Sofia Teste, Porto paga-me a mim; quando pagar, desconto 25€.');
   });
 
   it('paid to the owner with an invoice: the team gets half of the price without VAT (Inês, 16 Oct)', () => {
@@ -128,7 +114,7 @@ describe('teamAccounts', () => {
       row({ calendar_event_id: 'e3', client_name: 'Sofia Teste', city: 'Porto', billed_value: 79, my_cut: 40, invoiced: true, paid_to_owner: true, client_paid_owner_at: '2026-10-16T12:00:00Z' }),
     ], events, '2026-10-13');
     expect(r.teams[0].ownerOwes[0].amount).toBe(32.11);
-    expect(r.teams[0].message).toContain('13/10 Sofia Teste, Porto · a vossa parte 32,11€ (com fatura: 79€ = 64,23€ sem IVA + 14,77€ de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)');
+    expect(r.teams[0].message).toContain('Menos 32,11€ de Sofia Teste, Porto, que me pagou diretamente');
   });
 
   it('with an invoice and a share agreed above half, the owner gets that share + all the VAT (Verónica, 4 Nov)', () => {
@@ -141,32 +127,20 @@ describe('teamAccounts', () => {
     // IVA incluído no preço e dividido a meias (16/10): base 64,23€, a equipa fica com 32,11€.
     expect(r.teams[0].total).toBe(46.89);
     // Dono, 26/10: o IVA bem explícito, linha a linha, e o total de IVA a entregar ao Estado no fim.
-    expect(r.teams[0].message).toContain([
-      'COM FATURA: o cliente paga 79€, IVA incluído',
-      'Valor do serviço sem IVA: 64,23€',
-      'IVA a entregar ao Estado: 14,77€',
-      'Vossa parte (metade do valor sem IVA): 32,11€',
-      'Minha parte (metade do valor sem IVA): 32,12€',
-      'Deves-me 46,89€ (a minha parte 32,12€ + o IVA 14,77€)',
-    ].join('\n'));
-    expect(r.teams[0].message).toContain('Total que me devem: 46,89€\nDos quais IVA a entregar ao Estado: 14,77€');
+    expect(r.teams[0].message).toContain(': 46,89€ (32,12€ da minha parte + 14,77€ de IVA, porque teve fatura)');
+    expect(r.teams[0].message).toContain('Total: 46,89€.\nA vossa parte nos serviços com fatura faturam-ma a mim.');
   });
 
   it('an invoice for only part of the service: only that part has VAT (27 Oct, mattress for the condominium)', () => {
     // 99€ sem fatura + colchão 60€ + IVA = 73,80€: o cliente paga 172,80€, IVA 13,80€.
     const r = teamAccounts([row({ calendar_event_id: 'e3', request_date: '2026-11-03', billed_value: 172.8, my_cut: 80, invoiced: true, invoice_value: 73.8 })], events, '2026-11-03');
-    expect(r.teams[0].message).toContain([
-      'COM FATURA: o cliente paga 172,80€, IVA incluído',
-      'Valor do serviço sem IVA: 159€',
-      'IVA a entregar ao Estado: 13,80€',
-      'Vossa parte (metade do valor sem IVA): 79,50€',
-    ].join('\n'));
+    expect(r.teams[0].message).toContain('13,80€ de IVA, porque teve fatura');
     expect(r.teams[0].total).toBe(93.3);
   });
 
   it('says when the VAT was on top of the agreed price (owner, 27 Oct)', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e3', request_date: '2026-10-19', billed_value: 257.07, my_cut: 105, invoiced: true, vat_on_top: true })], events, '2026-10-19');
-    expect(r.teams[0].message).toContain('COM FATURA, IVA À PARTE: o cliente paga 257,07€ (209€ + 48,07€ de IVA)');
+    expect(r.teams[0].message).toContain('(104,50€ da minha parte + 48,07€ de IVA, porque teve fatura)');
   });
 
   it('without an invoice there is no VAT line', () => {
@@ -176,6 +150,6 @@ describe('teamAccounts', () => {
 
   it('with an invoice and an upsell the owner part of the upsell is spelled out too', () => {
     const r = teamAccounts([row({ calendar_event_id: 'e5', request_date: '2026-10-20', billed_value: 123, my_cut: 62, invoiced: true, upsell_value: 50, upsell_team: 'Lisboa 1' })], events, '2026-10-20');
-    expect(r.teams[0].message).toMatch(/Deves-me [\d,]+€ \(a minha parte [\d,]+€ \+ o IVA 23€ \+ a minha parte no upsell [\d,]+€\)/);
+    expect(r.teams[0].message).toMatch(/da minha parte \+ 23€ de IVA, porque teve fatura/);
   });
 });

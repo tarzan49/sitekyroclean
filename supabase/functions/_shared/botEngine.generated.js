@@ -3374,62 +3374,23 @@ function ownerShareOf(r) {
 var sum = (lines) => round24(lines.reduce((s, l) => s + l.amount, 0));
 function lineBlock(l, team) {
   const head = [dm(l.date), l.label, l.what].filter(Boolean).join(" · ");
-  if (l.billed === void 0 || l.share === void 0) return [`${head}: ${euros(l.amount)}`];
-  const parts = [`a minha parte ${euros(l.share)}`];
-  if (l.reviewPenalty) parts.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
-  if (l.vat && l.teamPart !== void 0) {
-    const net = round24(l.billed - l.vat);
-    const mine = round24(net - l.teamPart);
-    const owed = [`a minha parte ${euros(mine)}`, `o IVA ${euros(l.vat)}`];
-    if (l.upsellShare) owed.push(`a minha parte no upsell ${euros(l.upsellShare)}`);
-    if (l.reviewPenalty) owed.push(`5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
-    return [
-      head,
-      l.vatOnTop ? `COM FATURA, IVA À PARTE: o cliente paga ${euros(l.billed)} (${euros(net)} + ${euros(l.vat)} de IVA)` : `COM FATURA: o cliente paga ${euros(l.billed)}, IVA incluído`,
-      `Valor do serviço sem IVA: ${euros(net)}`,
-      `IVA a entregar ao Estado: ${euros(l.vat)}`,
-      `Vossa parte (${Math.abs(l.teamPart - mine) <= 1 ? "metade do valor sem IVA" : "o que sobra"}): ${euros(l.teamPart)}`,
-      `Minha parte (${Math.abs(l.teamPart - mine) <= 1 ? "metade do valor sem IVA" : "combinada"}): ${euros(mine)}`,
-      `Deves-me ${euros(l.amount)} (${owed.join(" + ")})`
-    ];
+  const extra = [];
+  if (l.vat && l.billed !== void 0) {
+    const mine = round24(l.amount - l.vat - (l.reviewPenalty ?? 0));
+    extra.push(`${euros(mine)} da minha parte + ${euros(l.vat)} de IVA, porque teve fatura`);
   }
-  return [head, `Serviço ${euros(l.billed)} · ${parts.join(" + ")} = deves-me ${euros(l.amount)}`];
-}
-function paidToOwnerLine(l) {
-  const base = `${dm(l.date)} ${l.label} · a vossa parte ${euros(l.amount)}`;
-  if (!l.vat || l.billed === void 0) return base;
-  return `${base} (com fatura: ${euros(l.billed)} = ${euros(l.billed - l.vat)} sem IVA + ${euros(l.vat)} de IVA a entregar ao Estado; a vossa parte é metade do valor sem IVA)`;
+  if (l.reviewPenalty) extra.push(`inclui 5% ${REVIEW_PENALTY_LABEL[team] ?? "sem avaliação"} ${euros(l.reviewPenalty)}`);
+  return [`${head}: ${euros(l.amount)}${extra.length ? ` (${extra.join("; ")})` : ""}`];
 }
 function teamMessage(a) {
-  const out = [`Contas até ${dm(a.date)} (${a.team})`, ""];
-  if (a.today.length) {
-    out.push(`Serviços de ${dm(a.date)}:`, "");
-    for (const l of a.today) out.push(...lineBlock(l, a.team), "");
-    out.push(`Total de ${dm(a.date)}: ${euros(a.todayTotal)}`);
-  } else {
-    out.push(`${dm(a.date)}: nenhum serviço por pagar.`);
-  }
-  if (a.before.length) {
-    out.push("", "Por pagar de dias anteriores:", "");
-    for (const l of a.before) out.push(...lineBlock(l, a.team), "");
-    out.push(`Total de dias anteriores: ${euros(a.beforeTotal)}`);
-  }
-  if (a.adjustments.length) {
-    out.push("", "Acertos combinados:");
-    for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
-  }
-  if (a.ownerOwes.length) {
-    out.push("", `Soma: ${euros(sum([...a.today, ...a.before, ...a.adjustments]))}`);
-    out.push("", "Pagos diretamente a mim (desconto a vossa parte):");
-    for (const l of a.ownerOwes) out.push(paidToOwnerLine(l));
-  }
-  if (a.awaitingClient.length) {
-    out.push("", "O cliente paga-me a mim e ainda não pagou (desconto a vossa parte quando pagar):");
-    for (const l of a.awaitingClient) out.push(paidToOwnerLine(l));
-  }
-  out.push("", `Total que me devem: ${euros(a.total)}`);
-  const vat = round24([...a.today, ...a.before].reduce((s, l) => s + (l.vat ?? 0), 0));
-  if (vat > 0) out.push(`Dos quais IVA a entregar ao Estado: ${euros(vat)}`);
+  const lines = [...a.today, ...a.before];
+  const out = [a.total >= 0 ? `Contas até ${dm(a.date)} (${a.team}): tens de me enviar *${euros(a.total)}*.` : `Contas até ${dm(a.date)} (${a.team}): sou eu que vos devo *${euros(-a.total)}*.`, ""];
+  for (const l of lines) out.push(...lineBlock(l, a.team));
+  for (const l of a.adjustments) out.push(`${l.label}: ${euros(l.amount)}`);
+  for (const l of a.ownerOwes) out.push(`Menos ${euros(l.amount)} de ${l.label}, que me pagou diretamente`);
+  out.push("", `Total: ${euros(a.total)}.`);
+  for (const l of a.awaitingClient) out.push(`Ainda não conta: ${l.label} paga-me a mim; quando pagar, desconto ${euros(l.amount)}.`);
+  if (lines.some((l) => l.vat)) out.push("A vossa parte nos serviços com fatura faturam-ma a mim.");
   return out.join("\n");
 }
 function teamAccounts(rows, events, date, adjustments = []) {
