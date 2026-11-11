@@ -146,6 +146,7 @@ describe('messages', () => {
     expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é 22/10. Obrigado!');
     expect(m).not.toContain('reencaminha');
     expect(m).not.toMatch(noDash);
+    expect(m).not.toContain('Instagram');
   });
   it('the shots follow the service: waterproofing only, cleaning only, or both in one visit', () => {
     const only = procedureShots('Impermeabilização Premium sofá 2 lugares');
@@ -171,12 +172,9 @@ describe('messages', () => {
   it('the client message: first name, the service, the right review link, the owner\'s 10% line', () => {
     const m = procedureClientMessage({ firstName: 'Ana', what: 'Limpeza de sofá de 3 lugares', team: 'Porto 2' });
     expect(m).toBe([
-      'Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares). Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:',
+      'Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares). Se ficou contente com o trabalho, a sua avaliação no Google demora só 10 segundos e ajuda-nos imenso a mostrar a outros clientes o nosso valor:',
       REVIEW_LINKS.porto,
       'Como agradecimento, fica com 10% de desconto no próximo serviço.',
-      '',
-      'E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:',
-      'https://www.instagram.com/kyrocleansolutions/',
       'Obrigado!',
     ].join('\n'));
     expect(m).not.toMatch(noDash);

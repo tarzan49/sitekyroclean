@@ -158,7 +158,8 @@ Deno.test("client review request: once, at the end of the service, never to a pa
   assertEquals(first.phone, "351912000000");
   assert(String(first.message).startsWith("Olá Ana, obrigado por nos ter recebido hoje! Esperamos que tenha gostado do resultado do serviço (limpeza de sofá de 3 lugares)."));
   assert(String(first.message).includes("10% de desconto no próximo serviço"));
-  assert(String(first.message).includes("instagram.com"));
+  assert(!String(first.message).includes("instagram.com")); // dono, 4 Nov: sem Instagram no pedido
+  assert(String(first.message).includes("demora só 10 segundos"));
   await procedureSent({ eventId: "s1", kind: "client-review", messageIds: ["w1"] }, store, new Date("2026-10-15T15:16:00Z"));
   assertEquals(table.get("s1")!.client_review_msg_id, "w1");
   // Two hours after the end: s3 goes (Lisbon link), s2 is on hold and s4 has no phone; s1 is not sent again.

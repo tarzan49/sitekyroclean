@@ -14,6 +14,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 4. **Conteúdo (vídeos, posts, anúncios) só a partir de um guião aprovado pelo dono.** Se não existir guião para esse formato, propor primeiro em texto (ideia, cenas, texto do ecrã) e esperar o OK. Um vídeo tem de ser vídeo real da equipa ou movimento real; nunca fotografias paradas montadas como vídeo. Sem OK, nada se publica.
 5. **Nada vai para clientes ou equipas sem o dono ver primeiro** (mensagens, ofertas, horas), salvo o que o bot já faz sozinho por regra escrita.
 6. **Não sei = digo que não sei**, e digo como confirmar. Nunca inventar números, horas, preços, nomes ou fontes.
+7. **Uma regra por tema.** Regra nova do dono substitui a antiga em todas as camadas no mesmo dia: código (`botAvailability`/motor), ficheiro do bot (linha S certa, nunca no fim), `bot-contract.md`, este ficheiro, `docs/regras-detalhadas.md` (marcar `[RETIRADA dd/mm]`) e memória. Entre duas regras que se contradizem ganha a data do dono mais recente; se não houver data, perguntar. A frase retirada entra em kyro-bot `tests/regras-retiradas.test.ts` (o deploy falha se voltar).
 
 ---
 

@@ -20,7 +20,6 @@
 // imports puros, porque vai no pacote do bot.
 import { REVIEW_DEADLINE_DAYS, REVIEW_MIN_STARS } from './crmReviews';
 import { UPSELL_TIERS_FROM } from './crmUpsell';
-import { INSTAGRAM_URL } from '../constants/business';
 
 export const PROCEDURE_FULL_SHARE = 50;
 export const PROCEDURE_REDUCED_SHARE = 45;
@@ -285,9 +284,9 @@ export function procedurePromptMessage(f: PromptFacts): string {
 /**
  * O pedido de avaliação que o bot manda ao cliente no fim do serviço: o
  * primeiro nome, o serviço feito, o link da ficha certa (Lisboa para as
- * equipas de Lisboa, Porto para as outras), os 10% no próximo serviço e o
- * Instagram (dono, 2026-10-28: "a avaliação oferece 10% no próximo serviço e
- * na mensagem pede também para seguir no Insta"). A frase dos 10% é do dono
+ * equipas de Lisboa, Porto para as outras) e os 10% no próximo serviço. Sem
+ * Instagram, que só vai depois de o cliente dizer que avaliou, e com "demora
+ * só 10 segundos" (dono, 4 Nov 2026; o Instagram de 28/10 saiu). A frase dos 10% é do dono
  * (14/10: "não é para tirar a frase"), avisado de que o Google não permite
  * ofertas em troca de avaliações. `sameDay` falso quando sai no dia seguinte
  * (o serviço acabou tarde): sem "hoje".
@@ -297,12 +296,9 @@ export function procedureClientMessage(f: Pick<PromptFacts, 'firstName' | 'what'
   const what = (f.what ?? '').trim();
   const service = what ? `do serviço (${what.charAt(0).toLowerCase()}${what.slice(1)})` : 'do serviço';
   return [
-    `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido${f.sameDay === false ? '' : ' hoje'}! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, uma avaliação no Google ajuda-nos muito e ajuda outros clientes a escolher. Demora menos de um minuto:`,
+    `Olá${name ? ` ${name}` : ''}, obrigado por nos ter recebido${f.sameDay === false ? '' : ' hoje'}! Esperamos que tenha gostado do resultado ${service}. Se ficou contente com o trabalho, a sua avaliação no Google demora só 10 segundos e ajuda-nos imenso a mostrar a outros clientes o nosso valor:`,
     REVIEW_LINKS[reviewProfileOfTeam(f.team)],
     'Como agradecimento, fica com 10% de desconto no próximo serviço.',
-    '',
-    'E se quiser ver mais antes e depois dos nossos trabalhos, siga-nos no Instagram:',
-    INSTAGRAM_URL,
     'Obrigado!',
   ].join('\n');
 }
