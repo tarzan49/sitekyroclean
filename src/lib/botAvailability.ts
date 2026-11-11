@@ -98,7 +98,7 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : undefined;
   const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
     .filter(t => !pickupTeams || pickupTeams.includes(t))
-    .filter(t => !TEAM_CLOSED_FROM[t] || (day && day <= TEAM_CLOSED_FROM[t].date))
+    .filter(t => !TEAM_CLOSED_FROM[t] || (day && (day <= TEAM_CLOSED_FROM[t].date || (TEAM_CLOSED_FROM[t].reopen !== undefined && day >= TEAM_CLOSED_FROM[t].reopen!))))
     .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
@@ -229,12 +229,14 @@ export const TEAM_OFF: readonly TeamOff[] = [
  * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends
  * at 20:00; its past services stay. It was the only team waterproofing in Porto and Braga, so those go to the owner.
  */
-export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number }>> = { 'Porto 1': { date: '2026-11-06', hour: 20 } };
-const closedAt = (team: string, to: number) => {
+// Owner, 11 Nov 2026: Porto 1 reopens (Nelito) from 11/11 for Premium waterproofing in Porto and Braga ("reabre Porto 1").
+export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number; reopen?: string }>> = { 'Porto 1': { date: '2026-11-06', hour: 20, reopen: '2026-11-11' } };
+const closedAt = (team: string, from: number, to: number) => {
   const closed = TEAM_CLOSED_FROM[team];
-  return Boolean(closed) && to > lisbonToUtc(closed.date, closed.hour * 60);
+  if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;
+  return !closed.reopen || from < lisbonToUtc(closed.reopen, 0);
 };
-const offAt = (team: string, from: number, to: number) => closedAt(team, to) || TEAM_OFF.some(o => {
+const offAt = (team: string, from: number, to: number) => closedAt(team, from, to) || TEAM_OFF.some(o => {
   if (o.team !== team) return false;
   const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
   return from < b && to > a;

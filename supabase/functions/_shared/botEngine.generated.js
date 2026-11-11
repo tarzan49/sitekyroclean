@@ -2419,7 +2419,7 @@ var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var RUG_PICKUP_TEAMS = { Porto: ["Porto 3"] };
 var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;
-  const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && day <= TEAM_CLOSED_FROM[t].date).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
+  const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
@@ -2492,12 +2492,13 @@ var TEAM_OFF = [
   // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
   ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` }))
 ];
-var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20 } };
-var closedAt = (team, to) => {
+var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20, reopen: "2026-11-11" } };
+var closedAt = (team, from, to) => {
   const closed = TEAM_CLOSED_FROM[team];
-  return Boolean(closed) && to > lisbonToUtc(closed.date, closed.hour * 60);
+  if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;
+  return !closed.reopen || from < lisbonToUtc(closed.reopen, 0);
 };
-var offAt = (team, from, to) => closedAt(team, to) || TEAM_OFF.some((o) => {
+var offAt = (team, from, to) => closedAt(team, from, to) || TEAM_OFF.some((o) => {
   if (o.team !== team) return false;
   const a = lisbonToUtc(o.date, (o.fromHour ?? 0) * 60), b = lisbonToUtc(o.date, (o.untilHour ?? 24) * 60);
   return from < b && to > a;

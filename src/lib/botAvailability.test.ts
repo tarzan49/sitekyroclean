@@ -394,7 +394,9 @@ describe('Porto 1 closed from 6 Nov 2026, 20:00', () => {
   it('works until 20:00 and takes nothing that ends later', () => {
     expect(teamWorks('Porto 1', lisbonUtc('2026-11-06', '18:00'), lisbonUtc('2026-11-06', '20:00'))).toBe(true);
     expect(teamWorks('Porto 1', lisbonUtc('2026-11-06', '19:00'), lisbonUtc('2026-11-06', '20:30'))).toBe(false);
-    expect(teamWorks('Porto 1', lisbonUtc('2026-12-01', '10:00'), lisbonUtc('2026-12-01', '12:00'))).toBe(false);
+    expect(teamWorks('Porto 1', lisbonUtc('2026-11-10', '10:00'), lisbonUtc('2026-11-10', '12:00'))).toBe(false);
+    // Owner, 11 Nov 2026: Porto 1 reopens from 11/11.
+    expect(teamWorks('Porto 1', lisbonUtc('2026-12-01', '10:00'), lisbonUtc('2026-12-01', '12:00'))).toBe(true);
   });
 
   it('passes Porto and Braga waterproofing to Porto 2, cleanings keep their teams', () => {
@@ -405,7 +407,7 @@ describe('Porto 1 closed from 6 Nov 2026, 20:00', () => {
       expect(r.handToOwner).toBeNull();
     }
     expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1, treatment: 'clean' }] }, [], now)).teams).not.toContain('Porto 1');
-    expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBe('Porto 2');
+    expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBe('Porto 1');
   });
 });
 
@@ -416,7 +418,7 @@ describe('waterproofing in Porto and Braga from 11 Nov 2026 (owner, 6 Nov 2026)'
     for (const city of ['Porto', 'Braga']) {
       const r = botAvailability({ city, items, durationMin: 90 }, [], now);
       if ('error' in r) throw new Error(r.error);
-      expect(r.teams).toEqual(['Porto 2']);
+      expect(r.teams).toEqual(['Porto 1', 'Porto 2']);
       expect(r.handToOwner).toBeNull();
       expect(r.free.every(d => d.date >= '2026-11-11')).toBe(true);
     }
@@ -427,7 +429,7 @@ describe('waterproofing in Porto and Braga from 11 Nov 2026 (owner, 6 Nov 2026)'
     expect(r.requested?.free).toBe(false);
     expect(r.free[0].date).toBe('2026-11-11');
     expect(chooseTeam([], 'Porto', '2026-11-10T10:00:00Z', '2026-11-10T11:30:00Z', 'premium', false)).toBeNull();
-    expect(chooseTeam([], 'Porto', '2026-11-11T10:00:00Z', '2026-11-11T11:30:00Z', 'premium', false)).toBe('Porto 2');
+    expect(chooseTeam([], 'Porto', '2026-11-11T10:00:00Z', '2026-11-11T11:30:00Z', 'premium', false)).toBe('Porto 1');
   });
   it('cleanings are unchanged', () => {
     const r = botAvailability({ city: 'Porto', durationMin: 60, items: [{ kind: 'sofa', seats: 3 }] }, [], now);
