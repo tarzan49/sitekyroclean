@@ -78,7 +78,7 @@ Deno.test("find-order gives the bot the order as data, by number or by the chat'
   const leads = fakeLeads([{ booking_id: "AB12CD34", name: "Julia Costa", phone: "+351 912 345 678", source: "Website", service: "Tapete", details: "x", location: "Faro", value: "Sob orçamento", quiz_order: quizOrder }]);
   const byNumber = await (await call({ action: "find-order", order: "AB12CD34", phone: "351912345678" }, { leads })).json();
   assertEquals([byNumber.found, byNumber.matchedBy, byNumber.phoneMatches], [true, "number", true]);
-  assertEquals(byNumber.order.brief.quoteRequest, { items: quizOrder.quote.items, city: "Faro" });
+  assertEquals(byNumber.order.brief.quoteRequest, { items: quizOrder.quote.items, city: "Faro", site: true });
   assert(byNumber.order.brief.alreadyKnown.includes("as medidas de cada tapete ou alcatifa"));
   assertEquals(byNumber.order.brief.observations, "Rua das Flores 3");
   const byPhone = await (await call({ action: "find-order", phone: "912345678" }, { leads })).json();

@@ -181,7 +181,7 @@ export interface QuizOrderBrief {
   items: string[];
   rugs: QuizOrderRug[];
   /** The `calcular_orcamento` request, or null when the items are not known as data. */
-  quoteRequest: { items: QuoteItem[]; city: string } | null;
+  quoteRequest: { items: QuoteItem[]; city: string; site: true } | null;
   /** False when one line has no exact match in the tool (the quiz price stands for it). */
   quoteExact: boolean;
   /** Things the client already answered: never ask them again. */
@@ -257,7 +257,8 @@ export function describeQuizOrder(row: { quiz_order?: unknown; details?: string 
       source: 'quiz_order',
       items,
       rugs,
-      quoteRequest: quoteItems.length ? { items: quoteItems, city: o.city || city } : null,
+      // `site: true`: the client saw the site's prices, so the bot quotes those (chairs, owner 12 Nov 2026).
+      quoteRequest: quoteItems.length ? { items: quoteItems, city: o.city || city, site: true } : null,
       quoteExact: o.quote?.exact !== false,
       alreadyKnown: knownFrom(service, kinds, rugs.length > 0, o.city || city, o.rugPickup ?? null),
       confirmFirst: rugChecks(rugs),

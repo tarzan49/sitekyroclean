@@ -175,6 +175,16 @@ function chairWaterproofTotal(qty, tier) {
   const unit = tier === "premium" ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
   return Math.max(qty * unit, CHAIR_WATERPROOF_SMALL_MAX * small);
 }
+var WHATSAPP_CHAIR_CLEAN_SMALL = 25;
+var WHATSAPP_CHAIR_CLEAN_SMALL_MAX = 3;
+var WHATSAPP_CHAIR_CLEAN = 20;
+var WHATSAPP_CHAIR_CLEAN_BIG_FROM = 8;
+var WHATSAPP_CHAIR_CLEAN_BIG = 18;
+function whatsappChairCleanUnit(totalChairs) {
+  if (!Number.isSafeInteger(totalChairs) || totalChairs <= 0) return null;
+  if (totalChairs <= WHATSAPP_CHAIR_CLEAN_SMALL_MAX) return WHATSAPP_CHAIR_CLEAN_SMALL;
+  return totalChairs >= WHATSAPP_CHAIR_CLEAN_BIG_FROM ? WHATSAPP_CHAIR_CLEAN_BIG : WHATSAPP_CHAIR_CLEAN;
+}
 
 // src/constants/antiAcarosPricing.ts
 var SOFA_ANTI_ACAROS_PRICE = {
@@ -327,7 +337,7 @@ function customPackLine(item) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
-    amount2 = calcChairClean(item.qty);
+    amount2 = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount2 !== null) {
       if (item.extra === "premium") amount2 += calcChairWaterproofPremium(item.qty) ?? 0;
       if (item.extra === "essencial") amount2 += calcChairWaterproof(item.qty) ?? 0;
@@ -355,7 +365,7 @@ function calculateCustomPack(items, city) {
   const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly2(i)).reduce((sum2, i) => sum2 + i.qty, 0);
   const table = items.map((item) => {
     const line = customPackLine(item);
-    return item.kind === "chairs" && !waterproofingOnly2(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    return item.kind === "chairs" && !waterproofingOnly2(item) && !item.unitPrice && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
   });
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({
@@ -2202,7 +2212,7 @@ function withBigOrder(r) {
 }
 function botQuoteInner(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards } = input;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards, site: rawSite } = input;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== "number" || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail("puffs tem de ser um inteiro entre 0 e 20");
   const armchairs = rawArmchairs ?? 0;
@@ -2257,6 +2267,11 @@ function botQuoteInner(input) {
     }
     items.push(item);
     rawOf.push(raw);
+  }
+  const chairsToClean = items.filter((i) => i.kind === "chairs" && i.primary !== "waterproofing").reduce((sum2, i) => sum2 + i.qty, 0);
+  const chairUnit = rawSite === true ? null : whatsappChairCleanUnit(chairsToClean);
+  if (chairUnit) {
+    for (const [n, i] of items.entries()) if (i.kind === "chairs" && i.primary !== "waterproofing") items[n] = { ...i, unitPrice: chairUnit };
   }
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? "");
@@ -3895,7 +3910,8 @@ function describeQuizOrder(row) {
       source: "quiz_order",
       items: items2,
       rugs: rugs2,
-      quoteRequest: quoteItems.length ? { items: quoteItems, city: o.city || city } : null,
+      // `site: true`: the client saw the site's prices, so the bot quotes those (chairs, owner 12 Nov 2026).
+      quoteRequest: quoteItems.length ? { items: quoteItems, city: o.city || city, site: true } : null,
       quoteExact: o.quote?.exact !== false,
       alreadyKnown: knownFrom(service, kinds, rugs2.length > 0, o.city || city, o.rugPickup ?? null),
       confirmFirst: rugChecks(rugs2),

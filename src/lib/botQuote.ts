@@ -22,6 +22,7 @@ import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 import { askedDiscountFor, type AskedDiscount } from './botAskedDiscount';
+import { whatsappChairCleanUnit } from '../constants/chairPricing';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -172,7 +173,7 @@ function rugPickupFor(items: CustomPackItem[]) {
 
 /**
  * `handToOwner` is true whenever the bot must not close the price itself: an
- * item "sob orçamento" (carpets, 4+ seats, 10+ chairs, rugs the bot cannot price
+ * item "sob orçamento" (carpets, 4+ seats, rugs the bot cannot price
  * by rule: see botRugEstimate), a locality that
  * is not served, or one where availability is confirmed case by case.
  */
@@ -492,7 +493,7 @@ function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal
 
 function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards } = input as Record<string, unknown>;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards, site: rawSite } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== 'number' || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail('puffs tem de ser um inteiro entre 0 e 20');
   const armchairs = rawArmchairs ?? 0;
@@ -537,6 +538,12 @@ function botQuoteInner(input: unknown) {
     items.push(item);
     rawOf.push(raw);
   }
+  // Chairs on WhatsApp (owner, 12 Nov 2026): 25€ each up to 3, 20€ from 4, 18€ from 8, counted over all
+  // the chairs to clean in the order; travel apart. The site's tiers (20/15/12,50€) are the site's only:
+  // an order from the site's questionnaire (`site: true`, quizOrder quoteRequest) keeps the price it showed.
+  const chairsToClean = items.filter(i => i.kind === 'chairs' && i.primary !== 'waterproofing').reduce((sum, i) => sum + i.qty, 0);
+  const chairUnit = rawSite === true ? null : whatsappChairCleanUnit(chairsToClean);
+  if (chairUnit) for (const [n, i] of items.entries()) if (i.kind === 'chairs' && i.primary !== 'waterproofing') items[n] = { ...i, unitPrice: chairUnit };
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? '') : null;

@@ -158,7 +158,7 @@ describe('planBotBooking', () => {
     expect(p).toMatchObject({ ok: true });
     if (!('ok' in p) || !p.ok) return;
     expect(p.event.title).toMatch(/^Serviço 67€ \(134€\) Limpeza de 7 cadeiras e cabeceira/);
-    expect(p.event.description).toContain('Preço combinado na conversa (tabela 122,50€)');
+    expect(p.event.description).toContain('Preço combinado na conversa (tabela 140€)');
     // A rug with no engine price closes too once the price was agreed; without it, it goes to the owner.
     expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }], agreedTotal: 79 }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ agreedTotal: -5, items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false });

@@ -44,7 +44,8 @@ export function customPackLine(item: CustomPackItem) {
     const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
     amount = unit === null ? null : unit * item.qty;
   } else if (item.kind === 'chairs') {
-    amount = calcChairClean(item.qty);
+    // Bot only: `unitPrice` = the WhatsApp price per chair (chairPricing whatsappChairCleanUnit, owner 12 Nov 2026).
+    amount = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount !== null) {
       if (item.extra === 'premium') amount += calcChairWaterproofPremium(item.qty) ?? 0;
       if (item.extra === 'essencial') amount += calcChairWaterproof(item.qty) ?? 0;
@@ -86,7 +87,8 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
   const chairsToClean = items.filter(i => i.kind === 'chairs' && !waterproofingOnly(i)).reduce((sum, i) => sum + i.qty, 0);
   const table = items.map(item => {
     const line = customPackLine(item);
-    return item.kind === 'chairs' && !waterproofingOnly(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    // The WhatsApp bot prices any number of chairs (unitPrice, owner 12 Nov 2026); the site keeps 10+ sob orçamento.
+    return item.kind === 'chairs' && !waterproofingOnly(item) && !item.unitPrice && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
   });
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({
