@@ -58,6 +58,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Cliente com serviço marcado pede para remarcar → o bot serve-o sozinho, mesmo com a conversa em pausa; se a equipa já não faz esse serviço no dia novo, passa para outra equipa livre da zona; a equipa que já tinha sido avisada sabe sempre da mudança.
 - Pagamento às equipas (dono, 6 Nov; Lisboa 1, Algarve, Braga, Porto 2, Porto 3; serviços desde 6/11): fotografias e vídeo = 50%, sem eles = 45%; avaliação de 4 ou 5 estrelas = mais 5€ pagos pelo dono (`procedureAdjustment`).
 - Pedido de avaliação só depois de o cliente dizer que correu bem; vai sem Instagram e diz que demora 10 segundos e ajuda a mostrar o nosso valor; o Instagram só depois de o cliente dizer que avaliou; 24 h depois do pedido, uma pergunta a quem não disse nada (dono, 4 Nov).
+- Fotografias e vídeos só com um orçamento novo (preço ainda não dado) ou quando o cliente os pede; nunca a responder a fatura, pagamento, marcação, serviço feito ou reclamação (dono, 12 Nov, Raimundo; kyro-bot `proofsAllowed`).
 - Recolha de tapete não é fim de serviço: nem "Como correu?" nem certificado na visita de recolha, só depois da entrega (dono, 9 Nov; `isRugPickupVisit`).
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
