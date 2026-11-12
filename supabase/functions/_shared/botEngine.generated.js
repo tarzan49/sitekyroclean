@@ -2492,7 +2492,7 @@ var TEAM_OFF = [
   // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
   ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` }))
 ];
-var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20, reopen: "2026-11-11" } };
+var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20 } };
 var closedAt = (team, from, to) => {
   const closed = TEAM_CLOSED_FROM[team];
   if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;

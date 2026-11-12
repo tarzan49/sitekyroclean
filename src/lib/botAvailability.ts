@@ -229,8 +229,9 @@ export const TEAM_OFF: readonly TeamOff[] = [
  * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends
  * at 20:00; its past services stay. It was the only team waterproofing in Porto and Braga, so those go to the owner.
  */
-// Owner, 11 Nov 2026: Porto 1 reopens (Nelito) from 11/11 for Premium waterproofing in Porto and Braga ("reabre Porto 1").
-export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number; reopen?: string }>> = { 'Porto 1': { date: '2026-11-06', hour: 20, reopen: '2026-11-11' } };
+// Owner, 12 Nov 2026: Porto 1 is NOT reopened (the 11/11 reopening is undone): "Porto 1 só faz serviços que eu indicar,
+// mais nada". The bot never offers or books it; the owner puts its services in the calendar himself.
+export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number; reopen?: string }>> = { 'Porto 1': { date: '2026-11-06', hour: 20, } };
 const closedAt = (team: string, from: number, to: number) => {
   const closed = TEAM_CLOSED_FROM[team];
   if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;
