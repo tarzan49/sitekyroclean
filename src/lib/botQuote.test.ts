@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { bigOrderPrice, botQuote, listBotCities, resolveBotCity } from './botQuote';
 import { locationPrices } from '../constants/travel';
+import { askedDiscountFor, ASKED_DISCOUNT_PCT } from './botAskedDiscount';
 
 const ok = (input: unknown) => {
   const r = botQuote(input);
@@ -223,5 +224,57 @@ describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
     expect(botQuote({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6 }], city: 'Porto' }).ok).toBe(false);
     expect(sub({ size: '5-lugares', seats: 5 })).toBe(119);
     expect(ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 8 }], city: 'Porto' }).quote).toBe(true);
+  });
+});
+
+describe('anti-odor em tapetes (dono, 12 Nov 2026: +15€, 5€ o m²)', () => {
+  it('máx(15€, 5€ × m², para baixo), numa linha própria, somado ao preço do tapete', () => {
+    const plain = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
+    const smelly = ok({ items: [{ kind: 'rug', width: 2, length: 3, odor: true }], city: 'Lisboa' });
+    expect(smelly.rugOdor).toMatchObject({ amount: 30, min: 15, perM2: 5 });
+    expect(smelly.lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor tapete 2 x 3 m', amount: 30 });
+    expect(smelly.rugEstimate?.ok && plain.rugEstimate?.ok && smelly.rugEstimate.homePrice - plain.rugEstimate.homePrice).toBe(30);
+    // A small rug pays the 15€ floor; 1,55 x 2,35 = 3,64 m² → 18€.
+    expect(ok({ items: [{ kind: 'rug', width: 1.2, length: 1.7, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(15);
+    expect(ok({ items: [{ kind: 'rug', width: 1.55, length: 2.35, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(18);
+    // With a sofa in the same visit: on the combo price.
+    const combo = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
+    const comboOdor = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3, odor: true }], city: 'Lisboa' });
+    expect(comboOdor.rugCombo?.ok && combo.rugCombo?.ok && comboOdor.rugCombo.comboPrice - combo.rugCombo.comboPrice).toBe(30);
+    expect(plain.rugOdor).toBeNull();
+    // Carpet: sob orçamento, the line is there for the owner.
+    expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5, odor: true }], city: 'Lisboa' }).lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor alcatifa 4 x 5 m', amount: 100 });
+    expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', odor: true }], city: 'Lisboa' }).ok).toBe(false);
+    expect(botQuote({ items: [{ kind: 'rug', width: 2, length: 3, odor: 'sim' }], city: 'Lisboa' }).ok).toBe(false);
+  });
+});
+
+describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
+  it('limpeza 10%; com impermeabilização 5% até 500€ e 10% acima; arredondado para baixo', () => {
+    expect(ASKED_DISCOUNT_PCT).toEqual({ cleaning: 10, waterproofing: 5, waterproofingAbove: 10 });
+    expect(askedDiscountFor(79, false)).toMatchObject({ pct: 10, total: 71, saving: 8 });
+    expect(askedDiscountFor(218, true)).toMatchObject({ pct: 5, total: 207, saving: 11 });
+    expect(askedDiscountFor(500, true)).toMatchObject({ pct: 5, total: 475 });
+    expect(askedDiscountFor(900, true)).toMatchObject({ pct: 10, total: 810, saving: 90 });
+    expect(askedDiscountFor(900, false)).toMatchObject({ pct: 10, total: 810 });
+    // Never below the engine's minimum travel.
+    expect(askedDiscountFor(11, false)?.total).toBe(10);
+    expect(askedDiscountFor(10, false)).toBeNull();
+    expect(askedDiscountFor(79, false)?.rule).toMatch(/condição especial/);
+  });
+  it('no quote: sofá 3L Oeiras 89€ → 80€; pack 3L Premium 218€ → 207€; tapete pelo preço em casa', () => {
+    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' }).askedDiscount).toMatchObject({ pct: 10, total: 80, saving: 9 });
+    const pack = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }], city: 'Porto' });
+    expect(pack.total).toBe(218);
+    expect(pack.askedDiscount).toMatchObject({ pct: 5, total: 207, saving: 11 });
+    const rug = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
+    expect(rug.rugEstimate?.ok && rug.askedDiscount?.total).toBe(rug.rugEstimate?.ok ? Math.floor(rug.rugEstimate.homePrice * 0.9) : -1);
+  });
+  it('null quando é sob orçamento, vai ao dono ou já leva condição especial (pedido grande)', () => {
+    expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5 }], city: 'Lisboa' }).askedDiscount).toBeNull();
+    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Madrid' }).askedDiscount).toBeNull();
+    const big = ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment: 'clean+premium' }, { kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
+    expect(big.bigOrder).not.toBeNull();
+    expect(big.askedDiscount).toBeNull();
   });
 });

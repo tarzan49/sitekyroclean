@@ -14,13 +14,14 @@
  */
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
-import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee } from '../constants/travel';
 import { isBlackFriday } from '../constants/campaigns';
 import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
+import { askedDiscountFor, type AskedDiscount } from './botAskedDiscount';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -85,8 +86,10 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   if (typeof qty !== 'number' || !Number.isInteger(qty) || qty < 1 || qty > 100) return fail(`items[${index}].qty tem de ser um inteiro entre 1 e 100`);
   const { extra, primary } = TREATMENT_TO_ITEM[treatment];
   if (kind === 'mattress' && (extra === 'premium' || extra === 'essencial')) return fail(`items[${index}]: colchões não se impermeabilizam`);
-  if (kind === 'rug' && (treatment === 'premium' || treatment === 'essencial')) return fail(`items[${index}]: a impermeabilização de tapete só tem preço na mesma visita de outro serviço: chama de novo com os artigos já marcados (ex.: o sofá, com o mesmo tratamento) e o tapete na mesma lista de items; sozinho passa ao dono`);
+  if (kind === 'rug' && (treatment === 'premium' || treatment === 'essencial')) return fail(`items[${index}]: a impermeabilização de tapete precisa de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
   if ((kind === 'rug' || kind === 'carpet') && treatment !== 'clean') return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
+  if (r.odor !== undefined && typeof r.odor !== 'boolean') return fail(`items[${index}].odor tem de ser true ou false`);
+  if (r.odor === true && !(kind === 'rug' || kind === 'carpet')) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
   let size = '';
   let unitPrice: number | undefined;
   if (kind === 'sofa' && r.size === 'u') {
@@ -250,7 +253,7 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
     // Travel included: price the rest of the order (if any) as usual, then add the U at its fixed price.
     const city = resolveBotCity(input.city);
     if (city === null || EXTENDED_TRIP_CITIES.has(city)) return null;
-    const base = others.length ? botQuote({ ...input, items: others }) : null;
+    const base = others.length ? botQuoteCore({ ...input, items: others }) as ReturnType<typeof botQuoteInner> : null;
     if (base && (!base.ok || base.quote || base.total === null)) return null;
     const rest = base && base.ok && base.total !== null ? base.total : 0;
     const premium = cents(rest + U_WATERPROOFING_ALONE.premium * n);
@@ -267,10 +270,11 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
       puff: base && base.ok ? base.puff : null,
       armchair: base && base.ok ? base.armchair : null,
       headboard: base && base.ok ? base.headboard : null,
+      rugOdor: base && base.ok ? base.rugOdor : null,
       closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
     };
   }
-  const base = botQuote({ ...input, items: raw.map(r => (isUw(r) ? { ...(r as object), treatment: 'clean' } : r)) });
+  const base = botQuoteCore({ ...input, items: raw.map(r => (isUw(r) ? { ...(r as object), treatment: 'clean' } : r)) }) as ReturnType<typeof botQuoteInner>;
   if (!base.ok || base.quote || base.total === null) return null;
   const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
   const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
@@ -287,51 +291,157 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
 
 /**
  * Rug waterproofing, bot only (owner, 30 Oct 2026: Premium 15€/m², Essencial 10€/m², rounded down;
- * 200x300 = 90€ Premium). Priced only in the same visit as other items (the service already booked,
- * passed in the same call), with no extra travel; a rug waterproofing on its own stays with the owner.
+ * 200x300 = 90€ Premium).
+ * - In the same visit as other items (passed in the same call): no extra travel.
+ * - On its own (owner, 12 Nov 2026: "o bot dá o preço, 15€ o metro quadrado"): the town's travel
+ *   (locationPrices), waived as in the rest of the engine (calculateTravelFee), read from the Premium so
+ *   both versions carry the same travel.
  */
 export const RUG_WATERPROOFING_PER_M2 = { premium: 15, essencial: 10 } as const;
 
-function rugWaterproofingQuote(input: Record<string, unknown>): ReturnType<typeof botQuoteInner> & { rugWaterproofing: { amount: number; sameVisit: true; travelExtra: 0 } } | null {
+type QuoteLine = { label: string; amount: number | null; tablePrice: number | null; perkApplied: boolean; perkNote?: string; quote: boolean };
+const plus = <V,>(v: V, a: number): V => (typeof v === 'number' ? (cents(v + a) as V) : v);
+
+/**
+ * Adds an amount priced in the same visit to every price the quote gives (total, the rug prices,
+ * both waterproofing versions, the extras' totals), with its own lines. A quote whose items are
+ * sob orçamento (`quote`) keeps its total: there the price lives in rugEstimate / rugCombo.
+ */
+function addToPrices<T extends object>(r: T, amount: number, lines: QuoteLine[], tierAmounts?: { premium: number; essencial: number }): T {
+  const q = r as Record<string, unknown>;
+  const re = q.rugEstimate as { ok?: boolean; homePrice?: number; pickupPrice?: number | null } | null | undefined;
+  const rc = q.rugCombo as { ok?: boolean; comboPrice?: number; usualPrice?: number } | null | undefined;
+  const tiers = q.waterproofingTiers as { travel: number; premium: number | null; essencial: number | null } | null | undefined;
+  const extra = (e: unknown) => (e && typeof e === 'object' ? { ...(e as object), total: plus((e as { total?: unknown }).total, amount) } : e);
+  return {
+    ...r,
+    lines: [...((q.lines as QuoteLine[] | undefined) ?? []), ...lines],
+    subtotal: q.quote ? q.subtotal : plus(q.subtotal, amount),
+    total: q.quote ? q.total : plus(q.total, amount),
+    rugEstimate: re && re.ok ? { ...re, homePrice: plus(re.homePrice, amount), pickupPrice: plus(re.pickupPrice, amount) } : re,
+    rugCombo: rc && rc.ok ? { ...rc, comboPrice: plus(rc.comboPrice, amount), usualPrice: plus(rc.usualPrice, amount) } : rc,
+    waterproofingTiers: tiers ? { ...tiers, premium: plus(tiers.premium, tierAmounts?.premium ?? amount), essencial: plus(tiers.essencial, tierAmounts?.essencial ?? amount) } : tiers,
+    puff: extra(q.puff), armchair: extra(q.armchair), headboard: extra(q.headboard),
+  };
+}
+
+/**
+ * Anti-odour on a rug or carpet (cheiro, urina), bot only (owner, 12 Nov 2026: "+15€ de anti-odor;
+ * dependendo dos m², 5€ o m²"): per rug, the larger of 15€ and 5€ × its m², rounded down. Item flag
+ * `odor: true` on the rug's cleaning item; its own line, already summed into the prices.
+ */
+export const RUG_ODOR = { min: 15, perM2: 5 } as const;
+export const RUG_ODOR_RULE = 'Já está somado ao preço (total, ou homePrice/pickupPrice/comboPrice nos tapetes): não somes outra vez. Diz o anti-odor numa linha à parte.';
+const rugOdorUnit = (w: number, l: number) => Math.max(RUG_ODOR.min, Math.floor(w * l * RUG_ODOR.perM2 + 1e-9));
+
+function rugOdorFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number; lines: QuoteLine[] } | null {
+  const lines: QuoteLine[] = [];
+  let amount = 0;
+  items.forEach((i, n) => {
+    if ((i.kind !== 'rug' && i.kind !== 'carpet') || (rawOf[n] as Record<string, unknown>)?.odor !== true) return;
+    const w = Number(i.width), l = Number(i.length);
+    const a = rugOdorUnit(w, l) * i.qty;
+    amount += a;
+    lines.push({ label: `Tratamento anti-odor ${i.kind === 'carpet' ? 'alcatifa' : 'tapete'} ${w} x ${l} m${i.qty > 1 ? ` (${i.qty} un.)` : ''}`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined, quote: false });
+  });
+  return amount ? { amount, lines } : null;
+}
+
+type InnerOk = Extract<ReturnType<typeof botQuoteInner>, { ok: true }>;
+type RugWpResult = InnerOk & { rugWaterproofing: { amount: number; sameVisit: boolean; travelExtra: number } };
+
+function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fail | null {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
   const isRw = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'rug' && ['premium', 'essencial'].includes(String((r as Record<string, unknown>).treatment));
   const rugs = raw.filter(isRw) as Record<string, unknown>[];
+  if (!rugs.length) return null;
   const others = raw.filter(r => !isRw(r));
-  if (!rugs.length || !others.length) return null;
-  const base = botQuote({ ...input, items: others });
-  if (!base.ok || base.quote || base.total === null || base.handToOwner) return null;
-  const lines: typeof base.lines = [];
+  const hasExtras = [input.puffs, input.armchairs].some(v => typeof v === 'number' && v > 0) || (Array.isArray(input.headboards) && input.headboards.length > 0);
+  const sameVisit = others.length > 0 || hasExtras;
+  const lines: QuoteLine[] = [];
   let amount = 0;
+  const byTier = { premium: 0, essencial: 0 };
   for (const r of rugs) {
     const w = typeof r.width === 'number' ? rugSide(r.width) : null;
     const l = typeof r.length === 'number' ? rugSide(r.length) : null;
-    if (!w || !l) return null;
+    if (!w || !l) return fail(`impermeabilização de tapete: width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
+    if (r.odor === true) return fail('odor: o anti-odor vai no artigo de limpeza do tapete (treatment clean), não na impermeabilização');
     const qty = typeof r.qty === 'number' && Number.isInteger(r.qty) && r.qty > 0 ? r.qty : 1;
     const tier = r.treatment as 'premium' | 'essencial';
-    const a = Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[tier] + 1e-9);
+    const at = (t: 'premium' | 'essencial') => Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[t] + 1e-9);
+    const a = at(tier);
     amount += a;
-    lines.push({ label: `Impermeabilização ${tier === 'premium' ? 'Premium' : 'Essencial'} tapete ${w.meters} x ${l.meters} m (mesma visita, sem deslocação extra)`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined as string | undefined, quote: false });
+    byTier.premium += at('premium');
+    byTier.essencial += at('essencial');
+    lines.push({ label: `Impermeabilização ${tier === 'premium' ? 'Premium' : 'Essencial'} tapete ${w.meters} x ${l.meters} m${sameVisit ? ' (mesma visita, sem deslocação extra)' : ''}`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined, quote: false });
   }
-  const total = cents(base.total + amount);
+  if (sameVisit) {
+    const base = botQuoteCore({ ...input, items: others }) as ReturnType<typeof botQuoteInner>;
+    if (!base.ok) return base;
+    const rugPriced = base.rugEstimate?.ok === true || base.rugCombo?.ok === true;
+    if (base.handToOwner || (base.quote ? !rugPriced : base.total === null)) return fail('a impermeabilização de tapete na mesma visita só tem preço quando os outros artigos têm preço: passa ao dono');
+    const out = addToPrices(base, amount, lines, byTier);
+    return {
+      ...out,
+      rugWaterproofing: { amount, sameVisit: true, travelExtra: 0 },
+      closeNow: closeNowOffer({ total: out.quote ? null : out.total, waterproofing: true, handToOwner: false, rug: null }),
+    };
+  }
+  const city = resolveBotCity(input.city);
+  const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  const baseFee = city === null ? undefined : locationPrices[city];
+  const travel = baseFee === undefined ? null : calculateTravelFee(baseFee, byTier.premium);
+  const handToOwner = travel === null || extendedTrip;
+  const total = travel === null ? null : cents(amount + travel);
   return {
-    ...base,
-    lines: [...base.lines, ...lines],
-    subtotal: cents(base.subtotal + amount),
-    total,
-    rugWaterproofing: { amount, sameVisit: true, travelExtra: 0 },
-    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null }),
-  };
+    ok: true as const, city, cityKnown: city !== null, extendedTrip, sharedTrip: false,
+    lines, subtotal: amount, savings: 0, perkEligible: false, travel: travel ?? 0, total: total as number,
+    waterproofingTiers: travel === null ? null : { travel, premium: cents(byTier.premium + travel), essencial: cents(byTier.essencial + travel) },
+    quote: false, handToOwner, rugPickup: null, rugEstimate: null, rugCombo: null, puff: null, armchair: null, headboard: null,
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner, rug: null }),
+    rugOdor: null,
+    rugWaterproofing: { amount, sameVisit: false, travelExtra: travel ?? 0 },
+  } as RugWpResult;
 }
 
 export function botQuote(input: unknown) {
+  return withAskedDiscount(input, botQuoteCore(input));
+}
+
+function botQuoteCore(input: unknown) {
   if (input && typeof input === 'object') {
     const rw = rugWaterproofingQuote(input as Record<string, unknown>);
-    if (rw) return rw;
+    if (rw) return rw.ok ? withAntiMiteGiftKept(withBigOrder(rw)) : rw;
     const u = uWaterproofingQuote(input as Record<string, unknown>);
     if (u) return withBigOrder(u);
   }
   return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+}
+/** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
+const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });
+
+/**
+ * The price cut the bot may give when the client asks for one (botAskedDiscount.ts, owner 12 Nov 2026):
+ * on the price the bot quotes (total, or the rug price), null when the quote is sob orçamento, goes to the
+ * owner, or already carries a special condition (big order, anti-mites gift).
+ */
+function withAskedDiscount<T extends { ok: boolean }>(input: unknown, r: T): T & { askedDiscount: AskedDiscount | null } {
+  const q = r as unknown as {
+    ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; antiMiteGift?: unknown;
+    waterproofingTiers?: unknown; rugWaterproofing?: unknown;
+    rugEstimate?: { ok?: boolean; homePrice?: number } | null; rugCombo?: { ok?: boolean; comboPrice?: number } | null;
+  };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift) return { ...r, askedDiscount: null };
+  const price = !q.quote && typeof q.total === 'number' ? q.total
+    : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === 'number' ? q.rugCombo.comboPrice
+    : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === 'number' ? q.rugEstimate.homePrice
+    : null;
+  if (price === null) return { ...r, askedDiscount: null };
+  const raw = (input as { items?: unknown } | null)?.items;
+  const waterproofing = !!q.waterproofingTiers || !!q.rugWaterproofing
+    || (Array.isArray(raw) && raw.some(i => /premium|essencial/.test(String((i as Record<string, unknown> | null)?.treatment ?? ''))));
+  return { ...r, askedDiscount: askedDiscountFor(price, waterproofing) };
 }
 
 /**
@@ -403,7 +513,8 @@ function botQuoteInner(input: unknown) {
       lines: [] as { label: string; amount: number | null; tablePrice: number | null; perkApplied: boolean; perkNote?: string; quote: boolean }[],
       subtotal: extra.amount, savings: 0, perkEligible: false, travel: extra.travel ?? 0, total: extra.total ?? extra.amount,
       waterproofingTiers: null, quote: false, handToOwner: city === null || extendedTrip,
-      rugPickup: null, rugEstimate: null, rugCombo: null, puff, armchair, headboard, closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
+      rugPickup: null, rugEstimate: null, rugCombo: null, puff, armchair, headboard, rugOdor: null as { amount: number; min: number; perM2: number; rule: string } | null,
+      closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city === null || extendedTrip, rug: null }),
     };
   }
   if (!Array.isArray(rawItems) || rawItems.length === 0) return fail('items tem de ser uma lista com pelo menos um artigo');
@@ -453,7 +564,7 @@ function botQuoteInner(input: unknown) {
     : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = (result.quote && !rugPriced) || city === null || (extendedTrip && !sharedTrip);
-  return {
+  const out = {
     ok: true as const,
     city,
     cityKnown: city !== null,
@@ -493,4 +604,8 @@ function botQuoteInner(input: unknown) {
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : rugCombo?.ok ? { homePrice: rugCombo.comboPrice, pickupPrice: null } : null,
     }),
   };
+  // Anti-odour on rugs and carpets (owner, 12 Nov 2026): own lines, summed into every price.
+  const odor = rugOdorFor(items, rawOf);
+  if (!odor) return { ...out, rugOdor: null as { amount: number; min: number; perM2: number; rule: string } | null };
+  return { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } };
 }

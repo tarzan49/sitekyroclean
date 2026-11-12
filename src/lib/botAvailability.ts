@@ -299,6 +299,25 @@ export interface DayRule {
   /** For the bot: what to tell a client who asks for a closed day. */
   note: string;
 }
+/**
+ * Zones where the bot closes the service but books no hour (dono, 12 Nov 2026: "não podes fazer a marcação
+ * neste momento para sítios como Funchal e Coimbra. Podes fechar o serviço e perguntar à pessoa que semana,
+ * que dia lhe daria mais jeito, e dizes que vamos conferir no calendário"). Coimbra = the Coimbra team's zone
+ * (Coimbra, Figueira da Foz, Leiria, Batalha). Madeira is not a served town in the engine (no travel fee, no
+ * team): it is read from the client's text (Funchal, Madeira, 9000-9399). A time the owner gave (`ownerTime`)
+ * is still booked.
+ */
+export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira']);
+export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
+const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
+/** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
+export function isMadeira(cityOrAddress: unknown): boolean {
+  if (typeof cityOrAddress !== 'string') return false;
+  const postal = POSTAL.exec(cityOrAddress);
+  if (postal) { const n = Number(postal[1]); if (n >= 9000 && n <= 9399) return true; }
+  return MADEIRA_PLACES.test(fold(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ''));
+}
+
 /** Days the bot books the Algarve itself (owner, 30 Oct 2026; 9 Nov: só quarta 18/11, o dia em que a equipa já lá vai). */
 export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-18'];
 
@@ -639,6 +658,9 @@ export type AvailabilityResult =
       sharedTrip?: SharedTrip | null;
       /** The owner's rule for these days (DAY_RULES), when one is on for this zone. */
       dayRule?: string | null;
+      /** ASK_WEEK_ZONES: no hours; close the service and ask the client's week and day (askWeekRule). */
+      askWeek?: true;
+      askWeekRule?: string;
     };
 
 /**
@@ -770,6 +792,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const base = { city, durationMin, suggestion: null, requested: null, free: [] as Array<{ date: string; label: string; times: string[] }> };
 
   if (req?.city !== undefined && typeof req.city !== 'string') return { error: 'city tem de ser texto' };
+  // Owner, 12 Nov 2026: Coimbra and Madeira (Funchal) close the service without an hour.
+  if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has('Madeira')) {
+    return { ...base, city: null, region: null, teams: [], handToOwner: 'Madeira (Funchal): o dono confirma o dia no calendário', askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
   if (EXTENDED_TRIP_CITIES.has(city)) {
@@ -777,6 +803,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
+  if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
+    return { ...base, region: area, teams: [...TEAMS_BY_REGION[area]], handToOwner: `${area}: o dono confirma o dia no calendário`, askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
   // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
   // offers no hours there; it books only a time he gave.
   // Owner, 30 Oct 2026: "na terça o Algarve tens de ser tu a marcar as coisas direito e com pensamento

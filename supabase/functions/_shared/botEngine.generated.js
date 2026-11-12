@@ -1837,6 +1837,20 @@ for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
   }
 }
 
+// src/lib/botAskedDiscount.ts
+var ASKED_DISCOUNT_PCT = { cleaning: 10, waterproofing: 5, waterproofingAbove: 10 };
+var ASKED_DISCOUNT_WATERPROOFING_BIG_FROM = 500;
+var ASKED_DISCOUNT_FLOOR = Math.min(...Object.values(locationPrices));
+var ASKED_DISCOUNT_RULE = "Só se o preço for a objeção (achou caro, tem orçamento, tem outro orçamento ou pediu melhor preço); uma vez por conversa; diz 'condição especial', nunca 'desconto'.";
+function askedDiscountFor(total, waterproofing) {
+  if (typeof total !== "number" || !Number.isFinite(total) || total <= 0) return null;
+  const pct = !waterproofing ? ASKED_DISCOUNT_PCT.cleaning : total > ASKED_DISCOUNT_WATERPROOFING_BIG_FROM ? ASKED_DISCOUNT_PCT.waterproofingAbove : ASKED_DISCOUNT_PCT.waterproofing;
+  const next = Math.max(ASKED_DISCOUNT_FLOOR, Math.floor(total * (100 - pct) / 100 + 1e-9));
+  const saving = Math.round((total - next) * 100) / 100;
+  if (saving <= 0) return null;
+  return { pct, total: next, saving, rule: ASKED_DISCOUNT_RULE };
+}
+
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
 var KINDS = ["sofa", "mattress", "chairs", "rug", "carpet"];
@@ -1882,8 +1896,10 @@ function toItem(raw, index) {
   if (typeof qty !== "number" || !Number.isInteger(qty) || qty < 1 || qty > 100) return fail(`items[${index}].qty tem de ser um inteiro entre 1 e 100`);
   const { extra, primary } = TREATMENT_TO_ITEM[treatment];
   if (kind === "mattress" && (extra === "premium" || extra === "essencial")) return fail(`items[${index}]: colchões não se impermeabilizam`);
-  if (kind === "rug" && (treatment === "premium" || treatment === "essencial")) return fail(`items[${index}]: a impermeabilização de tapete só tem preço na mesma visita de outro serviço: chama de novo com os artigos já marcados (ex.: o sofá, com o mesmo tratamento) e o tapete na mesma lista de items; sozinho passa ao dono`);
+  if (kind === "rug" && (treatment === "premium" || treatment === "essencial")) return fail(`items[${index}]: a impermeabilização de tapete precisa de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
+  if (r.odor !== void 0 && typeof r.odor !== "boolean") return fail(`items[${index}].odor tem de ser true ou false`);
+  if (r.odor === true && !(kind === "rug" || kind === "carpet")) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
   let size = "";
   let unitPrice;
   if (kind === "sofa" && r.size === "u") {
@@ -1980,7 +1996,7 @@ function uWaterproofingQuote(input) {
   if (alone) {
     const city = resolveBotCity(input.city);
     if (city === null || EXTENDED_TRIP_CITIES.has(city)) return null;
-    const base2 = others.length ? botQuote({ ...input, items: others }) : null;
+    const base2 = others.length ? botQuoteCore({ ...input, items: others }) : null;
     if (base2 && (!base2.ok || base2.quote || base2.total === null)) return null;
     const rest = base2 && base2.ok && base2.total !== null ? base2.total : 0;
     const premium2 = cents(rest + U_WATERPROOFING_ALONE.premium * n);
@@ -2009,10 +2025,11 @@ function uWaterproofingQuote(input) {
       puff: base2 && base2.ok ? base2.puff : null,
       armchair: base2 && base2.ok ? base2.armchair : null,
       headboard: base2 && base2.ok ? base2.headboard : null,
+      rugOdor: base2 && base2.ok ? base2.rugOdor : null,
       closeNow: closeNowOffer({ total: total2, waterproofing: true, handToOwner: false, rug: null })
     };
   }
-  const base = botQuote({ ...input, items: raw.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
+  const base = botQuoteCore({ ...input, items: raw.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
   if (!base.ok || base.quote || base.total === null) return null;
   const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
   const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
@@ -2027,45 +2044,132 @@ function uWaterproofingQuote(input) {
   };
 }
 var RUG_WATERPROOFING_PER_M2 = { premium: 15, essencial: 10 };
+var plus = (v, a) => typeof v === "number" ? cents(v + a) : v;
+function addToPrices(r, amount2, lines, tierAmounts) {
+  const q = r;
+  const re = q.rugEstimate;
+  const rc = q.rugCombo;
+  const tiers = q.waterproofingTiers;
+  const extra = (e) => e && typeof e === "object" ? { ...e, total: plus(e.total, amount2) } : e;
+  return {
+    ...r,
+    lines: [...q.lines ?? [], ...lines],
+    subtotal: q.quote ? q.subtotal : plus(q.subtotal, amount2),
+    total: q.quote ? q.total : plus(q.total, amount2),
+    rugEstimate: re && re.ok ? { ...re, homePrice: plus(re.homePrice, amount2), pickupPrice: plus(re.pickupPrice, amount2) } : re,
+    rugCombo: rc && rc.ok ? { ...rc, comboPrice: plus(rc.comboPrice, amount2), usualPrice: plus(rc.usualPrice, amount2) } : rc,
+    waterproofingTiers: tiers ? { ...tiers, premium: plus(tiers.premium, tierAmounts?.premium ?? amount2), essencial: plus(tiers.essencial, tierAmounts?.essencial ?? amount2) } : tiers,
+    puff: extra(q.puff),
+    armchair: extra(q.armchair),
+    headboard: extra(q.headboard)
+  };
+}
+var RUG_ODOR = { min: 15, perM2: 5 };
+var RUG_ODOR_RULE = "Já está somado ao preço (total, ou homePrice/pickupPrice/comboPrice nos tapetes): não somes outra vez. Diz o anti-odor numa linha à parte.";
+var rugOdorUnit = (w, l) => Math.max(RUG_ODOR.min, Math.floor(w * l * RUG_ODOR.perM2 + 1e-9));
+function rugOdorFor(items, rawOf) {
+  const lines = [];
+  let amount2 = 0;
+  items.forEach((i, n) => {
+    if (i.kind !== "rug" && i.kind !== "carpet" || rawOf[n]?.odor !== true) return;
+    const w = Number(i.width), l = Number(i.length);
+    const a = rugOdorUnit(w, l) * i.qty;
+    amount2 += a;
+    lines.push({ label: `Tratamento anti-odor ${i.kind === "carpet" ? "alcatifa" : "tapete"} ${w} x ${l} m${i.qty > 1 ? ` (${i.qty} un.)` : ""}`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
+  });
+  return amount2 ? { amount: amount2, lines } : null;
+}
 function rugWaterproofingQuote(input) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
   const isRw = (r) => !!r && typeof r === "object" && r.kind === "rug" && ["premium", "essencial"].includes(String(r.treatment));
   const rugs = raw.filter(isRw);
+  if (!rugs.length) return null;
   const others = raw.filter((r) => !isRw(r));
-  if (!rugs.length || !others.length) return null;
-  const base = botQuote({ ...input, items: others });
-  if (!base.ok || base.quote || base.total === null || base.handToOwner) return null;
+  const hasExtras = [input.puffs, input.armchairs].some((v) => typeof v === "number" && v > 0) || Array.isArray(input.headboards) && input.headboards.length > 0;
+  const sameVisit = others.length > 0 || hasExtras;
   const lines = [];
   let amount2 = 0;
+  const byTier = { premium: 0, essencial: 0 };
   for (const r of rugs) {
     const w = typeof r.width === "number" ? rugSide(r.width) : null;
     const l = typeof r.length === "number" ? rugSide(r.length) : null;
-    if (!w || !l) return null;
+    if (!w || !l) return fail(`impermeabilização de tapete: width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
+    if (r.odor === true) return fail("odor: o anti-odor vai no artigo de limpeza do tapete (treatment clean), não na impermeabilização");
     const qty = typeof r.qty === "number" && Number.isInteger(r.qty) && r.qty > 0 ? r.qty : 1;
     const tier = r.treatment;
-    const a = Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[tier] + 1e-9);
+    const at = (t) => Math.floor(qty * w.meters * l.meters * RUG_WATERPROOFING_PER_M2[t] + 1e-9);
+    const a = at(tier);
     amount2 += a;
-    lines.push({ label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} tapete ${w.meters} x ${l.meters} m (mesma visita, sem deslocação extra)`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
+    byTier.premium += at("premium");
+    byTier.essencial += at("essencial");
+    lines.push({ label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} tapete ${w.meters} x ${l.meters} m${sameVisit ? " (mesma visita, sem deslocação extra)" : ""}`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
   }
-  const total = cents(base.total + amount2);
+  if (sameVisit) {
+    const base = botQuoteCore({ ...input, items: others });
+    if (!base.ok) return base;
+    const rugPriced = base.rugEstimate?.ok === true || base.rugCombo?.ok === true;
+    if (base.handToOwner || (base.quote ? !rugPriced : base.total === null)) return fail("a impermeabilização de tapete na mesma visita só tem preço quando os outros artigos têm preço: passa ao dono");
+    const out = addToPrices(base, amount2, lines, byTier);
+    return {
+      ...out,
+      rugWaterproofing: { amount: amount2, sameVisit: true, travelExtra: 0 },
+      closeNow: closeNowOffer({ total: out.quote ? null : out.total, waterproofing: true, handToOwner: false, rug: null })
+    };
+  }
+  const city = resolveBotCity(input.city);
+  const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
+  const baseFee = city === null ? void 0 : locationPrices[city];
+  const travel = baseFee === void 0 ? null : calculateTravelFee(baseFee, byTier.premium);
+  const handToOwner = travel === null || extendedTrip;
+  const total = travel === null ? null : cents(amount2 + travel);
   return {
-    ...base,
-    lines: [...base.lines, ...lines],
-    subtotal: cents(base.subtotal + amount2),
+    ok: true,
+    city,
+    cityKnown: city !== null,
+    extendedTrip,
+    sharedTrip: false,
+    lines,
+    subtotal: amount2,
+    savings: 0,
+    perkEligible: false,
+    travel: travel ?? 0,
     total,
-    rugWaterproofing: { amount: amount2, sameVisit: true, travelExtra: 0 },
-    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner: false, rug: null })
+    waterproofingTiers: travel === null ? null : { travel, premium: cents(byTier.premium + travel), essencial: cents(byTier.essencial + travel) },
+    quote: false,
+    handToOwner,
+    rugPickup: null,
+    rugEstimate: null,
+    rugCombo: null,
+    puff: null,
+    armchair: null,
+    headboard: null,
+    closeNow: closeNowOffer({ total, waterproofing: true, handToOwner, rug: null }),
+    rugOdor: null,
+    rugWaterproofing: { amount: amount2, sameVisit: false, travelExtra: travel ?? 0 }
   };
 }
 function botQuote(input) {
+  return withAskedDiscount(input, botQuoteCore(input));
+}
+function botQuoteCore(input) {
   if (input && typeof input === "object") {
     const rw = rugWaterproofingQuote(input);
-    if (rw) return rw;
+    if (rw) return rw.ok ? withAntiMiteGiftKept(withBigOrder(rw)) : rw;
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
   return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+}
+var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
+function withAskedDiscount(input, r) {
+  const q = r;
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift) return { ...r, askedDiscount: null };
+  const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
+  if (price === null) return { ...r, askedDiscount: null };
+  const raw = input?.items;
+  const waterproofing = !!q.waterproofingTiers || !!q.rugWaterproofing || Array.isArray(raw) && raw.some((i) => /premium|essencial/.test(String(i?.treatment ?? "")));
+  return { ...r, askedDiscount: askedDiscountFor(price, waterproofing) };
 }
 function withAntiMiteGift(input, r) {
   const b = r.bigOrder;
@@ -2135,6 +2239,7 @@ function botQuoteInner(input) {
       puff,
       armchair,
       headboard,
+      rugOdor: null,
       closeNow: closeNowOffer({ total: extra.total, waterproofing: false, handToOwner: city2 === null || extendedTrip2, rug: null })
     };
   }
@@ -2169,7 +2274,7 @@ function botQuoteInner(input) {
   const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawOf[n].material })), othersResult.subtotal, city) : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = result.quote && !rugPriced || city === null || extendedTrip && !sharedTrip;
-  return {
+  const out = {
     ok: true,
     city,
     cityKnown: city !== null,
@@ -2209,6 +2314,9 @@ function botQuoteInner(input) {
       rug: rugPrice?.ok ? { homePrice: rugPrice.homePrice, pickupPrice: rugPrice.pickupPrice } : rugCombo?.ok ? { homePrice: rugCombo.comboPrice, pickupPrice: null } : null
     })
   };
+  const odor = rugOdorFor(items, rawOf);
+  if (!odor) return { ...out, rugOdor: null };
+  return { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } };
 }
 
 // src/constants/cityCoords.ts
@@ -2534,6 +2642,18 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
+var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira"]);
+var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
+var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
+function isMadeira(cityOrAddress) {
+  if (typeof cityOrAddress !== "string") return false;
+  const postal = POSTAL.exec(cityOrAddress);
+  if (postal) {
+    const n = Number(postal[1]);
+    if (n >= 9e3 && n <= 9399) return true;
+  }
+  return MADEIRA_PLACES.test(fold3(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ""));
+}
 var ALGARVE_BOT_DAYS = ["2026-11-18"];
 var DAY_RULES = [
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
@@ -2910,6 +3030,9 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const durationMin = Number.isFinite(durationRaw) && durationRaw >= 15 && durationRaw <= 600 ? Math.ceil(durationRaw / 15) * 15 : visitMinutes(req?.items);
   const base = { city, durationMin, suggestion: null, requested: null, free: [] };
   if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
+  if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has("Madeira")) {
+    return { ...base, city: null, region: null, teams: [], handToOwner: "Madeira (Funchal): o dono confirma o dia no calendário", askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   const area = CITY_REGION.get(fold3(city));
   if (EXTENDED_TRIP_CITIES.has(city)) {
@@ -2917,6 +3040,9 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
+  if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
+    return { ...base, region: area, teams: [...TEAMS_BY_REGION[area]], handToOwner: `${area}: o dono confirma o dia no calendário`, askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
   const algarveBotDay = area === "Algarve" && req.ownerTime !== true && (req.date === void 0 ? ALGARVE_BOT_DAYS.some((d) => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
   if (algarveBotDay && req.date === void 0) {
     const day = ALGARVE_BOT_DAYS.find((d) => d >= lisbon(now.getTime()).date);
