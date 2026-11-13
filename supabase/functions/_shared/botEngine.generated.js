@@ -2540,7 +2540,9 @@ var WATERPROOFING_FROM = { Porto: "2026-11-11", Braga: "2026-11-11" };
 var PORTO1_MIN_TOTAL = 200;
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var RUG_PICKUP_TEAMS = { Porto: ["Porto 3"] };
+var ZONE_TEAM_OVERRIDE = { Coimbra: ["Lisboa 1"] };
 var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
+  if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone];
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;
   const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
@@ -3056,7 +3058,15 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
-    return { ...base, region: area, teams: [...TEAMS_BY_REGION[area]], handToOwner: `${area}: o dono confirma o dia no calendário`, askWeek: true, askWeekRule: ASK_WEEK_RULE };
+    const override = ZONE_TEAM_OVERRIDE[area];
+    return {
+      ...base,
+      region: area,
+      teams: [...override ?? TEAMS_BY_REGION[area]],
+      handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join("/")} (junta com o serviço da Marinha Grande)` : ""}`,
+      askWeek: true,
+      askWeekRule: ASK_WEEK_RULE
+    };
   }
   const algarveBotDay = area === "Algarve" && req.ownerTime !== true && (req.date === void 0 ? ALGARVE_BOT_DAYS.some((d) => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
   if (algarveBotDay && req.date === void 0) {

@@ -94,7 +94,15 @@ export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
  */
 export const RUG_PICKUP_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { Porto: ['Porto 3'] };
 /** `waterproofing`: false, true (some tier) or 'premium' (a Premium item). `rugPickup`: the job has a rug pickup. */
+/**
+ * A zone whose jobs go to another team for now (owner, 13 Nov 2026: "o proximo serviço perto da marinha
+ * grande/leiria coimbra marca para lisboa 1, tenho um serviço na marinha grande q fui obrigado a reagendar").
+ * Lisboa 1 goes up for the rescheduled Marinha Grande job, so the next job of the Coimbra zone rides along.
+ * Remove the entry when the owner says the zone goes back to its own team.
+ */
+export const ZONE_TEAM_OVERRIDE: Partial<Record<TeamZone, readonly string[]>> = { Coimbra: ['Lisboa 1'] };
 export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] => {
+  if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone]!;
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : undefined;
   const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
     .filter(t => !pickupTeams || pickupTeams.includes(t))
@@ -803,7 +811,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
   if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
-    return { ...base, region: area, teams: [...TEAMS_BY_REGION[area]], handToOwner: `${area}: o dono confirma o dia no calendário`, askWeek: true, askWeekRule: ASK_WEEK_RULE };
+    const override = ZONE_TEAM_OVERRIDE[area];
+    return { ...base, region: area, teams: [...(override ?? TEAMS_BY_REGION[area])],
+      handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join('/')} (junta com o serviço da Marinha Grande)` : ''}`,
+      askWeek: true, askWeekRule: ASK_WEEK_RULE };
   }
   // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
   // offers no hours there; it books only a time he gave.
