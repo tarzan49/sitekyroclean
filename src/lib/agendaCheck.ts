@@ -9,7 +9,7 @@
 // mensagem ao dono. Como o resto da `bot-api`, não devolve nomes, telefones
 // nem moradas: só horas, equipas, o serviço e o que falta.
 import {
-  DAY_END_HOUR, WORK_FROM_HOUR, NO_RUG_PICKUP_ZONES, RUG_PICKUP_TEAMS, TEAMS_BY_REGION, STAGGER_TEAMS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
+  DAY_END_HOUR, WORK_FROM_HOUR, NO_RUG_PICKUP_ZONES, RUG_PICKUP_TEAMS, TEAMS_BY_REGION, STAGGER_TEAMS, SAME_HOUR_TEAMS, SAME_HOUR_JOBS, CLEANING_GAP_MIN, eventWaterproofingOnly, TEAM_CAPACITY, TEAM_TRAVEL_MARGIN_MIN, TEAM_WEEKDAY_HOURS, TRAVEL_MARGIN_MIN,
   WATERPROOFING_TEAMS, teamWorks, dayLabel, eventRegion, eventTeam, hourLabel, lisbon, type AvailabilityEvent, type TeamZone,
 } from './botAvailability';
 
@@ -124,6 +124,13 @@ export function agendaCheck(events: AvailabilityEvent[], date: string, now: Date
   const byTeam = new Map<string, Timed[]>();
   for (const t of services) if (t.team) byTeam.set(t.team, [...(byTeam.get(t.team) ?? []), t]);
   for (const [team, list] of byTeam) {
+    if (SAME_HOUR_TEAMS.has(team)) {
+      // Owner, 13 Nov 2026: Lisboa 1 takes two jobs at once (one per person), never three.
+      for (const t of list) {
+        if (list.filter(o => o !== t && o.from < t.to && o.to > t.from).length >= SAME_HOUR_JOBS) add(t, `${team} tem mais de ${SAME_HOUR_JOBS} serviços à mesma hora`);
+      }
+      continue;
+    }
     if (STAGGER_TEAMS.has(team)) {
       // Owner, 27 Oct 2026: two cleanings 1h30 apart; waterproofing only can share the hour.
       const cleanings = list.filter(t => !eventWaterproofingOnly(t.summary));

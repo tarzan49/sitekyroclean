@@ -2580,6 +2580,10 @@ var SOLO_DAYS = [
   { team: "Lisboa 1", date: "2026-11-02" }
 ];
 var staggers = (team, from) => STAGGER_TEAMS.has(team) && !SOLO_DAYS.some((d) => d.team === team && d.date === lisbon(from).date);
+var SAME_HOUR_TEAMS = /* @__PURE__ */ new Set(["Lisboa 1"]);
+var SAME_HOUR_JOBS = 2;
+var sameHour = (team, from) => SAME_HOUR_TEAMS.has(team) && staggers(team, from);
+var ownOverlaps = (busy, team, from, to) => busy.filter((b) => b.team === team && b.from < to && b.to > from).length;
 var staggerClash = (b, from, cleaning) => cleaning && b.cleaning && Math.abs(b.from - from) < CLEANING_GAP_MIN * 6e4;
 var eventWaterproofingOnly = (summary) => /impermeabiliz/.test(summary) && !/limpeza|lavagem|higieniz|anti-?acaros|desbacter/.test(summary);
 var TEAM_CAPACITY = {};
@@ -2863,14 +2867,14 @@ function slotState(busy, teams, region, from, to, cleaning = true, place = null)
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
   const overlapsFor = (t) => (b) => b.from < to + pairMarginMs(t, b, place) && b.to > from - pairMarginMs(t, b, place);
-  const spare = (t) => staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
+  const spare = (t) => sameHour(t, from) ? Math.max(0, SAME_HOUR_JOBS - ownOverlaps(busy, t, from, to)) : staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
   const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
   const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
-  const unassigned = busy.filter((b) => !b.team && b.region === region && (staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
+  const unassigned = busy.filter((b) => !b.team && b.region === region && (teams.every((t) => sameHour(t, from)) ? b.from < to && b.to > from : staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
-  const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && Math.abs(b.from - from) < 60 * 6e4);
+  const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && Math.abs(b.from - from) < 60 * 6e4 && !(b.team && sameHour(b.team, from) && teamsFree.includes(b.team)));
   return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
 function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
@@ -2879,6 +2883,7 @@ function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
   if (!teamWorks(team, from, to)) return true;
   if (weekdayFull(busyIntervals(events).filter((b) => !(b.from < to && b.to > from)), team, from)) return true;
   if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: "" }) : null))) return true;
+  if (sameHour(team, from)) return ownOverlaps(busyIntervals(events), team, from, to) >= SAME_HOUR_JOBS;
   if (staggers(team, from)) return busyIntervals(events).some((b) => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
   return busyIntervals(events).filter((b) => b.team === team && b.from < to + margin && b.to > from - margin).length >= capacity(team);
@@ -3415,6 +3420,12 @@ function agendaCheck(events, date, now, pendingDays = 7) {
   const byTeam = /* @__PURE__ */ new Map();
   for (const t of services) if (t.team) byTeam.set(t.team, [...byTeam.get(t.team) ?? [], t]);
   for (const [team, list2] of byTeam) {
+    if (SAME_HOUR_TEAMS.has(team)) {
+      for (const t of list2) {
+        if (list2.filter((o) => o !== t && o.from < t.to && o.to > t.from).length >= SAME_HOUR_JOBS) add(t, `${team} tem mais de ${SAME_HOUR_JOBS} serviços à mesma hora`);
+      }
+      continue;
+    }
     if (STAGGER_TEAMS.has(team)) {
       const cleanings = list2.filter((t) => !eventWaterproofingOnly(t.summary));
       for (let i = 1; i < cleanings.length; i++) {

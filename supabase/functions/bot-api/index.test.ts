@@ -392,9 +392,9 @@ Deno.test("hold writes one pre-booking per conversation, returns only times, and
   assertEquals(script.calls[1].eventId, "ev1");
   assertEquals(rows.size, 1);
 
-  // Oeiras: only Lisboa 1, and two cleanings 1h30 apart (owner, 27 Oct): a second client fits at 17h30, a third does not.
-  assertEquals(JSON.parse(await (await holdCall(hold("b", "17h30"), store, script.write)).text()).hold.ok, true);
-  const third = JSON.parse(await (await holdCall(hold("c", "17h30"), store, script.write)).text()).hold;
+  // Oeiras: only Lisboa 1, two people, two jobs at the same hour (owner, 13 Nov 2026): a second client fits at 16h, a third does not.
+  assertEquals(JSON.parse(await (await holdCall(hold("b", "16h"), store, script.write)).text()).hold.ok, true);
+  const third = JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold;
   assertEquals(third.ok, false);
   assertEquals(third.taken, true);
   assertEquals(script.calls.length, 3);

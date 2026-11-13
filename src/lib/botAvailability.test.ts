@@ -129,7 +129,8 @@ describe('botAvailability', () => {
     ];
     const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, events, NOW));
     expect(r.requested).toMatchObject({ time: '10h', free: false });
-    expect(r.free[0].times[0]).toBe('12h');
+    // 9h ends as Ana starts: the second person of Lisboa 1 (owner, 13 Nov 2026).
+    expect(r.free[0].times[0]).toBe('9h');
   });
 
   it("the owner's own appointments and other regions do not busy the team", () => {
@@ -156,10 +157,11 @@ describe('botAvailability', () => {
 
   it('answers whether the exact time a client asks for is free', () => {
     const events = [ev('2026-10-12', '15:00', '16:00', 'Serviço retificação - Rua Z, 2770-010 Paço de Arcos', 'Equipa: Lisboa 1')];
-    expect(ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW)).requested?.free).toBe(false);
-    // Waterproofing only can share the hour of a cleaning.
+    // Lisboa 1 takes a second job at that hour (owner, 13 Nov 2026), a third no.
+    expect(ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW)).requested?.free).toBe(true);
+    expect(ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, [...events, events[0]], NOW)).requested?.free).toBe(false);
     const r = ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h', items: [{ kind: 'sofa', qty: 1, treatment: 'premium' }] }, events, NOW));
-    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1'], sameTime: true, start: at('2026-10-12', '15:00'), end: expect.any(String) });
+    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1'], sameTime: false, start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
   it('hands the date to the owner where there is no team or it is "sob consulta"', () => {
@@ -197,9 +199,13 @@ describe('botAvailability', () => {
 describe('two-person teams and the team the bot books on', () => {
   const porto1 = (from: string, to: string, who: string) => ev('2026-10-08', from, to, `Serviço 60€ (119€) Sofá - ${who} - Porto`, 'Equipa: Porto 1');
 
-  it('Lisboa 1: a cleaning at 10h leaves 11h30 as the next cleaning; Braga stays one job at a time (owner, 27 Oct 2026)', () => {
+  it('Lisboa 1: two jobs at the same hour, never three; Braga stays one job at a time (owner, 13 Nov 2026)', () => {
     const lx = (who: string, summary = 'Sofá') => ev('2026-10-08', '10:00', '12:00', `Serviço 60€ (119€) ${summary} - ${who} - Lisboa`, 'Equipa: Lisboa 1');
-    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana')], NOW)).requested?.free).toBe(false);
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana')], NOW)).requested).toMatchObject({ free: true, teamsFree: ['Lisboa 1'], sameTime: false });
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana'), lx('Eva')], NOW)).requested?.free).toBe(false);
+    // Joana 10h30 (Rio de Mouro) + Mariana 11h (Lisboa), cleaning and Premium waterproofing: Lisboa 1, not "A confirmar".
+    const joana = ev('2026-10-08', '10:30', '12:30', 'Serviço 80€ (159€) Limpeza de sofá - Joana - Rua das Oliveiras, 2635-543 Rio de Mouro', 'Equipa: Lisboa 1');
+    expect(chooseTeam([joana], 'Lisboa', at('2026-10-08', '11:00'), at('2026-10-08', '13:00'), 'premium')).toBe('Lisboa 1');
     expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '11h30' }, [lx('Ana')], NOW)).requested).toMatchObject({ free: true, teamsFree: ['Lisboa 1'] });
     expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, [lx('Ana', 'Impermeabilização Essencial sofá')], NOW)).requested?.free).toBe(true);
     const braga = [ev('2026-10-08', '10:00', '12:00', 'Serviço 45€ (89€) Sofá - Braga', 'Equipa: Braga')];
