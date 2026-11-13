@@ -29,7 +29,12 @@ const ALL_TEAMS = "Todas as equipas";
 
 export interface PastDebt { id: string; date: string; description: string; kind: "client" | "team"; value: number }
 
-function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: AccountRow[]; onChanged: () => Promise<unknown> | void; pastDebts?: PastDebt[] }) {
+export interface ClientDebt { id: string; date: string; client: string; description: string; value: number }
+
+function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], onClientPaid }: {
+  records: AccountRow[]; onChanged: () => Promise<unknown> | void; pastDebts?: PastDebt[];
+  clientDebts?: ClientDebt[]; onClientPaid?: (id: string) => void;
+}) {
   const [events, setEvents] = useState<AccountEvent[] | null>(null);
   const [adjustments, setAdjustments] = useState<AdjustmentRow[]>([]);
   const [history, setHistory] = useState<SettlementRow[]>([]);
@@ -183,6 +188,30 @@ function CrmSettlements({ records, onChanged, pastDebts = [] }: { records: Accou
   return (
     <div className="space-y-4">
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
+
+      {/* Clientes que me pagam a mim (fatura com transferência, ou combinado comigo); a equipa já está paga. */}
+      <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+        <p className="text-sm font-bold text-orange-800">
+          Dívidas para comigo de clientes (já paguei aos funcionários): {euros(Math.round(clientDebts.reduce((s, d) => s + d.value, 0) * 100) / 100)} ({clientDebts.length})
+        </p>
+        {clientDebts.length === 0 ? (
+          <p className="mt-1 text-xs text-gray-600">Nenhum cliente te deve.</p>
+        ) : (
+          <ul className="mt-2 space-y-1.5 text-xs text-gray-700">
+            {clientDebts.map(d => (
+              <li key={d.id} className="flex items-center gap-2">
+                <span className="font-mono text-navy shrink-0">{dayMonth(d.date)}</span>
+                <span className="min-w-0 flex-1 truncate"><strong className="text-navy">{d.client}</strong> · {d.description}</span>
+                <span className="shrink-0 font-semibold text-orange-700">{euros(d.value)}</span>
+                {onClientPaid && (
+                  <button onClick={() => { if (window.confirm(`${d.client} pagou-te ${euros(d.value)}?`)) onClientPaid(d.id); }}
+                    className="shrink-0 rounded-full border border-orange-300 bg-white px-2 py-0.5 font-bold text-orange-700 hover:bg-orange-100">Recebi</button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {pastDebts.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">

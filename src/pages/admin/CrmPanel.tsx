@@ -320,13 +320,20 @@ const CrmPanel = () => {
     return out;
   }, [monthRecords, today]);
 
-  /** Dívidas de meses já passados: não entram no CRM, aparecem na aba Contas. */
+  /** Clientes que me pagam a mim e ainda não pagaram, de qualquer mês (aba Contas; dono, 13/11:
+   *  "dívidas para comigo de clientes, já paguei funcionários"). */
+  const clientDebts = useMemo(() => records
+    .filter(r => debtKindOf(r, today) === "client")
+    .map(r => ({ id: r.id, date: r.request_date, client: r.client_name || r.phone || "", description: r.description, value: owedOf(r, "client", today) }))
+    .sort((a, b) => a.date.localeCompare(b.date)), [records, today]);
+
+  /** Dívidas das equipas de meses já passados: não entram no CRM, aparecem na aba Contas. */
   const pastDebts = useMemo(() => {
     const thisMonth = today.slice(0, 7);
     return records
       .filter(r => r.request_date.slice(0, 7) < thisMonth)
       .map(r => ({ r, kind: debtKindOf(r, today) }))
-      .filter((x): x is { r: ServiceRequest; kind: DebtKind } => x.kind !== null)
+      .filter((x): x is { r: ServiceRequest; kind: DebtKind } => x.kind === "team")
       .map(({ r, kind }) => ({ id: r.id, date: r.request_date, description: r.description, kind, value: owedOf(r, kind, today) }))
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [records, today]);
@@ -631,7 +638,8 @@ const CrmPanel = () => {
           closeRates={quizSummary || waContacts ? computeServiceCloseRates(monthKey(viewedMonth), quizSummary, waContacts, records) : null} />
       )}
 
-      {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} pastDebts={pastDebts} />}
+      {view === "contas" && <CrmSettlements records={records} onChanged={fetchRecords} pastDebts={pastDebts} clientDebts={clientDebts}
+        onClientPaid={id => { const r = records.find(x => x.id === id); if (r) void markClientPaid(r); }} />}
 
       {view === "iva" && <CrmVat records={records} onTogglePaid={togglePaid} onMarkClientPaid={markClientPaid} onAdvanceInvoice={advanceInvoice} onEdit={editRow} />}
 
