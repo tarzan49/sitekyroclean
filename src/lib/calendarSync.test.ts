@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CalendarEvent } from './calendarServices';
-import { CALENDAR_SOURCE, planCalendarSync, VAT_HINT, type SyncableRow } from './calendarSync';
+import { CALENDAR_SOURCE, planCalendarSync, type SyncableRow } from './calendarSync';
 
 const since = '2026-09-26T15:00:00Z';
 const now = '2026-09-28T09:00:00Z';
@@ -156,26 +156,39 @@ describe('planCalendarSync', () => {
       expect(patch).toMatchObject({ billed_value: 172.8, my_cut: 80 });
     });
 
-    it('follows a real price change in the calendar and asks to review it', () => {
+    it('follows a real price change in the calendar, without asking to review it', () => {
       const r = row('r1', { ...linked, invoiced: true, billed_value: 89, my_cut: 45 });
       const patch = plan([r], [edited({ summary: 'Serviço 60€ (119€) Limpeza de sofá - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia' })]).updates[0].patch;
       expect(patch.billed_value).toBe(119);
-      expect(patch.needs_review).toContain('Com fatura: o calendário passou a dizer 119€ e o CRM tinha 89€');
+      expect(patch.needs_review).toBeNull();
     });
 
-    it('a new service whose event talks about an invoice is left to review, never marked on its own', () => {
+    it('a new service with "IVA à parte" is marked with invoice, the total with VAT', () => {
       const insert = plan([], [event('e1', { description: 'Fatura com NIF 500000000; total 98,10€ + IVA.' })]).inserts[0];
-      expect(insert.needs_review).toBe(VAT_HINT);
-      expect('invoiced' in insert).toBe(false);
+      expect(insert).toMatchObject({ invoiced: true, vat_on_top: true, invoice_by: 'Empresa' });
+      expect(insert.needs_review).toBeNull();
     });
 
-    it('an existing row without invoice is flagged when the event starts talking about VAT', () => {
+    it('reads the total written in the event (Fanhões, 30/10)', () => {
+      const r = row('r1', { ...linked, billed_value: 189, my_cut: 95 });
+      const patch = plan([r], [edited({ summary: 'Serviço 95€ (189€) Limpeza de sofá - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia', description: 'Com fatura (NIF 234442263) acresce IVA 23%, total 232,47€.' })]).updates[0].patch;
+      expect(patch).toMatchObject({ invoiced: true, vat_on_top: true, billed_value: 232.47, my_cut: 95, needs_review: null });
+    });
+
+    it('keeps the title when it is already the total with VAT (Diogo, 30/10)', () => {
+      const r = row('r1', { ...linked, billed_value: 195.57, my_cut: 80 });
+      const patch = plan([r], [edited({ summary: 'Serviço 80€ (195,57€) Impermeabilização - 912 345 678 - Ana - Rua das Flores 1, 4400-100 Vila Nova de Gaia', description: 'COM FATURA, IVA À PARTE\nO cliente paga 195,57€ = 159€ do serviço + 36,57€ de IVA (23%).' })]).updates[0].patch;
+      expect(patch).toMatchObject({ invoiced: true, vat_on_top: true, billed_value: 195.57 });
+    });
+
+    it('"IVA incluído" keeps the title value; "sem fatura" is not an invoice', () => {
       const r = row('r1', { ...linked, billed_value: 148, my_cut: 74 });
-      const patch = plan([r], [edited({ description: 'Nota: Valor de 148€ sem IVA. Com fatura fica em 182,04€.' })]).updates[0].patch;
-      expect(patch.needs_review).toBe(VAT_HINT);
-      // Palavras que só contêm as letras (positiva, motivo) não contam.
+      const inc = plan([r], [edited({ description: 'Com fatura, IVA incluído.' })]).updates[0].patch;
+      expect(inc).toMatchObject({ invoiced: true, vat_on_top: false });
+      const none = plan([r], [edited({ description: 'Sem fatura.' })]).updates[0].patch;
+      expect('invoiced' in none).toBe(false);
       const quiet = plan([r], [edited({ description: 'Avaliação positiva, sem motivo de queixa.' })]).updates[0].patch;
-      expect(quiet.needs_review).toBeNull();
+      expect('invoiced' in quiet).toBe(false);
     });
 
     it('no flag when the row already has the invoice', () => {

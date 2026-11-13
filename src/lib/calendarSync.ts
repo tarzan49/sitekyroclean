@@ -30,9 +30,10 @@
 //   no CRM esse valor direitinho?"). Numa linha com fatura, o valor com IVA vive
 //   no CRM: um evento que mude depois e diga o preço antes do IVA (Regina:
 //   "(209€)" no título, 257,07€ no CRM) não o apaga. Se o preço do calendário
-//   mudar mesmo, ganha o calendário e a linha fica para rever. Numa linha sem
-//   fatura, um evento que fale em IVA, fatura ou NIF deixa a linha para rever:
-//   quem decide se é com fatura é o dono, não a sincronização.
+//   mudar mesmo, ganha o calendário (com o IVA, ver `invoiceFromEvent`). Numa
+//   linha sem fatura, um evento que fale em IVA, fatura ou NIF marca-a com
+//   fatura, pela leitura do evento (dono, 2026-10-30: "para com essa merda de
+//   para rever, ou é ou não é"). Nada fica "para rever" por causa da fatura.
 import {
   AD_SOURCES, adSourceFromTitle, isServiceEvent, knownPlacesFrom, parseServiceEvent,
   type CalendarEvent, type CrmLocality, type ParsedService,
@@ -82,9 +83,17 @@ export type CalendarInsert = ParsedService & {
   calendar_updated_at: string;
   source: string;
   paid: false;
-};
+} & Partial<InvoiceFields>;
 
-export type CalendarPatch = Partial<ParsedService> & {
+/** O que a sincronização escreve quando o evento diz que é com fatura. */
+export interface InvoiceFields {
+  invoiced: true;
+  vat_on_top: boolean;
+  invoice_by: 'Empresa';
+  billed_value: number;
+}
+
+export type CalendarPatch = Partial<ParsedService> & Partial<InvoiceFields> & {
   source?: string;
   calendar_updated_at?: string;
   calendar_missing_since?: string | null;
@@ -105,15 +114,49 @@ const BOT_BOOKED = /Marcado pelo bot/;
 
 const VAT_WORDS = /\b(iva|fatura|factura|nif|contribuinte)\b/i;
 
-/** O que fica para rever quando o evento fala em fatura e a linha não a tem. */
-export const VAT_HINT = 'O calendário fala em IVA, fatura ou NIF: confirma se é com fatura e se o valor tem o IVA';
+const NO_INVOICE = /\bsem\s+(fatura|factura)\b|n[ãa]o\s+(quer|precisa|pediu|pede)\s+(de\s+)?(fatura|factura)/i;
+const VAT_INCLUDED = /iva\s+inclu[ií]do|iva\s+incl\b/i;
+const VAT_ON_TOP = /\bà\s+parte\b|\ba\s+parte\b|\bacresce|\+\s*iva\b|\bmais\s+iva\b|\biva\s+(de\s+)?23|\+\s*23\s*%/i;
+const VAT_RATE = 1.23;
+
+const amountsIn = (text: string) =>
+  [...text.matchAll(/(\d{1,5}(?:[.,]\d{1,2})?)\s*(?:€|eur)/gi)].map(m => Number(m[1].replace(',', '.')));
+const round2 = (n: number) => Math.round(n * 100) / 100;
+const near = (a: number, b: number) => Math.abs(a - b) <= 0.05;
+
+/**
+ * A leitura da fatura num evento, decidida sem perguntar ao dono. O título traz
+ * o preço; o valor faturado do CRM é sempre o que o cliente paga, com o IVA.
+ * - "sem fatura" / "não quer fatura": não é com fatura (null).
+ * - "IVA incluído": com fatura, o valor do título já tem o IVA.
+ * - "IVA à parte", "acresce IVA", "+ IVA": o cliente paga o título + 23%, a
+ *   não ser que o texto mostre que o título já é o total (Diogo, 30/10:
+ *   "195,57€ = 159€ + 36,57€ de IVA" com 195,57€ no título).
+ * - Só "fatura" ou "NIF": se o texto tiver o total com IVA, IVA à parte; senão
+ *   fica o valor do título, IVA incluído (nunca se inventa dinheiro).
+ */
+export function invoiceFromEvent(event: CalendarEvent, titleValue: number): InvoiceFields | null {
+  const text = `${event.summary}\n${event.description ?? ''}`;
+  if (!VAT_WORDS.test(text) || NO_INVOICE.test(text)) return null;
+  const base = Number(titleValue) || 0;
+  const withVat = round2(base * VAT_RATE);
+  const amounts = amountsIn(text);
+  const totalWritten = amounts.find(a => near(a, withVat));
+  const titleIsTotal = amounts.some(a => a < base && near(round2(a * VAT_RATE), base));
+  const result = (vat_on_top: boolean, billed_value: number): InvoiceFields =>
+    ({ invoiced: true, vat_on_top, invoice_by: 'Empresa', billed_value });
+  if (VAT_INCLUDED.test(text) && !VAT_ON_TOP.test(text)) return result(false, base);
+  if (titleIsTotal) return result(true, base);
+  if (totalWritten !== undefined) return result(true, totalWritten);
+  if (VAT_ON_TOP.test(text)) return result(true, withVat);
+  return result(false, base);
+}
 
 /** O evento fala em IVA, fatura ou NIF (título ou descrição). */
 export function mentionsInvoice(event: CalendarEvent): boolean {
   return VAT_WORDS.test(`${event.summary}\n${event.description ?? ''}`);
 }
 
-const joinReview = (...notes: Array<string | null | undefined>) => notes.filter(Boolean).join(' · ') || null;
 const cents = (n: unknown) => Math.round((Number(n) || 0) * 100);
 
 /** Data de fecho de um serviço que entra agora no CRM. */
@@ -159,7 +202,7 @@ export function planCalendarSync(
     if (!row) {
       plan.inserts.push({
         ...parsed,
-        needs_review: mentionsInvoice(event) ? joinReview(parsed.needs_review, VAT_HINT) : parsed.needs_review,
+        ...(invoiceFromEvent(event, parsed.billed_value) ?? {}),
         booked_at: closingDateOf(event),
         calendar_event_id: event.id,
         calendar_updated_at: event.updated,
@@ -207,9 +250,8 @@ export function planCalendarSync(
  * antes do IVA; sem fatura, um evento que fale nela fica para rever.
  */
 function invoiceChanges(row: SyncableRow, parsed: ParsedService, event: CalendarEvent): Partial<CalendarPatch> {
-  if (!row.invoiced) {
-    return mentionsInvoice(event) ? { needs_review: joinReview(parsed.needs_review, VAT_HINT) } : {};
-  }
+  const invoice = invoiceFromEvent(event, parsed.billed_value);
+  if (!row.invoiced) return invoice ?? {};
   if (row.billed_value === undefined || row.billed_value === null) return {};
   const crm = cents(row.billed_value);
   const calendar = cents(parsed.billed_value);
@@ -218,8 +260,8 @@ function invoiceChanges(row: SyncableRow, parsed: ParsedService, event: Calendar
   if (Math.abs(calendar - (crm - cents(serviceVatOf(row)))) <= 2) {
     return { billed_value: Number(row.billed_value), my_cut: Number(row.my_cut) || 0 };
   }
-  const euros = (c: number) => `${(c / 100).toFixed(2).replace('.', ',').replace(/,00$/, '')}€`;
-  return { needs_review: joinReview(parsed.needs_review, `Com fatura: o calendário passou a dizer ${euros(calendar)} e o CRM tinha ${euros(crm)}. Confirma o valor com IVA`) };
+  // O preço mudou mesmo: ganha o calendário, com o IVA se o evento o diz à parte.
+  return invoice ? { billed_value: invoice.billed_value } : {};
 }
 
 /**

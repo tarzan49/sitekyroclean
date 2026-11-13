@@ -345,12 +345,11 @@ function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { par
     [municipalityPlaces, false],
     [parishPlaces, true],
   ];
-  let guessedFromParish = false;
-  search: for (const [list, isParish] of tiers) {
+  search: for (const [list] of tiers) {
     for (const text of [addressText, head, fullText]) {
       const place = findPlace(text, list);
       if (!place) continue;
-      if (!locality) { locality = place.locality; guessedFromParish = isParish; }
+      if (!locality) locality = place.locality;
       city ??= place.name;
       break search;
     }
@@ -368,7 +367,6 @@ function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { par
 
   const review: string[] = [];
   if (!locality) review.push('Região por identificar');
-  else if (guessedFromParish) review.push(`Região deduzida pela freguesia (${city}): confirmar`);
   if (myCut > billed) review.push('A tua parte é maior que o faturado');
 
   const streetPart = [...address, ...clean(event.location).split(/[\n,]/)]

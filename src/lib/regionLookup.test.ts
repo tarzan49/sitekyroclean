@@ -29,10 +29,10 @@ describe('regionFromHits', () => {
     expect(regionFromHits([braga])).toEqual({ locality: 'Braga', city: 'Braga', note: null });
   });
 
-  it('takes the first answer and asks for confirmation when they disagree', () => {
+  it('takes the first answer when they disagree, without asking', () => {
     const found = regionFromHits([porto, famalicao, porto]);
     expect(found).toMatchObject({ locality: 'Porto', city: 'Porto' });
-    expect(found?.note).toContain('também existe em Braga');
+    expect(found?.note).toBeNull();
   });
 
   it('decides nothing without an answer', () => {
@@ -67,8 +67,7 @@ describe('resolveMissingRegions', () => {
     expect(await resolveMissingRegions([], plan, [event('e1', noAddress)], { search: map, pauseMs: 0 })).toBe(1);
     expect(map.calls).toEqual(['Rua D. João IV 376']);
     expect(plan.inserts[0]).toMatchObject({ locality: 'Porto', city: 'Porto' });
-    expect(plan.inserts[0].needs_review).toContain('confirmar');
-    expect(plan.inserts[0].needs_review).not.toContain('Região por identificar');
+    expect(plan.inserts[0].needs_review ?? '').not.toContain('Região por identificar');
   });
 
   it('prefers the phone of a previous client and does not ask the map', async () => {

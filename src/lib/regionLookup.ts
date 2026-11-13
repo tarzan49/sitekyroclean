@@ -49,11 +49,8 @@ export function regionFromHits(hits: MapHit[]): Found | null {
   });
   if (!found.length) return null;
   const [first] = found;
-  const others = [...new Set(found.map(f => f.locality))].filter(l => l !== first.locality);
-  const note = others.length
-    ? `Morada encontrada no mapa em ${first.city ?? first.locality} (${first.locality}), mas também existe em ${others.join(', ')}: confirmar`
-    : null;
-  return { locality: first.locality, city: first.city, note };
+  // A primeira resposta decide, sem pedir confirmação (dono, 2026-10-30).
+  return { locality: first.locality, city: first.city, note: null };
 }
 
 const digits = (phone: string | null) => (phone ?? '').replace(/\D/g, '').slice(-9);
