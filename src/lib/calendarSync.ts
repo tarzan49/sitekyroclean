@@ -114,7 +114,7 @@ const BOT_BOOKED = /Marcado pelo bot/;
 
 const VAT_WORDS = /\b(iva|fatura|factura|nif|contribuinte)\b/i;
 
-const NO_INVOICE = /\bsem\s+(fatura|factura)\b|n[ãa]o\s+(quer|precisa|pediu|pede)\s+(de\s+)?(fatura|factura)/i;
+const NO_INVOICE = /\bsem\s+(fatura|factura|iva)\b|n[ãa]o\s+(quer|precisa|pediu|pede)\s+(de\s+)?(fatura|factura)/i;
 const VAT_INCLUDED = /iva\s+inclu[ií]do|iva\s+incl\b/i;
 const VAT_ON_TOP = /\bà\s+parte\b|\ba\s+parte\b|\bacresce|\+\s*iva\b|\bmais\s+iva\b|\biva\s+(de\s+)?23|\+\s*23\s*%/i;
 const VAT_RATE = 1.23;

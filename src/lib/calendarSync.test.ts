@@ -187,6 +187,9 @@ describe('planCalendarSync', () => {
       expect(inc).toMatchObject({ invoiced: true, vat_on_top: false });
       const none = plan([r], [edited({ description: 'Sem fatura.' })]).updates[0].patch;
       expect('invoiced' in none).toBe(false);
+      // Luciana, 13 Nov: "Valor final 189€, sem IVA" não é com fatura.
+      const noVat = plan([r], [edited({ description: 'Valor final 189€, sem IVA.' })]).updates[0].patch;
+      expect('invoiced' in noVat).toBe(false);
       const quiet = plan([r], [edited({ description: 'Avaliação positiva, sem motivo de queixa.' })]).updates[0].patch;
       expect('invoiced' in quiet).toBe(false);
     });
