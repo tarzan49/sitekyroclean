@@ -26,6 +26,8 @@ interface SettlementRow {
 type AdjustmentRow = AccountAdjustment & { id: string };
 
 const ALL_TEAMS = "Todas as equipas";
+// Separador ao lado das equipas: clientes que me pagam a mim e ainda não pagaram (dono, 13/11).
+const CLIENTS = "Clientes";
 
 export interface PastDebt { id: string; date: string; description: string; kind: "client" | "team"; value: number }
 
@@ -99,7 +101,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
   }, [settlement, teamTotals, team]);
 
   const week = useMemo(
-    () => !events || !team ? []
+    () => !events || !team || team === CLIENTS ? []
       : team === ALL_TEAMS
         ? SETTLEMENT_TEAMS.flatMap(t => teamWeek(records, events, t, weekStart, today).map(w => ({ ...w, label: `${w.label} · ${t}` })))
             .sort((a, b) => a.date.localeCompare(b.date))
@@ -110,9 +112,11 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
   if (!settlement || !team) return <p className="text-center py-10 text-sm text-gray-400">{error ?? "A carregar as contas..."}</p>;
 
   const isAll = team === ALL_TEAMS;
+  const isClients = team === CLIENTS;
+  const clientsOwed = Math.round(clientDebts.reduce((s, d) => s + d.value, 0) * 100) / 100;
   const allAccounts = settlement.groups.flatMap(g => g.teams);
-  const account = isAll ? null : allAccounts.find(t => t.team === team) ?? null;
-  const group = isAll ? null : settlement.groups.find(g => g.id === groupOfTeam(team).id)!;
+  const account = isAll || isClients ? null : allAccounts.find(t => t.team === team) ?? null;
+  const group = isAll || isClients ? null : settlement.groups.find(g => g.id === groupOfTeam(team).id)!;
   const owedNow = isAll ? allAccounts.reduce((s, t) => s + t.total, 0) : account?.total ?? 0;
   const weekEnd = addDays(weekStart, 6);
   const sel = isAll ? allAccounts : account ? [account] : [];
@@ -189,30 +193,6 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
     <div className="space-y-4">
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
 
-      {/* Clientes que me pagam a mim (fatura com transferência, ou combinado comigo); a equipa já está paga. */}
-      <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-        <p className="text-sm font-bold text-orange-800">
-          Dívidas para comigo de clientes (já paguei aos funcionários): {euros(Math.round(clientDebts.reduce((s, d) => s + d.value, 0) * 100) / 100)} ({clientDebts.length})
-        </p>
-        {clientDebts.length === 0 ? (
-          <p className="mt-1 text-xs text-gray-600">Nenhum cliente te deve.</p>
-        ) : (
-          <ul className="mt-2 space-y-1.5 text-xs text-gray-700">
-            {clientDebts.map(d => (
-              <li key={d.id} className="flex items-center gap-2">
-                <span className="font-mono text-navy shrink-0">{dayMonth(d.date)}</span>
-                <span className="min-w-0 flex-1 truncate"><strong className="text-navy">{d.client}</strong> · {d.description}</span>
-                <span className="shrink-0 font-semibold text-orange-700">{euros(d.value)}</span>
-                {onClientPaid && (
-                  <button onClick={() => { if (window.confirm(`${d.client} pagou-te ${euros(d.value)}?`)) onClientPaid(d.id); }}
-                    className="shrink-0 rounded-full border border-orange-300 bg-white px-2 py-0.5 font-bold text-orange-700 hover:bg-orange-100">Recebi</button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
       {pastDebts.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-sm font-bold text-red-700">
@@ -253,8 +233,38 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
             </button>
           );
         })}
+        <button onClick={() => setTeam(CLIENTS)}
+          className={`shrink-0 rounded-xl border px-3.5 py-2 text-left transition ${isClients ? "bg-navy border-navy text-white" : "bg-white border-gray-200 text-navy hover:border-navy/40"}`}>
+          <span className="block text-xs font-semibold">{CLIENTS}</span>
+          <span className={`block text-sm font-bold ${clientsOwed > 0 ? (isClients ? "text-[#D4AF37]" : "text-red-600") : (isClients ? "text-white/60" : "text-gray-400")}`}>
+            {clientsOwed > 0 ? euros(clientsOwed) : "Em dia"}
+          </span>
+        </button>
       </div>
 
+      {isClients ? (
+        <div className="bg-navy text-white rounded-2xl p-5">
+          <p className="text-xs uppercase tracking-wide text-white/60">Clientes devem-te (já pagaste aos funcionários)</p>
+          <p className="text-4xl font-bold mt-1">{euros(clientsOwed)}</p>
+          {clientDebts.length === 0
+            ? <p className="mt-3 text-sm text-white/70">Nenhum cliente te deve.</p>
+            : (
+              <ul className="mt-3 border-t border-white/10 pt-3 space-y-2 text-sm">
+                {clientDebts.map(d => (
+                  <li key={d.id} className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-white/60 shrink-0">{dayMonth(d.date)}</span>
+                    <span className="min-w-0 flex-1"><strong>{d.client}</strong> <span className="text-white/60">· {d.description}</span></span>
+                    <span className="shrink-0 font-bold text-[#D4AF37]">{euros(d.value)}</span>
+                    {onClientPaid && (
+                      <button onClick={() => { if (window.confirm(`${d.client} pagou-te ${euros(d.value)}?`)) onClientPaid(d.id); }}
+                        className="shrink-0 rounded-lg border border-white/20 px-2.5 py-1 text-xs font-bold hover:bg-white/10">Recebi</button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+        </div>
+      ) : (<>
       {/* O que a equipa deve */}
       <div className="bg-navy text-white rounded-2xl p-5">
         <p className="text-xs uppercase tracking-wide text-white/60">{isAll ? "As equipas devem-te" : `${team} deve-te`}</p>
@@ -397,6 +407,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
             </div>
           ))}
       </div>
+      </>)}
     </div>
   );
 }
