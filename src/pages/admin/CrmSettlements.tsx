@@ -217,7 +217,7 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
           className={`shrink-0 rounded-xl border px-3.5 py-2 text-left transition ${isAll ? "bg-navy border-navy text-white" : "bg-white border-gray-200 text-navy hover:border-navy/40"}`}>
           <span className="block text-xs font-semibold">{ALL_TEAMS}</span>
           <span className={`block text-sm font-bold ${isAll ? "text-[#D4AF37]" : "text-red-600"}`}>
-            {euros([...teamTotals.values()].reduce((s, v) => s + v, 0))}
+            {euros(Math.round(([...teamTotals.values()].reduce((s, v) => s + v, 0) + clientsOwed) * 100) / 100)}
           </span>
         </button>
         {SETTLEMENT_TEAMS.map(t => {
@@ -267,9 +267,11 @@ function CrmSettlements({ records, onChanged, pastDebts = [], clientDebts = [], 
       ) : (<>
       {/* O que a equipa deve */}
       <div className="bg-navy text-white rounded-2xl p-5">
-        <p className="text-xs uppercase tracking-wide text-white/60">{isAll ? "As equipas devem-te" : `${team} deve-te`}</p>
-        <p className="text-4xl font-bold mt-1">{euros(owedNow)}</p>
+        <p className="text-xs uppercase tracking-wide text-white/60">{isAll ? "Devem-te no total (equipas e clientes)" : `${team} deve-te`}</p>
+        <p className="text-4xl font-bold mt-1">{euros(isAll ? Math.round((owedNow + clientsOwed) * 100) / 100 : owedNow)}</p>
         <div className="mt-3 space-y-1 text-xs text-white/80 border-t border-white/10 pt-3">
+          {isAll && <p className="flex justify-between text-sm font-semibold text-white"><span>Equipas</span><span>{euros(owedNow)}</span></p>}
+          {isAll && <p className="flex justify-between text-sm font-semibold text-white"><span>Clientes que te pagam a ti ({clientDebts.length}, já pagaste aos funcionários)</span><span>{euros(clientsOwed)}</span></p>}
           <p className="flex justify-between"><span>Serviços até hoje por pagar</span><span>{euros(sel.reduce((s, t) => s + t.todayTotal, 0))} + {euros(sel.reduce((s, t) => s + t.beforeTotal, 0))}</span></p>
           {adjSum > 0 && <p className="flex justify-between"><span>Acertos e dívidas combinadas</span><span>+{euros(adjSum)}</span></p>}
           {oweSum > 0 && <p className="flex justify-between"><span>Pagos a ti (parte da equipa)</span><span>−{euros(oweSum)}</span></p>}
