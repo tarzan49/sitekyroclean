@@ -778,3 +778,7 @@ A Dany (Porto, tapete 1,80 x 2,00, 69€ com recolha e entrega) teve a recolha �
 
 ### Sofá de 6 ou 7 lugares julgado pela fotografia (dono, 9 Nov 2026)
 Helena (Terrugem): modular 3+3 com peça ao centro saiu a 119€ + 10€ de deslocação (129€) e o bot perguntou "se quiser, dizemos-lhe o valor" da impermeabilização; ela marcou e o upsell perdeu-se. Dono: "no mínimo este sofá eram 149", "um sofá de 6 lugares tem que ser entre 129 e 149, tens que saber perceber". Motor (`src/lib/botQuote.ts` `SEAT6_LOOK_PRICES`, `src/lib/customPack.ts` `SEAT6_WATERPROOFING_EXTRA`): `seats` 6 ou 7 + `look` compacto 129€ / medio 139€ / grande 149€ (deslocação à parte, a isenção aplica-se), impermeabilização +170€ Premium / +110€ Essencial (os valores que o dono aprovou para a Helena); 8+ lugares sob orçamento. O bot dá sempre o número do extra quando há preço (kyro-bot f376157, contrato 12b e 13).
+
+### Confirmação com o valor final (dono, 13 Nov 2026)
+
+Tânia (sofá 3 lugares + colchão, Massamá): a reserva e a confirmação diziam "com os valores que já lhe enviámos" sem o número. O dono: "na msg de confirmação convém sempre dares o valor final à pessoa". O modelo S61 já tinha "Total: [total]€"; passou a haver guarda no kyro-bot (`confirmedTotalIssues` em `src/bot/agent.ts`): reserva/confirmação com hora e sem euros, ou a remeter para "os valores que já lhe enviámos", volta a ser escrita.
