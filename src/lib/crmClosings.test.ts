@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, closingRows, closingsOnDay, lisbonDay, monthBounds, serviceTotal, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
+import { addDays, closingRows, closingsOnDay, lisbonDay, monthBounds, serviceTotal, servicesDoneOnDay, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
 
 describe('calendar helpers', () => {
   it('counts the day in Lisbon, not in UTC or Copenhagen', () => {
@@ -79,6 +79,19 @@ describe('free revisits', () => {
     ];
     expect(summarizeClosings(rows, '2026-10-13', '2026-10-13')).toMatchObject({ count: 2, billed: 159 });
     expect(closingsOnDay(rows, '2026-10-13')).toHaveLength(2);
+  });
+});
+
+describe('servicesDoneOnDay', () => {
+  it('conta pelo dia do serviço, não pelo dia em que foi marcado, e deixa de fora as revisitas a 0€', () => {
+    const rows = [
+      { booked_at: '2026-10-06T23:11:34Z', request_date: '2026-11-13', billed_value: 149, my_cut: 75 },
+      { booked_at: '2026-11-13T11:16:37Z', request_date: '2026-11-13', billed_value: 268, my_cut: 134 },
+      { booked_at: '2026-11-13T12:03:19Z', request_date: '2026-11-16', billed_value: 159, my_cut: 80 },
+      { booked_at: '2026-11-12T10:00:00Z', request_date: '2026-11-13', billed_value: 0, my_cut: 0 },
+    ];
+    expect(servicesDoneOnDay(rows, '2026-11-13').map(r => r.billed_value)).toEqual([149, 268]);
+    expect(closingsOnDay(rows, '2026-11-13').map(r => r.billed_value)).toEqual([268, 159]);
   });
 });
 

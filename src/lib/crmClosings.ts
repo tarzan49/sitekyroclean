@@ -159,6 +159,16 @@ export function closingsOnDay<T extends ClosingRow>(rows: T[], day: string): T[]
     .sort((a, b) => a.booked_at!.localeCompare(b.booked_at!));
 }
 
+/**
+ * Os serviços feitos num dia: pelo dia do serviço (`request_date`), não pelo dia em que
+ * foram marcados (dono, 13 Nov: "hoje foram só estes serviços?" ao ver os fechos do dia).
+ */
+export function servicesDoneOnDay<T extends ClosingRow>(rows: T[], day: string): T[] {
+  return rows
+    .filter(r => countsAsClosing(r) && r.request_date?.slice(0, 10) === day)
+    .sort((a, b) => (a.booked_at ?? '').localeCompare(b.booked_at ?? ''));
+}
+
 export interface ServiceExtra { id: string; calendar_event_id: string; added_at: string; value: number | string; my_cut: number | string; description?: string | null }
 
 /**

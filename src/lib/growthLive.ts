@@ -23,6 +23,8 @@ export const SERVER_CONVERSATIONS_FROM = '2026-09-14';
 export interface ServerConversation { first_at: string; started_by_us: boolean; origin?: string | null; updated_at?: string | null }
 export interface LiveClosing extends ClosingInput {
   id?: string;
+  /** Dia do serviço (AAAA-MM-DD), para os serviços feitos em cada dia. */
+  request_date?: string | null;
   description?: string | null;
   city?: string | null;
   locality?: string | null;

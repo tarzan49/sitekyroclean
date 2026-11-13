@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { CalendarDays } from "lucide-react";
-import { addDays, closingsOnDay, lisbonDay, serviceTotal, summarizeClosings, WEEKDAY_SHORT, weekdayOf } from "@/lib/crmClosings";
+import { addDays, closingsOnDay, lisbonDay, serviceTotal, servicesDoneOnDay, summarizeClosings, WEEKDAY_SHORT, weekdayOf } from "@/lib/crmClosings";
 import type { LiveClosing } from "@/lib/growthLive";
 import { dm, euro } from "./format";
 
@@ -40,6 +40,10 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
   const maxBilled = Math.max(1, ...summary.perDay.map(d => d.billed));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dayRows = open ? closingsOnDay(rows as any[], open) as unknown as LiveClosing[] : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const doneRows = open ? servicesDoneOnDay(rows as any[], open) as unknown as LiveClosing[] : [];
+  const doneBilled = doneRows.reduce((s, r) => s + serviceTotal(r), 0);
+  const doneCut = doneRows.reduce((s, r) => s + (Number(r.my_cut) || 0), 0);
   const avg = summary.billed / days;
 
   return (
@@ -123,10 +127,35 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
                 ))}
               </ul>
             )}
+            <details className="pt-2 border-t border-gray-200">
+              <summary className="flex items-baseline justify-between gap-2 flex-wrap cursor-pointer list-none">
+                <span className="text-xs font-bold text-navy">{open === today ? "Feitos hoje" : "Feitos neste dia"}</span>
+                <span className="text-xs text-gray-600 tabular-nums">{doneRows.length} {doneRows.length === 1 ? "serviço" : "serviços"} · <b className="text-navy">{euro(doneBilled)}</b> · {euro(doneCut)} para ti</span>
+              </summary>
+              {doneRows.length === 0 ? <p className="text-xs text-gray-500 mt-1.5">Nenhum serviço neste dia.</p> : (
+                <ul className="space-y-1.5 mt-1.5">
+                  {doneRows.map((r, i) => (
+                    <li key={r.id ?? i} className="flex items-start gap-3 rounded-lg bg-white px-2.5 py-1.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-navy font-medium line-clamp-1">{r.description || "Serviço"}</p>
+                        <p className="text-[11px] text-gray-500">
+                          {r.booked_at ? `Marcado a ${dm(lisbonDay(r.booked_at))}` : "Sem data de fecho"}
+                          {(r.locality || r.city) && ` · ${r.locality || r.city}`}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs font-bold text-navy tabular-nums">{euro(serviceTotal(r))}</p>
+                        <p className="text-[11px] text-gray-500 tabular-nums">{euro(Number(r.my_cut) || 0)} para ti</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
           </div>
         );
       })()}
-      <p className="text-[11px] text-gray-500">Barras = faturado em cada dia. Um fecho conta no dia em que foi marcado (não no dia do serviço); revisitas a 0€ não contam.</p>
+      <p className="text-[11px] text-gray-500">Barras = faturado em cada dia. Um fecho conta no dia em que foi marcado; "Feitos" são os serviços agendados para esse dia, marcados quando quer que seja. Revisitas a 0€ não contam.</p>
     </section>
   );
 }
