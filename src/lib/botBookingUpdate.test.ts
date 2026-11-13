@@ -109,7 +109,7 @@ describe('planBookingUpdate: items added after booking (Diana, 3 Nov 2026)', () 
   it('rewrites the price, the service and the items, keeping phone, name and address', () => {
     const p = planBookingUpdate(diana, '351919326650', { requote: { total: 269, what: 'Sofá 3 lugares Premium + 4 cadeiras Premium', service: 'Impermeabilização Premium de sofá 3 lugares + 4 cadeiras' } }, at);
     if (!p.ok) throw new Error(p.reason);
-    expect(p.title).toBe('Serviço 135€ (269€) Impermeabilização Premium de sofá 3 lugares + 4 cadeiras - 919326650 - Diana - Rua Henrique Barros, lote 11, 3020-266 Coimbra');
+    expect(p.title).toBe('Serviço 135€ (269€) Impermeabilização Premium (solvente) de sofá 3 lugares + 4 cadeiras - 919326650 - Diana - Rua Henrique Barros, lote 11, 3020-266 Coimbra');
     expect(p.description).toContain('Artigos: Sofá 3 lugares Premium + 4 cadeiras Premium\nTotal: 269€');
     expect(p.summary[0]).toContain('total 269€ (era 149€)');
   });

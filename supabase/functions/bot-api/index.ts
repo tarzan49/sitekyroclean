@@ -76,7 +76,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { agendaCheck, teamAccounts, botAvailability, bookedServices, eventTeam, planBookingUpdate, replacementTeam, teamBusyAt, teamTakesJob, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, teamAccounts, botAvailability, bookedServices, eventTeam, planBookingUpdate, replacementTeam, teamBusyAt, teamTakesJob, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking, tagWaterproofBase } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage, type QuotedPrice } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
@@ -497,7 +497,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       const cal = await env.calendar();
       if ("error" in cal) return createErrorResponse(cal.error, 503);
-      return createSuccessResponse({ sweep: await sweepHolds(cal.events, env.holds, env.writeCalendar, env.now?.() ?? new Date()) });
+      const at = env.now?.() ?? new Date();
+      const sweep = await sweepHolds(cal.events, env.holds, env.writeCalendar, at);
+      return createSuccessResponse({ sweep: { ...sweep, waterproofBase: await sweepWaterproofBase(cal.events, env.writeCalendar, at) } });
     }
     case "hold":
     case "release":
@@ -803,6 +805,27 @@ export async function sweepHolds(events: CalendarEvent[], holds: HoldStore, writ
   }
   if (released) calendarCache = null;
   return { released, gone };
+}
+
+/**
+ * Dono, 13 Nov 2026: todas as impermeabilizações no calendário levam "(solvente)" (Premium) ou
+ * "(à base de água)" (Essencial) ao lado, também as que ele escreve à mão. Só serviços futuros com
+ * telefone (o Apps Script só muda um evento que tenha o número do cliente).
+ */
+export async function sweepWaterproofBase(events: CalendarEvent[], write: CalendarWriter, now: Date, max = 10) {
+  let tagged = 0, failed = 0;
+  for (const e of events) {
+    if (tagged + failed >= max) break;
+    if (e.status === "CANCELLED" || !/^(A confirmar · )?Servi[çc]o\b/i.test(e.summary.trim()) || !e.start || !e.end || !(Date.parse(e.end) > now.getTime())) continue;
+    const title = tagWaterproofBase(e.summary);
+    if (title === e.summary) continue;
+    const phone = /(?:^|\D)((?:351)?[29]\d{8})(?!\d)/.exec(e.summary.replace(/(\d) (?=\d)/g, "$1"))?.[1] ?? /bot:(\d+)/.exec(e.description)?.[1] ?? "";
+    if (!phone) continue;
+    const done = await write({ action: "update", eventId: e.id, phone, title, description: "", start: e.start, end: e.end });
+    if (done.ok) tagged++; else failed++;
+  }
+  if (tagged) calendarCache = null;
+  return { tagged, failed };
 }
 
 async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {

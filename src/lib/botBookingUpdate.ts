@@ -4,6 +4,7 @@
 // into the event's new title, description and time. Pure, so the rules are tested here.
 import { lisbon, lisbonToUtc } from './botAvailability';
 import { ownerShare } from './botHold';
+import { tagWaterproofBase } from './waterproofBase';
 
 export interface BookingChanges {
   /** Both or neither: a new day and hour the client and we agreed. */
@@ -89,7 +90,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
     if (total !== was) {
       const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','));
-      const service = clean(c.requote.service) || clean(c.requote.what);
+      const service = tagWaterproofBase(clean(c.requote.service) || clean(c.requote.what));
       title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
       description = description.split('\n').map(l => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote!.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join('\n');
       // The extra counts as a closing on the day the client took it, not on the day of the booking

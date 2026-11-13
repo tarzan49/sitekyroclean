@@ -3163,6 +3163,16 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   };
 }
 
+// src/lib/waterproofBase.ts
+var TAG = { premium: "(solvente)", essencial: "(à base de água)" };
+function tagWaterproofBase(text2) {
+  if (!/imperm/i.test(text2)) return text2;
+  return text2.replace(
+    /\b(premium|essencial)\b(?!\s*\((?:solvente|à base de água|a base de agua)\))/gi,
+    (word) => `${word} ${TAG[word.toLowerCase()]}`
+  );
+}
+
 // src/lib/botHold.ts
 var MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 };
 var text = (v, max) => typeof v === "string" ? v.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim().slice(0, max) : "";
@@ -3233,7 +3243,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   if (typeof r.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return { error: "date tem de ser AAAA-MM-DD" };
   const minutes = parseTime(r.time);
   if (minutes === null) return { error: "time inválido" };
-  const service = text(r.service, 160);
+  const service = tagWaterproofBase(text(r.service, 160));
   if (!service) return { error: "service em falta" };
   const durationRaw = Number(r.durationMin);
   const durationMin = Number.isFinite(durationRaw) && durationRaw >= 30 && durationRaw <= 480 ? Math.ceil(durationRaw / 15) * 15 : 60;
@@ -3330,7 +3340,7 @@ function planBotBooking(req, events, now, ownEventId) {
   if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");
-  const service = text(r.service, 120) || what;
+  const service = tagWaterproofBase(text(r.service, 120) || what);
   const ad = typeof r.adOrigin === "string" ? AD_MARK[r.adOrigin] ?? "" : "";
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
   const title = [`Serviço ${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(" - ");
@@ -4141,7 +4151,7 @@ function planBookingUpdate(ev, phone, c, now) {
     if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
     if (total !== was) {
       const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",");
-      const service = clean(c.requote.service) || clean(c.requote.what);
+      const service = tagWaterproofBase(clean(c.requote.service) || clean(c.requote.what));
       title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)${head[3]} ${service}` + title.slice(head[0].length);
       description = description.split("\n").map((l) => /^Artigos:/.test(l) ? `Artigos: ${clean(c.requote.what)}` : /^Total:/.test(l) ? `Total: ${fmt(total)}€` : l).join("\n");
       if (Number.isFinite(was) && total > was) {
@@ -4366,6 +4376,7 @@ export {
   resolveBotCity,
   serviceVatOf,
   slotForMedia,
+  tagWaterproofBase,
   teamAccounts,
   teamBusyAt,
   teamTakesJob

@@ -16,6 +16,7 @@
 import { botAvailability, chooseTeam, cityZone, hasWaterproofing, waterproofingKind, waterproofingOnly, rugPickupOwnerReason, RUG_PICKUP_TEAMS, teamWorks, TEAMS_BY_REGION, WATERPROOFING_TEAMS, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 import { CLOSE_NOW_DAYS } from './botCloseNow';
+import { tagWaterproofBase } from './waterproofBase';
 
 const MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 } as const;
 
@@ -159,7 +160,7 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return { error: 'date tem de ser AAAA-MM-DD' };
   const minutes = parseTime(r.time);
   if (minutes === null) return { error: 'time inválido' };
-  const service = text(r.service, 160);
+  const service = tagWaterproofBase(text(r.service, 160));
   if (!service) return { error: 'service em falta' };
   const durationRaw = Number(r.durationMin);
   const durationMin = Number.isFinite(durationRaw) && durationRaw >= 30 && durationRaw <= 480 ? Math.ceil(durationRaw / 15) * 15 : 60;
@@ -310,7 +311,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map(l => l.label).join(' + ');
-  const service = text(r.service, 120) || what;
+  const service = tagWaterproofBase(text(r.service, 120) || what);
   const ad = typeof r.adOrigin === 'string' ? AD_MARK[r.adOrigin] ?? '' : '';
   // His titles carry the Portuguese number without the country code; the CRM matches the last 9 digits either way.
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
