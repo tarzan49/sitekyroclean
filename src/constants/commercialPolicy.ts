@@ -1,5 +1,6 @@
 // Regras confirmadas pelo responsável em 10/09/2026. Importável também em Node.
 import { locationPrices } from './travel';
+import { cities } from '../data/serviceCatalog';
 export const RESPONSE_PROMISE = 'Resposta em menos de 5 minutos';
 export const DRYING_PROMISE = 'Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço.';
 // Tudo seca em 2 a 5 horas (dono, 15/10/2026; até aí só os sofás, desde 06/10, e o resto em 3 a 6 horas).
@@ -35,8 +36,22 @@ export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido 
 // este é o único valor dos tapetes que o site escreve.
 /** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo ou acima do máximo). */
 export const RUG_PICKUP_FEE = 20;
-export function rugPickupFee(totalAreaM2: number): number | null {
+// Lisboa e Algarve deixam de ter recolha de tapetes: só lavagem em casa (dono, 13/11/2026:
+// "em lisboa n temos mais condicoes para recolha de tapetes portanto corta essa opcao tanto em
+// lisboa como algarve"). A zona de Braga já não tinha recolha (dono, 03/11/2026).
+export const NO_RUG_PICKUP_AREAS: ReadonlySet<string> = new Set(['lisboa', 'algarve', 'braga']);
+const foldCity = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const CITY_AREA = new Map(cities.map(c => [foldCity(c.name), c.area] as const));
+/** false quando a localidade fica numa área sem recolha de tapetes (Lisboa, Algarve); true se não se sabe. */
+export function rugPickupOffered(city: string | null | undefined): boolean {
+  if (!city) return true;
+  const area = CITY_AREA.get(foldCity(city));
+  return !area || !NO_RUG_PICKUP_AREAS.has(area);
+}
+export const NO_RUG_PICKUP_RULE = 'Em Lisboa, no Algarve e na zona de Braga não há recolha de tapetes: a lavagem é feita em casa do cliente, com o mesmo processo e o mesmo resultado. Nunca ofereças recolha nestas zonas.';
+export function rugPickupFee(totalAreaM2: number, city?: string | null): number | null {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
+  if (!rugPickupOffered(city)) return null;
   return RUG_PICKUP_FEE;
 }
 

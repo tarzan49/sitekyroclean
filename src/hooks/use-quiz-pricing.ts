@@ -88,7 +88,7 @@ export function useQuizPricing(
   // entrega (rugPickupFee) já inclui a deslocação e é o único valor conhecido.
   const isRugService = formData.service === 'carpet';
   const rugPickupCost = isRugService && formData.carpetKind !== 'alcatifa' && formData.rugPickup
-    ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
+    ? rugPickupFee(carpetTotalArea(carpetItems), formData.location) : null;
   const rugTravelOnQuote = isRugService && rugPickupCost === null;
   const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + (rugPickupCost ?? 0);

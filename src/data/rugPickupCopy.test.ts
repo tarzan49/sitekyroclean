@@ -74,6 +74,12 @@ describe('recolha dos tapetes', () => {
     expect(rugPickupFee(20)).toBeNull();
     expect(rugPickupFee(30.2)).toBeNull();
     expect(rugPickupFee(Number.NaN)).toBeNull();
+    // Lisboa e Algarve sem recolha (dono, 13/11/2026); Porto mantém.
+    expect(rugPickupFee(6, 'Lisboa')).toBeNull();
+    expect(rugPickupFee(6, 'Cascais')).toBeNull();
+    expect(rugPickupFee(6, 'Faro')).toBeNull();
+    expect(rugPickupFee(6, 'Viana do Castelo')).toBeNull();
+    expect(rugPickupFee(6, 'Porto')).toBe(20);
   });
 
   it('o texto do custo diz os mesmos valores que a função', () => {

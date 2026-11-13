@@ -4,6 +4,7 @@ import { locationPrices } from '@/components/quiz/QuizTypes';
 import { cities } from '@/data/serviceCatalog';
 import { detectServiceCity, searchServiceLocations, type LocationOption } from '@/lib/locationDetection';
 import { Button } from '@/components/ui/button';
+import { rugPickupOffered } from '@/constants/commercialPolicy';
 
 interface QuizStepLocationProps {
   location: string;
@@ -78,7 +79,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
         {!loading && <button type="button" onClick={() => { manuallyEdited.current = false; setAttempt(value => value + 1); }} className="min-h-11 text-base text-gold flex items-center gap-2"><Navigation className="w-4 h-4" />Usar a minha localização</button>}
       </div>}
 
-      {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-base text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{travelOnQuote ? 'Sob orçamento' : `${locationPrices[selected]} €`}</span></div><p className="text-sm text-white/80 mt-2">{travelOnQuote ? 'Em tapetes e alcatifas, a deslocação entra no orçamento. Com recolha, já vem incluída no valor da recolha.' : 'Este valor será somado ao serviço no total.'}</p></div>}
+      {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-base text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{travelOnQuote ? 'Sob orçamento' : `${locationPrices[selected]} €`}</span></div><p className="text-sm text-white/80 mt-2">{travelOnQuote ? (rugPickupOffered(selected) ? 'Em tapetes e alcatifas, a deslocação entra no orçamento. Com recolha, já vem incluída no valor da recolha.' : 'Em tapetes e alcatifas, a deslocação entra no orçamento.') : 'Este valor será somado ao serviço no total.'}</p></div>}
       <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold tracking-wider uppercase rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
     </div>
   );

@@ -30,7 +30,7 @@ const QuizStepConfig = (props: QuizStepConfigProps) => {
     case 'mattress':
       return <QuizStepConfigMattress formData={props.formData} updateFormData={props.updateFormData} mattressItems={props.mattressItems} setMattressItems={props.setMattressItems} />;
     case 'carpet':
-      return <QuizStepConfigCarpet carpetKind={props.formData.carpetKind} carpetItems={props.carpetItems} setCarpetItems={props.setCarpetItems} rugPickup={props.formData.rugPickup} onRugPickupChange={rugPickup => props.updateFormData({ rugPickup })} />;
+      return <QuizStepConfigCarpet carpetKind={props.formData.carpetKind} carpetItems={props.carpetItems} setCarpetItems={props.setCarpetItems} rugPickup={props.formData.rugPickup} city={props.formData.location} onRugPickupChange={rugPickup => props.updateFormData({ rugPickup })} />;
     case 'chairs':
       return <QuizStepConfigChairs formData={props.formData} updateFormData={props.updateFormData} />;
     default:

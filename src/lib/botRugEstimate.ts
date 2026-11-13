@@ -120,7 +120,7 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
   const travelFee = locationPrices[city as keyof typeof locationPrices];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2);
+  const pickupFee = rugPickupFee(areaM2, city);
   return {
     ok: true,
     areaM2,

@@ -16,7 +16,7 @@ import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee } from '../constants/travel';
 import { isBlackFriday } from '../constants/campaigns';
-import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
+import { rugPickupFee, rugPickupOffered, NO_RUG_PICKUP_RULE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
@@ -164,11 +164,11 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   };
 }
 
-function rugPickupFor(items: CustomPackItem[]) {
+function rugPickupFor(items: CustomPackItem[], city: string | null) {
   const rugs = items.filter(i => i.kind === 'rug');
   if (!rugs.length) return null;
   const areaM2 = Math.round(rugs.reduce((sum, i) => sum + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
-  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2), rule: RUG_PICKUP_FEE_RULE };
+  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2, city), rule: rugPickupOffered(city) ? RUG_PICKUP_FEE_RULE : NO_RUG_PICKUP_RULE };
 }
 
 /**
@@ -594,7 +594,7 @@ function botQuoteInner(input: unknown) {
     waterproofingTiers: tiersOut,
     quote: result.quote,
     handToOwner,
-    rugPickup: rugPickupFor(items),
+    rugPickup: rugPickupFor(items, city),
     rugEstimate: rugPrice,
     rugCombo,
     // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.

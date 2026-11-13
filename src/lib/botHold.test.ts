@@ -56,10 +56,17 @@ describe('planBotHold', () => {
   });
 
   it('keeps "sob orçamento" when the engine has no price, and the name on one line', () => {
-    const p = plan(req({ items: [{ kind: 'rug', width: 2, length: 3 }], name: 'Rui\nTeste', rugPickup: true }));
+    const p = plan(req({ city: 'Porto', items: [{ kind: 'rug', width: 2, length: 3 }], name: 'Rui\nTeste', rugPickup: true }));
     expect(p.event.title).toMatch(/– sob orçamento$/);
     expect(p.event.title).toContain('Rui Teste');
     expect(p.event.description).toContain('Recolha e entrega: 20€');
+  });
+
+  it('no rug pickup in Lisboa or the Algarve: no pickup fee in the event (owner, 13 Nov 2026)', () => {
+    for (const city of ['Lisboa', 'Cascais']) {
+      const p = plan(req({ city, items: [{ kind: 'rug', width: 2, length: 3 }], rugPickup: true }));
+      expect(p.event.description).not.toContain('Recolha e entrega');
+    }
   });
 });
 

@@ -2,24 +2,26 @@ import { useId } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
 import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetItemFromCm, carpetItemMeasure, carpetTotalArea } from '@/components/quiz/quizHelpers';
-import { RUG_PICKUP_MAX_AREA_M2, RUG_PICKUP_MIN_AREA_M2, rugPickupFee } from '@/constants/commercialPolicy';
+import { RUG_PICKUP_MAX_AREA_M2, RUG_PICKUP_MIN_AREA_M2, rugPickupFee, rugPickupOffered } from '@/constants/commercialPolicy';
 
 interface Props {
   carpetItems: CarpetItem[];
   carpetKind?: 'tapete' | 'alcatifa';
   setCarpetItems: React.Dispatch<React.SetStateAction<CarpetItem[]>>;
   rugPickup?: boolean;
+  /** Localidade escolhida no passo 0: em Lisboa e no Algarve não há recolha (dono, 13/11/2026). */
+  city?: string;
   onRugPickupChange?: (pickup: boolean) => void;
 }
 
 const formatArea = (area: number) => area.toLocaleString('pt-PT', { maximumFractionDigits: 2 });
 
-const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete', rugPickup = false, onRugPickupChange }: Props) => {
+const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete', rugPickup = false, city, onRugPickupChange }: Props) => {
   const fieldPrefix = useId();
   const totalArea = carpetTotalArea(carpetItems);
   // Recolha: só tapetes (a alcatifa está fixa ao chão), de 3 a 12 m²
   // somados (dono, 2026-10-10), com o acréscimo de rugPickupFee (dono, 2026-10-05).
-  const pickupFee = rugPickupFee(totalArea);
+  const pickupFee = rugPickupFee(totalArea, city);
   const pickupChosen = rugPickup && pickupFee !== null;
   const showPickup = carpetKind === 'tapete' && !!onRugPickupChange && totalArea > 0;
 
@@ -85,7 +87,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
       {showPickup && (
         <div className="w-full max-w-sm text-left">
           {pickupFee === null ? (
-            <p className="rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 text-sm text-white/80">{totalArea > RUG_PICKUP_MAX_AREA_M2 ? `Com mais de ${RUG_PICKUP_MAX_AREA_M2} m² no total, a lavagem é feita em sua casa.` : `Com menos de ${RUG_PICKUP_MIN_AREA_M2} m² no total, a lavagem é feita em sua casa.`}</p>
+            <p className="rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 text-sm text-white/80">{!rugPickupOffered(city) ? 'Nesta zona, a lavagem é feita em sua casa, com o mesmo processo e o mesmo resultado.' : totalArea > RUG_PICKUP_MAX_AREA_M2 ? `Com mais de ${RUG_PICKUP_MAX_AREA_M2} m² no total, a lavagem é feita em sua casa.` : `Com menos de ${RUG_PICKUP_MIN_AREA_M2} m² no total, a lavagem é feita em sua casa.`}</p>
           ) : (
             <div role="radiogroup" aria-labelledby={`${fieldPrefix}-pickup`} className="flex flex-col gap-2">
               <p id={`${fieldPrefix}-pickup`} className="text-base font-semibold text-white">Onde prefere a lavagem?</p>

@@ -260,7 +260,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     // fixo de um pedido de tapetes. Desde 2026-10-10 já não diz "com a
     // deslocação": o bot soma-a ao preço em casa, que já a inclui (dono: "sim
     // tira"). A deslocação dos tapetes e das alcatifas é sob orçamento.
-    const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
+    const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems), finalLocation) : null;
     if (pickupFee !== null) receiptLines.push({ label: 'Recolha e entrega (até 5 dias úteis)', qty: 1, unitPrice: pickupFee, total: pickupFee });
     else if (finalLocation) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: null, total: null });
   }
