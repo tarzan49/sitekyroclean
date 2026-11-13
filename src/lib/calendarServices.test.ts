@@ -117,6 +117,13 @@ describe('parseServiceEvent', () => {
     ])).toEqual([]);
   });
 
+  it('reads Madeira as its own CRM region, by postal code and by town (owner, 13 Nov)', () => {
+    const sonia = parse('Serviço 95€ (189€) Limpeza de sofá 3 lugares e 2 colchões de casal - 968041317 - Sonia - equipa Madeira 1 - Edifício Jardim dos Barreiros, Bloco A3, 4.º AE, 9000-160 Funchal');
+    expect(sonia).toMatchObject({ client_name: 'Sonia', city: 'Funchal', locality: 'Madeira', needs_review: null });
+    expect(parse('Serviço 50€ (99€) Limpeza de sofá - 912345678 - Ana - Rua do Mar 3, Machico')?.locality).toBe('Madeira');
+    expect(localityFromPostalCode('9000-160')).toBeNull(); // o motor do bot não tem equipa na Madeira
+  });
+
   it('does not read a street name as the town', () => {
     expect(parse('Serviço 40€ (80€) Limpeza sofá - Rua de Braga 12, Seixal')).toMatchObject({ locality: 'Lisboa', city: 'Seixal' });
   });

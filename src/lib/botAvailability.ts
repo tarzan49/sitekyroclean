@@ -32,7 +32,7 @@
 import { CITY_COORDS, driveMinutes } from '../constants/cityCoords';
 import { cities } from '../data/serviceCatalog';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
-import { localityFromPostalCode, type CrmLocality } from './postalRegion';
+import { localityFromPostalCode, type TeamLocality } from './postalRegion';
 import { botQuote, resolveBotCity } from './botQuote';
 
 export interface AvailabilityEvent {
@@ -45,7 +45,7 @@ export interface AvailabilityEvent {
 }
 
 /** The zones the bot books by: the CRM's four regions plus Coimbra, which the CRM counts as Porto. */
-export type TeamZone = CrmLocality | 'Coimbra';
+export type TeamZone = TeamLocality;
 export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Porto: ['Porto 1', 'Porto 2', 'Porto 3'],
   Braga: ['Braga'],

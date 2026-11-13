@@ -15,9 +15,9 @@ import { cities } from '@/data/serviceCatalog';
 import { municipiosComFreguesias } from '@/data/freguesiaSeoData';
 import { normalizeCity, TOO_COMMON_PARISH_NAMES } from '@/lib/locationDetection';
 
-import { CRM_LOCALITIES, localityFromPostalCode, type CrmLocality } from './postalRegion';
+import { CRM_LOCALITIES, crmLocalityFromPostalCode, localityFromPostalCode, type CrmLocality } from './postalRegion';
 
-export { CRM_LOCALITIES, localityFromPostalCode, type CrmLocality };
+export { CRM_LOCALITIES, crmLocalityFromPostalCode, localityFromPostalCode, type CrmLocality };
 
 export interface CalendarEvent {
   id: string;
@@ -130,6 +130,15 @@ const PLACE_ALIASES: Array<{ name: string; display?: string; locality: CrmLocali
   { name: 'Azambuja', locality: 'Lisboa' },
   { name: 'Pucariça', locality: 'Lisboa' },
   { name: 'Carvoeiro', locality: 'Algarve' },
+  // Madeira (dono, 2026-11-13): região do CRM sem equipa no motor.
+  { name: 'Funchal', locality: 'Madeira' },
+  { name: 'Câmara de Lobos', locality: 'Madeira' },
+  { name: 'Machico', locality: 'Madeira' },
+  { name: 'Caniço', locality: 'Madeira' },
+  { name: 'Ribeira Brava', locality: 'Madeira' },
+  { name: 'Ponta do Sol', locality: 'Madeira' },
+  { name: 'Porto Moniz', locality: 'Madeira' },
+  { name: 'Porto Santo', locality: 'Madeira' },
   { name: 'Montegordo', display: 'Monte Gordo', locality: 'Algarve' },
   { name: 'Pedras del Rei', display: "Pedras d'El Rei", locality: 'Algarve' },
   { name: 'Pedras del Rey', display: "Pedras d'El Rei", locality: 'Algarve' },
@@ -333,7 +342,7 @@ function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { par
   let locality: CrmLocality | null = null;
   const postal = POSTAL.exec(addressText) ?? POSTAL.exec(fullText);
   if (postal) {
-    locality = localityFromPostalCode(postal[1]);
+    locality = crmLocalityFromPostalCode(postal[1]);
     const after = tidy(fullText.slice(fullText.indexOf(postal[0]) + postal[0].length).split(/[\n,]/)[0] ?? '');
     // "2700-256 Venteira Amadora" → Amadora, como o dono escreve no CRM.
     if (after && !/\d/.test(after) && /\p{L}/u.test(after)) city = findPlace(after, municipalityPlaces)?.name ?? after;

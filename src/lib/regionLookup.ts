@@ -15,7 +15,7 @@
 // Corre no separador CRM, depois de `planCalendarSync`, que fica síncrono e
 // testável sem rede.
 import {
-  localityFromPostalCode, parseServiceEvent, placeByName, streetForMap, teamRegionOf,
+  crmLocalityFromPostalCode, parseServiceEvent, placeByName, streetForMap, teamRegionOf,
   type CalendarEvent, type CrmLocality,
 } from './calendarServices';
 import type { SyncPlan } from './calendarSync';
@@ -44,7 +44,7 @@ interface Found { locality: CrmLocality; city: string | null; note: string | nul
 export function regionFromHits(hits: MapHit[]): Found | null {
   const found = hits.flatMap(hit => {
     const byName = hit.names.map(placeByName).find(Boolean) ?? null;
-    const locality = (hit.postcode ? localityFromPostalCode(hit.postcode) : null) ?? byName?.locality;
+    const locality = (hit.postcode ? crmLocalityFromPostalCode(hit.postcode) : null) ?? byName?.locality;
     return locality ? [{ locality, city: byName?.city ?? hit.names[0] ?? null }] : [];
   });
   if (!found.length) return null;

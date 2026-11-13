@@ -6,13 +6,16 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { describe, expect, it } from 'vitest';
-import { CRM_LOCALITIES, localityFromPostalCode, parseServiceEvent, placeIndex } from '@/lib/calendarServices';
+import { localityFromPostalCode, parseServiceEvent, placeIndex } from '@/lib/calendarServices';
+import { TEAM_LOCALITIES } from '@/lib/postalRegion';
 
 const DIR = path.resolve(__dirname, '../../google-apps-script/calendario-equipas');
 
 function lugaresGs(): string {
+  // Só as regiões com equipa: a Madeira é do CRM e não tem calendário de equipa.
+  const comEquipa = (pares: Array<[string, string]>) => pares.filter(([, regiao]) => (TEAM_LOCALITIES as readonly string[]).includes(regiao));
   const { municipalities, parishes } = placeIndex();
-  const lista = (pares: Array<[string, string]>) => pares.map(p => `    ${JSON.stringify(p)},`).join('\n');
+  const lista = (pares: Array<[string, string]>) => comEquipa(pares).map(p => `    ${JSON.stringify(p)},`).join('\n');
   return [
     '// Gerado a partir de src/lib/calendarServices.ts (placeIndex): os concelhos e',
     '// freguesias que o CRM usa para saber a região de um serviço. Não se edita à',
@@ -107,7 +110,7 @@ describe('região e equipa de cada serviço', () => {
   });
 
   it('tem uma equipa para cada região do CRM', () => {
-    for (const regiao of CRM_LOCALITIES) expect(gs.equipaDaRegiao(regiao).id).toBe(regiao.toLowerCase());
+    for (const regiao of TEAM_LOCALITIES) expect(gs.equipaDaRegiao(regiao).id).toBe(regiao.toLowerCase());
     expect(gs.equipaDaRegiao(null)).toBeNull();
     expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 3080-000 Figueira da Foz' })).id).toBe('coimbra');
     // Aveiro (região Porto) e o Alentejo (região Lisboa), como no travel.ts.

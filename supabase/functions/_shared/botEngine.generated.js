@@ -2506,6 +2506,8 @@ var cities = [
 ];
 
 // src/lib/postalRegion.ts
+var TEAM_LOCALITIES = ["Porto", "Lisboa", "Algarve", "Braga", "Coimbra"];
+var CRM_LOCALITIES = [...TEAM_LOCALITIES, "Madeira"];
 function localityFromPostalCode(code) {
   const n = Number(code.slice(0, 4));
   if (!Number.isInteger(n)) return null;

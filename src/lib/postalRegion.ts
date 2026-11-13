@@ -1,8 +1,12 @@
-// As cinco regiões do CRM e a região pelo código postal. Vivem fora de
+// As regiões do CRM e a região pelo código postal. Vivem fora de
 // `calendarServices.ts` porque esse módulo carrega as freguesias todas, e o
 // pacote do bot (`botAvailability.ts`) só precisa disto.
 
-export const CRM_LOCALITIES = ['Porto', 'Lisboa', 'Algarve', 'Braga', 'Coimbra'] as const;
+/** As regiões com equipas que o motor do bot conhece. */
+export const TEAM_LOCALITIES = ['Porto', 'Lisboa', 'Algarve', 'Braga', 'Coimbra'] as const;
+export type TeamLocality = (typeof TEAM_LOCALITIES)[number];
+/** As do CRM: as das equipas e a Madeira (dono, 2026-11-13), que o bot trata à parte (`isMadeira`). */
+export const CRM_LOCALITIES = [...TEAM_LOCALITIES, 'Madeira'] as const;
 export type CrmLocality = (typeof CRM_LOCALITIES)[number];
 
 /**
@@ -13,7 +17,7 @@ export type CrmLocality = (typeof CRM_LOCALITIES)[number];
  * 4780–4799 é Santo Tirso e Trofa, do Porto. Leiria (24xx), Beira Interior
  * (6xxx) e ilhas ficam por identificar.
  */
-export function localityFromPostalCode(code: string): CrmLocality | null {
+export function localityFromPostalCode(code: string): TeamLocality | null {
   const n = Number(code.slice(0, 4));
   if (!Number.isInteger(n)) return null;
   if (n >= 2400 && n < 2500) return 'Coimbra'; // Leiria/Batalha, equipa Coimbra (dono, 2026-10-26)
@@ -24,4 +28,11 @@ export function localityFromPostalCode(code: string): CrmLocality | null {
   if ((n >= 4700 && n < 4780) || (n >= 4800 && n < 5000)) return 'Braga';
   if (n >= 3000 && n < 6000) return 'Porto';
   return null;
+}
+
+/** A região do CRM pelo código postal: a das equipas, ou a Madeira (9000–9399; 95xx–99xx são os Açores). */
+export function crmLocalityFromPostalCode(code: string): CrmLocality | null {
+  const n = Number(code.slice(0, 4));
+  if (Number.isInteger(n) && n >= 9000 && n < 9400) return 'Madeira';
+  return localityFromPostalCode(code);
 }
