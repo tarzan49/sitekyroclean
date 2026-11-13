@@ -222,6 +222,19 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
     ].filter(Boolean).join('\n\n');
     return { ok: true, team, event: { title, description, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
   }
+  // Owner, 13 Nov 2026: "PARA DE POR A CONFIRMAR A PUTA DO SERVIÇO" (4-5 cases that week: Porto waterproofing
+  // with no team the bot may use). A booking with a price is always a real "Serviço"; with no team it goes
+  // in without a team colour and he picks the team. Only a booking without a price stays "A confirmar".
+  if (total !== null) {
+    const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+    const title = [`Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(' - ');
+    const description = [
+      `Marcado pelo bot a partir da conversa do WhatsApp. Sem equipa livre para este serviço: ${pickupOwner ? `${pickupOwner}: ` : ''}escolhe a cor da equipa que o faz.`,
+      text(r.notes, 600),
+      `bot:${conversationId}`,
+    ].filter(Boolean).join('\n\n');
+    return { ok: true, event: { title, description, start: startIso, end: endIso } };
+  }
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',

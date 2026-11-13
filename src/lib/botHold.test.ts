@@ -117,12 +117,12 @@ describe('planOwnerBooking', () => {
     const q = planOwnerBooking({ ...base, confirmed: true, city: 'Oeiras', total: null }, [], NOW.getTime());
     expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · /);
   });
-  it('a rug pickup in the Braga zone stays "A confirmar" for the owner, unless the chat named a team from outside (owner, 27 Oct)', () => {
+  it('a rug pickup in the Braga zone is a "Serviço" with no team colour (owner picks; 13 Nov: never "A confirmar"), unless the chat named a team from outside (owner, 27 Oct)', () => {
     const viana = { ...base, confirmed: true, city: 'Viana do Castelo', address: 'Rua Inventada 1, 4900-000 Viana do Castelo', total: 209, pickupFee: 20 };
     const p = planOwnerBooking(viana, [], NOW.getTime());
     if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
     expect(p.team).toBeUndefined();
-    expect(p.event.title).toMatch(/^A confirmar · Serviço 105€ \(209€\) Recolha/);
+    expect(p.event.title).toMatch(/^Serviço 105€ \(209€\) Recolha/);
     expect(p.event.description).toContain('a equipa Braga não faz recolhas');
     expect(planOwnerBooking({ ...viana, team: 'Braga' }, [], NOW.getTime())).not.toHaveProperty('team');
     expect(planOwnerBooking({ ...viana, team: 'Porto 1' }, [], NOW.getTime())).toMatchObject({ team: 'Porto 1', event: { colorId: '9' } });
@@ -244,5 +244,14 @@ describe('planBotBooking', () => {
     expect(planBotBooking(marlene, [cleaning], NOW)).toMatchObject({ ok: true, team: 'Porto 1' });
     // Starting at the same hour still goes to the owner.
     expect(planBotBooking({ ...marlene, time: '16h30' }, [cleaning], NOW)).toEqual({ ok: false, sameTime: true });
+  });
+});
+
+describe('owner, 13 Nov 2026: never "A confirmar" with a price', () => {
+  it('a Porto waterproofing with no team the bot may use is a real "Serviço" with no colour', () => {
+    const p = planOwnerBooking({ conversationId: 'x@s.whatsapp.net', date: '2026-11-14', time: '14h', service: 'Impermeabilização Essencial de sofá', total: 89, phone: '+351 900 000 001', name: 'Cliente Inventado', city: 'Vila do Conde', address: 'Rua Inventada 1, 4480-000 Vila do Conde' }, [], Date.parse('2026-11-13T12:00:00Z'));
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.event.title).toMatch(/^Serviço 45€ \(89€\) Impermeabilização Essencial/);
+    expect(p.event.description).toContain('escolhe a cor da equipa');
   });
 });

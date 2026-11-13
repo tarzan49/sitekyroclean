@@ -3291,6 +3291,16 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
     ].filter(Boolean).join("\n\n");
     return { ok: true, team, event: { title, description: description2, start: startIso, end: endIso, colorId: TEAM_COLOR[team] } };
   }
+  if (total !== null) {
+    const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+    const title = [`Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phoneOut, text(r.name, MAX.name), address].filter(Boolean).join(" - ");
+    const description2 = [
+      `Marcado pelo bot a partir da conversa do WhatsApp. Sem equipa livre para este serviço: ${pickupOwner ? `${pickupOwner}: ` : ""}escolhe a cor da equipa que o faz.`,
+      text(r.notes, 600),
+      `bot:${conversationId}`
+    ].filter(Boolean).join("\n\n");
+    return { ok: true, event: { title, description: description2, start: startIso, end: endIso } };
+  }
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), address].filter(Boolean);
   const description = [
     'Preparado a partir da conversa do WhatsApp. Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
