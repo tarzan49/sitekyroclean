@@ -264,7 +264,7 @@ export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'P
 const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', facebook: ' (anúncio facebook)', instagram: ' (anúncio instagram)' };
 
 export type BotBookingResult =
-  | { ok: true; team: string; event: { title: string; description: string; start: string; end: string; colorId: string }; slot: { date: string; time: string; durationMin: number } }
+  | { ok: true; team: string | null; event: { title: string; description: string; start: string; end: string; colorId?: string }; slot: { date: string; time: string; durationMin: number } }
   | { ok: false; sameTime: true }
   | { ok: false; missing: string[] }
   | { ok: false; exists: true }
@@ -308,7 +308,9 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
   if (!slot) return { error: 'time inválido' };
-  if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  // An hour the owner gave himself always closes, with no team when none is free (owner, 14 Nov 2026:
+  // Daniela, Bárbara and Teresa told "fica reservado" and never written to the calendar).
+  if (!slot.free && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
   // Owner, 9 Oct 2026: "se for a mesma hora tem que me consultar" (two services of the zone at once).
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
@@ -319,8 +321,8 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   // Far zone: the team already there that day (availability.sharedTrip).
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup);
-  if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
+  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
+  if (!team && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map(l => l.label).join(' + ');
@@ -330,7 +332,9 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
   const title = [`Serviço ${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
   const description = [
-    ownerChose
+    !team
+      ? 'Marcado pelo bot do WhatsApp numa hora escolhida por ti. Sem equipa livre a essa hora: escolhe a cor da equipa que o faz.'
+      : ownerChose
       ? `Marcado pelo bot do WhatsApp numa hora ${isWeekend(r.date) ? 'de fim de semana ' : ''}escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
       : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
@@ -340,5 +344,5 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',
     `bot:${conversationId}`,
   ].filter(Boolean).join('\n');
-  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, colorId: TEAM_COLOR[team] }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
+  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, ...(team ? { colorId: TEAM_COLOR[team] } : {}) }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
 }

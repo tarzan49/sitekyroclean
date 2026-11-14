@@ -632,7 +632,8 @@ async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
     return createSuccessResponse({ booking: { ok: !!data?.update?.ok, rescheduled: true, update: data?.update ?? null } });
   }
   if (plan.ok && plan.event) {
-    const failed = await writeAndSave(conversationId, ctx.live, ctx.now, env, "book", plan.event);
+    // No free team at an hour the owner gave: written without a colour, he picks the team (14 Nov 2026).
+    const failed = await writeAndSave(conversationId, ctx.live, ctx.now, env, plan.event.colorId ? "book" : "hold", plan.event);
     return failed ?? createSuccessResponse({ booking: { ok: true, slot: plan.slot, team: plan.team } });
   }
   // Not the bot's to close (weekend, no engine price, data still missing): the time

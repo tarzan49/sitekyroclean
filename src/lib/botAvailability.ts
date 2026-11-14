@@ -88,6 +88,8 @@ export const PORTO1_MIN_TOTAL = 200;
  * has no team, so the owner decides.
  */
 export const PORTO1_PREMIUM_ONLY_FROM = '2026-11-04';
+/** From this day every Premium waterproofing in Porto and Braga goes to Porto 1, and only there (owner, 14 Nov 2026). */
+export const PORTO1_ALL_PREMIUM_FROM = '2026-11-14';
 /**
  * The only teams of a zone that pick up rugs (owner, 8 Nov 2026: "porto 3 pode recolher tapetes";
  * "e a unica equipa no porto q pode recolher"). A Porto pickup goes to Porto 3 or, when it cannot, to the owner.
@@ -108,6 +110,7 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
     .filter(t => !pickupTeams || pickupTeams.includes(t))
     .filter(t => !TEAM_CLOSED_FROM[t] || (day && (day <= TEAM_CLOSED_FROM[t].date || (TEAM_CLOSED_FROM[t].reopen !== undefined && day >= TEAM_CLOSED_FROM[t].reopen!))))
     .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
+  if (waterproofing === 'premium' && (zone === 'Porto' || zone === 'Braga') && day && day >= PORTO1_ALL_PREMIUM_FROM) return ['Porto 1'];
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
@@ -117,7 +120,8 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
  * plus waterproofing (owner, 4 Nov 2026: "porto 1 fica apenas com imper + limpeza ou imper premium").
  */
 export function waterproofingKind(items: unknown): boolean | 'premium' {
-  if (Array.isArray(items) && items.some(i => /premium|^clean\+/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
+  // Owner, 14 Nov 2026: Porto 1 takes Premium waterproofing only (cleaning + Essencial is not Premium).
+  if (Array.isArray(items) && items.some(i => /premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
   return hasWaterproofing(items);
 }
 /**
@@ -249,7 +253,9 @@ export const TEAM_OFF: readonly TeamOff[] = [
  */
 // Owner, 12 Nov 2026: Porto 1 is NOT reopened (the 11/11 reopening is undone): "Porto 1 só faz serviços que eu indicar,
 // mais nada". The bot never offers or books it; the owner puts its services in the calendar himself.
-export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number; reopen?: string }>> = { 'Porto 1': { date: '2026-11-06', hour: 20, } };
+// Owner, 14 Nov 2026: "Porto 1, a partir de agora fica com todas as impermeabilizações premium" (PORTO1_ALL_PREMIUM_FROM).
+// It reopens for that only: teamsFor keeps it off every other job.
+export const TEAM_CLOSED_FROM: Readonly<Record<string, { date: string; hour: number; reopen?: string }>> = { 'Porto 1': { date: '2026-11-06', hour: 20, reopen: '2026-11-14' } };
 const closedAt = (team: string, from: number, to: number) => {
   const closed = TEAM_CLOSED_FROM[team];
   if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;

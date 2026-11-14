@@ -2551,18 +2551,20 @@ var WATERPROOFING_TEAMS = {
 var WATERPROOFING_FROM = { Porto: "2026-11-11", Braga: "2026-11-11" };
 var PORTO1_MIN_TOTAL = 200;
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
+var PORTO1_ALL_PREMIUM_FROM = "2026-11-14";
 var RUG_PICKUP_TEAMS = { Porto: ["Porto 3"] };
 var ZONE_TEAM_OVERRIDE = { Coimbra: ["Lisboa 1"] };
 var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone];
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;
   const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
+  if (waterproofing === "premium" && (zone === "Porto" || zone === "Braga") && day && day >= PORTO1_ALL_PREMIUM_FROM) return ["Porto 1"];
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
 };
 function waterproofingKind(items) {
-  if (Array.isArray(items) && items.some((i) => /premium|^clean\+/.test(String(i?.treatment ?? "")))) return "premium";
+  if (Array.isArray(items) && items.some((i) => /premium/.test(String(i?.treatment ?? "")))) return "premium";
   return hasWaterproofing(items);
 }
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
@@ -2633,7 +2635,7 @@ var TEAM_OFF = [
   // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
   ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` }))
 ];
-var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20 } };
+var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20, reopen: "2026-11-14" } };
 var closedAt = (team, from, to) => {
   const closed = TEAM_CLOSED_FROM[team];
   if (!closed || to <= lisbonToUtc(closed.date, closed.hour * 60)) return false;
@@ -3349,7 +3351,7 @@ function planBotBooking(req, events, now, ownEventId) {
   if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
   const slot = availability.requested;
   if (!slot) return { error: "time inválido" };
-  if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  if (!slot.free && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
   if ("error" in quote) return { error: String(quote.error) };
@@ -3358,8 +3360,8 @@ function planBotBooking(req, events, now, ownEventId) {
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup);
-  if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
+  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
+  if (!team && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");
   const service = tagWaterproofBase(text(r.service, 120) || what);
@@ -3367,7 +3369,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
   const title = [`Serviço ${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(" - ");
   const description = [
-    ownerChose ? `Marcado pelo bot do WhatsApp numa hora ${isWeekend(r.date) ? "de fim de semana " : ""}escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).` : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
+    !team ? "Marcado pelo bot do WhatsApp numa hora escolhida por ti. Sem equipa livre a essa hora: escolhe a cor da equipa que o faz." : ownerChose ? `Marcado pelo bot do WhatsApp numa hora ${isWeekend(r.date) ? "de fim de semana " : ""}escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).` : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
     availability.sharedTrip ? `Total: ${euro(total)} (sem deslocação: a equipa já está na zona nesse dia)` : `Total: ${euro(total)} (deslocação incluída)`,
     chatTotal ? `Preço combinado na conversa${quote.quote || !(quote.total > 0) ? "" : ` (tabela ${euro(quote.total)})`}.` : "",
@@ -3375,7 +3377,7 @@ function planBotBooking(req, events, now, ownEventId) {
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : "",
     `bot:${conversationId}`
   ].filter(Boolean).join("\n");
-  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, colorId: TEAM_COLOR[team] }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
+  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, ...team ? { colorId: TEAM_COLOR[team] } : {} }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
 }
 
 // src/lib/agendaCheck.ts
