@@ -178,6 +178,24 @@ export function planCalendarSync(
   const byEvent = new Map(rows.filter(r => r.calendar_event_id).map(r => [r.calendar_event_id!, r]));
   const present = new Set<string>();
   const plan: SyncPlan = { inserts: [], updates: [], counts: { added: 0, updated: 0, missing: 0, restored: 0 } };
+  // Reagendar não é fechar (dono, 14 Nov: a Lis, marcada a 5/11, desmarcada e
+  // marcada outra vez a 13/11, contou como fecho de 13/11). Um evento novo do
+  // mesmo telefone cujo serviço anterior saiu do calendário há menos de 30 dias
+  // herda o dia do fecho desse serviço.
+  const earlierBooking = new Map<string, string>();
+  for (const r of rows) {
+    const phone = (r as { phone?: string | null }).phone;
+    if (!phone || !r.booked_at || !r.calendar_missing_since) continue;
+    if (time(now) - time(r.calendar_missing_since) > 30 * 86_400_000) continue;
+    const key = phone.replace(/\D/g, '');
+    const prev = earlierBooking.get(key);
+    if (!prev || time(r.booked_at) < time(prev)) earlierBooking.set(key, r.booked_at);
+  }
+  const bookedAtFor = (event: CalendarEvent, phone: string | null) => {
+    const own = closingDateOf(event);
+    const prev = phone ? earlierBooking.get(phone.replace(/\D/g, '')) : undefined;
+    return prev && time(prev) < time(own) ? prev : own;
+  };
 
   for (const event of events) {
     if (event.status === 'CANCELLED' || !isServiceEvent(event.summary)) continue;
@@ -203,7 +221,7 @@ export function planCalendarSync(
       plan.inserts.push({
         ...parsed,
         ...(invoiceFromEvent(event, parsed.billed_value) ?? {}),
-        booked_at: closingDateOf(event),
+        booked_at: bookedAtFor(event, parsed.phone),
         calendar_event_id: event.id,
         calendar_updated_at: event.updated,
         source,
