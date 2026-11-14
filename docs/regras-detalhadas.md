@@ -786,3 +786,6 @@ Tânia (sofá 3 lugares + colchão, Massamá): a reserva e a confirmação dizia
 
 ### Cadeiras com estofo só no tampo do assento (dono, 14 Nov 2026)
 André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem estofo", "quando for assim temos de praticar estes preços"; "só se a cadeira só tiver um tampo e mais nada como estofo". Impermeabilização 18€ Premium e 12€ Essencial por cadeira, qualquer quantidade, deslocação como o motor der (`CHAIR_SEAT_ONLY_WATERPROOF_*` em `chairPricing.ts`, item `seatOnly: true` na ação `quote`; kyro-bot passa-o também ao preço por cadeira). Encosto ou braços estofados = tabela normal. No mesmo caso o bot enviou 25€/cadeira antes de a pausa entrar (envio começou 50 s antes); o dono exigiu o funil completo em tudo, sempre.
+
+### Impermeabilização: 24 h sem usar (dono, 15 Nov 2026)
+"claro que é 24 horas sem uso para deixar o produto atuar direito". A secagem de 2 a 5 h é a da limpeza; depois de impermeabilizar a peça fica 24 h sem uso. Respondi ao André "secas em 2 a 5 horas" sem as 24 h: erro meu, não do ficheiro do bot.
