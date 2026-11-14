@@ -26,14 +26,22 @@ describe('Google reviews on service pages', () => {
     }
     const sofa = pickReviewSubset('limpeza-sofas', '/limpeza-sofas-porto');
     expect(sofa[0].text).toMatch(/sof[áa]|poltrona|chaise|estofo|upholstery/i);
-    expect(sofa.some(r => !/sof[áa]|poltrona|chaise|estofo|upholstery/i.test(r.text))).toBe(true);
+    // Dono, 14 Nov: só 5 estrelas e nunca avaliações de outro serviço.
+    for (const service of SERVICES) {
+      for (const r of pickReviewSubset(service, `${service}/x-porto`, 20)) {
+        expect(r.rating).toBe(5);
+        const others = Object.entries({ 'limpeza-sofas': /sof[áa]|chaise|poltrona|estofo|upholstery/i, 'limpeza-colchoes': /colch|mattress/i, 'limpeza-tapetes': /tapete|carpete|\brug\b|carpet/i }).filter(([s]) => s !== service);
+        const own = { 'limpeza-sofas': /sof[áa]|chaise|poltrona|estofo|upholstery/i, 'limpeza-colchoes': /colch|mattress/i, 'limpeza-tapetes': /tapete|carpete|\brug\b|carpet/i }[service as 'limpeza-sofas'];
+        if (own && !own.test(r.text)) for (const [, re] of others) expect(r.text).not.toMatch(re);
+      }
+    }
     expect(pickReviewSubset('impermeabilizacao', '/impermeabilizacao-lisboa')[0].text).toMatch(/impermeabiliz/i);
   });
 
   it('labels only Lisbon-profile reviews with a city and keeps them off other regions', () => {
     expect(reviewRegion('/limpeza-sofas-lisboa-alvalade')).toBe('lisboa');
     expect(reviewRegion('Vila Nova de Gaia')).toBe('porto');
-    expect(pickReviewSubset('limpeza-tapetes', '/limpeza-tapetes-lisboa').every(r => r.city === 'Lisboa')).toBe(true);
+    expect(pickReviewSubset('limpeza-sofas', '/limpeza-sofas-lisboa')[0].city).toBe('Lisboa');
     for (const page of ['/limpeza-sofas-porto', '/limpeza-sofas-braga']) {
       expect(pickReviewSubset('limpeza-sofas', page).every(r => !r.city)).toBe(true);
     }

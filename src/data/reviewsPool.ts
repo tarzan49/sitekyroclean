@@ -196,39 +196,25 @@ function hashSeed(seed: string): number {
 
 const servicesOf = (r: PoolReview) => Object.keys(SERVICE_KEYWORDS).filter(s => SERVICE_KEYWORDS[s].test(r.text));
 
-/** Escolha determinística e variada: até metade fala do serviço da página,
- *  depois uma de cada outro serviço (para a página mostrar sofás, colchões,
- *  tapetes, impermeabilização…), e o resto com avaliações gerais.
+/** Escolha determinística (dono, 14 Nov): cada página mostra só avaliações
+ *  de 5 estrelas que falam do serviço dela; se faltarem, completa com
+ *  avaliações gerais de 5 estrelas que não falam de nenhum serviço. Nunca
+ *  uma avaliação de outro serviço (ex.: carpete numa página de sofás).
  *  Páginas da região de Lisboa usam primeiro a ficha de Lisboa; as outras
  *  nunca mostram avaliações com a cidade de outra região. */
 export function pickReviewSubset(serviceSlug: string, seed: string, count = 6): PoolReview[] {
   const region = reviewRegion(seed);
-  // A região vem da ficha de cada avaliação, não do nome: o mesmo cliente
-  // pode ter avaliado as duas fichas (Manuel Reis).
   const regionOf = (r: PoolReview) => (r.city === 'Lisboa' ? 'lisboa' : undefined);
-  const local = region ? PUBLISHED_REVIEWS.filter(r => regionOf(r) === region) : [];
-  const rest = PUBLISHED_REVIEWS.filter(r => !regionOf(r) && !local.includes(r));
+  const fiveStars = PUBLISHED_REVIEWS.filter(r => r.rating === 5);
+  const local = region ? fiveStars.filter(r => regionOf(r) === region) : [];
+  const rest = fiveStars.filter(r => !regionOf(r) && !local.includes(r));
   const order = (list: PoolReview[]) => [...list].sort((a, b) => hashSeed(`${seed}:${a.name}:${a.date}`) - hashSeed(`${seed}:${b.name}:${b.date}`));
+  const own = (r: PoolReview) => servicesOf(r).includes(serviceSlug);
+  const generic = (r: PoolReview) => servicesOf(r).length === 0;
   const picked: PoolReview[] = [];
-  const add = (r?: PoolReview) => { if (r && picked.length < count && !picked.includes(r)) picked.push(r); };
-
-  // Sem avaliações locais deste serviço (ex.: impermeabilização em Lisboa),
-  // duas da ficha do Porto, que não levam cidade, abrem a lista.
-  if (local.length && !local.some(r => servicesOf(r).includes(serviceSlug))) {
-    order(rest).filter(r => servicesOf(r).includes(serviceSlug)).slice(0, 2).forEach(add);
-  }
-  for (const pool of [order(local), order(rest)]) {
+  for (const r of [...order(local).filter(own), ...order(rest).filter(own), ...order(local).filter(generic), ...order(rest).filter(generic)]) {
     if (picked.length >= count) break;
-    const specific = pool.filter(r => servicesOf(r).includes(serviceSlug));
-    specific.slice(0, Math.ceil(count / 2) - picked.filter(r => servicesOf(r).includes(serviceSlug)).length).forEach(add);
-    for (const other of Object.keys(SERVICE_KEYWORDS).filter(s => s !== serviceSlug)) {
-      if (picked.length >= count - 1) break;
-      if (picked.some(r => servicesOf(r).includes(other))) continue;
-      add(pool.find(r => servicesOf(r)[0] === other && !picked.includes(r)));
-    }
-    pool.filter(r => servicesOf(r).length === 0).forEach(add);
-    specific.forEach(add);
-    pool.forEach(add);
+    if (!picked.includes(r)) picked.push(r);
   }
   return picked.map(r => ({ ...r }));
 }
