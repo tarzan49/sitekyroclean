@@ -9,10 +9,17 @@ export const CHAIR_WATERPROOF_SMALL_MAX = 4;
 export const CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
 export const CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
 
+// Cadeira em que o único estofo é o tampo do assento (sem encosto nem braços estofados): impermeabilização
+// a 18€ Premium e 12€ Essencial por cadeira, qualquer quantidade (dono, 14 Nov 2026, André, 6 cadeiras:
+// "a cadeira quase não tem estofo"; "só se a cadeira só tiver um tampo e mais nada como estofo"). Só bot.
+export const CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM = 18;
+export const CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL = 12;
+
 export type ChairWaterproofTier = 'premium' | 'essencial';
 
-export function chairWaterproofTotal(qty: number, tier: ChairWaterproofTier): number | null {
+export function chairWaterproofTotal(qty: number, tier: ChairWaterproofTier, seatOnly = false): number | null {
   if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  if (seatOnly) return qty * (tier === 'premium' ? CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM : CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL);
   const small = tier === 'premium' ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
   if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
   const unit = tier === 'premium' ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;

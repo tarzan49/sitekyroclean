@@ -1,5 +1,6 @@
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcSofaUnitPrice, calcMattressUnitPrice } from '../components/quiz/quizHelpers';
+import { chairWaterproofTotal } from '../constants/chairPricing';
 import { chairAntiAcarosTotal } from '../constants/antiAcarosPricing';
 import { locationPrices, calculateTravelFee } from '../constants/travel';
 import { priceWithPackPerks, type PerkTreatment } from '../constants/packPerks';
@@ -11,7 +12,7 @@ export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros';
  * cleaning (sofas and chairs, with `extra` premium or essencial). The
  * configurator never sets it; the WhatsApp bot's quote uses it
  * (`src/lib/botQuote.ts`), so both price through this one engine. */
-export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; }
+export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; seatOnly?: boolean; }
 export const PACK_KIND_LABEL: Record<PackKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 export const EXTRA_LABEL: Record<PackExtra, string> = { none: 'Só limpeza', premium: 'Limpeza + impermeabilização Premium (até 10 anos)', essencial: 'Limpeza + impermeabilização Essencial (1 a 2 anos)', 'anti-acaros': 'Limpeza + tratamento anti-ácaros' };
 export function makePackItem(kind: PackKind, id: string): CustomPackItem {
@@ -39,7 +40,7 @@ export function customPackLine(item: CustomPackItem) {
   const size = item.kind === 'rug' || item.kind === 'carpet' ? `${item.width} × ${item.length} m` : item.kind === 'chairs' ? `${item.qty} unidades` : option?.label ?? 'Tamanho a confirmar';
   const waterproofingOnly = item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial') && (item.kind === 'sofa' || item.kind === 'chairs');
   if (waterproofingOnly && item.kind === 'chairs') {
-    amount = (item.extra === 'premium' ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    amount = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === 'premium' ? 'premium' : 'essencial', true) : (item.extra === 'premium' ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
   } else if (waterproofingOnly && option) {
     const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
     amount = unit === null ? null : unit * item.qty;
@@ -47,8 +48,8 @@ export function customPackLine(item: CustomPackItem) {
     // Bot only: `unitPrice` = the WhatsApp price per chair (chairPricing whatsappChairCleanUnit, owner 12 Nov 2026).
     amount = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount !== null) {
-      if (item.extra === 'premium') amount += calcChairWaterproofPremium(item.qty) ?? 0;
-      if (item.extra === 'essencial') amount += calcChairWaterproof(item.qty) ?? 0;
+      if (item.extra === 'premium') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'premium', true) : calcChairWaterproofPremium(item.qty)) ?? 0;
+      if (item.extra === 'essencial') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'essencial', true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === 'anti-acaros') amount += chairAntiAcarosTotal(item.qty) ?? 0;
     }
   } else if (item.kind === 'sofa' && item.unitPrice && item.primary !== 'waterproofing' && item.extra !== 'anti-acaros') {

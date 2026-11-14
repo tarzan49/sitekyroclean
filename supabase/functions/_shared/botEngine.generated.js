@@ -168,8 +168,11 @@ var CHAIR_WATERPROOF_PREMIUM = 25;
 var CHAIR_WATERPROOF_SMALL_MAX = 4;
 var CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
 var CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
-function chairWaterproofTotal(qty, tier) {
+var CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM = 18;
+var CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL = 12;
+function chairWaterproofTotal(qty, tier, seatOnly = false) {
   if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  if (seatOnly) return qty * (tier === "premium" ? CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM : CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL);
   const small = tier === "premium" ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
   if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
   const unit = tier === "premium" ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
@@ -332,15 +335,15 @@ function customPackLine(item) {
   const size = item.kind === "rug" || item.kind === "carpet" ? `${item.width} × ${item.length} m` : item.kind === "chairs" ? `${item.qty} unidades` : option2?.label ?? "Tamanho a confirmar";
   const waterproofingOnly2 = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly2 && item.kind === "chairs") {
-    amount2 = (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    amount2 = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial", true) : (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
   } else if (waterproofingOnly2 && option2) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
     amount2 = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount2 !== null) {
-      if (item.extra === "premium") amount2 += calcChairWaterproofPremium(item.qty) ?? 0;
-      if (item.extra === "essencial") amount2 += calcChairWaterproof(item.qty) ?? 0;
+      if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
+      if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
     }
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
@@ -2008,6 +2011,7 @@ function toItem(raw, index) {
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   if (r.odor !== void 0 && typeof r.odor !== "boolean") return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === "rug" || kind === "carpet")) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
+  if (r.seatOnly !== void 0 && (typeof r.seatOnly !== "boolean" || r.seatOnly && kind !== "chairs")) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = "";
   let unitPrice;
   if (kind === "sofa" && r.size === "u") {
@@ -2034,7 +2038,7 @@ function toItem(raw, index) {
   const width = kind === "rug" || kind === "carpet" ? dim(r.width) : "";
   const length = kind === "rug" || kind === "carpet" ? dim(r.length) : "";
   if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
-  return { id: String(index), kind, size, qty, extra, primary, width, length, ...unitPrice ? { unitPrice } : {} };
+  return { id: String(index), kind, size, qty, extra, primary, width, length, ...unitPrice ? { unitPrice } : {}, ...r.seatOnly === true ? { seatOnly: true } : {} };
 }
 var WATERPROOFING_TRAVEL_MAX = 10;
 var isWaterproofing = (i) => i.extra === "essencial" || i.extra === "premium";

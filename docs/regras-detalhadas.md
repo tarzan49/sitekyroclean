@@ -783,3 +783,6 @@ Helena (Terrugem): modular 3+3 com peça ao centro saiu a 119€ + 10€ de desl
 ### Confirmação com o valor final (dono, 13 Nov 2026)
 
 Tânia (sofá 3 lugares + colchão, Massamá): a reserva e a confirmação diziam "com os valores que já lhe enviámos" sem o número. O dono: "na msg de confirmação convém sempre dares o valor final à pessoa". O modelo S61 já tinha "Total: [total]€"; passou a haver guarda no kyro-bot (`confirmedTotalIssues` em `src/bot/agent.ts`): reserva/confirmação com hora e sem euros, ou a remeter para "os valores que já lhe enviámos", volta a ser escrita.
+
+### Cadeiras com estofo só no tampo do assento (dono, 14 Nov 2026)
+André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem estofo", "quando for assim temos de praticar estes preços"; "só se a cadeira só tiver um tampo e mais nada como estofo". Impermeabilização 18€ Premium e 12€ Essencial por cadeira, qualquer quantidade, deslocação como o motor der (`CHAIR_SEAT_ONLY_WATERPROOF_*` em `chairPricing.ts`, item `seatOnly: true` na ação `quote`; kyro-bot passa-o também ao preço por cadeira). Encosto ou braços estofados = tabela normal. No mesmo caso o bot enviou 25€/cadeira antes de a pausa entrar (envio começou 50 s antes); o dono exigiu o funil completo em tudo, sempre.

@@ -91,6 +91,8 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   if ((kind === 'rug' || kind === 'carpet') && treatment !== 'clean') return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   if (r.odor !== undefined && typeof r.odor !== 'boolean') return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === 'rug' || kind === 'carpet')) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
+  // `seatOnly`: chairs whose only upholstery is the seat top (owner, 14 Nov 2026): waterproofing 18€/12€ each.
+  if (r.seatOnly !== undefined && (typeof r.seatOnly !== 'boolean' || (r.seatOnly && kind !== 'chairs'))) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = '';
   let unitPrice: number | undefined;
   if (kind === 'sofa' && r.size === 'u') {
@@ -121,7 +123,7 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   const width = kind === 'rug' || kind === 'carpet' ? dim(r.width) : '';
   const length = kind === 'rug' || kind === 'carpet' ? dim(r.length) : '';
   if ((kind === 'rug' || kind === 'carpet') && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros (ou centímetros, a partir de ${RUG_SIDE_MAX_METERS + 1})`);
-  return { id: String(index), kind, size, qty, extra, primary, width, length, ...(unitPrice ? { unitPrice } : {}) };
+  return { id: String(index), kind, size, qty, extra, primary, width, length, ...(unitPrice ? { unitPrice } : {}), ...(r.seatOnly === true ? { seatOnly: true } : {}) };
 }
 
 /**
