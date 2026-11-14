@@ -346,6 +346,11 @@ export function isMadeira(cityOrAddress: unknown): boolean {
 export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-18'];
 
 export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 14 Nov 2026 at 23:55 (André, cadeiras): "n marques amanhã se n for lisboa, se for porto só segunda em porto 1".
+  ...(['Porto', 'Braga', 'Coimbra', 'Algarve'] as const).map((zone): DayRule => ({
+    zone, from: '2026-11-14', until: '2026-11-15', closed: [{ date: '2026-11-15' }],
+    ...(zone === 'Porto' ? { prefer: ['2026-11-16'], onlyPreferred: true } : {}),
+    note: zone === 'Porto' ? 'Domingo (dia 15) já não temos vaga no Porto: oferece segunda (dia 16).' : 'Domingo (dia 15) já não temos vaga: oferece outro dia.' })),
   // Owner, 26 Oct 2026 at night: "amanhã no Porto só te quero marcar serviços para quarta-feira".
   { zone: 'Porto', from: '2026-10-26', until: '2026-10-27', closed: [{ date: '2026-10-27' }], prefer: ['2026-10-28'], onlyPreferred: true,
     note: 'Terça (dia 27) já não temos vaga no Porto: oferece quarta (dia 28).' },
