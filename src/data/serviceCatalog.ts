@@ -104,6 +104,14 @@ export const cities = [
   // Leiria e Batalha (equipa Coimbra, dono 2026-10-26)
   { name: "Leiria", slug: "leiria", region: "secondary", area: "coimbra", description: "cidade do castelo, no centro litoral" },
   { name: "Batalha", slug: "batalha", region: "secondary", area: "coimbra", description: "vila do mosteiro, junto a Leiria" },
+  // Zona de Leiria (dono 2026-11-15, escalões pelo centro de Leiria)
+  { name: "Marinha Grande", slug: "marinha-grande", region: "secondary", area: "coimbra", description: "cidade do vidro, junto ao pinhal de Leiria" },
+  { name: "Porto de Mós", slug: "porto-de-mos", region: "secondary", area: "coimbra", description: "vila do castelo, à porta da Serra de Aire e Candeeiros" },
+  { name: "Ourém", slug: "ourem", region: "secondary", area: "coimbra", description: "cidade do castelo medieval, no norte do Ribatejo" },
+  { name: "Fátima", slug: "fatima", region: "secondary", area: "coimbra", description: "cidade do santuário, no concelho de Ourém" },
+  { name: "Pombal", slug: "pombal", region: "secondary", area: "coimbra", description: "cidade entre Leiria e Coimbra" },
+  { name: "Alcobaça", slug: "alcobaca", region: "secondary", area: "coimbra", description: "cidade do mosteiro, no Oeste" },
+  { name: "Nazaré", slug: "nazare", region: "secondary", area: "coimbra", description: "vila piscatória das ondas gigantes" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },

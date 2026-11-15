@@ -805,3 +805,8 @@ André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem est
 - O mesmo vídeo/foto nunca duas vezes, contando também respostas cortadas a meio (Flávia: vídeo do tapete 4 vezes).
 - Firmeza quando o cliente duvida do processo: explicação técnica + avaliação real do mesmo problema, sem dar razão à dúvida (Flávia).
 - Poltronas/cadeirões: oferecer impermeabilização como extra, preço de sofá de 1 lugar por poltrona.
+
+
+### Deslocação na zona de Leiria (dono, 15 Nov 2026)
+
+O dono disse: 10€ no centro de Leiria e 20€ no que for muito além disso. Aplicou-se a mesma lógica de escalões de Braga: até ~10 km 10€, até ~15 km 15€, acima 20€. A regra antiga, Leiria 20€ (26/10), fica [RETIRADA 15/11]. Entraram 7 cidades novas em `locationPrices` + `cities` + `cityCoords` (área coimbra), o que deu mais 40 rotas de cidade.

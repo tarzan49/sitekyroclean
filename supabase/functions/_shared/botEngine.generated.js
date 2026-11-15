@@ -56,9 +56,17 @@ var locationPrices = {
   "Coimbra": 10,
   "Figueira da Foz": 20,
   // ~45 min pela A14
-  // Dono, 2026-10-26: Leiria fica perto de Coimbra, equipa Coimbra, 20€.
-  "Leiria": 20,
-  "Batalha": 20,
+  // Dono, 2026-11-15: escalões pelo centro de Leiria (como Braga):
+  // centro 10€, arredores próximos (até ~15 km) 15€, mais longe 20€.
+  "Leiria": 10,
+  "Batalha": 15,
+  "Marinha Grande": 15,
+  "Porto de Mós": 20,
+  "Ourém": 20,
+  "Fátima": 20,
+  "Pombal": 20,
+  "Alcobaça": 20,
+  "Nazaré": 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
@@ -436,6 +444,14 @@ var cities = [
   // Leiria e Batalha (equipa Coimbra, dono 2026-10-26)
   { name: "Leiria", slug: "leiria", region: "secondary", area: "coimbra", description: "cidade do castelo, no centro litoral" },
   { name: "Batalha", slug: "batalha", region: "secondary", area: "coimbra", description: "vila do mosteiro, junto a Leiria" },
+  // Zona de Leiria (dono 2026-11-15, escalões pelo centro de Leiria)
+  { name: "Marinha Grande", slug: "marinha-grande", region: "secondary", area: "coimbra", description: "cidade do vidro, junto ao pinhal de Leiria" },
+  { name: "Porto de Mós", slug: "porto-de-mos", region: "secondary", area: "coimbra", description: "vila do castelo, à porta da Serra de Aire e Candeeiros" },
+  { name: "Ourém", slug: "ourem", region: "secondary", area: "coimbra", description: "cidade do castelo medieval, no norte do Ribatejo" },
+  { name: "Fátima", slug: "fatima", region: "secondary", area: "coimbra", description: "cidade do santuário, no concelho de Ourém" },
+  { name: "Pombal", slug: "pombal", region: "secondary", area: "coimbra", description: "cidade entre Leiria e Coimbra" },
+  { name: "Alcobaça", slug: "alcobaca", region: "secondary", area: "coimbra", description: "cidade do mosteiro, no Oeste" },
+  { name: "Nazaré", slug: "nazare", region: "secondary", area: "coimbra", description: "vila piscatória das ondas gigantes" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
@@ -2470,6 +2486,13 @@ var CITY_COORDS = {
   "Figueira da Foz": [40.1486, -8.8557],
   "Leiria": [39.7438, -8.8071],
   "Batalha": [39.6579, -8.8244],
+  "Marinha Grande": [39.7477, -8.9322],
+  "Porto de Mós": [39.6019, -8.8183],
+  "Ourém": [39.655, -8.577],
+  "Fátima": [39.63, -8.673],
+  "Pombal": [39.9161, -8.6283],
+  "Alcobaça": [39.548, -8.977],
+  "Nazaré": [39.602, -9.071],
   "Braga": [41.5511, -8.428],
   "Guimarães": [41.4418, -8.2956],
   "Vila Nova de Famalicão": [41.4065, -8.5188],
