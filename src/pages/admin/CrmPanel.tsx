@@ -213,7 +213,10 @@ const CrmPanel = () => {
         .select("*")
         .order("request_date", { ascending: true });
       if (err) throw err;
-      setRecords(data ?? []);
+      // Evento apagado no calendário = serviço desmarcado (dono, 16 Nov): sai do
+      // CRM e das contas sem pedir nada. A linha fica na base (a sincronização
+      // precisa dela para repor o evento se voltar e para os reagendamentos).
+      setRecords((data ?? []).filter((r: ServiceRequest) => !r.calendar_missing_since));
       return data ?? [];
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Erro ao carregar pedidos. Cria a tabela service_requests no Supabase primeiro.");
@@ -276,7 +279,6 @@ const CrmPanel = () => {
     if (rows && await syncCalendar(rows)) await fetchRecords();
   };
 
-  const missingRows = useMemo(() => records.filter(r => r.calendar_missing_since), [records]);
   const reviewCount = useMemo(() => records.filter(r => r.needs_review).length, [records]);
 
   const monthRecords = useMemo(
@@ -578,7 +580,7 @@ const CrmPanel = () => {
                 : `Google Calendar (${TIME_FMT.format(sync.at)}): ${[
                     sync.counts.added && `${sync.counts.added} novo${sync.counts.added === 1 ? "" : "s"}`,
                     sync.counts.updated && `${sync.counts.updated} atualizado${sync.counts.updated === 1 ? "" : "s"}`,
-                    sync.counts.missing && `${sync.counts.missing} apagado${sync.counts.missing === 1 ? "" : "s"} do calendário`,
+                    sync.counts.missing && `${sync.counts.missing} desmarcado${sync.counts.missing === 1 ? "" : "s"} (saiu do CRM)`,
                     sync.counts.restored && `${sync.counts.restored} de volta ao calendário`,
                   ].filter(Boolean).join(", ")}`
             )}
@@ -624,12 +626,6 @@ const CrmPanel = () => {
         ))}
       </div>
 
-      {missingRows.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
-          {missingRows.length === 1 ? "1 serviço foi apagado" : `${missingRows.length} serviços foram apagados`} do Google Calendar ({missingRows.map(r => `${r.client_name ?? r.description} a ${new Date(r.request_date + "T00:00:00").getDate()}/${r.request_date.slice(5, 7)}`).join("; ")}).
-          {" "}Se foi cancelado, apaga-o aqui; se o serviço se fez, carrega em <strong>Manter</strong> na linha.
-        </div>
-      )}
 
       {view === "servicos" && (
         <CrmServiceMix monthLabel={monthLabel}
