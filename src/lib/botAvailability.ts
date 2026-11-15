@@ -102,7 +102,7 @@ export const RUG_PICKUP_TEAMS: Partial<Record<TeamZone, readonly string[]>> = { 
  * Lisboa 1 goes up for the rescheduled Marinha Grande job, so the next job of the Coimbra zone rides along.
  * Remove the entry when the owner says the zone goes back to its own team.
  */
-export const ZONE_TEAM_OVERRIDE: Partial<Record<TeamZone, readonly string[]>> = { Coimbra: ['Lisboa 1'] };
+export const ZONE_TEAM_OVERRIDE: Partial<Record<TeamZone, readonly string[]>> = {}; // Coimbra→Lisboa 1 retirada 16 Nov (era só para o serviço da Marinha Grande)
 export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] => {
   if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone]!;
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : undefined;

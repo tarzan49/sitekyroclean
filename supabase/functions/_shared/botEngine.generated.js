@@ -2648,7 +2648,7 @@ var PORTO1_MIN_TOTAL = 200;
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var PORTO1_ALL_PREMIUM_FROM = "2026-11-14";
 var RUG_PICKUP_TEAMS = { Porto: ["Porto 3"] };
-var ZONE_TEAM_OVERRIDE = { Coimbra: ["Lisboa 1"] };
+var ZONE_TEAM_OVERRIDE = {};
 var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone];
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;

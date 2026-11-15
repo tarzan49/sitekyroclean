@@ -486,16 +486,16 @@ describe('Coimbra e Madeira: fecha o serviço sem marcar hora (dono, 12 Nov 2026
   });
 });
 
-describe('zona de Coimbra na Lisboa 1 (dono, 13 Nov 2026)', () => {
-  it('Leiria e Coimbra vão para a Lisboa 1, o dono confirma o dia', () => {
+describe('zona de Coimbra na equipa Coimbra (Lisboa 1 retirada 16 Nov)', () => {
+  it('Leiria e Coimbra vão para a Coimbra, o dono confirma o dia', () => {
     for (const city of ['Leiria', 'Coimbra', 'Batalha']) {
       const r = botAvailability({ city } as never, [], new Date('2026-11-13T10:00:00Z')) as { teams: string[]; askWeek?: boolean; handToOwner?: string };
-      expect(r.teams).toEqual(['Lisboa 1']);
+      expect(r.teams).toEqual(['Coimbra']);
       expect(r.askWeek).toBe(true);
-      expect(r.handToOwner).toContain('Lisboa 1');
+      expect(r.handToOwner).toContain('Coimbra');
     }
   });
-  it('a hora dada pelo dono marca na Lisboa 1', () => {
-    expect(chooseTeam([], 'Leiria', '2026-11-20T10:00:00Z', '2026-11-20T11:00:00Z')).toBe('Lisboa 1');
+  it('a hora dada pelo dono marca na Coimbra', () => {
+    expect(chooseTeam([], 'Leiria', '2026-11-20T10:00:00Z', '2026-11-20T11:00:00Z')).toBe('Coimbra');
   });
 });
