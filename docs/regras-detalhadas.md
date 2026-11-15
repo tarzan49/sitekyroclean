@@ -792,3 +792,7 @@ André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem est
 
 ### Porto 1: Premium só de 2 lugares para cima, cadeiras a partir de 130€ (dono, 15 Nov 2026)
 "imper para porto 1 so de 2 L para cima, cadeira q n sejam abaixo de 130 eur eles nao querem". `waterproofingKind(items, total)` só devolve 'premium' para sofá Premium que não seja 1 lugar, ou cadeiras Premium com total ≥ 130€ (`PORTO1_CHAIRS_MIN_TOTAL`). Poltrona Premium e cadeiras abaixo de 130€ saem da Porto 1 e vão para a outra equipa de impermeabilização da zona. Substitui em parte a regra de 14 Nov ("todas as Premium").
+
+## Disponibilidade: norte a partir de 79€ (dono, 15 Nov)
+
+"Acabou esta merda de não dar disponibilidades": só o Algarve e o Alentejo ficam com o dono; Coimbra/Leiria pode perguntar; o resto dá horas. A norte, orçamento igual ou superior a 79€ dá sempre horas (`NORTH_MIN_TOTAL`): Viana deixa o mínimo de 100€ [RETIRADA 15/11] e Aveiro sai da deslocação alargada no bot (equipa Porto). Caso: Carlos, Ribamar (Mafra), ficou sem horas porque Ribamar não estava na lista; entrou em `BOT_ONLY_PARISHES`.

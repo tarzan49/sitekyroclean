@@ -665,10 +665,12 @@ export interface AvailabilityRequest {
  * below 110€ (120€ less his 10€ margin) the bot offers no hours and says we check availability.
  * The Alentejo Litoral is already in EXTENDED_TRIP_CITIES.
  */
-export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Leiria', 'Batalha']);
+export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Aveiro', 'Leiria', 'Batalha']);
 export const SMALL_ORDER_MIN_TOTAL = 110;
 /** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
-const SMALL_ORDER_MIN_BY_CITY: Readonly<Record<string, number>> = { 'Viana do Castelo': 100 };
+// Owner, 15 Nov 2026: "tudo a norte que forem orçamento de valor igual ou superior a 79 eur tens que dar sempre disponibilidade".
+export const NORTH_MIN_TOTAL = 79;
+const SMALL_ORDER_MIN_BY_CITY: Readonly<Record<string, number>> = { 'Viana do Castelo': NORTH_MIN_TOTAL, 'Aveiro': NORTH_MIN_TOTAL };
 function orderTotal(req: AvailabilityRequest, city: string): number | null {
   const given = Number(req.total);
   if (req.total !== undefined && Number.isFinite(given)) return given;
@@ -837,7 +839,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   }
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
-  if (EXTENDED_TRIP_CITIES.has(city)) {
+  // Owner, 15 Nov 2026: only the Algarve and the Alentejo are his; Aveiro (Porto team) gets hours like the north.
+  if (EXTENDED_TRIP_CITIES.has(city) && city !== 'Aveiro') {
     if (req.date !== undefined && (typeof req.date !== 'string' || !DATE.test(req.date))) return { error: 'date tem de ser AAAA-MM-DD' };
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }

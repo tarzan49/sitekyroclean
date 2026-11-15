@@ -42,7 +42,7 @@ describe('planBotHold', () => {
   });
 
   it('hands to the owner where the bot has no calendar, and checks its input', () => {
-    expect(planBotHold(req({ city: 'Aveiro' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) });
+    expect(planBotHold(req({ city: 'Alcácer do Sal' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) }); // Aveiro dá horas desde 15 Nov (dono)
     expect(planBotHold(req({ conversationId: '' }), [], NOW)).toHaveProperty('error');
     expect(planBotHold(req({ time: undefined }), [], NOW)).toHaveProperty('error');
     expect(planBotHold(req({ date: '2026-10-01' }), [], NOW)).toHaveProperty('error');
@@ -196,7 +196,7 @@ describe('planBotBooking', () => {
     expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toMatchObject({ ok: true });
     expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.stringContaining('sob orçamento') });
-    expect(planBotBooking(book({ city: 'Aveiro' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) });
+    expect(planBotBooking(book({ city: 'Alcácer do Sal' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) }); // Aveiro dá horas desde 15 Nov (dono)
   });
 
   it('closes a Saturday or Sunday time the owner chose, even at the hour of another service', () => {

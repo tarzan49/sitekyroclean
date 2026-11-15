@@ -391,16 +391,21 @@ describe("the owner's rules for the next days (DAY_RULES)", () => {
 
 describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
   const now = new Date('2026-10-29T09:00:00Z');
-  it('Viana abaixo de 100€ e Leiria abaixo de 110€ não dão horas; acima dá (dono, 3 Nov)', () => {
-    const low = botAvailability({ city: 'Viana do Castelo', total: 89 }, [], now) as { handToOwner: string | null };
+  it('Norte a partir de 79€ dá sempre horas (dono, 15 Nov); Leiria abaixo de 110€ não', () => {
+    const low = botAvailability({ city: 'Viana do Castelo', total: 78 }, [], now) as { handToOwner: string | null };
     expect(low.handToOwner).toMatch(/verificar a disponibilidade/);
+    const viana = botAvailability({ city: 'Viana do Castelo', total: 79 }, [], now) as { handToOwner: string | null };
+    expect(viana.handToOwner).toBeNull();
+    const aveiro = botAvailability({ city: 'Aveiro', total: 99 }, [], now) as { handToOwner: string | null; region: string };
+    expect(aveiro.handToOwner).toBeNull();
+    expect(aveiro.region).toBe('Porto');
     // Leiria is in the Coimbra zone: since 12 Nov 2026 no hours at any total (ASK_WEEK_ZONES).
     const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { handToOwner: string | null; askWeek?: true };
     expect([quoted.handToOwner, quoted.askWeek]).toEqual([COIMBRA_HAND, true]);
     const viana100 = botAvailability({ city: 'Viana do Castelo', total: 100 }, [], now) as { handToOwner: string | null };
     expect(viana100.handToOwner).toBeNull();
     const viana95 = botAvailability({ city: 'Viana do Castelo', total: 95 }, [], now) as { handToOwner: string | null };
-    expect(viana95.handToOwner).toMatch(/abaixo de 100/);
+    expect(viana95.handToOwner).toBeNull(); // dono 15 Nov: norte a partir de 79€
     const ok = botAvailability({ city: 'Viana do Castelo', total: 115 }, [], now) as { handToOwner: string | null };
     expect(ok.handToOwner).toBeNull();
     const owner = botAvailability({ city: 'Viana do Castelo', total: 50, ownerTime: true }, [], now) as { handToOwner: string | null };

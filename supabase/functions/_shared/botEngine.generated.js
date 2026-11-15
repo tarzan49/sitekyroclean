@@ -2962,9 +2962,10 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const closest = (t) => Math.min(Infinity, ...busy.filter((b) => b.team === t && b.place && place && lisbon(b.from).date === day).map((b) => driveMinutes(b.place, place)));
   return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
-var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Leiria", "Batalha"]);
+var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Aveiro", "Leiria", "Batalha"]);
 var SMALL_ORDER_MIN_TOTAL = 110;
-var SMALL_ORDER_MIN_BY_CITY = { "Viana do Castelo": 100 };
+var NORTH_MIN_TOTAL = 79;
+var SMALL_ORDER_MIN_BY_CITY = { "Viana do Castelo": NORTH_MIN_TOTAL, "Aveiro": NORTH_MIN_TOTAL };
 function orderTotal(req, city) {
   const given = Number(req.total);
   if (req.total !== void 0 && Number.isFinite(given)) return given;
@@ -3095,7 +3096,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   const area = CITY_REGION.get(fold3(city));
-  if (EXTENDED_TRIP_CITIES.has(city)) {
+  if (EXTENDED_TRIP_CITIES.has(city) && city !== "Aveiro") {
     if (req.date !== void 0 && (typeof req.date !== "string" || !DATE.test(req.date))) return { error: "date tem de ser AAAA-MM-DD" };
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
