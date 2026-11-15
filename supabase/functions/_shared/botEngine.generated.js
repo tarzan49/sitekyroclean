@@ -70,6 +70,9 @@ var locationPrices = {
   "Póvoa de Lanhoso": 15,
   "Fafe": 20,
   "Esposende": 20,
+  "Vizela": 15,
+  "Amares": 10,
+  "Vila Verde": 15,
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
   // Lisboa: mínimo 10€, máximo 15€.
   // Zona 0 — Lisboa
@@ -443,6 +446,9 @@ var cities = [
   { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "braga", description: "vila do Minho perto de Braga" },
   { name: "Fafe", slug: "fafe", region: "secondary", area: "braga", description: "vila do Minho, terra do capuchinho" },
   { name: "Esposende", slug: "esposende", region: "secondary", area: "braga", description: "vila costeira na foz do Cávado" },
+  { name: "Vizela", slug: "vizela", region: "secondary", area: "braga", description: "cidade termal entre Guimarães e Santo Tirso" },
+  { name: "Amares", slug: "amares", region: "secondary", area: "braga", description: "vila do Minho a norte de Braga" },
+  { name: "Vila Verde", slug: "vila-verde", region: "secondary", area: "braga", description: "vila do Minho a noroeste de Braga" },
   // Lisboa, Área Metropolitana e Alentejo Litoral
   { name: "Lisboa", slug: "lisboa", region: "primary", area: "lisboa", description: "capital de Portugal" },
   { name: "Amadora", slug: "amadora", region: "secondary", area: "lisboa", description: "município vizinho de Lisboa, um dos mais densos do país" },
@@ -2472,6 +2478,9 @@ var CITY_COORDS = {
   "Póvoa de Lanhoso": [41.576, -8.27],
   "Fafe": [41.4514, -8.1709],
   "Esposende": [41.5315, -8.7793],
+  "Vizela": [41.3784, -8.3077],
+  "Amares": [41.6302, -8.3517],
+  "Vila Verde": [41.6492, -8.4362],
   "Lisboa": [38.7078, -9.1366],
   "Amadora": [38.759, -9.2365],
   "Odivelas": [38.7904, -9.1793],

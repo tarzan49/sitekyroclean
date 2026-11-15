@@ -53,6 +53,9 @@ export const locationPrices: Record<string, number> = {
   'Póvoa de Lanhoso': 15,
   'Fafe': 20,
   'Esposende': 20,
+  'Vizela': 15,
+  'Amares': 10,
+  'Vila Verde': 15,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
   // Lisboa: mínimo 10€, máximo 15€.

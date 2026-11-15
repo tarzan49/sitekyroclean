@@ -114,6 +114,9 @@ export const cities = [
   { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "braga", description: "vila do Minho perto de Braga" },
   { name: "Fafe", slug: "fafe", region: "secondary", area: "braga", description: "vila do Minho, terra do capuchinho" },
   { name: "Esposende", slug: "esposende", region: "secondary", area: "braga", description: "vila costeira na foz do Cávado" },
+  { name: "Vizela", slug: "vizela", region: "secondary", area: "braga", description: "cidade termal entre Guimarães e Santo Tirso" },
+  { name: "Amares", slug: "amares", region: "secondary", area: "braga", description: "vila do Minho a norte de Braga" },
+  { name: "Vila Verde", slug: "vila-verde", region: "secondary", area: "braga", description: "vila do Minho a noroeste de Braga" },
   // Lisboa, Área Metropolitana e Alentejo Litoral
   { name: "Lisboa", slug: "lisboa", region: "primary", area: "lisboa", description: "capital de Portugal" },
   { name: "Amadora", slug: "amadora", region: "secondary", area: "lisboa", description: "município vizinho de Lisboa, um dos mais densos do país" },
