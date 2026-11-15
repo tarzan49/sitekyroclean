@@ -814,3 +814,13 @@ O dono disse: 10€ no centro de Leiria e 20€ no que for muito além disso. Ap
 ### Madeira no site (dono, 15 Nov 2026)
 
 O dono aceitou a mesma lógica de Leiria para o Funchal. Zona nova `madeira` no catálogo, com Funchal 10€, Câmara de Lobos e Caniço 15€, e Santa Cruz e Machico 20€. Freguesias novas: Leiria (17, sem a sede) e Funchal (9, sem a Sé), sem dados locais. A equipa da Madeira ainda não está decidida, e o bot continua a fechar sem hora (`askWeek`).
+
+## Antes e depois no pedido de avaliação (dono, 15 Nov 2026)
+
+- Origem: o dono mandou ao Sharles (Lisboa 1, Agualva-Cacém) o antes e depois do sofá com o pedido de avaliação e ele avaliou logo. "Foi do melhor que já vi."
+- kyro-bot `src/bot/beforeAfter.ts` (`proofsFor`): fotografias e vídeos da equipa ligados ao serviço, incluindo os soltos (sem responder à mensagem) que ficam mais perto desse serviço no tempo. O Sharles mandou o antes com manchas às 15:45, solto, 12 min depois do depois.
+- Escolha por visão (folha com todas numeradas): o antes é a de mais sujidade à vista, nunca pela ordem. Par fraco (de longe, sem diferença) não vai.
+- Sem bom par: edição ANTES (5 s) → extração (3 s) → DEPOIS (7 s) dos vídeos da equipa (aprovada no Diogo), senão o vídeo de mais efeito wow. Impermeabilização: o vídeo do líquido a entornar.
+- Com fotografia e vídeo: primeiro o vídeo ("O seu sofá, do antes ao depois."), depois a fotografia com o pedido. Texto aprovado: "Ainda bem que gostou! Aqui fica o antes e depois do seu sofá. Se puder deixar a sua opinião no Google, demora 10 segundos e ajuda-nos muito: [link] Fica com 10% de desconto no próximo serviço." [RETIRADA 15/11] a frase longa de 3/11 "Gostaríamos de saber a sua opinião … ajuda-nos imenso a mostrar a outros clientes o nosso valor".
+- Nunca o mesmo ficheiro duas vezes ao mesmo cliente (`review_before_after`). O par enviado fica em `service_procedure.before_after_*` (ligação à avaliação Google para as galerias do site, que ainda esperam pelo OK do dono à maqueta).
+- Equipas: "Serviço terminado" diz que o cliente pediu para ver o antes e depois; lembrete aos 30 min (`FIRST_NUDGE_MIN`).
