@@ -796,3 +796,12 @@ André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem est
 ## Disponibilidade: norte a partir de 79€ (dono, 15 Nov)
 
 "Acabou esta merda de não dar disponibilidades": só o Algarve e o Alentejo ficam com o dono; Coimbra/Leiria pode perguntar; o resto dá horas. A norte, orçamento igual ou superior a 79€ dá sempre horas (`NORTH_MIN_TOTAL`): Viana deixa o mínimo de 100€ [RETIRADA 15/11] e Aveiro sai da deslocação alargada no bot (equipa Porto). Caso: Carlos, Ribamar (Mafra), ficou sem horas porque Ribamar não estava na lista; entrou em `BOT_ONLY_PARISHES`.
+
+
+## Bot: 15 Nov 2026 (dono)
+
+- Apagar uma mensagem do bot pára-o só 2 minutos; nunca mais pausa por apagar duas vezes. Pausas do dono acabam em 2 h; só reclamação e parceria esperam por "Retomar" (Carlos).
+- Elogio nunca é reclamação (Sharles: "cheiroso" apanhava a palavra "cheiro").
+- O mesmo vídeo/foto nunca duas vezes, contando também respostas cortadas a meio (Flávia: vídeo do tapete 4 vezes).
+- Firmeza quando o cliente duvida do processo: explicação técnica + avaliação real do mesmo problema, sem dar razão à dúvida (Flávia).
+- Poltronas/cadeirões: oferecer impermeabilização como extra, preço de sofá de 1 lugar por poltrona.
