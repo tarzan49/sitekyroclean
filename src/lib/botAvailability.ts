@@ -119,9 +119,14 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
  * The waterproofing of the job for `teamsFor`: 'premium' (Porto 1 may take it) when an item is Premium or is cleaning
  * plus waterproofing (owner, 4 Nov 2026: "porto 1 fica apenas com imper + limpeza ou imper premium").
  */
-export function waterproofingKind(items: unknown): boolean | 'premium' {
+export const PORTO1_CHAIRS_MIN_TOTAL = 130;
+export function waterproofingKind(items: unknown, total?: number | null): boolean | 'premium' {
   // Owner, 14 Nov 2026: Porto 1 takes Premium waterproofing only (cleaning + Essencial is not Premium).
-  if (Array.isArray(items) && items.some(i => /premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')))) return 'premium';
+  // Owner, 15 Nov 2026: "imper para porto 1 so de 2 L para cima, cadeira q n sejam abaixo de 130 eur eles nao querem":
+  // a Premium sofa of 2 seats or more, or Premium chairs in a job of 130€ or more; the rest goes to the other team.
+  const porto1 = (i: { kind?: unknown; size?: unknown }) => i.kind === 'sofa' ? i.size !== '1-lugar'
+    : i.kind === 'chairs' ? typeof total === 'number' && total >= PORTO1_CHAIRS_MIN_TOTAL : false;
+  if (Array.isArray(items) && items.some(i => /premium/.test(String((i as { treatment?: unknown })?.treatment ?? '')) && porto1(i as { kind?: unknown; size?: unknown }))) return 'premium';
   return hasWaterproofing(items);
 }
 /**
@@ -867,7 +872,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? '' : '';
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsFor(area, waterproofingKind(req?.items, orderTotal(req, city)), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area]!.join('/')} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);

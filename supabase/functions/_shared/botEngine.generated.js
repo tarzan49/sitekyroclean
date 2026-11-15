@@ -2567,8 +2567,10 @@ var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
 };
-function waterproofingKind(items) {
-  if (Array.isArray(items) && items.some((i) => /premium/.test(String(i?.treatment ?? "")))) return "premium";
+var PORTO1_CHAIRS_MIN_TOTAL = 130;
+function waterproofingKind(items, total) {
+  const porto1 = (i) => i.kind === "sofa" ? i.size !== "1-lugar" : i.kind === "chairs" ? typeof total === "number" && total >= PORTO1_CHAIRS_MIN_TOTAL : false;
+  if (Array.isArray(items) && items.some((i) => /premium/.test(String(i?.treatment ?? "")) && porto1(i))) return "premium";
   return hasWaterproofing(items);
 }
 var NO_RUG_PICKUP_ZONES = /* @__PURE__ */ new Set(["Braga"]);
@@ -3116,7 +3118,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? "" : "";
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsFor(area, waterproofingKind(req?.items), area === "Porto" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsFor(area, waterproofingKind(req?.items, orderTotal(req, city)), area === "Porto" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area].join("/")} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização nesta zona: o responsável escolhe a equipa e a hora" };
   const cleaning = !waterproofingOnly(req?.items);
@@ -3373,7 +3375,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
-  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
+  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items, total), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
   if (!team && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
   const what = quote.lines.map((l) => l.label).join(" + ");

@@ -321,7 +321,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (typeof agreed === 'string') return { ok: false, handToOwner: agreed };
   const total = agreed.total!;
   // Far zone: the team already there that day (availability.sharedTrip).
-  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
+  const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items, total), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
   if (!team && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
 
   const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;

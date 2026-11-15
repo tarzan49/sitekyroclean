@@ -68,10 +68,17 @@ describe('botAvailability', () => {
     expect(teamBusyAt(two.slice(0, 1), 'Porto 2', at('2026-10-08', '11:30'), at('2026-10-08', '12:30'))).toBe(false);
   });
 
+  it('Porto 1: Premium only from a 2-seat sofa, chairs only from 130€ (owner, 15 Nov 2026)', () => {
+    const d = '2026-11-20';
+    expect(teamsFor('Porto', waterproofingKind([{ kind: 'sofa', size: '2-lugares', treatment: 'premium' }], 99), 99, d)).toEqual(['Porto 1']);
+    expect(teamsFor('Porto', waterproofingKind([{ kind: 'sofa', size: '1-lugar', treatment: 'premium' }], 79), 79, d)).not.toContain('Porto 1');
+    expect(teamsFor('Porto', waterproofingKind([{ kind: 'chairs', qty: 4, treatment: 'premium' }], 120), 120, d)).not.toContain('Porto 1');
+    expect(teamsFor('Porto', waterproofingKind([{ kind: 'chairs', qty: 6, treatment: 'premium' }], 150), 150, d)).toEqual(['Porto 1']);
+  });
   it('Porto 1 takes cleaning + waterproofing or Premium, not Essencial alone', () => {
     // Owner, 14 Nov 2026: cleaning + Essencial is not Premium, so not Porto 1.
     expect(teamsFor('Porto', waterproofingKind([{ treatment: 'clean+essencial' }]), 100, '2026-11-05')).not.toContain('Porto 1');
-    expect(teamsFor('Porto', waterproofingKind([{ treatment: 'premium' }]), 100, '2026-11-05')).toContain('Porto 1');
+    expect(teamsFor('Porto', waterproofingKind([{ kind: 'sofa', size: '2-lugares', treatment: 'premium' }]), 100, '2026-11-05')).toContain('Porto 1');
     expect(teamsFor('Porto', waterproofingKind([{ treatment: 'essencial' }]), 100, '2026-11-05')).not.toContain('Porto 1');
   });
 

@@ -789,3 +789,6 @@ André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem est
 
 ### Impermeabilização: 24 h sem usar (dono, 15 Nov 2026)
 "claro que é 24 horas sem uso para deixar o produto atuar direito". A secagem de 2 a 5 h é a da limpeza; depois de impermeabilizar a peça fica 24 h sem uso. Respondi ao André "secas em 2 a 5 horas" sem as 24 h: erro meu, não do ficheiro do bot.
+
+### Porto 1: Premium só de 2 lugares para cima, cadeiras a partir de 130€ (dono, 15 Nov 2026)
+"imper para porto 1 so de 2 L para cima, cadeira q n sejam abaixo de 130 eur eles nao querem". `waterproofingKind(items, total)` só devolve 'premium' para sofá Premium que não seja 1 lugar, ou cadeiras Premium com total ≥ 130€ (`PORTO1_CHAIRS_MIN_TOTAL`). Poltrona Premium e cadeiras abaixo de 130€ saem da Porto 1 e vão para a outra equipa de impermeabilização da zona. Substitui em parte a regra de 14 Nov ("todas as Premium").
