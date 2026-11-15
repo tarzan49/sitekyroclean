@@ -162,6 +162,10 @@ Deno.test("client review request: once, at the end of the service, never to a pa
   assert(String(first.message).includes("demora só 10 segundos"));
   await procedureSent({ eventId: "s1", kind: "client-review", messageIds: ["w1"] }, store, new Date("2026-10-15T15:16:00Z"));
   assertEquals(table.get("s1")!.client_review_msg_id, "w1");
+  // The before and after sent with it is kept on the service (dono, 15 Nov): sent, before, after.
+  await procedureSent({ eventId: "s1", kind: "client-before-after", messageIds: ["w1", "b1", "a1"] }, store, new Date("2026-10-15T15:16:00Z"));
+  assertEquals([table.get("s1")!.before_after_sent_msg_id, table.get("s1")!.before_after_before_msg_id, table.get("s1")!.before_after_after_msg_id], ["w1", "b1", "a1"]);
+  assertEquals((await procedureSent({ eventId: "s1", kind: "client-before-after", messageIds: ["w1"] }, store, new Date())).status, 400);
   // Two hours after the end: s3 goes (Lisbon link), s2 is on hold and s4 has no phone; s1 is not sent again.
   body = await json(await procedureDue(events, store, new Date("2026-10-15T17:05:00Z")));
   assertEquals((body.clientReviews as Row[]).map(c => c.eventId), ["s3"]);

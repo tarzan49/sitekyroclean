@@ -242,6 +242,15 @@ export async function procedureSent(body: Row, store: ProcedureStore, now: Date)
       : { client_review_skip: skipped, updated_at: now.toISOString() });
     return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
   }
+  if (body.kind === "client-before-after") {
+    // The montage sent with the review request: [sent message, team's before photo, team's after photo].
+    if (ids.length < 3) return createErrorResponse("messageIds tem de ter a mensagem enviada, o antes e o depois", 400);
+    const err = await store.update(eventId, {
+      before_after_sent_msg_id: ids[0], before_after_before_msg_id: ids[1], before_after_after_msg_id: ids[2],
+      before_after_sent_at: now.toISOString(), updated_at: now.toISOString(),
+    });
+    return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
+  }
   if (body.kind === "client-certificate") {
     const skipped = typeof body.skipped === "string" ? body.skipped.trim().slice(0, 200) : "";
     if (!ids.length && !skipped) return createErrorResponse("messageIds ou skipped em falta", 400);
