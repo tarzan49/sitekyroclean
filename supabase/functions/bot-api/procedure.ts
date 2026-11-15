@@ -45,7 +45,7 @@ const hhmm = (iso: string) =>
     .format(new Date(iso)).replace(":00", "h").replace(":", "h");
 
 function labelFor(service: Row | undefined, event: CalendarEvent): { label: string; what: string | null; firstName: string | null } {
-  const title = factsFromTitle(event.summary);
+  const title = factsFromTitle(event.summary, (event as { location?: string }).location ?? '');
   const name = typeof service?.client_name === "string" ? service.client_name.trim().split(/\s+/)[0] : title.firstName;
   const city = typeof service?.city === "string" ? service.city.trim() : "";
   const what = (typeof service?.description === "string" && service.description.trim()) || title.what;

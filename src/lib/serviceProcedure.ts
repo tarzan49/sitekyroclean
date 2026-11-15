@@ -401,7 +401,14 @@ export const PROCEDURE_NOT_A_REPLY_MESSAGE =
  * do título ("Serviço 45€ (89€) (anúncio) Limpeza de sofá - 9… - Ana Silva - Rua…")
  * e o primeiro nome. Usado quando o CRM ainda não tem a linha.
  */
-export function factsFromTitle(summary: string): { what: string | null; firstName: string | null } {
+/** A localidade escrita no título (ex. "Agualva") não é o nome do cliente (dono, 15 Nov, Sharles). */
+function isPlace(part: string, summary: string, location: string): boolean {
+  const n = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const hay = n(`${location} ${summary.replace(part, '')}`);
+  return n(part).split(/\s+/).some(w => w.length > 2 && new RegExp(`\\b${w}\\b`).test(hay));
+}
+
+export function factsFromTitle(summary: string, location = ''): { what: string | null; firstName: string | null } {
   const parts = summary.split(/\s+-\s+/).map(s => s.trim());
   const what = (parts[0] ?? '')
     .replace(/^(a confirmar\s*·\s*)?(servi[cç]o|limpeza)\b/i, m => (/limpeza/i.test(m) ? 'Limpeza' : ''))
@@ -409,7 +416,7 @@ export function factsFromTitle(summary: string): { what: string | null; firstNam
     .replace(/\((?:\s*|an[uú]ncio[^)]*)\)/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
-  const nameish = parts.slice(1).find(p => /^[\p{L} '.]+$/u.test(p) && p.split(/\s+/).length <= 4 && !/^(rua|av|avenida|travessa|largo|praça|estrada)\b/i.test(p));
+  const nameish = parts.slice(1).find(p => /^[\p{L} '.]+$/u.test(p) && p.split(/\s+/).length <= 4 && !/^(rua|av|avenida|travessa|largo|praça|estrada|beco)\b/i.test(p) && !isPlace(p, summary, location));
   return { what: what || null, firstName: nameish ? nameish.split(/\s+/)[0] : null };
 }
 
