@@ -10,7 +10,7 @@
 // through the team; `clientReviewDue` decides when).
 import {
   addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, isRugPickupVisit, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
-  procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
+  procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
 import { createErrorResponse, createSuccessResponse, safeLog } from "../_shared/security.ts";
@@ -132,7 +132,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const index = reminderDue(r, check, now);
     if (index === null) return [];
     const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
-    return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, message: procedureReminderMessage(label, check, r.service_day) }];
+    return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, message: procedureReminderMessage(label, check, r.service_day, { first: index === 0 && !!r.prompted_at && r.prompted_at >= FIRST_NUDGE_FROM, what: serviceByEvent.get(r.calendar_event_id)?.description as string | null }) }];
   });
   // The state kept in the table (for the panel), and a notice when a deadline closes with something missing.
   const linked = reviews.map(r => ({ stars: Number(r.stars), reviewed_at: String(r.reviewed_at), excluded: (r.excluded as string) ?? null, service_request_id: (r.service_request_id as string) ?? null }));

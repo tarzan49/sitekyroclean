@@ -137,16 +137,21 @@ describe('photos and video sent in reply', () => {
 
 describe('messages', () => {
   const noDash = /—|–/;
-  it('the service message asks for the photos and the video and says the bot sends the review request to the client', () => {
+  it('the service message: the client asked for the before and after; never the review (dono, 15/11)', () => {
     const m = procedurePromptMessage({ label: 'Ana, Paranhos', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15', time: '15h' });
-    expect(m).toContain('Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.');
-    expect(m).toContain('Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo');
-    expect(m).toContain('sempre em HD no WhatsApp');
-    expect(m).toContain('4. Escovação');
-    expect(m).toContain('Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é 22/10. Obrigado!');
-    expect(m).not.toContain('reencaminha');
+    expect(m).toBe([
+      'Serviço terminado: Ana, Paranhos (Limpeza de sofá), 15/10 às 15h.', '',
+      'O cliente pediu para ver o antes e depois do serviço dele. Responde a esta mensagem com:',
+      '1. Fotografia de antes, de perto, onde se veja a sujidade ou a mancha',
+      '2. Fotografia de depois, do mesmo sítio e do mesmo ângulo',
+      '3. Vídeo do processo (5 a 10 segundos, telemóvel na vertical, sem caras)', '',
+      'Manda sempre em HD no WhatsApp. Obrigado!',
+    ].join('\n'));
+    expect(m).not.toMatch(/avalia/i);
     expect(m).not.toMatch(noDash);
-    expect(m).not.toContain('Instagram');
+    const imper = procedurePromptMessage({ label: 'Ana', what: 'Impermeabilização Premium sofá 2 lugares', team: 'Porto 1', serviceDay: '2026-10-15' });
+    expect(imper).toContain('O cliente pediu para ver o vídeo da impermeabilização. Responde a esta mensagem com o vídeo da aplicação, do teste com água e do pano a tirar a água (telemóvel na vertical, sem caras, em HD).');
+    expect(procedurePromptMessage({ label: 'Ana', what: 'Limpeza e impermeabilização Premium de sofá', team: 'Porto 1', serviceDay: '2026-10-15' })).toContain('4. Vídeo da impermeabilização');
   });
   it('the shots follow the service: waterproofing only, cleaning only, or both in one visit', () => {
     const only = procedureShots('Impermeabilização Premium sofá 2 lugares');
@@ -164,9 +169,7 @@ describe('messages', () => {
     }
   });
   it('a service with no description also mentions the waterproofing shots', () => {
-    const m = procedurePromptMessage({ label: 'Ana, Paranhos', team: 'Porto 2', serviceDay: '2026-10-15' });
-    expect(m).toContain('4. Escovação');
-    expect(m).toContain('Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água.');
+    expect(procedurePromptMessage({ label: 'Ana, Paranhos', team: 'Porto 2', serviceDay: '2026-10-15' })).toContain('Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água.');
     expect(procedurePromptMessage({ label: 'Ana', what: 'Limpeza de sofá', team: 'Porto 2', serviceDay: '2026-10-15' })).not.toContain('Se houve impermeabilização');
   });
   it('the client message: first name, the service, the right review link, the owner\'s 10% line', () => {
@@ -200,6 +203,12 @@ describe('messages', () => {
     const m = procedureReminderMessage('Ana', { missing: ['video', 'review'], deadline: '2026-10-22' }, '2026-10-15');
     expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo. Responde à mensagem desse serviço com o que falta. Prazo: 22/10.');
     expect(m).not.toMatch(noDash);
+    expect(procedureReminderMessage('Sharles, Agualva-Cacém', { missing: ['before', 'after', 'video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Limpeza de sofá' }))
+      .toBe('O cliente está à espera do antes e depois do serviço Sharles, Agualva-Cacém. Responde à mensagem do serviço com as fotografias e o vídeo, em HD.');
+    expect(procedureReminderMessage('Ana', { missing: ['video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Limpeza de sofá' }))
+      .toBe('O cliente está à espera do antes e depois do serviço Ana. Responde à mensagem do serviço com o que falta: vídeo, em HD.');
+    expect(procedureReminderMessage('Ana', { missing: ['video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Impermeabilização Premium' }))
+      .toBe('O cliente está à espera do vídeo da impermeabilização do serviço Ana. Responde à mensagem do serviço com o vídeo, em HD.');
   });
 });
 
@@ -245,6 +254,15 @@ describe('reminders', () => {
     expect(reminderDue(rec({ reminders_sent: 1 }), open, new Date('2026-10-17T12:00:00Z'))).toBeNull();
     expect(reminderDue(rec({ reminders_sent: 1 }), open, new Date('2026-10-20T12:00:00Z'))).toBe(1);
     expect(reminderDue(rec({ reminders_sent: 2 }), open, new Date('2026-10-21T12:00:00Z'))).toBeNull();
+  });
+  it('from 16/11: 30 min after the service message, then the day after and the 5th day', () => {
+    const r = (o = {}) => rec({ prompted_at: '2026-11-16T15:00:00Z', service_day: '2026-11-16', ...o });
+    expect(reminderDue(r(), open, new Date('2026-11-16T15:29:00Z'))).toBeNull();
+    expect(reminderDue(r(), open, new Date('2026-11-16T15:30:00Z'))).toBe(0);
+    expect(reminderDue(r({ reminders_sent: 1 }), open, new Date('2026-11-16T18:00:00Z'))).toBeNull();
+    expect(reminderDue(r({ reminders_sent: 1 }), open, new Date('2026-11-17T10:00:00Z'))).toBe(1);
+    expect(reminderDue(r({ reminders_sent: 2 }), open, new Date('2026-11-21T10:00:00Z'))).toBe(2);
+    expect(reminderDue(r({ reminders_sent: 3 }), open, new Date('2026-11-22T10:00:00Z'))).toBeNull();
   });
   it('nothing when complete or closed', () => {
     expect(reminderDue(rec(), { missing: [], status: 'completo' }, new Date('2026-10-16T12:00:00Z'))).toBeNull();

@@ -3794,41 +3794,23 @@ function slotForMedia(rec, kind, caption) {
   return rec.before_msg_id ? "after" : "before";
 }
 var serviceName = (f) => `${f.label}${f.what ? ` (${f.what})` : ""}`;
-var CLEANING_SHOTS = [
-  "Antes: o artigo inteiro",
-  "Antes: a pior mancha, de perto",
-  "Pulverização",
-  "Escovação",
-  "Extração, de perto, com o som da máquina",
-  "A água suja na máquina"
-];
-var WATERPROOFING_SHOTS = [
-  "A pessoa a impermeabilizar",
-  "Teste da impermeabilização com água",
-  "O pano a tirar a água"
-];
-function procedureShots(what) {
-  const imper = /impermeab/i.test(what ?? "");
-  const clean = !imper || /limpeza|lavagem/i.test(what ?? "");
-  return [
-    ...clean ? CLEANING_SHOTS : ["Antes: o artigo inteiro"],
-    ...imper ? WATERPROOFING_SHOTS : [],
-    "Depois: o artigo inteiro, do mesmo sítio do plano 1"
-  ];
-}
 function procedurePromptMessage(f) {
-  const shots = procedureShots(f.what);
+  const imper = /impermeab/i.test(f.what ?? "");
+  const clean = !imper || /limpeza|lavagem/i.test(f.what ?? "");
+  const head = `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`;
+  const imperVideo = "o vídeo da aplicação, do teste com água e do pano a tirar a água (telemóvel na vertical, sem caras, em HD)";
+  if (!clean) return [head, "", `O cliente pediu para ver o vídeo da impermeabilização. Responde a esta mensagem com ${imperVideo}.`].join("\n");
   return [
-    `Serviço terminado: ${serviceName(f)}, ${dm2(f.serviceDay)}${f.time ? ` às ${f.time}` : ""}.`,
+    head,
     "",
-    "Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo (telemóvel na vertical, sem caras, 5 a 10 segundos cada):",
-    ...shots.map((s, i) => `${i + 1}. ${s}`),
+    "O cliente pediu para ver o antes e depois do serviço dele. Responde a esta mensagem com:",
+    "1. Fotografia de antes, de perto, onde se veja a sujidade ou a mancha",
+    "2. Fotografia de depois, do mesmo sítio e do mesmo ângulo",
+    "3. Vídeo do processo (5 a 10 segundos, telemóvel na vertical, sem caras)",
+    ...imper ? [`4. Vídeo da impermeabilização: a aplicação, o teste com água e o pano a tirar a água`] : [],
     ...f.what ? [] : ["", "Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água."],
     "",
-    // Dono, 4/11/2026: "sempre a pedir para enviarem fotos em HD no WhatsApp".
-    "Manda as fotografias e os vídeos sempre em HD no WhatsApp (carrega em HD antes de enviar).",
-    "",
-    `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm2(procedureDeadline(f.serviceDay))}. Obrigado!`
+    "Manda sempre em HD no WhatsApp. Obrigado!"
   ].join("\n");
 }
 function procedureClientMessage(f) {
@@ -3874,19 +3856,31 @@ function procedureReceiptMessage(label, received, check) {
 }
 var REMINDER_DAYS = [1, 5];
 var REMINDER_HOUR = 10;
+var FIRST_NUDGE_MIN = 30;
+var FIRST_NUDGE_FROM = "2026-11-15T23:00:00Z";
+var hasNudge = (rec) => !!rec.prompted_at && rec.prompted_at >= FIRST_NUDGE_FROM;
 function reminderDue(rec, check, now) {
   if (!rec.prompted_at || check.status !== "em_curso" || !check.missing.some((i) => i !== "review")) return null;
+  const nudge = hasNudge(rec);
+  if (nudge && rec.reminders_sent === 0) return now.getTime() >= Date.parse(rec.prompted_at) + FIRST_NUDGE_MIN * 6e4 ? 0 : null;
   const today = lisbonDayOf(now);
   const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Lisbon", hour: "2-digit", hourCycle: "h23" }).format(now));
   if (hour < REMINDER_HOUR) return null;
+  const off = nudge ? 1 : 0;
   let due = null;
   REMINDER_DAYS.forEach((d, i) => {
-    if (i >= rec.reminders_sent && today >= addDays2(rec.service_day, d)) due = i;
+    if (i + off >= rec.reminders_sent && today >= addDays2(rec.service_day, d)) due = i + off;
   });
   return due;
 }
-function procedureReminderMessage(label, check, serviceDay) {
+function procedureReminderMessage(label, check, serviceDay, opts = {}) {
   const media = check.missing.filter((i) => i !== "review");
+  if (opts.first) {
+    const imperOnly = /impermeab/i.test(opts.what ?? "") && !/limpeza|lavagem/i.test(opts.what ?? "");
+    if (imperOnly) return `O cliente está à espera do vídeo da impermeabilização do serviço ${label}. Responde à mensagem do serviço com o vídeo, em HD.`;
+    const all = media.length >= 3;
+    return `O cliente está à espera do antes e depois do serviço ${label}. Responde à mensagem do serviço com ${all ? "as fotografias e o vídeo" : `o que falta: ${missingText(media)}`}, em HD.`;
+  }
   const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(media)}.`];
   lines.push("Responde à mensagem desse serviço com o que falta.");
   lines.push(`Prazo: ${dm2(check.deadline)}.`);
@@ -4390,6 +4384,7 @@ function certificateNumber(serviceDate, taken, tier = "premium") {
   return `${base}${String(n).padStart(2, "0")}`;
 }
 export {
+  FIRST_NUDGE_FROM,
   PROCEDURE_NOT_A_REPLY_MESSAGE,
   TEAM_COLOR,
   addDays2 as addDays,

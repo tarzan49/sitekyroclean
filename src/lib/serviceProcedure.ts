@@ -266,18 +266,24 @@ export function procedureShots(what: string | null | undefined): string[] {
  * (`clientReviewDue`). Sem emojis nem travessões.
  */
 export function procedurePromptMessage(f: PromptFacts): string {
-  const shots = procedureShots(f.what);
+  // Dono, 15/11/2026: o cliente recebe o antes e depois (ou o vídeo da impermeabilização) do serviço dele,
+  // por isso a equipa sabe que é o cliente que o pediu; a avaliação não se menciona à equipa.
+  const imper = /impermeab/i.test(f.what ?? '');
+  const clean = !imper || /limpeza|lavagem/i.test(f.what ?? '');
+  const head = `Serviço terminado: ${serviceName(f)}, ${dm(f.serviceDay)}${f.time ? ` às ${f.time}` : ''}.`;
+  const imperVideo = 'o vídeo da aplicação, do teste com água e do pano a tirar a água (telemóvel na vertical, sem caras, em HD)';
+  if (!clean) return [head, '', `O cliente pediu para ver o vídeo da impermeabilização. Responde a esta mensagem com ${imperVideo}.`].join('\n');
   return [
-    `Serviço terminado: ${serviceName(f)}, ${dm(f.serviceDay)}${f.time ? ` às ${f.time}` : ''}.`,
+    head,
     '',
-    'Responde a esta mensagem com a fotografia de antes, a fotografia de depois e os vídeos do processo todo (telemóvel na vertical, sem caras, 5 a 10 segundos cada):',
-    ...shots.map((s, i) => `${i + 1}. ${s}`),
+    'O cliente pediu para ver o antes e depois do serviço dele. Responde a esta mensagem com:',
+    '1. Fotografia de antes, de perto, onde se veja a sujidade ou a mancha',
+    '2. Fotografia de depois, do mesmo sítio e do mesmo ângulo',
+    '3. Vídeo do processo (5 a 10 segundos, telemóvel na vertical, sem caras)',
+    ...(imper ? [`4. Vídeo da impermeabilização: a aplicação, o teste com água e o pano a tirar a água`] : []),
     ...(f.what ? [] : ['', 'Se houve impermeabilização, filma também a aplicação, o teste com água e o pano a tirar a água.']),
     '',
-    // Dono, 4/11/2026: "sempre a pedir para enviarem fotos em HD no WhatsApp".
-    'Manda as fotografias e os vídeos sempre em HD no WhatsApp (carrega em HD antes de enviar).',
-    '',
-    `Assim que chegar a fotografia de depois ou o vídeo, o bot pergunta ao cliente como correu o serviço. O prazo para a avaliação é ${dm(procedureDeadline(f.serviceDay))}. Obrigado!`,
+    'Manda sempre em HD no WhatsApp. Obrigado!',
   ].join('\n');
 }
 
@@ -365,21 +371,34 @@ export function procedureReceiptMessage(label: string, received: ProcedureItem[]
 /** Lembretes: no dia a seguir ao serviço e no 5.º dia, às 10h de Lisboa, se faltar alguma coisa. */
 export const REMINDER_DAYS = [1, 5] as const;
 export const REMINDER_HOUR = 10;
+/** Dono, 15/11/2026: insistir 30 minutos depois do "Serviço terminado" (só nos serviços avisados a partir de agora). */
+export const FIRST_NUDGE_MIN = 30;
+export const FIRST_NUDGE_FROM = '2026-11-15T23:00:00Z';
+const hasNudge = (rec: Pick<ProcedureRecord, 'prompted_at'>) => !!rec.prompted_at && rec.prompted_at >= FIRST_NUDGE_FROM;
 
-/** Qual lembrete toca agora (índice em REMINDER_DAYS), ou null. */
+/** Qual lembrete toca agora (índice), ou null. Com o lembrete dos 30 min: 0 = 30 min, 1 = dia seguinte, 2 = 5.º dia. */
 export function reminderDue(rec: Pick<ProcedureRecord, 'service_day' | 'reminders_sent' | 'prompted_at'>, check: Pick<ProcedureCheck, 'missing' | 'status'>, now: Date): number | null {
   // A avaliação já não se cobra à equipa (dono, 6/11): só a falta de fotografias ou vídeo dá lembrete.
   if (!rec.prompted_at || check.status !== 'em_curso' || !check.missing.some(i => i !== 'review')) return null;
+  const nudge = hasNudge(rec);
+  if (nudge && rec.reminders_sent === 0) return now.getTime() >= Date.parse(rec.prompted_at) + FIRST_NUDGE_MIN * 60_000 ? 0 : null;
   const today = lisbonDayOf(now);
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', hour: '2-digit', hourCycle: 'h23' }).format(now));
   if (hour < REMINDER_HOUR) return null;
+  const off = nudge ? 1 : 0;
   let due: number | null = null;
-  REMINDER_DAYS.forEach((d, i) => { if (i >= rec.reminders_sent && today >= addDays(rec.service_day, d)) due = i; });
+  REMINDER_DAYS.forEach((d, i) => { if (i + off >= rec.reminders_sent && today >= addDays(rec.service_day, d)) due = i + off; });
   return due;
 }
 
-export function procedureReminderMessage(label: string, check: Pick<ProcedureCheck, 'missing' | 'deadline'>, serviceDay: string): string {
+export function procedureReminderMessage(label: string, check: Pick<ProcedureCheck, 'missing' | 'deadline'>, serviceDay: string, opts: { first?: boolean; what?: string | null } = {}): string {
   const media = check.missing.filter(i => i !== 'review');
+  if (opts.first) {
+    const imperOnly = /impermeab/i.test(opts.what ?? '') && !/limpeza|lavagem/i.test(opts.what ?? '');
+    if (imperOnly) return `O cliente está à espera do vídeo da impermeabilização do serviço ${label}. Responde à mensagem do serviço com o vídeo, em HD.`;
+    const all = media.length >= 3;
+    return `O cliente está à espera do antes e depois do serviço ${label}. Responde à mensagem do serviço com ${all ? 'as fotografias e o vídeo' : `o que falta: ${missingText(media)}`}, em HD.`;
+  }
   const lines = [`Lembrete do serviço ${label}, ${dm(serviceDay)}. Falta: ${missingText(media)}.`];
   lines.push('Responde à mensagem desse serviço com o que falta.');
   lines.push(`Prazo: ${dm(check.deadline)}.`);
