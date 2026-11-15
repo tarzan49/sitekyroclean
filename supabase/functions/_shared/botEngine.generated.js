@@ -1944,7 +1944,7 @@ for (const m of municipiosComFreguesias) {
 }
 for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToMunicipio.delete(key);
 var BOT_ONLY_PARISHES = {
-  Mafra: ["Santo Isidoro", "Encarnação", "Enxara do Bispo", "Gradil", "Vila Franca do Rosário", "Igreja Nova", "Cheleiros", "Milharado", "Azueira", "Sobral da Abelheira"]
+  Mafra: ["Santo Isidoro", "Ribamar", "Ribeira de Ilhas", "Sobreiro", "São Lourenço", "Encarnação", "Enxara do Bispo", "Gradil", "Vila Franca do Rosário", "Igreja Nova", "Cheleiros", "Milharado", "Azueira", "Sobral da Abelheira"]
 };
 for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
   if (!(municipality in locationPrices)) continue;

@@ -75,7 +75,7 @@ for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToM
  * not shared with another served municipality.
  */
 const BOT_ONLY_PARISHES: Record<string, string[]> = {
-  Mafra: ['Santo Isidoro', 'Encarnação', 'Enxara do Bispo', 'Gradil', 'Vila Franca do Rosário', 'Igreja Nova', 'Cheleiros', 'Milharado', 'Azueira', 'Sobral da Abelheira'],
+  Mafra: ['Santo Isidoro', 'Ribamar', 'Ribeira de Ilhas', 'Sobreiro', 'São Lourenço', 'Encarnação', 'Enxara do Bispo', 'Gradil', 'Vila Franca do Rosário', 'Igreja Nova', 'Cheleiros', 'Milharado', 'Azueira', 'Sobral da Abelheira'],
 };
 for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
   if (!(municipality in locationPrices)) continue;
