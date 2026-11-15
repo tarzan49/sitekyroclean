@@ -111,6 +111,8 @@ import colchao06Antes from "@/assets/before-after-pool/colchao-06-antes.webp";
 import colchao06Depois from "@/assets/before-after-pool/colchao-06-depois.webp";
 import colchao07Antes from "@/assets/before-after-pool/colchao-07-antes.webp";
 import colchao07Depois from "@/assets/before-after-pool/colchao-07-depois.webp";
+import sofa15Antes from "@/assets/before-after-pool/sofa-15-antes.webp";
+import sofa15Depois from "@/assets/before-after-pool/sofa-15-depois.webp";
 import sofa14Antes from "@/assets/before-after-pool/sofa-14-antes.webp";
 import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
 import tapete06Antes from "@/assets/before-after-pool/tapete-06-antes.webp";
@@ -153,16 +155,18 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
-    { kind: "pair", before: sofa02Antes, after: sofa02Depois },
+    // 15/11/2026 (dono): sofá da Lisboa 1 (Rodolfo) em 2.º; 4.º e 5.º trocados; sofa-02 para o fim.
+    { kind: "pair", before: sofa15Antes, after: sofa15Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
-    { kind: "pair", before: sofa13Antes, after: sofa13Depois },
     { kind: "pair", before: sofa07Antes, after: sofa07Depois },
+    { kind: "pair", before: sofa13Antes, after: sofa13Depois },
     { kind: "pair", before: sofa11Antes, after: sofa11Depois },
     { kind: "pair", before: sofa09Antes, after: sofa09Depois },
     { kind: "pair", before: sofa01Antes, after: sofa01Depois },
     { kind: "pair", before: sofa04Antes, after: sofa04Depois },
     { kind: "pair", before: sofa14Depois, after: sofa14Antes },
     { kind: "pair", before: sofa08Antes, after: sofa08Depois },
+    { kind: "pair", before: sofa02Antes, after: sofa02Depois },
   ],
   colchao: [
     { kind: "pair", before: colchao06Antes, after: colchao06Depois },
