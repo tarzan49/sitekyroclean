@@ -46,6 +46,7 @@ const AREA_TO_LOCALITY: Record<string, CrmLocality> = {
   porto: 'Porto', lisboa: 'Lisboa', algarve: 'Algarve', braga: 'Braga',
   // Coimbra e Figueira da Foz: região própria no CRM desde 2026-10-11 (dono).
   coimbra: 'Coimbra',
+  madeira: 'Madeira',
 };
 
 /** Direção de texto, espaços invisíveis e hífenes tipográficos que o Google Contacts mete à volta dos telefones. */

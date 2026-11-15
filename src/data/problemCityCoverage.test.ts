@@ -241,7 +241,7 @@ describe('limpeza-sofa-perto-de-mim: a página nacional nomeia todas as zonas', 
   it('a resposta "Em que cidades" sai do catálogo e aparece na página', () => {
     const answer = perto.faqs.find(faq => faq.question === question)!.answer;
     // Texto escolhido pelo dono; o número de concelhos acompanha o catálogo.
-    expect(answer.startsWith(`Servimos ${cities.length} concelhos em cinco zonas: Porto e arredores, Braga e Minho, Coimbra e Figueira da Foz, Lisboa e Setúbal até ao Alentejo Litoral, e Algarve. `)).toBe(true);
+    expect(answer.startsWith(`Servimos ${cities.length} concelhos em seis zonas: Porto e arredores, Braga e Minho, Coimbra, Leiria e Figueira da Foz, Lisboa e Setúbal até ao Alentejo Litoral, Algarve, e Madeira. `)).toBe(true);
     expect(answer.endsWith(' Contacte-nos para confirmar a sua localidade.')).toBe(true);
     const onRequest = answer.match(/ Em (.+), a disponibilidade é sob consulta\. /)![1];
     expect(onRequest.split(/, | e /)).toEqual(cities.map(c => c.name).filter(name => EXTENDED_TRIP_CITIES.has(name)));

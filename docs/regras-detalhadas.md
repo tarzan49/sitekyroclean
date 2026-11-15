@@ -810,3 +810,7 @@ André (6 cadeiras de madeira, Porto, ref. P64TF): "a cadeira quase não tem est
 ### Deslocação na zona de Leiria (dono, 15 Nov 2026)
 
 O dono disse: 10€ no centro de Leiria e 20€ no que for muito além disso. Aplicou-se a mesma lógica de escalões de Braga: até ~10 km 10€, até ~15 km 15€, acima 20€. A regra antiga, Leiria 20€ (26/10), fica [RETIRADA 15/11]. Entraram 7 cidades novas em `locationPrices` + `cities` + `cityCoords` (área coimbra), o que deu mais 40 rotas de cidade.
+
+### Madeira no site (dono, 15 Nov 2026)
+
+O dono aceitou a mesma lógica de Leiria para o Funchal. Zona nova `madeira` no catálogo, com Funchal 10€, Câmara de Lobos e Caniço 15€, e Santa Cruz e Machico 20€. Freguesias novas: Leiria (17, sem a sede) e Funchal (9, sem a Sé), sem dados locais. A equipa da Madeira ainda não está decidida, e o bot continua a fechar sem hora (`askWeek`).

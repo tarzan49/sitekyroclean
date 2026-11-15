@@ -10,14 +10,15 @@ import { cities, services, cityPrep, cityPrepDe } from "@/data/serviceCatalog";
 import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
-type Area = "porto" | "braga" | "coimbra" | "lisboa" | "algarve";
+type Area = "porto" | "braga" | "coimbra" | "lisboa" | "algarve" | "madeira";
 
 const REGIONS: { area: Area; heading: string; goldWord: string }[] = [
   { area: "porto", heading: "Área Metropolitana do", goldWord: "Porto" },
   { area: "braga", heading: "Equipa de Braga e", goldWord: "Minho" },
-  { area: "coimbra", heading: "Coimbra e", goldWord: "Figueira da Foz" },
+  { area: "coimbra", heading: "Coimbra, Figueira da Foz e", goldWord: "Leiria" },
   { area: "lisboa", heading: "Lisboa, Setúbal e", goldWord: "Alentejo Litoral" },
   { area: "algarve", heading: "Cobertura no", goldWord: "Algarve" },
+  { area: "madeira", heading: "Ilha da", goldWord: "Madeira" },
 ];
 
 function citiesForArea(area: Area) {

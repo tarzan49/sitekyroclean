@@ -67,6 +67,12 @@ var locationPrices = {
   "Pombal": 20,
   "Alcobaça": 20,
   "Nazaré": 20,
+  // ═══ Madeira (dono, 2026-11-15): escalões pelo centro do Funchal ═══
+  "Funchal": 10,
+  "Câmara de Lobos": 15,
+  "Caniço": 15,
+  "Santa Cruz": 20,
+  "Machico": 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
@@ -452,6 +458,12 @@ var cities = [
   { name: "Pombal", slug: "pombal", region: "secondary", area: "coimbra", description: "cidade entre Leiria e Coimbra" },
   { name: "Alcobaça", slug: "alcobaca", region: "secondary", area: "coimbra", description: "cidade do mosteiro, no Oeste" },
   { name: "Nazaré", slug: "nazare", region: "secondary", area: "coimbra", description: "vila piscatória das ondas gigantes" },
+  // Madeira (dono 2026-11-15, escalões pelo centro do Funchal)
+  { name: "Funchal", slug: "funchal", region: "primary", area: "madeira", description: "capital da Madeira, virada para a baía" },
+  { name: "Câmara de Lobos", slug: "camara-de-lobos", region: "secondary", area: "madeira", description: "vila piscatória a oeste do Funchal" },
+  { name: "Caniço", slug: "canico", region: "secondary", area: "madeira", description: "vila a leste do Funchal, no concelho de Santa Cruz" },
+  { name: "Santa Cruz", slug: "santa-cruz", region: "secondary", area: "madeira", description: "vila do aeroporto, na costa leste da Madeira" },
+  { name: "Machico", slug: "machico", region: "secondary", area: "madeira", description: "baía onde começou o povoamento da Madeira" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
@@ -1924,6 +1936,48 @@ var municipiosComFreguesias = [
       { name: "Fonte Boa e Rio Tinto", slug: "fonte-boa-e-rio-tinto", nearby: ["fao", "apulia", "gemeses"] },
       { name: "Vila Chã", slug: "vila-cha-esposende", nearby: ["curvos", "fonte-boa-e-rio-tinto", "antas", "palmeira-de-faro"] }
     ]
+  },
+  // Zona de Leiria e Madeira (dono, 2026-11-15). A freguesia sede fica de
+  // fora (Leiria, Pousos, Barreira e Cortes; Sé no Funchal): seria igual à
+  // página da cidade. Sem dados locais: cai no texto genérico até haver
+  // pontos de referência confirmados.
+  {
+    name: "Leiria",
+    slug: "leiria",
+    freguesias: [
+      { name: "Marrazes e Barosa", slug: "marrazes-e-barosa", nearby: ["parceiros-e-azoia", "regueira-de-pontes", "amor"] },
+      { name: "Parceiros e Azoia", slug: "parceiros-e-azoia", nearby: ["marrazes-e-barosa", "santa-eufemia-e-boa-vista", "maceira"] },
+      { name: "Santa Eufémia e Boa Vista", slug: "santa-eufemia-e-boa-vista", nearby: ["parceiros-e-azoia", "caranguejeira", "colmeias-e-memoria"] },
+      { name: "Caranguejeira", slug: "caranguejeira", nearby: ["santa-eufemia-e-boa-vista", "santa-catarina-da-serra-e-chainca", "arrabal"] },
+      { name: "Santa Catarina da Serra e Chainça", slug: "santa-catarina-da-serra-e-chainca", nearby: ["caranguejeira", "arrabal"] },
+      { name: "Arrabal", slug: "arrabal", nearby: ["caranguejeira", "santa-catarina-da-serra-e-chainca", "maceira"] },
+      { name: "Maceira", slug: "maceira", nearby: ["parceiros-e-azoia", "arrabal"] },
+      { name: "Colmeias e Memória", slug: "colmeias-e-memoria", nearby: ["santa-eufemia-e-boa-vista", "milagres"] },
+      { name: "Milagres", slug: "milagres", nearby: ["colmeias-e-memoria", "regueira-de-pontes", "bidoeira-de-cima"] },
+      { name: "Regueira de Pontes", slug: "regueira-de-pontes", nearby: ["marrazes-e-barosa", "amor", "milagres"] },
+      { name: "Amor", slug: "amor", nearby: ["regueira-de-pontes", "marrazes-e-barosa", "monte-real-e-carvide"] },
+      { name: "Monte Real e Carvide", slug: "monte-real-e-carvide", nearby: ["amor", "souto-da-carpalhosa-e-ortigosa", "monte-redondo-e-carreira"] },
+      { name: "Monte Redondo e Carreira", slug: "monte-redondo-e-carreira", nearby: ["monte-real-e-carvide", "bajouca", "coimbrao"] },
+      { name: "Coimbrão", slug: "coimbrao", nearby: ["monte-redondo-e-carreira"] },
+      { name: "Bajouca", slug: "bajouca", nearby: ["monte-redondo-e-carreira", "souto-da-carpalhosa-e-ortigosa", "bidoeira-de-cima"] },
+      { name: "Souto da Carpalhosa e Ortigosa", slug: "souto-da-carpalhosa-e-ortigosa", nearby: ["monte-real-e-carvide", "bajouca", "bidoeira-de-cima"] },
+      { name: "Bidoeira de Cima", slug: "bidoeira-de-cima", nearby: ["souto-da-carpalhosa-e-ortigosa", "milagres", "bajouca"] }
+    ]
+  },
+  {
+    name: "Funchal",
+    slug: "funchal",
+    freguesias: [
+      { name: "Santo António", slug: "santo-antonio-funchal", nearby: ["sao-martinho-funchal", "sao-roque-funchal", "sao-pedro-funchal"] },
+      { name: "São Martinho", slug: "sao-martinho-funchal", nearby: ["santo-antonio-funchal", "sao-pedro-funchal"] },
+      { name: "São Pedro", slug: "sao-pedro-funchal", nearby: ["sao-martinho-funchal", "santa-luzia-funchal", "santo-antonio-funchal"] },
+      { name: "Santa Luzia", slug: "santa-luzia-funchal", nearby: ["sao-pedro-funchal", "imaculado-coracao-de-maria", "monte-funchal"] },
+      { name: "Imaculado Coração de Maria", slug: "imaculado-coracao-de-maria", nearby: ["santa-luzia-funchal", "santa-maria-maior-funchal", "monte-funchal"] },
+      { name: "Santa Maria Maior", slug: "santa-maria-maior-funchal", nearby: ["imaculado-coracao-de-maria", "sao-goncalo-funchal"] },
+      { name: "São Gonçalo", slug: "sao-goncalo-funchal", nearby: ["santa-maria-maior-funchal"] },
+      { name: "Monte", slug: "monte-funchal", nearby: ["imaculado-coracao-de-maria", "santa-luzia-funchal", "sao-roque-funchal"] },
+      { name: "São Roque", slug: "sao-roque-funchal", nearby: ["monte-funchal", "santo-antonio-funchal"] }
+    ]
   }
 ];
 
@@ -2493,6 +2547,11 @@ var CITY_COORDS = {
   "Pombal": [39.9161, -8.6283],
   "Alcobaça": [39.548, -8.977],
   "Nazaré": [39.602, -9.071],
+  "Funchal": [32.6669, -16.9241],
+  "Câmara de Lobos": [32.6486, -16.9775],
+  "Caniço": [32.65, -16.85],
+  "Santa Cruz": [32.688, -16.793],
+  "Machico": [32.718, -16.767],
   "Braga": [41.5511, -8.428],
   "Guimarães": [41.4418, -8.2956],
   "Vila Nova de Famalicão": [41.4065, -8.5188],

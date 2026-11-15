@@ -1165,4 +1165,44 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
       { name: "Vila Chã", slug: "vila-cha-esposende", nearby: ["curvos", "fonte-boa-e-rio-tinto", "antas", "palmeira-de-faro"] },
     ],
   },
+  // Zona de Leiria e Madeira (dono, 2026-11-15). A freguesia sede fica de
+  // fora (Leiria, Pousos, Barreira e Cortes; Sé no Funchal): seria igual à
+  // página da cidade. Sem dados locais: cai no texto genérico até haver
+  // pontos de referência confirmados.
+  {
+    name: "Leiria", slug: "leiria",
+    freguesias: [
+      { name: "Marrazes e Barosa", slug: "marrazes-e-barosa", nearby: ["parceiros-e-azoia", "regueira-de-pontes", "amor"] },
+      { name: "Parceiros e Azoia", slug: "parceiros-e-azoia", nearby: ["marrazes-e-barosa", "santa-eufemia-e-boa-vista", "maceira"] },
+      { name: "Santa Eufémia e Boa Vista", slug: "santa-eufemia-e-boa-vista", nearby: ["parceiros-e-azoia", "caranguejeira", "colmeias-e-memoria"] },
+      { name: "Caranguejeira", slug: "caranguejeira", nearby: ["santa-eufemia-e-boa-vista", "santa-catarina-da-serra-e-chainca", "arrabal"] },
+      { name: "Santa Catarina da Serra e Chainça", slug: "santa-catarina-da-serra-e-chainca", nearby: ["caranguejeira", "arrabal"] },
+      { name: "Arrabal", slug: "arrabal", nearby: ["caranguejeira", "santa-catarina-da-serra-e-chainca", "maceira"] },
+      { name: "Maceira", slug: "maceira", nearby: ["parceiros-e-azoia", "arrabal"] },
+      { name: "Colmeias e Memória", slug: "colmeias-e-memoria", nearby: ["santa-eufemia-e-boa-vista", "milagres"] },
+      { name: "Milagres", slug: "milagres", nearby: ["colmeias-e-memoria", "regueira-de-pontes", "bidoeira-de-cima"] },
+      { name: "Regueira de Pontes", slug: "regueira-de-pontes", nearby: ["marrazes-e-barosa", "amor", "milagres"] },
+      { name: "Amor", slug: "amor", nearby: ["regueira-de-pontes", "marrazes-e-barosa", "monte-real-e-carvide"] },
+      { name: "Monte Real e Carvide", slug: "monte-real-e-carvide", nearby: ["amor", "souto-da-carpalhosa-e-ortigosa", "monte-redondo-e-carreira"] },
+      { name: "Monte Redondo e Carreira", slug: "monte-redondo-e-carreira", nearby: ["monte-real-e-carvide", "bajouca", "coimbrao"] },
+      { name: "Coimbrão", slug: "coimbrao", nearby: ["monte-redondo-e-carreira"] },
+      { name: "Bajouca", slug: "bajouca", nearby: ["monte-redondo-e-carreira", "souto-da-carpalhosa-e-ortigosa", "bidoeira-de-cima"] },
+      { name: "Souto da Carpalhosa e Ortigosa", slug: "souto-da-carpalhosa-e-ortigosa", nearby: ["monte-real-e-carvide", "bajouca", "bidoeira-de-cima"] },
+      { name: "Bidoeira de Cima", slug: "bidoeira-de-cima", nearby: ["souto-da-carpalhosa-e-ortigosa", "milagres", "bajouca"] },
+    ],
+  },
+  {
+    name: "Funchal", slug: "funchal",
+    freguesias: [
+      { name: "Santo António", slug: "santo-antonio-funchal", nearby: ["sao-martinho-funchal", "sao-roque-funchal", "sao-pedro-funchal"] },
+      { name: "São Martinho", slug: "sao-martinho-funchal", nearby: ["santo-antonio-funchal", "sao-pedro-funchal"] },
+      { name: "São Pedro", slug: "sao-pedro-funchal", nearby: ["sao-martinho-funchal", "santa-luzia-funchal", "santo-antonio-funchal"] },
+      { name: "Santa Luzia", slug: "santa-luzia-funchal", nearby: ["sao-pedro-funchal", "imaculado-coracao-de-maria", "monte-funchal"] },
+      { name: "Imaculado Coração de Maria", slug: "imaculado-coracao-de-maria", nearby: ["santa-luzia-funchal", "santa-maria-maior-funchal", "monte-funchal"] },
+      { name: "Santa Maria Maior", slug: "santa-maria-maior-funchal", nearby: ["imaculado-coracao-de-maria", "sao-goncalo-funchal"] },
+      { name: "São Gonçalo", slug: "sao-goncalo-funchal", nearby: ["santa-maria-maior-funchal"] },
+      { name: "Monte", slug: "monte-funchal", nearby: ["imaculado-coracao-de-maria", "santa-luzia-funchal", "sao-roque-funchal"] },
+      { name: "São Roque", slug: "sao-roque-funchal", nearby: ["monte-funchal", "santo-antonio-funchal"] },
+    ],
+  },
 ];

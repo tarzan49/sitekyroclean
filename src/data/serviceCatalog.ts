@@ -112,6 +112,12 @@ export const cities = [
   { name: "Pombal", slug: "pombal", region: "secondary", area: "coimbra", description: "cidade entre Leiria e Coimbra" },
   { name: "Alcobaça", slug: "alcobaca", region: "secondary", area: "coimbra", description: "cidade do mosteiro, no Oeste" },
   { name: "Nazaré", slug: "nazare", region: "secondary", area: "coimbra", description: "vila piscatória das ondas gigantes" },
+  // Madeira (dono 2026-11-15, escalões pelo centro do Funchal)
+  { name: "Funchal", slug: "funchal", region: "primary", area: "madeira", description: "capital da Madeira, virada para a baía" },
+  { name: "Câmara de Lobos", slug: "camara-de-lobos", region: "secondary", area: "madeira", description: "vila piscatória a oeste do Funchal" },
+  { name: "Caniço", slug: "canico", region: "secondary", area: "madeira", description: "vila a leste do Funchal, no concelho de Santa Cruz" },
+  { name: "Santa Cruz", slug: "santa-cruz", region: "secondary", area: "madeira", description: "vila do aeroporto, na costa leste da Madeira" },
+  { name: "Machico", slug: "machico", region: "secondary", area: "madeira", description: "baía onde começou o povoamento da Madeira" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },

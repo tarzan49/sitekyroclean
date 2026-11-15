@@ -95,9 +95,10 @@ const sofaUrgenteBenefits = (area: string) => [
 const COVERAGE_ZONE_LABELS: Record<(typeof cities)[number]['area'], string> = {
   porto: "Porto e arredores",
   braga: "Braga e Minho",
-  coimbra: "Coimbra e Figueira da Foz",
+  coimbra: "Coimbra, Leiria e Figueira da Foz",
   lisboa: "Lisboa e Setúbal até ao Alentejo Litoral",
   algarve: "Algarve",
+  madeira: "Madeira",
 };
 
 /** "A, B e C". */

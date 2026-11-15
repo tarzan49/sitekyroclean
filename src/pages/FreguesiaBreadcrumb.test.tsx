@@ -16,7 +16,7 @@ import FreguesiaServicePage from './FreguesiaServicePage';
 
 // A migalha das páginas de freguesia (/{serviço}-{município}-{freguesia}) nos
 // quatro sítios onde aparece: o hero e o JSON-LD do React, e a <nav> e o
-// BreadcrumbList do HTML estático. Até 30/09/2026 as 4.170 páginas mostravam
+// BreadcrumbList do HTML estático. Até 30/09/2026 as 4.326 páginas mostravam
 // "Início › serviço › Paranhos" e o HTML estático declarava "… › Porto ›
 // Paranhos"; depois do React, o ServiceLocationSchema voltava a declarar três
 // passos. O dono escolheu os quatro. O hero e o schema são os verdadeiros; as
@@ -35,7 +35,7 @@ const model = (route: string) => {
   return resolved!;
 };
 
-// Desenhar as 4.170 no React não acrescenta nada: é a mesma página com outro
+// Desenhar as 4.326 no React não acrescenta nada: é a mesma página com outro
 // modelo. A amostra leva, em cada um dos 69 municípios, a primeira e a última
 // freguesia, com o serviço a rodar pelos seis, e todas as freguesias com o
 // mesmo nome noutro município (Santa Clara, em Coimbra e em Lisboa), que são
@@ -101,8 +101,8 @@ describe('páginas de freguesia: cada passo da migalha é uma página que existe
   const locationRoutes = getAllLocationRoutes();
   const pages = new Set(['/', ...PILLAR_PAGES.map(page => page.path), ...locationRoutes.map(route => route.path), ...routes.map(route => route.path)]);
 
-  it('Início › serviço › município › freguesia, nas 4.170 páginas', () => {
-    expect(routes).toHaveLength(4170);
+  it('Início › serviço › município › freguesia, nas 4.326 páginas', () => {
+    expect(routes).toHaveLength(4326);
     for (const route of routes) {
       const service = services.find(item => item.slug === route.serviceSlug)!;
       const municipality = municipiosComFreguesias.find(item => item.slug === route.citySlug)!;

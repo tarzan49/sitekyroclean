@@ -50,6 +50,12 @@ export const locationPrices: Record<string, number> = {
   'Pombal': 20,
   'Alcobaça': 20,
   'Nazaré': 20,
+  // ═══ Madeira (dono, 2026-11-15): escalões pelo centro do Funchal ═══
+  'Funchal': 10,
+  'Câmara de Lobos': 15,
+  'Caniço': 15,
+  'Santa Cruz': 20,
+  'Machico': 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.

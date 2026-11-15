@@ -17,9 +17,10 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
   const regions = [
     { area: "porto", label: "Porto", hint: "Grande Porto e concelhos próximos" },
     { area: "braga", label: "Braga e Minho", hint: "Braga, Viana do Castelo e concelhos próximos" },
-    { area: "coimbra", label: "Coimbra e Centro", hint: "Coimbra e Figueira da Foz" },
+    { area: "coimbra", label: "Coimbra e Centro", hint: "Coimbra, Leiria e Figueira da Foz" },
     { area: "lisboa", label: "Lisboa, Setúbal e Alentejo Litoral", hint: "Lisboa, Cascais, Sintra, Setúbal e Sines" },
     { area: "algarve", label: "Algarve", hint: "De Aljezur a Vila Real de Santo António" },
+    { area: "madeira", label: "Madeira", hint: "Funchal, Câmara de Lobos, Caniço e Machico" },
   ].map(region => ({
     ...region,
     cities: cities.filter(city => city.area === region.area && normalize(city.name).includes(search))
