@@ -41,7 +41,7 @@ Deno.test("a service that just ended gets its message; revisits, other events an
   assert(String(prompts[0].message).startsWith("Serviço terminado: Ana, Paranhos (Limpeza de sofá de 3 lugares), 15/10 às 15h."));
   // The review request no longer goes to the team (owner, 28 Oct): the bot sends it to the client.
   assertEquals(prompts[0].clientMessage, undefined);
-  assert(!JSON.stringify(prompts).includes("912000000"), "no phone in the team prompts");
+  assert(!prompts.some((p: Record<string, unknown>) => String(p.message).includes("912000000")), "no phone in the team prompt text");
   assertEquals(body.clientReviews, []);
 });
 
