@@ -873,7 +873,7 @@ function supabaseUpsells(): BotEnv["upsells"] {
   if (!url || !key) return null;
   const client = createClient(url, key);
   return async () => {
-    const since = new Date(Date.now() - 45 * 86400000).toISOString().slice(0, 10);
+    const since = "2026-01-01";
     const { data } = await client.from("service_requests").select("calendar_event_id, billed_value, upsell_value").gt("upsell_value", 0).gte("request_date", since).not("calendar_event_id", "is", null);
     return (data ?? []) as Row[];
   };
