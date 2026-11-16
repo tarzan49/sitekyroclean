@@ -831,3 +831,9 @@ Com a Madeira o build chegou a 20.327 ficheiros, e o Pages recusa mais de 20.000
 
 ### Zona de Leiria: só sexta, fecha sempre (dono, 16 Nov)
 "a regra neste funil e marcar para sexta feira e fechar a cliente de qualquer forma, e mm importante reter este cliente para conseguir colocar serviços para a proxima sexta la" (cliente da Marinha Grande, sofá 2 lugares). `FRIDAY_ONLY_CITIES` em `botAvailability.ts`: a `availability` dá horas só na próxima sexta (equipa Coimbra), sem mínimo de valor e sem askWeek. [RETIRADA 16/11] Leiria/Batalha abaixo de 110€ → dono.
+
+### Valor da equipa = valor fechado com o cliente (dono, 16 Nov 2026)
+
+Alfredo (Lisboa): o dono escreveu "fica pelos 89€" e "o anti-ácaros fica por mais 10€"; o cliente aceitou. O bot confirmou "Total: 99€", mas o evento e o aviso à Lisboa 1 ficaram com 65€ (129€) da tabela: o travão `checkedTotal` deitou fora o `agreedTotal` 99 porque esse número nunca foi escrito na conversa. No mesmo dia a Marina (Coimbra) teve outro desencontro entre o evento e o que o cliente ouviu. Dono: "o valor que passas à equipa é sempre o valor fechado com o cliente".
+- kyro-bot `agreedPrice.ts`: preço + "mais X€" na mesma mensagem conta como total combinado.
+- kyro-bot `saidTotal.ts`: depois de enviar uma mensagem com "Total: X€" / "X€ no total" (bot ou dono), compara com o único serviço aberto do cliente; se diferir, chama `update-booking` com `saidTotal` (bot-api acerta título e linha Total, para cima ou para baixo, e manda email ao dono) e reenvia o aviso à equipa. Tenta já, aos 3 e aos 10 min (o calendário demora a mostrar um evento novo). Dois serviços abertos: não mexe.
