@@ -251,6 +251,9 @@ export const TEAM_OFF: readonly TeamOff[] = [
   ...['2026-11-02', '2026-11-03'].map(date => ({ team: 'Porto 3', date })),
   // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
   ...Array.from({ length: 12 }, (_, i) => ({ team: 'Porto 2', date: `2026-11-${String(11 + i).padStart(2, '0')}` })),
+  // Owner, 16 Nov 2026: "porto 3 n pode amanha de manha trabalhar, porto 2 tb n e porto 1 tb n so se for alguma imper".
+  // Porto 1 only takes Premium waterproofing anyway; Porto 2 is already off.
+  { team: 'Porto 3', date: '2026-11-17', untilHour: 13 },
 ];
 /**
  * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends

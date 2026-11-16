@@ -2730,7 +2730,10 @@ var TEAM_OFF = [
   // Owner, 3 Nov 2026: Laurinda's 4/11 cleaning "este é porto 3": Porto 3 works again from 4 Nov.
   ...["2026-11-02", "2026-11-03"].map((date) => ({ team: "Porto 3", date })),
   // Porto 2, 8 Nov 2026: no new jobs this week nor the next (does Tiago Resende on 10/11). Owner, 9 Nov: "bloqueia".
-  ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` }))
+  ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` })),
+  // Owner, 16 Nov 2026: "porto 3 n pode amanha de manha trabalhar, porto 2 tb n e porto 1 tb n so se for alguma imper".
+  // Porto 1 only takes Premium waterproofing anyway; Porto 2 is already off.
+  { team: "Porto 3", date: "2026-11-17", untilHour: 13 }
 ];
 var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20, reopen: "2026-11-14" } };
 var closedAt = (team, from, to) => {
@@ -4303,6 +4306,18 @@ function planBookingUpdate(ev, phone, c, now) {
         added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: clean(c.requote.what) };
       }
       said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
+    }
+  }
+  if (!c.requote && c.saidTotal && c.saidTotal > 0) {
+    const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)/i.exec(title);
+    if (!head) return { ok: false, reason: "título sem preço: o dono atualiza" };
+    const was = Number(head[2].replace(",", "."));
+    const total = Math.round(c.saidTotal * 100) / 100;
+    if (total !== was) {
+      const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",");
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + title.slice(head[0].length);
+      description = description.split("\n").map((l) => /^Total:/.test(l) ? l.replace(/^Total:\s*[\d,.]+€/, `Total: ${fmt(total)}€`) : l).join("\n");
+      said.push(`total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
