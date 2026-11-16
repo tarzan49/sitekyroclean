@@ -213,6 +213,12 @@ const marginMs = (team: string | null) => (team && TEAM_TRAVEL_MARGIN_MIN[team] 
  */
 const ROAD_MARGIN_TEAMS: ReadonlySet<string> = new Set(['Algarve']);
 const ROAD_MARGIN_MIN_MIN = 15;
+/**
+ * One-person teams whose next job must leave the drive between the two addresses PLUS the fixed margin (owner,
+ * 16 Nov 2026, Joana: the bot offered Porto 3 Ovar at 11h with Vila Nova da Telha at 13h, 75 min for a ~65 min
+ * drive, and the owner had to move her: "não vimos no horário a logística do serviço a seguir").
+ */
+const DRIVE_PLUS_MARGIN_TEAMS: ReadonlySet<string> = new Set(['Porto 3']);
 const pairMarginMs = (team: string, b: { place: Place }, place: Place) =>
   ROAD_MARGIN_TEAMS.has(team) && b.place && place ? Math.max(ROAD_MARGIN_MIN_MIN, driveMinutes(b.place, place)) * 60_000 : marginMs(team);
 /**
@@ -508,6 +514,12 @@ function travelClash(busy: Busy[], team: string, from: number, to: number, place
   return busy.some(b => {
     if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
     const drive = driveMinutes(b.place, place);
+    if (DRIVE_PLUS_MARGIN_TEAMS.has(team)) {
+      const need = (drive + TRAVEL_MARGIN_MIN) * 60_000;
+      if (b.to <= from) return from - b.to < need;
+      if (b.from >= to) return b.from - to < need;
+      return false;
+    }
     if (!ROAD_MARGIN_TEAMS.has(team) && drive * 60_000 <= marginMs(team)) return false; // the fixed margin already covers it
     const need = drive * 60_000;
     if (b.to <= from) return from - b.to < need;

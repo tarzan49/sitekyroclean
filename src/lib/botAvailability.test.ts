@@ -499,3 +499,13 @@ describe('zona de Coimbra na equipa Coimbra (Lisboa 1 retirada 16 Nov)', () => {
     expect(chooseTeam([], 'Leiria', '2026-11-20T10:00:00Z', '2026-11-20T11:00:00Z')).toBe('Coimbra');
   });
 });
+
+describe('Porto 3: viagem + margem entre serviços (dono, 16 Nov 2026, Joana)', () => {
+  const jaime = ev('2026-11-25', '13:00', '15:00', 'Serviço 74€ (148€) Limpeza de sofá - Rua X 605, 4470-724 Vila Nova da Telha, Maia', 'Equipa: Porto 3');
+  it('Ovar às 11h não cabe antes de Maia às 13h', () => {
+    expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '11:00'), at('2026-11-25', '11:45'), true, 'Ovar')).toBe(true);
+  });
+  it('Ovar às 9h cabe', () => {
+    expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '09:00'), at('2026-11-25', '09:45'), true, 'Ovar')).toBe(false);
+  });
+});
