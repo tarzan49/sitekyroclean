@@ -98,6 +98,10 @@ duplicadas, desta vez em configuração.
 
 O pack é a limpeza + a impermeabilização sozinha menos 10€, nas duas versões e em cada tamanho (`bothPrice` = limpeza + Essencial sozinha, `packPremiumDelta` = Premium − Essencial sozinhas, em `src/components/quiz/QuizTypes.ts`). Assim, quando a impermeabilização sobe, o pack sobe com ela. Antes estavam fixados à mão e não acompanharam as subidas: o Premium de 3 lugares no Porto saía a 199€ com a impermeabilização sozinha a 159€, a limpeza a 40€ (cliente 919…, 3/11). O dono: "não faz sentido o preço aumentar e a pessoa pagar o mesmo". O de 1 lugar ficou como estava (78/118€ seria descer 1€).
 
+## Pele nunca leva impermeabilização (dono, 2026-11-16)
+
+O bot ofereceu a impermeabilização (Premium 218€, Essencial 158€) a um sofá de pele com riscos de marcador. Dono: "nunca mais ofereças imper para sofás de couro, não faz sentido; sempre que for sofá de couro falas em tratamento de pele". Num sofá ou cadeirão de pele o extra é o tratamento da pele (limpeza e hidratação do couro, mantém-no macio, evita que resseque e estale). Código: kyro-bot `src/bot/leatherGuard.ts`; o `calcular_orcamento` com `leather: true` e impermeabilização não dá preço e manda refazer só com limpeza. Ficheiro do bot: S26 e bolha 2 da secção 3.
+
 ## Armadilha recorrente: constantes duplicadas
 
 `scripts/prerender.ts` e `scripts/generate-sitemap.ts` correm em Node puro (sem Vite), por isso não conseguem importar via alias `@/`. Vários dados de negócio existem em **duas cópias**: uma importável (`src/constants/business.ts`, `src/components/quiz/QuizTypes.ts`) e uma cópia paralela consumida só pelos scripts (`src/data/locationSeoData.ts`, constantes locais dentro do próprio `prerender.ts`). **Qualquer correção de preço, taxa ou estatística tem de ser feita nas duas cópias**, senão o site prerenderizado (o que o Google vê) fica dessincronizado do site interativo.

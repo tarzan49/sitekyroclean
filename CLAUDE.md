@@ -66,6 +66,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Fotografias e vídeos só com um orçamento novo (preço ainda não dado) ou quando o cliente os pede; nunca a responder a fatura, pagamento, marcação, serviço feito ou reclamação (dono, 12 Nov, Raimundo; kyro-bot `proofsAllowed`).
 - Provas no orçamento (dono, 7 Nov): limpeza = vídeo do problema do cliente (anúncio aprovado com a 1.ª frase do problema, pontos no fim) + antes/depois; impermeabilização = só o vídeo da situação. Código em kyro-bot `src/bot/proofVideos.ts`, vídeos em `KYRO_AD_FACTORY/WHATSAPP-PROVAS`.
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
+- Sofá ou cadeirão de pele nunca leva impermeabilização: o extra é o tratamento da pele (limpeza e hidratação); kyro-bot `leatherGuard.ts`, `leather: true` (dono, 16 Nov).
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 - Resposta parada à espera do dono: nunca só "Obrigado pela mensagem!", nem só o cumprimento ou o upsell (a ponte leva as respostas às perguntas, dono 9 Nov); sem preço novo nem horas, sai inteira e o dono recebe o aviso do preço (dono, 8 Nov).
 - Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script).
