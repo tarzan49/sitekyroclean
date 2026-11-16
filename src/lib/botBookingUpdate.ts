@@ -20,6 +20,8 @@ export interface BookingChanges {
    * anotado" and the event stayed at the sofa alone, 149€ instead of 269€.
    */
   requote?: { total: number; what: string; service?: string };
+  /** The total the client was told in a message that went out (owner, 16 Nov 2026: "o valor que passas à equipa é sempre o valor fechado com o cliente"). Up or down; items stay. */
+  saidTotal?: number;
 }
 export interface BookingEvent { id: string; summary: string; description: string; start: string | null; end: string | null }
 export type BookingUpdatePlan =
@@ -100,6 +102,18 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
         added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: clean(c.requote.what) };
       }
       said.push(`artigos agora ${clean(c.requote.what)}, total ${fmt(total)}€ (era ${head[2]}€)`);
+    }
+  }
+  if (!c.requote && c.saidTotal && c.saidTotal > 0) {
+    const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)/i.exec(title);
+    if (!head) return { ok: false, reason: 'título sem preço: o dono atualiza' };
+    const was = Number(head[2].replace(',', '.'));
+    const total = Math.round(c.saidTotal * 100) / 100;
+    if (total !== was) {
+      const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','));
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + title.slice(head[0].length);
+      description = description.split('\n').map(l => /^Total:/.test(l) ? l.replace(/^Total:\s*[\d,.]+€/, `Total: ${fmt(total)}€`) : l).join('\n');
+      said.push(`total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);

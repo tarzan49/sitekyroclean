@@ -122,3 +122,23 @@ describe('planBookingUpdate: items added after booking (Diana, 3 Nov 2026)', () 
     expect(planBookingUpdate(diana, '919326650', { requote: { total: 99, what: 'x' } }, at)).toMatchObject({ ok: false });
   });
 });
+
+describe('planBookingUpdate: total told to the client wins (Alfredo, 16 Nov 2026)', () => {
+  const alfredo = {
+    id: 'a1',
+    summary: 'Serviço 65€ (129€) Limpeza de sofá 3 lugares com chaise + tratamento anti-ácaros - 244923473858 - Alfredo Dias - Rua Professor Reinaldo dos Santos 24, Lisboa',
+    description: 'Equipa: Lisboa 1\nArtigos: Sofá · 3 Lugares · 1 un. · Limpeza + tratamento anti-ácaros\nTotal: 129€ (deslocação incluída)\nbot:244923473858@s.whatsapp.net',
+    start: '2026-11-16T18:00:00Z', end: '2026-11-16T19:00:00Z',
+  };
+  const at = new Date('2026-11-16T15:53:00Z');
+  it('a lower total the client was told goes into the title and the Total line, items kept', () => {
+    const p = planBookingUpdate(alfredo, '244923473858', { saidTotal: 99 }, at);
+    if (!p.ok) throw new Error(p.reason);
+    expect(p.title).toBe('Serviço 50€ (99€) Limpeza de sofá 3 lugares com chaise + tratamento anti-ácaros - 244923473858 - Alfredo Dias - Rua Professor Reinaldo dos Santos 24, Lisboa');
+    expect(p.description).toContain('Artigos: Sofá · 3 Lugares · 1 un. · Limpeza + tratamento anti-ácaros\nTotal: 99€ (deslocação incluída)');
+    expect(p.added).toBeUndefined();
+  });
+  it('the same total writes nothing', () => {
+    expect(planBookingUpdate(alfredo, '244923473858', { saidTotal: 129 }, at)).toMatchObject({ ok: false, reason: 'nada de novo' });
+  });
+});
