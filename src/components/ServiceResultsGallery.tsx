@@ -88,11 +88,11 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <button type="button" className={control} aria-label="Exemplo seguinte" onClick={() => select(index + 1)}><ChevronRight size={20} /></button>
         </div>
       </div>
-      <div ref={thumbnailsRef} className="relative flex gap-2 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin]" aria-label="Escolher exemplo">
+      <div ref={thumbnailsRef} className="relative flex gap-2 overflow-x-auto overscroll-x-contain snap-x snap-proximity pb-2 [scrollbar-width:thin]" aria-label="Escolher exemplo">
         {pool.map((example, i) => (
           <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "video" ? ", vídeo" : ""}`}
             aria-pressed={i === index} onClick={() => select(i)}
-            className={`relative h-12 w-16 shrink-0 overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
+            className={`relative h-12 w-16 shrink-0 snap-center overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
             <img src={example.kind === "video" ? example.poster : resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" width={64} height={48} />
             <span className="absolute bottom-0 right-0 bg-black/75 text-white text-sm px-1.5 py-0.5">{i + 1}</span>
           </button>
