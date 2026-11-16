@@ -100,7 +100,7 @@ O pack é a limpeza + a impermeabilização sozinha menos 10€, nas duas versõ
 
 ## Pele nunca leva impermeabilização (dono, 2026-11-16)
 
-O bot ofereceu a impermeabilização (Premium 218€, Essencial 158€) a um sofá de pele com riscos de marcador. Dono: "nunca mais ofereças imper para sofás de couro, não faz sentido; sempre que for sofá de couro falas em tratamento de pele". Num sofá ou cadeirão de pele o extra é o tratamento da pele (limpeza e hidratação do couro, mantém-no macio, evita que resseque e estale). Código: kyro-bot `src/bot/leatherGuard.ts`; o `calcular_orcamento` com `leather: true` e impermeabilização não dá preço e manda refazer só com limpeza. Ficheiro do bot: S26 e bolha 2 da secção 3.
+O bot ofereceu a impermeabilização (Premium 218€, Essencial 158€) a um sofá de pele com riscos de marcador. Dono: "nunca mais ofereças imper para sofás de couro, não faz sentido; sempre que for sofá de couro falas em tratamento de pele". Num sofá ou cadeirão de pele o extra é o tratamento da pele (limpeza e hidratação do couro, mantém-no macio, evita que resseque e estale). Código: kyro-bot `src/bot/leatherGuard.ts`; o `calcular_orcamento` com `leather: true` e impermeabilização não dá preço e manda refazer só com limpeza. Ficheiro do bot: S26 e bolha 2 da secção 3. Preço (dono, mesmo dia): tratamento da pele +30€ por sofá, `LEATHER_TREATMENT` em `src/lib/botQuote.ts`, linha própria somada ao total; o motor recusa `leather` com impermeabilização ou anti-ácaros.
 
 ## Armadilha recorrente: constantes duplicadas
 
