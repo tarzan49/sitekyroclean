@@ -22,7 +22,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 
 - Início: `git status` + `git log -5 --oneline`; `git pull` se não estiver alinhado com `origin/master`.
 - Fim: commit + push. Repositório **público** (`tarzan49/sitekyroclean`): nada de dados de clientes, NIFs, chaves.
-- `.env` é local, nunca vai para o Git. Produção (cleansolutions.com.pt) atualiza com push (Cloudflare Pages).
+- `.env` é local, nunca vai para o Git. Produção (cleansolutions.com.pt) é o Worker `kyro-site` desde 16 Nov (o Pages só aceita 20.000 ficheiros): um push NÃO publica. Publicar = build limpo (`git archive HEAD`) com as `VITE_*` do `.env` + `npx wrangler deploy` com o token em `Kyro-segredos/cloudflare-kyro-site.env`; confirmar que o JS não tem `placeholder.supabase`.
 - Eu corro os comandos e os deploys; não peço ao dono para os correr.
 
 ## 2. Verificar
