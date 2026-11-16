@@ -201,6 +201,9 @@ describe('planCalendarSync', () => {
       // Luciana, 13 Nov: "Valor final 189€, sem IVA" não é com fatura.
       const noVat = plan([r], [edited({ description: 'Valor final 189€, sem IVA.' })]).updates[0].patch;
       expect('invoiced' in noVat).toBe(false);
+      // Raquel, 16 Nov: a nota do bot "Cliente dispensa fatura" não é com fatura.
+      const waived = plan([r], [edited({ description: 'Cliente dispensa fatura (16/11), por isso não há NIF a pedir. Em nome individual, o IVA fica incluído: 109€.' })]).updates[0].patch;
+      expect('invoiced' in waived).toBe(false);
       const quiet = plan([r], [edited({ description: 'Avaliação positiva, sem motivo de queixa.' })]).updates[0].patch;
       expect('invoiced' in quiet).toBe(false);
     });
