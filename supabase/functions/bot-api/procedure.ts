@@ -109,6 +109,8 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const facts = labelFor(serviceByEvent.get(e.id), e);
     return {
       eventId: e.id, team, serviceDay: day, label: facts.label,
+      // For the "service not done" check before sending (kyro-bot, owner 16/11, Joana): the team may have moved it.
+      phone: clientPhoneFromTitle(e.summary), firstName: facts.firstName, serviceStart: e.start!,
       message: procedurePromptMessage({ label: facts.label, what: facts.what, team: team!, serviceDay: day, time: hhmm(e.start!) }),
     };
   });
@@ -131,8 +133,9 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
     const index = reminderDue(r, check, now);
     if (index === null) return [];
-    const label = labelFor(serviceByEvent.get(r.calendar_event_id), ev).label;
-    return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, message: procedureReminderMessage(label, check, r.service_day, { first: index === 0 && !!r.prompted_at && r.prompted_at >= FIRST_NUDGE_FROM, what: serviceByEvent.get(r.calendar_event_id)?.description as string | null }) }];
+    const facts = labelFor(serviceByEvent.get(r.calendar_event_id), ev);
+    const label = facts.label;
+    return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, phone: clientPhoneFromTitle(ev.summary), firstName: facts.firstName, serviceStart: ev.start!, message: procedureReminderMessage(label, check, r.service_day, { first: index === 0 && !!r.prompted_at && r.prompted_at >= FIRST_NUDGE_FROM, what: serviceByEvent.get(r.calendar_event_id)?.description as string | null }) }];
   });
   // The state kept in the table (for the panel), and a notice when a deadline closes with something missing.
   const linked = reviews.map(r => ({ stars: Number(r.stars), reviewed_at: String(r.reviewed_at), excluded: (r.excluded as string) ?? null, service_request_id: (r.service_request_id as string) ?? null }));
