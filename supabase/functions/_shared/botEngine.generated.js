@@ -2724,6 +2724,7 @@ var TEAM_TRAVEL_MARGIN_MIN = {
 var marginMs = (team) => (team && TEAM_TRAVEL_MARGIN_MIN[team] || TRAVEL_MARGIN_MIN) * 6e4;
 var ROAD_MARGIN_TEAMS = /* @__PURE__ */ new Set(["Algarve"]);
 var ROAD_MARGIN_MIN_MIN = 15;
+var DRIVE_PLUS_MARGIN_TEAMS = /* @__PURE__ */ new Set(["Porto 3"]);
 var pairMarginMs = (team, b, place) => ROAD_MARGIN_TEAMS.has(team) && b.place && place ? Math.max(ROAD_MARGIN_MIN_MIN, driveMinutes(b.place, place)) * 6e4 : marginMs(team);
 var TEAM_WEEKDAY_HOURS = { "Porto 2": { from: 9, to: 13 } };
 var TEAM_MAX_JOBS_PER_WEEKDAY = { "Porto 2": 2 };
@@ -2975,6 +2976,12 @@ function travelClash(busy, team, from, to, place) {
   return busy.some((b) => {
     if (b.team !== team || !b.place || lisbon(b.from).date !== lisbon(from).date) return false;
     const drive = driveMinutes(b.place, place);
+    if (DRIVE_PLUS_MARGIN_TEAMS.has(team)) {
+      const need2 = (drive + TRAVEL_MARGIN_MIN) * 6e4;
+      if (b.to <= from) return from - b.to < need2;
+      if (b.from >= to) return b.from - to < need2;
+      return false;
+    }
     if (!ROAD_MARGIN_TEAMS.has(team) && drive * 6e4 <= marginMs(team)) return false;
     const need = drive * 6e4;
     if (b.to <= from) return from - b.to < need;
