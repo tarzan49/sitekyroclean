@@ -93,12 +93,12 @@ const MarcaColchaoPage = () => {
   const prep = cityPrep(city.name);
   const heroImg = MARCA_HERO[marca.slug] ?? heroColchao;
 
-  // Resposta em menos de 5 minutos: compromisso comum a todo o site.
+  // Resposta em menos de 1 minuto: compromisso comum a todo o site.
 
   const serviceDuration = SERVICE_DURATION['limpeza-colchoes'];
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
+    { value: "<1 min", label: "Respondemos em menos de 1 minuto", icon: Clock },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 

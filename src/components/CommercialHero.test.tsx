@@ -38,7 +38,7 @@ describe('mandatory commercial hero', () => {
       const stats = container.querySelector('[data-hero-part="stats"]')!.textContent!;
       expect(stats).toContain('± 1 h');
       expect(stats).not.toContain('avaliações');
-      expect(stats).toContain('<5 min');
+      expect(stats).toContain('<1 min');
       expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? 'Ativação' : 'Secagem');
       if (['limpeza-tapetes', 'limpeza-alcatifas'].includes(serviceSlug)) expect(container.textContent).toContain('Sob orçamento');
       cleanup();

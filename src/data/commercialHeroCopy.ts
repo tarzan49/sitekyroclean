@@ -92,7 +92,7 @@ export const ON_SITE_DURATION = '± 1 h';
  */
 export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
   { key: 'duration', value: ON_SITE_DURATION, label: 'Limpeza' },
-  { key: 'response', value: '<5 min', label: 'Resposta' },
+  { key: 'response', value: '<1 min', label: 'Resposta' },
   // A impermeabilização não seca, ativa: o tratamento precisa de até 24 h para
   // ficar operacional, ao contrário da limpeza, que devolve o artigo em 2 a 5 h
   // (todos os artigos desde 15/10/2026, dono).

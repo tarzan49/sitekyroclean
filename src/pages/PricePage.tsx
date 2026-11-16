@@ -87,11 +87,11 @@ const PricePage = () => {
   const heroBreadcrumbs = heroBreadcrumb(data.breadcrumb);
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "2 a 5h", label: "Pronto a usar" };
-  // Resposta em menos de 5 minutos: compromisso comum a todo o site.
+  // Resposta em menos de 1 minuto: compromisso comum a todo o site.
 
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "<5min", label: "Respondemos em menos de 5 minutos", icon: Clock },
+    { value: "<1 min", label: "Respondemos em menos de 1 minuto", icon: Clock },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 

@@ -1,7 +1,7 @@
 // Regras confirmadas pelo responsável em 10/09/2026. Importável também em Node.
 import { locationPrices } from './travel';
 import { cities } from '../data/serviceCatalog';
-export const RESPONSE_PROMISE = 'Resposta em menos de 5 minutos';
+export const RESPONSE_PROMISE = 'Resposta em menos de 1 minuto';
 export const DRYING_PROMISE = 'Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço.';
 // Tudo seca em 2 a 5 horas (dono, 15/10/2026; até aí só os sofás, desde 06/10, e o resto em 3 a 6 horas).
 export const SOFA_DRYING_RANGE = '2 a 5 horas';
@@ -12,7 +12,7 @@ export const AVAILABILITY_PROMISE = 'Procuramos realizar o serviço no próprio 
 export const COVERAGE_PROMISE = 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.';
 export const WEEKLY_REQUESTS = 'Recebemos habitualmente 50 a 60 pedidos de orçamento por semana.';
 
-export const EN_RESPONSE_PROMISE = 'We reply in under 5 minutes';
+export const EN_RESPONSE_PROMISE = 'We reply in under 1 minute';
 export const EN_AVAILABILITY_PROMISE = 'We aim for same-day or next-day service, subject to availability confirmed by the local team.';
 export const EN_COVERAGE_PROMISE = 'Teams in Braga, Porto, Coimbra, Lisbon and the Algarve, with regular coverage along the coast from Viana do Castelo to the Algarve. Aveiro, the Alentejo coast and other locations are subject to availability confirmation.';
 export const EN_DRYING_PROMISE = 'Average drying time is 2 to 5 hours, depending on ventilation, fabric and room conditions.';
