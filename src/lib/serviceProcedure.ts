@@ -380,6 +380,8 @@ const hasNudge = (rec: Pick<ProcedureRecord, 'prompted_at'>) => !!rec.prompted_a
 export function reminderDue(rec: Pick<ProcedureRecord, 'service_day' | 'reminders_sent' | 'prompted_at'>, check: Pick<ProcedureCheck, 'missing' | 'status'>, now: Date): number | null {
   // A avaliação já não se cobra à equipa (dono, 6/11): só a falta de fotografias ou vídeo dá lembrete.
   if (!rec.prompted_at || check.status !== 'em_curso' || !check.missing.some(i => i !== 'review')) return null;
+  // Um só seguimento por serviço (dono, 16/11): depois do primeiro, mais nenhum.
+  if (rec.reminders_sent >= 1) return null;
   const nudge = hasNudge(rec);
   if (nudge && rec.reminders_sent === 0) return now.getTime() >= Date.parse(rec.prompted_at) + FIRST_NUDGE_MIN * 60_000 ? 0 : null;
   const today = lisbonDayOf(now);
@@ -394,10 +396,10 @@ export function reminderDue(rec: Pick<ProcedureRecord, 'service_day' | 'reminder
 export function procedureReminderMessage(label: string, check: Pick<ProcedureCheck, 'missing' | 'deadline'>, serviceDay: string, opts: { first?: boolean; what?: string | null } = {}): string {
   const media = check.missing.filter(i => i !== 'review');
   if (opts.first) {
+    // Um só seguimento (dono, 16/11): o que falta enviar + o que o cliente pediu.
     const imperOnly = /impermeab/i.test(opts.what ?? '') && !/limpeza|lavagem/i.test(opts.what ?? '');
-    if (imperOnly) return `O cliente está à espera do vídeo da impermeabilização do serviço ${label}. Responde à mensagem do serviço com o vídeo, em HD.`;
-    const all = media.length >= 3;
-    return `O cliente está à espera do antes e depois do serviço ${label}. Responde à mensagem do serviço com ${all ? 'as fotografias e o vídeo' : `o que falta: ${missingText(media)}`}, em HD.`;
+    const asked = imperOnly ? 'o vídeo da impermeabilização' : 'o antes e depois e o vídeo';
+    return `Serviço ${label}: falta enviar ${missingText(media)}. O cliente pediu também ${asked}. Responde à mensagem do serviço com isso, em HD.`;
   }
   const lines = [`Lembrete do serviço ${label}, ${dm(serviceDay)}. Falta: ${missingText(media)}.`];
   lines.push('Responde à mensagem desse serviço com o que falta.');

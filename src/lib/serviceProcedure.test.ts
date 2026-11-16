@@ -204,11 +204,11 @@ describe('messages', () => {
     expect(m).toBe('Lembrete do serviço Ana, 15/10. Falta: vídeo. Responde à mensagem desse serviço com o que falta. Prazo: 22/10.');
     expect(m).not.toMatch(noDash);
     expect(procedureReminderMessage('Sharles, Agualva-Cacém', { missing: ['before', 'after', 'video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Limpeza de sofá' }))
-      .toBe('O cliente está à espera do antes e depois do serviço Sharles, Agualva-Cacém. Responde à mensagem do serviço com as fotografias e o vídeo, em HD.');
+      .toBe('Serviço Sharles, Agualva-Cacém: falta enviar fotografia de antes, fotografia de depois e vídeo. O cliente pediu também o antes e depois e o vídeo. Responde à mensagem do serviço com isso, em HD.');
     expect(procedureReminderMessage('Ana', { missing: ['video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Limpeza de sofá' }))
-      .toBe('O cliente está à espera do antes e depois do serviço Ana. Responde à mensagem do serviço com o que falta: vídeo, em HD.');
+      .toBe('Serviço Ana: falta enviar vídeo. O cliente pediu também o antes e depois e o vídeo. Responde à mensagem do serviço com isso, em HD.');
     expect(procedureReminderMessage('Ana', { missing: ['video'], deadline: '2026-11-22' }, '2026-11-15', { first: true, what: 'Impermeabilização Premium' }))
-      .toBe('O cliente está à espera do vídeo da impermeabilização do serviço Ana. Responde à mensagem do serviço com o vídeo, em HD.');
+      .toBe('Serviço Ana: falta enviar vídeo. O cliente pediu também o vídeo da impermeabilização. Responde à mensagem do serviço com isso, em HD.');
   });
 });
 
@@ -252,7 +252,7 @@ describe('reminders', () => {
     expect(reminderDue(rec(), open, new Date('2026-10-16T08:59:00Z'))).toBeNull(); // 9h59 in Lisbon
     expect(reminderDue(rec(), open, new Date('2026-10-16T09:00:00Z'))).toBe(0);
     expect(reminderDue(rec({ reminders_sent: 1 }), open, new Date('2026-10-17T12:00:00Z'))).toBeNull();
-    expect(reminderDue(rec({ reminders_sent: 1 }), open, new Date('2026-10-20T12:00:00Z'))).toBe(1);
+    expect(reminderDue(rec({ reminders_sent: 1 }), open, new Date('2026-10-20T12:00:00Z'))).toBeNull();
     expect(reminderDue(rec({ reminders_sent: 2 }), open, new Date('2026-10-21T12:00:00Z'))).toBeNull();
   });
   it('from 16/11: 30 min after the service message, then the day after and the 5th day', () => {
@@ -260,8 +260,8 @@ describe('reminders', () => {
     expect(reminderDue(r(), open, new Date('2026-11-16T15:29:00Z'))).toBeNull();
     expect(reminderDue(r(), open, new Date('2026-11-16T15:30:00Z'))).toBe(0);
     expect(reminderDue(r({ reminders_sent: 1 }), open, new Date('2026-11-16T18:00:00Z'))).toBeNull();
-    expect(reminderDue(r({ reminders_sent: 1 }), open, new Date('2026-11-17T10:00:00Z'))).toBe(1);
-    expect(reminderDue(r({ reminders_sent: 2 }), open, new Date('2026-11-21T10:00:00Z'))).toBe(2);
+    expect(reminderDue(r({ reminders_sent: 1 }), open, new Date('2026-11-17T10:00:00Z'))).toBeNull();
+    expect(reminderDue(r({ reminders_sent: 2 }), open, new Date('2026-11-21T10:00:00Z'))).toBeNull();
     expect(reminderDue(r({ reminders_sent: 3 }), open, new Date('2026-11-22T10:00:00Z'))).toBeNull();
   });
   it('nothing when complete or closed', () => {

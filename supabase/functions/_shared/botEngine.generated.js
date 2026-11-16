@@ -3943,6 +3943,7 @@ var FIRST_NUDGE_FROM = "2026-11-15T23:00:00Z";
 var hasNudge = (rec) => !!rec.prompted_at && rec.prompted_at >= FIRST_NUDGE_FROM;
 function reminderDue(rec, check, now) {
   if (!rec.prompted_at || check.status !== "em_curso" || !check.missing.some((i) => i !== "review")) return null;
+  if (rec.reminders_sent >= 1) return null;
   const nudge = hasNudge(rec);
   if (nudge && rec.reminders_sent === 0) return now.getTime() >= Date.parse(rec.prompted_at) + FIRST_NUDGE_MIN * 6e4 ? 0 : null;
   const today = lisbonDayOf(now);
@@ -3959,9 +3960,8 @@ function procedureReminderMessage(label, check, serviceDay, opts = {}) {
   const media = check.missing.filter((i) => i !== "review");
   if (opts.first) {
     const imperOnly = /impermeab/i.test(opts.what ?? "") && !/limpeza|lavagem/i.test(opts.what ?? "");
-    if (imperOnly) return `O cliente está à espera do vídeo da impermeabilização do serviço ${label}. Responde à mensagem do serviço com o vídeo, em HD.`;
-    const all = media.length >= 3;
-    return `O cliente está à espera do antes e depois do serviço ${label}. Responde à mensagem do serviço com ${all ? "as fotografias e o vídeo" : `o que falta: ${missingText(media)}`}, em HD.`;
+    const asked = imperOnly ? "o vídeo da impermeabilização" : "o antes e depois e o vídeo";
+    return `Serviço ${label}: falta enviar ${missingText(media)}. O cliente pediu também ${asked}. Responde à mensagem do serviço com isso, em HD.`;
   }
   const lines = [`Lembrete do serviço ${label}, ${dm2(serviceDay)}. Falta: ${missingText(media)}.`];
   lines.push("Responde à mensagem desse serviço com o que falta.");
