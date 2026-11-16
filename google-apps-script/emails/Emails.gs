@@ -186,16 +186,26 @@ function paraDecisao(msg) {
 
 function pasta(nome) { return GmailApp.getUserLabelByName(nome) || GmailApp.createLabel(nome); }
 
-/** Corre de 5 em 5 minutos. */
+/** A pesquisa do Gmail para "mexeu depois de `ms`", com 10 min de margem (o after: aceita segundos). */
+function depoisDe(ms) { return 'after:' + Math.floor((ms - 10 * 60 * 1000) / 1000); }
+
+/**
+ * Corre de 5 em 5 minutos e só lê o que mudou desde a última volta. Ler 14 dias e 100 conversas a cada volta,
+ * mais a ponte a ler 2 dias a cada minuto, esgotava a quota diária do Gmail: a ponte ficava ~17 h por dia
+ * sem ler e o bot não respondia (16 Nov, Faisal).
+ */
 function verificar() {
   var props = PropertiesService.getScriptProperties();
   var instaladoEm = Number(props.getProperty('instaladoEm') || Date.now());
   var agora = Date.now();
   var porResponder = pasta(PASTA_POR_RESPONDER);
   var respostaAuto = pasta(PASTA_RESPOSTA_AUTO);
+  // A primeira volta (ou depois de 14 dias parado) vê os 14 dias; as outras só o que chegou desde a anterior.
+  var ultimaVolta = Number(props.getProperty('verificadoEm') || 0);
+  var janela = ultimaVolta && agora - ultimaVolta < 14 * 864e5 ? depoisDe(ultimaVolta) : 'newer_than:14d';
 
   // Conversas na caixa de entrada com pessoas (os alertas do bot já não passam por lá).
-  var base = 'in:inbox newer_than:14d -from:me -from:' + REMETENTE_BOT;
+  var base = 'in:inbox ' + janela + ' -from:me -from:' + REMETENTE_BOT;
   var conversas = GmailApp.search(base + ' -category:promotions -category:social -category:forums', 0, 50);
   // A resposta automática só sai para o separador Principal: o Gmail põe lá as pessoas.
   var principais = {};
@@ -222,14 +232,17 @@ function verificar() {
     }
   });
 
-  // Sai de "Por responder" o que já tem resposta tua, ou que arquivaste (arquivar = tratado).
-  porResponder.getThreads(0, 100).forEach(function (conversa) {
+  // Sai de "Por responder" o que já tem resposta tua (só as conversas que mexeram desde a última volta),
+  // ou que arquivaste (arquivar = tratado).
+  var etiqueta = 'label:' + PASTA_POR_RESPONDER.toLowerCase().replace(/[\s\/]+/g, '-');
+  GmailApp.search(etiqueta + ' ' + janela, 0, 100).concat(GmailApp.search(etiqueta + ' -in:inbox', 0, 100)).forEach(function (conversa) {
     var mensagens = conversa.getMessages();
     var d = decidir(mensagens.map(paraDecisao), agora, instaladoEm, 0);
     if (d.porResponder && conversa.isInInbox()) return;
     conversa.removeLabel(porResponder);
     mensagens.forEach(function (m) { if (m.isStarred()) m.unstar(); });
   });
+  props.setProperty('verificadoEm', String(agora));
 }
 
 // ---------------------------------------------------------------- ponte para o bot
@@ -248,12 +261,18 @@ function clienteDaConversa(mensagens) {
   return enderecoDe(String(mensagens[0].getTo()).split(',')[0]);
 }
 
+/**
+ * O bot pergunta a cada minuto. Só procura conversas com mensagens desde `desde` (a última leitura que correu
+ * bem, em ms), nunca mais de 2 dias: ler os 2 dias inteiros a cada minuto esgotava a quota do Gmail (16 Nov, Faisal).
+ */
 function ponteListar(desde) {
-  var base = 'newer_than:2d -in:spam -in:trash -from:' + REMETENTE_BOT;
+  var base = 'newer_than:2d' + (Number(desde) ? ' ' + depoisDe(Number(desde)) : '') + ' -in:spam -in:trash -from:' + REMETENTE_BOT;
+  var conversas = GmailApp.search(base, 0, 50);
+  if (!conversas.length) return { ok: true, messages: [] };
   var principais = {};
   GmailApp.search(base + ' category:primary', 0, 50).forEach(function (c) { principais[c.getId()] = true; });
   var saida = [];
-  GmailApp.search(base, 0, 50).forEach(function (conversa) {
+  conversas.forEach(function (conversa) {
     var mensagens = conversa.getMessages();
     var cliente = clienteDaConversa(mensagens);
     mensagens.forEach(function (m) {
