@@ -94,6 +94,7 @@ export interface InvoiceFields {
 }
 
 export type CalendarPatch = Partial<ParsedService> & Partial<InvoiceFields> & {
+  calendar_event_id?: string;
   source?: string;
   calendar_updated_at?: string;
   calendar_missing_since?: string | null;
@@ -177,12 +178,28 @@ export function planCalendarSync(
   const known = knownPlacesFrom(rows);
   const byEvent = new Map(rows.filter(r => r.calendar_event_id).map(r => [r.calendar_event_id!, r]));
   const present = new Set<string>();
+  const movedRows = new Set<string>();
   const plan: SyncPlan = { inserts: [], updates: [], counts: { added: 0, updated: 0, missing: 0, restored: 0 } };
   // Reagendar não é fechar (dono, 14 Nov: a Lis, marcada a 5/11, desmarcada e
   // marcada outra vez a 13/11, contou como fecho de 13/11). Um evento novo do
   // mesmo telefone cujo serviço anterior saiu do calendário há menos de 30 dias
   // herda o dia do fecho desse serviço.
   const earlierBooking = new Map<string, string>();
+  // Remarcação (dono, 16 Nov, Mariana: evento de 16/11 apagado, outro a 19/11):
+  // o evento novo do mesmo telefone fica com a linha que saiu do calendário,
+  // em vez de ela ficar como apagada e de nascer uma linha nova.
+  // Conta também a linha cujo evento sai do feed nesta mesma leitura.
+  const inFeed = new Set(events.filter(e => e.status !== 'CANCELLED').map(e => e.id));
+  const rescheduled = new Map<string, SyncableRow>();
+  for (const r of rows) {
+    const phone = (r as { phone?: string | null }).phone;
+    if (!phone || !r.calendar_event_id) continue;
+    const gone = r.calendar_missing_since
+      ? time(now) - time(r.calendar_missing_since) <= 30 * 86_400_000
+      : !inFeed.has(r.calendar_event_id) && time(r.booked_at) >= time(since);
+    if (!gone) continue;
+    rescheduled.set(phone.replace(/\D/g, '').slice(-9), r);
+  }
   for (const r of rows) {
     const phone = (r as { phone?: string | null }).phone;
     if (!phone || !r.booked_at || !r.calendar_missing_since) continue;
@@ -217,6 +234,19 @@ export function planCalendarSync(
 
     const source = adSourceFromTitle(event.summary) ?? CALENDAR_SOURCE;
     const row = byEvent.get(event.id);
+    const moved = !row && parsed.phone ? rescheduled.get(parsed.phone.replace(/\D/g, '').slice(-9)) : undefined;
+    if (moved) {
+      rescheduled.delete(parsed.phone!.replace(/\D/g, '').slice(-9));
+      movedRows.add(moved.id);
+      plan.updates.push({ id: moved.id, patch: {
+        request_date: parsed.request_date,
+        calendar_event_id: event.id,
+        calendar_updated_at: event.updated,
+        calendar_missing_since: null,
+      } });
+      plan.counts.restored++;
+      continue;
+    }
     if (!row) {
       plan.inserts.push({
         ...parsed,
@@ -251,7 +281,7 @@ export function planCalendarSync(
   }
 
   for (const row of byEvent.values()) {
-    if (present.has(row.calendar_event_id!) || row.calendar_missing_since) continue;
+    if (present.has(row.calendar_event_id!) || row.calendar_missing_since || movedRows.has(row.id)) continue;
     // As linhas ligadas ao calendário antes de `since` (a data de fecho das
     // antigas veio de lá) não são vigiadas: o feed só traz eventos novos.
     if (!(time(row.booked_at) >= time(since))) continue;

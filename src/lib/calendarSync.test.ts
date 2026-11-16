@@ -89,6 +89,17 @@ describe('planCalendarSync', () => {
     expect(back.counts.restored).toBe(1);
   });
 
+  it('a new event of the same phone takes over the row whose event left the calendar (reschedule, Mariana 16 Nov)', () => {
+    const linked = row('r1', { client_name: 'Ana', phone: '912345678', calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' } as Partial<SyncableRow>);
+    const moved = event('e2', { startDate: '2026-10-04', created: '2026-09-28T08:00:00Z', updated: '2026-09-28T08:00:00Z' });
+    for (const r of [linked, { ...linked, calendar_missing_since: '2026-09-28T07:00:00Z' }]) {
+      const p = plan([r], [moved]);
+      expect(p.inserts).toEqual([]);
+      expect(p.updates).toEqual([{ id: 'r1', patch: { request_date: '2026-10-04', calendar_event_id: 'e2', calendar_updated_at: '2026-09-28T08:00:00Z', calendar_missing_since: null } }]);
+      expect(p.counts.missing).toBe(0);
+    }
+  });
+
   it('treats an event renamed away from "Serviço" as gone', () => {
     const linked = row('r1', { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
     expect(plan([linked], [event('e1', { summary: 'Cancelado - Ana sofá', updated: '2026-09-27T20:00:00Z' })]).counts.missing).toBe(1);
