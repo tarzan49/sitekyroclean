@@ -7,7 +7,6 @@ import { installLandingModel, clearLandingModel } from '../test/landingModelDom'
 import { LANDING_SECTION_ORDER } from '../data/landingServiceCopy';
 import { getLandingPageModel } from '../data/landingPageModel';
 
-vi.mock('./ProblemCarousel', () => ({ default: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 vi.mock('./CustomerReviews', () => ({ default: () => <div>Avaliações</div> }));
 vi.mock('./PriceWidget', () => ({ default: (props: object) => <div data-testid="widget">{JSON.stringify(props)}</div> }));
 vi.mock('./SofaProcessGuide', () => ({ default: () => <div>Processo sofá</div> }));
