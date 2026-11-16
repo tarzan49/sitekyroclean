@@ -34,7 +34,7 @@ export async function syncCalendarIntoCrm(rows: Array<SyncableRow & { phone: str
   const db = supabase as any;
   // Linhas apagadas no CRM: o evento continua no calendário, mas não volta.
   const { data: ignoredRows, error: ignoredError } = await db.from("crm_ignored_calendar_events").select("event_id");
-  if (ignoredError) throw ignoredError;
+  if (ignoredError) throw dbError(ignoredError, "eventos ignorados");
   const ignored = new Set<string>((ignoredRows ?? []).map((r: { event_id: string }) => r.event_id));
   const plan = planCalendarSync(rows, events, { since: CALENDAR_SYNC_SINCE, now: new Date().toISOString(), ignored });
   // Sem cidade nem código postal: telefone de um cliente anterior, depois a rua no mapa.
@@ -43,11 +43,16 @@ export async function syncCalendarIntoCrm(rows: Array<SyncableRow & { phone: str
     // ignoreDuplicates: dois separadores abertos não duplicam um serviço.
     const { error } = await db.from("service_requests")
       .upsert(plan.inserts, { onConflict: "calendar_event_id", ignoreDuplicates: true });
-    if (error) throw error;
+    if (error) throw dbError(error, "criar linhas");
   }
   for (const { id, patch } of plan.updates) {
     const { error } = await db.from("service_requests").update(patch).eq("id", id);
-    if (error) throw error;
+    if (error) throw dbError(error, `atualizar ${id} (${Object.keys(patch).join(", ")})`);
   }
   return { status: "done", changed: plan.inserts.length + plan.updates.length > 0, counts: plan.counts };
+}
+
+/** Os erros do Supabase são objetos simples: sem isto o ecrã mostra "[object Object]". */
+function dbError(e: { message?: string; details?: string | null; hint?: string | null }, what: string): Error {
+  return new Error(`${what}: ${[e.message, e.details, e.hint].filter(Boolean).join(" · ") || JSON.stringify(e)}`);
 }
