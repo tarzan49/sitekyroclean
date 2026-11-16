@@ -284,3 +284,16 @@ describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
     expect(big.askedDiscount).toBeNull();
   });
 });
+
+describe('sofá de pele (dono, 16 Nov 2026: tratamento da pele +30€, nunca impermeabilização)', () => {
+  it('soma 30€ por sofá de pele, numa linha própria, sem versões de impermeabilização', () => {
+    const plain = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Lisboa' });
+    const leather = ok({ items: [{ kind: 'sofa', size: '3-lugares', leather: true }], city: 'Lisboa' });
+    expect(leather.total).toBe((plain.total as number) + 30);
+    expect(leather.lines.at(-1)).toMatchObject({ label: 'Tratamento da pele (limpeza e hidratação)', amount: 30 });
+    expect(leather.waterproofingTiers).toBeNull();
+  });
+  it('recusa impermeabilização num sofá de pele', () => {
+    expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium', leather: true }], city: 'Lisboa' }).ok).toBe(false);
+  });
+});

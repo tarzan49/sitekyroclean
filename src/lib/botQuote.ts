@@ -91,6 +91,9 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   if ((kind === 'rug' || kind === 'carpet') && treatment !== 'clean') return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   if (r.odor !== undefined && typeof r.odor !== 'boolean') return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === 'rug' || kind === 'carpet')) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
+  // `leather`: a leather sofa (owner, 16 Nov 2026): never waterproofed; the leather treatment is +30€ per sofa.
+  if (r.leather !== undefined && (typeof r.leather !== 'boolean' || (r.leather && kind !== 'sofa'))) return fail(`items[${index}].leather só serve para sofás (true ou false)`);
+  if (r.leather === true && treatment !== 'clean') return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€) junta-se sozinho`);
   // `seatOnly`: chairs whose only upholstery is the seat top (owner, 14 Nov 2026): waterproofing 18€/12€ each.
   if (r.seatOnly !== undefined && (typeof r.seatOnly !== 'boolean' || (r.seatOnly && kind !== 'chairs'))) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = '';
@@ -346,6 +349,25 @@ function rugOdorFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number
     const a = rugOdorUnit(w, l) * i.qty;
     amount += a;
     lines.push({ label: `Tratamento anti-odor ${i.kind === 'carpet' ? 'alcatifa' : 'tapete'} ${w} x ${l} m${i.qty > 1 ? ` (${i.qty} un.)` : ''}`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined, quote: false });
+  });
+  return amount ? { amount, lines } : null;
+}
+
+/**
+ * Leather treatment (tratamento da pele: limpeza e hidratação do couro), owner 16 Nov 2026: +30€ per
+ * leather sofa. A leather sofa is never waterproofed. Item flag `leather: true` on the sofa's cleaning.
+ */
+export const LEATHER_TREATMENT = 30;
+export const LEATHER_RULE = 'Já está somado ao total: não somes outra vez. Diz o tratamento da pele numa linha à parte. Nunca ofereças impermeabilização a um sofá de pele.';
+
+function leatherFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number; lines: QuoteLine[] } | null {
+  const lines: QuoteLine[] = [];
+  let amount = 0;
+  items.forEach((i, n) => {
+    if (i.kind !== 'sofa' || (rawOf[n] as Record<string, unknown>)?.leather !== true) return;
+    const a = LEATHER_TREATMENT * i.qty;
+    amount += a;
+    lines.push({ label: `Tratamento da pele (limpeza e hidratação)${i.qty > 1 ? ` (${i.qty} un.)` : ''}`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined, quote: false });
   });
   return amount ? { amount, lines } : null;
 }
@@ -615,6 +637,11 @@ function botQuoteInner(input: unknown) {
   };
   // Anti-odour on rugs and carpets (owner, 12 Nov 2026): own lines, summed into every price.
   const odor = rugOdorFor(items, rawOf);
-  if (!odor) return { ...out, rugOdor: null as { amount: number; min: number; perM2: number; rule: string } | null };
-  return { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } };
+  const withOdor = odor
+    ? { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } as { amount: number; min: number; perM2: number; rule: string } | null }
+    : { ...out, rugOdor: null as { amount: number; min: number; perM2: number; rule: string } | null };
+  // Leather treatment (owner, 16 Nov 2026): own line, summed into the price; never waterproofing tiers.
+  const leather = leatherFor(items, rawOf);
+  if (!leather) return { ...withOdor, leatherTreatment: null as { amount: number; perSofa: number; rule: string } | null };
+  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: LEATHER_TREATMENT, rule: LEATHER_RULE } as { amount: number; perSofa: number; rule: string } | null };
 }

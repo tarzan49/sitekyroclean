@@ -2087,6 +2087,8 @@ function toItem(raw, index) {
   if ((kind === "rug" || kind === "carpet") && treatment !== "clean") return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   if (r.odor !== void 0 && typeof r.odor !== "boolean") return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === "rug" || kind === "carpet")) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
+  if (r.leather !== void 0 && (typeof r.leather !== "boolean" || r.leather && kind !== "sofa")) return fail(`items[${index}].leather só serve para sofás (true ou false)`);
+  if (r.leather === true && treatment !== "clean") return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€) junta-se sozinho`);
   if (r.seatOnly !== void 0 && (typeof r.seatOnly !== "boolean" || r.seatOnly && kind !== "chairs")) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = "";
   let unitPrice;
@@ -2264,6 +2266,19 @@ function rugOdorFor(items, rawOf) {
     const a = rugOdorUnit(w, l) * i.qty;
     amount2 += a;
     lines.push({ label: `Tratamento anti-odor ${i.kind === "carpet" ? "alcatifa" : "tapete"} ${w} x ${l} m${i.qty > 1 ? ` (${i.qty} un.)` : ""}`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
+  });
+  return amount2 ? { amount: amount2, lines } : null;
+}
+var LEATHER_TREATMENT = 30;
+var LEATHER_RULE = "Já está somado ao total: não somes outra vez. Diz o tratamento da pele numa linha à parte. Nunca ofereças impermeabilização a um sofá de pele.";
+function leatherFor(items, rawOf) {
+  const lines = [];
+  let amount2 = 0;
+  items.forEach((i, n) => {
+    if (i.kind !== "sofa" || rawOf[n]?.leather !== true) return;
+    const a = LEATHER_TREATMENT * i.qty;
+    amount2 += a;
+    lines.push({ label: `Tratamento da pele (limpeza e hidratação)${i.qty > 1 ? ` (${i.qty} un.)` : ""}`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
   });
   return amount2 ? { amount: amount2, lines } : null;
 }
@@ -2508,8 +2523,10 @@ function botQuoteInner(input) {
     })
   };
   const odor = rugOdorFor(items, rawOf);
-  if (!odor) return { ...out, rugOdor: null };
-  return { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } };
+  const withOdor = odor ? { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } } : { ...out, rugOdor: null };
+  const leather = leatherFor(items, rawOf);
+  if (!leather) return { ...withOdor, leatherTreatment: null };
+  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: LEATHER_TREATMENT, rule: LEATHER_RULE } };
 }
 
 // src/constants/cityCoords.ts
