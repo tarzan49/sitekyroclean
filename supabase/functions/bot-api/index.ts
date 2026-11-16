@@ -128,6 +128,8 @@ export interface BotEnv {
   conversations?: ((rows: Row[]) => Promise<{ error?: string }>) | null;
   /** service_extras: items added to a booked service, a closing on the day the client took them. */
   extras?: ((row: Row) => Promise<string | null>) | null;
+  /** CRM rows with an upsell (calendar_event_id, billed_value, upsell_value), for the title total sweep. */
+  upsells?: (() => Promise<Row[]>) | null;
   /** Email to the owner (Resend); null = sent, else why not. */
   notifyOwner?: ((subject: string, text: string, html?: string) => Promise<string | null>) | null;
   now?: () => Date;
@@ -499,7 +501,8 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       if ("error" in cal) return createErrorResponse(cal.error, 503);
       const at = env.now?.() ?? new Date();
       const sweep = await sweepHolds(cal.events, env.holds, env.writeCalendar, at);
-      return createSuccessResponse({ sweep: { ...sweep, waterproofBase: await sweepWaterproofBase(cal.events, env.writeCalendar, at) } });
+      const upsellRows = env.upsells ? await env.upsells().catch(() => [] as Row[]) : [];
+      return createSuccessResponse({ sweep: { ...sweep, waterproofBase: await sweepWaterproofBase(cal.events, env.writeCalendar, at), upsellTotals: await sweepUpsellTotals(cal.events, upsellRows, env.writeCalendar) } });
     }
     case "hold":
     case "release":
@@ -829,6 +832,53 @@ export async function sweepWaterproofBase(events: CalendarEvent[], write: Calend
   return { tagged, failed };
 }
 
+const euros = (n: number) => `${(Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, "").replace(".", ",")}€`;
+
+/**
+ * Dono, 16 Nov 2026 (Flávia): o upsell gravado no CRM aparece no calendário. O total entre
+ * parênteses no título passa a ser serviço + upsell (a sincronização do CRM aceita esse total e
+ * mantém o serviço e o upsell separados, `invoiceChanges` em calendarSync.ts).
+ */
+export function titleWithUpsellTotal(summary: string, billed: number, upsell: number): string {
+  if (!(upsell > 0) || !(billed > 0)) return summary;
+  const total = Math.round((billed + upsell) * 100);
+  const m = /^(.*?)\((\d+(?:[.,]\d+)?)\s*€\)/.exec(summary);
+  if (!m) return summary;
+  const shown = Math.round(parseFloat(m[2].replace(",", ".")) * 100);
+  if (Math.abs(shown - total) <= 2) return summary;
+  return `${m[1]}(${euros(total / 100)})${summary.slice(m[0].length)}`;
+}
+
+export async function sweepUpsellTotals(events: CalendarEvent[], rows: Row[], write: CalendarWriter, max = 10) {
+  let fixed = 0, failed = 0;
+  const byId = new Map(rows.map(r => [String(r.calendar_event_id ?? ""), r]));
+  for (const e of events) {
+    if (fixed + failed >= max) break;
+    const r = byId.get(e.id);
+    if (!r || e.status === "CANCELLED" || !e.start || !e.end) continue;
+    const title = titleWithUpsellTotal(e.summary, Number(r.billed_value) || 0, Number(r.upsell_value) || 0);
+    if (title === e.summary) continue;
+    const phone = /(?:^|\D)((?:351)?[29]\d{8})(?!\d)/.exec(e.summary.replace(/(\d) (?=\d)/g, "$1"))?.[1] ?? /bot:(\d+)/.exec(e.description)?.[1] ?? "";
+    if (!phone) continue;
+    const done = await write({ action: "update", eventId: e.id, phone, title, description: "", start: e.start, end: e.end });
+    if (done.ok) fixed++; else failed++;
+  }
+  if (fixed) calendarCache = null;
+  return { fixed, failed };
+}
+
+function supabaseUpsells(): BotEnv["upsells"] {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  return async () => {
+    const since = new Date(Date.now() - 45 * 86400000).toISOString().slice(0, 10);
+    const { data } = await client.from("service_requests").select("calendar_event_id, billed_value, upsell_value").gt("upsell_value", 0).gte("request_date", since).not("calendar_event_id", "is", null);
+    return (data ?? []) as Row[];
+  };
+}
+
 async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
   const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
   if (!conversationId) return createErrorResponse("conversationId em falta", 400);
@@ -1105,5 +1155,5 @@ function resendOwnerMail(): BotEnv["notifyOwner"] {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), certificates: supabaseCertificates(), conversations: supabaseConversations(), extras: supabaseExtras() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter(), notifyOwner: resendOwnerMail(), accounts: supabaseAccounts(), procedures: supabaseProcedures(), certificates: supabaseCertificates(), conversations: supabaseConversations(), extras: supabaseExtras(), upsells: supabaseUpsells() }));
 }
