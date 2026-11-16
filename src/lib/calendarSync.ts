@@ -84,7 +84,10 @@ export type CalendarInsert = ParsedService & {
   calendar_updated_at: string;
   source: string;
   paid: false;
-} & Partial<InvoiceFields>;
+  invoiced: boolean;
+  vat_on_top: boolean;
+  invoice_by: 'Empresa' | null;
+} & Partial<Omit<InvoiceFields, 'invoiced' | 'vat_on_top' | 'invoice_by'>>;
 
 /** O que a sincronização escreve quando o evento diz que é com fatura. */
 export interface InvoiceFields {
@@ -251,6 +254,11 @@ export function planCalendarSync(
     if (!row) {
       plan.inserts.push({
         ...parsed,
+        // O upsert em lote junta as colunas de todas as linhas: uma sem fatura
+        // ia com invoiced null e o lote todo falhava (16/11).
+        invoiced: false,
+        vat_on_top: false,
+        invoice_by: null,
         ...(invoiceFromEvent(event, parsed.billed_value) ?? {}),
         booked_at: bookedAtFor(event, parsed.phone),
         calendar_event_id: event.id,
