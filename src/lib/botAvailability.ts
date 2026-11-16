@@ -665,7 +665,18 @@ export interface AvailabilityRequest {
  * below 110€ (120€ less his 10€ margin) the bot offers no hours and says we check availability.
  * The Alentejo Litoral is already in EXTENDED_TRIP_CITIES.
  */
-export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Aveiro', 'Leiria', 'Batalha']);
+export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Aveiro']);
+/**
+ * Leiria tier (owner, 16 Nov 2026: "a regra neste funil e marcar para sexta feira e fechar a cliente de qualquer
+ * forma"): any amount, the bot gives hours only on the next Friday (Coimbra team) and closes; no askWeek, no minimum.
+ */
+export const FRIDAY_ONLY_CITIES: ReadonlySet<string> = new Set(['Leiria', 'Batalha', 'Marinha Grande', 'Porto de Mós', 'Ourém', 'Fátima', 'Pombal', 'Alcobaça', 'Nazaré']);
+function nextFriday(now: Date): string {
+  const today = lisbon(now.getTime()).date;
+  const d = new Date(`${today}T12:00:00Z`);
+  do d.setUTCDate(d.getUTCDate() + 1); while (d.getUTCDay() !== 5);
+  return d.toISOString().slice(0, 10);
+}
 export const SMALL_ORDER_MIN_TOTAL = 110;
 /** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
 // Owner, 15 Nov 2026: "tudo a norte que forem orçamento de valor igual ou superior a 79 eur tens que dar sempre disponibilidade".
@@ -845,7 +856,12 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
-  if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
+  const fridayDone = (req as { _friday?: unknown })._friday === true;
+  if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
+    const friday = typeof req.date === 'string' && DATE.test(req.date) && new Date(`${req.date}T12:00:00Z`).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
+    return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
+  }
+  if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];
     return { ...base, region: area, teams: [...(override ?? TEAMS_BY_REGION[area])],
       handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join('/')} (junta com o serviço da Marinha Grande)` : ''}`,

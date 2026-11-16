@@ -521,7 +521,7 @@ var cities = [
 ];
 
 // src/constants/commercialPolicy.ts
-var RESPONSE_PROMISE = "Resposta em menos de 5 minutos";
+var RESPONSE_PROMISE = "Resposta em menos de 1 minuto";
 var DRYING_PROMISE = "Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço.";
 var SOFA_DRYING_RANGE = "2 a 5 horas";
 var SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;
@@ -3044,7 +3044,16 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const closest = (t) => Math.min(Infinity, ...busy.filter((b) => b.team === t && b.place && place && lisbon(b.from).date === day).map((b) => driveMinutes(b.place, place)));
   return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
-var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Aveiro", "Leiria", "Batalha"]);
+var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Aveiro"]);
+var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
+function nextFriday(now) {
+  const today = lisbon(now.getTime()).date;
+  const d = /* @__PURE__ */ new Date(`${today}T12:00:00Z`);
+  do
+    d.setUTCDate(d.getUTCDate() + 1);
+  while (d.getUTCDay() !== 5);
+  return d.toISOString().slice(0, 10);
+}
 var SMALL_ORDER_MIN_TOTAL = 110;
 var NORTH_MIN_TOTAL = 79;
 var SMALL_ORDER_MIN_BY_CITY = { "Viana do Castelo": NORTH_MIN_TOTAL, "Aveiro": NORTH_MIN_TOTAL };
@@ -3183,7 +3192,12 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
-  if (req.ownerTime !== true && ASK_WEEK_ZONES.has(area)) {
+  const fridayDone = req._friday === true;
+  if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
+    const friday = typeof req.date === "string" && DATE.test(req.date) && (/* @__PURE__ */ new Date(`${req.date}T12:00:00Z`)).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
+    return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
+  }
+  if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];
     return {
       ...base,
