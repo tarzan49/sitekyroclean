@@ -75,6 +75,7 @@ export interface SyncableRow {
   my_cut?: number | string | null;
   invoiced?: boolean | null;
   invoice_value?: number | string | null;
+  upsell_value?: number | string | null;
 }
 
 export type CalendarInsert = ParsedService & {
@@ -299,6 +300,16 @@ export function planCalendarSync(
  */
 function invoiceChanges(row: SyncableRow, parsed: ParsedService, event: CalendarEvent): Partial<CalendarPatch> {
   const invoice = invoiceFromEvent(event, parsed.billed_value);
+  // Upsell separado no CRM (dono, 16/11, Flávia): o título traz o total com o
+  // upsell; se bate com serviço + upsell (com ou sem IVA), fica o do CRM.
+  const upsell = cents(row.upsell_value ?? 0);
+  if (upsell > 0 && row.billed_value != null) {
+    const total = cents(row.billed_value) + upsell;
+    const calendarTotal = cents(parsed.billed_value);
+    if (Math.abs(calendarTotal - total) <= 2 || Math.abs(round2(calendarTotal * VAT_RATE) - total) <= 2) {
+      return { billed_value: Number(row.billed_value), my_cut: Number(row.my_cut) || 0 };
+    }
+  }
   if (!row.invoiced) return invoice ?? {};
   if (row.billed_value === undefined || row.billed_value === null) return {};
   const crm = cents(row.billed_value);
