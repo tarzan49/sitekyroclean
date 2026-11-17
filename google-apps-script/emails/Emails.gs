@@ -272,8 +272,9 @@ function partesApi(parte, saida) {
   return saida;
 }
 
-/** A API devolve base64 "web safe" às vezes sem o `=` final, que o Utilities exige. */
+/** No Apps Script a API devolve os dados já em bytes; noutros casos em base64 "web safe", às vezes sem o `=` final. */
 function bytesDe(dados) {
+  if (dados && typeof dados !== 'string') return dados;
   var d = String(dados || '').replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
   while (d.length % 4) d += '=';
   return Utilities.base64Decode(d);
