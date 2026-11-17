@@ -852,3 +852,6 @@ Tapete com traças em Vila do Bispo: o bot escreveu "Não prometemos eliminar os
 
 ### Funil sem resposta do cliente: compacto (dono, 17 Nov 2026)
 Raquel (quiz sofá 3L + 4 tapetes, Porto) recebeu 9 mensagens em 5 min sem escrever: boas-vindas, "Obrigado, Raquel!" sem ela ter dito nada, preço dos tapetes em falta (só 32 m² e o total 389€), upsell à parte, 5 provas e as horas. Agora o funil do questionário e o da espera da fotografia saem em 1 texto (preço de cada artigo, €/m² nos tapetes, total, horas) + 1 prova; o upsell só depois de o cliente responder. Código: kyro-bot `src/bot/silentCompact.ts`.
+
+### Email: só orçamentos banais (dono, 17 Nov)
+Câmara de Leiria (80 cadeiras, 2 anos) chegou ao email. Regra: o bot responde só a orçamentos de limpezas do dia a dia; em massa, grandes ou institucionais vão ao dono (aviso por email, kyro-bot `isBulkRequest`). Emails que eu envie à mão saem sempre pelo `composeEmail` (cabeçalho, fotografias, assinatura), nunca texto simples.
