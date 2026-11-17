@@ -591,3 +591,21 @@ Deno.test("a reschedule to a day the team no longer takes the job goes to a free
     writeCalendar: p => { writes.push(p); return Promise.resolve({ ok: true, eventId: "prem" }); }, notifyOwner: () => Promise.resolve(null) }).then(r => r.json());
   assertEquals([r.update.moved, r.update.team, writes[1].action, writes[1].start], [true, undefined, "update", "2026-11-05T16:30:00.000Z"]);
 });
+
+Deno.test("update-booking: a deleted service frees the bot's booking row, so it never comes back for 3 h (Mariana, 15 Nov)", async () => {
+  const conv = "900000006@s.whatsapp.net";
+  const row: HoldRow = { conversation_id: conv, event_id: "gone", title: "Serviço 45€ (89€) Limpeza de sofá - 900000006 - Teste - Rua Y 2", starts_at: "2026-11-19T09:00:00Z", ends_at: "2026-11-19T11:00:00Z", updated_at: "2026-11-15T22:03:00Z", released_at: null };
+  const released: string[] = [];
+  const holds: HoldStore = { get: () => Promise.resolve(row), recent: () => Promise.resolve([row]), save: () => Promise.resolve(null), release: id => { released.push(id); return Promise.resolve(null); } };
+  const event = { id: "gone", summary: row.title, description: `Equipa: Lisboa 1\n\nbot:${conv}`, location: "", startDate: "2026-11-19", created: "", updated: "", status: "CONFIRMED", start: row.starts_at, end: row.ends_at };
+  const call = (eventId: string) => handleBotRequest(new Request("https://x/functions/v1/bot-api", {
+    method: "POST", headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.5.${++ip % 250}` },
+    body: JSON.stringify({ action: "update-booking", eventId, phone: "900000006", conversationId: conv, changes: { cancel: "já não precisa" } }),
+  }), { botKey: KEY, leads: null, holds, calendar: () => Promise.resolve({ events: [event, { ...event, id: "other" }] }), now: () => new Date("2026-11-15T22:05:30Z"),
+    writeCalendar: p => Promise.resolve(p.action === "cancel" ? { ok: true } : { ok: true, eventId: String(p.eventId) }), notifyOwner: () => Promise.resolve(null) }).then(r => r.json());
+  const r = await call("gone");
+  assertEquals([r.update.cancel, r.update.deleted, released], [true, true, [conv]]);
+  // Another event of the same chat leaves the row alone.
+  await call("other");
+  assertEquals(released, [conv]);
+});

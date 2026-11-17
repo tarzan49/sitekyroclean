@@ -740,6 +740,13 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     const gone = await env.writeCalendar!({ action: "cancel", eventId, phone });
     if (gone.ok) deleted = true; else deleteError = gone.error.slice(0, 200);
     calendarCache = null;
+    // The bot's own booking row would put the deleted event back into booked-services and the availability for up to
+    // 3 h (withRecentHolds covers Google's feed delay): Mariana, 15 Nov 2026, four minutes after the delete the bot
+    // still read her service as "no calendário" and told her "Fica anotado: quinta-feira (dia 19) às 9h".
+    if (deleted && conversationId && env.holds) {
+      const row = await env.holds.get(conversationId);
+      if (row && !("error" in row) && row.event_id === eventId && !row.released_at) await env.holds.release(conversationId);
+    }
   }
   if ((plan.cancel || plan.moved) && env.notifyOwner) {
     await env.notifyOwner(plan.cancel ? `Cliente desmarcou: ${plan.title.slice(0, 90)}` : `Serviço mudado pelo cliente: ${plan.title.slice(0, 90)}`,
