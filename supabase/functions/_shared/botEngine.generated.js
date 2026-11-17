@@ -2751,7 +2751,9 @@ var TEAM_OFF = [
   ...Array.from({ length: 12 }, (_, i) => ({ team: "Porto 2", date: `2026-11-${String(11 + i).padStart(2, "0")}` })),
   // Owner, 16 Nov 2026: "porto 3 n pode amanha de manha trabalhar, porto 2 tb n e porto 1 tb n so se for alguma imper".
   // Porto 1 only takes Premium waterproofing anyway; Porto 2 is already off.
-  { team: "Porto 3", date: "2026-11-17", untilHour: 13 }
+  { team: "Porto 3", date: "2026-11-17", untilHour: 13 },
+  // Porto 3, 17 Nov 2026: "sexta eu já tenho um compromisso para o dia todo". Owner: "bloqueia".
+  { team: "Porto 3", date: "2026-11-20" }
 ];
 var TEAM_CLOSED_FROM = { "Porto 1": { date: "2026-11-06", hour: 20, reopen: "2026-11-14" } };
 var closedAt = (team, from, to) => {

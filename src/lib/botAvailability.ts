@@ -260,6 +260,8 @@ export const TEAM_OFF: readonly TeamOff[] = [
   // Owner, 16 Nov 2026: "porto 3 n pode amanha de manha trabalhar, porto 2 tb n e porto 1 tb n so se for alguma imper".
   // Porto 1 only takes Premium waterproofing anyway; Porto 2 is already off.
   { team: 'Porto 3', date: '2026-11-17', untilHour: 13 },
+  // Porto 3, 17 Nov 2026: "sexta eu já tenho um compromisso para o dia todo". Owner: "bloqueia".
+  { team: 'Porto 3', date: '2026-11-20' },
 ];
 /**
  * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends
