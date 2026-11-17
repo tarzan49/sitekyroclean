@@ -46,8 +46,8 @@ describe('final landing SEO regression coverage', () => {
       expect(getLandingPageModel(route.path + '?utm_medium=cpc#problemas')!.problems).toEqual(model.problems);
     }
     expect(usage.size).toBe(240);
-    // Statistical regression guard for the current 2,152-page inventory, not a ranking target.
-    for (const [id, count] of usage) { expect(count, id).toBeGreaterThan(140); expect(count, id).toBeLessThan(300); }
+    // Statistical regression guard (inventory grew with Leiria and Madeira on 17 Nov), not a ranking target.
+    for (const [id, count] of usage) { expect(count, id).toBeGreaterThan(140); expect(count, id).toBeLessThan(330); }
     for (const set of combinations.values()) expect(set.size).toBeGreaterThan(1750);
   });
 });

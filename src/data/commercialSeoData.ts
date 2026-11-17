@@ -15,7 +15,7 @@ import { cityPrep } from "./serviceCatalog";
 export interface CommercialCity {
   name: string;
   slug: string;
-  region: "Porto" | "Coimbra" | "Lisboa" | "Algarve";
+  region: "Porto" | "Coimbra" | "Lisboa" | "Algarve" | "Madeira";
 }
 
 export const COMMERCIAL_CITIES: CommercialCity[] = [
@@ -36,6 +36,12 @@ export const COMMERCIAL_CITIES: CommercialCity[] = [
   // Coimbra e Centro (trabalhador local desde 2026-09-28)
   { name: "Coimbra", slug: "coimbra", region: "Coimbra" },
   { name: "Figueira da Foz", slug: "figueira-da-foz", region: "Coimbra" },
+  { name: "Leiria", slug: "leiria", region: "Coimbra" },
+  { name: "Fátima", slug: "fatima", region: "Coimbra" },
+  { name: "Nazaré", slug: "nazare", region: "Coimbra" },
+  // Madeira (equipa própria; dono, 17 Nov): hotelaria e alojamento local
+  { name: "Funchal", slug: "funchal", region: "Madeira" },
+  { name: "Santa Cruz", slug: "santa-cruz", region: "Madeira" },
   // Lisboa / Área Metropolitana
   { name: "Lisboa", slug: "lisboa", region: "Lisboa" },
   { name: "Cascais", slug: "cascais", region: "Lisboa" },

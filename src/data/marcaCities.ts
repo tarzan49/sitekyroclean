@@ -37,6 +37,15 @@ export const MARCA_CITIES = [
   // Coimbra e Centro
   { name: "Coimbra", slug: "coimbra" },
   { name: "Figueira da Foz", slug: "figueira-da-foz" },
+  { name: "Leiria", slug: "leiria" },
+  { name: "Marinha Grande", slug: "marinha-grande" },
+  { name: "Pombal", slug: "pombal" },
+  { name: "Alcobaça", slug: "alcobaca" },
+  { name: "Ourém", slug: "ourem" },
+  // Madeira (equipa própria; dono, 17 Nov)
+  { name: "Funchal", slug: "funchal" },
+  { name: "Santa Cruz", slug: "santa-cruz" },
+  { name: "Câmara de Lobos", slug: "camara-de-lobos" },
   // Lisboa / Área Metropolitana
   { name: "Lisboa", slug: "lisboa" },
   { name: "Sintra", slug: "sintra" },

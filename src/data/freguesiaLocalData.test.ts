@@ -11,6 +11,9 @@ const FULL_COVERAGE = [
   'Coimbra', 'Figueira da Foz', 'Braga', 'Guimarães', 'Barcelos', 'Vila Nova de Famalicão',
   // Norte Litoral (2026-09-28)
   'Viana do Castelo', 'Esposende', 'Póvoa de Varzim', 'Vila do Conde', 'Espinho', 'Ovar',
+  // Leiria e zona, Madeira (dono, 17 Nov)
+  'Leiria', 'Batalha', 'Marinha Grande', 'Nazaré', 'Porto de Mós', 'Ourém', 'Pombal', 'Alcobaça',
+  'Funchal', 'Câmara de Lobos', 'Santa Cruz', 'Machico',
   ...cities.filter(city => city.area === 'algarve').map(city => city.name),
 ];
 

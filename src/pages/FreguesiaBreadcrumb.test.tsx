@@ -101,8 +101,8 @@ describe('páginas de freguesia: cada passo da migalha é uma página que existe
   const locationRoutes = getAllLocationRoutes();
   const pages = new Set(['/', ...PILLAR_PAGES.map(page => page.path), ...locationRoutes.map(route => route.path), ...routes.map(route => route.path)]);
 
-  it('Início › serviço › município › freguesia, nas 4.326 páginas', () => {
-    expect(routes).toHaveLength(4326);
+  it('Início › serviço › município › freguesia, nas 4.656 páginas', () => {
+    expect(routes).toHaveLength(4656);
     for (const route of routes) {
       const service = services.find(item => item.slug === route.serviceSlug)!;
       const municipality = municipiosComFreguesias.find(item => item.slug === route.citySlug)!;

@@ -156,7 +156,8 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
         ...problemCityBenefits(problem, city.name),
       ];
       for (const text of texts) {
-        const match = text.match(other);
+        // "Porto de Mós" contém "Porto": tira-se primeiro o nome da própria cidade.
+        const match = text.split(city.name).join(' ').match(other);
         if (match) found.push(`${route.path}: "${match[0]}" em "${text}"`);
       }
     }
@@ -166,7 +167,7 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
   it('limpeza-sofa-domicilio: a página nacional fica no Porto, as de cidade não', () => {
     const domicilio = getProblemBySlug('limpeza-sofa-domicilio')!;
     const routes = getAllProblemCityRoutes().filter(route => route.problemSlug === domicilio.slug);
-    expect(routes).toHaveLength(31);
+    expect(routes).toHaveLength(45);
     for (const route of routes) {
       const city = cities.find(c => c.slug === route.citySlug)!;
       const { title, description } = problemCityMeta(domicilio, city.name);
@@ -175,7 +176,7 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
         ...problemBreadcrumb(domicilio, city).map(step => step.name),
         ...problemCityBenefits(domicilio, city.name),
       ];
-      for (const text of texts) expect(text, route.path).not.toMatch(otherCityPattern(city.name));
+      for (const text of texts) expect(text.split(city.name).join(' '), route.path).not.toMatch(otherCityPattern(city.name));
     }
 
     // Texto escolhido pelo dono a 30/09/2026.

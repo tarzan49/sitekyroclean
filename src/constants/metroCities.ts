@@ -6,6 +6,10 @@ export const METRO_CITY_SLUGS = [
   "vila-nova-de-famalicao", "barcelos", "viana-do-castelo", "povoa-de-lanhoso", "fafe", "esposende",
   // Coimbra (trabalhador local desde 2026-09-28)
   "coimbra", "figueira-da-foz",
+  // Leiria e zona (equipa Coimbra; dono, 15 Nov)
+  "leiria", "batalha", "marinha-grande", "porto-de-mos", "ourem", "fatima", "pombal", "alcobaca", "nazare",
+  // Madeira (equipa própria; dono, 17 Nov)
+  "funchal", "camara-de-lobos", "canico", "santa-cruz", "machico",
   // Lisboa / Área Metropolitana
   "lisboa", "sintra", "cascais", "oeiras", "amadora", "almada", "loures",
   // Algarve
