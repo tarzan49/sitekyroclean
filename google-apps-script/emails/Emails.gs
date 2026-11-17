@@ -346,23 +346,30 @@ function cabecalhoUtf8(t) {
 
 function base64Linhas(b64) { return b64.replace(/(.{76})/g, '$1\r\n'); }
 
-/** Email em MIME, texto e HTML em UTF-8 (os "������" do 17 Nov eram o corpo simples do GmailApp), mais os anexos. */
+/** Fotos com `inline` e `cid` vão dentro do email (galeria do HTML). Email em MIME, texto e HTML em UTF-8 (os "������" do 17 Nov eram o corpo simples do GmailApp), mais os anexos. */
 function mimeDe(p, assunto, emResposta) {
-  var mista = 'kyro-m-' + Utilities.getUuid(), alt = 'kyro-a-' + Utilities.getUuid();
-  var l = [
-    'To: ' + p.to,
-    'Subject: ' + cabecalhoUtf8(assunto),
-    'MIME-Version: 1.0'
-  ];
+  var mista = 'kyro-m-' + Utilities.getUuid(), rel = 'kyro-r-' + Utilities.getUuid(), alt = 'kyro-a-' + Utilities.getUuid();
+  var todos = p.attachments || [];
+  var dentro = todos.filter(function (a) { return a.inline && a.cid; });
+  var fora = todos.filter(function (a) { return !(a.inline && a.cid); });
+  var l = ['To: ' + p.to, 'Subject: ' + cabecalhoUtf8(assunto), 'MIME-Version: 1.0'];
   if (emResposta) l.push('In-Reply-To: ' + emResposta, 'References: ' + emResposta);
+  // mixed[ related[ alternative[texto, html], fotos dentro do email ], anexos ]
   l.push('Content-Type: multipart/mixed; boundary="' + mista + '"', '', '--' + mista,
+    'Content-Type: multipart/related; boundary="' + rel + '"', '', '--' + rel,
     'Content-Type: multipart/alternative; boundary="' + alt + '"', '',
     '--' + alt, 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '',
     base64Linhas(Utilities.base64Encode(p.body || '', Utilities.Charset.UTF_8)));
   if (p.html) l.push('--' + alt, 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '',
     base64Linhas(Utilities.base64Encode(p.html, Utilities.Charset.UTF_8)));
   l.push('--' + alt + '--');
-  (p.attachments || []).forEach(function (a) {
+  dentro.forEach(function (a) {
+    l.push('--' + rel, 'Content-Type: ' + a.mime + '; name="' + cabecalhoUtf8(a.name) + '"', 'Content-ID: <' + a.cid + '>',
+      'Content-Disposition: inline; filename="' + cabecalhoUtf8(a.name) + '"', 'Content-Transfer-Encoding: base64', '',
+      base64Linhas(a.base64));
+  });
+  l.push('--' + rel + '--');
+  fora.forEach(function (a) {
     l.push('--' + mista, 'Content-Type: ' + a.mime + '; name="' + cabecalhoUtf8(a.name) + '"',
       'Content-Disposition: attachment; filename="' + cabecalhoUtf8(a.name) + '"', 'Content-Transfer-Encoding: base64', '',
       base64Linhas(a.base64));
