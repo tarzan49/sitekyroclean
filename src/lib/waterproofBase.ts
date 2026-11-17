@@ -5,7 +5,11 @@
 const TAG = { premium: '(solvente)', essencial: '(à base de água)' } as const;
 
 /** "Impermeabilização Premium de sofá" → "Impermeabilização Premium (solvente) de sofá". */
+// Dono, 17 Nov 2026: "em todas as limpezas com anti ácaros identifica no calendário como produto bactran".
+const ANTI_MITES = /anti[\s-]?[áa]caros?\b(?!\s*\(produto bactran\))/gi;
+
 export function tagWaterproofBase(text: string): string {
+  if (!/bactran/i.test(text)) text = text.replace(ANTI_MITES, (w: string) => `${w} (produto Bactran)`);
   if (!/imperm/i.test(text)) return text;
   return text.replace(/\b(premium|essencial)\b(?!\s*\((?:solvente|à base de água|a base de agua)\))/gi,
     (word: string) => `${word} ${TAG[word.toLowerCase() as keyof typeof TAG]}`);

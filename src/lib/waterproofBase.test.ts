@@ -14,4 +14,11 @@ describe('tagWaterproofBase', () => {
     const once = tagWaterproofBase('Impermeabilização Premium sofá');
     expect(tagWaterproofBase(once)).toBe(once);
   });
+  it('anti-ácaros leva sempre (produto Bactran), uma só vez', () => {
+    expect(tagWaterproofBase('Serviço 50€ (99€) Limpeza de colchão de casal com anti-ácaros - Lourenço'))
+      .toBe('Serviço 50€ (99€) Limpeza de colchão de casal com anti-ácaros (produto Bactran) - Lourenço');
+    const once = tagWaterproofBase('Colchão + anti ácaros');
+    expect(once).toBe('Colchão + anti ácaros (produto Bactran)');
+    expect(tagWaterproofBase(once)).toBe(once);
+  });
 });

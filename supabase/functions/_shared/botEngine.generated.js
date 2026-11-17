@@ -3451,7 +3451,9 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
 
 // src/lib/waterproofBase.ts
 var TAG = { premium: "(solvente)", essencial: "(à base de água)" };
+var ANTI_MITES = /anti[\s-]?[áa]caros?\b(?!\s*\(produto bactran\))/gi;
 function tagWaterproofBase(text2) {
+  if (!/bactran/i.test(text2)) text2 = text2.replace(ANTI_MITES, (w) => `${w} (produto Bactran)`);
   if (!/imperm/i.test(text2)) return text2;
   return text2.replace(
     /\b(premium|essencial)\b(?!\s*\((?:solvente|à base de água|a base de agua)\))/gi,

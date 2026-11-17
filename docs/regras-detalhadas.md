@@ -866,3 +866,8 @@ Dono: "no máximo, o bot a responder tem que demorar 49 segundos a cada mensagem
 
 ### Fatura pedida pelo cliente (dono, 17 Nov, Angelina)
 A regra de 16/11 (Regina) de responder com "problema no programa de faturação / código das Finanças" fica **[RETIRADA 17/11]**: a Vendus emite desde 16/11 e o bot deu a desculpa à Angelina, que já tinha pago 69€ e dado o NIF. Agora: cliente pagou e deu nome+NIF → "Fica tratado, [nome]. A fatura segue já de seguida." + `note_for_owner` urgente; a fatura é emitida e enviada na hora e o CRM marcado com fatura (FT 01P2026/19). Teste em kyro-bot `tests/regras-retiradas.test.ts`.
+
+
+### Anti-ácaros = produto Bactran; opções em qualquer upsell (dono, 17 Nov)
+
+"Em todas as limpezas com anti ácaros identifica no calendário como produto bactran": `tagWaterproofBase` (src/lib/waterproofBase.ts) junta "(produto Bactran)" a "anti-ácaros" nos títulos que o bot escreve, e o sweep de 5 min da `bot-api` acerta os futuros escritos à mão. "A regra não funciona só para colchões, funciona para qualquer upsell": a regra das opções por escolher (Lourenço) vale para todos os extras; o travão `openOptionIssues` já é por valores, não por artigo.
