@@ -880,3 +880,7 @@ Pergunta ao dono: "Um rascunho retido sai sozinho se não responderes em 10 min?
 
 ## Impermeabilização de tapete: garantia (dono, 17 Nov 2026)
 O site (FAQ de tapetes em `landingFaqPool.ts` e FAQ do blog em `blogData.ts`) deixava dizer que não fazemos. Passa a dizer que fazemos, que não é a nossa recomendação (por isso não está listada), que o contacto constante com os pés desgasta o efeito e que não conseguimos prever a garantia. No WhatsApp o bot nunca dá os 10 anos da Premium nem a garantia da Essencial num tapete e diz que não conseguimos garanti-las (S32). O travão "não conseguimos garantir" do kyro-bot (`guard`) tem exceção só para esta frase sobre a garantia do tapete.
+
+## Bot em esforço médio (dono, 2026-11-17)
+
+O bot escreve com o Claude Sonnet 5.5 (`--model sonnet`). Desde 19 Out estava em esforço alto (dono: "não pára para pensar"). A 17 Nov, depois da escrita em paralelo, a 1.ª bolha ficou em 52 s de mediana e 9 de 14 respostas passavam dos 49 s, porque a escrita sozinha levava 30 a 53 s. Pergunta ao dono: "Passo o bot de esforço alto para médio?" Resposta: "Sim, esforço médio". Mudou no kyro-bot 6cc543a (`BOT_EFFORT` por defeito `medium`), junto com a escrita a começar 3 s depois da última mensagem do cliente em vez de 8 s (`EARLY_WRITE_S`). O portão dos casos corrigidos corre com o mesmo esforço, por isso valida a qualidade em médio.
