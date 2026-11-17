@@ -272,8 +272,15 @@ function partesApi(parte, saida) {
   return saida;
 }
 
+/** A API devolve base64 "web safe" às vezes sem o `=` final, que o Utilities exige. */
+function bytesDe(dados) {
+  var d = String(dados || '').replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
+  while (d.length % 4) d += '=';
+  return Utilities.base64Decode(d);
+}
+
 function textoDe(dados) {
-  return dados ? Utilities.newBlob(Utilities.base64DecodeWebSafe(dados)).getDataAsString('UTF-8') : '';
+  return dados ? Utilities.newBlob(bytesDe(dados)).getDataAsString('UTF-8') : '';
 }
 
 function corpoApi(msg) {
@@ -392,7 +399,7 @@ function doPost(e) {
     if (p.action === 'attachment') {
       var msg = Gmail.Users.Messages.get('me', p.messageId, { format: 'full' });
       var anexo = anexosApi(msg)[Number(p.index) || 0];
-      var bytes = Utilities.base64DecodeWebSafe(Gmail.Users.Messages.Attachments.get('me', p.messageId, anexo.body.attachmentId).data);
+      var bytes = bytesDe(Gmail.Users.Messages.Attachments.get('me', p.messageId, anexo.body.attachmentId).data);
       return respostaPonte({ ok: true, base64: Utilities.base64Encode(bytes), mime: anexo.mimeType });
     }
     return respostaPonte({ ok: false, error: 'ação desconhecida' });
