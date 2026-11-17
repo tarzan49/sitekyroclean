@@ -117,7 +117,11 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     }
   }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);
-  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+  // A day and an hour agreed in the chat is a move, never a delete on top of it, even when the event already has them
+  // (Mariana, 15 Nov 2026: marcar_servico moved her 409€ service to Thursday, the reader read "cancelar" in "teremos de
+  // cancelar a limpeza amanhã. Seria possível na 5a feira às 9h?" and update-booking deleted the event it had just moved).
+  const cancelled = c.date && c.time ? '' : cancel;
+  if (cancelled) said.push(`PEDIU PARA DESMARCAR: ${cancelled}`);
   if (!said.length) return { ok: false, reason: 'nada de novo' };
 
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join('; ')}.`;
@@ -125,7 +129,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   // Keep "Equipa: X" first and the "bot:" mark last; the new line goes before the mark.
   const markAt = lines.findIndex(l => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, ''); else lines.push('', line);
-  return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancel, summary: said, added };
+  return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancelled, summary: said, added };
 }
 
 const hm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;

@@ -35,6 +35,16 @@ describe('planBookingUpdate', () => {
     expect(p.cancel).toBe(true);
     expect(p.description).toContain('PEDIU PARA DESMARCAR: teve um imprevisto');
   });
+  it('a new day and hour with a cancel on top moves the event and never deletes it (Mariana, 15 Nov)', () => {
+    const p = planBookingUpdate(ev, '914000111', { date: '2026-10-22', time: '09:00', cancel: 'tem um acontecimento em casa nesse dia' }, now);
+    if (!p.ok) throw new Error(p.reason);
+    expect([p.moved, p.cancel]).toEqual([true, false]);
+    expect(p.description).not.toContain('PEDIU PARA DESMARCAR');
+    // Already moved there by marcar_servico: the same hour again is still no cancel.
+    const same = planBookingUpdate(ev, '914000111', { date: '2026-10-17', time: '09:00', cancel: 'x', note: 'Sofás 24 h sem uso' }, now);
+    if (!same.ok) throw new Error(same.reason);
+    expect([same.moved, same.cancel]).toEqual([false, false]);
+  });
   it('fills a missing name and replaces a changed address', () => {
     const bare = { ...ev, summary: 'Serviço 45€ (89€) Limpeza de sofá - +351 914 000 111' };
     const p = planBookingUpdate(bare, '914000111', { name: 'Natércia Reis', address: 'Rua dos Bombeiros 5, 2.º esq., Castanheira do Ribatejo' }, now);

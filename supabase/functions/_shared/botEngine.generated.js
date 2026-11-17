@@ -1976,7 +1976,123 @@ var municipiosComFreguesias = [
       { name: "Santa Maria Maior", slug: "santa-maria-maior-funchal", nearby: ["imaculado-coracao-de-maria", "sao-goncalo-funchal"] },
       { name: "São Gonçalo", slug: "sao-goncalo-funchal", nearby: ["santa-maria-maior-funchal"] },
       { name: "Monte", slug: "monte-funchal", nearby: ["imaculado-coracao-de-maria", "santa-luzia-funchal", "sao-roque-funchal"] },
-      { name: "São Roque", slug: "sao-roque-funchal", nearby: ["monte-funchal", "santo-antonio-funchal"] }
+      { name: "São Roque", slug: "sao-roque-funchal", nearby: ["monte-funchal", "santo-antonio-funchal"] },
+      { name: "Sé", slug: "se-funchal", nearby: ["santa-maria-maior-funchal", "sao-pedro-funchal", "santa-luzia-funchal"] }
+    ]
+  },
+  // Leiria e zona (equipa Coimbra) e Madeira (equipa própria); dono, 17 Nov. A sede de concelho tem página de cidade própria.
+  {
+    name: "Batalha",
+    slug: "batalha",
+    freguesias: [
+      { name: "Golpilheira", slug: "golpilheira", nearby: ["reguengo-do-fetal"] },
+      { name: "Reguengo do Fetal", slug: "reguengo-do-fetal", nearby: ["golpilheira", "sao-mamede-batalha"] },
+      { name: "São Mamede", slug: "sao-mamede-batalha", nearby: ["reguengo-do-fetal"] }
+    ]
+  },
+  {
+    name: "Marinha Grande",
+    slug: "marinha-grande",
+    freguesias: [
+      { name: "Vieira de Leiria", slug: "vieira-de-leiria", nearby: ["moita-marinha-grande"] },
+      { name: "Moita", slug: "moita-marinha-grande", nearby: ["vieira-de-leiria"] }
+    ]
+  },
+  {
+    name: "Nazaré",
+    slug: "nazare",
+    freguesias: [
+      { name: "Famalicão", slug: "famalicao-nazare", nearby: ["valado-dos-frades"] },
+      { name: "Valado dos Frades", slug: "valado-dos-frades", nearby: ["famalicao-nazare"] }
+    ]
+  },
+  {
+    name: "Porto de Mós",
+    slug: "porto-de-mos",
+    freguesias: [
+      { name: "Mira de Aire", slug: "mira-de-aire", nearby: ["juncal"] },
+      { name: "Juncal", slug: "juncal", nearby: ["mira-de-aire", "calvaria-de-cima"] },
+      { name: "Calvaria de Cima", slug: "calvaria-de-cima", nearby: ["juncal", "pedreiras"] },
+      { name: "Pedreiras", slug: "pedreiras", nearby: ["calvaria-de-cima", "serro-ventoso"] },
+      { name: "Serro Ventoso", slug: "serro-ventoso", nearby: ["pedreiras", "alqueidao-da-serra"] },
+      { name: "Alqueidão da Serra", slug: "alqueidao-da-serra", nearby: ["serro-ventoso", "sao-bento-porto-de-mos"] },
+      { name: "São Bento", slug: "sao-bento-porto-de-mos", nearby: ["alqueidao-da-serra"] }
+    ]
+  },
+  {
+    name: "Ourém",
+    slug: "ourem",
+    freguesias: [
+      { name: "Nossa Senhora da Piedade", slug: "nossa-senhora-da-piedade-ourem", nearby: ["nossa-senhora-das-misericordias"] },
+      { name: "Nossa Senhora das Misericórdias", slug: "nossa-senhora-das-misericordias", nearby: ["nossa-senhora-da-piedade-ourem", "caxarias"] },
+      { name: "Caxarias", slug: "caxarias", nearby: ["nossa-senhora-das-misericordias", "atouguia-ourem"] },
+      { name: "Atouguia", slug: "atouguia-ourem", nearby: ["caxarias", "seica"] },
+      { name: "Seiça", slug: "seica", nearby: ["atouguia-ourem", "espite"] },
+      { name: "Espite", slug: "espite", nearby: ["seica", "urqueira"] },
+      { name: "Urqueira", slug: "urqueira", nearby: ["espite"] }
+    ]
+  },
+  {
+    name: "Pombal",
+    slug: "pombal",
+    freguesias: [
+      { name: "Louriçal", slug: "lourical", nearby: ["redinha"] },
+      { name: "Redinha", slug: "redinha", nearby: ["lourical", "abiul"] },
+      { name: "Abiul", slug: "abiul", nearby: ["redinha", "almagreira"] },
+      { name: "Almagreira", slug: "almagreira", nearby: ["abiul", "carnide-pombal"] },
+      { name: "Carnide", slug: "carnide-pombal", nearby: ["almagreira", "carrico"] },
+      { name: "Carriço", slug: "carrico", nearby: ["carnide-pombal", "meirinhas"] },
+      { name: "Meirinhas", slug: "meirinhas", nearby: ["carrico", "pelariga"] },
+      { name: "Pelariga", slug: "pelariga", nearby: ["meirinhas", "vermoil"] },
+      { name: "Vermoil", slug: "vermoil", nearby: ["pelariga", "vila-ca"] },
+      { name: "Vila Cã", slug: "vila-ca", nearby: ["vermoil", "guia-ilha-e-mata-mourisca"] },
+      { name: "Guia, Ilha e Mata Mourisca", slug: "guia-ilha-e-mata-mourisca", nearby: ["vila-ca"] }
+    ]
+  },
+  {
+    name: "Alcobaça",
+    slug: "alcobaca",
+    freguesias: [
+      { name: "Benedita", slug: "benedita", nearby: ["sao-martinho-do-porto"] },
+      { name: "São Martinho do Porto", slug: "sao-martinho-do-porto", nearby: ["benedita", "pataias-e-martinganca"] },
+      { name: "Pataias e Martingança", slug: "pataias-e-martinganca", nearby: ["sao-martinho-do-porto", "aljubarrota"] },
+      { name: "Aljubarrota", slug: "aljubarrota", nearby: ["pataias-e-martinganca", "alfeizerao"] },
+      { name: "Alfeizerão", slug: "alfeizerao", nearby: ["aljubarrota", "turquel"] },
+      { name: "Turquel", slug: "turquel", nearby: ["alfeizerao", "barrio"] },
+      { name: "Bárrio", slug: "barrio", nearby: ["turquel", "cela"] },
+      { name: "Cela", slug: "cela", nearby: ["barrio", "maiorga"] },
+      { name: "Maiorga", slug: "maiorga", nearby: ["cela", "evora-de-alcobaca"] },
+      { name: "Évora de Alcobaça", slug: "evora-de-alcobaca", nearby: ["maiorga", "vimeiro-alcobaca"] },
+      { name: "Vimeiro", slug: "vimeiro-alcobaca", nearby: ["evora-de-alcobaca", "coz-alpedriz-e-montes"] },
+      { name: "Coz, Alpedriz e Montes", slug: "coz-alpedriz-e-montes", nearby: ["vimeiro-alcobaca"] }
+    ]
+  },
+  {
+    name: "Câmara de Lobos",
+    slug: "camara-de-lobos",
+    freguesias: [
+      { name: "Estreito de Câmara de Lobos", slug: "estreito-de-camara-de-lobos", nearby: ["curral-das-freiras"] },
+      { name: "Curral das Freiras", slug: "curral-das-freiras", nearby: ["estreito-de-camara-de-lobos", "jardim-da-serra"] },
+      { name: "Jardim da Serra", slug: "jardim-da-serra", nearby: ["curral-das-freiras", "quinta-grande"] },
+      { name: "Quinta Grande", slug: "quinta-grande", nearby: ["jardim-da-serra"] }
+    ]
+  },
+  {
+    name: "Santa Cruz",
+    slug: "santa-cruz",
+    freguesias: [
+      { name: "Camacha", slug: "camacha", nearby: ["gaula"] },
+      { name: "Gaula", slug: "gaula", nearby: ["camacha", "santo-antonio-da-serra"] },
+      { name: "Santo António da Serra", slug: "santo-antonio-da-serra", nearby: ["gaula"] }
+    ]
+  },
+  {
+    name: "Machico",
+    slug: "machico",
+    freguesias: [
+      { name: "Caniçal", slug: "canical", nearby: ["porto-da-cruz"] },
+      { name: "Porto da Cruz", slug: "porto-da-cruz", nearby: ["canical", "agua-de-pena"] },
+      { name: "Água de Pena", slug: "agua-de-pena", nearby: ["porto-da-cruz"] }
     ]
   }
 ];
@@ -4347,14 +4463,15 @@ function planBookingUpdate(ev, phone, c, now) {
     }
   }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
-  if (cancel) said.push(`PEDIU PARA DESMARCAR: ${cancel}`);
+  const cancelled = c.date && c.time ? "" : cancel;
+  if (cancelled) said.push(`PEDIU PARA DESMARCAR: ${cancelled}`);
   if (!said.length) return { ok: false, reason: "nada de novo" };
   const line = `Atualizado pela conversa (${stamp(now)}): ${said.join("; ")}.`;
   const lines = description.split("\n");
   const markAt = lines.findIndex((l) => /^bot:/.test(l));
   if (markAt >= 0) lines.splice(markAt, 0, line, "");
   else lines.push("", line);
-  return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancel, summary: said, added };
+  return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancelled, summary: said, added };
 }
 var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 function fold6(s) {
