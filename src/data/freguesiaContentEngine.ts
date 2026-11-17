@@ -2,6 +2,19 @@ import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { startingPriceLabel } from './enginePrices';
+
+// Freguesias que levam artigo: "na Golpilheira", "no Caniçal" (dono, 17 Nov).
+// As restantes ficam com "em".
+const FREGUESIA_ARTICLE: Record<string, "no" | "na"> = Object.fromEntries([
+  ...["Golpilheira", "Vieira de Leiria", "Moita", "Benedita", "Camacha", "Cela", "Maiorga", "Redinha", "Pelariga",
+    "Atouguia", "Caranguejeira", "Maceira", "Bajouca", "Bidoeira de Cima", "Guia, Ilha e Mata Mourisca",
+    "Calvaria de Cima", "Urqueira"].map(n => [n, "na"] as const),
+  ...["Caniçal", "Porto da Cruz", "Juncal", "Louriçal", "Carriço", "Bárrio", "Vimeiro", "Arrabal", "Coimbrão",
+    "Monte", "Curral das Freiras", "Estreito de Câmara de Lobos", "Jardim da Serra", "Serro Ventoso",
+    "Alqueidão da Serra", "Reguengo do Fetal", "Souto da Carpalhosa e Ortigosa", "Amor", "Valado dos Frades",
+    "Imaculado Coração de Maria"].map(n => [n, "no"] as const),
+]);
+export const freguesiaPrep = (name: string) => FREGUESIA_ARTICLE[name] ?? "em";
 import { LOCAL_DATA_BY_MUNICIPIO } from './freguesiaLocalData';
 // ─── Dynamic Content Engine ───────────────────────────────────────
 // Generates unique, deterministic content for each freguesia × service page.
@@ -261,7 +274,7 @@ const howItWorksTemplates: ContentTemplate[] = [
   (f, c, svc) => `Em ${f}, o processo é simples: inspecionamos o estado dos estofos, aplicamos pré-tratamento específico nas manchas, realizamos a extração profissional profunda e garantimos secagem rápida. Tudo na sua casa em ${c}.`,
   (f, c, svc) => `Na sua casa em ${f}, começamos por avaliar o tipo de tecido e o grau de sujidade. Depois, aplicamos o tratamento mais adequado com extração profissional a quente. O resultado é imediato e os estofos ficam prontos em poucas horas.`,
   (f, c, svc) => `O nosso processo de ${svc.toLowerCase()} em ${f} é pensado para minimizar a interrupção da sua rotina. Chegamos, inspecionamos, tratamos e entregamos: tudo num único agendamento, sem necessidade de transportar os seus estofos.`,
-  (f, c, svc) => `Quando visitamos a sua casa em ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O trabalho no local leva, em regra, cerca de 1 hora e os estofos ficam prontos a usar no mesmo dia.`,
+  (f, c, svc) => `Quando visitamos a sua casa ${freguesiaPrep(f)} ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O trabalho no local leva, em regra, cerca de 1 hora e os estofos ficam prontos a usar no mesmo dia.`,
 ];
 
 // ─── Meta Description Templates ──────────────────────────────────
@@ -460,7 +473,7 @@ export function getDynamicContent(
   return {
     title: `${serviceName} em ${freguesiaName}, ${municipio} | ${/^\d/.test(priceFrom) ? startingPriceLabel(serviceSlug, priceFrom, 'title') : 'Orçamento Grátis'} | Kyro Clean Solutions`,
     metaDescription,
-    h1: `${serviceName} em ${freguesiaName}`,
+    h1: `${serviceName} ${freguesiaPrep(freguesiaName)} ${freguesiaName}`,
     intro: `${intro} ${localSection}`,
     localSection,
     problems: serviceSlug === "limpeza-alcatifas" ? ALCATIFA_PROBLEMS : serviceSlug === "impermeabilizacao" ? WATERPROOFING_PROBLEMS : selectedProblems,
