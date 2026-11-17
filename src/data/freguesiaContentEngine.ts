@@ -5,14 +5,18 @@ import { startingPriceLabel } from './enginePrices';
 
 // Freguesias que levam artigo: "na Golpilheira", "no Caniçal" (dono, 17 Nov).
 // As restantes ficam com "em".
-const FREGUESIA_ARTICLE: Record<string, "no" | "na"> = Object.fromEntries([
+const FREGUESIA_ARTICLE: Record<string, "no" | "na" | "nos" | "nas"> = Object.fromEntries([
   ...["Golpilheira", "Vieira de Leiria", "Moita", "Benedita", "Camacha", "Cela", "Maiorga", "Redinha", "Pelariga",
     "Atouguia", "Caranguejeira", "Maceira", "Bajouca", "Bidoeira de Cima", "Guia, Ilha e Mata Mourisca",
-    "Calvaria de Cima", "Urqueira"].map(n => [n, "na"] as const),
+    "Calvaria de Cima", "Urqueira",
+    "Ajuda", "Afurada", "Aguçadoura", "Amora", "Anta", "Apúlia", "Arrifana", "Azurara", "Baixa da Banheira e Vale da Amoreira", "Caparica e Trafaria", "Charneca de Caparica e Sobreda", "Costa", "Costa da Caparica", "Costa de Lavos", "Cova-Gala", "Cruz", "Ericeira", "Estrela", "Encosta do Sol", "Falagueira-Venda Nova", "Foz do Douro", "Foz do Sousa", "Glória", "Guia", "Lama", "Lixa", "Lomba", "Luz", "Luz de Tavira e Santo Estêvão", "Madalena", "Marinha das Ondas", "Mexilhoeira Grande", "Mina de Água", "Misericórdia", "Palmeira", "Pedralva", "Pedrulha", "Penha de França", "Ponte", "Pontinha e Famões", "Pousa", "Pousada de Saramagos", "Póvoa de Lanhoso", "Póvoa de Santa Iria e Forte da Casa", "Póvoa de Santo Adrião e Olival Basto", "Póvoa de Varzim Centro", "Quinta Grande", "Quinta do Anjo", "Quinta do Lago", "Ramada e Caneças", "Ribeira de Frades", "Senhora da Hora", "Sé", "Sé Nova", "Silva", "Silva Escura", "Torre de Vilela", "Torre e Vila Mou", "Trofa Centro", "Várzea", "Venda do Pinheiro e Santo Estêvão das Galés", "Venteira", "Vitória", "Fonte Boa e Rio Tinto", "Gâmbia-Pontes-Alto da Guerra", "Leirosa", "Lamarosa", "Areosa", "Oliveirinha", "Cidade da Maia", "Malveira e São Miguel de Alcainça", "Ucha", "Seroa", "Comporta", "Carregosa", "Carvalhosa"].map(n => [n, "na"] as const),
   ...["Caniçal", "Porto da Cruz", "Juncal", "Louriçal", "Carriço", "Bárrio", "Vimeiro", "Arrabal", "Coimbrão",
     "Monte", "Curral das Freiras", "Estreito de Câmara de Lobos", "Jardim da Serra", "Serro Ventoso",
     "Alqueidão da Serra", "Reguengo do Fetal", "Souto da Carpalhosa e Ortigosa", "Amor", "Valado dos Frades",
-    "Imaculado Coração de Maria"].map(n => [n, "no"] as const),
+    "Imaculado Coração de Maria",
+    "Areeiro", "Bairro", "Barco", "Beato", "Bonfim", "Bom Sucesso", "Campo", "Campo de Ourique", "Carvalhal", "Castelo do Neiva", "Castêlo da Maia", "Cercal do Alentejo", "Covelo", "Furadouro", "Lumiar", "Outeiro", "Paião", "Parque das Nações", "Pinhal Novo", "Pinheiro", "Pinheiro da Bemposta", "Sado", "Seixal, Arrentela e Aldeia de Paio Pires", "Barreiro e Lavradio", "Torrão", "Vale das Flores", "Vale do Lobo", "Montijo e Afonsoeiro", "Laranjeiro e Feijó", "Alto do Seixalinho, Santo André e Verderena", "Alto Estanqueiro-Jardia", "Cacém e São Marcos"].map(n => [n, "no"] as const),
+  ...["Antas", "Areias", "Marinhas", "Avenidas Novas", "Águas Livres", "Águas Santas", "Águas Santas e Moure", "Torres do Mondego"].map(n => [n, "nas"] as const),
+  ...["Olivais"].map(n => [n, "nos"] as const),
 ]);
 export const freguesiaPrep = (name: string) => FREGUESIA_ARTICLE[name] ?? "em";
 import { LOCAL_DATA_BY_MUNICIPIO } from './freguesiaLocalData';
