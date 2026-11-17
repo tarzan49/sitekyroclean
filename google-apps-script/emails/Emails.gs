@@ -255,37 +255,75 @@ function respostaPonte(dados) {
   return ContentService.createTextOutput(JSON.stringify(dados)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function clienteDaConversa(mensagens) {
-  var deles = mensagens.filter(function (m) { return !ehNosso(enderecoDe(m.getFrom())); }).pop();
-  if (deles) return enderecoDe(deles.getFrom());
-  return enderecoDe(String(mensagens[0].getTo()).split(',')[0]);
+// A ponte usa a API do Gmail (serviço avançado), não o GmailApp: o GmailApp tem um limite diário de chamadas que a
+// ponte, a perguntar a cada minuto, esgotava. A 17 Nov ficou cega das 00h às 14h08 e o Jorge esperou 1h30
+// pela resposta. A API conta por unidades, com uma quota muito acima disto.
+
+function cabecalhoApi(msg, nome) {
+  var h = ((msg.payload && msg.payload.headers) || []).filter(function (x) { return x.name.toLowerCase() === nome.toLowerCase(); })[0];
+  return h ? h.value : '';
+}
+
+function partesApi(parte, saida) {
+  saida = saida || [];
+  if (!parte) return saida;
+  saida.push(parte);
+  (parte.parts || []).forEach(function (p) { partesApi(p, saida); });
+  return saida;
+}
+
+function textoDe(dados) {
+  return dados ? Utilities.newBlob(Utilities.base64DecodeWebSafe(dados)).getDataAsString('UTF-8') : '';
+}
+
+function corpoApi(msg) {
+  var partes = partesApi(msg.payload);
+  var texto = partes.filter(function (p) { return p.mimeType === 'text/plain' && !p.filename; })[0];
+  if (texto) return textoDe(texto.body.data);
+  var html = partes.filter(function (p) { return p.mimeType === 'text/html' && !p.filename; })[0];
+  return html ? textoDe(html.body.data).replace(/<br\s*\/?>|<\/p>|<\/div>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ') : '';
+}
+
+function anexosApi(msg) {
+  return partesApi(msg.payload).filter(function (p) { return p.filename && p.body && p.body.attachmentId; });
+}
+
+function clienteDaConversaApi(mensagens) {
+  var deles = mensagens.filter(function (m) { return !ehNosso(enderecoDe(cabecalhoApi(m, 'From'))); }).pop();
+  if (deles) return enderecoDe(cabecalhoApi(deles, 'From'));
+  return enderecoDe(String(cabecalhoApi(mensagens[0], 'To')).split(',')[0]);
 }
 
 /**
- * O bot pergunta a cada minuto. Só procura conversas com mensagens desde `desde` (a última leitura que correu
- * bem, em ms), nunca mais de 2 dias: ler os 2 dias inteiros a cada minuto esgotava a quota do Gmail (16 Nov, Faisal).
+ * O bot pergunta a cada minuto. Só procura mensagens desde `desde` (a última leitura que correu bem, em ms), nunca
+ * mais de 2 dias.
  */
 function ponteListar(desde) {
   var base = 'newer_than:2d' + (Number(desde) ? ' ' + depoisDe(Number(desde)) : '') + ' -in:spam -in:trash -from:' + REMETENTE_BOT;
-  var conversas = GmailApp.search(base, 0, 50);
-  if (!conversas.length) return { ok: true, messages: [] };
-  var principais = {};
-  GmailApp.search(base + ' category:primary', 0, 50).forEach(function (c) { principais[c.getId()] = true; });
+  var lista = Gmail.Users.Messages.list('me', { q: base, maxResults: 100 });
+  var ids = {};
+  ((lista && lista.messages) || []).forEach(function (m) { ids[m.threadId] = true; });
   var saida = [];
-  conversas.forEach(function (conversa) {
-    var mensagens = conversa.getMessages();
-    var cliente = clienteDaConversa(mensagens);
+  Object.keys(ids).forEach(function (tid) {
+    var mensagens = Gmail.Users.Threads.get('me', tid, { format: 'full' }).messages || [];
+    var cliente = clienteDaConversaApi(mensagens);
     mensagens.forEach(function (m) {
-      if (m.getDate().getTime() < desde || m.isDraft()) return;
-      var de = enderecoDe(m.getFrom());
+      var data = Number(m.internalDate);
+      var etiquetas = m.labelIds || [];
+      if (data < desde || etiquetas.indexOf('DRAFT') >= 0) return;
+      var deCompleto = cabecalhoApi(m, 'From');
+      var de = enderecoDe(deCompleto);
       var nossa = ehNosso(de);
-      if (nossa && ehRespostaAutomatica(m.getPlainBody())) return;
+      var corpo = corpoApi(m);
+      if (nossa && ehRespostaAutomatica(corpo)) return;
+      var cab = {};
+      ['Auto-Submitted', 'Precedence', 'List-Unsubscribe', 'List-Id', 'X-Autoreply', 'X-Autorespond'].forEach(function (n) { cab[n] = cabecalhoApi(m, n); });
       saida.push({
-        id: m.getId(), threadId: conversa.getId(), client: cliente, name: nossa ? '' : primeiroNome(m.getFrom()), fromMe: nossa,
-        subject: m.getSubject(), date: m.getDate().getTime(), body: m.getPlainBody(),
-        primary: !!principais[conversa.getId()],
-        automatic: !nossa && (remetenteAutomatico(de) || cabecalhosAutomaticos(cabecalhosDe(m))),
-        attachments: m.getAttachments().map(function (a) { return { name: a.getName(), mime: a.getContentType() }; })
+        id: m.id, threadId: tid, client: cliente, name: nossa ? '' : primeiroNome(deCompleto), fromMe: nossa,
+        subject: cabecalhoApi(m, 'Subject'), date: data, body: corpo,
+        primary: etiquetas.indexOf('CATEGORY_PERSONAL') >= 0 || !etiquetas.some(function (l) { return /^CATEGORY_/.test(l); }),
+        automatic: !nossa && (remetenteAutomatico(de) || cabecalhosAutomaticos(cab)),
+        attachments: anexosApi(m).map(function (a) { return { name: a.filename, mime: a.mimeType }; })
       });
     });
   });
@@ -293,23 +331,54 @@ function ponteListar(desde) {
   return { ok: true, messages: saida };
 }
 
-function ponteResponder(p) {
-  var anexos = (p.attachments || []).map(function (a) {
-    return Utilities.newBlob(Utilities.base64Decode(a.base64), a.mime, a.name);
+/** Cabeçalho com acentos (assunto, nome) em UTF-8, como manda o RFC 2047. */
+function cabecalhoUtf8(t) {
+  return /^[\x20-\x7e]*$/.test(t) ? t : '=?UTF-8?B?' + Utilities.base64Encode(t, Utilities.Charset.UTF_8) + '?=';
+}
+
+function base64Linhas(b64) { return b64.replace(/(.{76})/g, '$1\r\n'); }
+
+/** Email em MIME, texto e HTML em UTF-8 (os "������" do 17 Nov eram o corpo simples do GmailApp), mais os anexos. */
+function mimeDe(p, assunto, emResposta) {
+  var mista = 'kyro-m-' + Utilities.getUuid(), alt = 'kyro-a-' + Utilities.getUuid();
+  var l = [
+    'To: ' + p.to,
+    'Subject: ' + cabecalhoUtf8(assunto),
+    'MIME-Version: 1.0'
+  ];
+  if (emResposta) l.push('In-Reply-To: ' + emResposta, 'References: ' + emResposta);
+  l.push('Content-Type: multipart/mixed; boundary="' + mista + '"', '', '--' + mista,
+    'Content-Type: multipart/alternative; boundary="' + alt + '"', '',
+    '--' + alt, 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '',
+    base64Linhas(Utilities.base64Encode(p.body || '', Utilities.Charset.UTF_8)));
+  if (p.html) l.push('--' + alt, 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '',
+    base64Linhas(Utilities.base64Encode(p.html, Utilities.Charset.UTF_8)));
+  l.push('--' + alt + '--');
+  (p.attachments || []).forEach(function (a) {
+    l.push('--' + mista, 'Content-Type: ' + a.mime + '; name="' + cabecalhoUtf8(a.name) + '"',
+      'Content-Disposition: attachment; filename="' + cabecalhoUtf8(a.name) + '"', 'Content-Transfer-Encoding: base64', '',
+      base64Linhas(a.base64));
   });
-  var opcoes = { name: 'Kyro Clean Solutions', attachments: anexos };
-  if (!p.threadId) {
-    GmailApp.sendEmail(p.to, p.subject || 'Kyro Clean Solutions', p.body, opcoes);
-    Utilities.sleep(2000);
-    var enviada = GmailApp.search('in:sent to:' + p.to, 0, 1)[0].getMessages().pop();
-    return { ok: true, id: enviada.getId() };
+  l.push('--' + mista + '--');
+  return l.join('\r\n');
+}
+
+function ponteResponder(p) {
+  var assunto = p.subject || 'Kyro Clean Solutions', emResposta = '', threadId;
+  if (p.threadId) {
+    var mensagens = Gmail.Users.Threads.get('me', p.threadId, { format: 'metadata', metadataHeaders: ['From', 'Subject', 'Message-ID'] }).messages || [];
+    var deles = mensagens.filter(function (m) { return enderecoDe(cabecalhoApi(m, 'From')) === String(p.to).toLowerCase(); }).pop();
+    if (!deles) return { ok: false, error: 'conversa sem mensagens de ' + p.to };
+    assunto = cabecalhoApi(deles, 'Subject') || assunto;
+    if (!/^re:/i.test(assunto)) assunto = 'Re: ' + assunto;
+    emResposta = cabecalhoApi(deles, 'Message-ID');
+    threadId = p.threadId;
   }
-  var conversa = GmailApp.getThreadById(p.threadId);
-  var deles = conversa.getMessages().filter(function (m) { return enderecoDe(m.getFrom()) === String(p.to).toLowerCase(); }).pop();
-  if (!deles) return { ok: false, error: 'conversa sem mensagens de ' + p.to };
-  deles.reply(p.body, opcoes);
-  Utilities.sleep(2000);
-  return { ok: true, id: GmailApp.getThreadById(p.threadId).getMessages().pop().getId() };
+  var raw = Utilities.base64EncodeWebSafe(Utilities.newBlob(mimeDe(p, assunto, emResposta)).getBytes());
+  var pedido = { raw: raw };
+  if (threadId) pedido.threadId = threadId;
+  var enviada = Gmail.Users.Messages.send(pedido, 'me');
+  return { ok: true, id: enviada.id };
 }
 
 function doPost(e) {
@@ -321,8 +390,10 @@ function doPost(e) {
     if (p.action === 'list') return respostaPonte(ponteListar(Number(p.since) || 0));
     if (p.action === 'reply') return respostaPonte(ponteResponder(p));
     if (p.action === 'attachment') {
-      var anexo = GmailApp.getMessageById(p.messageId).getAttachments()[Number(p.index) || 0];
-      return respostaPonte({ ok: true, base64: Utilities.base64Encode(anexo.getBytes()), mime: anexo.getContentType() });
+      var msg = Gmail.Users.Messages.get('me', p.messageId, { format: 'full' });
+      var anexo = anexosApi(msg)[Number(p.index) || 0];
+      var bytes = Utilities.base64DecodeWebSafe(Gmail.Users.Messages.Attachments.get('me', p.messageId, anexo.body.attachmentId).data);
+      return respostaPonte({ ok: true, base64: Utilities.base64Encode(bytes), mime: anexo.mimeType });
     }
     return respostaPonte({ ok: false, error: 'ação desconhecida' });
   } catch (err) { return respostaPonte({ ok: false, error: String(err) }); }
