@@ -122,7 +122,8 @@ it.each([
   [[{ id: 'a', largura: '2', comprimento: '3' }, { id: 'b', largura: '1', comprimento: '2' }], 20],
   [[{ id: 'a', largura: '2,5', comprimento: '4' }], 20],
 ])('adds the rug pickup fee to the receipt by summed area (%#)', (items, fee) => {
-  const p = payload({ service: 'carpet', serviceType: 'cleaning' });
+  // Recolha só na zona do Porto (dono, 17/11/2026).
+  const p = payload({ service: 'carpet', serviceType: 'cleaning', location: 'Porto' });
   p.carpetItems = items; p.rugPickup = true;
   const line = buildReceiptLines(p).find(l => l.label.startsWith('Recolha e entrega'));
   expect(line?.total ?? null).toBe(fee);

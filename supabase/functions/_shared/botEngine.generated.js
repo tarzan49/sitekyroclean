@@ -532,17 +532,18 @@ var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com 
 var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
 var RUG_PICKUP_MIN_AREA_M2 = 3;
 var RUG_PICKUP_MAX_AREA_M2 = 12;
-var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
+var RUG_PICKUP_RULE = `Neste momento não estamos a fazer recolhas de tapetes: a lavagem é feita em sua casa. A única exceção é a zona do Porto, com tapetes que somem entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m².`;
 var RUG_PICKUP_FEE = 20;
-var NO_RUG_PICKUP_AREAS = /* @__PURE__ */ new Set(["lisboa", "algarve", "braga"]);
+var RUG_PICKUP_AREAS = /* @__PURE__ */ new Set(["porto"]);
 var foldCity = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 var CITY_AREA = new Map(cities.map((c) => [foldCity(c.name), c.area]));
 function rugPickupOffered(city) {
-  if (!city) return true;
+  if (!city) return false;
   const area = CITY_AREA.get(foldCity(city));
-  return !area || !NO_RUG_PICKUP_AREAS.has(area);
+  return !!area && RUG_PICKUP_AREAS.has(area);
 }
-var NO_RUG_PICKUP_RULE = "Em Lisboa, no Algarve e na zona de Braga não há recolha de tapetes: a lavagem é feita em casa do cliente, com o mesmo processo e o mesmo resultado. Nunca ofereças recolha nestas zonas.";
+var NO_RUG_PICKUP_RULE = "Neste momento não estamos a fazer recolhas de tapetes: só na zona do Porto, com tapetes que somem entre 3 e 12 m². Fora da zona do Porto a lavagem é feita em casa do cliente, com o mesmo processo e o mesmo resultado; nunca ofereças nem fales de recolha.";
+var RUG_PICKUP_ASKED_RULE = "Sempre que o cliente pedir recolha, mostra-lhe primeiro que o serviço em casa é exatamente igual: o mesmo equipamento, o mesmo processo e o mesmo resultado, seco em 2 a 5 horas e sem ficar dias sem o tapete.";
 function rugPickupFee(totalAreaM2, city) {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
   if (!rugPickupOffered(city)) return null;
@@ -2255,7 +2256,7 @@ function rugPickupFor(items, city) {
   const rugs = items.filter((i) => i.kind === "rug");
   if (!rugs.length) return null;
   const areaM2 = Math.round(rugs.reduce((sum2, i) => sum2 + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
-  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2, city), rule: rugPickupOffered(city) ? RUG_PICKUP_FEE_RULE : NO_RUG_PICKUP_RULE };
+  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2, city), rule: `${rugPickupOffered(city) ? RUG_PICKUP_FEE_RULE : NO_RUG_PICKUP_RULE} ${RUG_PICKUP_ASKED_RULE}` };
 }
 var PUFF_PRICE = 25;
 var PUFF_SAME_VISIT_PRICE = 20;

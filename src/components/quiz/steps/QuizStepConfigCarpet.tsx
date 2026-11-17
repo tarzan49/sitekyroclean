@@ -23,7 +23,8 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
   // somados (dono, 2026-10-10), com o acréscimo de rugPickupFee (dono, 2026-10-05).
   const pickupFee = rugPickupFee(totalArea, city);
   const pickupChosen = rugPickup && pickupFee !== null;
-  const showPickup = carpetKind === 'tapete' && !!onRugPickupChange && totalArea > 0;
+  // Fora da zona do Porto a opção nem aparece (dono, 17/11/2026).
+  const showPickup = carpetKind === 'tapete' && !!onRugPickupChange && totalArea > 0 && rugPickupOffered(city);
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
@@ -87,7 +88,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
       {showPickup && (
         <div className="w-full max-w-sm text-left">
           {pickupFee === null ? (
-            <p className="rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 text-sm text-white/80">{!rugPickupOffered(city) ? 'Nesta zona, a lavagem é feita em sua casa, com o mesmo processo e o mesmo resultado.' : totalArea > RUG_PICKUP_MAX_AREA_M2 ? `Com mais de ${RUG_PICKUP_MAX_AREA_M2} m² no total, a lavagem é feita em sua casa.` : `Com menos de ${RUG_PICKUP_MIN_AREA_M2} m² no total, a lavagem é feita em sua casa.`}</p>
+            <p className="rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 text-sm text-white/80">{totalArea > RUG_PICKUP_MAX_AREA_M2 ? `Com mais de ${RUG_PICKUP_MAX_AREA_M2} m² no total, a lavagem é feita em sua casa.` : `Com menos de ${RUG_PICKUP_MIN_AREA_M2} m² no total, a lavagem é feita em sua casa.`}</p>
           ) : (
             <div role="radiogroup" aria-labelledby={`${fieldPrefix}-pickup`} className="flex flex-col gap-2">
               <p id={`${fieldPrefix}-pickup`} className="text-base font-semibold text-white">Onde prefere a lavagem?</p>

@@ -8,10 +8,10 @@ afterEach(cleanup);
 
 // Recolha dos tapetes no questionário (dono, 2026-10-05): escolha entre a
 // lavagem em casa e a recolha, com o acréscimo pela área somada.
-function Harness({ items, kind = 'tapete' }: { items: CarpetItem[]; kind?: 'tapete' | 'alcatifa' }) {
+function Harness({ items, kind = 'tapete', city = 'Porto' }: { items: CarpetItem[]; kind?: 'tapete' | 'alcatifa'; city?: string }) {
   const [carpetItems, setCarpetItems] = useState(items);
   const [rugPickup, setRugPickup] = useState(false);
-  return <QuizStepConfigCarpet carpetKind={kind} carpetItems={carpetItems} setCarpetItems={setCarpetItems} rugPickup={rugPickup} onRugPickupChange={setRugPickup} />;
+  return <QuizStepConfigCarpet carpetKind={kind} carpetItems={carpetItems} setCarpetItems={setCarpetItems} rugPickup={rugPickup} onRugPickupChange={setRugPickup} city={city} />;
 }
 
 describe('recolha no passo dos tapetes', () => {
@@ -33,6 +33,15 @@ describe('recolha no passo dos tapetes', () => {
     render(<Harness items={[{ id: 'a', largura: '4', comprimento: '2.8' }, { id: 'b', largura: '5', comprimento: '3.8' }]} />);
     expect(screen.queryByRole('radio')).toBeNull();
     expect(screen.getByText(/Com mais de 12 m² no total, a lavagem é feita em sua casa/)).toBeTruthy();
+  });
+
+  it('fora da zona do Porto a opção nem aparece (dono, 17/11/2026)', () => {
+    for (const city of ['Lisboa', 'Braga', 'Coimbra', 'Funchal', 'Faro']) {
+      render(<Harness city={city} items={[{ id: 'a', largura: '2', comprimento: '3' }]} />);
+      expect(screen.queryByRole('radio')).toBeNull();
+      expect(screen.queryByText(/[Rr]ecolha/)).toBeNull();
+      cleanup();
+    }
   });
 
   it('a alcatifa nunca oferece recolha', () => {

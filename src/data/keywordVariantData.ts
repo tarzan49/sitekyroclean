@@ -450,7 +450,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   return {
     intro: pick([
       `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional em ${loc}, ${ctx}, na maioria dos casos em sua casa. Cada tapete é medido e orçamentado individualmente.`,
-      `A Kyro Clean Solutions faz lavagem especializada de tapetes persas, orientais, modernos e de lã em ${loc}, ${ctx}, com extração profissional. Lavamos em sua casa sempre que possível e recolhemos só quando a peça o exige. Cada tapete é medido e orçamentado individualmente, sem tabela fixa por m².`,
+      `A Kyro Clean Solutions faz lavagem especializada de tapetes persas, orientais, modernos e de lã em ${loc}, ${ctx}, com extração profissional. Lavamos o tapete em sua casa. Cada tapete é medido e orçamentado individualmente, sem tabela fixa por m².`,
       `Tapetes persas, orientais, modernos ou de lã em ${loc} pedem tratamento diferente consoante a fibra. A Kyro Clean Solutions faz lavagem especializada com extração profissional em ${loc}, ${ctx}, em sua casa na maioria dos casos, medindo e orçamentando cada peça individualmente.`,
     ] as const, seed),
     whatIs: pick([
@@ -471,7 +471,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
         'Especialistas em lavagem de tapetes persas e orientais',
         `Cores e aspeto original de volta ao tapete em ${loc}`,
         'Manchas de gordura, vinho e animais removidas',
-        `Recolha em ${loc} só quando é precisa, com entrega em até 5 dias úteis`,
+        `Lavagem em sua casa em ${loc}, sem transportar o tapete`,
         'Cada fibra tratada com a técnica adequada',
         'Secagem controlada para preservar as fibras',
       ],

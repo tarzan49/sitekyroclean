@@ -26,7 +26,8 @@ export const RUG_PICKUP_MIN_AREA_M2 = 3;
 // 2026-10-10: "para de oferecer recolha para tapetes que sejam acima de 20 m2";
 // "o total dos tapetes").
 export const RUG_PICKUP_MAX_AREA_M2 = 12;
-export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²; fora disso, a lavagem é sempre feita em sua casa.`;
+// Dono, 17/11/2026: "não estamos a fazer recolhas neste momento"; se houver, só no Porto e até 12 m².
+export const RUG_PICKUP_RULE = `Neste momento não estamos a fazer recolhas de tapetes: a lavagem é feita em sua casa. A única exceção é a zona do Porto, com tapetes que somem entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m².`;
 
 // Recolha e entrega: mais 20€ do que a lavagem em casa, em qualquer área em
 // que haja recolha (dono, 2026-10-10: "deixa mais 20 euros", "muda também no
@@ -36,19 +37,20 @@ export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido 
 // este é o único valor dos tapetes que o site escreve.
 /** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo ou acima do máximo). */
 export const RUG_PICKUP_FEE = 20;
-// Lisboa e Algarve deixam de ter recolha de tapetes: só lavagem em casa (dono, 13/11/2026:
-// "em lisboa n temos mais condicoes para recolha de tapetes portanto corta essa opcao tanto em
-// lisboa como algarve"). A zona de Braga já não tinha recolha (dono, 03/11/2026).
-export const NO_RUG_PICKUP_AREAS: ReadonlySet<string> = new Set(['lisboa', 'algarve', 'braga']);
+// Recolha de tapetes só na zona do Porto; em qualquer outro sítio a opção nem aparece (dono, 17/11/2026:
+// "se for um sítio que não seja o Porto, nem coloques essa opção").
+export const RUG_PICKUP_AREAS: ReadonlySet<string> = new Set(['porto']);
 const foldCity = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const CITY_AREA = new Map(cities.map(c => [foldCity(c.name), c.area] as const));
-/** false quando a localidade fica numa área sem recolha de tapetes (Lisboa, Algarve); true se não se sabe. */
+/** true só quando a localidade fica na zona do Porto; sem localidade ou fora do Porto, false. */
 export function rugPickupOffered(city: string | null | undefined): boolean {
-  if (!city) return true;
+  if (!city) return false;
   const area = CITY_AREA.get(foldCity(city));
-  return !area || !NO_RUG_PICKUP_AREAS.has(area);
+  return !!area && RUG_PICKUP_AREAS.has(area);
 }
-export const NO_RUG_PICKUP_RULE = 'Em Lisboa, no Algarve e na zona de Braga não há recolha de tapetes: a lavagem é feita em casa do cliente, com o mesmo processo e o mesmo resultado. Nunca ofereças recolha nestas zonas.';
+export const NO_RUG_PICKUP_RULE = 'Neste momento não estamos a fazer recolhas de tapetes: só na zona do Porto, com tapetes que somem entre 3 e 12 m². Fora da zona do Porto a lavagem é feita em casa do cliente, com o mesmo processo e o mesmo resultado; nunca ofereças nem fales de recolha.';
+// Dono, 17/11/2026: "sempre que o cliente pede recolha, tenta mostrar-lhe que o serviço em casa é exatamente igual".
+export const RUG_PICKUP_ASKED_RULE = 'Sempre que o cliente pedir recolha, mostra-lhe primeiro que o serviço em casa é exatamente igual: o mesmo equipamento, o mesmo processo e o mesmo resultado, seco em 2 a 5 horas e sem ficar dias sem o tapete.';
 export function rugPickupFee(totalAreaM2: number, city?: string | null): number | null {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2) || totalAreaM2 > RUG_PICKUP_MAX_AREA_M2) return null;
   if (!rugPickupOffered(city)) return null;

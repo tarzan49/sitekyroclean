@@ -592,7 +592,7 @@ const problemDefinitions: ProblemPage[] = [
     category: "materiais",
     keyword: "limpeza de tapete persa",
     title: "Limpeza de Tapete Persa | Lavagem Especializada | Kyro",
-    metaDescription: "Lavagem profissional de tapetes persas e orientais. Técnicas seguras que preservam cores e fibras. Em casa ou com recolha, conforme a peça. Orçamento grátis.",
+    metaDescription: "Lavagem profissional de tapetes persas e orientais. Técnicas seguras que preservam cores e fibras. Lavagem em sua casa. Orçamento grátis.",
     h1: "Lavagem Especializada de Tapetes Persas e Orientais",
     intro: "Tapetes persas e orientais são peças valiosas que requerem lavagem especializada. A Kyro Clean Solutions lava tapetes persas com técnicas que preservam as cores, a lã e a seda, prolongando a vida do tapete.",
     problemDetail: "Tapetes persas são feitos com lãs e tintes naturais que podem reagir mal a produtos químicos agressivos. Lavagem em máquina pode destruir as fibras e desbotar as cores. Muitos tapetes persas são peças de valor significativo que merecem cuidado profissional.",
@@ -602,7 +602,7 @@ const problemDefinitions: ProblemPage[] = [
       "Teste de solidez de cor",
       "Preserva fibras naturais",
       "Secagem controlada",
-      "Recolha só quando é precisa, com entrega em até 5 dias úteis",
+      "Lavagem feita em sua casa, sem transportar o tapete",
       "Experiência com tapetes de valor",
     ],
     faqs: [
@@ -619,7 +619,7 @@ const problemDefinitions: ProblemPage[] = [
     category: "materiais",
     keyword: "limpeza de tapete de lã",
     title: "Limpeza de Tapete de Lã | Lavagem Profissional | Kyro",
-    metaDescription: "Lavagem profissional de tapetes de lã. Técnicas que preservam as fibras naturais. Em casa ou com recolha, conforme a fibra. Orçamento grátis.",
+    metaDescription: "Lavagem profissional de tapetes de lã. Técnicas que preservam as fibras naturais. Lavagem em sua casa. Orçamento grátis.",
     h1: "Lavagem de Tapetes de Lã",
     intro: "Tapetes de lã precisam de lavagem especializada que limpe profundamente sem danificar as fibras naturais. A Kyro Clean Solutions trata tapetes de lã com cuidado profissional.",
     problemDetail: "A lã é uma fibra natural que pode encolher com água quente, perder a forma com agitação mecânica excessiva e desbotar com produtos agressivos. Tapetes de lã sujos perdem a sua textura macia e podem desenvolver odores.",
@@ -630,7 +630,7 @@ const problemDefinitions: ProblemPage[] = [
       "Reduz o risco de encolhimento",
       "Preserva maciez natural",
       "Secagem plana controlada",
-      "Recolha só quando a fibra o exige, com entrega em até 5 dias úteis",
+      "Lã lavada em sua casa, sem transporte da peça",
     ],
     faqs: [
       { question: "A lavagem faz o tapete de lã encolher?", answer: "Não. Controlamos a temperatura da água e o processo de secagem para prevenir qualquer encolhimento." },
@@ -797,12 +797,12 @@ const problemDefinitions: ProblemPage[] = [
     title: "Quanto Custa Lavar um Tapete? | Orçamento Grátis | Kyro",
     metaDescription: "Preços de lavagem profissional de tapetes. Orçamento à medida de cada tapete. Lavagem em sua casa na maioria dos casos. Peça orçamento grátis.",
     h1: "Quanto Custa a Lavagem Profissional de Tapetes?",
-    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente. Na maioria dos casos lavamos o tapete em sua casa; quando é preciso recolhê-lo, entregamos em até 5 dias úteis.",
-    problemDetail: "O custo de lavagem de tapetes depende do tamanho, tipo de fibra (sintética, lã, seda), estado de sujidade e da necessidade de recolha. Tapetes orientais e persas podem ter cotação especial devido ao cuidado adicional necessário.",
+    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente. Lavamos o tapete em sua casa; neste momento só fazemos recolha na zona do Porto, com tapetes até 12 m².",
+    problemDetail: "O custo de lavagem de tapetes depende do tamanho, tipo de fibra (sintética, lã, seda), e estado de sujidade. Tapetes orientais e persas podem ter cotação especial devido ao cuidado adicional necessário.",
     // Em casa por defeito, recolha só quando é precisa, com o custo de
     // RUG_PICKUP_FEE_RULE (dono, 2026-10-05); o desconto para vários tapetes
     // existe (dono, 2026-09-30).
-    solutionDetail: `Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. Na maioria dos casos a lavagem é feita em sua casa; quando o material ou o estado do tapete exigem recolha, entregamos em até 5 dias úteis. ${RUG_PICKUP_FEE_RULE} Desconto para múltiplos tapetes.`,
+    solutionDetail: `Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. ${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} Desconto para múltiplos tapetes.`,
     benefits: [
       "Orçamento à medida de cada tapete",
       "Lavagem em sua casa na maioria dos casos",
@@ -812,7 +812,7 @@ const problemDefinitions: ProblemPage[] = [
       "Sem custos ocultos",
     ],
     faqs: [
-      { question: "A recolha e entrega do tapete têm custo?", answer: `Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos em até 5 dias úteis. ${RUG_PICKUP_FEE_RULE} ${RUG_PICKUP_RULE}` },
+      { question: "A recolha e entrega do tapete têm custo?", answer: `${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} Com recolha, a entrega é feita em até 5 dias úteis.` },
       { question: "Tapetes persas são mais caros de lavar?", answer: "Tapetes persas e orientais requerem técnicas mais delicadas e são cotados individualmente, mas os preços continuam acessíveis." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "manchas-tapete", "tapete-persa"],

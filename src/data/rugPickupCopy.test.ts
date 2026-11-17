@@ -63,18 +63,23 @@ describe('recolha dos tapetes', () => {
   });
 
   it('o custo da recolha segue os escalões do dono, pela área somada', () => {
-    expect(rugPickupFee(2.99)).toBeNull();
-    expect(rugPickupFee(3)).toBe(20);
-    expect(rugPickupFee(6)).toBe(20);
-    expect(rugPickupFee(6.01)).toBe(20);
-    expect(rugPickupFee(9.99)).toBe(20);
-    expect(rugPickupFee(10)).toBe(20);
-    expect(rugPickupFee(12)).toBe(20);
-    expect(rugPickupFee(12.01)).toBeNull();
-    expect(rugPickupFee(20)).toBeNull();
-    expect(rugPickupFee(30.2)).toBeNull();
-    expect(rugPickupFee(Number.NaN)).toBeNull();
-    // Lisboa e Algarve sem recolha (dono, 13/11/2026); Porto mantém.
+    expect(rugPickupFee(2.99, 'Porto')).toBeNull();
+    expect(rugPickupFee(3, 'Porto')).toBe(20);
+    expect(rugPickupFee(6, 'Porto')).toBe(20);
+    expect(rugPickupFee(6.01, 'Porto')).toBe(20);
+    expect(rugPickupFee(9.99, 'Porto')).toBe(20);
+    expect(rugPickupFee(10, 'Porto')).toBe(20);
+    expect(rugPickupFee(12, 'Porto')).toBe(20);
+    expect(rugPickupFee(12.01, 'Porto')).toBeNull();
+    expect(rugPickupFee(20, 'Porto')).toBeNull();
+    expect(rugPickupFee(30.2, 'Porto')).toBeNull();
+    expect(rugPickupFee(Number.NaN, 'Porto')).toBeNull();
+    // Só a zona do Porto tem recolha (dono, 17/11/2026); sem localidade, também não.
+    expect(rugPickupFee(6)).toBeNull();
+    expect(rugPickupFee(6, 'Coimbra')).toBeNull();
+    expect(rugPickupFee(6, 'Funchal')).toBeNull();
+    expect(rugPickupFee(6, 'Braga')).toBeNull();
+    expect(rugPickupFee(6, 'Matosinhos')).toBe(20);
     expect(rugPickupFee(6, 'Lisboa')).toBeNull();
     expect(rugPickupFee(6, 'Cascais')).toBeNull();
     expect(rugPickupFee(6, 'Faro')).toBeNull();
@@ -83,7 +88,7 @@ describe('recolha dos tapetes', () => {
   });
 
   it('o texto do custo diz os mesmos valores que a função', () => {
-    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(5)}€`);
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(5, 'Porto')}€`);
     expect(RUG_PICKUP_FEE_RULE).not.toMatch(/10€|15€/);
     expect(RUG_PICKUP_RULE).toContain(`entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²`);
   });

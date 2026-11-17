@@ -398,7 +398,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Local e condições do serviço",
-        "body": "Confirme com a equipa onde será feita a intervenção e as condições adequadas à peça. Quando o tapete precisa de ser recolhido, a entrega é feita em até 5 dias úteis. Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "Confirme com a equipa onde será feita a intervenção e as condições adequadas à peça. Neste momento a lavagem é feita em sua casa (recolha só na zona do Porto, até 12 m²). Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -408,7 +408,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Recolhem e entregam qualquer tapete?",
-        "a": `Na maioria dos casos lavamos o tapete em casa. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos em até 5 dias úteis. ${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} A modalidade fica confirmada no orçamento.`
+        "a": `${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} Com recolha, a entrega é feita em até 5 dias úteis.`
       },
       {
         "q": "Posso molhar sisal ou juta?",
