@@ -46,6 +46,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Sem preço próprio no site: puffs, cabeceira, 5+ impermeabilização. Chaise longue não é opção. Manchas, tecido e sujidade não mudam o preço (pele pode).
 - Secagem 2 a 5 h em tudo; com impermeabilização, 24 h sem usar para o produto atuar (dono, 15 Nov). Resposta em menos de 1 minuto. Preços sem IVA; com fatura, a empresa paga mais 23% e no particular o IVA fica dentro do preço; o valor sem IVA divide-se sempre a meias com a equipa (dono, 5 Nov).
 - Serviço com fatura/IVA (empresa ou particular): o cliente paga SEMPRE por transferência à conta da empresa (IBAN no ficheiro do bot, S43), nunca à equipa; quem recebe é o dono; o IVA é todo do dono; só o valor sem IVA se divide com a equipa. Aviso às equipas antes do serviço, a quem o faz (grupo se houver grupo) (dono, 4 Nov).
+- Fatura pedida: aviso do IBAN da empresa primeiro; com comprovativo + NIF a fatura-recibo sai sozinha pela API da Vendus, o PDF vai na conversa e o CRM fica marcado (kyro-bot `invoiceAuto.ts`, precisa de `VENDUS_API_KEY`); nunca desculpas de faturação (dono, 17 Nov, Angelina).
 - O desconto de 10% acima de 149€ não existe. Nunca mecânicas de urgência não pedidas.
 - Avaliações nas páginas: só as reais de `src/data/reviewsPool.ts`. Testemunhos B2B: nunca inventar.
 
