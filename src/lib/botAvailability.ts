@@ -167,13 +167,21 @@ export function waterproofingOnly(items: unknown): boolean {
  */
 export const STAGGER_TEAMS: ReadonlySet<string> = new Set(['Porto 1', 'Porto 2', 'Lisboa 1']);
 export const CLEANING_GAP_MIN = 90;
-/** Days a staggered team works with one person only: one job at a time, with the travel margin. */
-export const SOLO_DAYS: ReadonlyArray<{ team: string; date: string }> = [
+/**
+ * Days a staggered team works with one person only: one job at a time, with the travel margin. With `untilHour`,
+ * only the jobs that start before that hour (Lisbon time); from it on the second person is back.
+ */
+export const SOLO_DAYS: ReadonlyArray<{ team: string; date: string; untilHour?: number }> = [
   // Owner, 31 Oct 2026: "lisboa 1 so vai ter 1 membro da equipa la na segunda pq o outro vai pro algarve".
   { team: 'Lisboa 1', date: '2026-11-02' },
+  // Owner, 17 Nov 2026: "o joab diz q quinta so pode a partir do 12:00".
+  { team: 'Lisboa 1', date: '2026-11-19', untilHour: 12 },
 ];
-const staggers = (team: string, from: number) =>
-  STAGGER_TEAMS.has(team) && !SOLO_DAYS.some(d => d.team === team && d.date === lisbon(from).date);
+const staggers = (team: string, from: number) => {
+  if (!STAGGER_TEAMS.has(team)) return false;
+  const at = lisbon(from);
+  return !SOLO_DAYS.some(d => d.team === team && d.date === at.date && (d.untilHour === undefined || at.minutes < d.untilHour * 60));
+};
 /**
  * Two-person teams with no gap between their jobs (owner, 13 Nov 2026, Joana 10h30 + Mariana 11h, both on
  * Lisboa 1: "tem capacidade para fazer um e outro serviço [...] praticamente à mesma hora"): each person

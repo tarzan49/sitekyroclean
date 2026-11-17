@@ -2821,9 +2821,15 @@ var STAGGER_TEAMS = /* @__PURE__ */ new Set(["Porto 1", "Porto 2", "Lisboa 1"]);
 var CLEANING_GAP_MIN = 90;
 var SOLO_DAYS = [
   // Owner, 31 Oct 2026: "lisboa 1 so vai ter 1 membro da equipa la na segunda pq o outro vai pro algarve".
-  { team: "Lisboa 1", date: "2026-11-02" }
+  { team: "Lisboa 1", date: "2026-11-02" },
+  // Owner, 17 Nov 2026: "o joab diz q quinta so pode a partir do 12:00".
+  { team: "Lisboa 1", date: "2026-11-19", untilHour: 12 }
 ];
-var staggers = (team, from) => STAGGER_TEAMS.has(team) && !SOLO_DAYS.some((d) => d.team === team && d.date === lisbon(from).date);
+var staggers = (team, from) => {
+  if (!STAGGER_TEAMS.has(team)) return false;
+  const at = lisbon(from);
+  return !SOLO_DAYS.some((d) => d.team === team && d.date === at.date && (d.untilHour === void 0 || at.minutes < d.untilHour * 60));
+};
 var SAME_HOUR_TEAMS = /* @__PURE__ */ new Set(["Lisboa 1"]);
 var SAME_HOUR_JOBS = 2;
 var sameHour = (team, from) => SAME_HOUR_TEAMS.has(team) && staggers(team, from);

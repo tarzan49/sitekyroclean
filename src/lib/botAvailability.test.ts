@@ -172,6 +172,24 @@ describe('botAvailability', () => {
     expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1'], sameTime: false, start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
+  it('Lisboa 1 has one person until 12h on Thursday 19 Nov (owner, 17 Nov 2026: Joab only from 12:00)', () => {
+    const now = new Date('2026-11-17T20:00:00Z');
+    // November = UTC+0.
+    const nov = (from: string, to: string, summary: string): AvailabilityEvent =>
+      ({ summary, description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: `2026-11-19T${from}:00.000Z`, end: `2026-11-19T${to}:00.000Z` });
+    const events = [nov('09:00', '11:45', 'Serviço 205€ (409€) Limpeza e impermeabilização Premium 2 sofás - Rua X, 1070-009 Lisboa')];
+    const req = (time: string) => ok(botAvailability({ city: 'Lisboa', date: '2026-11-19', time, items: [{ kind: 'sofa', qty: 1, treatment: 'clean' }] }, events, now)).requested?.free;
+    expect(req('10h')).toBe(false);
+    expect(req('11h')).toBe(false);
+    expect(req('12h')).toBe(true);
+    // From 12h both again: two at once, never three.
+    const two = [...events, nov('12:00', '13:00', 'Serviço 45€ (89€) Sofá - Rua Y, 2780-000 Oeiras'), nov('12:00', '13:00', 'Serviço 55€ (109€) Colchão - Rua Z, 2615-675 Sobralinho')];
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-11-19', time: '12h' }, two, now)).requested?.free).toBe(false);
+    // Another day keeps two at the same hour.
+    const wed = [{ ...events[0], start: '2026-11-18T09:00:00.000Z', end: '2026-11-18T11:45:00.000Z' }];
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-11-18', time: '10h' }, wed, now)).requested?.free).toBe(true);
+  });
+
   it('hands the date to the owner where there is no team or it is "sob consulta"', () => {
     for (const city of ['Aveiro', 'Sines', 'Madrid']) {
       const r = ok(botAvailability({ city }, [], NOW));
