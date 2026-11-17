@@ -68,6 +68,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - Sofá ou cadeirão de pele nunca leva impermeabilização: o extra é o tratamento da pele (limpeza e hidratação), +30€ por sofá (`LEATHER_TREATMENT` no motor, `leather: true`; dono, 16 Nov).
 - Mensagens do bot diretas e compactas: só o essencial, sem rodeios nem ar de spam; o preço impossível de ler mal (dono, 17 Nov).
+- Cliente que ainda não escreveu (funil do questionário, espera da fotografia): 1 texto com preço de cada artigo e horas + 1 prova, sem upsell até responder (kyro-bot `silentCompact.ts`; dono, 17 Nov, Raquel).
 - Nunca "não prometemos", "não garantimos", "não repara": omite-se a limitação e diz-se o que o processo faz (traças: a extração retira os ovos das fibras, o anti-ácaros desinfeta; dono, 17 Nov; travão no kyro-bot `guard`).
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 - Resposta parada à espera do dono: nunca só "Obrigado pela mensagem!", nem só o cumprimento ou o upsell (a ponte leva as respostas às perguntas, dono 9 Nov); sem preço novo nem horas, sai inteira e o dono recebe o aviso do preço (dono, 8 Nov).

@@ -848,3 +848,7 @@ Joana Vasconcelos (Ovar): o bot ofereceu terça às 11h na Porto 3 com o Jaime �
 
 ## Nunca "não prometemos" (dono, 17/11/2026)
 Tapete com traças em Vila do Bispo: o bot escreveu "Não prometemos eliminar os ovos, e a lavagem não repara o dano". O dono: dizer "não prometemos" é dizer que o trabalho não é bom; a limpeza com extração e o anti-ácaros tratam disto. Origem: linha de prompts/commercial-language.md ("Explica as limitações relevantes com transparência"), trocada. Regra no ficheiro do bot, travão em agent.ts guard().
+
+
+### Funil sem resposta do cliente: compacto (dono, 17 Nov 2026)
+Raquel (quiz sofá 3L + 4 tapetes, Porto) recebeu 9 mensagens em 5 min sem escrever: boas-vindas, "Obrigado, Raquel!" sem ela ter dito nada, preço dos tapetes em falta (só 32 m² e o total 389€), upsell à parte, 5 provas e as horas. Agora o funil do questionário e o da espera da fotografia saem em 1 texto (preço de cada artigo, €/m² nos tapetes, total, horas) + 1 prova; o upsell só depois de o cliente responder. Código: kyro-bot `src/bot/silentCompact.ts`.
