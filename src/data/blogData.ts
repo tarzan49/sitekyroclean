@@ -231,7 +231,7 @@ Deslocação à parte. A duração depende do uso, cuidados e condições aplic�
       },
       {
         "q": "Também impermeabilizam tapetes ou colchões?",
-        "a": "Não. A impermeabilização Kyro destina-se a sofás e cadeiras compatíveis."
+        "a": "Colchões não. Tapetes sim, mas não é a nossa recomendação, por isso não aparece na lista do site. Um tapete está sempre em contacto com os pés, o que desgasta o efeito da impermeabilização muito mais depressa. Por isso não conseguimos prever a garantia: a da impermeabilização Premium e a da Essencial não são as mesmas que damos nos sofás e nas cadeiras. Se quiser fazer na mesma, peça o preço pelo WhatsApp."
       },
       {
         "q": "Qual das duas opções devo escolher?",

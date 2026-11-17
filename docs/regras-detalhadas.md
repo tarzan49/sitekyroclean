@@ -875,3 +875,7 @@ A regra de 16/11 (Regina) de responder com "problema no programa de faturação 
 ## Resposta retida sai sozinha aos 10 min (dono, 2026-11-17)
 
 Pergunta ao dono: "Um rascunho retido sai sozinho se não responderes em 10 min?" Resposta: "Sim, sai sozinho". A auditoria de 13-17 Nov mostrou que, depois da ponte, o rascunho retido (com o preço e as horas) nunca chegava ao cliente se ninguém voltasse a escrever. Agora (kyro-bot 386aec5, `heldPastTimeout`) sai 10 min depois de escrito quando todos os motivos são "passa para ti: …" sem reclamação, desconto, áudio ou travão, e ninguém (cliente ou dono) escreveu depois. Continuam à espera do dono: rascunho travado pelo código, "com a fotografia" depois da fotografia, recolha de tapete onde não há, valor diferente do combinado, dias ou horas diferentes dos que o dono escreveu, áudio sem transcrição, possível reclamação, cliente em pausa por queixa.
+
+
+## Impermeabilização de tapete: garantia (dono, 17 Nov 2026)
+O site (FAQ de tapetes em `landingFaqPool.ts` e FAQ do blog em `blogData.ts`) deixava dizer que não fazemos. Passa a dizer que fazemos, que não é a nossa recomendação (por isso não está listada), que o contacto constante com os pés desgasta o efeito e que não conseguimos prever a garantia. No WhatsApp o bot nunca dá os 10 anos da Premium nem a garantia da Essencial num tapete e diz que não conseguimos garanti-las (S32). O travão "não conseguimos garantir" do kyro-bot (`guard`) tem exceção só para esta frase sobre a garantia do tapete.
