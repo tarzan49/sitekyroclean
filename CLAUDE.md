@@ -30,6 +30,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Tipos: `npm run typecheck` (nunca `npx tsc --noEmit`, que verifica 0 ficheiros). `npm run build` não verifica tipos: correr os dois.
 - Edge Functions: `npm run test:functions`, `deno check`, publicar com `node_modules/.bin/supabase functions deploy <nome>` (a `bot-api` e as que recebem chamadas externas com `--no-verify-jwt`). Um push não publica funções.
 - Depois de mudar preços/motor/regras do bot: `npm run build:bot-engine` (e `build:follow-up-engine` se mexer no seguimento), commit, publicar `bot-api`.
+- Bot (kyro-bot): um deploy de cada vez (`scripts/deploy.sh` tem trinco no servidor); juntar alterações num só deploy, porque cada um reinicia o bot e o portão corre no mesmo VPS de 1 CPU (17 Nov: 7 portões ao mesmo tempo = respostas em minutos).
 - **Nunca `supabase db push`.** SQL aplica-se com `node_modules/.bin/supabase db query --linked -f <ficheiro>` ou no SQL Editor.
 - Medir sobre o `dist` só a partir de um build limpo (`git archive HEAD` para pasta à parte se houver trabalho de outra sessão).
 
@@ -69,6 +70,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - A mensagem de "Serviço terminado" pede o processo todo em vídeo, conforme o serviço (`procedureShots`: limpeza, impermeabilização ou as duas), e sempre em HD. Conteúdo só com o guião aprovado.
 - Sofá ou cadeirão de pele nunca leva impermeabilização: o extra é o tratamento da pele (limpeza e hidratação), +30€ por sofá (`LEATHER_TREATMENT` no motor, `leather: true`; dono, 16 Nov).
 - Mensagens do bot diretas e compactas: só o essencial, sem rodeios nem ar de spam; o preço impossível de ler mal (dono, 17 Nov).
+- Nenhuma resposta do bot passa dos 49 s: a 1.ª bolha conta desde a mensagem do cliente (o tempo a escrever conta como "a escrever…"), respostas escritas em paralelo (kyro-bot `firstBubbleWaitMs`, `WRITE_CONCURRENCY`; dono, 17 Nov).
 - Cliente que ainda não escreveu (funil do questionário, espera da fotografia): 1 texto com preço de cada artigo e horas + 1 prova, sem upsell até responder (kyro-bot `silentCompact.ts`; dono, 17 Nov, Raquel).
 - Nunca "não prometemos", "não garantimos", "não repara": omite-se a limitação e diz-se o que o processo faz (traças: a extração retira os ovos das fibras, o anti-ácaros desinfeta; dono, 17 Nov; travão no kyro-bot `guard`).
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
