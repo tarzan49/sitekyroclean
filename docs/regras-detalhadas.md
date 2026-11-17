@@ -845,3 +845,6 @@ Alfredo (Lisboa): o dono escreveu "fica pelos 89€" e "o anti-ácaros fica por 
 ## Porto 3: viagem + 30 min entre serviços (dono, 2026-11-16)
 
 Joana Vasconcelos (Ovar): o bot ofereceu terça às 11h na Porto 3 com o Jaime às 13h em Vila Nova da Telha. O motor só exigia a viagem estimada (~65 min) e havia 75 min, por isso deixou passar. O dono teve de a passar à mão para quarta. Desde 16/11 a Porto 3 (uma pessoa) tem de deixar entre dois serviços do mesmo dia a viagem entre as moradas mais `TRAVEL_MARGIN_MIN` (30 min) (`DRIVE_PLUS_MARGIN_TEAMS` em `src/lib/botAvailability.ts`). No mesmo dia, no kyro-bot: uma resposta que fala de um dia ou de uma hora que o dono não escreveu, quando foi ele o último a escrever à mão, fica à espera dele (`ownerLineDayHourIssue`). Apagar uma mensagem no telemóvel (@lid) passa a parar a conversa certa.
+
+## Nunca "não prometemos" (dono, 17/11/2026)
+Tapete com traças em Vila do Bispo: o bot escreveu "Não prometemos eliminar os ovos, e a lavagem não repara o dano". O dono: dizer "não prometemos" é dizer que o trabalho não é bom; a limpeza com extração e o anti-ácaros tratam disto. Origem: linha de prompts/commercial-language.md ("Explica as limitações relevantes com transparência"), trocada. Regra no ficheiro do bot, travão em agent.ts guard().
