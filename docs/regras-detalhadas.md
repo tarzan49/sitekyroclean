@@ -871,3 +871,7 @@ A regra de 16/11 (Regina) de responder com "problema no programa de faturação 
 ### Anti-ácaros = produto Bactran; opções em qualquer upsell (dono, 17 Nov)
 
 "Em todas as limpezas com anti ácaros identifica no calendário como produto bactran": `tagWaterproofBase` (src/lib/waterproofBase.ts) junta "(produto Bactran)" a "anti-ácaros" nos títulos que o bot escreve, e o sweep de 5 min da `bot-api` acerta os futuros escritos à mão. "A regra não funciona só para colchões, funciona para qualquer upsell": a regra das opções por escolher (Lourenço) vale para todos os extras; o travão `openOptionIssues` já é por valores, não por artigo.
+
+## Resposta retida sai sozinha aos 10 min (dono, 2026-11-17)
+
+Pergunta ao dono: "Um rascunho retido sai sozinho se não responderes em 10 min?" Resposta: "Sim, sai sozinho". A auditoria de 13-17 Nov mostrou que, depois da ponte, o rascunho retido (com o preço e as horas) nunca chegava ao cliente se ninguém voltasse a escrever. Agora (kyro-bot 386aec5, `heldPastTimeout`) sai 10 min depois de escrito quando todos os motivos são "passa para ti: …" sem reclamação, desconto, áudio ou travão, e ninguém (cliente ou dono) escreveu depois. Continuam à espera do dono: rascunho travado pelo código, "com a fotografia" depois da fotografia, recolha de tapete onde não há, valor diferente do combinado, dias ou horas diferentes dos que o dono escreveu, áudio sem transcrição, possível reclamação, cliente em pausa por queixa.
