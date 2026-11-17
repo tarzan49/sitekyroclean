@@ -72,7 +72,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Nunca "não prometemos", "não garantimos", "não repara": omite-se a limitação e diz-se o que o processo faz (traças: a extração retira os ovos das fibras, o anti-ácaros desinfeta; dono, 17 Nov; travão no kyro-bot `guard`).
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
 - Resposta parada à espera do dono: nunca só "Obrigado pela mensagem!", nem só o cumprimento ou o upsell (a ponte leva as respostas às perguntas, dono 9 Nov); sem preço novo nem horas, sai inteira e o dono recebe o aviso do preço (dono, 8 Nov).
-- Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script).
+- Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script). Email tem formato próprio (texto+HTML, preços em tabela, total em destaque, sem emojis nem legendas do WhatsApp, anexos numa linha; kyro-bot `composeEmail`) e a ponte usa a API do Gmail, não o GmailApp (quota; dono, 17 Nov).
 
 ## 5. Site e SEO
 
