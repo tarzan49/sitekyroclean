@@ -41,7 +41,7 @@ const METRICS: Metric[] = [
   { id: "faturado", label: "Faturado", value: w => w.billed, base: b => b.billed, fmt: euro, additive: true },
   { id: "paraTi", label: "Para ti", value: w => w.share, base: b => b.share, fmt: euro, additive: true },
   { id: "gasto", label: "Gasto Google", value: w => w.spend, base: () => null, fmt: euro, additive: true },
-  { id: "lucro", label: "Lucro dos anúncios", value: (_w, x) => (x ? x.profit : null), base: () => null, fmt: signedEuro, additive: true },
+  { id: "lucro", label: "Lucro Google", value: (_w, x) => (x ? x.profit : null), base: () => null, fmt: signedEuro, additive: true },
 ];
 
 function kindOf(w: WeekWithEstimate): Kind {
@@ -193,11 +193,11 @@ function WeekDetail({ w, prev, base, extra }: { w: WeekWithEstimate; prev: WeekW
       )}
       {extra && (
         <div className="rounded-xl bg-[#0B2F2A] text-white px-3.5 py-3 text-sm flex flex-wrap gap-x-4 gap-y-1.5">
-          <span><span className="text-white/50">Gasto</span> <b className="tabular-nums">{euro(extra.spend)}</b></span>
+          <span><span className="text-white/50">Gasto Google</span> <b className="tabular-nums">{euro(extra.spend)}</b></span>
           {extra.extraNewPeople !== null && <span><span className="text-white/50">Pedidos a mais</span> <b className="tabular-nums">{signedNum(extra.extraNewPeople)}</b></span>}
           <span><span className="text-white/50">Fechos a mais</span> <b className="tabular-nums">{signedNum(extra.extraClosings)}</b></span>
           <span><span className="text-white/50">A mais para ti</span> <b className="tabular-nums">{signedEuro(extra.extraShare)}</b></span>
-          <span><span className="text-white/50">Lucro</span> <b className={`tabular-nums ${extra.profit >= 0 ? "text-emerald-300" : "text-red-300"}`}>{signedEuro(extra.profit)}</b></span>
+          <span><span className="text-white/50">Lucro Google</span> <b className={`tabular-nums ${extra.profit >= 0 ? "text-emerald-300" : "text-red-300"}`}>{signedEuro(extra.profit)}</b></span>
           {cpr !== null && <span><span className="text-white/50">Por pedido a mais</span> <b className="tabular-nums">{euro(cpr)}</b></span>}
         </div>
       )}

@@ -20,11 +20,15 @@ const tables: Record<string, Record<string, unknown>[]> = {
     { first_at: '2026-10-07T10:00:00Z', started_by_us: false, origin: 'organico', updated_at: '2026-10-14T10:17:00Z' },
     { first_at: '2026-10-13T10:00:00Z', started_by_us: false, origin: 'google', updated_at: '2026-10-14T10:17:00Z' },
   ],
+  // Sem leitura da Marketing API: o gasto Meta tem de dizer "por ligar", nunca 0€.
+  meta_ads_daily_stats: [],
+  meta_ads_sync_status: [],
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const chain = (rows: Record<string, unknown>[]): any => ({
   select: () => chain(rows),
   gte: (col: string, v: string) => chain(rows.filter(r => String(r[col]) >= v)),
+  eq: (col: string, v: string) => chain(rows.filter(r => r[col] === v)),
   range: async (a: number, b: number) => ({ data: rows.slice(a, b + 1), error: null }),
 });
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: (t: string) => chain(tables[t] ?? []) } }));
@@ -38,13 +42,24 @@ describe('GrowthPanel', () => {
 
   it('desenha o lucro dos anúncios, a semana ao vivo, as dicas, o gráfico, o simulador e as campanhas', async () => {
     render(<GrowthPanel />);
-    await waitFor(() => expect(screen.getByText(/Lucro dos anúncios desde 28\/09/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/Lucro dos anúncios Google desde 28\/09\/2026/)).toBeTruthy());
     expect(screen.getByText('Esta semana, ao vivo')).toBeTruthy();
     expect(screen.getByText('Até quarta às 12:00, contra a semana passada à mesma hora.')).toBeTruthy();
     expect(screen.getByText('Dicas para crescer')).toBeTruthy();
     expect(screen.getByText('Porto | Set 2026')).toBeTruthy();
     expect(screen.getByText('Limpeza de colchão')).toBeTruthy();
     expect(screen.getByText('Média orgânica')).toBeTruthy();
+
+    // Trocar entre o lucro do Google, da Meta e o Total; sem a API ligada, o gasto Meta fica por ligar.
+    fireEvent.click(screen.getByRole('tab', { name: 'Meta' }));
+    expect(screen.getByText(/Lucro dos anúncios Meta desde 18\/11\/2026/)).toBeTruthy();
+    expect(screen.getAllByText(/por ligar/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Lucro dos anúncios Google desde/)).toBeNull();
+    fireEvent.click(screen.getByRole('tab', { name: 'Total' }));
+    expect(screen.getByText(/Google desde 28\/09\/2026 e Meta desde 18\/11\/2026/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('tab', { name: 'Google' }));
+    // Nas métricas: o gasto Meta ao lado do Google, por ligar.
+    expect(screen.getAllByText('Gasto Meta').length).toBeGreaterThanOrEqual(2);
 
     // Trocar o número do gráfico e escolher uma semana.
     const fechos = screen.getByRole('tab', { name: 'Fechos' });

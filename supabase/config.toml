@@ -3,3 +3,6 @@ project_id = "kswapioiaetfccxzfwkg"
 # without this (or --no-verify-jwt) locks the bot out with 401 (10 Oct 2026).
 [functions.bot-api]
 verify_jwt = false
+# Chamada pelo pg_cron com x-meta-sync-key, sem sessão do Supabase (18 Nov 2026).
+[functions.meta-ads-daily-sync]
+verify_jwt = false

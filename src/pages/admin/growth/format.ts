@@ -8,6 +8,7 @@ export const one = (n: number) => n.toLocaleString("pt-PT", { maximumFractionDig
 export const pct = (n: number | null) => (n === null ? "–" : `${Math.round(n * 100)}%`);
 export const signedPct = (n: number) => `${n >= 0 ? "+" : "−"}${Math.abs(Math.round(n * 100))}%`;
 export const dm = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+export const dmy = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}/${day.slice(0, 4)}`;
 
 /** Variação relativa; null sem termo de comparação. */
 export const change = (now: number | null, then: number | null) => (now === null || then === null || then === 0 ? null : now / then - 1);

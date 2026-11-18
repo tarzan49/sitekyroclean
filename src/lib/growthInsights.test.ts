@@ -98,7 +98,7 @@ describe('growthInsights', () => {
     const out = growthInsights(input(steady, live));
     expect(out.find(i => i.id === 'pace-requests')!.tone).toBe('bom');
     expect(out.find(i => i.id === 'pace-closings')!.tone).toBe('bom');
-    expect(out.find(i => i.id === 'ads-roi')).toMatchObject({ tone: 'bom', title: 'Os anúncios estão a pagar-se' });
+    expect(out.find(i => i.id === 'ads-roi')).toMatchObject({ tone: 'bom', title: 'Os anúncios do Google estão a pagar-se' });
     expect(out.some(i => i.tone === 'alerta')).toBe(false);
   });
 

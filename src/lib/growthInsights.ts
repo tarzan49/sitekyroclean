@@ -168,7 +168,7 @@ export function growthInsights({ weeks, base, extra, live, campaigns, now }: Gro
       const expected = base.newPeople * live.fraction;
       const extraNow = live.requests.now - expected;
       const row = extra.rows.find(x => x.partial);
-      const profit = row ? ` Lucro dos anúncios até agora: ${signedEur(row.profit)}.` : '';
+      const profit = row ? ` Lucro dos anúncios do Google até agora: ${signedEur(row.profit)}.` : '';
       if (extraNow <= 0) {
         out.push({
           id: 'ads-efficiency', tone: 'alerta',
@@ -190,21 +190,21 @@ export function growthInsights({ weeks, base, extra, live, campaigns, now }: Gro
     }
   }
 
-  // 3. Os anúncios desde o início.
+  // 3. Os anúncios do Google desde o início (sem o que a Meta trouxe desde 18/11, src/lib/adsByChannel.ts).
   const t = extra.total;
   if (t.spend > 0) {
     const ratio = t.extraShare / t.spend;
     if (t.profit >= 0) {
       out.push({
         id: 'ads-roi', tone: 'bom',
-        title: 'Os anúncios estão a pagar-se',
+        title: 'Os anúncios do Google estão a pagar-se',
         detail: `Desde ${dm(ADS_FROM)} gastaste ${eur(t.spend)} e ficaste com ${eur(t.extraShare)} a mais do que em agosto e setembro: ${ratio.toFixed(2).replace('.', ',')}€ por cada 1€.`,
         impact: t.profit / Math.max(1, extra.rows.length),
       });
     } else {
       out.push({
         id: 'ads-roi', tone: 'alerta',
-        title: 'Os anúncios estão a dar prejuízo',
+        title: 'Os anúncios do Google estão a dar prejuízo',
         detail: `Desde ${dm(ADS_FROM)} gastaste ${eur(t.spend)} e ficaste só com ${eur(Math.max(0, t.extraShare))} a mais do que em agosto e setembro (${signedEur(t.profit)}).`,
         action: 'Baixa o orçamento das campanhas com o clique mais caro até perceberes o que mudou.',
         impact: -t.profit / Math.max(1, extra.rows.length),

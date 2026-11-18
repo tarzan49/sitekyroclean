@@ -5,15 +5,20 @@ import { addDays, closingRows, lisbonDay, serviceTotal, type ServiceExtra } from
 import { syncCalendarIntoCrm } from "@/lib/crmCalendarSync";
 import { ADS_FROM, adsExtra, buildWeeks, ORGANIC_FROM, ORGANIC_TO, organicBaseline, type WeeklyConversationRow } from "@/lib/adsVsOrganic";
 import {
-  campaignTrends, conversationFactor, liveWeek, recentClosings, SERVER_CONVERSATIONS_FROM, sinceVisit, withConversationEstimates,
+  attributeMeta, META_FROM, metaSpendByWeek, metaView, totalView, withoutMeta,
+  type ChannelClosing, type MetaConversation, type MetaSpendRow, type MetaSyncStatus,
+} from "@/lib/adsByChannel";
+import {
+  campaignTrends, conversationFactor, liveWeek, recentClosings, SERVER_CONVERSATIONS_FROM, sinceVisit, spendPace, withConversationEstimates,
   type LiveClosing, type ServerConversation, type WeekWithEstimate,
 } from "@/lib/growthLive";
 import { costPerExtraRequest, growthInsights, recentWindow } from "@/lib/growthInsights";
-import { AdsHero, CampaignList, InsightList, LiveWeekCard, RecentClosingsList, SinceVisitStrip } from "./growth/LiveCards";
+import { CampaignList, InsightList, LiveWeekCard, RecentClosingsList, SinceVisitStrip } from "./growth/LiveCards";
 import WeekExplorer from "./growth/WeekExplorer";
 import GrowthSimulator from "./growth/GrowthSimulator";
 import DailyClosings from "./growth/DailyClosings";
-import { dm, euro, one, pct } from "./growth/format";
+import AdsProfitCard from "./growth/AdsProfitCard";
+import { dm, dmy, euro, one, pct } from "./growth/format";
 
 // Separador "Crescimento" do painel (dono, 2026-10-17: "quero apenas dados que me
 // farão crescer e tirar boas conclusões de crescimento"; mais tarde no mesmo dia:
@@ -27,6 +32,13 @@ import { dm, euro, one, pct } from "./growth/format";
 // anúncios (contas em src/lib/adsVsOrganic.ts). A semana em curso compara com a
 // semana passada à mesma hora (src/lib/growthLive.ts) e as dicas saem de regras
 // fixas sobre estes números (src/lib/growthInsights.ts).
+//
+// Desde 18/11/2026 também a Meta (dono: "ter lá o lucro de anúncios de Google e o
+// lucro de anúncios Meta desde, e vais meter as datas. E eu consigo trocar entre um
+// e o outro"; "Nas métricas vais também ter gasto com o Meta"): o cartão do lucro
+// troca entre Google, Meta e Total (src/lib/adsByChannel.ts). O lucro do Google, as
+// dicas e o gráfico usam a subida sem os pedidos e fechos da Meta; o gasto Meta vem
+// de meta_ads_daily_stats e, sem a Marketing API ligada, diz "por ligar", nunca 0€.
 
 interface AdsRow { stat_date: string; cost: number; clicks: number; conversions: number; campaign_name: string }
 
@@ -66,10 +78,13 @@ function useTicker(ms: number) {
 
 interface Loaded {
   at: Date;
-  closings: LiveClosing[];
+  closings: (LiveClosing & ChannelClosing)[];
   ads: AdsRow[];
   weekly: WeeklyConversationRow[];
   server: ServerConversation[];
+  metaConversations: MetaConversation[];
+  metaSpend: MetaSpendRow[];
+  metaStatus: MetaSyncStatus | null;
 }
 
 const GrowthPanel = () => {
@@ -103,12 +118,17 @@ const GrowthPanel = () => {
       }
       const at = new Date();
       const serverFrom = [SERVER_CONVERSATIONS_FROM, addDays(lisbonDay(at), -SERVER_WINDOW_DAYS)].sort().pop()!;
-      const [weekly, ads, server, extras] = await Promise.all([
+      const [weekly, ads, server, extras, metaConversations, metaSpend, metaStatus] = await Promise.all([
         fetchAll<WeeklyConversationRow>(() => db.from("whatsapp_weekly_stats").select("week, source, new_people, people_wrote, counted_at")),
         fetchAll<AdsRow>(() => db.from("ads_daily_stats").select("stat_date, cost, clicks, conversions, campaign_name")),
         fetchAll<ServerConversation>(() => db.from("whatsapp_conversations").select("first_at, started_by_us, origin, updated_at").gte("first_at", `${serverFrom}T00:00:00Z`)),
         // Sem a tabela, os acréscimos ficam no dia do serviço, como antes.
         fetchAll<ServiceExtra>(() => db.from("service_extras").select("id, calendar_event_id, added_at, value, my_cut, description")).catch(() => [] as ServiceExtra[]),
+        // Todas as conversas Meta (também as de antes de 18/11, para saber quem já vinha do gasto que ficou para trás).
+        fetchAll<MetaConversation>(() => db.from("whatsapp_conversations").select("contact_key, is_lid, first_at, started_by_us, origin").eq("origin", "meta")),
+        // Sem a tabela ou sem leitura boa, o gasto Meta fica "por ligar" (nunca 0€).
+        fetchAll<MetaSpendRow>(() => db.from("meta_ads_daily_stats").select("stat_date, campaign_name, spend, impressions, clicks, conversations").gte("stat_date", META_FROM)).catch(() => [] as MetaSpendRow[]),
+        fetchAll<MetaSyncStatus>(() => db.from("meta_ads_sync_status").select("last_ok_at, last_error, last_error_at")).then(r => r[0] ?? null).catch(() => null),
       ]);
       rows = closingRows(rows, extras);
       // Fechos que entraram desde a atualização anterior (não na primeira).
@@ -124,6 +144,9 @@ const GrowthPanel = () => {
         weekly,
         server,
         ads: ads.map(x => ({ ...x, cost: Number(x.cost) || 0, clicks: Number(x.clicks) || 0, conversions: Number(x.conversions) || 0 })),
+        metaConversations,
+        metaSpend: metaSpend.map(x => ({ ...x, spend: Number(x.spend) || 0, clicks: Number(x.clicks) || 0, conversations: Number(x.conversations) || 0 })),
+        metaStatus,
       });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));
@@ -145,21 +168,35 @@ const GrowthPanel = () => {
 
   const data = useMemo(() => {
     if (!loaded) return null;
-    const { at, closings, ads, weekly, server } = loaded;
+    const { at, closings, ads, weekly, server, metaConversations, metaSpend, metaStatus } = loaded;
     const factor = conversationFactor(weekly, server, at);
     const weeks: WeekWithEstimate[] = withConversationEstimates(buildWeeks(closings, ads, weekly, ORGANIC_FROM, at), server, factor, at);
     const base = organicBaseline(weeks);
-    const extra = adsExtra(weeks, base);
+    // A subida com tudo (para o Total) e a do Google, sem o que a Meta trouxe desde 18/11.
+    const everything = adsExtra(weeks, base);
+    const metaAttr = attributeMeta(closings, metaConversations);
+    const extra = adsExtra(withoutMeta(weeks, metaAttr), base);
+    const meta = metaView(metaAttr, metaSpend, metaStatus);
+    const total = totalView(everything, metaSpend, meta.connected);
     const live = liveWeek({ closings, spend: ads, server, factor, now: at });
+    const metaLive = {
+      pace: meta.connected ? spendPace(metaSpend.map(r => ({ stat_date: r.stat_date, cost: r.spend })), at) : null,
+      from: META_FROM,
+      compare: addDays(live.week, -7) >= META_FROM,
+    };
     const campaigns = campaignTrends(ads, ADS_FROM, at);
     const insights = growthInsights({ weeks, base, extra, live, campaigns, now: at });
     const win = recentWindow(weeks);
-    return { weeks, base, extra, live, campaigns, insights, win, cpr: costPerExtraRequest(extra.rows), recent: recentClosings(closings), since: prevVisit ? sinceVisit(closings, server, prevVisit, at) : null };
+    return {
+      weeks, base, extra, meta, total, live, metaLive, metaWeek: metaSpendByWeek(metaSpend), campaigns, insights, win,
+      cpr: costPerExtraRequest(extra.rows), recent: recentClosings(closings), since: prevVisit ? sinceVisit(closings, server, prevVisit, at) : null,
+    };
   }, [loaded, prevVisit]);
 
   if (error && !data) return <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">Crescimento: {error}</div>;
   if (!data || !loaded) return <p className="text-sm text-gray-500">A carregar…</p>;
-  const { weeks, base, extra, live, campaigns, insights, win, cpr, recent, since } = data;
+  const { weeks, base, extra, meta, total, live, metaLive, metaWeek, campaigns, insights, win, cpr, recent, since } = data;
+  const metaSpendOf = (week: string) => (addDays(week, 6) < META_FROM ? "–" : meta.connected ? euro(metaWeek.get(week) ?? 0) : "por ligar");
   const isOrganic = (week: string) => week >= ORGANIC_FROM && addDays(week, 6) <= ORGANIC_TO;
   const rateOf = (w: WeekWithEstimate) => (w.newPeople ? w.closings / w.newPeople : null);
   const ticketOf = (w: WeekWithEstimate) => (w.closings ? w.billed / w.closings : null);
@@ -193,8 +230,8 @@ const GrowthPanel = () => {
       <SinceVisitStrip since={since && since.hours >= 2 / 60 ? since : null} fresh={fresh} />
 
       <div className="grid gap-4 lg:grid-cols-5">
-        <div className="lg:col-span-2"><AdsHero rows={extra.rows} total={extra.total} /></div>
-        <div className="lg:col-span-3"><LiveWeekCard live={live} /></div>
+        <div className="lg:col-span-2"><AdsProfitCard google={extra} meta={meta} total={total} /></div>
+        <div className="lg:col-span-3"><LiveWeekCard live={live} meta={metaLive} /></div>
       </div>
 
       <DailyClosings rows={loaded.closings} now={tick} />
@@ -219,7 +256,7 @@ const GrowthPanel = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-left text-[11px] text-gray-500">
-                <th className="py-1 pr-3">Semana</th><th className="pr-3">Gasto</th><th className="pr-3">Pedidos</th><th className="pr-3">Escreveram</th>
+                <th className="py-1 pr-3">Semana</th><th className="pr-3 whitespace-nowrap">Gasto Google</th><th className="pr-3 whitespace-nowrap">Gasto Meta</th><th className="pr-3">Pedidos</th><th className="pr-3">Escreveram</th>
                 <th className="pr-3">Fechos</th><th className="pr-3">Taxa</th><th className="pr-3">Ticket</th><th className="pr-3">Faturado</th><th>Para ti</th>
               </tr></thead>
               <tbody>
@@ -227,6 +264,7 @@ const GrowthPanel = () => {
                   <tr key={w.week} className={`border-t border-gray-100 ${isOrganic(w.week) ? "text-gray-600" : ""}`}>
                     <td className="py-1.5 pr-3 whitespace-nowrap">{dm(w.week)}{w.daysElapsed < 7 ? <span className="text-[10px] text-gray-500"> (em curso)</span> : null}</td>
                     <td className="pr-3">{euro(w.spend)}</td>
+                    <td className={`pr-3 ${metaSpendOf(w.week) === "por ligar" ? "text-amber-700" : ""}`}>{metaSpendOf(w.week)}</td>
                     <td className="pr-3 font-semibold">{w.newPeople ?? "–"}{w.requestsEstimated ? <span className="text-[10px] font-normal text-gray-500"> est.</span> : null}</td>
                     <td className="pr-3">{w.peopleWrote ?? "–"}</td>
                     <td className="pr-3 font-semibold">{w.closings}</td>
@@ -239,6 +277,7 @@ const GrowthPanel = () => {
                 <tr className="border-t-2 border-navy/20 font-semibold text-navy bg-gray-50">
                   <td className="py-1.5 pr-3">Média orgânica</td>
                   <td className="pr-3">0€</td>
+                  <td className="pr-3">–</td>
                   <td className="pr-3">{base.newPeople === null ? "–" : one(base.newPeople)}</td>
                   <td className="pr-3">{base.peopleWrote === null ? "–" : one(base.peopleWrote)}</td>
                   <td className="pr-3">{one(base.closings)}</td>
@@ -256,7 +295,8 @@ const GrowthPanel = () => {
       <p className="text-[11px] text-gray-500 leading-relaxed">
         Média orgânica = média das {base.weeks} semanas de {dm(ORGANIC_FROM)} a {dm(ORGANIC_TO)}, antes dos anúncios (a de 21/09 fica de fora: os anúncios começaram no sábado 26/09). Tudo o que uma semana com anúncios tem acima dela conta como trazido pelos anúncios, marcado com "(anúncio)" ou não; o orgânico já estava a crescer, por isso parte disso pode ser esse crescimento.
         Pedidos de orçamento = pessoas que te escreveram pela primeira vez nessa semana, contadas no WhatsApp Web às segundas; a semana em curso (e uma semana ainda por contar) é uma estimativa do servidor do bot, que perde cerca de 20% das conversas e por isso é corrigida pela razão das últimas semanas.
-        Fechos, faturado e "para ti" vêm do CRM, pela semana em que o serviço foi fechado; revisitas a 0€ não contam. Taxa de fecho = fechos ÷ pedidos de orçamento. "Para ti" é a tua parte em cada serviço, sem a tua parte nos upsells. O gasto é só o do Google Ads.
+        Fechos, faturado e "para ti" vêm do CRM, pela semana em que o serviço foi fechado; revisitas a 0€ não contam. Taxa de fecho = fechos ÷ pedidos de orçamento. "Para ti" é a tua parte em cada serviço, sem a tua parte nos upsells.
+        Desde {dmy(META_FROM)} há também a Meta: o lucro do Google, as dicas e o gráfico usam a subida sem os pedidos e os fechos atribuídos à Meta (clientes que vieram de uma conversa Meta e os fechos marcados "Meta Ads" no CRM), para a Meta não inflacionar o Google; o lucro Meta é o que esses fechos deixaram para ti menos o gasto Meta; o Total é a subida com tudo menos os dois gastos. O gasto Meta de antes de {dmy(META_FROM)} fica de fora.
       </p>
     </div>
   );

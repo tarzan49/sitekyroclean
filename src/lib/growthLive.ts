@@ -115,6 +115,28 @@ export interface LiveWeek {
 
 const CLOCK = new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 
+/**
+ * Gasto da semana em curso contra a semana passada à mesma hora (Google ou Meta): o dia
+ * de hoje já é o gasto até agora; o mesmo dia da semana passada conta só a parte do dia
+ * já passada.
+ */
+export function spendPace(spend: Array<{ stat_date: string; cost: number }>, now: Date): Pace {
+  const nowMs = now.getTime();
+  const today = lisbonDay(now);
+  const week = mondayOf(today);
+  const weekday = weekdayOf(today);
+  const dayFraction = Math.min(1, Math.max(0, (nowMs - lisbonMidnight(today)) / DAY_MS));
+  const costOn = (day: string) => spend.filter(s => s.stat_date === day).reduce((s, x) => s + (Number(x.cost) || 0), 0);
+  let spendNow = 0;
+  let spendThen = 0;
+  for (let i = 0; i <= weekday; i++) {
+    spendNow += costOn(addDays(week, i));
+    const prevDay = addDays(week, i - 7);
+    spendThen += i < weekday ? costOn(prevDay) : costOn(prevDay) * dayFraction;
+  }
+  return pace(spendNow, spendThen);
+}
+
 /** A semana em curso contra a anterior à mesma hora. */
 export function liveWeek(input: {
   closings: ClosingInput[];
@@ -141,17 +163,6 @@ export function liveWeek(input: {
   const sum = (rows: ClosingInput[], f: (c: ClosingInput) => number) => rows.reduce((s, c) => s + f(c), 0);
   const billedOf = (c: ClosingInput) => serviceTotal(c);
 
-  // Gasto: o dia de hoje no Google Ads já é o gasto até agora; o mesmo dia da semana passada conta só a parte do dia já passada.
-  const dayFraction = Math.min(1, Math.max(0, (nowMs - lisbonMidnight(today)) / DAY_MS));
-  const costOn = (day: string) => spend.filter(s => s.stat_date === day).reduce((s, x) => s + (Number(x.cost) || 0), 0);
-  let spendNow = 0;
-  let spendThen = 0;
-  for (let i = 0; i <= weekday; i++) {
-    spendNow += costOn(addDays(week, i));
-    const prevDay = addDays(week, i - 7);
-    spendThen += i < weekday ? costOn(prevDay) : costOn(prevDay) * dayFraction;
-  }
-
   const f = factor ?? 1;
   const reqNow = serverCount(server, start, nowMs + 1);
   const reqThen = serverCount(server, prevStart, prevCut);
@@ -175,7 +186,7 @@ export function liveWeek(input: {
     closings: { ...pace(nowC.length, thenC.length), projection: closingsProjection },
     billed: pace(sum(nowC, billedOf), sum(thenC, billedOf)),
     share: { ...pace(shareNow, shareThen), projection: shareProjection },
-    spend: pace(spendNow, spendThen),
+    spend: spendPace(spend, now),
     serverUpdatedAt: updated,
   };
 }

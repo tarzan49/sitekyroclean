@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { AlertTriangle, ArrowRight, Bell, Lightbulb, Megaphone, Receipt, TrendingDown, TrendingUp } from "lucide-react";
-import { ADS_FROM, type ExtraWeek } from "@/lib/adsVsOrganic";
+import { ADS_FROM } from "@/lib/adsVsOrganic";
 import { serviceTotal, WEEKDAY_SHORT } from "@/lib/crmClosings";
-import { campaignLabel, timeAgo, type CampaignTrend, type LiveClosing, type LiveWeek, type SinceVisit } from "@/lib/growthLive";
+import { campaignLabel, timeAgo, type CampaignTrend, type LiveClosing, type LiveWeek, type Pace, type SinceVisit } from "@/lib/growthLive";
 import type { Insight } from "@/lib/growthInsights";
-import { dm, euro, euro2, one, signedEuro, signedPct } from "./format";
+import { dm, dmy, euro, euro2, one, signedPct } from "./format";
 
-// Cartões do separador Crescimento: o lucro dos anúncios, a semana em curso ao
-// vivo, as novidades, as dicas, os últimos fechos e as campanhas. As contas vêm
+// Cartões do separador Crescimento: a semana em curso ao vivo, as novidades, as dicas, os últimos fechos e as campanhas. As contas vêm
 // de src/lib/growthLive.ts e src/lib/growthInsights.ts.
 
 const GOLD = "#D4AF37";
@@ -24,46 +23,6 @@ export function DeltaPill({ value, goodWhenUp = true, small = false }: { value: 
       {!flat && <Icon className="w-3 h-3" aria-hidden="true" />}
       {signedPct(value)}
     </span>
-  );
-}
-
-export function AdsHero({ rows, total }: { rows: ExtraWeek[]; total: Omit<ExtraWeek, "week" | "partial"> }) {
-  const max = Math.max(1, ...rows.map(r => Math.abs(r.profit)));
-  const perEuro = total.spend > 0 ? total.extraShare / total.spend : null;
-  return (
-    <section className="rounded-2xl bg-[#0B2F2A] text-white p-5 flex flex-col gap-4">
-      <div>
-        <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: GOLD }}>Lucro dos anúncios desde {dm(ADS_FROM)}</p>
-        <p className={`font-playfair text-4xl font-bold mt-1 tabular-nums ${total.profit >= 0 ? "text-emerald-300" : "text-red-300"}`}>{signedEuro(total.profit)}</p>
-        <p className="text-xs text-white/60 mt-1">O que ficou para ti acima da média de agosto e setembro, já sem o gasto.</p>
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: "Gasto", value: euro(total.spend) },
-          { label: "A mais para ti", value: signedEuro(total.extraShare) },
-          { label: "Por cada 1€", value: perEuro === null ? "–" : euro2(perEuro) },
-        ].map(s => (
-          <div key={s.label} className="rounded-xl bg-white/5 border border-white/10 px-2.5 py-2">
-            <p className="text-[10.5px] text-white/50">{s.label}</p>
-            <p className="text-sm font-bold tabular-nums">{s.value}</p>
-          </div>
-        ))}
-      </div>
-      {rows.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-[10.5px] text-white/50">Lucro por semana</p>
-          {rows.map(r => (
-            <div key={r.week} className="flex items-center gap-2 text-xs">
-              <span className="w-11 shrink-0 text-white/60 tabular-nums">{dm(r.week)}</span>
-              <div className="flex-1 h-2.5 rounded-full bg-white/5 overflow-hidden">
-                <div className={`h-full rounded-full ${r.profit >= 0 ? "bg-emerald-400" : "bg-red-400"} ${r.partial ? "opacity-60" : ""}`} style={{ width: `${Math.max(3, (Math.abs(r.profit) / max) * 100)}%` }} />
-              </div>
-              <span className="w-24 shrink-0 text-right font-semibold tabular-nums">{signedEuro(r.profit)}{r.partial && <span className="font-normal text-white/50"> até agora</span>}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
   );
 }
 
@@ -87,7 +46,29 @@ function PaceRow({ label, now, then, fmt, change, goodWhenUp = true, note }: {
   );
 }
 
-export function LiveWeekCard({ live }: { live: LiveWeek }) {
+/**
+ * Gasto Meta da semana em curso. Sem a Marketing API ligada diz "por ligar", nunca 0€; e
+ * só compara com a semana passada quando ela já é toda depois de `from` (o gasto de antes
+ * dos 500€ ficou para trás e não está gravado).
+ */
+function MetaSpendTile({ pace, from, compare }: { pace: Pace | null; from: string; compare: boolean }) {
+  return (
+    <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[11px] font-semibold text-gray-500">Gasto Meta</p>
+        {pace && compare && <DeltaPill value={pace.change} goodWhenUp={null} small />}
+      </div>
+      {pace
+        ? <p className="text-2xl font-bold text-navy tabular-nums mt-0.5">{euro(pace.now)}</p>
+        : <p className="text-base font-bold text-amber-700 mt-1.5">por ligar</p>}
+      <p className="text-[11px] text-gray-500 mt-1.5">
+        {pace && compare ? <>semana passada: <span className="font-semibold text-gray-700 tabular-nums">{euro(pace.then)}</span></> : `desde ${dmy(from)}`}
+      </p>
+    </div>
+  );
+}
+
+export function LiveWeekCard({ live, meta }: { live: LiveWeek; meta: { pace: Pace | null; from: string; compare: boolean } }) {
   const n = (x: number) => String(Math.round(x));
   const projection = [
     live.requests.projection !== null ? `~${n(live.requests.projection)} pedidos` : null,
@@ -114,11 +95,12 @@ export function LiveWeekCard({ live }: { live: LiveWeek }) {
           {WEEKDAY_SHORT.map((d, i) => <span key={d} className={`text-center ${i === live.weekday ? "font-bold text-navy" : ""}`}>{d}</span>)}
         </div>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2.5">
         <PaceRow label="Pedidos" now={live.requests.now} then={live.requests.then} fmt={n} change={live.requests.change} note={live.requests.estimated ? "estimativa" : undefined} />
         <PaceRow label="Fechos" now={live.closings.now} then={live.closings.then} fmt={n} change={live.closings.change} />
         <PaceRow label="Para ti" now={live.share.now} then={live.share.then} fmt={euro} change={live.share.change} />
         <PaceRow label="Gasto Google" now={live.spend.now} then={live.spend.then} fmt={euro} change={live.spend.change} goodWhenUp={null} />
+        <MetaSpendTile {...meta} />
       </div>
       {projection.length > 0 && (
         <p className="text-sm text-gray-700">
