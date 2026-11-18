@@ -73,6 +73,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Sofá ou cadeirão de pele nunca leva impermeabilização: o extra é o tratamento da pele (limpeza e hidratação), +30€ por sofá (`LEATHER_TREATMENT` no motor, `leather: true`; dono, 16 Nov).
 - Mensagens do bot diretas e compactas: só o essencial, sem rodeios nem ar de spam; o preço impossível de ler mal (dono, 17 Nov).
 - Nenhuma resposta do bot passa dos 49 s: a 1.ª bolha conta desde a mensagem do cliente (o tempo a escrever conta como "a escrever…"), respostas escritas em paralelo, Sonnet 5.5 em esforço médio, escrita começa 3 s depois do cliente (kyro-bot `firstBubbleWaitMs`, `WRITE_CONCURRENCY`, `BOT_EFFORT`; dono, 17 Nov).
+- Cliente interessado que deixou de responder (novo ou antigo): UM seguimento no dia a seguir, uma pergunta com tentativa de fecho, SÓ pela API oficial (kyro-bot `recovery.ts`, 20–23 h depois da última mensagem do cliente, de hora a hora 9h–20h, máx. 15/dia; desligado até a API estar ativa; dono, 18 Nov).
 - Cliente que ainda não escreveu (funil do questionário, espera da fotografia): 1 texto com preço de cada artigo e horas + 1 prova, sem upsell até responder (kyro-bot `silentCompact.ts`; dono, 17 Nov, Raquel).
 - Nunca "não prometemos", "não garantimos", "não repara": omite-se a limitação e diz-se o que o processo faz (traças: a extração retira os ovos das fibras, o anti-ácaros desinfeta; dono, 17 Nov; travão no kyro-bot `guard`).
 - O que o bot não sabe pergunta ao dono; nunca nega um serviço.
