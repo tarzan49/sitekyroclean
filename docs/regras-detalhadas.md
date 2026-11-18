@@ -927,3 +927,8 @@ Caso Faisal (Estoril, chenille Sklum "só a seco"): o rascunho propunha "só o t
 ### Deslocação na impermeabilização: pedido inteiro numa chamada (dono, 18 Nov 2026)
 
 Caso Altieres: sofá 3L com chaise + 4 cadeiras; o bot calculou as peças à parte e somou "Deslocação: 10€" (279€), quando o motor com o pedido inteiro dá 269€ sem deslocação. Ficheiro do bot: o pedido inteiro numa só chamada, nunca linha de deslocação à mão; mais cadeiras ditas pelo cliente = preço pelo total. Correção enviada à mão: 8 cadeiras a 25/18€, deslocação oferecida, 1 cadeira oferecida como condição especial (324€ / 215€). Decisão do dono (18 Nov): impermeabilização de várias peças nunca leva deslocação nas cidades de 10€ ("fica mal cobrar deslocação"); uma só peça mantém a regra de Rio Meão (10€ até 200€ Premium). Motor: `severalPieces` em `botQuote.ts`.
+
+
+### Adiamento para quando receber: reservar já e perguntar a opção (dono, 18 Nov 2026)
+
+Pedro (colchão de solteiro, São João da Talha, 69€ ou 84€ com anti-ácaros) disse "assim que eu receber nos dias 28 e 29 eu ligo para marcar" e o bot respondeu só "quando receber é só dizer-nos", sem propor reserva e sem perguntar a opção. Dono: deixar já reservada uma data no início de dezembro, sem compromisso, por causa da procura da Black Friday, e perguntar sempre qual opção faz mais sentido. Regra no ficheiro do bot (S53c) e travão no kyro-bot `deferredOptionIssues` (commit 881b674), que segura a resposta sem a reserva ou sem a pergunta da opção.
