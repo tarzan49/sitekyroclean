@@ -15,6 +15,7 @@
 //   node_modules/.bin/supabase functions deploy ads-daily-sync --no-verify-jwt
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { changedRows } from "../_shared/changedRows.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 
 const MAX_BODY_BYTES = 200_000;
@@ -126,13 +127,23 @@ function supabaseStore(): StatsStore | null {
   const now = () => new Date().toISOString();
   return {
     async upsertStats(rows) {
+      const dates = [...new Set(rows.map(r => r.stat_date))];
+      const { data: existing, error: readError } = await client.from("ads_daily_stats").select("*").in("stat_date", dates);
+      if (readError) return readError.message;
+      const changed = changedRows(rows as unknown as Record<string, unknown>[], existing ?? [], ["stat_date", "campaign_id"]);
+      if (!changed.length) return null;
       const { error } = await client.from("ads_daily_stats")
-        .upsert(rows.map(r => ({ ...r, updated_at: now() })), { onConflict: "stat_date,campaign_id" });
+        .upsert(changed.map(r => ({ ...r, updated_at: now() })), { onConflict: "stat_date,campaign_id" });
       return error?.message ?? null;
     },
     async upsertSpend(rows) {
+      const dates = [...new Set(rows.map(r => r.spend_date))];
+      const { data: existing, error: readError } = await client.from("ad_spend_daily").select("*").in("spend_date", dates);
+      if (readError) return readError.message;
+      const changed = changedRows(rows as unknown as Record<string, unknown>[], existing ?? [], ["platform", "spend_date"]);
+      if (!changed.length) return null;
       const { error } = await client.from("ad_spend_daily")
-        .upsert(rows.map(r => ({ ...r, updated_at: now() })), { onConflict: "platform,spend_date" });
+        .upsert(changed.map(r => ({ ...r, updated_at: now() })), { onConflict: "platform,spend_date" });
       return error?.message ?? null;
     },
   };

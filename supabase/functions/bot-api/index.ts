@@ -79,6 +79,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { agendaCheck, teamAccounts, botAvailability, bookedServices, eventTeam, planBookingUpdate, replacementTeam, teamBusyAt, teamTakesJob, TEAM_COLOR, botQuote, describeQuizOrder, isTestOrder, labelFacts, listBotCities, planBotBooking, planBotHold, planOwnerBooking, tagWaterproofBase } from "../_shared/botEngine.generated.js";
 import { buildWhatsAppMessage, type QuotedPrice } from "../_shared/whatsappReply.ts";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
+import { changedRows } from "../_shared/changedRows.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { procedureDue, procedureMedia, procedureSent, type ProcedureStore } from "./procedure.ts";
 import { certificateAction, type CertificateStore } from "./certificate.ts";
@@ -1072,7 +1073,12 @@ function supabaseConversations(): BotEnv["conversations"] {
   if (!url || !key) return null;
   const client = createClient(url, key);
   return async rows => {
-    const { error } = await client.from("whatsapp_conversations").upsert(rows, { onConflict: "contact_key" });
+    const keys = rows.map(r => String(r.contact_key));
+    const { data: existing, error: readError } = await client.from("whatsapp_conversations").select("*").in("contact_key", keys);
+    if (readError) return { error: readError.message };
+    const changed = changedRows(rows, (existing ?? []) as Row[], ["contact_key"]);
+    if (!changed.length) return {};
+    const { error } = await client.from("whatsapp_conversations").upsert(changed, { onConflict: "contact_key" });
     return error ? { error: error.message } : {};
   };
 }
