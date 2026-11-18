@@ -132,7 +132,9 @@ describe('região e equipa de cada serviço', () => {
     const lisboa = 'Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa';
     expect(equipa(lisboa)).toBeNull();
     expect(equipa(lisboa, '6')).toBe('lisboa');
-    expect(equipa(lisboa, '1')).toBeNull();
+    // Lavanda (1) é a equipa Viana desde 18/11/2026 (dono).
+    expect(equipa(lisboa, '1')).toBe('viana');
+    expect(equipa('Serviço 45€ (89€) sofá - Rua X 1, 4900-000 Viana do Castelo - equipa viana')).toBe('viana');
     // A cor escolhe, mesmo que a morada seja de outra região.
     expect(equipa(lisboa, '10')).toBe('braga');
     expect(equipa('Serviço 45€ (89€) sofá, 8600-000 Lagos', '5')).toBe('algarve');
@@ -148,8 +150,8 @@ describe('região e equipa de cada serviço', () => {
     // Uma cor que não é de nenhuma equipa não é uma escolha.
     expect(equipa(lisboa, '2')).toBeNull();
     // Cada equipa com a sua cor.
-    expect(['9', '8', '3', '10', '6', '5', '4'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
-      .toEqual(['porto', 'porto2', 'porto3', 'braga', 'lisboa', 'algarve', 'coimbra']);
+    expect(['9', '8', '3', '10', '6', '5', '4', '1'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+      .toEqual(['porto', 'porto2', 'porto3', 'braga', 'lisboa', 'algarve', 'coimbra', 'viana']);
   });
 
   it('não confunde o nome da rua com a cidade', () => {
@@ -419,10 +421,10 @@ describe('o que muda nos calendários das equipas', () => {
       expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
       expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
       expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
-      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra']) {
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra', 'Lavanda = Equipa Viana']) {
         expect(mensagem.texto).toContain(linha);
       }
-      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa algarve" ou "equipa coimbra"');
+      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa algarve", "equipa coimbra" ou "equipa viana"');
       expect(gs.mensagemParaDono(primeira.novos.slice(0, 1)).assunto).toBe('Escolhe a equipa deste serviço');
     });
   });

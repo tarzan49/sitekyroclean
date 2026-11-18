@@ -566,6 +566,9 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
       expect([r.free, r.suggestion, r.askWeek, r.askTeam]).toEqual([[], null, true, 'Viana']);
       expect(r.handToOwner).toMatch(/perguntar primeiro à equipa de Viana/);
     }
+    // Equipa Viana (dono, 18 Nov 2026): as limpezas de Viana são dela, a impermeabilização fica nas equipas do Porto.
+    expect(ok(botAvailability({ city: 'Viana do Castelo', items: cleaning }, [], now)).teams).toEqual(['Viana']);
+    expect(ok(botAvailability({ city: 'Viana do Castelo', items: premium }, [], now)).teams).not.toContain('Viana');
   });
   it('Funchal: limpeza e impermeabilização sem horas (sem calendário de equipa na Madeira)', () => {
     for (const items of [cleaning, premium]) {
@@ -587,5 +590,29 @@ describe('Viana pergunta à equipa (dono, 18 Nov)', () => {
     expect(r.askWeek).toBe(true);
     expect(r.askTeam).toBe('Viana');
     expect(r.slots ?? []).toHaveLength(0);
+  });
+});
+
+describe('equipa Viana (LigLav): só as limpezas de Viana do Castelo; a Braga deixa de as fazer (dono, 18 Nov 2026)', () => {
+  const now = new Date('2026-11-23T08:00:00Z');
+  const cleaning = [{ kind: 'sofa', size: '3-lugares' }];
+  it('a hora que o dono dá marca na Viana; o resto da zona de Braga fica na Braga', () => {
+    const owner = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, date: '2026-11-24', time: '10h', ownerTime: true }, [], now));
+    expect([owner.teams, owner.requested?.free, owner.requested?.teamsFree]).toEqual([['Viana'], true, ['Viana']]);
+    expect(chooseTeam([], 'Viana do Castelo', '2026-11-24T10:00:00Z', '2026-11-24T11:00:00Z')).toBe('Viana');
+    expect(chooseTeam([], 'Viana do Castelo', '2026-11-24T10:00:00Z', '2026-11-24T11:30:00Z', 'premium')).not.toBe('Viana');
+    for (const city of ['Braga', 'Guimarães', 'Barcelos']) {
+      expect(chooseTeam([], city, '2026-11-24T10:00:00Z', '2026-11-24T11:00:00Z'), city).toBe('Braga');
+      expect(ok(botAvailability({ city, items: cleaning }, [], now)).teams, city).toEqual(['Braga']);
+    }
+    expect(teamsFor('Braga', false)).toEqual(['Braga']);
+  });
+  it('a Viana ocupada não passa o serviço para a Braga; o calendário dela ocupa só a ela', () => {
+    const busy = ev('2026-11-24', '09:00', '13:00', 'Serviço 45€ (89€) Sofá - Viana do Castelo', 'Equipa: Viana');
+    expect(eventTeam(busy)).toBe('Viana');
+    expect(chooseTeam([busy], 'Viana do Castelo', at('2026-11-24', '10:00'), at('2026-11-24', '11:00'))).toBeNull();
+    expect(chooseTeam([busy], 'Braga', at('2026-11-24', '10:00'), at('2026-11-24', '11:00'))).toBe('Braga');
+    expect(teamTakesJob('Viana', busy, at('2026-11-25', '10:00'))).toBe(true);
+    expect(teamTakesJob('Viana', { summary: 'Serviço 60€ (119€) Impermeabilização Premium - Viana do Castelo', description: '' }, at('2026-11-25', '10:00'))).toBe(false);
   });
 });

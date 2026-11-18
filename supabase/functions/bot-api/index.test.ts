@@ -259,8 +259,9 @@ Deno.test("availability: Algarve and waterproofing in Viana/Leiria close without
   assertEquals([leiria.askWeek, leiria.free, leiria.teams], [true, [], ["Lisboa 1"]]);
   const viana = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares", treatment: "essencial" }] });
   assertEquals([viana.askWeek, viana.free], [true, []]);
+  // Viana (dono, 18 Nov 2026): limpeza também sem horas, na equipa Viana; o dono confirma com a equipa antes de marcar.
   const vianaClean = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares" }], total: 109 });
-  assertEquals([vianaClean.askWeek, vianaClean.teams, vianaClean.suggestion.slots.length], [undefined, ["Braga"], 2]);
+  assertEquals([vianaClean.askWeek, vianaClean.teams, vianaClean.free], [true, ["Viana"], []]);
 });
 
 Deno.test("agenda-check reports tomorrow's problems without client data", async () => {
@@ -453,7 +454,7 @@ Deno.test("book leaves prices to confirm and missing data as a pre-booking for t
   const noAddress = JSON.parse(await (await holdCall(book("n", { phone: "911000002", address: "", time: "17h" }), store, script.write)).text()).booking;
   assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
   // A rug pickup in the Braga zone is never closed by the bot: the Braga team does not pick up rugs (owner, 27 Oct).
-  const viana = JSON.parse(await (await holdCall(book("v", { phone: "911000003", city: "Viana do Castelo", address: "Rua Inventada 1, 4900-000 Viana do Castelo",
+  const viana = JSON.parse(await (await holdCall(book("v", { phone: "911000003", city: "Barcelos", address: "Rua Inventada 1, 4750-000 Barcelos",
     items: [{ kind: "rug", width: 3, length: 2.5 }], rugPickup: true, agreedTotal: 129, service: "Recolha de tapete" }), store, script.write)).text()).booking;
   assertEquals([viana.ok, /Braga não faz recolhas/.test(viana.handToOwner), viana.hold.ok], [false, true, true]);
   assert(script.calls.every(c => c.action === "hold"));

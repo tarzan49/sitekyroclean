@@ -48,12 +48,18 @@ export interface AvailabilityEvent {
 export type TeamZone = TeamLocality;
 export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Porto: ['Porto 1', 'Porto 2', 'Porto 3'],
-  Braga: ['Braga'],
+  // Viana (owner, 18 Nov 2026, partner LigLav): cleanings in Viana do Castelo only (TOWN_TEAMS).
+  Braga: ['Braga', 'Viana'],
   Lisboa: ['Lisboa 1'],
   Algarve: ['Algarve'],
   Coimbra: ['Coimbra'],
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+/**
+ * Teams of one town (owner, 18 Nov 2026: "Eles são a equipa de Viana"): they take only the cleanings of that town,
+ * and that town's cleanings go only to them (teamsForCity). teamsFor (the zone alone) never offers them.
+ */
+export const TOWN_TEAMS: Readonly<Record<string, string>> = { Viana: 'Viana do Castelo' };
 /**
  * Backup teams (owner, 4 Nov 2026: "a denise fica como prioridade e o aleixo perde prioridade [...] apenas
  * passas lhe serviços se a denise estiver ocupada"): Porto 2 (Aleixo) takes a job only when Denise (Porto 3)
@@ -107,6 +113,7 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
   if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone]!;
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : undefined;
   const teams = ((waterproofing && WATERPROOFING_TEAMS[zone]) || TEAMS_BY_REGION[zone])
+    .filter(t => !TOWN_TEAMS[t])
     .filter(t => !pickupTeams || pickupTeams.includes(t))
     .filter(t => !TEAM_CLOSED_FROM[t] || (day && (day <= TEAM_CLOSED_FROM[t].date || (TEAM_CLOSED_FROM[t].reopen !== undefined && day >= TEAM_CLOSED_FROM[t].reopen!))))
     .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
@@ -149,7 +156,7 @@ export function rugPickupOwnerReason(cityOrAddress: unknown, rugPickup: boolean)
   if (!rugPickup) return null;
   const zone = cityZone(cityOrAddress);
   if (!zone || !NO_RUG_PICKUP_ZONES.has(zone)) return null;
-  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].join('/')} não faz recolhas, o responsável escolhe a equipa e a hora`;
+  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].filter(t => !TOWN_TEAMS[t]).join('/')} não faz recolhas, o responsável escolhe a equipa e a hora`;
 }
 /** The job includes waterproofing: an item with Essencial/Premium (the bot's `quote` items). */
 export function hasWaterproofing(items: unknown): boolean {
@@ -623,13 +630,14 @@ export function teamTakesJob(team: string, e: Pick<AvailabilityEvent, 'summary' 
   const zone = zoneOfTeam(team);
   if (!zone) return true;
   const { waterproofing, total, rugPickup } = eventJob(e);
+  if (TOWN_TEAMS[team]) return !waterproofing && !rugPickup;
   return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup).includes(team);
 }
 
 /** Another team of the same zone that takes the job that day and is free then; the backup team last. null: none. */
 export function replacementTeam(events: AvailabilityEvent[], team: string, e: Pick<AvailabilityEvent, 'summary' | 'description'>, startIso: string, endIso: string, cleaning = true): string | null {
   const zone = zoneOfTeam(team);
-  if (!zone) return null;
+  if (!zone || TOWN_TEAMS[team]) return null;
   const { waterproofing, total, rugPickup } = eventJob(e);
   return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)]
     .filter(t => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary))
@@ -690,7 +698,7 @@ export interface AvailabilityRequest {
  * below 110€ (120€ less his 10€ margin) the bot offers no hours and says we check availability.
  * The Alentejo Litoral is already in EXTENDED_TRIP_CITIES.
  */
-export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', 'Aveiro']);
+export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Aveiro']); // Viana do Castelo: sem horas desde 18 Nov (equipa Viana)
 /**
  * Leiria tier (owner, 16 Nov 2026: "a regra neste funil e marcar para sexta feira e fechar a cliente de qualquer
  * forma"): any amount, the bot gives hours only on the next Friday (Coimbra team) and closes; no askWeek, no minimum.
@@ -708,6 +716,8 @@ export const LEIRIA_WATERPROOFING_TEAMS: readonly string[] = ['Lisboa 1'];
 /** teamsFor, with the town's own team where the owner set one (LEIRIA_WATERPROOFING_TEAMS). */
 export function teamsForCity(city: string | null, zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] {
   if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
+  const townTeam = city ? Object.keys(TOWN_TEAMS).find(t => TOWN_TEAMS[t] === city) : undefined;
+  if (townTeam && !waterproofing && !rugPickup) return [townTeam];
   return teamsFor(zone, waterproofing, total, day, rugPickup);
 }
 function nextFriday(now: Date): string {
@@ -720,7 +730,7 @@ export const SMALL_ORDER_MIN_TOTAL = 110;
 /** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
 // Owner, 15 Nov 2026: "tudo a norte que forem orçamento de valor igual ou superior a 79 eur tens que dar sempre disponibilidade".
 export const NORTH_MIN_TOTAL = 79;
-const SMALL_ORDER_MIN_BY_CITY: Readonly<Record<string, number>> = { 'Viana do Castelo': NORTH_MIN_TOTAL, 'Aveiro': NORTH_MIN_TOTAL };
+const SMALL_ORDER_MIN_BY_CITY: Readonly<Record<string, number>> = { 'Aveiro': NORTH_MIN_TOTAL };
 function orderTotal(req: AvailabilityRequest, city: string): number | null {
   const given = Number(req.total);
   if (req.total !== undefined && Number.isFinite(given)) return given;
@@ -904,7 +914,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // job in Viana do Castelo closes without an hour; the Viana team (LigLav) is asked first, with the photo or
   // video of the item, that it is in Viana, and its availability. The hour comes from the team.
   if (req.ownerTime !== true && city === 'Viana do Castelo') {
-    return { ...base, region: area, teams: [],
+    const total = orderTotal(req, city);
+    // The Viana team takes the cleanings (owner, 18 Nov 2026: "Sem horas, confirmo eu"); waterproofing keeps the Porto teams.
+    return { ...base, region: area, teams: [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))],
       handToOwner: VIANA_ASK_TEAM_RULE,
       askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Viana' };
   }

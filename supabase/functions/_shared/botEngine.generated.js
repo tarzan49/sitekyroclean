@@ -2780,12 +2780,14 @@ function localityFromPostalCode(code) {
 // src/lib/botAvailability.ts
 var TEAMS_BY_REGION = {
   Porto: ["Porto 1", "Porto 2", "Porto 3"],
-  Braga: ["Braga"],
+  // Viana (owner, 18 Nov 2026, partner LigLav): cleanings in Viana do Castelo only (TOWN_TEAMS).
+  Braga: ["Braga", "Viana"],
   Lisboa: ["Lisboa 1"],
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+var TOWN_TEAMS = { Viana: "Viana do Castelo" };
 var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 2"]);
 var WATERPROOFING_TEAMS = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
@@ -2803,7 +2805,7 @@ var ZONE_TEAM_OVERRIDE = {};
 var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   if (ZONE_TEAM_OVERRIDE[zone]) return ZONE_TEAM_OVERRIDE[zone];
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;
-  const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
+  const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !TOWN_TEAMS[t]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
   if (waterproofing === "premium" && (zone === "Porto" || zone === "Braga") && day && day >= PORTO1_ALL_PREMIUM_FROM) return ["Porto 1"];
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
@@ -2827,7 +2829,7 @@ function rugPickupOwnerReason(cityOrAddress, rugPickup) {
   if (!rugPickup) return null;
   const zone = cityZone(cityOrAddress);
   if (!zone || !NO_RUG_PICKUP_ZONES.has(zone)) return null;
-  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].join("/")} não faz recolhas, o responsável escolhe a equipa e a hora`;
+  return `Recolha de tapetes na zona de ${zone}: a equipa ${TEAMS_BY_REGION[zone].filter((t) => !TOWN_TEAMS[t]).join("/")} não faz recolhas, o responsável escolhe a equipa e a hora`;
 }
 function hasWaterproofing(items) {
   return Array.isArray(items) && items.some((i) => /essencial|premium/.test(String(i?.treatment ?? "")));
@@ -3189,11 +3191,12 @@ function teamTakesJob(team, e, startIso) {
   const zone = zoneOfTeam(team);
   if (!zone) return true;
   const { waterproofing, total, rugPickup } = eventJob(e);
+  if (TOWN_TEAMS[team]) return !waterproofing && !rugPickup;
   return teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup).includes(team);
 }
 function replacementTeam(events, team, e, startIso, endIso, cleaning = true) {
   const zone = zoneOfTeam(team);
-  if (!zone) return null;
+  if (!zone || TOWN_TEAMS[team]) return null;
   const { waterproofing, total, rugPickup } = eventJob(e);
   return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)].filter((t) => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary)).sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
 }
@@ -3213,12 +3216,14 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const closest = (t) => Math.min(Infinity, ...busy.filter((b) => b.team === t && b.place && place && lisbon(b.from).date === day).map((b) => driveMinutes(b.place, place)));
   return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
-var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Aveiro"]);
+var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
 var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", ...FRIDAY_ONLY_CITIES]);
 var LEIRIA_WATERPROOFING_TEAMS = ["Lisboa 1"];
 function teamsForCity(city, zone, waterproofing, total, day, rugPickup = false) {
   if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
+  const townTeam = city ? Object.keys(TOWN_TEAMS).find((t) => TOWN_TEAMS[t] === city) : void 0;
+  if (townTeam && !waterproofing && !rugPickup) return [townTeam];
   return teamsFor(zone, waterproofing, total, day, rugPickup);
 }
 function nextFriday(now) {
@@ -3231,7 +3236,7 @@ function nextFriday(now) {
 }
 var SMALL_ORDER_MIN_TOTAL = 110;
 var NORTH_MIN_TOTAL = 79;
-var SMALL_ORDER_MIN_BY_CITY = { "Viana do Castelo": NORTH_MIN_TOTAL, "Aveiro": NORTH_MIN_TOTAL };
+var SMALL_ORDER_MIN_BY_CITY = { "Aveiro": NORTH_MIN_TOTAL };
 function orderTotal(req, city) {
   const given = Number(req.total);
   if (req.total !== void 0 && Number.isFinite(given)) return given;
@@ -3369,10 +3374,11 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const fridayDone = req._friday === true;
   if (req.ownerTime !== true && city === "Viana do Castelo") {
+    const total = orderTotal(req, city);
     return {
       ...base,
       region: area,
-      teams: [],
+      teams: [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))],
       handToOwner: VIANA_ASK_TEAM_RULE,
       askWeek: true,
       askWeekRule: ASK_WEEK_RULE,
@@ -3639,7 +3645,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "3", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "3", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4", Viana: "1" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {
@@ -3824,7 +3830,7 @@ function agendaMessage(day, services, issues, pending) {
 }
 
 // src/lib/crmUpsell.ts
-var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Algarve", "Coimbra"];
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Algarve", "Coimbra", "Viana"];
 function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }

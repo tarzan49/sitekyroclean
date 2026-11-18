@@ -1218,7 +1218,7 @@ ${campaigns.map((c) => `<p style="font-size:13px;margin:4px 0">${esc(c.name)}: $
 }
 
 // src/lib/crmUpsell.ts
-var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Algarve", "Coimbra"];
+var UPSELL_TEAMS = ["Porto 1", "Porto 2", "Porto 3", "Braga", "Lisboa 1", "Algarve", "Coimbra", "Viana"];
 function teamShareOf(team) {
   return team.startsWith("Porto") ? 0.6 : 0.7;
 }

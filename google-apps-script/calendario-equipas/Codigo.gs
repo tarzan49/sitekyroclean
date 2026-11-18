@@ -22,7 +22,7 @@
 // (latitude, longitude) só decide as moradas fora de todas as regiões
 // (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
 // serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
-// 8 Grafite, 3 Uva, 10 Basílico, 6 Tangerina, 5 Banana, 4 Flamingo) e `corDoCalendario` é a mesma
+// 8 Grafite, 3 Uva, 10 Basílico, 6 Tangerina, 5 Banana, 4 Flamingo, 1 Lavanda) e `corDoCalendario` é a mesma
 // cor no calendário da equipa, para as duas coisas baterem certo.
 // `escrito` é o que o dono escreve depois de "equipa" para escolher a equipa.
 // Desde 29/09/2026 o dono escolhe sempre a equipa, em todas as regiões, pela
@@ -43,6 +43,9 @@ const EQUIPAS = [
   // Coimbra e Figueira da Foz (dono, 10/10/2026: "cria o calendário da equipa de coimbra"); região própria
   // no CRM desde 11/10/2026.
   { id: 'coimbra', nome: 'Kyro · Equipa Coimbra', escrito: ['coimbra'], regioes: ['Coimbra'], base: [40.2033, -8.4103], cor: '4', nomeDaCor: 'Flamingo', corDoCalendario: '#e67c73' },
+  // Viana do Castelo (dono, 18/11/2026: "Eles são a equipa de Viana"; parceiro LigLav). Só as limpezas de Viana;
+  // o dono confirma cada marcação com a equipa antes de marcar. Região Braga, por isso sem `regioes` próprias.
+  { id: 'viana', nome: 'Kyro · Equipa Viana', escrito: ['viana'], regioes: [], base: null, cor: '1', nomeDaCor: 'Lavanda', corDoCalendario: '#7986cb' },
 ];
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
@@ -539,7 +542,7 @@ function origemDaRegiao(evento) {
 function equipaEscrita(evento) {
   const texto = normalizar([evento.location, evento.summary, evento.description].filter(Boolean).join('\n'));
   // "porto 3" (Denise, 28/10/2026): com [12] só, "equipa porto 3" lia-se "equipa porto" = Porto 1.
-  const escrito = /\bequipa\s+(braga|algarve|coimbra|(?:porto|lisboa)(?:\s*[123])?)\b/.exec(texto);
+  const escrito = /\bequipa\s+(braga|algarve|coimbra|viana|(?:porto|lisboa)(?:\s*[123])?)\b/.exec(texto);
   if (!escrito) return null;
   const nome = escrito[1].replace(/^(porto|lisboa)\s*([123])$/, '$1 $2');
   return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;

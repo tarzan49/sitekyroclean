@@ -135,8 +135,10 @@ describe('planOwnerBooking', () => {
     expect(planOwnerBooking({ ...viana, team: 'Porto 1' }, [], NOW.getTime())).toMatchObject({ team: 'Porto 1', event: { colorId: '9' } });
     // Only the town's postal code: still the Braga zone.
     expect(planOwnerBooking({ ...viana, city: undefined }, [], NOW.getTime())).not.toHaveProperty('team');
-    // A home cleaning there is still Braga's.
-    expect(planOwnerBooking({ ...viana, service: 'Limpeza de sofá 3 lugares', pickupFee: undefined, total: 89 }, [], NOW.getTime())).toMatchObject({ team: 'Braga' });
+    // A home cleaning in Viana do Castelo is the Viana team's since 18 Nov 2026 (owner); Braga keeps the rest of the zone.
+    expect(planOwnerBooking({ ...viana, service: 'Limpeza de sofá 3 lugares', pickupFee: undefined, total: 89 }, [], NOW.getTime())).toMatchObject({ team: 'Viana', event: { colorId: '1' } });
+    expect(planOwnerBooking({ ...viana, team: 'Viana' }, [], NOW.getTime())).not.toHaveProperty('team');
+    expect(planOwnerBooking({ ...viana, city: 'Barcelos', address: 'Rua Inventada 1, 4750-000 Barcelos', service: 'Limpeza de sofá 3 lugares', pickupFee: undefined, total: 89 }, [], NOW.getTime())).toMatchObject({ team: 'Braga' });
   });
   it('checks its input', () => {
     expect(planOwnerBooking({ ...base, time: 'amanhã' }, [], NOW.getTime())).toHaveProperty('error');

@@ -259,7 +259,7 @@ const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed
  * already has ("se for a mesma hora tem que me consultar"), and anything without
  * an engine price.
  */
-export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '8', 'Porto 3': '3', Braga: '10', 'Lisboa 1': '6', Algarve: '5', Coimbra: '4' };
+export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '8', 'Porto 3': '3', Braga: '10', 'Lisboa 1': '6', Algarve: '5', Coimbra: '4', Viana: '1' }; // Viana: Lavanda (dono, 18 Nov 2026)
 /** The owner's ads mark in the title, read by the CRM (calendarServices adSourceFromTitle). */
 const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', facebook: ' (anúncio facebook)', instagram: ' (anúncio instagram)' };
 
