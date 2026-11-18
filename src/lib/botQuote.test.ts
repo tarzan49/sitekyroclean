@@ -47,6 +47,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     // 10€ towns: never the waiver (owner, 30 Oct 2026, Rio Meão: "159€ e a outra 99€").
     expect(q('3-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 159, essencial: 99 });
     expect(q('3-lugares', 'premium', 'Santa Maria da Feira').waterproofingTiers).toEqual({ travel: 10, premium: 159, essencial: 99 });
+    // Several pieces waterproofed in a 10€ town: never travel (owner, 18 Nov 2026, Altieres).
+    const multi = ok({ items: [{ kind: 'sofa', size: '2-lugares', treatment: 'essencial' }, { kind: 'chairs', qty: 2, treatment: 'essencial' }], city: 'Lisboa' });
+    expect(multi.waterproofingTiers.travel).toBe(0);
     // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
     expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 129, essencial: 79 });
     expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 49 });
