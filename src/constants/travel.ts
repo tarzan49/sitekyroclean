@@ -57,16 +57,16 @@ export const locationPrices: Record<string, number> = {
   'Santa Cruz': 20,
   'Machico': 20,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
-  // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
+  // Dono, 2026-11-18: Minho só 10€ ou 15€ (perto das equipas de Braga ou de Viana = 10€, resto 15€).
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
   'Braga': 10,
-  'Guimarães': 20,
-  'Vila Nova de Famalicão': 20,
-  'Barcelos': 20,
-  'Viana do Castelo': 20,
+  'Guimarães': 15,
+  'Vila Nova de Famalicão': 15,
+  'Barcelos': 15,
+  'Viana do Castelo': 10,
   'Póvoa de Lanhoso': 15,
-  'Fafe': 20,
-  'Esposende': 20,
+  'Fafe': 15,
+  'Esposende': 15,
   'Vizela': 15,
   'Amares': 10,
   'Vila Verde': 15,

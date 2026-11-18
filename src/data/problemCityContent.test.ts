@@ -32,7 +32,7 @@ describe('conteúdo por cidade das páginas de problema', () => {
 
   it('usa a taxa de deslocação real de cada cidade', () => {
     expect(getProblemCityCoverage('Porto')).toContain('+10€');
-    expect(getProblemCityCoverage('Guimarães')).toContain('+20€');
+    expect(getProblemCityCoverage('Guimarães')).toContain('+15€');
     expect(getProblemCityCoverage('Porto')).not.toEqual(getProblemCityCoverage('Guimarães'));
   });
 
