@@ -936,3 +936,6 @@ Pedro (colchão de solteiro, São João da Talha, 69€ ou 84€ com anti-ácaro
 
 ### Processo da limpeza só quando perguntado (dono, 18 Nov)
 "A explicação do processo de limpeza ocupa muito texto e confunde o cliente, é desnecessário." Tirada dos exemplos de orçamento (sofá, colchão, cadeiras) e da confirmação pós-chamada no ficheiro do bot; mantém-se só na resposta a "qual a técnica?".
+
+## Impermeabilizações no norte sem horas (dono, 18 Nov 2026)
+"acalma-te a marcar impermeabilizações no norte, só marcas horários que eu aprovar com as equipas... as equipas em termos de imper estão um bocado fragilizadas". Zonas Porto e Braga (Aveiro incluído): toda a impermeabilização fecha sem horas (askWeek); o dono confirma a hora com a equipa. Limpezas mantêm as horas. Código: `NORTH_WATERPROOFING_ASK_WEEK_REGIONS` em `src/lib/botAvailability.ts`.

@@ -718,6 +718,9 @@ export const FRIDAY_ONLY_CITIES: ReadonlySet<string> = new Set(['Leiria', 'Batal
  * NORTH_MIN_TOTAL; Leiria zone: next Friday, Coimbra team).
  */
 export const WATERPROOFING_ASK_WEEK_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', ...FRIDAY_ONLY_CITIES]);
+/** Waterproofing in the north: no hours from the engine, the owner approves them with the team (owner, 18 Nov 2026). */
+export const NORTH_WATERPROOFING_ASK_WEEK_REGIONS: ReadonlySet<string> = new Set(['Porto', 'Braga']);
+export const NORTH_WATERPROOFING_ASK_WEEK_FROM = '2026-11-18';
 /** Leiria-zone waterproofing goes to Lisboa 1 (owner, 18 Nov 2026: "Impermeabilizações de Leiria, tentar juntar a sempre Lisboa 1"). */
 export const LEIRIA_WATERPROOFING_TEAMS: readonly string[] = ['Lisboa 1'];
 /** teamsFor, with the town's own team where the owner set one (LEIRIA_WATERPROOFING_TEAMS). */
@@ -926,6 +929,15 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return { ...base, region: area, teams: [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))],
       handToOwner: VIANA_ASK_TEAM_RULE,
       askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Viana' };
+  }
+  // Owner, 18 Nov 2026 ("acalma-te a marcar impermeabilizações no norte, só marcas horários que eu aprovar com
+  // as equipas"): every waterproofing in the Porto and Braga zones closes without an hour; he checks with the team.
+  if (req.ownerTime !== true && lisbon(now.getTime()).date >= NORTH_WATERPROOFING_ASK_WEEK_FROM && NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && hasWaterproofing(req.items)) {
+    const total = orderTotal(req, city);
+    const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
+    return { ...base, region: area, teams,
+      handToOwner: `Impermeabilização em ${city}: o dono confirma a hora com a equipa antes de a dar ao cliente`,
+      askWeek: true, askWeekRule: ASK_WEEK_RULE };
   }
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
