@@ -2787,7 +2787,7 @@ var TEAMS_BY_REGION = {
   Algarve: ["Algarve"],
   Coimbra: ["Coimbra"]
 };
-var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+var ALL_TEAMS = [...Object.values(TEAMS_BY_REGION).flat(), "Funchal 1"];
 var TOWN_TEAMS = { Viana: "Viana do Castelo" };
 var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 2"]);
 var WATERPROOFING_TEAMS = {
@@ -3649,7 +3649,7 @@ function planOwnerBooking(req, events, nowMs = Date.now()) {
   return { ok: true, event: { title: parts.join(" - "), description, start: startIso, end: endIso } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
-var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "3", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4", Viana: "1" };
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "8", "Porto 3": "3", Braga: "10", "Lisboa 1": "6", Algarve: "5", Coimbra: "4", Viana: "1", "Funchal 1": "2" };
 var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
 var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
 function planBotBooking(req, events, now, ownEventId) {

@@ -54,7 +54,8 @@ export const TEAMS_BY_REGION: Record<TeamZone, readonly string[]> = {
   Algarve: ['Algarve'],
   Coimbra: ['Coimbra'],
 };
-const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+// Funchal 1 (WashElite, dono 18 Nov 2026): the Madeira is askWeek, the owner gives the hour; known by name only.
+const ALL_TEAMS = [...Object.values(TEAMS_BY_REGION).flat(), 'Funchal 1'];
 /**
  * Teams of one town (owner, 18 Nov 2026: "Eles são a equipa de Viana"): they take only the cleanings of that town,
  * and that town's cleanings go only to them (teamsForCity). teamsFor (the zone alone) never offers them.
