@@ -922,3 +922,8 @@ Só 10€ ou 15€ conforme a distância às equipas de Braga e de Viana: Viana 
 
 ### Anti-odor só com limpeza (dono, 18 Nov 2026)
 Caso Faisal (Estoril, chenille Sklum "só a seco"): o rascunho propunha "só o tratamento do cheiro" se o teste corresse mal. O dono: "Não existem tratamentos de cheiro sem limpeza." Regra: o anti-odor aplica-se sempre junto da limpeza; nunca sozinho, nunca como alternativa. Tecido marcado "só a seco": extração muito controlada, teste numa zona escondida primeiro, o cliente decide.
+
+
+### Deslocação na impermeabilização: pedido inteiro numa chamada (dono, 18 Nov 2026)
+
+Caso Altieres: sofá 3L com chaise + 4 cadeiras; o bot calculou as peças à parte e somou "Deslocação: 10€" (279€), quando o motor com o pedido inteiro dá 269€ sem deslocação. Ficheiro do bot: o pedido inteiro numa só chamada, nunca linha de deslocação à mão; mais cadeiras ditas pelo cliente = preço pelo total. Correção enviada à mão: 8 cadeiras a 25/18€, deslocação oferecida, 1 cadeira oferecida como condição especial (324€ / 215€). Em aberto: o dono disse "acima de 120 nem é suposto cobrar"; o motor mantém 10€ na impermeabilização sozinha até 200€ (Rio Meão, 30 Out) até ele confirmar.
