@@ -226,8 +226,8 @@ describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
     expect(sub({ size: '5-lugares', seats: 6, look: 'compacto' })).toBe(129);
     expect(sub({ size: '5-lugares', seats: 7, look: 'medio' })).toBe(139);
     expect(sub({ size: 'u', seats: 6, look: 'grande' })).toBe(149);
-    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+premium' })).toBe(319);
-    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+essencial' })).toBe(259);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+premium' })).toBe(329);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+essencial' })).toBe(269);
   });
   it('needs the look, keeps 5 seats at 119 and sends 8+ to the owner', () => {
     expect(botQuote({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6 }], city: 'Porto' }).ok).toBe(false);

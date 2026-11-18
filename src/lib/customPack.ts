@@ -26,7 +26,7 @@ export function packItemValid(item: CustomPackItem) {
 }
 
 /** Waterproofing on top of the cleaning of a 6 or 7 seat sofa, bot only (owner, 9 Nov 2026). */
-export const SEAT6_WATERPROOFING_EXTRA = { premium: 170, essencial: 110 } as const;
+export const SEAT6_WATERPROOFING_EXTRA = { premium: 180, essencial: 120 } as const;
 
 const PERK_TREATMENT: Record<PackExtra, PerkTreatment> = { none: 'none', premium: 'waterproofing', essencial: 'waterproofing', 'anti-acaros': 'anti-acaros' };
 
@@ -54,7 +54,7 @@ export function customPackLine(item: CustomPackItem) {
     }
   } else if (item.kind === 'sofa' && item.unitPrice && item.primary !== 'waterproofing' && item.extra !== 'anti-acaros') {
     // Bot only: a sofa of 6 or 7 seats, cleaning judged on the photo (botQuote SEAT6_LOOK_PRICES), plus
-    // the waterproofing the owner gave for one (9 Nov 2026, Helena: +170€ Premium / +110€ Essencial).
+    // the waterproofing the owner gave for one (18 Nov 2026: +180€ Premium / +120€ Essencial).
     const wp = item.extra === 'premium' || item.extra === 'essencial' ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
     amount = (item.unitPrice + wp) * item.qty;
   } else if (item.kind === 'sofa' && option) {

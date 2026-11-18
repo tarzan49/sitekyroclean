@@ -343,7 +343,7 @@ function packItemValid(item) {
   if (item.kind === "rug" || item.kind === "carpet") return [item.width, item.length].every((s) => Number.isFinite(dimension(s)) && dimension(s) > 0);
   return item.kind === "chairs" || (item.kind === "sofa" ? sofaPrices : mattressPrices).some((p) => p.id === item.size);
 }
-var SEAT6_WATERPROOFING_EXTRA = { premium: 170, essencial: 110 };
+var SEAT6_WATERPROOFING_EXTRA = { premium: 180, essencial: 120 };
 var PERK_TREATMENT = { none: "none", premium: "waterproofing", essencial: "waterproofing", "anti-acaros": "anti-acaros" };
 function customPackLine(item) {
   const options = item.kind === "sofa" ? sofaPrices : mattressPrices;

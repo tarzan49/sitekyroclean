@@ -110,7 +110,7 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   }
   // 6 or more seats (owner, 9 Nov 2026, Helena: a modular 3+3 with a centre piece went out at 119€ + travel;
   // "um sofá de 6 lugares tem que ser entre 129 e 149, tens que saber perceber"): the cleaning is judged on
-  // the photo, `look` compacto 129€ / medio 139€ / grande 149€ (travel apart); with waterproofing +170€ / +110€
+  // the photo, `look` compacto 129€ / medio 139€ / grande 149€ (travel apart); with waterproofing +180€ / +120€
   // (customPack SEAT6_WATERPROOFING_EXTRA). 8+ seats go to the owner.
   const seats = typeof r.seats === 'number' && Number.isInteger(r.seats) ? r.seats : 0;
   if (kind === 'sofa' && size === '5-lugares' && ['clean', 'clean+premium', 'clean+essencial'].includes(treatment) && seats >= 6) {
