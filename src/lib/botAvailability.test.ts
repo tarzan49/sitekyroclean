@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASK_WEEK_RULE, ASK_WEEK_ZONES, ZONE_TEAM_OVERRIDE, DAY_RULES, botAvailability, isMadeira, chooseTeam, teamBusyAt, teamWorks, teamsFor, teamTakesJob, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
+import { ASK_WEEK_RULE, ASK_WEEK_ZONES, LEIRIA_WATERPROOFING_TEAMS, WATERPROOFING_ASK_WEEK_CITIES, ZONE_TEAM_OVERRIDE, DAY_RULES, botAvailability, isMadeira, chooseTeam, teamBusyAt, teamWorks, teamsFor, teamTakesJob, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -319,10 +319,15 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(full.suggestion?.slots).toHaveLength(2);
     expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);
   });
-  it('Algarve: no hours from the bot, the owner picks the time (22 Oct 2026)', () => {
+  it('Algarve: never hours from the bot, it closes and asks the week and the day (owner, 18 Nov 2026)', () => {
     const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
-    expect(r.free).toEqual([]);
-    expect(r.handToOwner).toMatch(/Algarve/);
+    expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams]).toEqual([[], null, true, ASK_WEEK_RULE, ['Algarve']]);
+    expect(r.handToOwner).toBe('Algarve: o dono confirma o dia no calendário');
+    // 18 Nov was the last "bot day" in the Algarve: no hours that day either.
+    const today = ok(botAvailability({ city: 'Tavira', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], new Date('2026-11-18T08:00:00Z')));
+    expect([today.askWeek, today.free, today.suggestion]).toEqual([true, [], null]);
+    // A time the owner gave is still booked on the Algarve team.
+    expect(ok(botAvailability({ city: 'Faro', date: '2026-10-08', time: '15h', ownerTime: true }, [], NOW)).requested).toMatchObject({ free: true, teamsFree: ['Algarve'] });
   });
   it('rug pickup in the Braga zone: no hours, the owner picks the team (27 Oct 2026, Viana do Castelo); home washing and other zones as before', () => {
     const rugs = [{ kind: 'rug', qty: 2, width: 3, length: 2.5 }];
@@ -409,7 +414,7 @@ describe("the owner's rules for the next days (DAY_RULES)", () => {
 
 describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
   const now = new Date('2026-10-29T09:00:00Z');
-  it('Norte a partir de 79€ dá sempre horas (dono, 15 Nov); Leiria abaixo de 110€ não', () => {
+  it('Norte a partir de 79€ dá sempre horas (dono, 15 Nov); Leiria só na próxima sexta (dono, 16 Nov)', () => {
     const low = botAvailability({ city: 'Viana do Castelo', total: 78 }, [], now) as { handToOwner: string | null };
     expect(low.handToOwner).toMatch(/verificar a disponibilidade/);
     const viana = botAvailability({ city: 'Viana do Castelo', total: 79 }, [], now) as { handToOwner: string | null };
@@ -417,9 +422,10 @@ describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
     const aveiro = botAvailability({ city: 'Aveiro', total: 99 }, [], now) as { handToOwner: string | null; region: string };
     expect(aveiro.handToOwner).toBeNull();
     expect(aveiro.region).toBe('Porto');
-    // Leiria is in the Coimbra zone: since 12 Nov 2026 no hours at any total (ASK_WEEK_ZONES).
-    const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { handToOwner: string | null; askWeek?: true };
-    expect([quoted.handToOwner, quoted.askWeek]).toEqual([COIMBRA_HAND, true]);
+    // Leiria (FRIDAY_ONLY_CITIES, owner 16 Nov 2026): any total, hours only on the next Friday, Coimbra team.
+    const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { handToOwner: string | null; askWeek?: true; teams: string[]; free: Array<{ date: string }> };
+    expect([quoted.handToOwner, quoted.askWeek, quoted.teams]).toEqual([null, undefined, ['Coimbra']]);
+    expect(quoted.free.map(d => d.date)).toEqual(['2026-10-30']);
     const viana100 = botAvailability({ city: 'Viana do Castelo', total: 100 }, [], now) as { handToOwner: string | null };
     expect(viana100.handToOwner).toBeNull();
     const viana95 = botAvailability({ city: 'Viana do Castelo', total: 95 }, [], now) as { handToOwner: string | null };
@@ -484,9 +490,9 @@ describe('waterproofing in Porto and Braga from 11 Nov 2026 (owner, 6 Nov 2026)'
 });
 
 describe('Coimbra e Madeira: fecha o serviço sem marcar hora (dono, 12 Nov 2026)', () => {
-  it('free vazio, askWeek e handToOwner com a razão; o Algarve e o Porto ficam como estavam', () => {
-    expect([...ASK_WEEK_ZONES]).toEqual(['Coimbra', 'Madeira']);
-    for (const city of ['Coimbra', 'Figueira da Foz', 'Leiria', 'Batalha']) {
+  it('free vazio, askWeek e handToOwner com a razão; o Algarve também desde 18 Nov; o Porto fica como estava', () => {
+    expect([...ASK_WEEK_ZONES]).toEqual(['Coimbra', 'Madeira', 'Algarve']);
+    for (const city of ['Coimbra', 'Figueira da Foz']) {
       const r = ok(botAvailability({ city, items: [{ kind: 'sofa', size: '3-lugares' }] }, [], NOW));
       expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.handToOwner], city).toEqual([[], null, true, ASK_WEEK_RULE, COIMBRA_HAND]);
     }
@@ -498,19 +504,20 @@ describe('Coimbra e Madeira: fecha o serviço sem marcar hora (dono, 12 Nov 2026
     const sjm = ok(botAvailability({ city: 'São João da Madeira' }, [], NOW));
     expect([sjm.region, sjm.askWeek]).toEqual(['Porto', undefined]);
     const algarve = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
-    expect([algarve.handToOwner, algarve.askWeek]).toEqual(['Algarve: o responsável escolhe o horário', undefined]);
+    expect([algarve.handToOwner, algarve.askWeek]).toEqual(['Algarve: o dono confirma o dia no calendário', true]);
     const porto = ok(botAvailability({ city: 'Matosinhos' }, [], NOW));
     expect([porto.askWeek, porto.suggestion !== null]).toEqual([undefined, true]);
   });
 });
 
 describe('zona de Coimbra na equipa Coimbra (Lisboa 1 retirada 16 Nov)', () => {
-  it('Leiria e Coimbra vão para a Coimbra, o dono confirma o dia', () => {
-    for (const city of ['Leiria', 'Coimbra', 'Batalha']) {
-      const r = botAvailability({ city } as never, [], new Date('2026-11-13T10:00:00Z')) as { teams: string[]; askWeek?: boolean; handToOwner?: string };
-      expect(r.teams).toEqual(['Coimbra']);
-      expect(r.askWeek).toBe(true);
-      expect(r.handToOwner).toContain('Coimbra');
+  it('Coimbra: o dono confirma o dia; limpezas de Leiria e Batalha: só na próxima sexta, equipa Coimbra', () => {
+    const coimbra = ok(botAvailability({ city: 'Coimbra' }, [], new Date('2026-11-13T10:00:00Z')));
+    expect([coimbra.teams, coimbra.askWeek, coimbra.handToOwner]).toEqual([['Coimbra'], true, COIMBRA_HAND]);
+    for (const city of ['Leiria', 'Batalha']) {
+      const r = ok(botAvailability({ city }, [], new Date('2026-11-13T10:00:00Z')));
+      expect([r.teams, r.askWeek, r.handToOwner], city).toEqual([['Coimbra'], undefined, null]);
+      expect(r.free.map(d => d.date), city).toEqual(['2026-11-20']);
     }
   });
   it('a hora dada pelo dono marca na Coimbra', () => {
@@ -525,5 +532,53 @@ describe('Porto 3: viagem + margem entre serviços (dono, 16 Nov 2026, Joana)', 
   });
   it('Ovar às 9h cabe', () => {
     expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '09:00'), at('2026-11-25', '09:45'), true, 'Ovar')).toBe(false);
+  });
+});
+
+describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarve sem horas (dono, 18 Nov 2026)', () => {
+  const now = new Date('2026-11-18T10:00:00Z');
+  const premium = [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }];
+  const essencial = [{ kind: 'sofa', size: '3-lugares', treatment: 'essencial' }];
+  const cleaning = [{ kind: 'sofa', size: '3-lugares' }];
+  it('as cidades: Viana do Castelo e a zona de Leiria', () => {
+    expect([...WATERPROOFING_ASK_WEEK_CITIES]).toEqual(['Viana do Castelo', 'Leiria', 'Batalha', 'Marinha Grande', 'Porto de Mós', 'Ourém', 'Fátima', 'Pombal', 'Alcobaça', 'Nazaré']);
+  });
+  it('Leiria: impermeabilização sem horas, sempre na Lisboa 1; a limpeza continua na sexta com a Coimbra', () => {
+    for (const city of ['Leiria', 'Marinha Grande', 'Nazaré']) {
+      for (const items of [premium, essencial]) {
+        const r = ok(botAvailability({ city, items }, [], now));
+        expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams, r.region], city).toEqual([[], null, true, ASK_WEEK_RULE, LEIRIA_WATERPROOFING_TEAMS, 'Coimbra']);
+        expect(r.handToOwner, city).toBe(`Impermeabilização em ${city}: o dono escolhe o dia e a equipa no calendário; equipa Lisboa 1`);
+      }
+      const clean = ok(botAvailability({ city, items: cleaning }, [], now));
+      expect([clean.askWeek, clean.teams, clean.free.map(d => d.date)], city).toEqual([undefined, ['Coimbra'], ['2026-11-20']]);
+    }
+    // A time the owner gave books on Lisboa 1, and so does his own booking (chooseTeam).
+    const owner = ok(botAvailability({ city: 'Leiria', items: premium, date: '2026-11-20', time: '15h', ownerTime: true }, [], now));
+    expect([owner.teams, owner.requested?.free]).toEqual([['Lisboa 1'], true]);
+    expect(chooseTeam([], 'Leiria', '2026-11-20T15:00:00Z', '2026-11-20T16:30:00Z', 'premium', false)).toBe('Lisboa 1');
+    expect(chooseTeam([], 'Rua X 1, Marinha Grande', '2026-11-20T15:00:00Z', '2026-11-20T16:30:00Z', true)).toBe('Lisboa 1');
+    expect(chooseTeam([], 'Leiria', '2026-11-20T15:00:00Z', '2026-11-20T16:00:00Z')).toBe('Coimbra');
+  });
+  it('Viana do Castelo: impermeabilização sem horas (o dono escolhe dia e equipa); limpeza a partir de 79€ com horas da Braga', () => {
+    const r = ok(botAvailability({ city: 'Viana do Castelo', items: premium }, [], now));
+    expect([r.free, r.suggestion, r.askWeek, r.region]).toEqual([[], null, true, 'Braga']);
+    expect(r.teams).not.toContain('Braga');
+    expect(r.handToOwner).toBe('Impermeabilização em Viana do Castelo: o dono escolhe o dia e a equipa no calendário');
+    const clean = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 109 }, [], now));
+    expect([clean.askWeek, clean.handToOwner, clean.teams]).toEqual([undefined, null, ['Braga']]);
+    expect(clean.suggestion?.slots.length).toBe(2);
+  });
+  it('Funchal: limpeza e impermeabilização sem horas (sem calendário de equipa na Madeira)', () => {
+    for (const items of [cleaning, premium]) {
+      const r = ok(botAvailability({ city: 'Funchal', items }, [], now));
+      expect([r.free, r.askWeek, r.handToOwner]).toEqual([[], true, 'Madeira (Funchal): o dono confirma o dia no calendário']);
+    }
+  });
+  it('o resto do país não muda: Porto e Lisboa dão horas com impermeabilização', () => {
+    for (const city of ['Lisboa', 'Matosinhos']) {
+      const r = ok(botAvailability({ city, items: premium, days: 14 }, [], new Date('2026-11-23T08:00:00Z')));
+      expect([r.askWeek, r.suggestion !== null], city).toEqual([undefined, true]);
+    }
   });
 });

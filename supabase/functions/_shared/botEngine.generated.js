@@ -2937,7 +2937,7 @@ var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
-var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira"]);
+var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
 var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 function isMadeira(cityOrAddress) {
@@ -2949,7 +2949,6 @@ function isMadeira(cityOrAddress) {
   }
   return MADEIRA_PLACES.test(fold3(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ""));
 }
-var ALGARVE_BOT_DAYS = ["2026-11-18"];
 var DAY_RULES = [
   // Owner, 14 Nov 2026 at 23:55 (André, cadeiras): "n marques amanhã se n for lisboa, se for porto só segunda em porto 1".
   ...["Porto", "Braga", "Coimbra", "Algarve"].map((zone) => ({
@@ -3204,7 +3203,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing, total, lisbon(from).date, rugPickup);
+  const order = teamsForCity(name, area, waterproofing, total, lisbon(from).date, rugPickup);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -3215,6 +3214,12 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
 }
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", "Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
+var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", ...FRIDAY_ONLY_CITIES]);
+var LEIRIA_WATERPROOFING_TEAMS = ["Lisboa 1"];
+function teamsForCity(city, zone, waterproofing, total, day, rugPickup = false) {
+  if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
+  return teamsFor(zone, waterproofing, total, day, rugPickup);
+}
 function nextFriday(now) {
   const today = lisbon(now.getTime()).date;
   const d = /* @__PURE__ */ new Date(`${today}T12:00:00Z`);
@@ -3362,6 +3367,18 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const fridayDone = req._friday === true;
+  if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
+    const total = orderTotal(req, city);
+    const teams2 = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
+    return {
+      ...base,
+      region: area,
+      teams: teams2,
+      handToOwner: `Impermeabilização em ${city}: o dono escolhe o dia e a equipa no calendário${FRIDAY_ONLY_CITIES.has(city) ? `; equipa ${LEIRIA_WATERPROOFING_TEAMS.join("/")}` : ""}`,
+      askWeek: true,
+      askWeekRule: ASK_WEEK_RULE
+    };
+  }
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === "string" && DATE.test(req.date) && (/* @__PURE__ */ new Date(`${req.date}T12:00:00Z`)).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
@@ -3377,12 +3394,6 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       askWeekRule: ASK_WEEK_RULE
     };
   }
-  const algarveBotDay = area === "Algarve" && req.ownerTime !== true && (req.date === void 0 ? ALGARVE_BOT_DAYS.some((d) => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
-  if (algarveBotDay && req.date === void 0) {
-    const day = ALGARVE_BOT_DAYS.find((d) => d >= lisbon(now.getTime()).date);
-    return botAvailability({ ...req, date: day }, events, now, rules);
-  }
-  if (area === "Algarve" && req.ownerTime !== true && !algarveBotDay) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: "Algarve: o responsável escolhe o horário" };
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
   if (SMALL_ORDER_CITIES.has(city) && req.ownerTime !== true) {
@@ -3393,7 +3404,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? "" : "";
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsFor(area, waterproofingKind(req?.items, orderTotal(req, city)), area === "Porto" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === "Porto" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area].join("/")} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização nesta zona: o responsável escolhe a equipa e a hora" };
   const cleaning = !waterproofingOnly(req?.items);
@@ -3422,8 +3433,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   for (const date of scan) {
     const label = dayLabel(date, today);
     const firstMinutes = Math.min(...teams.map((t) => teamEarliestMinutes(t, date)));
-    const step = area === "Algarve" && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
-    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt2(date, m) || tooEarly(date)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4, cleaning, place);

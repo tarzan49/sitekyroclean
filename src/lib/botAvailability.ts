@@ -351,11 +351,13 @@ export interface DayRule {
  * Zones where the bot closes the service but books no hour (dono, 12 Nov 2026: "não podes fazer a marcação
  * neste momento para sítios como Funchal e Coimbra. Podes fechar o serviço e perguntar à pessoa que semana,
  * que dia lhe daria mais jeito, e dizes que vamos conferir no calendário"). Coimbra = the Coimbra team's zone
- * (Coimbra, Figueira da Foz, Leiria, Batalha). Madeira is not a served town in the engine (no travel fee, no
- * team): it is read from the client's text (Funchal, Madeira, 9000-9399). A time the owner gave (`ownerTime`)
- * is still booked.
+ * (Coimbra, Figueira da Foz; the Leiria towns are FRIDAY_ONLY_CITIES). Madeira is not a served town in the engine
+ * (no travel fee, no team calendar yet): it is read from the client's text (Funchal, Madeira, 9000-9399).
+ * Algarve since 18 Nov 2026 (dono: "No Algarve podes fechar, mas [...] nunca dizer horários no Algarve"): the
+ * bot closes with the price and the full address, asks the week and the day, and he gives the hour.
+ * A time the owner gave (`ownerTime`) is still booked.
  */
-export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira']);
+export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira', 'Algarve']);
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
 const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 /** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
@@ -365,9 +367,6 @@ export function isMadeira(cityOrAddress: unknown): boolean {
   if (postal) { const n = Number(postal[1]); if (n >= 9000 && n <= 9399) return true; }
   return MADEIRA_PLACES.test(fold(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ''));
 }
-
-/** Days the bot books the Algarve itself (owner, 30 Oct 2026; 9 Nov: só quarta 18/11, o dia em que a equipa já lá vai). */
-export const ALGARVE_BOT_DAYS: readonly string[] = ['2026-11-18'];
 
 export const DAY_RULES: readonly DayRule[] = [
   // Owner, 14 Nov 2026 at 23:55 (André, cadeiras): "n marques amanhã se n for lisboa, se for porto só segunda em porto 1".
@@ -649,7 +648,7 @@ export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso:
   const from = Date.parse(startIso), to = Date.parse(endIso);
   if (!Number.isFinite(from) || !(to > from)) return null;
   const busy = busyIntervals(events);
-  const order = teamsFor(area, waterproofing, total, lisbon(from).date, rugPickup);
+  const order = teamsForCity(name, area, waterproofing, total, lisbon(from).date, rugPickup);
   const place = placeOf(name);
   const st = slotState(busy, order, area, from, to, cleaning, place);
   if (!st.free) return null;
@@ -674,7 +673,7 @@ export interface AvailabilityRequest {
   date?: unknown;
   /** "15h", "15:00", "15h30": with `date`, is this exact time free? */
   time?: unknown;
-  /** The owner gave this time himself (Algarve and his weekend picks). */
+  /** The owner gave this time himself (askWeek zones, the Algarve included, and his weekend picks). */
   ownerTime?: unknown;
   /** true: the client wants the rugs picked up (in NO_RUG_PICKUP_ZONES the owner decides; in Porto only RUG_PICKUP_TEAMS). */
   rugPickup?: unknown;
@@ -696,6 +695,20 @@ export const SMALL_ORDER_CITIES: ReadonlySet<string> = new Set(['Viana do Castel
  * forma"): any amount, the bot gives hours only on the next Friday (Coimbra team) and closes; no askWeek, no minimum.
  */
 export const FRIDAY_ONLY_CITIES: ReadonlySet<string> = new Set(['Leiria', 'Batalha', 'Marinha Grande', 'Porto de Mós', 'Ourém', 'Fátima', 'Pombal', 'Alcobaça', 'Nazaré']);
+/**
+ * Waterproofing the bot closes without an hour (owner, 18 Nov 2026: "no Funchal, impermeabilizações, também vamos
+ * ter que ter cuidado. E em Viana e Leiria também"): askWeek, he picks the day and the team. The Funchal is
+ * askWeek for every job already (isMadeira). Cleanings in these towns keep their rule (Viana: Braga team from
+ * NORTH_MIN_TOTAL; Leiria zone: next Friday, Coimbra team).
+ */
+export const WATERPROOFING_ASK_WEEK_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', ...FRIDAY_ONLY_CITIES]);
+/** Leiria-zone waterproofing goes to Lisboa 1 (owner, 18 Nov 2026: "Impermeabilizações de Leiria, tentar juntar a sempre Lisboa 1"). */
+export const LEIRIA_WATERPROOFING_TEAMS: readonly string[] = ['Lisboa 1'];
+/** teamsFor, with the town's own team where the owner set one (LEIRIA_WATERPROOFING_TEAMS). */
+export function teamsForCity(city: string | null, zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] {
+  if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
+  return teamsFor(zone, waterproofing, total, day, rugPickup);
+}
 function nextFriday(now: Date): string {
   const today = lisbon(now.getTime()).date;
   const d = new Date(`${today}T12:00:00Z`);
@@ -869,19 +882,28 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const base = { city, durationMin, suggestion: null, requested: null, free: [] as Array<{ date: string; label: string; times: string[] }> };
 
   if (req?.city !== undefined && typeof req.city !== 'string') return { error: 'city tem de ser texto' };
-  // Owner, 12 Nov 2026: Coimbra and Madeira (Funchal) close the service without an hour.
+  // Owner, 12 Nov 2026: Coimbra and Madeira (Funchal) close the service without an hour; the Algarve too since 18 Nov.
   if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has('Madeira')) {
     return { ...base, city: null, region: null, teams: [], handToOwner: 'Madeira (Funchal): o dono confirma o dia no calendário', askWeek: true, askWeekRule: ASK_WEEK_RULE };
   }
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
-  // Owner, 15 Nov 2026: only the Algarve and the Alentejo are his; Aveiro (Porto team) gets hours like the north.
+  // Owner, 15 Nov 2026: only the Alentejo Litoral is his (the Algarve is askWeek since 18 Nov); Aveiro (Porto team) gets hours like the north.
   if (EXTENDED_TRIP_CITIES.has(city) && city !== 'Aveiro') {
     if (req.date !== undefined && (typeof req.date !== 'string' || !DATE.test(req.date))) return { error: 'date tem de ser AAAA-MM-DD' };
     return sharedTripAvailability(req, city, area ?? null, durationMin, events, now);
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: 'Região sem equipa: confirmar com o responsável' };
   const fridayDone = (req as { _friday?: unknown })._friday === true;
+  // Owner, 18 Nov 2026: waterproofing in Viana do Castelo and the Leiria zone closes without an hour; he picks
+  // the day and the team (Leiria's goes to Lisboa 1).
+  if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
+    const total = orderTotal(req, city);
+    const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
+    return { ...base, region: area, teams,
+      handToOwner: `Impermeabilização em ${city}: o dono escolhe o dia e a equipa no calendário${FRIDAY_ONLY_CITIES.has(city) ? `; equipa ${LEIRIA_WATERPROOFING_TEAMS.join('/')}` : ''}`,
+      askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === 'string' && DATE.test(req.date) && new Date(`${req.date}T12:00:00Z`).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
@@ -892,18 +914,6 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
       handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join('/')} (junta com o serviço da Marinha Grande)` : ''}`,
       askWeek: true, askWeekRule: ASK_WEEK_RULE };
   }
-  // Owner, 22 Oct 2026: "sempre que for algarve passa para mim para escolher horário". The bot
-  // offers no hours there; it books only a time he gave.
-  // Owner, 30 Oct 2026: "na terça o Algarve tens de ser tu a marcar as coisas direito e com pensamento
-  // sempre na logística de transporte". On these days the bot offers Algarve hours from the calendar,
-  // only on these days, with the Algarve travel margin; any other day stays with him.
-  const algarveBotDay = area === 'Algarve' && req.ownerTime !== true
-    && (req.date === undefined ? ALGARVE_BOT_DAYS.some(d => d >= lisbon(now.getTime()).date) : ALGARVE_BOT_DAYS.includes(String(req.date)));
-  if (algarveBotDay && req.date === undefined) {
-    const day = ALGARVE_BOT_DAYS.find(d => d >= lisbon(now.getTime()).date)!;
-    return botAvailability({ ...req, date: day }, events, now, rules);
-  }
-  if (area === 'Algarve' && req.ownerTime !== true && !algarveBotDay) return { ...base, region: area, teams: [...TEAMS_BY_REGION.Algarve], handToOwner: 'Algarve: o responsável escolhe o horário' };
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. No hours from its calendar, even with a time he gave.
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
   if (pickupOwner) return { ...base, region: area, teams: [], handToOwner: pickupOwner };
@@ -916,7 +926,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? '' : '';
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsFor(area, waterproofingKind(req?.items, orderTotal(req, city)), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area]!.join('/')} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
@@ -951,9 +961,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   for (const date of scan) {
     const label = dayLabel(date, today);
     const firstMinutes = Math.min(...teams.map(t => teamEarliestMinutes(t, date)));
-    // Algarve bot days: half hours too, the gaps between far-apart jobs are rarely on the hour (owner, 2 Nov 2026).
-    const step = area === 'Algarve' && ALGARVE_BOT_DAYS.includes(date) ? 30 : 60;
-    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += step) {
+    for (let m = firstMinutes; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday || closedAt(date, m) || tooEarly(date)) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000, cleaning, place);

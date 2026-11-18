@@ -246,6 +246,23 @@ Deno.test("availability gives two times and no client data, and never guesses wi
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras", date: "amanhã" }, () => Promise.resolve({ events: [] }))).status, 400);
 });
 
+// Dono, 18 Nov 2026: Algarve fecha sem horas; impermeabilização em Viana e na zona de Leiria também (Leiria na Lisboa 1).
+Deno.test("availability: Algarve and waterproofing in Viana/Leiria close without hours (askWeek); cleanings keep their hours", async () => {
+  const ask = async (body: Record<string, unknown>) => {
+    const res = await calendarCall({ action: "availability", ...body }, () => Promise.resolve({ events: [] }));
+    assertEquals(res.status, 200);
+    return (await res.json()).availability;
+  };
+  const algarve = await ask({ city: "Faro", items: [{ kind: "sofa", size: "3-lugares" }] });
+  assertEquals([algarve.askWeek, algarve.free, algarve.suggestion, algarve.handToOwner], [true, [], null, "Algarve: o dono confirma o dia no calendário"]);
+  const leiria = await ask({ city: "Leiria", items: [{ kind: "sofa", size: "3-lugares", treatment: "clean+premium" }] });
+  assertEquals([leiria.askWeek, leiria.free, leiria.teams], [true, [], ["Lisboa 1"]]);
+  const viana = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares", treatment: "essencial" }] });
+  assertEquals([viana.askWeek, viana.free], [true, []]);
+  const vianaClean = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares" }], total: 109 });
+  assertEquals([vianaClean.askWeek, vianaClean.teams, vianaClean.suggestion.slots.length], [undefined, ["Braga"], 2]);
+});
+
 Deno.test("agenda-check reports tomorrow's problems without client data", async () => {
   const job = {
     id: "y", summary: "Serviço 30€ (59€) Colchão casal - Cliente Inventado - Porto",
