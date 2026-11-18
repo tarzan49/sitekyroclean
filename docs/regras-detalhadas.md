@@ -932,3 +932,7 @@ Caso Altieres: sofá 3L com chaise + 4 cadeiras; o bot calculou as peças à par
 ### Adiamento para quando receber: reservar já e perguntar a opção (dono, 18 Nov 2026)
 
 Pedro (colchão de solteiro, São João da Talha, 69€ ou 84€ com anti-ácaros) disse "assim que eu receber nos dias 28 e 29 eu ligo para marcar" e o bot respondeu só "quando receber é só dizer-nos", sem propor reserva e sem perguntar a opção. Dono: deixar já reservada uma data no início de dezembro, sem compromisso, por causa da procura da Black Friday, e perguntar sempre qual opção faz mais sentido. Regra no ficheiro do bot (S53c) e travão no kyro-bot `deferredOptionIssues` (commit 881b674), que segura a resposta sem a reserva ou sem a pergunta da opção.
+
+
+### Processo da limpeza só quando perguntado (dono, 18 Nov)
+"A explicação do processo de limpeza ocupa muito texto e confunde o cliente, é desnecessário." Tirada dos exemplos de orçamento (sofá, colchão, cadeiras) e da confirmação pós-chamada no ficheiro do bot; mantém-se só na resposta a "qual a técnica?".
