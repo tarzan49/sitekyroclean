@@ -261,6 +261,8 @@ const isWeekday = (date: string) => { const d = new Date(`${date}T12:00:00Z`).ge
  */
 export interface TeamOff { team: string; date: string; fromHour?: number; untilHour?: number }
 export const TEAM_OFF: readonly TeamOff[] = [
+  // Owner, 18 Nov 2026: Joab says Lisboa 1 works Saturday (21/11) until 18h.
+  { team: 'Lisboa 1', date: '2026-11-21', fromHour: 18 },
   // Owner, 28 Oct 2026: "amanha a tarde porto 1 n ta disponivel", "NAO ESTA DISPONIVEL PONTO": nothing from noon on (Juliana, 10h30-12h, stays).
   // Cleanings go to Porto 3, waterproofing is not booked.
   { team: 'Porto 1', date: '2026-10-29', fromHour: 12 },
@@ -378,6 +380,9 @@ export function isMadeira(cityOrAddress: unknown): boolean {
 }
 
 export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 18 Nov 2026: "nao enchas tanto quinta e sexta [...] amanha lisboa 1 ta mt cheio, mete para sexta e sabado mais para a tarde".
+  { zone: 'Lisboa', from: '2026-11-18', until: '2026-11-21', prefer: ['2026-11-20', '2026-11-21'],
+    note: 'Quinta (dia 19) a Lisboa 1 já está muito cheia: oferece primeiro sexta (dia 20) e sábado (dia 21), de preferência à tarde (sábado até às 18h). Quinta só se o cliente pedir.' },
   // Owner, 14 Nov 2026 at 23:55 (André, cadeiras): "n marques amanhã se n for lisboa, se for porto só segunda em porto 1".
   ...(['Porto', 'Braga', 'Coimbra', 'Algarve'] as const).map((zone): DayRule => ({
     zone, from: '2026-11-14', until: '2026-11-15', closed: [{ date: '2026-11-15' }],
