@@ -198,6 +198,9 @@ export const ARMCHAIR_SAME_VISIT_PRICE = 29;
 /** 4 or more armchairs: 25€ each, alone or with other items (owner, 18 Nov 2026: 29€ up to 3, then a special condition). */
 export const ARMCHAIR_BULK_MIN = 4;
 export const ARMCHAIR_BULK_PRICE = 25;
+/** Large armchairs (high back, wide arms, look like a 1-seater sofa): 35€ each, travel apart; 4 or more 30€ each (owner, 18 Nov 2026). */
+export const ARMCHAIR_LARGE_PRICE = 35;
+export const ARMCHAIR_LARGE_BULK_PRICE = 30;
 
 /**
  * Upholstered headboards, "cabeceira" (owner, 4 Nov 2026, +351 936 376 201: the bot stayed silent because the
@@ -224,7 +227,14 @@ function extraQuote(qty: number, tablePrice: number, sameVisitPrice: number, cit
 }
 const puffQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
   extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
-const armchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
+const armchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null, large = false) => {
+  if (!large) return normalArmchairQuote(qty, city, withOthers, othersTotal);
+  const unit = qty >= ARMCHAIR_BULK_MIN ? ARMCHAIR_LARGE_BULK_PRICE : ARMCHAIR_LARGE_PRICE;
+  const q = extraQuote(qty, unit, unit, city, false, null);
+  return { ...q, tablePrice: ARMCHAIR_LARGE_PRICE, specialCondition: unit !== ARMCHAIR_LARGE_PRICE, large: true,
+    ...(withOthers ? { travel: 0, total: othersTotal === null ? null : cents(othersTotal + q.amount) } : {}) };
+};
+const normalArmchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
   qty >= ARMCHAIR_BULK_MIN
     ? { ...extraQuote(qty, ARMCHAIR_BULK_PRICE, ARMCHAIR_BULK_PRICE, city, withOthers, othersTotal), tablePrice: ARMCHAIR_SAME_VISIT_PRICE, specialCondition: true }
     : extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
@@ -522,10 +532,11 @@ function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal
 
 function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, headboards: rawHeadboards, site: rawSite } = input as Record<string, unknown>;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, largeArmchairs: rawLarge, headboards: rawHeadboards, site: rawSite } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== 'number' || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail('puffs tem de ser um inteiro entre 0 e 20');
   const armchairs = rawArmchairs ?? 0;
+  const largeArmchairs = rawLarge === true;
   if (typeof armchairs !== 'number' || !Number.isInteger(armchairs) || armchairs < 0 || armchairs > 20) return fail('armchairs tem de ser um inteiro entre 0 e 20');
   const headboards = rawHeadboards ?? [];
   if (!Array.isArray(headboards) || headboards.length > 20 || headboards.some(h => typeof h !== 'string' || !(h in HEADBOARD_PRICES))) return fail('headboards tem de ser uma lista de tamanhos: solteiro, casal, queen ou king');
@@ -534,7 +545,7 @@ function botQuoteInner(input: unknown) {
   if (Array.isArray(rawItems) && rawItems.length === 0 && (puffs > 0 || armchairs > 0 || headboards.length > 0)) {
     const city = resolveBotCity(rawCity);
     const puff = puffs > 0 ? puffQuote(puffs, city, false, null) : null;
-    const armchair = armchairs > 0 ? armchairQuote(armchairs, city, false, null) : null;
+    const armchair = armchairs > 0 ? armchairQuote(armchairs, city, false, null, largeArmchairs) : null;
     const headboard = headboards.length > 0 ? headboardQuote(headboards as HeadboardSize[], city, false, null) : null;
     const extra = (puff ?? armchair ?? headboard)!;
     const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
@@ -629,7 +640,7 @@ function botQuoteInner(input: unknown) {
     // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Armchairs (cadeirões) on the same visit: 29€ each (4 or more: 25€ each, also alone). Add armchair.amount to the price you quote.
-    armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
+    armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total, largeArmchairs) : null,
     // Headboards (cabeceiras) on the same visit: 29€ solteiro, 39€ casal, 45€ queen/king, no travel. Add headboard.amount to the price you quote.
     headboard: headboards.length > 0 ? headboardQuote(headboards as HeadboardSize[], city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Discount to close now, only when the client said the price is the problem (owner, 13 Oct 2026).
