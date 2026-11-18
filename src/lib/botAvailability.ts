@@ -321,7 +321,7 @@ function zoneFromPostalCode(code: string): TeamZone | null {
 }
 
 /** Minutes per article (owner's averages; the upper end where he gave a range). */
-const MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
+const MINUTES = { sofa: 60, armchair: 20, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
 /** Drive between two jobs of the same team. There is no maps API: a flat margin on each side. */
 export const TRAVEL_MARGIN_MIN = 30;
 /** Owner, 27 Oct 2026: "qualquer equipa trabalha depois das 8h, preferencialmente 9h". The bot offers from 9h; a time the client asks for is taken from 8h. */
@@ -436,7 +436,7 @@ export function eventRegion(e: AvailabilityEvent): TeamZone | null {
   return null;
 }
 
-type BotItem = { kind?: unknown; qty?: unknown; treatment?: unknown; width?: unknown; length?: unknown };
+type BotItem = { kind?: unknown; qty?: unknown; size?: unknown; treatment?: unknown; width?: unknown; length?: unknown };
 
 /** Minutes the visit takes, from the same items the bot sends to `quote`. */
 export function visitMinutes(items: unknown): number {
@@ -447,7 +447,7 @@ export function visitMinutes(items: unknown): number {
     const t = String(raw?.treatment ?? 'clean');
     const waterproof = /essencial|premium/.test(t);
     switch (raw?.kind) {
-      case 'sofa': total += qty * (MINUTES.sofa + (waterproof ? MINUTES.waterproofing : 0)); break;
+      case 'sofa': total += qty * ((/^1(-|$)/.test(String(raw?.size ?? '')) ? MINUTES.armchair : MINUTES.sofa) + (waterproof ? MINUTES.waterproofing : 0)); break;
       case 'mattress': total += qty * (MINUTES.mattress + (waterproof ? MINUTES.waterproofing : 0)); break;
       case 'chairs': total += qty * MINUTES.chair + (waterproof ? MINUTES.waterproofing : 0); break;
       case 'rug':
@@ -456,6 +456,7 @@ export function visitMinutes(items: unknown): number {
         total += qty * (Number.isFinite(m2) && m2 > 0 ? m2 * MINUTES.rugPerM2 : 30);
         break;
       }
+      case 'armchair': total += qty * (MINUTES.armchair + (waterproof ? MINUTES.waterproofing : 0)); break;
       default: total += 60;
     }
   }

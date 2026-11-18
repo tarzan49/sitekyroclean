@@ -2244,7 +2244,7 @@ function waterproofingTiers(items, city) {
   const essencial = calculateCustomPack(withTier(items, "essencial"), city);
   if (premium.travel === null) return null;
   const baseFee = locationPrices[city] ?? 0;
-  const aloneSmall = items.every((i) => i.primary === "waterproofing" || !isWaterproofing(i)) && !items.some((i) => i.primary === "cleaning") && premium.subtotal <= 200;
+  const aloneSmall = items.every((i) => i.primary === "waterproofing" || !isWaterproofing(i)) && !items.some((i) => i.primary === "cleaning") && premium.subtotal <= 120;
   const travel = isBlackFriday() ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
@@ -2930,7 +2930,7 @@ function zoneFromPostalCode(code) {
   if (n >= 3e3 && n < 3100) return "Coimbra";
   return localityFromPostalCode(code);
 }
-var MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
+var MINUTES = { sofa: 60, armchair: 20, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
 var TRAVEL_MARGIN_MIN = 30;
 var EARLIEST_HOUR = 9;
 var WORK_FROM_HOUR = 8;
@@ -3044,7 +3044,7 @@ function visitMinutes(items) {
     const waterproof = /essencial|premium/.test(t);
     switch (raw?.kind) {
       case "sofa":
-        total += qty * (MINUTES.sofa + (waterproof ? MINUTES.waterproofing : 0));
+        total += qty * ((/^1(-|$)/.test(String(raw?.size ?? "")) ? MINUTES.armchair : MINUTES.sofa) + (waterproof ? MINUTES.waterproofing : 0));
         break;
       case "mattress":
         total += qty * (MINUTES.mattress + (waterproof ? MINUTES.waterproofing : 0));
@@ -3058,6 +3058,9 @@ function visitMinutes(items) {
         total += qty * (Number.isFinite(m2) && m2 > 0 ? m2 * MINUTES.rugPerM2 : 30);
         break;
       }
+      case "armchair":
+        total += qty * (MINUTES.armchair + (waterproof ? MINUTES.waterproofing : 0));
+        break;
       default:
         total += 60;
     }
