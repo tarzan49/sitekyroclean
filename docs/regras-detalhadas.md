@@ -911,3 +911,6 @@ Cadeirão grande (encosto alto, braços largos, parece sofá de 1 lugar), decidi
 
 ### Deslocação Minho (dono, 18 Nov)
 Só 10€ ou 15€ conforme a distância às equipas de Braga e de Viana: Viana do Castelo 10€; Guimarães, Famalicão, Barcelos, Fafe e Esposende 15€ (antes 20€). `[RETIRADA 18/11]` escalão de 20€ no Minho.
+
+### Viana: perguntar à equipa (dono, 18 Nov)
+"Em Viana, não podes dar disponibilidades sem perguntar primeiro à equipa." Todo o serviço em Viana do Castelo (limpeza e imper) fecha sem hora; o pedido vai ao grupo "LigLav PARCEIROS VIANA" (todas as pessoas) com a fotografia ou vídeo do artigo, "é em Viana" e a pergunta da disponibilidade; a hora ao cliente é a que a equipa der. `[RETIRADA 18/11]` "as limpezas de Viana dão horas (equipa Braga)".

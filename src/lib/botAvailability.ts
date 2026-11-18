@@ -358,6 +358,7 @@ export interface DayRule {
  * A time the owner gave (`ownerTime`) is still booked.
  */
 export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira', 'Algarve']);
+export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.';
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
 const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 /** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
@@ -752,6 +753,8 @@ export type AvailabilityResult =
       /** ASK_WEEK_ZONES: no hours; close the service and ask the client's week and day (askWeekRule). */
       askWeek?: true;
       askWeekRule?: string;
+      /** Owner, 18 Nov: ask this team its availability (photo/video of the item + town) before any hour. */
+      askTeam?: 'Viana';
     };
 
 /**
@@ -897,6 +900,14 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const fridayDone = (req as { _friday?: unknown })._friday === true;
   // Owner, 18 Nov 2026: waterproofing in Viana do Castelo and the Leiria zone closes without an hour; he picks
   // the day and the team (Leiria's goes to Lisboa 1).
+  // Owner, 18 Nov 2026 ("Em Viana, não podes dar disponibilidades sem perguntar primeiro à equipa"): every
+  // job in Viana do Castelo closes without an hour; the Viana team (LigLav) is asked first, with the photo or
+  // video of the item, that it is in Viana, and its availability. The hour comes from the team.
+  if (req.ownerTime !== true && city === 'Viana do Castelo') {
+    return { ...base, region: area, teams: [],
+      handToOwner: VIANA_ASK_TEAM_RULE,
+      askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Viana' };
+  }
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];

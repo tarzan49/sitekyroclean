@@ -2938,6 +2938,7 @@ var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
 var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
+var VIANA_ASK_TEAM_RULE = "Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
 var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 function isMadeira(cityOrAddress) {
@@ -3367,6 +3368,17 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const fridayDone = req._friday === true;
+  if (req.ownerTime !== true && city === "Viana do Castelo") {
+    return {
+      ...base,
+      region: area,
+      teams: [],
+      handToOwner: VIANA_ASK_TEAM_RULE,
+      askWeek: true,
+      askWeekRule: ASK_WEEK_RULE,
+      askTeam: "Viana"
+    };
+  }
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     const teams2 = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];

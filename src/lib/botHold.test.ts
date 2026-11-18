@@ -173,7 +173,7 @@ describe('planBotBooking', () => {
 
   it('never closes a rug pickup in the Braga zone: the Braga team does not pick up rugs (owner, 27 Oct, Viana do Castelo)', () => {
     const rugs = [{ kind: 'rug', width: 3.66, length: 2.44, material: 'lã' }, { kind: 'rug', width: 2.44, length: 3.3, material: 'lã' }];
-    const viana = { city: 'Viana do Castelo', address: 'Rua Inventada 1, 4900-000 Viana do Castelo', items: rugs, agreedTotal: 209 };
+    const viana = { city: 'Barcelos', address: 'Rua Inventada 1, 4750-000 Barcelos', items: rugs, agreedTotal: 209 };
     const reason = expect.stringMatching(/Braga não faz recolhas/);
     expect(planBotBooking(book({ ...viana, rugPickup: true, service: 'Lavagem de 2 tapetes' }), [], NOW)).toEqual({ ok: false, handToOwner: reason });
     // The bot forgot the flag but the service says it.
