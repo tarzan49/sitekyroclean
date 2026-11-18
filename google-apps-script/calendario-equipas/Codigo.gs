@@ -44,7 +44,7 @@ const EQUIPAS = [
   // no CRM desde 11/10/2026.
   { id: 'coimbra', nome: 'Kyro · Equipa Coimbra', escrito: ['coimbra'], regioes: ['Coimbra'], base: [40.2033, -8.4103], cor: '4', nomeDaCor: 'Flamingo', corDoCalendario: '#e67c73' },
   // Viana do Castelo (dono, 18/11/2026: "Eles são a equipa de Viana"; parceiro LigLav). Só as limpezas de Viana;
-  // o dono confirma cada marcação com a equipa antes de marcar. Região Braga, por isso sem `regioes` próprias.
+  // o bot pergunta as datas livres ao grupo da equipa antes de propor uma hora. Região Braga, sem `regioes` próprias.
   { id: 'viana', nome: 'Kyro · Equipa Viana', escrito: ['viana'], regioes: [], base: null, cor: '1', nomeDaCor: 'Lavanda', corDoCalendario: '#7986cb' },
 ];
 
