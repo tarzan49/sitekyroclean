@@ -884,3 +884,6 @@ O site (FAQ de tapetes em `landingFaqPool.ts` e FAQ do blog em `blogData.ts`) de
 ## Bot em esforço médio (dono, 2026-11-17)
 
 O bot escreve com o Claude Sonnet 5.5 (`--model sonnet`). Desde 19 Out estava em esforço alto (dono: "não pára para pensar"). A 17 Nov, depois da escrita em paralelo, a 1.ª bolha ficou em 52 s de mediana e 9 de 14 respostas passavam dos 49 s, porque a escrita sozinha levava 30 a 53 s. Pergunta ao dono: "Passo o bot de esforço alto para médio?" Resposta: "Sim, esforço médio". Mudou no kyro-bot 6cc543a (`BOT_EFFORT` por defeito `medium`), junto com a escrita a começar 3 s depois da última mensagem do cliente em vez de 8 s (`EARLY_WRITE_S`). O portão dos casos corrigidos corre com o mesmo esforço, por isso valida a qualidade em médio.
+
+## Cadeirões por quantidade (18 Nov 2026)
+Dono, cliente com 5 cadeirões: "o cadeirão a 29 e se for até 3, a partir daí podes ter uma atenção extra" → 4 ou mais = 25€ cada (`ARMCHAIR_BULK_PRICE`), sozinhos ou com outros artigos.

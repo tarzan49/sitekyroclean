@@ -195,6 +195,9 @@ export const PUFF_SAME_VISIT_PRICE = 20;
  */
 export const ARMCHAIR_PRICE = 39;
 export const ARMCHAIR_SAME_VISIT_PRICE = 29;
+/** 4 or more armchairs: 25€ each, alone or with other items (owner, 18 Nov 2026: 29€ up to 3, then a special condition). */
+export const ARMCHAIR_BULK_MIN = 4;
+export const ARMCHAIR_BULK_PRICE = 25;
 
 /**
  * Upholstered headboards, "cabeceira" (owner, 4 Nov 2026, +351 936 376 201: the bot stayed silent because the
@@ -222,7 +225,9 @@ function extraQuote(qty: number, tablePrice: number, sameVisitPrice: number, cit
 const puffQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
   extraQuote(qty, PUFF_PRICE, PUFF_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 const armchairQuote = (qty: number, city: string | null, withOthers: boolean, othersTotal: number | null) =>
-  extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
+  qty >= ARMCHAIR_BULK_MIN
+    ? { ...extraQuote(qty, ARMCHAIR_BULK_PRICE, ARMCHAIR_BULK_PRICE, city, withOthers, othersTotal), tablePrice: ARMCHAIR_SAME_VISIT_PRICE, specialCondition: true }
+    : extraQuote(qty, ARMCHAIR_PRICE, ARMCHAIR_SAME_VISIT_PRICE, city, withOthers, othersTotal);
 const headboardQuote = (sizes: HeadboardSize[], city: string | null, withOthers: boolean, othersTotal: number | null) => {
   const amount = sizes.reduce((sum, size) => sum + HEADBOARD_PRICES[size], 0);
   return { ...extraQuote(1, amount, amount, city, withOthers, othersTotal), qty: sizes.length, sizes, specialCondition: false };
@@ -623,7 +628,7 @@ function botQuoteInner(input: unknown) {
     rugCombo,
     // Puffs on the same visit: 20€ each (special condition). Add puff.amount to the price you quote.
     puff: puffs > 0 ? puffQuote(puffs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
-    // Armchairs (cadeirões) on the same visit: 29€ each. Add armchair.amount to the price you quote.
+    // Armchairs (cadeirões) on the same visit: 29€ each (4 or more: 25€ each, also alone). Add armchair.amount to the price you quote.
     armchair: armchairs > 0 ? armchairQuote(armchairs, city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
     // Headboards (cabeceiras) on the same visit: 29€ solteiro, 39€ casal, 45€ queen/king, no travel. Add headboard.amount to the price you quote.
     headboard: headboards.length > 0 ? headboardQuote(headboards as HeadboardSize[], city, true, rugCombo?.ok ? rugCombo.comboPrice : rugPrice?.ok ? rugPrice.homePrice : result.quote ? null : total) : null,
