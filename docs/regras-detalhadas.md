@@ -914,3 +914,7 @@ Só 10€ ou 15€ conforme a distância às equipas de Braga e de Viana: Viana 
 
 ### Viana: perguntar à equipa (dono, 18 Nov)
 "Em Viana, não podes dar disponibilidades sem perguntar primeiro à equipa." Todo o serviço em Viana do Castelo (limpeza e imper) fecha sem hora; o pedido vai ao grupo "LigLav PARCEIROS VIANA" (todas as pessoas) com a fotografia ou vídeo do artigo, "é em Viana" e a pergunta da disponibilidade; a hora ao cliente é a que a equipa der. `[RETIRADA 18/11]` "as limpezas de Viana dão horas (equipa Braga)".
+
+### Equipa Viana: calendário e cor (dono, 18 Nov 2026)
+"Eles são a equipa de Viana" (parceiro LigLav). Equipa **Viana** na região Braga, só com as limpezas de Viana do Castelo (`TOWN_TEAMS` em `botAvailability.ts`: `teamsFor` da zona nunca a oferece, `teamsForCity`/`chooseTeam` dão-lhe as limpezas da cidade, `teamTakesJob`/`replacementTeam` não a trocam pela Braga); a Braga deixa de fazer Viana. A impermeabilização em Viana fica nas equipas do Porto. Sem horas do bot em Viana (`askWeek`, `teams: ['Viana']`); uma hora dada pelo dono marca na Viana e, sem ela livre, entra sem cor. Cor **Lavanda (1)** (`TEAM_COLOR`, `EQUIPAS` do Apps Script, "equipa viana" escrito, `CORES_DAS_EQUIPAS` do ReservasBot, web app versão 13). Calendário "Kyro · Equipa Viana" criado pelo `configurar` a 18/11, ainda **não partilhado** (falta o email da equipa). Sem contacto da equipa no kyro-bot, por isso sem avisos; pagamento por decidir. `SETTLEMENT_TEAMS` e `UPSELL_TEAMS` com a Viana.
+
