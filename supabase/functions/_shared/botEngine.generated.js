@@ -2246,11 +2246,12 @@ function waterproofingTiers(items, city) {
   const baseFee = locationPrices[city] ?? 0;
   const aloneSmall = items.every((i) => i.primary === "waterproofing" || !isWaterproofing(i)) && !items.some((i) => i.primary === "cleaning") && premium.subtotal <= 200;
   const severalPieces = items.length > 1 && items.some(isWaterproofing);
+  const chairBulk = (tier) => severalPieces ? items.filter((i) => i.kind === "chairs" && isWaterproofing(i) && !i.seatOnly && i.qty <= CHAIR_WATERPROOF_SMALL_MAX).reduce((s, i) => s + i.qty * (tier === "premium" ? CHAIR_WATERPROOF_SMALL_PREMIUM - CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL - CHAIR_WATERPROOF_ESSENTIAL), 0) : 0;
   const travel = isBlackFriday() || severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
-    premium: premium.quote ? null : cents(premium.subtotal + travel),
-    essencial: essencial.quote ? null : cents(essencial.subtotal + travel)
+    premium: premium.quote ? null : cents(premium.subtotal - chairBulk("premium") + travel),
+    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk("essencial") + travel)
   };
 }
 function rugPickupFor(items, city) {
