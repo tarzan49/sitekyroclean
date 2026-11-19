@@ -33,3 +33,27 @@ export function isBlackFriday(now?: Date): boolean {
   const t = campaignNow(now);
   return t !== null && t >= BLACK_FRIDAY_2026.from && t < BLACK_FRIDAY_2026.until;
 }
+
+// Black Friday 2026, tabela do dono (19 Nov 2026), preço final ao cliente com a
+// deslocação incluída. Vale de 27 a 30/11 para todos; quem vem do anúncio Meta
+// "GTA 13 anos" (código "ref. BFGTA", `campaign: 'BFGTA'` no quote) tem-na desde
+// já até 30/11 (conta a data da marcação). Só limpezas: as impermeabilizações e a
+// limpeza com impermeabilização não mudam. Várias limpezas = soma da tabela,
+// arredondada para baixo a acabar em 9. Sem condição especial por cima.
+export const BLACK_FRIDAY_PRICES = {
+  sofa: { '1-lugar': 49, '2-lugares': 59, '3-lugares': 69, '4-lugares': 89, '5-lugares': 99, canto: 99 } as Record<string, number>,
+  mattress: { solteiro: 49, casal: 59, king: 69 } as Record<string, number>,
+  armchairAlone: 39,
+  /** Cadeiras no WhatsApp, por cadeira, pelo total de cadeiras do pedido. */
+  chairUnit: (n: number) => (n >= 8 ? 13 : n >= 4 ? 15 : 19),
+  /** Tapetes: cerca de −20% sobre o preço de hoje, a acabar em 9. */
+  rugFactor: 0.8,
+} as const;
+export const BLACK_FRIDAY_REF = 'BFGTA';
+
+/** Preços da Black Friday ativos: 27–30/11 para todos, ou desde já até 30/11 com ref. BFGTA. */
+export function blackFridayPricesActive(campaign: unknown, now?: Date): boolean {
+  if (isBlackFriday(now)) return true;
+  const t = campaignNow(now);
+  return campaign === BLACK_FRIDAY_REF && t !== null && t < BLACK_FRIDAY_2026.until;
+}

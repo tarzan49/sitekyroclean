@@ -14,6 +14,21 @@ function isBlackFriday(now) {
   const t = campaignNow(now);
   return t !== null && t >= BLACK_FRIDAY_2026.from && t < BLACK_FRIDAY_2026.until;
 }
+var BLACK_FRIDAY_PRICES = {
+  sofa: { "1-lugar": 49, "2-lugares": 59, "3-lugares": 69, "4-lugares": 89, "5-lugares": 99, canto: 99 },
+  mattress: { solteiro: 49, casal: 59, king: 69 },
+  armchairAlone: 39,
+  /** Cadeiras no WhatsApp, por cadeira, pelo total de cadeiras do pedido. */
+  chairUnit: (n) => n >= 8 ? 13 : n >= 4 ? 15 : 19,
+  /** Tapetes: cerca de −20% sobre o preço de hoje, a acabar em 9. */
+  rugFactor: 0.8
+};
+var BLACK_FRIDAY_REF = "BFGTA";
+function blackFridayPricesActive(campaign, now) {
+  if (isBlackFriday(now)) return true;
+  const t = campaignNow(now);
+  return campaign === BLACK_FRIDAY_REF && t !== null && t < BLACK_FRIDAY_2026.until;
+}
 
 // src/constants/travel.ts
 var locationPrices = {
@@ -2488,7 +2503,46 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withAskedDiscount(input, botQuoteCore(input));
+  return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
+}
+var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: dá total como o preço e normal como o de sempre ("em vez de"). Sem condição especial por cima. As impermeabilizações não mudam.';
+function withBlackFridayPrices(input, r) {
+  const none = { ...r, blackFriday: null };
+  const inp = input ?? {};
+  const q = r;
+  const raw = Array.isArray(inp.items) ? inp.items : [];
+  const rugsOnly = raw.length > 0 && raw.every((i) => i?.kind === "rug");
+  if (!q.ok || q.quote && !rugsOnly || q.handToOwner || q.sharedTrip || !blackFridayPricesActive(inp.campaign)) return none;
+  if (!raw.length || q.rugCombo?.ok) return none;
+  const end9 = (v) => Math.floor((v + 1) / 10) * 10 - 1;
+  let bf;
+  if (rugsOnly) {
+    if (raw.some((i) => i.odor === true || (i.treatment ?? "clean") !== "clean") || !q.rugEstimate?.ok || typeof q.rugEstimate.homePrice !== "number") return none;
+    bf = end9(q.rugEstimate.homePrice * BLACK_FRIDAY_PRICES.rugFactor);
+  } else {
+    const chairs = raw.filter((i) => i?.kind === "chairs").reduce((s, i) => s + (typeof i.qty === "number" ? i.qty : 1), 0);
+    let sum2 = 0, pieces = 0;
+    for (const i of raw) {
+      if (!i || (i.treatment ?? "clean") !== "clean" || i.leather === true) return none;
+      const qty = typeof i.qty === "number" ? i.qty : 1;
+      let unit;
+      if (i.kind === "sofa") {
+        const size = i.size === "u" ? typeof i.seats === "number" && i.seats <= 4 ? "4-lugares" : "" : String(i.size);
+        unit = typeof i.seats === "number" && i.seats >= 6 ? void 0 : BLACK_FRIDAY_PRICES.sofa[size];
+      } else if (i.kind === "mattress") unit = BLACK_FRIDAY_PRICES.mattress[String(i.size)];
+      else if (i.kind === "chairs" && inp.site !== true && i.seatOnly !== true) unit = BLACK_FRIDAY_PRICES.chairUnit(chairs);
+      if (unit === void 0) return none;
+      sum2 += unit * qty;
+      pieces += i.kind === "chairs" ? 1 : qty;
+    }
+    bf = pieces > 1 || raw.some((i) => i.kind === "chairs") ? end9(sum2) : sum2;
+  }
+  const normal = rugsOnly ? q.rugEstimate.homePrice : q.total;
+  if (typeof normal !== "number" || bf >= normal) return none;
+  const out = { ...r, total: bf, subtotal: bf, travel: 0, bigOrder: null, closeNow: null, antiMiteGift: null, mattressMiteOffer: null };
+  const rug = q.rugEstimate;
+  if (rug?.ok && rugsOnly) out.rugEstimate = { ...rug, homePrice: bf, pickupPrice: rug.pickupPrice == null ? null : bf + (rug.pickupPrice - (rug.homePrice ?? 0)) };
+  return { ...out, blackFriday: { normal, total: bf, until: "2026-11-30", rule: BLACK_FRIDAY_RULE } };
 }
 function botQuoteCore(input) {
   if (input && typeof input === "object") {
@@ -2516,7 +2570,7 @@ function withMattressMiteOffer(input, r) {
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(input, r) {
   const q = r;
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer) return { ...r, askedDiscount: null };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = input?.items;
