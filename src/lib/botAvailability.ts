@@ -380,9 +380,9 @@ export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo: nunca dar horas sem pergun
 /**
  * Owner, 19 Nov 2026 ("Nestas equipas (viana, funchal, leiria, coimbra) que nao podemos marcar sem avisar [...] tu tens
  * q perguntar a equipa (foto + detalhe do serviço + disponibilidade)"): these zones never get hours from the calendar;
- * the bot asks the team (perguntar_equipa) and the hour is the team's. Aveiro: still to be decided (no partner of its own).
+ * the bot asks the team (perguntar_equipa) and the hour is the team's. Aveiro (owner, 19 Nov 2026: "Equipa Porto 3 OU Porto 2"): Denise first, then Aleixo.
  */
-export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra';
+export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra' | 'Aveiro';
 export const askTeamRule = (team: AskTeam) => team === 'Viana' ? VIANA_ASK_TEAM_RULE
   : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
@@ -955,6 +955,12 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return { ...base, region: area, teams,
       handToOwner: `Impermeabilização em ${city}: o dono confirma a hora com a equipa antes de a dar ao cliente`,
       askWeek: true, askWeekRule: ASK_WEEK_RULE };
+  }
+  // Aveiro (owner, 19 Nov 2026: "Serviços em aveiro tb precisamos de saber a disponibilidade" + "Equipa Porto 3"): the
+  // cleanings close without an hour; Porto 3 (Denise) is asked, and Porto 2 (Aleixo) if she can't (kyro-bot
+  // TEAM_ASK_FALLBACK). Waterproofing stays with the north rule above.
+  if (req.ownerTime !== true && city === 'Aveiro') {
+    return { ...base, region: area, teams: ['Porto 3', 'Porto 2'], handToOwner: askTeamRule('Aveiro'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Aveiro' };
   }
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);

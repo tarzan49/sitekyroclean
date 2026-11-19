@@ -419,9 +419,9 @@ describe('cidades sem ninguém fixo (dono, 29 Oct 2026)', () => {
     expect(low.askTeam).toBe('Viana');
     const viana = botAvailability({ city: 'Barcelos', total: 79 }, [], now) as { handToOwner: string | null };
     expect(viana.handToOwner).toBeNull();
-    const aveiro = botAvailability({ city: 'Aveiro', total: 99 }, [], now) as { handToOwner: string | null; region: string };
-    expect(aveiro.handToOwner).toBeNull();
-    expect(aveiro.region).toBe('Porto');
+    // Aveiro (owner, 19 Nov 2026): no hours, Porto 3 (Denise), then Porto 2.
+    const aveiro = botAvailability({ city: 'Aveiro', total: 99 }, [], now) as { askTeam?: string; region: string; teams: string[]; free: unknown[] };
+    expect([aveiro.askTeam, aveiro.region, aveiro.teams, aveiro.free]).toEqual(['Aveiro', 'Porto', ['Porto 3', 'Porto 2'], []]);
     // Leiria (owner 19 Nov 2026): no hours, the Leiria team is asked (askTeam).
     const quoted = botAvailability({ city: 'Leiria', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], now) as { askTeam?: string; askWeek?: true; free: unknown[] };
     expect([quoted.askTeam, quoted.askWeek, quoted.free]).toEqual(['Leiria', true, []]);
