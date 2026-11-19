@@ -939,3 +939,11 @@ Pedro (colchão de solteiro, São João da Talha, 69€ ou 84€ com anti-ácaro
 
 ## Impermeabilizações no norte sem horas (dono, 18 Nov 2026)
 "acalma-te a marcar impermeabilizações no norte, só marcas horários que eu aprovar com as equipas... as equipas em termos de imper estão um bocado fragilizadas". Zonas Porto e Braga (Aveiro incluído): toda a impermeabilização fecha sem horas (askWeek); o dono confirma a hora com a equipa. Limpezas mantêm as horas. Código: `NORTH_WATERPROOFING_ASK_WEEK_REGIONS` em `src/lib/botAvailability.ts`.
+
+## Primeiro o pack, depois as datas (dono, 19 Nov 2026, Fernando)
+O bot mandou ao Fernando (sofá: 89€ só limpeza, 158€ Essencial, 218€ Premium), com o vídeo da Pepsi: "deixamos já reservada uma data no início de dezembro, a partir das 16h ou ao sábado ... Qual das opções faz mais sentido, a limpeza com impermeabilização ou só a limpeza?", sem valores. Ele respondeu só às datas. Dono: "Aqui primeiro perguntas qual pack prefere e dizes as opções, depois perguntas das disponibilidades."
+- Opções abertas e cliente sem dia nem hora: a mensagem só pergunta qual das opções, cada uma com o valor. Nada de datas nem reservas na mesma mensagem.
+- Depois de ele escolher: pergunta-se a disponibilidade e dão-se duas horas.
+- Se ele já deu o dia/hora (Fernando: "só tenho as 11:30"), confirmar a hora e listar as opções com valores + nome e morada na mesma mensagem está certo (dono: "esta maneira também é inteligente").
+- Quem adia para quando receber (regra do Pedro, 18/11): com opções abertas, também primeiro o pack; a reserva no início de dezembro vem depois.
+- Código: `packFirstIssues` e `deferredOptionIssues` em kyro-bot `src/bot/agent.ts`, teste `tests/deferredOptions.test.ts`.
