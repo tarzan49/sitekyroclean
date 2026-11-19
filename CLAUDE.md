@@ -90,6 +90,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Resposta retida para o dono sai sozinha aos 10 min se ele não responder; esperam por ele só reclamação, desconto, áudio, valor diferente do combinado e respostas que o código achou erradas (kyro-bot `heldPastTimeout`; dono, 17 Nov).
 - Email: o bot só responde a orçamentos banais (limpezas do dia a dia); orçamentos em massa, grandes ou de entidades (câmaras, concursos, propostas formais) vão ao dono para parecer (kyro-bot `isBulkRequest`, dono 17 Nov, Câmara de Leiria). Qualquer email enviado por mim sai sempre com a estrutura do `composeEmail`, nunca texto simples (dono, 17 Nov).
 - Email: o bot responde a conversas novas que peçam um serviço (kyro-bot `src/email.ts`, `email_bot`=on, dono 4 Nov); o resto e as conversas já a decorrer ficam em "Por responder". O texto automático está calado (`botEmail`=on no script). Email tem formato próprio (texto+HTML, preços em tabela, total em destaque, sem emojis nem legendas do WhatsApp, anexos numa linha; kyro-bot `composeEmail`) e a ponte usa a API do Gmail, não o GmailApp (quota; dono, 17 Nov).
+- **Peça vista na fotografia e não pedida (dono, 19 Nov):** tapete (ou cadeiras, colchão, sofá) que aparece na fotografia sem ter sido pedido é oferecido numa bolha à parte, na mesma visita, com condição especial, pedindo as medidas. `seen_in_photo` no JSON + travão em `funnelIssues`. Detalhe em `docs/regras-detalhadas.md`.
 
 ## 5. Site e SEO
 
