@@ -2791,6 +2791,7 @@ var TEAMS_BY_REGION = {
 var ALL_TEAMS = [...Object.values(TEAMS_BY_REGION).flat(), "Funchal 1"];
 var TOWN_TEAMS = { Viana: "Viana do Castelo" };
 var BACKUP_TEAMS = /* @__PURE__ */ new Set(["Porto 2"]);
+var backupRank = (t, waterproofing = false, day = "") => t === "Porto 1" && !waterproofing && day >= PORTO1_CLEANING_FROM ? 2 : BACKUP_TEAMS.has(t) ? 1 : 0;
 var WATERPROOFING_TEAMS = {
   // Owner, 28 Oct 2026: "se for limpeza passa para porto 3, se for imper ou imper e limpeza tem q ser porto 1".
   // Denise (Porto 3) covers cleanings only, so no waterproofing job goes to her.
@@ -2800,6 +2801,8 @@ var WATERPROOFING_TEAMS = {
 };
 var WATERPROOFING_FROM = { Porto: "2026-11-11", Braga: "2026-11-11" };
 var PORTO1_MIN_TOTAL = 200;
+var PORTO1_CLEANING_MIN_TOTAL = 135;
+var PORTO1_CLEANING_FROM = "2026-11-19";
 var PORTO1_PREMIUM_ONLY_FROM = "2026-11-04";
 var PORTO1_ALL_PREMIUM_FROM = "2026-11-14";
 var RUG_PICKUP_TEAMS = { Porto: ["Porto 3"] };
@@ -2809,6 +2812,7 @@ var teamsFor = (zone, waterproofing, total, day, rugPickup = false) => {
   const pickupTeams = rugPickup ? RUG_PICKUP_TEAMS[zone] : void 0;
   const teams = (waterproofing && WATERPROOFING_TEAMS[zone] || TEAMS_BY_REGION[zone]).filter((t) => !TOWN_TEAMS[t]).filter((t) => !pickupTeams || pickupTeams.includes(t)).filter((t) => !TEAM_CLOSED_FROM[t] || day && (day <= TEAM_CLOSED_FROM[t].date || TEAM_CLOSED_FROM[t].reopen !== void 0 && day >= TEAM_CLOSED_FROM[t].reopen)).filter((t) => !(waterproofing && t === "Porto 2" && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]));
   if (waterproofing === "premium" && (zone === "Porto" || zone === "Braga") && day && day >= PORTO1_ALL_PREMIUM_FROM) return ["Porto 1"];
+  if (zone === "Porto" && !waterproofing && day && day >= PORTO1_CLEANING_FROM && typeof total === "number" && total >= PORTO1_CLEANING_MIN_TOTAL) return teams;
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== "premium") return teams.filter((t) => t !== "Porto 1");
   if (zone === "Porto" && !waterproofing && typeof total === "number" && total < PORTO1_MIN_TOTAL) return teams.filter((t) => t !== "Porto 1");
   return teams;
@@ -3213,7 +3217,7 @@ function replacementTeam(events, team, e, startIso, endIso, cleaning = true) {
   const zone = zoneOfTeam(team);
   if (!zone || TOWN_TEAMS[team]) return null;
   const { waterproofing, total, rugPickup } = eventJob(e);
-  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)].filter((t) => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary)).sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
+  return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)].filter((t) => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary)).sort((a, b) => backupRank(a, waterproofing, lisbon(Date.parse(startIso)).date) - backupRank(b, waterproofing, lisbon(Date.parse(startIso)).date))[0] ?? null;
 }
 function chooseTeam(events, city, startIso, endIso, waterproofing = false, cleaning = true, total, rugPickup = false) {
   const name = resolveBotCity(city);
@@ -3229,7 +3233,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
   const day = lisbon(from).date;
   const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
   const closest = (t) => Math.min(Infinity, ...busy.filter((b) => b.team === t && b.place && place && lisbon(b.from).date === day).map((b) => driveMinutes(b.place, place)));
-  return [...st.teamsFree].sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
+  return [...st.teamsFree].sort((a, b) => backupRank(a, waterproofing, day) - backupRank(b, waterproofing, day) || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);

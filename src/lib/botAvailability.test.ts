@@ -622,3 +622,19 @@ describe('equipa Viana (LigLav): só as limpezas de Viana do Castelo; a Braga de
     expect(teamTakesJob('Viana', { summary: 'Serviço 60€ (119€) Impermeabilização Premium - Viana do Castelo', description: '' }, at('2026-11-25', '10:00'))).toBe(false);
   });
 });
+
+describe('sem impermeabilização (dono, 19 Nov, Rute)', () => {
+  it('a cleaning marked "sem impermeabilização" is not taken by Porto 1', () => {
+    const e = { summary: 'Serviço 55€ (109€) Limpeza de sofá 3 lugares com chaise e 4 cadeiras (sem impermeabilização) - 933716539 - Rute', description: 'Equipa: Porto 1\nCadeiras · 4 unidades · Só limpeza (SEM impermeabilização)' };
+    expect(teamTakesJob('Porto 1', e, '2026-11-23T15:00:00Z')).toBe(false);
+    expect(teamTakesJob('Porto 3', e, '2026-11-23T15:00:00Z')).toBe(true);
+  });
+});
+
+describe('Porto 1 limpezas a partir de 135€ (dono, 19 Nov)', () => {
+  it('cleaning ≥135€ in Porto may go to Porto 1, last; below stays off', () => {
+    expect(teamsFor('Porto', false, 139, '2026-11-23')).toContain('Porto 1');
+    expect(teamsFor('Porto', false, 109, '2026-11-23')).not.toContain('Porto 1');
+    expect(teamsFor('Porto', true, 158, '2026-11-23')).not.toContain('Porto 1');
+  });
+});

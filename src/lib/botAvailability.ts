@@ -68,6 +68,9 @@ export const TOWN_TEAMS: Readonly<Record<string, string>> = { Viana: 'Viana do C
  * gives it the job last.
  */
 export const BACKUP_TEAMS: ReadonlySet<string> = new Set(['Porto 2']);
+/** A Porto cleaning goes to Porto 1 only after Porto 3 and Porto 2 (owner, 19 Nov 2026: "não como prioridade"). */
+const backupRank = (t: string, waterproofing: boolean | 'premium' = false, day = '') =>
+  t === 'Porto 1' && !waterproofing && day >= PORTO1_CLEANING_FROM ? 2 : BACKUP_TEAMS.has(t) ? 1 : 0;
 /**
  * Waterproofing goes to another team in some zones (owner, 15 Oct 2026: "para já a equipa de
  * braga só fica com limpeza de estofos ao domicílio, a do porto fica com impermeabilizações
@@ -88,6 +91,9 @@ export const WATERPROOFING_FROM: Partial<Record<TeamZone, string>> = { Porto: '2
  * of 200€ or more (owner, 4 Nov 2026: "limpeza abaixo de 200 euros ficam para porto 3"; was 100€ on 31 Oct 2026). Waterproofing stays with Porto 1.
  */
 export const PORTO1_MIN_TOTAL = 200;
+/** Porto cleanings from this total go to Porto 1 too, last (owner, 19 Nov 2026: "limpezas acima de 135 euros [...] não como prioridade"). */
+export const PORTO1_CLEANING_MIN_TOTAL = 135;
+export const PORTO1_CLEANING_FROM = '2026-11-19';
 /**
  * Porto 1 only takes Premium waterproofing or cleaning + waterproofing (owner, 4 Nov 2026; 3 Nov 2026: "NAO E PARA MARCARES MAIS SERVIÇOS PARA
  * PORTO 1 ABAIXO DE 130 EUROS, SO MARCAS PARA ELES IMPER PREMIUM"; "Limpezas nao marcas mais"). No
@@ -119,6 +125,8 @@ export const teamsFor = (zone: TeamZone, waterproofing: boolean | 'premium', tot
     .filter(t => !TEAM_CLOSED_FROM[t] || (day && (day <= TEAM_CLOSED_FROM[t].date || (TEAM_CLOSED_FROM[t].reopen !== undefined && day >= TEAM_CLOSED_FROM[t].reopen!))))
     .filter(t => !(waterproofing && t === 'Porto 2' && day && WATERPROOFING_FROM[zone] && day < WATERPROOFING_FROM[zone]!));
   if (waterproofing === 'premium' && (zone === 'Porto' || zone === 'Braga') && day && day >= PORTO1_ALL_PREMIUM_FROM) return ['Porto 1'];
+  // Owner, 19 Nov 2026 (Nelito agreed): Porto cleanings of 135€ or more may go to Porto 1, after Porto 3 and Porto 2.
+  if (zone === 'Porto' && !waterproofing && day && day >= PORTO1_CLEANING_FROM && typeof total === 'number' && total >= PORTO1_CLEANING_MIN_TOTAL) return teams;
   if ((!day || day >= PORTO1_PREMIUM_ONLY_FROM) && waterproofing !== 'premium') return teams.filter(t => t !== 'Porto 1');
   if (zone === 'Porto' && !waterproofing && typeof total === 'number' && total < PORTO1_MIN_TOTAL) return teams.filter(t => t !== 'Porto 1');
   return teams;
@@ -625,7 +633,8 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
  * the event: waterproofing with no tier written counts as Premium, so only a clear case changes the team.
  */
 function eventJob(e: Pick<AvailabilityEvent, 'summary' | 'description'>): { waterproofing: boolean | 'premium'; total: number | null; rugPickup: boolean } {
-  const text = `${e.summary}\n${e.description ?? ''}`;
+  // "(sem impermeabilização)" is a cleaning only (owner, 19 Nov 2026, Rute: read as Premium, the cleaning went to Porto 1).
+  const text = `${e.summary}\n${e.description ?? ''}`.replace(/\(?\s*sem\s+impermeabiliza[cç][aã]o\s*\)?/gi, '');
   const waterproofing = /imperm/i.test(text) ? (/essencial/i.test(text) && !/premium/i.test(text) ? true : 'premium') : false;
   const total = /\((\d+(?:[.,]\d+)?)\s*€\)/.exec(e.summary)?.[1];
   return { waterproofing, total: total ? Number(total.replace(',', '.')) : null, rugPickup: /recolh/i.test(text) };
@@ -648,7 +657,7 @@ export function replacementTeam(events: AvailabilityEvent[], team: string, e: Pi
   const { waterproofing, total, rugPickup } = eventJob(e);
   return [...teamsFor(zone, waterproofing, total, lisbon(Date.parse(startIso)).date, rugPickup)]
     .filter(t => t !== team && !teamBusyAt(events, t, startIso, endIso, cleaning, e.summary))
-    .sort((a, b) => Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b)))[0] ?? null;
+    .sort((a, b) => backupRank(a, waterproofing, lisbon(Date.parse(startIso)).date) - backupRank(b, waterproofing, lisbon(Date.parse(startIso)).date))[0] ?? null;
 }
 
 /**
@@ -673,7 +682,7 @@ export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso:
   // The team already working closest to this town that day drives least.
   const closest = (t: string) => Math.min(Infinity, ...busy.filter(b => b.team === t && b.place && place && lisbon(b.from).date === day).map(b => driveMinutes(b.place!, place!)));
   return [...st.teamsFree].sort((a, b) =>
-    Number(BACKUP_TEAMS.has(a)) - Number(BACKUP_TEAMS.has(b))
+    backupRank(a, waterproofing, day) - backupRank(b, waterproofing, day)
     || Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
     || (Number.isFinite(closest(a)) && Number.isFinite(closest(b)) ? closest(a) - closest(b) : 0)
     || jobsThatDay(a) - jobsThatDay(b)

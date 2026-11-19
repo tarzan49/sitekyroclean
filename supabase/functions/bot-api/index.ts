@@ -684,14 +684,17 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   let busyTeam: string | null = null;
   let newTeam: { from: string; to: string; colorId: string } | null = null;
   const conversationId = typeof body.conversationId === "string" ? body.conversationId : "";
-  if (plan.ok && plan.moved) {
+  // A move, or items changed (owner, 19 Nov 2026, Rute: chose cleaning only and stayed on Porto 1): the team must still take the job.
+  const itemsChangeTeam = plan.ok && !!requote && !teamTakesJob(eventTeam(ev) ?? "", { summary: plan.title, description: plan.description }, plan.start);
+  if (plan.ok && plan.summary !== undefined && (plan.moved || itemsChangeTeam)) {
     const team = eventTeam(ev);
     const others = cal.events.filter(e => e.id !== ev.id);
     const cleaning = !(/imperm/i.test(ev.summary) && !/limpeza|lavagem|higieniz|anti-?[aá]caros/i.test(ev.summary));
     // The team no longer takes this job on the new day (Laurinda, 3 Nov 2026: a cleaning on Porto 1 moved past 4/11):
     // a free team of the zone that does takes it, written with its colour by "book" (only the bot's own events,
     // marked with this conversation; any other stays at the old hour and the owner is emailed, below).
-    const swap = team && !teamTakesJob(team, ev, plan.start) ? replacementTeam(others, team, ev, plan.start, plan.end, cleaning) : null;
+    const job = { summary: plan.title, description: plan.description };
+    const swap = team && !teamTakesJob(team, job, plan.start) ? replacementTeam(others, team, job, plan.start, plan.end, cleaning) : null;
     const swapColor = swap ? (TEAM_COLOR as Record<string, string>)[swap] : undefined;
     if (team && swap && swapColor && conversationId && /^\s*servi[cç]o\b/i.test(plan.title) && ev.description.split("\n").includes(`bot:${conversationId}`)) {
       newTeam = { from: team, to: swap, colorId: swapColor };
@@ -704,7 +707,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
       const why = takes ? `a equipa ${team} já tem um serviço a essa hora` : `a equipa ${team} já não faz este serviço nesse dia e nenhuma outra equipa da zona está livre a essa hora`;
       plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, date: undefined, time: undefined }, now);
       if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} ${takes ? "está ocupada" : "já não faz este serviço"}`,
-        `O cliente combinou ${asked.date} às ${asked.time}, mas ${why}. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
+        `${asked.date ? `O cliente combinou ${asked.date} às ${asked.time}` : "O cliente mudou os artigos"}, mas ${why}. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
     }
   }
   if (!plan.ok) return createSuccessResponse({ update: busyTeam ? { ok: false, reason: `equipa ${busyTeam} ocupada a essa hora`, teamBusy: busyTeam } : plan });
