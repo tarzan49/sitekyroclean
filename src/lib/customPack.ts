@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcSofaUnitPrice, calcMattressUnitPrice } from '../components/quiz/quizHelpers';
-import { chairWaterproofTotal } from '../constants/chairPricing';
+import { chairWaterproofTotal, CHAIR_WATERPROOF_BIG_FROM, WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG } from '../constants/chairPricing';
 import { chairAntiAcarosTotal } from '../constants/antiAcarosPricing';
 import { locationPrices, calculateTravelFee } from '../constants/travel';
 import { priceWithPackPerks, type PerkTreatment } from '../constants/packPerks';
@@ -46,7 +46,13 @@ export function customPackLine(item: CustomPackItem) {
     amount = unit === null ? null : unit * item.qty;
   } else if (item.kind === 'chairs') {
     // Bot only: `unitPrice` = the WhatsApp price per chair (chairPricing whatsappChairCleanUnit, owner 12 Nov 2026).
-    amount = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
+    // 9 or more chairs cleaned and waterproofed (bot): the cleaning drops to 12,50€ each (owner, 19 Nov 2026).
+    const bigPack = !!item.unitPrice && !item.seatOnly && (item.extra === 'premium' || item.extra === 'essencial') && item.qty >= CHAIR_WATERPROOF_BIG_FROM;
+    // The pack total never falls below that of 8 chairs at the 8-chair prices (owner's rule: one more never costs less).
+    const eight = CHAIR_WATERPROOF_BIG_FROM - 1;
+    const eightPack = bigPack ? item.unitPrice! * eight + (chairWaterproofTotal(eight, item.extra === 'premium' ? 'premium' : 'essencial') ?? 0) : 0;
+    const bigWp = bigPack ? (chairWaterproofTotal(item.qty, item.extra === 'premium' ? 'premium' : 'essencial') ?? 0) : 0;
+    amount = bigPack ? Math.max(WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG * item.qty + bigWp, eightPack) - bigWp : item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount !== null) {
       if (item.extra === 'premium') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'premium', true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === 'essencial') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'essencial', true) : calcChairWaterproof(item.qty)) ?? 0;

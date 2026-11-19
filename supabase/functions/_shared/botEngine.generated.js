@@ -199,6 +199,10 @@ var CHAIR_WATERPROOF_PREMIUM = 25;
 var CHAIR_WATERPROOF_SMALL_MAX = 4;
 var CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
 var CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
+var CHAIR_WATERPROOF_BIG_FROM = 9;
+var CHAIR_WATERPROOF_BIG_PREMIUM = 22.5;
+var CHAIR_WATERPROOF_BIG_ESSENTIAL = 15;
+var WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG = 12.5;
 var CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM = 18;
 var CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL = 12;
 function chairWaterproofTotal(qty, tier, seatOnly = false) {
@@ -206,8 +210,10 @@ function chairWaterproofTotal(qty, tier, seatOnly = false) {
   if (seatOnly) return qty * (tier === "premium" ? CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM : CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL);
   const small = tier === "premium" ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
   if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
-  const unit = tier === "premium" ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
-  return Math.max(qty * unit, CHAIR_WATERPROOF_SMALL_MAX * small);
+  const mid = tier === "premium" ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
+  if (qty < CHAIR_WATERPROOF_BIG_FROM) return Math.max(qty * mid, CHAIR_WATERPROOF_SMALL_MAX * small);
+  const big = tier === "premium" ? CHAIR_WATERPROOF_BIG_PREMIUM : CHAIR_WATERPROOF_BIG_ESSENTIAL;
+  return Math.max(qty * big, (CHAIR_WATERPROOF_BIG_FROM - 1) * mid);
 }
 var WHATSAPP_CHAIR_CLEAN_SMALL = 25;
 var WHATSAPP_CHAIR_CLEAN_SMALL_MAX = 3;
@@ -371,7 +377,11 @@ function customPackLine(item) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
-    amount2 = item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
+    const bigPack = !!item.unitPrice && !item.seatOnly && (item.extra === "premium" || item.extra === "essencial") && item.qty >= CHAIR_WATERPROOF_BIG_FROM;
+    const eight = CHAIR_WATERPROOF_BIG_FROM - 1;
+    const eightPack = bigPack ? item.unitPrice * eight + (chairWaterproofTotal(eight, item.extra === "premium" ? "premium" : "essencial") ?? 0) : 0;
+    const bigWp = bigPack ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial") ?? 0 : 0;
+    amount2 = bigPack ? Math.max(WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG * item.qty + bigWp, eightPack) - bigWp : item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount2 !== null) {
       if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;

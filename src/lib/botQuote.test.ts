@@ -125,12 +125,24 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('prices chair waterproofing alone for any number of chairs (owner, 2026-10-09: 10 chairs, 25€ Premium / 18€ Essencial)', () => {
     const premium = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'premium' }], city: 'Póvoa de Varzim' });
-    expect([premium.lines[0].amount, premium.travel, premium.total, premium.handToOwner]).toEqual([250, 0, 250, false]);
+    // From 9 chairs: 22,50€ Premium / 15€ Essencial each (owner, 19 Nov 2026).
+    expect([premium.lines[0].amount, premium.travel, premium.total, premium.handToOwner]).toEqual([225, 0, 225, false]);
     const essencial = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'essencial' }], city: 'Porto' });
-    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([216, 0, 216, false]);
+    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([180, 0, 180, false]);
     // Waterproofed-only chairs do not push the cleaned ones over the 10-chair quote limit.
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
     expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([80, false]);
+  });
+  it('9 or more chairs cleaned and waterproofed: cleaning 12,50€ + 22,50€ Premium / 15€ Essencial each (owner, 19 Nov 2026)', () => {
+    const r = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Cruz Quebrada' });
+    expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([420, 420, 330]);
+    // Cleaning alone keeps the WhatsApp price (18€ from 8).
+    expect(ok({ items: [{ kind: 'chairs', qty: 12 }], city: 'Cruz Quebrada' }).total).toBe(216);
+    // 9 never costs less than 8.
+    const p8 = ok({ items: [{ kind: 'chairs', qty: 8, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
+    const p9 = ok({ items: [{ kind: 'chairs', qty: 9, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
+    expect(p9.premium!).toBeGreaterThanOrEqual(p8.premium!);
+    expect(p9.essencial!).toBeGreaterThanOrEqual(p8.essencial!);
   });
   it('matches localities without accents or capitals', () => {
     expect(resolveBotCity('vila nova de gaia')).toBe('Vila Nova de Gaia');

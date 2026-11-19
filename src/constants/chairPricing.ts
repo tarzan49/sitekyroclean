@@ -8,6 +8,14 @@ export const CHAIR_WATERPROOF_PREMIUM = 25;
 export const CHAIR_WATERPROOF_SMALL_MAX = 4;
 export const CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
 export const CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
+// A partir de 9 cadeiras (dono, 19 Nov 2026, 12 cadeiras a 516€/432€ com limpeza: "até 8 cadeiras é ok
+// fazeres 25, mas depois disto tens de descer o preço"; "12,5€ a limpeza, 22,5€ a premium ... e a outra
+// fazes a 15"): impermeabilização Premium 22,50€ e Essencial 15€ por cadeira, em todas; e, no bot, a
+// limpeza que vai com a impermeabilização fica a 12,50€ por cadeira (limpeza sozinha mantém o preço).
+export const CHAIR_WATERPROOF_BIG_FROM = 9;
+export const CHAIR_WATERPROOF_BIG_PREMIUM = 22.5;
+export const CHAIR_WATERPROOF_BIG_ESSENTIAL = 15;
+export const WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG = 12.5;
 
 // Cadeira em que o único estofo é o tampo do assento (sem encosto nem braços estofados): impermeabilização
 // a 18€ Premium e 12€ Essencial por cadeira, qualquer quantidade (dono, 14 Nov 2026, André, 6 cadeiras:
@@ -22,8 +30,11 @@ export function chairWaterproofTotal(qty: number, tier: ChairWaterproofTier, sea
   if (seatOnly) return qty * (tier === 'premium' ? CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM : CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL);
   const small = tier === 'premium' ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
   if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
-  const unit = tier === 'premium' ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
-  return Math.max(qty * unit, CHAIR_WATERPROOF_SMALL_MAX * small);
+  const mid = tier === 'premium' ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
+  if (qty < CHAIR_WATERPROOF_BIG_FROM) return Math.max(qty * mid, CHAIR_WATERPROOF_SMALL_MAX * small);
+  // From 9 the price per chair drops; the total never falls below that of 8 (same rule as 4 → 5).
+  const big = tier === 'premium' ? CHAIR_WATERPROOF_BIG_PREMIUM : CHAIR_WATERPROOF_BIG_ESSENTIAL;
+  return Math.max(qty * big, (CHAIR_WATERPROOF_BIG_FROM - 1) * mid);
 }
 
 // Limpeza de cadeiras no WhatsApp, preço por cadeira (dono, 12 Nov 2026: "isso só

@@ -34,7 +34,9 @@ describe('chair protection per chair: 30€/23€ up to 4 chairs, 25€/18€ fr
   it.each([
     [1, 30, 23], [2, 60, 46], [4, 120, 92],
     // 5 x 18 = 90 would be less than 4 chairs (92): never below the 4-chair total.
-    [5, 125, 92], [6, 150, 108], [9, 225, 162], [10, 250, 180], [100, 2500, 1800],
+    [5, 125, 92], [6, 150, 108], [8, 200, 144],
+    // From 9 (owner, 19 Nov 2026): 22,50€ / 15€ each, never below the 8-chair total (9 x 15 = 135 < 144).
+    [9, 202.5, 144], [10, 225, 150], [12, 270, 180], [100, 2250, 1500],
   ])('%i chairs: Premium %i€, Essencial %i€', (qty, premium, essencial) => {
     expect(calcChairWaterproofPremium(qty)).toBe(premium);
     expect(calcChairWaterproof(qty)).toBe(essencial);
