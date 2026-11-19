@@ -50,6 +50,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     // Several pieces waterproofed in a 10€ town: never travel (owner, 18 Nov 2026, Altieres).
     const multi = ok({ items: [{ kind: 'sofa', size: '2-lugares', treatment: 'essencial' }, { kind: 'chairs', qty: 2, treatment: 'essencial' }], city: 'Lisboa' });
     expect(multi.waterproofingTiers.travel).toBe(0);
+    // Chairs waterproofed with another piece: 25/18€ each at any count (owner, 19 Nov 2026, Hugo: 269€ should be 249€).
+    const hugo = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'premium' }, { kind: 'chairs', qty: 4, treatment: 'premium' }], city: 'Lisboa' });
+    expect(hugo.waterproofingTiers).toEqual({ travel: 0, premium: 249, essencial: 161 });
     // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
     expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 129, essencial: 79 });
     expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 49 });

@@ -22,7 +22,7 @@ import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 import { askedDiscountFor, type AskedDiscount } from './botAskedDiscount';
-import { whatsappChairCleanUnit } from '../constants/chairPricing';
+import { whatsappChairCleanUnit, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -164,11 +164,15 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   // Owner, 18 Nov 2026 (Altieres, sofá 3L + cadeiras with "Deslocação: 10€"): waterproofing of several pieces
   // (two or more lines in the order) never carries travel in 10€ towns; one piece alone keeps the rule above.
   const severalPieces = items.length > 1 && items.some(isWaterproofing);
+  // Owner, 19 Nov 2026 (Hugo, sofá 3L chaise + 4 cadeiras quoted 149 + 4×30 = 269€): chairs waterproofed with
+  // another piece always go at the 5+ rate (25€ Premium / 18€ Essencial), whatever the count.
+  const chairBulk = (tier: 'premium' | 'essencial') => severalPieces ? items.filter(i => i.kind === 'chairs' && isWaterproofing(i) && !i.seatOnly && i.qty <= CHAIR_WATERPROOF_SMALL_MAX)
+    .reduce((s, i) => s + i.qty * (tier === 'premium' ? CHAIR_WATERPROOF_SMALL_PREMIUM - CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL - CHAIR_WATERPROOF_ESSENTIAL), 0) : 0;
   const travel = isBlackFriday() || (severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX) ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
-    premium: premium.quote ? null : cents(premium.subtotal + travel),
-    essencial: essencial.quote ? null : cents(essencial.subtotal + travel),
+    premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),
+    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk('essencial') + travel),
   };
 }
 
