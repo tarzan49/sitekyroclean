@@ -2949,6 +2949,7 @@ var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
 var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
 var VIANA_ASK_TEAM_RULE = "Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
+var askTeamRule = (team) => team === "Viana" ? VIANA_ASK_TEAM_RULE : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
 var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 function isMadeira(cityOrAddress) {
@@ -3384,7 +3385,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const base = { city, durationMin, suggestion: null, requested: null, free: [] };
   if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
   if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has("Madeira")) {
-    return { ...base, city: null, region: null, teams: [], handToOwner: "Madeira (Funchal): o dono confirma o dia no calendário", askWeek: true, askWeekRule: ASK_WEEK_RULE };
+    return { ...base, city: null, region: null, teams: [], handToOwner: askTeamRule("Funchal"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Funchal" };
   }
   if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   const area = CITY_REGION.get(fold3(city));
@@ -3418,6 +3419,9 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       askWeekRule: ASK_WEEK_RULE
     };
   }
+  if (req.ownerTime !== true && city === "Aveiro") {
+    return { ...base, region: area, teams: ["Porto 3", "Porto 2"], handToOwner: askTeamRule("Aveiro"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Aveiro" };
+  }
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     const teams2 = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
@@ -3430,6 +3434,17 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       askWeekRule: ASK_WEEK_RULE
     };
   }
+  if (req.ownerTime !== true && FRIDAY_ONLY_CITIES.has(city)) {
+    return {
+      ...base,
+      region: area,
+      teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
+      handToOwner: askTeamRule("Leiria"),
+      askWeek: true,
+      askWeekRule: ASK_WEEK_RULE,
+      askTeam: "Leiria"
+    };
+  }
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === "string" && DATE.test(req.date) && (/* @__PURE__ */ new Date(`${req.date}T12:00:00Z`)).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
@@ -3440,9 +3455,10 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       ...base,
       region: area,
       teams: [...override ?? TEAMS_BY_REGION[area]],
-      handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join("/")} (junta com o serviço da Marinha Grande)` : ""}`,
+      handToOwner: area === "Coimbra" ? askTeamRule("Coimbra") : `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join("/")} (junta com o serviço da Marinha Grande)` : ""}`,
       askWeek: true,
-      askWeekRule: ASK_WEEK_RULE
+      askWeekRule: ASK_WEEK_RULE,
+      ...area === "Coimbra" ? { askTeam: "Coimbra" } : {}
     };
   }
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
