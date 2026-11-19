@@ -4,7 +4,7 @@ import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
 import kyroLogo from "@/assets/kyro-logo.webp";
-import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID, INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/constants/business";
+import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID, BUSINESS_LEGAL_NAME, INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/constants/business";
 import { COVERAGE_PROMISE, RESPONSE_PROMISE, TRAVEL_FEE_MIN } from "@/constants/commercialPolicy";
 
 const Footer = () => {
@@ -85,7 +85,9 @@ const Footer = () => {
           <div className="flex flex-col items-center gap-2">
             <p className="text-sm md:text-base text-white/80 text-center">
               © {new Date().getFullYear()} Kyro Clean Solutions. Todos os direitos reservados.
-              {BUSINESS_TAX_ID && <> NIF {BUSINESS_TAX_ID}.</>}
+            </p>
+            <p className="text-xs md:text-sm text-white/70 text-center">
+              {BUSINESS_LEGAL_NAME}{BUSINESS_TAX_ID && <>, NIPC {BUSINESS_TAX_ID}</>}. {BUSINESS_ADDRESS.streetAddress}, {BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}.
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
               {FOOTER_LEGAL_LINKS.map(link => (

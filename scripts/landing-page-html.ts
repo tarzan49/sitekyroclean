@@ -5,7 +5,7 @@ import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroFacts } from '../src/data/commercialHeroCopy';
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
 import { SERVICE_CONDITIONS, SERVICE_CONDITIONS_LINKS } from '../src/constants/commercialPolicy';
-import { INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../src/constants/business';
+import { INSTAGRAM_URL, INSTAGRAM_HANDLE, BUSINESS_LEGAL_NAME, BUSINESS_TAX_ID, BUSINESS_ADDRESS } from '../src/constants/business';
 import { formatReviewDate } from '../src/data/reviewsPool';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -71,7 +71,8 @@ export const ENTITY_FOOTER_HTML =
   + FOOTER_LEGAL_LINKS.map(link => `<li><a href="${e(link.href)}">${e(link.label)}</a></li>`).join('')
   + '<li><a href="https://www.livroreclamacoes.pt/inicio" rel="nofollow noopener">Livro de Reclamações</a></li>'
   + '</ul></nav>'
-  + `<p><a href="${e(INSTAGRAM_URL)}" rel="noopener">Instagram ${e(INSTAGRAM_HANDLE)}</a></p>`;
+  + `<p><a href="${e(INSTAGRAM_URL)}" rel="noopener">Instagram ${e(INSTAGRAM_HANDLE)}</a></p>`
+  + `<p>${e(BUSINESS_LEGAL_NAME)}${BUSINESS_TAX_ID ? `, NIPC ${e(BUSINESS_TAX_ID)}` : ''}. ${e(BUSINESS_ADDRESS.streetAddress)}, ${e(BUSINESS_ADDRESS.postalCode)} ${e(BUSINESS_ADDRESS.addressLocality)}.</p>`;
 
 /**
  * "Condições do serviço e garantia": o bloco que o rodapé React desenha em

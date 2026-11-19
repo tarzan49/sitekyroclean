@@ -7,6 +7,7 @@ import {
   REVIEW_RATING,
   REVIEW_COUNT,
   BUSINESS_TAX_ID,
+  BUSINESS_LEGAL_NAME,
   BUSINESS_PROFILES,
 } from "../constants/business";
 import { GOOGLE_MAPS_URL } from "../constants/google";
@@ -70,7 +71,8 @@ export function buildLocalBusinessNode(areaServed?: AreaServed) {
     // acrescentam-se a esta lista quando existirem: e o sinal que permite a um
     // motor confirmar que a empresa e real fora do seu proprio dominio.
     "sameAs": [GOOGLE_MAPS_URL, ...BUSINESS_PROFILES],
-    ...(BUSINESS_TAX_ID && { "vatID": BUSINESS_TAX_ID, "taxID": BUSINESS_TAX_ID }),
+    "legalName": BUSINESS_LEGAL_NAME,
+    ...(BUSINESS_TAX_ID && { "vatID": `PT${BUSINESS_TAX_ID}`, "taxID": BUSINESS_TAX_ID }),
     ...(areaServed && { "areaServed": areaServed }),
     "aggregateRating": {
       "@type": "AggregateRating",

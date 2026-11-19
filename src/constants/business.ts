@@ -13,7 +13,10 @@ export const WHATSAPP_BASE = "https://wa.me/351925530647";
 // Anotado como `string` e nao deixado a inferir `""`: sem a anotacao o tipo
 // literal da constante vazia fazia `...(BUSINESS_TAX_ID && { vatID })` em
 // seoSchema.ts rebentar no typecheck (TS2698).
-export const BUSINESS_TAX_ID: string = "";
+export const BUSINESS_TAX_ID: string = "519720318";
+// Nome legal da empresa (certidao permanente). Visivel no rodape: a verificacao
+// da empresa na Meta pede o nome escrito no site (dono, 19 Nov 2026).
+export const BUSINESS_LEGAL_NAME = "KYRO CLEAN SOLUTIONS, UNIPESSOAL LDA";
 
 // Perfis proprios noutras plataformas, para o `sameAs`. A 2026-09-17 nao
 // existia nenhum; o Instagram entrou a 2026-09-28 (perfil confirmado, usado
