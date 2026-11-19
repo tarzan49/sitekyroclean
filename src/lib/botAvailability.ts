@@ -377,6 +377,14 @@ export interface DayRule {
  */
 export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira', 'Algarve']);
 export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.';
+/**
+ * Owner, 19 Nov 2026 ("Nestas equipas (viana, funchal, leiria, coimbra) que nao podemos marcar sem avisar [...] tu tens
+ * q perguntar a equipa (foto + detalhe do serviço + disponibilidade)"): these zones never get hours from the calendar;
+ * the bot asks the team (perguntar_equipa) and the hour is the team's. Aveiro: still to be decided (no partner of its own).
+ */
+export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra';
+export const askTeamRule = (team: AskTeam) => team === 'Viana' ? VIANA_ASK_TEAM_RULE
+  : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
 const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 /** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
@@ -783,7 +791,7 @@ export type AvailabilityResult =
       askWeek?: true;
       askWeekRule?: string;
       /** Owner, 18 Nov: ask this team its availability (photo/video of the item + town) before any hour. */
-      askTeam?: 'Viana';
+      askTeam?: AskTeam;
     };
 
 /**
@@ -916,7 +924,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req?.city !== undefined && typeof req.city !== 'string') return { error: 'city tem de ser texto' };
   // Owner, 12 Nov 2026: Coimbra and Madeira (Funchal) close the service without an hour; the Algarve too since 18 Nov.
   if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has('Madeira')) {
-    return { ...base, city: null, region: null, teams: [], handToOwner: 'Madeira (Funchal): o dono confirma o dia no calendário', askWeek: true, askWeekRule: ASK_WEEK_RULE };
+    return { ...base, city: null, region: null, teams: [], handToOwner: askTeamRule('Funchal'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Funchal' };
   }
   if (!city) return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   const area = CITY_REGION.get(fold(city));
@@ -955,6 +963,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
       handToOwner: `Impermeabilização em ${city}: o dono escolhe o dia e a equipa no calendário${FRIDAY_ONLY_CITIES.has(city) ? `; equipa ${LEIRIA_WATERPROOFING_TEAMS.join('/')}` : ''}`,
       askWeek: true, askWeekRule: ASK_WEEK_RULE };
   }
+  if (req.ownerTime !== true && FRIDAY_ONLY_CITIES.has(city)) {
+    return { ...base, region: area, teams: [...(ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area])],
+      handToOwner: askTeamRule('Leiria'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Leiria' };
+  }
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === 'string' && DATE.test(req.date) && new Date(`${req.date}T12:00:00Z`).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
@@ -962,8 +974,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];
     return { ...base, region: area, teams: [...(override ?? TEAMS_BY_REGION[area])],
-      handToOwner: `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join('/')} (junta com o serviço da Marinha Grande)` : ''}`,
-      askWeek: true, askWeekRule: ASK_WEEK_RULE };
+      handToOwner: area === 'Coimbra' ? askTeamRule('Coimbra') : `${area}: o dono confirma o dia no calendário${override ? `; equipa ${override.join('/')} (junta com o serviço da Marinha Grande)` : ''}`,
+      askWeek: true, askWeekRule: ASK_WEEK_RULE, ...(area === 'Coimbra' ? { askTeam: 'Coimbra' as const } : {}) };
   }
   // Owner, 27 Oct 2026: the Braga team does not pick up rugs. No hours from its calendar, even with a time he gave.
   const pickupOwner = rugPickupOwnerReason(city, req.rugPickup === true);
