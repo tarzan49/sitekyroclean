@@ -9,7 +9,7 @@ import { dm, euro } from "./format";
 // dia" da antiga aba Fechos: fechos pelo dia de `booked_at` (Lisboa), faturado e
 // a parte do dono, e carregar num dia mostra os serviços desse dia.
 
-const RANGES = [7, 14, 30, 60] as const;
+const RANGES = [7, 14, 30, 60, 90, 120, 180, 270, 365] as const;
 
 export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now: Date }) {
   const [days, setDays] = useState<(typeof RANGES)[number]>(7);
@@ -53,7 +53,7 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
           <h3 className="flex items-center gap-2 text-sm font-bold text-navy"><CalendarDays className="w-4 h-4" aria-hidden="true" /> Dia a dia</h3>
           <p className="text-[11px] text-gray-500">Serviços fechados em cada dia e o dinheiro desse dia. Carrega num dia para ver os serviços.</p>
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {RANGES.map(n => (
             <button key={n} onClick={() => setDays(n)}
               className={`px-2.5 py-1 text-xs rounded-full border ${days === n ? "bg-navy text-white border-navy" : "bg-white text-navy border-gray-200"}`}>{n} dias</button>
@@ -69,7 +69,7 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
       <p className="text-[11px] text-gray-500">Média: {euro(avg)} faturados e {(summary.count / days).toLocaleString("pt-PT", { maximumFractionDigits: 1 })} fechos por dia. Os {days} dias de agora incluem hoje, ainda a meio; os anteriores são dias inteiros.</p>
 
       <div className="pt-6">
-        <div className="flex items-end gap-[3px] sm:gap-1.5 h-40 border-b border-gray-200">
+        <div className={`flex items-end ${days > 60 ? "gap-0" : "gap-[3px] sm:gap-1.5"} h-40 border-b border-gray-200`}>
           {summary.perDay.map(d => {
             const sel = open === d.day;
             const h = d.billed > 0 ? Math.max(4, (d.billed / maxBilled) * 100) : 0;
@@ -80,15 +80,15 @@ export default function DailyClosings({ rows, now }: { rows: LiveClosing[]; now:
                 {days <= 14 && d.billed > 0 && (
                   <span className={`absolute text-[10px] tabular-nums whitespace-nowrap ${sel ? "font-bold text-navy" : "text-gray-500"}`} style={{ bottom: `calc(${h}% + 4px)`, top: "auto" }}>{euro(d.billed)}</span>
                 )}
-                <span className={`w-full max-w-[34px] rounded-t-md transition-all ${sel ? "" : "opacity-80 group-hover:opacity-100"}`}
+                <span className={`w-full max-w-[34px] ${days > 60 ? "rounded-t-sm" : "rounded-t-md"} transition-all ${sel ? "" : "opacity-80 group-hover:opacity-100"}`}
                   style={{ height: `${h}%`, background: sel ? "#0B2F2A" : "#D4AF37" }} />
               </button>
             );
           })}
         </div>
-        <div className="flex gap-[3px] sm:gap-1.5 mt-1">
+        <div className={`flex ${days > 60 ? "gap-0" : "gap-[3px] sm:gap-1.5"} mt-1`}>
           {summary.perDay.map((d, i) => {
-            const step = days <= 14 ? 1 : days <= 30 ? 3 : 7;
+            const step = days <= 14 ? 1 : days <= 30 ? 3 : days <= 60 ? 7 : days <= 120 ? 14 : days <= 180 ? 30 : 45;
             const show = (summary.perDay.length - 1 - i) % step === 0;
             return (
               <span key={d.day} className={`flex-1 min-w-0 text-center text-[10px] leading-tight ${open === d.day ? "font-bold text-navy" : "text-gray-400"}`}>
