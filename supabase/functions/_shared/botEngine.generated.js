@@ -25,7 +25,6 @@ var BLACK_FRIDAY_PRICES = {
 };
 var BLACK_FRIDAY_REF = "BFGTA";
 function blackFridayPricesActive(campaign, now) {
-  if (isBlackFriday(now)) return true;
   const t = campaignNow(now);
   return campaign === BLACK_FRIDAY_REF && t !== null && t < BLACK_FRIDAY_2026.until;
 }

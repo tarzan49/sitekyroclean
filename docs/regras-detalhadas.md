@@ -970,7 +970,7 @@ O bot mandou ao Fernando (sofá: 89€ só limpeza, 158€ Essencial, 218€ Pre
 
 ## Black Friday 2026 (dono, 19 Nov 2026)
 Substitui a proposta de 18/11 (−20€ por peça / 10% acima de 199€ / metade da deslocação, F1b antigo) e a tabela 69/79/99 de `reports/black-friday-2026.md`. Feito para o anúncio Meta "13 anos depois" (GTA), que mostra 2L 59€ / 3L 69€ / 4L 89€ riscando 79/89/109: o bot tem de dar estes preços.
-- Quem traz "ref. BFGTA": preços BF desde já até 30/11 (kyro-bot `mcpServer.ts` vê o código no texto do cliente e manda `campaign: 'BFGTA'` ao `quote`). Os outros e o site: 27 a 30/11 (`isBlackFriday`). Conta a data da marcação.
+- Quem traz "ref. BFGTA": preços BF desde já até 30/11 (kyro-bot `mcpServer.ts` vê o código no texto do cliente e manda `campaign: 'BFGTA'` ao `quote`). Os outros e o site: por agora preço normal (dono, 19 Nov: primeiro só o anúncio; a janela 27–30/11 para todos, o site e os packs ficam para um segundo passo). Conta a data da marcação.
 - Tabela só de limpezas (`BLACK_FRIDAY_PRICES`, `withBlackFridayPrices` em `botQuote.ts`). Fica fora (preço normal): impermeabilizações, limpeza com imper, anti-ácaros, pele, alcatifas, tapetes com anti-odor ou misturados com outras peças, sofás de 6+, cadeiras do site e só-assento. Puffs, cadeirões e cabeceiras na mesma visita somam-se à parte como hoje.
 - Deslocação oferecida acima de 50€: a tabela já a inclui. Falta o dono dizer se vale também para pedidos só de impermeabilização (hoje: de 27 a 30/11 o motor já tira a deslocação da imper sozinha, `isBlackFriday`; com ref. BFGTA antes de 27/11 não).
 - Sem `askedDiscount`, `bigOrder`, `closeNow` por cima.

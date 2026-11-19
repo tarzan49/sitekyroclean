@@ -17,11 +17,14 @@ describe('Black Friday 2026 (dono, 19 Nov)', () => {
     expect(q(sofa).total).toBe(89);
     expect(q(sofa).blackFriday).toBeNull();
   });
-  it('27–30/11 para todos; soma arredondada para baixo a acabar em 9', () => {
+  it('ref. BFGTA: soma arredondada para baixo a acabar em 9', () => {
     at('2026-11-28T12:00:00Z');
-    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }] }).total).toBe(119);
-    expect(q({ items: [{ kind: 'sofa', size: '2-lugares' }] }).total).toBe(59);
-    expect(q({ items: [{ kind: 'chairs', qty: 6 }] }).total).toBe(89);
+    const g = { campaign: 'BFGTA' };
+    expect(q({ ...g, items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }] }).total).toBe(119);
+    expect(q({ ...g, items: [{ kind: 'sofa', size: '2-lugares' }] }).total).toBe(59);
+    expect(q({ ...g, items: [{ kind: 'sofa', size: '4-lugares' }] }).total).toBe(89);
+    expect(q({ ...g, items: [{ kind: 'chairs', qty: 6 }] }).total).toBe(89);
+    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }] }).blackFriday).toBeNull();
   });
   it('impermeabilização não muda; acaba a 1/12', () => {
     at('2026-11-20T12:00:00Z');

@@ -51,9 +51,9 @@ export const BLACK_FRIDAY_PRICES = {
 } as const;
 export const BLACK_FRIDAY_REF = 'BFGTA';
 
-/** Preços da Black Friday ativos: 27–30/11 para todos, ou desde já até 30/11 com ref. BFGTA. */
+/** Preços da Black Friday ativos: por agora só com ref. BFGTA, até 30/11 (dono, 19 Nov: a janela 27–30/11
+ * para todos, o site e os packs ficam para um segundo passo). */
 export function blackFridayPricesActive(campaign: unknown, now?: Date): boolean {
-  if (isBlackFriday(now)) return true;
   const t = campaignNow(now);
   return campaign === BLACK_FRIDAY_REF && t !== null && t < BLACK_FRIDAY_2026.until;
 }
