@@ -48,8 +48,17 @@ export const WHATSAPP_CHAIR_CLEAN = 20;
 export const WHATSAPP_CHAIR_CLEAN_BIG_FROM = 8;
 export const WHATSAPP_CHAIR_CLEAN_BIG = 18;
 
+// A partir de 9 cadeiras, limpeza sozinha a 15€ cada (dono, 19 Nov 2026, 12 cadeiras a 18€: "Fazes a 15€ a
+// cadeira ... 18€ uma cadeira para limpar ... está maluco"); o total nunca fica abaixo do de 8 (8 × 18€).
+export const WHATSAPP_CHAIR_CLEAN_HUGE_FROM = 9;
+export const WHATSAPP_CHAIR_CLEAN_HUGE = 15;
+
 export function whatsappChairCleanUnit(totalChairs: number): number | null {
   if (!Number.isSafeInteger(totalChairs) || totalChairs <= 0) return null;
+  if (totalChairs >= WHATSAPP_CHAIR_CLEAN_HUGE_FROM) {
+    const floor = (WHATSAPP_CHAIR_CLEAN_HUGE_FROM - 1) * WHATSAPP_CHAIR_CLEAN_BIG;
+    return Math.max(WHATSAPP_CHAIR_CLEAN_HUGE, Math.ceil((floor / totalChairs) * 100) / 100);
+  }
   if (totalChairs <= WHATSAPP_CHAIR_CLEAN_SMALL_MAX) return WHATSAPP_CHAIR_CLEAN_SMALL;
   return totalChairs >= WHATSAPP_CHAIR_CLEAN_BIG_FROM ? WHATSAPP_CHAIR_CLEAN_BIG : WHATSAPP_CHAIR_CLEAN;
 }

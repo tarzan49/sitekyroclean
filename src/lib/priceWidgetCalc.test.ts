@@ -14,13 +14,13 @@ describe('calcChairBracket', () => {
   });
   it('keeps cleaning under quotation at 10+ but prices protection per unit', () => {
     expect(calcChairBracket(10, false)).toBeNull();
-    expect(calcChairBracket(10, true)).toBe(180);
+    expect(calcChairBracket(10, true)).toBe(150); // 15€ each from 9 (owner, 19 Nov 2026)
   });
   it('uses the same Essential and Premium chair prices as the quiz', () => {
     expect(calcChairBracket(4, true, 'essencial')).toBe(92); // 23€ por cadeira até 4 (dono, 2026-10-09)
-    expect(calcChairBracket(9, true, 'essencial')).toBe(162);
+    expect(calcChairBracket(9, true, 'essencial')).toBe(144); // never below 8 chairs (owner, 19 Nov 2026)
     expect(calcChairBracket(4, true, 'premium')).toBe(120); // 30€ por cadeira até 4
-    expect(calcChairBracket(9, true, 'premium')).toBe(225);
+    expect(calcChairBracket(9, true, 'premium')).toBe(202.5); // 22,50€ each from 9 (owner, 19 Nov 2026)
   });
 });
 
@@ -122,7 +122,7 @@ describe('waterproof widget handoff', () => {
   });
   it('prices ten protected chairs in a mixed selection', () => {
     const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 6: 10 })!;
-    expect(config.initialUpsellItems?.[0].price).toBe(180);
+    expect(config.initialUpsellItems?.[0].price).toBe(150); // 10 chairs x 15€ Essencial from 9 (owner, 19 Nov 2026)
   });
 });
 

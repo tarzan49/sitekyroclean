@@ -220,8 +220,14 @@ var WHATSAPP_CHAIR_CLEAN_SMALL_MAX = 3;
 var WHATSAPP_CHAIR_CLEAN = 20;
 var WHATSAPP_CHAIR_CLEAN_BIG_FROM = 8;
 var WHATSAPP_CHAIR_CLEAN_BIG = 18;
+var WHATSAPP_CHAIR_CLEAN_HUGE_FROM = 9;
+var WHATSAPP_CHAIR_CLEAN_HUGE = 15;
 function whatsappChairCleanUnit(totalChairs) {
   if (!Number.isSafeInteger(totalChairs) || totalChairs <= 0) return null;
+  if (totalChairs >= WHATSAPP_CHAIR_CLEAN_HUGE_FROM) {
+    const floor = (WHATSAPP_CHAIR_CLEAN_HUGE_FROM - 1) * WHATSAPP_CHAIR_CLEAN_BIG;
+    return Math.max(WHATSAPP_CHAIR_CLEAN_HUGE, Math.ceil(floor / totalChairs * 100) / 100);
+  }
   if (totalChairs <= WHATSAPP_CHAIR_CLEAN_SMALL_MAX) return WHATSAPP_CHAIR_CLEAN_SMALL;
   return totalChairs >= WHATSAPP_CHAIR_CLEAN_BIG_FROM ? WHATSAPP_CHAIR_CLEAN_BIG : WHATSAPP_CHAIR_CLEAN;
 }
@@ -379,7 +385,7 @@ function customPackLine(item) {
   } else if (item.kind === "chairs") {
     const bigPack = !!item.unitPrice && !item.seatOnly && (item.extra === "premium" || item.extra === "essencial") && item.qty >= CHAIR_WATERPROOF_BIG_FROM;
     const eight = CHAIR_WATERPROOF_BIG_FROM - 1;
-    const eightPack = bigPack ? item.unitPrice * eight + (chairWaterproofTotal(eight, item.extra === "premium" ? "premium" : "essencial") ?? 0) : 0;
+    const eightPack = bigPack ? (whatsappChairCleanUnit(eight) ?? 0) * eight + (chairWaterproofTotal(eight, item.extra === "premium" ? "premium" : "essencial") ?? 0) : 0;
     const bigWp = bigPack ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial") ?? 0 : 0;
     amount2 = bigPack ? Math.max(WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG * item.qty + bigWp, eightPack) - bigWp : item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
     if (amount2 !== null) {

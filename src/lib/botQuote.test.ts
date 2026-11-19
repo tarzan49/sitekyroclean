@@ -73,7 +73,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     // WhatsApp (owner, 12 Nov 2026): 25€ each up to 3, 20€ from 4, 18€ from 8; the site's tiers only with site: true.
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto' }).subtotal).toBe(120);
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto', site: true }).subtotal).toBe(110);
-    expect([1, 3, 4, 7, 8, 12].map(qty => ok({ items: [{ kind: 'chairs', qty }], city: 'Porto' }).subtotal)).toEqual([25, 75, 80, 140, 144, 216]);
+    // From 9 (owner, 19 Nov 2026): 15€ each, never below 8 chairs (9 chairs = 144€).
+    expect([1, 3, 4, 7, 8, 9, 10, 12].map(qty => ok({ items: [{ kind: 'chairs', qty }], city: 'Porto' }).subtotal)).toEqual([25, 75, 80, 140, 144, 144, 150, 180]);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }, { kind: 'chairs', qty: 2 }], city: 'Porto' }).subtotal).toBe(80);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }], city: 'Braga' }).travel).toBeGreaterThan(0);
     expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(23);
@@ -116,7 +117,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
       expect([r.lines[0].amount, r.quote, r.handToOwner], treatment).toEqual([null, true, true]);
     }
     // 10+ chairs: priced on WhatsApp (18€ each, owner 12 Nov 2026); sob orçamento only for a site order.
-    expect([ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).subtotal, ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).handToOwner]).toEqual([180, false]);
+    expect([ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).subtotal, ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).handToOwner]).toEqual([150, false]); // 15€ each from 9 (owner, 19 Nov 2026)
     expect(ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto', site: true }).handToOwner).toBe(true);
     const unknown = ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Madrid' });
     expect([unknown.cityKnown, unknown.travel, unknown.handToOwner]).toEqual([false, null, true]);
@@ -136,8 +137,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('9 or more chairs cleaned and waterproofed: cleaning 12,50€ + 22,50€ Premium / 15€ Essencial each (owner, 19 Nov 2026)', () => {
     const r = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Cruz Quebrada' });
     expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([420, 420, 330]);
-    // Cleaning alone keeps the WhatsApp price (18€ from 8).
-    expect(ok({ items: [{ kind: 'chairs', qty: 12 }], city: 'Cruz Quebrada' }).total).toBe(216);
+    // Cleaning alone: 15€ each from 9 (owner, 19 Nov 2026).
+    expect(ok({ items: [{ kind: 'chairs', qty: 12 }], city: 'Cruz Quebrada' }).total).toBe(180);
     // 9 never costs less than 8.
     const p8 = ok({ items: [{ kind: 'chairs', qty: 8, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
     const p9 = ok({ items: [{ kind: 'chairs', qty: 9, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
