@@ -2520,7 +2520,7 @@ function rugWaterproofingQuote(input) {
 function botQuote(input) {
   return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
 }
-var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: dá total como o preço e normal como o de sempre ("em vez de"). Sem condição especial por cima. As impermeabilizações não mudam.';
+var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
 function withBlackFridayPrices(input, r) {
   const none = { ...r, blackFriday: null };
   const inp = input ?? {};

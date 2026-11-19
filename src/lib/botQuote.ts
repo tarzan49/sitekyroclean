@@ -456,7 +456,7 @@ export function botQuote(input: unknown) {
   return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
 }
 
-export const BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: dá total como o preço e normal como o de sempre ("em vez de"). Sem condição especial por cima. As impermeabilizações não mudam.';
+export const BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
 /**
  * Black Friday 2026 table (owner, 19 Nov 2026): cleaning-only orders get the BF price, travel included;
  * several pieces = sum of the table rounded DOWN to end in 9 (69 + 59 = 128 → 119). Waterproofing,
