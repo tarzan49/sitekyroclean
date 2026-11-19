@@ -86,7 +86,8 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(',', '.')) : NaN;
-    const total = Math.round(c.requote.total * 100) / 100;
+    // The total said to the client wins over the engine's table (owner, 19 Nov 2026, Altieres: 249€ agreed, 279€ written).
+    const total = Math.round((c.saidTotal && c.saidTotal > 0 ? c.saidTotal : c.requote.total) * 100) / 100;
     // Adding items only: a lower total is a price talk, which is the owner's.
     if (!head || !(total > 0)) return { ok: false, reason: 'título sem preço: o dono atualiza' };
     if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };

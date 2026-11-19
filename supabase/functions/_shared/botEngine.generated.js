@@ -3196,7 +3196,7 @@ function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
 }
 function eventJob(e) {
   const text2 = `${e.summary}
-${e.description ?? ""}`;
+${e.description ?? ""}`.replace(/\(?\s*sem\s+impermeabiliza[cç][aã]o\s*\)?/gi, "");
   const waterproofing = /imperm/i.test(text2) ? /essencial/i.test(text2) && !/premium/i.test(text2) ? true : "premium" : false;
   const total = /\((\d+(?:[.,]\d+)?)\s*€\)/.exec(e.summary)?.[1];
   return { waterproofing, total: total ? Number(total.replace(",", ".")) : null, rugPickup: /recolh/i.test(text2) };
@@ -4518,7 +4518,7 @@ function planBookingUpdate(ev, phone, c, now) {
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
     const was = head ? Number(head[2].replace(",", ".")) : NaN;
-    const total = Math.round(c.requote.total * 100) / 100;
+    const total = Math.round((c.saidTotal && c.saidTotal > 0 ? c.saidTotal : c.requote.total) * 100) / 100;
     if (!head || !(total > 0)) return { ok: false, reason: "título sem preço: o dono atualiza" };
     if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
     if (total !== was) {
