@@ -463,7 +463,30 @@ function botQuoteCore(input: unknown) {
     const u = uWaterproofingQuote(input as Record<string, unknown>);
     if (u) return withBigOrder(u);
   }
-  return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+  return withMattressMiteOffer(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
+}
+
+/**
+ * Order of 150€ or more with a mattress: the anti-mites on the mattress goes as a gift, to win the client
+ * (owner, 19 Nov 2026: "a pessoa tem um colchão, oferece o anti-ácaros no colchão... dizes que normalmente
+ * seria X, mas nós conseguimos oferecer"). `normal` = what the anti-mites on the mattresses would cost
+ * (quote with it minus the same quote with cleaning only); `total` = the price with the gift (cleaning
+ * only), which must be 150€ or more. Not on top of the big-order condition (above 300€).
+ */
+export const MATTRESS_MITE_OFFER_MIN = 150;
+function withMattressMiteOffer<T extends { ok: boolean }>(input: unknown, r: T): T & { mattressMiteOffer: { normal: number; total: number } | null } {
+  const q = r as unknown as { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown };
+  const raw = (input as { items?: unknown } | null)?.items;
+  const isMattress = (i: unknown) => (i as Record<string, unknown> | null)?.kind === 'mattress'
+    && [undefined, 'clean', 'clean+anti-acaros'].includes((i as Record<string, unknown>).treatment as string | undefined);
+  if (!q.ok || q.quote || q.handToOwner || q.bigOrder || typeof q.total !== 'number' || !Array.isArray(raw) || !raw.some(isMattress)) return { ...r, mattressMiteOffer: null };
+  const as = (t: string) => botQuoteInner({ ...(input as object), items: raw.map(i => (isMattress(i) ? { ...(i as object), treatment: t } : i)) }) as { ok: boolean; total?: number | null; quote?: boolean };
+  const clean = as('clean');
+  const mites = as('clean+anti-acaros');
+  if (!clean.ok || !mites.ok || clean.quote || mites.quote || typeof clean.total !== 'number' || typeof mites.total !== 'number') return { ...r, mattressMiteOffer: null };
+  const normal = cents(mites.total - clean.total);
+  if (clean.total < MATTRESS_MITE_OFFER_MIN || normal <= 0) return { ...r, mattressMiteOffer: null };
+  return { ...r, mattressMiteOffer: { normal, total: clean.total } };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
 const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });
@@ -475,11 +498,11 @@ const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: 
  */
 function withAskedDiscount<T extends { ok: boolean }>(input: unknown, r: T): T & { askedDiscount: AskedDiscount | null } {
   const q = r as unknown as {
-    ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; antiMiteGift?: unknown;
+    ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; antiMiteGift?: unknown; mattressMiteOffer?: unknown;
     waterproofingTiers?: unknown; rugWaterproofing?: unknown;
     rugEstimate?: { ok?: boolean; homePrice?: number } | null; rugCombo?: { ok?: boolean; comboPrice?: number } | null;
   };
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift) return { ...r, askedDiscount: null };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === 'number' ? q.total
     : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === 'number' ? q.rugCombo.comboPrice
     : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === 'number' ? q.rugEstimate.homePrice

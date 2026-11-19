@@ -2497,12 +2497,26 @@ function botQuoteCore(input) {
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
-  return withAntiMiteGift(input, withBigOrder(botQuoteInner(input)));
+  return withMattressMiteOffer(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
+}
+var MATTRESS_MITE_OFFER_MIN = 150;
+function withMattressMiteOffer(input, r) {
+  const q = r;
+  const raw = input?.items;
+  const isMattress = (i) => i?.kind === "mattress" && [void 0, "clean", "clean+anti-acaros"].includes(i.treatment);
+  if (!q.ok || q.quote || q.handToOwner || q.bigOrder || typeof q.total !== "number" || !Array.isArray(raw) || !raw.some(isMattress)) return { ...r, mattressMiteOffer: null };
+  const as = (t) => botQuoteInner({ ...input, items: raw.map((i) => isMattress(i) ? { ...i, treatment: t } : i) });
+  const clean = as("clean");
+  const mites = as("clean+anti-acaros");
+  if (!clean.ok || !mites.ok || clean.quote || mites.quote || typeof clean.total !== "number" || typeof mites.total !== "number") return { ...r, mattressMiteOffer: null };
+  const normal = cents(mites.total - clean.total);
+  if (clean.total < MATTRESS_MITE_OFFER_MIN || normal <= 0) return { ...r, mattressMiteOffer: null };
+  return { ...r, mattressMiteOffer: { normal, total: clean.total } };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(input, r) {
   const q = r;
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift) return { ...r, askedDiscount: null };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = input?.items;

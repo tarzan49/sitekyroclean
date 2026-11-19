@@ -875,6 +875,12 @@ Dono: "no máximo, o bot a responder tem que demorar 49 segundos a cada mensagem
 A regra de 16/11 (Regina) de responder com "problema no programa de faturação / código das Finanças" fica **[RETIRADA 17/11]**: a Vendus emite desde 16/11 e o bot deu a desculpa à Angelina, que já tinha pago 69€ e dado o NIF. Agora: cliente pagou e deu nome+NIF → "Fica tratado, [nome]. A fatura segue já de seguida." + `note_for_owner` urgente; a fatura é emitida e enviada na hora e o CRM marcado com fatura (FT 01P2026/19). Teste em kyro-bot `tests/regras-retiradas.test.ts`.
 
 
+### Bactran: só o que a ficha diz; ficha a quem pede; colchão oferecido a partir de 150€ (dono, 19 Nov)
+
+Mafalda (Lisboa, sofá + tapete 149€) perguntou se o Bactran tem eficácia comprovada contra fungos e ácaros; o bot respondeu que "atua sobre bactérias, fungos e ácaros" e prometeu "estudos de eficácia". A ficha oficial (Vonixx, FISPQ-SGQ-50, guardada em `02 Kyro/Fichas tecnicas produtos/` e no servidor como `data/bot-media/ficha-bactran.pdf`) diz: limpador bactericida 7 em 1 com peróxido de hidrogénio, desinfeta "matando até 99,9% das bactérias", neutraliza odores e elimina bolores. Não fala de ácaros. Regra: o bot só diz isso; os ácaros e os resíduos saem com a extração. O dono: "envia a ficha do Bactran sempre que alguém pedir anti-ácaros" (kyro-bot `MEDIA["ficha-bactran"]`, `onlyAskedMedia` deixa-a passar a quem fala de ácaros, alergias, desinfeção, estudos ou eficácia).
+
+Oferta: "a pessoa tem um colchão, oferece o anti-ácaros no colchão... dizes que normalmente seria X, mas nós conseguimos oferecer" (agarrar clientes, o Bactran é barato). `botQuote` devolve `mattressMiteOffer` {normal, total} quando o pedido só com limpeza dá 150€ ou mais e tem colchão, sem `bigOrder` (acima de 300€ fica a condição de sempre); `normal` = o anti-ácaros de todos os colchões do pedido, `total` = o preço só com limpeza. Com a oferta não há `askedDiscount`. Ex.: Lisboa, sofá 4L + colchão de casal = 154€, anti-ácaros normal 20€.
+
 ### Anti-ácaros = produto Bactran; opções em qualquer upsell (dono, 17 Nov)
 
 "Em todas as limpezas com anti ácaros identifica no calendário como produto bactran": `tagWaterproofBase` (src/lib/waterproofBase.ts) junta "(produto Bactran)" a "anti-ácaros" nos títulos que o bot escreve, e o sweep de 5 min da `bot-api` acerta os futuros escritos à mão. "A regra não funciona só para colchões, funciona para qualquer upsell": a regra das opções por escolher (Lourenço) vale para todos os extras; o travão `openOptionIssues` já é por valores, não por artigo.

@@ -21,3 +21,19 @@ describe('anti-ácaros oferecido num pedido grande (dono, 30/10/2026)', () => {
     expect(q.antiMiteGift).toBeNull();
   });
 });
+
+describe('anti-ácaros no colchão oferecido a partir de 150€ (dono, 19/11/2026)', () => {
+  it('sofá + colchão de 150€ ou mais: oferta com o valor normal e o total só com limpeza', () => {
+    const items = [{ kind: 'sofa', size: '4-lugares' }, { kind: 'mattress', size: 'casal' }];
+    const q = botQuote({ city: 'Porto', items }) as any;
+    const mites = botQuote({ city: 'Porto', items: [items[0], { ...items[1], treatment: 'clean+anti-acaros' }] }) as any;
+    expect(q.total).toBeGreaterThanOrEqual(150);
+    expect(q.mattressMiteOffer).toEqual({ normal: mites.total - q.total, total: q.total });
+    expect(mites.mattressMiteOffer).toEqual(q.mattressMiteOffer);
+    expect(q.askedDiscount).toBeNull();
+  });
+  it('abaixo de 150€ ou sem colchão: sem oferta', () => {
+    expect((botQuote({ city: 'Porto', items: [{ kind: 'mattress', size: 'casal' }] }) as any).mattressMiteOffer).toBeNull();
+    expect((botQuote({ city: 'Porto', items: [{ kind: 'sofa', size: '5-lugares' }, { kind: 'sofa', size: '4-lugares' }] }) as any).mattressMiteOffer).toBeNull();
+  });
+});
