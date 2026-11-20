@@ -2165,7 +2165,9 @@ for (const m of municipiosComFreguesias) {
 }
 for (const key of [...ambiguousParts, ...TOO_COMMON_PARISH_NAMES]) parishPartToMunicipio.delete(key);
 var BOT_ONLY_PARISHES = {
-  Mafra: ["Santo Isidoro", "Ribamar", "Ribeira de Ilhas", "Sobreiro", "São Lourenço", "Encarnação", "Enxara do Bispo", "Gradil", "Vila Franca do Rosário", "Igreja Nova", "Cheleiros", "Milharado", "Azueira", "Sobral da Abelheira"]
+  Mafra: ["Santo Isidoro", "Ribamar", "Ribeira de Ilhas", "Sobreiro", "São Lourenço", "Encarnação", "Enxara do Bispo", "Gradil", "Vila Franca do Rosário", "Igreja Nova", "Cheleiros", "Milharado", "Azueira", "Sobral da Abelheira"],
+  // 20 Nov 2026 (Flavia): "Monte da Caparica" came back without a locality and the bot quoted 99€ instead of 89€.
+  Almada: ["Monte da Caparica", "Charneca da Caparica", "Vale Fetal", "Fonte da Telha", "Pragal", "Cacilhas"]
 };
 for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
   if (!(municipality in locationPrices)) continue;
