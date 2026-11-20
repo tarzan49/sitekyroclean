@@ -983,3 +983,4 @@ Funil curto (dono, 19 Nov, mesma conversa): "o cliente já fechou, o cliente já
 
 ## Peças elétricas: nunca aceitar (dono, 19 Nov 2026, Angelina)
 "nunca mais aceites limpeza a coisa eletricas esta cliente vai me foder bem". A Angelina (berço SNOO, estrutura elétrica, malha fixa) marcou limpeza a 17/11 com a Porto 3; a 18/11 o berço pingava água por dentro e deixou uma poça no chão. Desde 19/11 o bot (S69c) nunca dá preço nem horas para uma peça com estrutura, motor ou componentes elétricos nela própria: uma bolha curta a explicar que a água da extração pode chegar ao interior, outras peças seguem o funil, handoff em silêncio. Exceção do dono à regra de nunca negar (como o mofo em casa, S69b).
+Sofás e poltronas reclináveis elétricos aceitam-se (motor na estrutura, não no estofo; dono, 19 Nov).
