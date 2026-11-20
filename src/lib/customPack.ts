@@ -12,7 +12,7 @@ export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros';
  * cleaning (sofas and chairs, with `extra` premium or essencial). The
  * configurator never sets it; the WhatsApp bot's quote uses it
  * (`src/lib/botQuote.ts`), so both price through this one engine. */
-export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; seatOnly?: boolean; }
+export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; seatOnly?: boolean; waterproofingFixed?: { premium: number; essencial: number }; }
 export const PACK_KIND_LABEL: Record<PackKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 export const EXTRA_LABEL: Record<PackExtra, string> = { none: 'Só limpeza', premium: 'Limpeza + impermeabilização Premium (até 10 anos)', essencial: 'Limpeza + impermeabilização Essencial (1 a 2 anos)', 'anti-acaros': 'Limpeza + tratamento anti-ácaros' };
 export function makePackItem(kind: PackKind, id: string): CustomPackItem {
@@ -41,6 +41,9 @@ export function customPackLine(item: CustomPackItem) {
   const waterproofingOnly = item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial') && (item.kind === 'sofa' || item.kind === 'chairs');
   if (waterproofingOnly && item.kind === 'chairs') {
     amount = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === 'premium' ? 'premium' : 'essencial', true) : (item.extra === 'premium' ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+  } else if (waterproofingOnly && item.waterproofingFixed) {
+    // Bot only: a corner sofa is waterproofed as a 5-seat sofa (owner, 20 Nov 2026), fixed price per sofa.
+    amount = item.waterproofingFixed[item.extra === 'premium' ? 'premium' : 'essencial'] * item.qty;
   } else if (waterproofingOnly && option) {
     const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
     amount = unit === null ? null : unit * item.qty;
@@ -63,6 +66,10 @@ export function customPackLine(item: CustomPackItem) {
     // the waterproofing the owner gave for one (18 Nov 2026: +180€ Premium / +120€ Essencial).
     const wp = item.extra === 'premium' || item.extra === 'essencial' ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
     amount = (item.unitPrice + wp) * item.qty;
+  } else if (item.kind === 'sofa' && option && item.waterproofingFixed && (item.extra === 'premium' || item.extra === 'essencial')) {
+    // Bot only: the sofa's own cleaning plus a fixed waterproofing (corner sofa = 5 seats, owner 20 Nov 2026).
+    const unit = calcSofaUnitPrice(option, false, 'cleaning', 'premium', false);
+    amount = unit === null ? null : (unit + item.waterproofingFixed[item.extra]) * item.qty;
   } else if (item.kind === 'sofa' && option) {
     const unit = calcSofaUnitPrice(option, item.extra !== 'none', 'cleaning', item.extra === 'premium' ? 'premium' : 'essencial', item.extra === 'anti-acaros');
     amount = unit === null ? null : unit * item.qty;

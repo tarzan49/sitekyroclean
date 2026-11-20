@@ -102,7 +102,7 @@ function comboOf(rug: Extract<RugEstimate, { ok: true }>, othersPrice: number): 
     usualPrice,
     comboPrice,
     travelWaived: usualPrice - comboPrice,
-    rule: 'Lavagem em casa, na mesma visita: o preço é comboPrice (preço de tabela de cada peça, sem desconto). Nunca "em vez de" nem condição especial. Depois a impermeabilização como opção, a prova e as horas.',
+    rule: 'Lavagem em casa, na mesma visita: comboPrice = preço de tabela de cada peça, sem desconto na linha do tapete. A condição especial da mesma visita vem só no fim, sobre o total (sameVisitSpecial). Depois a impermeabilização como opção, a prova e as horas.',
   };
 }
 

@@ -225,19 +225,14 @@ describe('puffs (owner, 21 Oct 2026)', () => {
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).bigOrder).toBeNull();
   });
 
-  it('an L sofa with waterproofing is priced as a 3-seater plus a 2-seater (owner, 25 and 28 Oct 2026)', () => {
-    const solo = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' });
-    for (const t of ['premium', 'essencial']) {
-      const l = ok({ items: [{ kind: 'sofa', size: 'canto', treatment: t }], city: 'Porto' });
-      expect(l.quote).toBe(false);
-      expect(l.subtotal).toBe(solo('3-lugares', t).subtotal + solo('2-lugares', t).subtotal);
-    }
-    // With the cleaning: the L at 119€ + the 3+2 waterproofing on its own (owner, 20 Nov 2026, Ana Marques).
-    for (const t of ['premium', 'essencial']) {
-      const l = ok({ items: [{ kind: 'sofa', size: 'canto', treatment: `clean+${t}` }], city: 'Porto' });
-      expect(l.subtotal).toBe(119 + solo('3-lugares', t).subtotal + solo('2-lugares', t).subtotal);
-    }
-    expect(ok({ items: [{ kind: 'sofa', size: 'canto' }], city: 'Porto' }).subtotal).toBe(solo('canto', 'clean').subtotal);
+  it('a corner sofa is waterproofed as a 5-seat sofa, the U rule (owner, 20 Nov 2026, Ana Marques)', () => {
+    const l = (treatment: string) => ok({ items: [{ kind: 'sofa', size: 'canto', treatment }], city: 'Porto' });
+    expect(l('premium')).toMatchObject({ quote: false, total: 179 });
+    expect(l('essencial')).toMatchObject({ quote: false, total: 129 });
+    expect(l('clean+premium').subtotal).toBe(119 + 150);
+    expect(l('clean+essencial').subtotal).toBe(119 + 90);
+    expect(l('clean+premium').waterproofingTiers).toMatchObject({ premium: 269, essencial: 209 });
+    expect(l('clean').subtotal).toBe(119);
   });
 });
 
@@ -303,9 +298,13 @@ describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
   it('null quando é sob orçamento, vai ao dono ou já leva condição especial (pedido grande)', () => {
     expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5 }], city: 'Lisboa' }).askedDiscount).toBeNull();
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Madrid' }).askedDiscount).toBeNull();
-    const big = ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment: 'clean+premium' }, { kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
+    const big = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Porto' });
     expect(big.bigOrder).not.toBeNull();
     expect(big.askedDiscount).toBeNull();
+    const several = ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment: 'clean+premium' }, { kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
+    expect(several.sameVisitSpecial).not.toBeNull();
+    expect(several.bigOrder).toBeNull();
+    expect(several.askedDiscount).toBeNull();
   });
 });
 
@@ -327,5 +326,22 @@ describe('sofá de pele (dono, 20 Nov 2026: tratamento da pele +40€, +60€ em
   });
   it('recusa impermeabilização num sofá de pele', () => {
     expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium', leather: true }], city: 'Lisboa' }).ok).toBe(false);
+  });
+});
+
+describe('condição especial na mesma visita, no total final (dono, 20 Nov 2026, Ana Marques)', () => {
+  const ana = (treatment: string) => ok({ city: 'Armação de Pêra', items: [{ kind: 'sofa', size: 'canto', treatment }, { kind: 'rug', width: 2.5, length: 3.5 }], headboards: ['casal'] });
+  it('cada peça ao preço de tabela, o total × 0,9 a acabar em 9, em cada opção', () => {
+    expect(ana('clean').sameVisitSpecial).toMatchObject({ normal: 247, total: 219 });
+    expect(ana('clean+premium').sameVisitSpecial).toMatchObject({ normal: 397, total: 349 });
+    expect(ana('clean+essencial').sameVisitSpecial).toMatchObject({ normal: 337, total: 299 });
+    expect(ana('clean+premium').sameVisitSpecial.options).toEqual({ cleaning: { normal: 247, total: 219 }, premium: { normal: 397, total: 349 }, essencial: { normal: 337, total: 299 } });
+    expect(ana('clean').rugCombo.comboPrice).toBe(208);
+    expect(ana('clean').askedDiscount).toBeNull();
+  });
+  it('uma peça só não leva; com os preços Black Friday não leva', () => {
+    expect(ok({ items: [{ kind: 'sofa', size: 'canto' }], city: 'Porto' }).sameVisitSpecial).toBeNull();
+    const bf = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }], city: 'Porto', campaign: 'BFGTA' });
+    if (bf.blackFriday) expect(bf.sameVisitSpecial).toBeNull();
   });
 });

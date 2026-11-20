@@ -379,6 +379,8 @@ function customPackLine(item) {
   const waterproofingOnly2 = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly2 && item.kind === "chairs") {
     amount2 = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial", true) : (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+  } else if (waterproofingOnly2 && item.waterproofingFixed) {
+    amount2 = item.waterproofingFixed[item.extra === "premium" ? "premium" : "essencial"] * item.qty;
   } else if (waterproofingOnly2 && option2) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
@@ -396,6 +398,9 @@ function customPackLine(item) {
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
     const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
     amount2 = (item.unitPrice + wp) * item.qty;
+  } else if (item.kind === "sofa" && option2 && item.waterproofingFixed && (item.extra === "premium" || item.extra === "essencial")) {
+    const unit = calcSofaUnitPrice(option2, false, "cleaning", "premium", false);
+    amount2 = unit === null ? null : (unit + item.waterproofingFixed[item.extra]) * item.qty;
   } else if (item.kind === "sofa" && option2) {
     const unit = calcSofaUnitPrice(option2, item.extra !== "none", "cleaning", item.extra === "premium" ? "premium" : "essencial", item.extra === "anti-acaros");
     amount2 = unit === null ? null : unit * item.qty;
@@ -695,7 +700,7 @@ function comboOf(rug, othersPrice) {
     usualPrice,
     comboPrice,
     travelWaived: usualPrice - comboPrice,
-    rule: 'Lavagem em casa, na mesma visita: o preço é comboPrice (preço de tabela de cada peça, sem desconto). Nunca "em vez de" nem condição especial. Depois a impermeabilização como opção, a prova e as horas.'
+    rule: "Lavagem em casa, na mesma visita: comboPrice = preço de tabela de cada peça, sem desconto na linha do tapete. A condição especial da mesma visita vem só no fim, sobre o total (sameVisitSpecial). Depois a impermeabilização como opção, a prova e as horas."
   };
 }
 var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de juta ou sisal, o valor é ajustado (a lã paga o mesmo). Se a fotografia mostrar claramente juta, sisal, seda, viscose ou persa, recalcula com esse material antes de responder. ";
@@ -2337,7 +2342,10 @@ function uWaterproofingQuote(input) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
   const treatmentOf = (r) => String(r.treatment ?? "");
-  const isU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
+  const isRealU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
+  const isCantoAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "canto" && ["premium", "essencial"].includes(treatmentOf(r));
+  const cantoAsU = !raw.some(isRealU);
+  const isU = (r) => isRealU(r) || cantoAsU && isCantoAlone(r);
   const isUw = (r) => isU(r) && ["clean+premium", "clean+essencial", "premium", "essencial"].includes(treatmentOf(r));
   const uItems = raw.filter(isUw);
   if (!uItems.length) return null;
@@ -2357,7 +2365,7 @@ function uWaterproofingQuote(input) {
     const essencial2 = cents(rest + U_WATERPROOFING_ALONE.essencial * n);
     const total2 = tier === "premium" ? premium2 : essencial2;
     const amount2 = U_WATERPROOFING_ALONE[tier] * n;
-    const line = { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} sofá em U`, amount: amount2, tablePrice: amount2, perkApplied: false, perkNote: void 0, quote: false };
+    const line = { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} ${uItems.every(isCantoAlone) ? "sofá de canto" : "sofá em U"}`, amount: amount2, tablePrice: amount2, perkApplied: false, perkNote: void 0, quote: false };
     return {
       ok: true,
       city,
@@ -2519,7 +2527,59 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
+  return withAskedDiscount(input, withSameVisitSpecial(input, withBlackFridayPrices(input, botQuoteCore(input))));
+}
+var SAME_VISIT_SPECIAL_FACTOR = 0.9;
+var SAME_VISIT_SPECIAL_MIN_PIECES = 2;
+var SAME_VISIT_SPECIAL_RULE = 'Várias peças na mesma visita: dá cada peça ao preço de tabela (lines, cabeceiras, puffs, cadeirões) e no fim, numa linha, "Condição especial na mesma visita: fica tudo por [total]€ (em vez de [normal]€)." Com opções, faz o mesmo em cada uma (Só a limpeza / Premium / Essencial) com os valores de options. Nunca percentagem nem a palavra desconto, nunca o desconto numa peça. Sem outra condição por cima (nem askedDiscount nem bigOrder).';
+var sameVisitEnd9 = (v) => Math.floor((v + 1) / 10) * 10 - 1;
+function sameVisitSpecialPrice(normal) {
+  return sameVisitEnd9(Math.floor(normal * SAME_VISIT_SPECIAL_FACTOR * 100) / 100);
+}
+function finalOrderPrice(r) {
+  const q = r;
+  if (!q.ok || q.handToOwner) return null;
+  const base = q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : !q.quote && typeof q.total === "number" ? q.total : null;
+  if (base === null) return null;
+  const extras = [q.puff, q.armchair, q.headboard].reduce((s, e) => s + (e && typeof e.amount === "number" ? e.amount : 0), 0);
+  return cents(base + extras);
+}
+function sameVisitPieces(input) {
+  const raw = Array.isArray(input.items) ? input.items : [];
+  const items = raw.reduce((n, i) => n + (i?.kind === "chairs" ? 1 : typeof i?.qty === "number" && i.qty > 0 ? i.qty : 1), 0);
+  const extras = [typeof input.puffs === "number" && input.puffs > 0, typeof input.armchairs === "number" && input.armchairs > 0, Array.isArray(input.headboards) && input.headboards.length > 0].filter(Boolean).length;
+  return items + extras;
+}
+function withSameVisitSpecial(input, r) {
+  const none = { ...r, sameVisitSpecial: null };
+  if (!input || typeof input !== "object") return none;
+  const inp = input;
+  const q = r;
+  if (!q.ok || q.blackFriday || q.mattressMiteOffer || q.antiMiteGift || q.rugCombo?.ok && (q.rugCombo.travelWaived ?? 0) > 0) return none;
+  if (sameVisitPieces(inp) < SAME_VISIT_SPECIAL_MIN_PIECES) return none;
+  const normal = finalOrderPrice(r);
+  if (normal === null) return none;
+  const price = (v) => v === null ? null : { normal: v, total: sameVisitSpecialPrice(v) };
+  const raw = Array.isArray(inp.items) ? inp.items : [];
+  const treatmentOf = (i) => String(i?.treatment ?? "clean");
+  const wp = raw.some((i) => /premium|essencial/.test(treatmentOf(i)));
+  const variant = (to) => {
+    if (to === "clean" && raw.some((i) => /^(premium|essencial)$/.test(treatmentOf(i)))) return null;
+    const items = raw.map((i) => {
+      const t = treatmentOf(i);
+      if (!/premium|essencial/.test(t)) return i;
+      return { ...i, treatment: to === "clean" ? "clean" : t.startsWith("clean") ? `clean+${to}` : to };
+    });
+    const v = botQuoteCore({ ...inp, items });
+    return v.ok ? finalOrderPrice(v) : null;
+  };
+  const options = wp ? { cleaning: price(variant("clean")), premium: price(variant("premium")), essencial: price(variant("essencial")) } : { cleaning: price(normal), premium: null, essencial: null };
+  return {
+    ...r,
+    bigOrder: null,
+    closeNow: { ok: false, reason: "já leva a condição especial da mesma visita (sameVisitSpecial)" },
+    sameVisitSpecial: { normal, total: sameVisitSpecialPrice(normal), options, rule: SAME_VISIT_SPECIAL_RULE }
+  };
 }
 var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
 function withBlackFridayPrices(input, r) {
@@ -2586,7 +2646,7 @@ function withMattressMiteOffer(input, r) {
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(input, r) {
   const q = r;
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday) return { ...r, askedDiscount: null };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday || r.sameVisitSpecial) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = input?.items;
@@ -2674,13 +2734,8 @@ function botQuoteInner(input) {
     const item = toItem(raw, i);
     if ("ok" in item) return item;
     if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
-      if (item.primary === "cleaning") {
-        items.push({ ...item, id: `${item.id}c`, extra: "none" }, { ...item, id: `${item.id}a`, size: "3-lugares", primary: "waterproofing" }, { ...item, id: `${item.id}b`, size: "2-lugares", primary: "waterproofing" });
-        rawOf.push(raw, raw, raw);
-        continue;
-      }
-      items.push({ ...item, id: `${item.id}a`, size: "3-lugares" }, { ...item, id: `${item.id}b`, size: "2-lugares" });
-      rawOf.push(raw, raw);
+      items.push({ ...item, waterproofingFixed: item.primary === "waterproofing" ? U_WATERPROOFING_ALONE : U_WATERPROOFING_EXTRA });
+      rawOf.push(raw);
       continue;
     }
     items.push(item);
