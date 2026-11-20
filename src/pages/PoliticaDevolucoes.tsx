@@ -1,4 +1,4 @@
-import { SATISFACTION_PROMISE, PRICE_PROMISE } from '../constants/commercialPolicy';
+import { SATISFACTION_PROMISE, SATISFACTION_PHOTOS, PRICE_PROMISE } from '../constants/commercialPolicy';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, WHATSAPP_BASE, PHONE_DISPLAY } from '@/constants/business';
@@ -44,7 +44,7 @@ const PoliticaDevolucoes = () => (
 
         <Section title="3. Reclamações">
           <p>
-            {SATISFACTION_PROMISE}
+            {SATISFACTION_PROMISE} {SATISFACTION_PHOTOS}
           </p>
         </Section>
 

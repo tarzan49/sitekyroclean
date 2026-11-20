@@ -7,6 +7,8 @@ export const DRYING_PROMISE = 'Secagem média de 2 a 5 horas, dependendo da vent
 export const SOFA_DRYING_RANGE = '2 a 5 horas';
 export const SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;
 export const SATISFACTION_PROMISE = 'Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Após esse prazo, esta garantia comercial de repetição deixa de se aplicar, sem prejuízo dos direitos legais.';
+// Dono, 20 Nov: a repetição das 48 h pede fotografias das zonas, como diz o certificado de limpeza.
+export const SATISFACTION_PHOTOS = 'Para pedir a repetição, envie fotografias das zonas em causa dentro dessas 48 horas.';
 export const PRICE_PROMISE = 'A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.';
 export const AVAILABILITY_PROMISE = 'Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.';
 export const COVERAGE_PROMISE = 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.';

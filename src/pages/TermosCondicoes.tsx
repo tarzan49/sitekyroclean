@@ -1,4 +1,4 @@
-import { SATISFACTION_PROMISE, PRICE_PROMISE } from '../constants/commercialPolicy';
+import { SATISFACTION_PROMISE, SATISFACTION_PHOTOS, PRICE_PROMISE } from '../constants/commercialPolicy';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_E164, PHONE_DISPLAY, BUSINESS_ADDRESS } from '@/constants/business';
@@ -79,7 +79,7 @@ const TermosCondicoes = () => (
 
         <Section title="8. Reclamações">
           <p>
-            {SATISFACTION_PROMISE} Para mais detalhes, consulte a nossa{' '}
+            {SATISFACTION_PROMISE} {SATISFACTION_PHOTOS} Para mais detalhes, consulte a nossa{' '}
             <a href="/politica-de-devolucoes" className="text-[#1A4E30] underline underline-offset-2">Política de Devoluções</a>.
           </p>
         </Section>
