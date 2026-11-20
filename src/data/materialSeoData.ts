@@ -124,6 +124,7 @@ const materialDefinitions: MaterialDefinition[] = [
     faqs: [
       { question: "Com que frequência devo limpar um sofá em pele?", answer: "Recomendamos limpeza profissional a cada 6-12 meses, dependendo do uso. A hidratação deve ser feita pelo menos semestralmente." },
       { question: "A limpeza remove arranhões da pele?", answer: "Arranhões superficiais podem ser minimizados com o processo de hidratação e proteção. Arranhões profundos podem necessitar de restauro especializado." },
+      { question: "Um sofá em pele pode ser impermeabilizado?", answer: "Não fazemos, porque não faz sentido: a pele já não deixa entrar os líquidos. O cuidado certo é a limpeza com hidratação, que a mantém macia e evita que resseque e estale." },
       { question: "Quanto custa limpar e hidratar um sofá em pele?", answer: `A partir de ${formatEuro(sofaCleaningPrice('2-lugares'))} para sofás de 2 lugares, incluindo limpeza e hidratação. O valor final é confirmado no orçamento, porque um sofá em pele pode custar mais do que um de tecido com o mesmo tamanho.` },
     ],
     relatedMaterials: ["limpeza-sofa-tecido", "limpeza-sofa-camurca", "limpeza-sofa-sintetico"],
@@ -226,7 +227,7 @@ const materialDefinitions: MaterialDefinition[] = [
     ],
     faqs: [
       { question: "Posso limpar camurça com água?", answer: "Não recomendamos. A água pode manchar permanentemente a camurça. Ajustamos o produto e a humidade à avaliação do material, depois de testar uma zona discreta." },
-      { question: "A camurça pode ser impermeabilizada?", answer: "Sim, e recomendamos. A impermeabilização cria uma barreira protetora contra líquidos e manchas, prolongando a vida útil do sofá em camurça." },
+      { question: "A camurça pode ser impermeabilizada?", answer: "Depende do acabamento: a camurça e o nobuck pedem um protetor próprio, diferente do dos tecidos. Vemos o material pela fotografia e dizemos se faz sentido no seu sofá." },
     ],
     relatedMaterials: ["limpeza-sofa-pele", "limpeza-sofa-veludo", "limpeza-sofa-tecido"],
   },
@@ -260,6 +261,7 @@ const materialDefinitions: MaterialDefinition[] = [
     ],
     faqs: [
       { question: "A pele sintética pode ser limpa profissionalmente?", answer: "Sim. Utilizamos produtos específicos para materiais sintéticos que limpam sem causar descamação ou descoloração." },
+      { question: "Um sofá em pele sintética pode ser impermeabilizado?", answer: "Não fazemos, porque não faz sentido: a pele sintética, a napa e o curvim não absorvem líquidos. Basta a limpeza certa para o material." },
       { question: "Como evitar que o sofá sintético descame?", answer: "A hidratação regular e proteção contra calor e UV são fundamentais. O nosso serviço inclui hidratação e proteção que prolonga a vida do material." },
     ],
     relatedMaterials: ["limpeza-sofa-pele", "limpeza-sofa-tecido", "limpeza-sofa-microfibra"],

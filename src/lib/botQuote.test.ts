@@ -304,13 +304,21 @@ describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
   });
 });
 
-describe('sofá de pele (dono, 16 Nov 2026: tratamento da pele +30€, nunca impermeabilização)', () => {
-  it('soma 30€ por sofá de pele, numa linha própria, sem versões de impermeabilização', () => {
+describe('sofá de pele (dono, 20 Nov 2026: tratamento da pele +40€, +60€ em 5 ou 6 lugares, nunca impermeabilização)', () => {
+  it('soma 40€ por sofá de pele, numa linha própria, sem versões de impermeabilização', () => {
     const plain = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Lisboa' });
     const leather = ok({ items: [{ kind: 'sofa', size: '3-lugares', leather: true }], city: 'Lisboa' });
-    expect(leather.total).toBe((plain.total as number) + 30);
-    expect(leather.lines.at(-1)).toMatchObject({ label: 'Tratamento da pele (limpeza e hidratação)', amount: 30 });
+    expect(leather.total).toBe((plain.total as number) + 40);
+    expect(leather.lines.at(-1)).toMatchObject({ label: 'Tratamento da pele (limpeza e hidratação)', amount: 40 });
     expect(leather.waterproofingTiers).toBeNull();
+  });
+  it('soma 60€ num sofá de pele de 5 ou 6 lugares', () => {
+    const plain5 = ok({ items: [{ kind: 'sofa', size: '5-lugares' }], city: 'Lisboa' });
+    const leather5 = ok({ items: [{ kind: 'sofa', size: '5-lugares', leather: true }], city: 'Lisboa' });
+    expect(leather5.total).toBe((plain5.total as number) + 60);
+    const plain6 = ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6, look: 'medio' }], city: 'Lisboa' });
+    const leather6 = ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6, look: 'medio', leather: true }], city: 'Lisboa' });
+    expect(leather6.total).toBe((plain6.total as number) + 60);
   });
   it('recusa impermeabilização num sofá de pele', () => {
     expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium', leather: true }], city: 'Lisboa' }).ok).toBe(false);

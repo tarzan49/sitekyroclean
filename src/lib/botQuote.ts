@@ -91,9 +91,9 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
   if ((kind === 'rug' || kind === 'carpet') && treatment !== 'clean') return fail(`items[${index}]: tapetes e alcatifas só têm limpeza`);
   if (r.odor !== undefined && typeof r.odor !== 'boolean') return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === 'rug' || kind === 'carpet')) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
-  // `leather`: a leather sofa (owner, 16 Nov 2026): never waterproofed; the leather treatment is +30€ per sofa.
+  // `leather`: a leather sofa (owner, 16 Nov 2026): never waterproofed; the leather treatment is +40€ per sofa, +60€ on 5 or 6 seats (owner, 20 Nov).
   if (r.leather !== undefined && (typeof r.leather !== 'boolean' || (r.leather && kind !== 'sofa'))) return fail(`items[${index}].leather só serve para sofás (true ou false)`);
-  if (r.leather === true && treatment !== 'clean') return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€) junta-se sozinho`);
+  if (r.leather === true && treatment !== 'clean') return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€, +${LEATHER_TREATMENT_LARGE}€ em 5 ou 6 lugares) junta-se sozinho`);
   // `seatOnly`: chairs whose only upholstery is the seat top (owner, 14 Nov 2026): waterproofing 18€/12€ each.
   if (r.seatOnly !== undefined && (typeof r.seatOnly !== 'boolean' || (r.seatOnly && kind !== 'chairs'))) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = '';
@@ -376,10 +376,13 @@ function rugOdorFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number
 }
 
 /**
- * Leather treatment (tratamento da pele: limpeza e hidratação do couro), owner 16 Nov 2026: +30€ per
- * leather sofa. A leather sofa is never waterproofed. Item flag `leather: true` on the sofa's cleaning.
+ * Leather treatment (tratamento da pele: limpeza e hidratação do couro), owner 20 Nov 2026: +40€ per
+ * leather sofa, +60€ on a 5 or 6 seater (size 5-lugares, U with 5+ seats included). A leather sofa is
+ * never waterproofed. Item flag `leather: true` on the sofa's cleaning.
  */
-export const LEATHER_TREATMENT = 30;
+export const LEATHER_TREATMENT = 40;
+export const LEATHER_TREATMENT_LARGE = 60;
+const leatherUnit = (size: string) => (size === '5-lugares' ? LEATHER_TREATMENT_LARGE : LEATHER_TREATMENT);
 export const LEATHER_RULE = 'Já está somado ao total: não somes outra vez. Diz o tratamento da pele numa linha à parte. Nunca ofereças impermeabilização a um sofá de pele.';
 
 function leatherFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number; lines: QuoteLine[] } | null {
@@ -387,7 +390,7 @@ function leatherFor(items: CustomPackItem[], rawOf: unknown[]): { amount: number
   let amount = 0;
   items.forEach((i, n) => {
     if (i.kind !== 'sofa' || (rawOf[n] as Record<string, unknown>)?.leather !== true) return;
-    const a = LEATHER_TREATMENT * i.qty;
+    const a = leatherUnit(i.size) * i.qty;
     amount += a;
     lines.push({ label: `Tratamento da pele (limpeza e hidratação)${i.qty > 1 ? ` (${i.qty} un.)` : ''}`, amount: a, tablePrice: a, perkApplied: false, perkNote: undefined, quote: false });
   });
@@ -735,5 +738,5 @@ function botQuoteInner(input: unknown) {
   // Leather treatment (owner, 16 Nov 2026): own line, summed into the price; never waterproofing tiers.
   const leather = leatherFor(items, rawOf);
   if (!leather) return { ...withOdor, leatherTreatment: null as { amount: number; perSofa: number; rule: string } | null };
-  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: LEATHER_TREATMENT, rule: LEATHER_RULE } as { amount: number; perSofa: number; rule: string } | null };
+  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === 'sofa' && (rawOf[n] as Record<string, unknown>)?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } as { amount: number; perSofa: number; rule: string } | null };
 }
