@@ -647,9 +647,16 @@ function botQuoteInner(input: unknown) {
     if ('ok' in item) return item;
     // Waterproofing an L sofa = a 3-seater plus a 2-seater (owner, 25 Oct 2026: "SOFÁ EM L … É UM SOFÁ
     // DE 3+2 LUGARES"; 28 Oct 2026, "adiciona tb": impermeabilizar em L = 3 lugares + 2 lugares). Only
-    // the cleaning of an L has its own price (canto, 109€); before this the bot handed every waterproofing
+    // the cleaning of an L has its own price (canto, 119€ desde 20 Nov); before this the bot handed every waterproofing
     // of an L to the owner as sob orçamento.
     if (item.kind === 'sofa' && item.size === 'canto' && (item.extra === 'premium' || item.extra === 'essencial')) {
+      // With the cleaning, the L is cleaned at its own price (119€) and only the waterproofing is 3+2 (owner,
+      // 20 Nov 2026, Ana Marques: "em teoria eram 79 mais 69, mas não vamos fazer esse preço. Fazemos 119").
+      if (item.primary === 'cleaning') {
+        items.push({ ...item, id: `${item.id}c`, extra: 'none' }, { ...item, id: `${item.id}a`, size: '3-lugares', primary: 'waterproofing' }, { ...item, id: `${item.id}b`, size: '2-lugares', primary: 'waterproofing' });
+        rawOf.push(raw, raw, raw);
+        continue;
+      }
       items.push({ ...item, id: `${item.id}a`, size: '3-lugares' }, { ...item, id: `${item.id}b`, size: '2-lugares' });
       rawOf.push(raw, raw);
       continue;

@@ -181,7 +181,7 @@ var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 168, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
   { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 208, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 70 },
   { id: "5-lugares", label: "5+ Lugares", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
-  { id: "canto", label: "Canto", cleaningPrice: 109, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
+  { id: "canto", label: "Canto", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "4+-lugares", label: "Em U ou modular", cleaningPrice: "Sob orçamento", waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" }
 ];
 var mattressPrices = [
@@ -665,7 +665,6 @@ function rugMaterialClass(material) {
   return "common";
 }
 var roundToNine = (value) => Math.max(9, Math.round((value - 9) / 10) * 10 + 9);
-var roundDownToNine = (value) => Math.max(9, Math.floor((value - 9) / 10) * 10 + 9);
 function rugComboEstimate(rugs, othersPrice, city) {
   const rug = rugEstimate(rugs, city);
   if (!rug.ok) return rug;
@@ -687,8 +686,8 @@ function comboOf(rug, othersPrice) {
       rule: "Tapete pequeno na mesma visita. Dá o preço como condição especial: com o tapete seria usualPrice, fazemos tudo por comboPrice. Depois a prova e as horas."
     };
   }
-  const usualPrice = rug.homePrice + othersPrice + rug.travelFee;
-  const comboPrice = roundDownToNine(rugsWashing + othersPrice);
+  const comboPrice = rugsWashing + othersPrice;
+  const usualPrice = comboPrice;
   return {
     ok: true,
     rugsWashing,
@@ -696,7 +695,7 @@ function comboOf(rug, othersPrice) {
     usualPrice,
     comboPrice,
     travelWaived: usualPrice - comboPrice,
-    rule: "Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas."
+    rule: 'Lavagem em casa, na mesma visita: o preço é comboPrice (preço de tabela de cada peça, sem desconto). Nunca "em vez de" nem condição especial. Depois a impermeabilização como opção, a prova e as horas.'
   };
 }
 var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de juta ou sisal, o valor é ajustado (a lã paga o mesmo). Se a fotografia mostrar claramente juta, sisal, seda, viscose ou persa, recalcula com esse material antes de responder. ";
@@ -2675,6 +2674,11 @@ function botQuoteInner(input) {
     const item = toItem(raw, i);
     if ("ok" in item) return item;
     if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
+      if (item.primary === "cleaning") {
+        items.push({ ...item, id: `${item.id}c`, extra: "none" }, { ...item, id: `${item.id}a`, size: "3-lugares", primary: "waterproofing" }, { ...item, id: `${item.id}b`, size: "2-lugares", primary: "waterproofing" });
+        rawOf.push(raw, raw, raw);
+        continue;
+      }
       items.push({ ...item, id: `${item.id}a`, size: "3-lugares" }, { ...item, id: `${item.id}b`, size: "2-lugares" });
       rawOf.push(raw, raw);
       continue;

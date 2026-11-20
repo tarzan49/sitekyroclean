@@ -145,14 +145,14 @@ describe('sofa waterproofing upsell reduction', () => {
     // Sem delta de recurso, o acréscimo do tratamento também fica por definir.
     expect(calcPackPricing(five, true, false, null, 'essencial').packDelta).toBeNull();
   });
-  it('lists the U-shaped or modular sofa last, fully under quote, after the corner sofa (cleaning only, 109)', () => {
+  it('lists the U-shaped or modular sofa last, fully under quote, after the corner sofa (cleaning only, 119 since 20 Nov 2026)', () => {
     const uShape = sofaPrices[sofaPrices.length - 1];
     expect(uShape.id).toBe('4+-lugares');
     expect(uShape.label.replace(/\u00A0/g, ' ')).toBe('Em U ou modular');
     expect([uShape.cleaningPrice, uShape.waterproofingPrice, uShape.waterproofingPremiumPrice, uShape.bothPrice].every(v => typeof v !== 'number')).toBe(true);
     const corner = sofaPrices[sofaPrices.length - 2];
     expect(corner.id).toBe('canto');
-    expect(corner.cleaningPrice).toBe(109);
+    expect(corner.cleaningPrice).toBe(119);
     expect([corner.waterproofingPrice, corner.waterproofingPremiumPrice, corner.bothPrice].every(v => typeof v !== 'number')).toBe(true);
   });
 });

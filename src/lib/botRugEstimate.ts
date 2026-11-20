@@ -90,8 +90,11 @@ function comboOf(rug: Extract<RugEstimate, { ok: true }>, othersPrice: number): 
       rule: 'Tapete pequeno na mesma visita. Dá o preço como condição especial: com o tapete seria usualPrice, fazemos tudo por comboPrice. Depois a prova e as horas.',
     };
   }
-  const usualPrice = rug.homePrice + othersPrice + rug.travelFee;
-  const comboPrice = roundDownToNine(rugsWashing + othersPrice);
+  // No discount nobody asked for (owner, 20 Nov 2026, Ana Marques: canto 119€ + carpete 8,75 m² 89€ sent
+  // as 159€ "em vez de 188€" — "fizeste um desconto de 30€ sem ninguém te pedir nada"): same visit =
+  // rug washing + the other items at table price; only the second trip is saved, never a rounding down.
+  const comboPrice = rugsWashing + othersPrice;
+  const usualPrice = comboPrice;
   return {
     ok: true,
     rugsWashing,
@@ -99,7 +102,7 @@ function comboOf(rug: Extract<RugEstimate, { ok: true }>, othersPrice: number): 
     usualPrice,
     comboPrice,
     travelWaived: usualPrice - comboPrice,
-    rule: 'Lavagem em casa. Dá o preço como condição especial da mesma visita: em separado seria usualPrice, tudo na mesma visita fica comboPrice, com a deslocação oferecida. Uma frase curta sobre porque faz sentido (uma só deslocação), depois a prova e as horas.',
+    rule: 'Lavagem em casa, na mesma visita: o preço é comboPrice (preço de tabela de cada peça, sem desconto). Nunca "em vez de" nem condição especial. Depois a impermeabilização como opção, a prova e as horas.',
   };
 }
 

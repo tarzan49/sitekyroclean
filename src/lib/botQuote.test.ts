@@ -227,10 +227,15 @@ describe('puffs (owner, 21 Oct 2026)', () => {
 
   it('an L sofa with waterproofing is priced as a 3-seater plus a 2-seater (owner, 25 and 28 Oct 2026)', () => {
     const solo = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' });
-    for (const t of ['premium', 'essencial', 'clean+premium', 'clean+essencial']) {
+    for (const t of ['premium', 'essencial']) {
       const l = ok({ items: [{ kind: 'sofa', size: 'canto', treatment: t }], city: 'Porto' });
       expect(l.quote).toBe(false);
       expect(l.subtotal).toBe(solo('3-lugares', t).subtotal + solo('2-lugares', t).subtotal);
+    }
+    // With the cleaning: the L at 119€ + the 3+2 waterproofing on its own (owner, 20 Nov 2026, Ana Marques).
+    for (const t of ['premium', 'essencial']) {
+      const l = ok({ items: [{ kind: 'sofa', size: 'canto', treatment: `clean+${t}` }], city: 'Porto' });
+      expect(l.subtotal).toBe(119 + solo('3-lugares', t).subtotal + solo('2-lugares', t).subtotal);
     }
     expect(ok({ items: [{ kind: 'sofa', size: 'canto' }], city: 'Porto' }).subtotal).toBe(solo('canto', 'clean').subtotal);
   });

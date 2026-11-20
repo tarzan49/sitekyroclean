@@ -46,8 +46,8 @@ describe('calcWidgetPricing — sem conceito de desconto', () => {
 });
 
 describe('calcWidgetTotal (limpeza-sofas, dados reais)', () => {
-  it('prices the corner sofa cleaning at 109 (owner, 13 Oct 2026); "em U ou modular" (sob orçamento) never contributes a price', () => {
-    expect(calcWidgetTotal('limpeza-sofas', { 5: 1 })).toBe(109); // index 5 = canto
+  it('prices the corner sofa cleaning at 119 (owner, 20 Nov 2026); "em U ou modular" (sob orçamento) never contributes a price', () => {
+    expect(calcWidgetTotal('limpeza-sofas', { 5: 1 })).toBe(119); // index 5 = canto
     expect(calcWidgetTotal('limpeza-sofas', { 6: 1 })).toBe(0); // index 6 = em U ou modular: sob orçamento.
     expect(widgetSofaUnitPrice(PRICE_TABLE_QUIZ_CONFIG['limpeza-sofas'][6]!, false, 'essencial')).toBeNull();
   });

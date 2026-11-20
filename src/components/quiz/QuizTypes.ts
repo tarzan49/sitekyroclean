@@ -107,7 +107,7 @@ export interface PriceOption {
 // sob orçamento (o dono não deu valores: não inventar). O motor devolve null
 // nesses casos (calcSofaUnitPrice) e o quiz marca-os como sob orçamento.
 //
-// Sofá de canto (dono, 2026-10-13: "sofá de canto faz a 109 eur"): id 'canto',
+// Sofá de canto (dono, 2026-10-13: "sofá de canto faz a 109 eur"; 20 Nov: "Fazemos 119 num sofá de canto"): id 'canto',
 // só a limpeza tem preço; impermeabilização, anti-ácaros e pack ficam sob
 // orçamento, como no de 5+ lugares (o dono não deu valores: não inventar).
 //
@@ -131,7 +131,7 @@ export const sofaPrices: PriceOption[] = [
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 168, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
   { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 208, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 70 },
   { id: '5-lugares',  label: '5+ Lugares', cleaningPrice: 119, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
-  { id: 'canto',      label: 'Canto',      cleaningPrice: 109, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { id: 'canto',      label: 'Canto',      cleaningPrice: 119, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
   { id: '4+-lugares', label: 'Em\u00A0U ou modular', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
