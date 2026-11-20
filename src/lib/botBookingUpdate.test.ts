@@ -169,3 +169,13 @@ describe('total dito ganha à tabela (Altieres, 19 Nov)', () => {
     expect(r.added?.value).toBe(50);
   });
 });
+
+describe('extra feito no local (Elisabete, 20 Nov 2026)', () => {
+  it('pago acima do evento: o extra entra no serviço e conta como fecho', () => {
+    const ev3 = { id: 'e', start: '2026-11-20T09:00:00Z', end: '2026-11-20T11:00:00Z', summary: 'Serviço 45€ (89€) Limpeza de sofá 3 lugares com chaise - 910090056 - Elisabete - Rua das Caleiras, 31, 4470-156 Maia', description: 'Equipa: Porto 1\n\nbot:351910090056@s.whatsapp.net' };
+    const r = planBookingUpdate(ev3, '910090056', { saidTotal: 129, extra: 'tratamento enzimático da urina' }, new Date('2026-11-20T12:00:00Z'));
+    if (!r.ok) throw new Error(r.reason);
+    expect(r.title).toBe('Serviço 65€ (129€) Limpeza de sofá 3 lugares com chaise + tratamento enzimático da urina - 910090056 - Elisabete - Rua das Caleiras, 31, 4470-156 Maia');
+    expect(r.added).toEqual({ value: 40, cut: 20, what: 'tratamento enzimático da urina (feito no local)' });
+  });
+});

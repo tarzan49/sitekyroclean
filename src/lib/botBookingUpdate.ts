@@ -26,6 +26,12 @@ export interface BookingChanges {
   requote?: { total: number; what: string; service?: string; fewer?: boolean };
   /** The total the client was told in a message that went out (owner, 16 Nov 2026: "o valor que passas à equipa é sempre o valor fechado com o cliente"). Up or down; items stay. */
   saidTotal?: number;
+  /**
+   * With saidTotal above the booked total: what the team did on top, on site (owner, 20 Nov 2026,
+   * Elisabete: "tratamento da urina", 89€ + 40€, paid by MB Way and never written in the chat).
+   * It joins the service in the title and counts as a closing of its own, like items added.
+   */
+  extra?: string;
 }
 export interface BookingEvent { id: string; summary: string; description: string; start: string | null; end: string | null }
 export type BookingUpdatePlan =
@@ -116,9 +122,20 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     const total = Math.round(c.saidTotal * 100) / 100;
     if (total !== was) {
       const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','));
-      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + title.slice(head[0].length);
+      const extra = clean(c.extra);
+      let rest = title.slice(head[0].length);
+      if (extra && total > was) {
+        // " Limpeza de sofá - 9100… - Name - Address": the extra goes at the end of the service part.
+        const cut = rest.indexOf(' - ');
+        rest = cut >= 0 ? `${rest.slice(0, cut)} + ${extra}${rest.slice(cut)}` : `${rest} + ${extra}`;
+        const wasCut = Number(head[0].match(/[\d,.]+(?=€)/)?.[0].replace(',', '.'));
+        added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: `${extra} (feito no local)` };
+      }
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + rest;
       description = description.split('\n').map(l => /^Total:/.test(l) ? l.replace(/^Total:\s*[\d,.]+€/, `Total: ${fmt(total)}€`) : l).join('\n');
-      said.push(`total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
+      said.push(extra && total > was
+        ? `extra feito no local: ${extra}, total ${fmt(total)}€ (era ${head[2]}€)`
+        : `total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold(ev.description).includes(fold(note))) said.push(`nota: ${note}`);

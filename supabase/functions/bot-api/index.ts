@@ -678,7 +678,8 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     requote = { total: q.total, what: (q.lines ?? []).map((l: { label: string }) => l.label).join(" + "), service: str("service"), fewer: changes.fewer === true };
   }
   const saidTotal = typeof changes.saidTotal === "number" && changes.saidTotal > 0 ? changes.saidTotal : undefined;
-  let plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal }, now);
+  const extra = str("extra");
+  let plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, extra }, now);
   // Reschedules are the bot's (owner, 16 Oct 2026). A move keeps the event's team, so the new hour has to
   // have room for that team, not only for the zone: otherwise the hour stays and the owner picks the team.
   let busyTeam: string | null = null;
@@ -705,7 +706,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
       busyTeam = team;
       const takes = teamTakesJob(team, ev, plan.start);
       const why = takes ? `a equipa ${team} já tem um serviço a essa hora` : `a equipa ${team} já não faz este serviço nesse dia e nenhuma outra equipa da zona está livre a essa hora`;
-      plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, date: undefined, time: undefined }, now);
+      plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, extra, date: undefined, time: undefined }, now);
       if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} ${takes ? "está ocupada" : "já não faz este serviço"}`,
         `${asked.date ? `O cliente combinou ${asked.date} às ${asked.time}` : "O cliente mudou os artigos"}, mas ${why}. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
     }
@@ -734,7 +735,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     await env.notifyOwner(`${requote.fewer ? "Artigos retirados" : "Artigos acrescentados"}: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.${extraError ? `\n\nO acréscimo não ficou nos fechos de hoje (${extraError.slice(0, 200)}): conta no dia em que o serviço foi marcado.` : ""}`).catch(() => null);
   }
   if (saidTotal && plan.ok && env.notifyOwner) {
-    await env.notifyOwner(`Total do evento acertado: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento tinha um total diferente do que o cliente recebeu na confirmação; ficou o do cliente e a equipa recebe a atualização.`).catch(() => null);
+    await env.notifyOwner(extra ? `Extra feito no local: ${plan.title.slice(0, 90)}` : `Total do evento acertado: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\n${extra ? "O cliente pagou mais do que o evento dizia: o extra entrou no evento e nos fechos de hoje. Se não estiver certo, corrige no calendário." : "O evento tinha um total diferente do que o cliente recebeu na confirmação; ficou o do cliente e a equipa recebe a atualização."}`).catch(() => null);
   }
   // The client cancelled: the bot deletes the service (owner, 3 Nov 2026, Carla: "o bot apaga o evento").
   // The CRM marks the row as gone from the calendar, out of the closings and the team accounts; the

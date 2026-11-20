@@ -4658,9 +4658,17 @@ function planBookingUpdate(ev, phone, c, now) {
     const total = Math.round(c.saidTotal * 100) / 100;
     if (total !== was) {
       const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",");
-      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + title.slice(head[0].length);
+      const extra = clean(c.extra);
+      let rest = title.slice(head[0].length);
+      if (extra && total > was) {
+        const cut = rest.indexOf(" - ");
+        rest = cut >= 0 ? `${rest.slice(0, cut)} + ${extra}${rest.slice(cut)}` : `${rest} + ${extra}`;
+        const wasCut = Number(head[0].match(/[\d,.]+(?=€)/)?.[0].replace(",", "."));
+        added = { value: Math.round((total - was) * 100) / 100, cut: Math.round((ownerShare(total) - (Number.isFinite(wasCut) ? wasCut : ownerShare(was))) * 100) / 100, what: `${extra} (feito no local)` };
+      }
+      title = `${head[1]}${fmt(ownerShare(total))}€ (${fmt(total)}€)` + rest;
       description = description.split("\n").map((l) => /^Total:/.test(l) ? l.replace(/^Total:\s*[\d,.]+€/, `Total: ${fmt(total)}€`) : l).join("\n");
-      said.push(`total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
+      said.push(extra && total > was ? `extra feito no local: ${extra}, total ${fmt(total)}€ (era ${head[2]}€)` : `total acertado ao combinado com o cliente: ${fmt(total)}€ (era ${head[2]}€)`);
     }
   }
   if (note && !fold6(ev.description).includes(fold6(note))) said.push(`nota: ${note}`);
