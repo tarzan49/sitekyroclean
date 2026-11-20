@@ -2235,7 +2235,7 @@ function toItem(raw, index) {
   if (r.odor !== void 0 && typeof r.odor !== "boolean") return fail(`items[${index}].odor tem de ser true ou false`);
   if (r.odor === true && !(kind === "rug" || kind === "carpet")) return fail(`items[${index}].odor: o anti-odor só se junta à limpeza de um tapete ou alcatifa`);
   if (r.leather !== void 0 && (typeof r.leather !== "boolean" || r.leather && kind !== "sofa")) return fail(`items[${index}].leather só serve para sofás (true ou false)`);
-  if (r.leather === true && treatment !== "clean") return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€) junta-se sozinho`);
+  if (r.leather === true && treatment !== "clean") return fail(`items[${index}]: um sofá de pele nunca leva impermeabilização nem anti-ácaros; vai com treatment clean e o tratamento da pele (+${LEATHER_TREATMENT}€, +${LEATHER_TREATMENT_LARGE}€ em 5 ou 6 lugares) junta-se sozinho`);
   if (r.seatOnly !== void 0 && (typeof r.seatOnly !== "boolean" || r.seatOnly && kind !== "chairs")) return fail(`items[${index}].seatOnly só serve para cadeiras (true ou false)`);
   let size = "";
   let unitPrice;
@@ -2434,14 +2434,16 @@ function rugOdorFor(items, rawOf) {
   });
   return amount2 ? { amount: amount2, lines } : null;
 }
-var LEATHER_TREATMENT = 30;
+var LEATHER_TREATMENT = 40;
+var LEATHER_TREATMENT_LARGE = 60;
+var leatherUnit = (size) => size === "5-lugares" ? LEATHER_TREATMENT_LARGE : LEATHER_TREATMENT;
 var LEATHER_RULE = "Já está somado ao total: não somes outra vez. Diz o tratamento da pele numa linha à parte. Nunca ofereças impermeabilização a um sofá de pele.";
 function leatherFor(items, rawOf) {
   const lines = [];
   let amount2 = 0;
   items.forEach((i, n) => {
     if (i.kind !== "sofa" || rawOf[n]?.leather !== true) return;
-    const a = LEATHER_TREATMENT * i.qty;
+    const a = leatherUnit(i.size) * i.qty;
     amount2 += a;
     lines.push({ label: `Tratamento da pele (limpeza e hidratação)${i.qty > 1 ? ` (${i.qty} un.)` : ""}`, amount: a, tablePrice: a, perkApplied: false, perkNote: void 0, quote: false });
   });
@@ -2745,7 +2747,7 @@ function botQuoteInner(input) {
   const withOdor = odor ? { ...addToPrices(out, odor.amount, odor.lines), rugOdor: { amount: odor.amount, min: RUG_ODOR.min, perM2: RUG_ODOR.perM2, rule: RUG_ODOR_RULE } } : { ...out, rugOdor: null };
   const leather = leatherFor(items, rawOf);
   if (!leather) return { ...withOdor, leatherTreatment: null };
-  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: LEATHER_TREATMENT, rule: LEATHER_RULE } };
+  return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
 }
 
 // src/constants/cityCoords.ts
@@ -3033,6 +3035,7 @@ var MAX_DAYS = 14;
 var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
 var VIANA_ASK_TEAM_RULE = "Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
 var askTeamRule = (team) => team === "Viana" ? VIANA_ASK_TEAM_RULE : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
+var ALGARVE_FRIDAY_RULE = 'Algarve só às sextas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima sexta-feira (fridayOnly). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima sexta-feira, dia X." A hora confirmamos a seguir.';
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
 var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 function isMadeira(cityOrAddress) {
@@ -3531,6 +3534,18 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === "string" && DATE.test(req.date) && (/* @__PURE__ */ new Date(`${req.date}T12:00:00Z`)).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
+  }
+  if (req.ownerTime !== true && area === "Algarve") {
+    const friday = nextFriday(now);
+    return {
+      ...base,
+      region: area,
+      teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
+      handToOwner: `Algarve: só sexta-feira (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      askWeek: true,
+      askWeekRule: ALGARVE_FRIDAY_RULE,
+      fridayOnly: friday
+    };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];

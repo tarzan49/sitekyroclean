@@ -254,7 +254,7 @@ Deno.test("availability: Algarve and waterproofing in Viana/Leiria close without
     return (await res.json()).availability;
   };
   const algarve = await ask({ city: "Faro", items: [{ kind: "sofa", size: "3-lugares" }] });
-  assertEquals([algarve.askWeek, algarve.free, algarve.suggestion, algarve.handToOwner], [true, [], null, "Algarve: o dono confirma o dia no calendário"]);
+  assertEquals([algarve.askWeek, algarve.free, algarve.suggestion, typeof algarve.fridayOnly], [true, [], null, "string"]);
   const leiria = await ask({ city: "Leiria", items: [{ kind: "sofa", size: "3-lugares", treatment: "clean+premium" }] });
   assertEquals([leiria.askWeek, leiria.free, leiria.teams], [true, [], ["Lisboa 1"]]);
   const viana = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares", treatment: "essencial" }] });

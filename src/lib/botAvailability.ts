@@ -385,6 +385,12 @@ export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo: nunca dar horas sem pergun
 export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra' | 'Aveiro';
 export const askTeamRule = (team: AskTeam) => team === 'Viana' ? VIANA_ASK_TEAM_RULE
   : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
+/**
+ * Algarve only on Fridays (dono, 20 Nov 2026: "O Algarve é só sexta-feira, sempre que a pessoa sugerir outra data [...]
+ * nesse dia já não temos disponibilidade, temos na próxima sexta-feira"): still no hours (the owner gives the hour),
+ * but the bot never asks the week or the day; it offers the next Friday (`fridayOnly`).
+ */
+export const ALGARVE_FRIDAY_RULE = 'Algarve só às sextas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima sexta-feira (fridayOnly). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima sexta-feira, dia X." A hora confirmamos a seguir.';
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
 const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 /** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
@@ -790,6 +796,8 @@ export type AvailabilityResult =
       /** ASK_WEEK_ZONES: no hours; close the service and ask the client's week and day (askWeekRule). */
       askWeek?: true;
       askWeekRule?: string;
+      /** Algarve (dono, 20 Nov 2026): the only day on offer, the next Friday (AAAA-MM-DD). */
+      fridayOnly?: string;
       /** Owner, 18 Nov: ask this team its availability (photo/video of the item + town) before any hour. */
       askTeam?: AskTeam;
     };
@@ -976,6 +984,12 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req.ownerTime !== true && !fridayDone && FRIDAY_ONLY_CITIES.has(city)) {
     const friday = typeof req.date === 'string' && DATE.test(req.date) && new Date(`${req.date}T12:00:00Z`).getUTCDay() === 5 && req.date > lisbon(now.getTime()).date ? req.date : nextFriday(now);
     return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
+  }
+  if (req.ownerTime !== true && area === 'Algarve') {
+    const friday = nextFriday(now);
+    return { ...base, region: area, teams: [...(ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area])],
+      handToOwner: `Algarve: só sexta-feira (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      askWeek: true, askWeekRule: ALGARVE_FRIDAY_RULE, fridayOnly: friday };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];

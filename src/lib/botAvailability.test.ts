@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ASK_WEEK_RULE, askTeamRule, ASK_WEEK_ZONES, LEIRIA_WATERPROOFING_TEAMS, WATERPROOFING_ASK_WEEK_CITIES, ZONE_TEAM_OVERRIDE, DAY_RULES, botAvailability, isMadeira, chooseTeam, teamBusyAt, teamWorks, teamsFor, teamTakesJob, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
+import { ASK_WEEK_RULE, ALGARVE_FRIDAY_RULE, askTeamRule, ASK_WEEK_ZONES, LEIRIA_WATERPROOFING_TEAMS, WATERPROOFING_ASK_WEEK_CITIES, ZONE_TEAM_OVERRIDE, DAY_RULES, botAvailability, isMadeira, chooseTeam, teamBusyAt, teamWorks, teamsFor, teamTakesJob, waterproofingKind, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent, type DayRule } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -319,10 +319,12 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(full.suggestion?.slots).toHaveLength(2);
     expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);
   });
-  it('Algarve: never hours from the bot, it closes and asks the week and the day (owner, 18 Nov 2026)', () => {
+  it('Algarve: never hours from the bot, only the next Friday (owner, 18 and 20 Nov 2026)', () => {
     const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
-    expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams]).toEqual([[], null, true, ASK_WEEK_RULE, ['Algarve']]);
-    expect(r.handToOwner).toBe('Algarve: o dono confirma o dia no calendário');
+    expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams]).toEqual([[], null, true, ALGARVE_FRIDAY_RULE, ['Algarve']]);
+    expect(r.handToOwner).toMatch(/^Algarve: só sexta-feira \(\d{2}\/\d{2}\)/);
+    const fri = ok(botAvailability({ city: 'Quarteira' }, [], new Date('2026-11-20T13:00:00Z')));
+    expect([fri.fridayOnly, fri.handToOwner]).toEqual(['2026-11-27', 'Algarve: só sexta-feira (27/11); o dono confirma a hora no calendário']);
     // 18 Nov was the last "bot day" in the Algarve: no hours that day either.
     const today = ok(botAvailability({ city: 'Tavira', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], new Date('2026-11-18T08:00:00Z')));
     expect([today.askWeek, today.free, today.suggestion]).toEqual([true, [], null]);
@@ -503,7 +505,7 @@ describe('Coimbra e Madeira: fecha o serviço sem marcar hora (dono, 12 Nov 2026
     const sjm = ok(botAvailability({ city: 'São João da Madeira' }, [], NOW));
     expect([sjm.region, sjm.askWeek]).toEqual(['Porto', undefined]);
     const algarve = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
-    expect([algarve.handToOwner, algarve.askWeek]).toEqual(['Algarve: o dono confirma o dia no calendário', true]);
+    expect([algarve.fridayOnly !== undefined, algarve.askWeek]).toEqual([true, true]);
     const porto = ok(botAvailability({ city: 'Matosinhos' }, [], NOW));
     expect([porto.askWeek, porto.suggestion !== null]).toEqual([undefined, true]);
   });
