@@ -4623,7 +4623,7 @@ function planBookingUpdate(ev, phone, c, now) {
     const was = head ? Number(head[2].replace(",", ".")) : NaN;
     const total = Math.round((c.saidTotal && c.saidTotal > 0 ? c.saidTotal : c.requote.total) * 100) / 100;
     if (!head || !(total > 0)) return { ok: false, reason: "título sem preço: o dono atualiza" };
-    if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
+    if (Number.isFinite(was) && total < was && !c.requote.fewer) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
     if (total !== was) {
       const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",");
       const service = tagWaterproofBase(clean(c.requote.service) || clean(c.requote.what));

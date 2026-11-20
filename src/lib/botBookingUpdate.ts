@@ -18,8 +18,12 @@ export interface BookingChanges {
    * The whole service after the client added items, priced by the engine (bot-api runs botQuote on
    * the items the bot sends). Diana, 3 Nov 2026: "também com as cadeiras", the bot said "fica
    * anotado" and the event stayed at the sofa alone, 149€ instead of 269€.
+   * `fewer`: the client took items out or chose a lower level ("só a limpeza, sem impermeabilização");
+   * then a lower total goes in too, so the team, the accounts and the "Como correu?" name what is done
+   * (owner, 20 Nov 2026, Elisabete: the event kept "Limpeza + impermeabilização Essencial" after she
+   * chose only the cleaning, and the check-in asked about a waterproofing never done).
    */
-  requote?: { total: number; what: string; service?: string };
+  requote?: { total: number; what: string; service?: string; fewer?: boolean };
   /** The total the client was told in a message that went out (owner, 16 Nov 2026: "o valor que passas à equipa é sempre o valor fechado com o cliente"). Up or down; items stay. */
   saidTotal?: number;
 }
@@ -90,7 +94,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     const total = Math.round((c.saidTotal && c.saidTotal > 0 ? c.saidTotal : c.requote.total) * 100) / 100;
     // Adding items only: a lower total is a price talk, which is the owner's.
     if (!head || !(total > 0)) return { ok: false, reason: 'título sem preço: o dono atualiza' };
-    if (Number.isFinite(was) && total < was) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
+    if (Number.isFinite(was) && total < was && !c.requote.fewer) return { ok: false, reason: `total novo ${total}€ abaixo do marcado ${was}€: o dono decide` };
     if (total !== was) {
       const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ','));
       const service = tagWaterproofBase(clean(c.requote.service) || clean(c.requote.what));

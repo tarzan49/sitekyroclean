@@ -669,13 +669,13 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
   const now = env.now?.() ?? new Date();
   const asked = { date: str("date"), time: str("time"), postcode: str("postcode"), floor: str("floor"), address: str("address"), name: str("name"), note: str("note"), cancel: str("cancel") };
   // Items added after booking (Diana, 3 Nov 2026): the whole list after the change, priced by the engine.
-  let requote: { total: number; what: string; service?: string } | undefined;
+  let requote: { total: number; what: string; service?: string; fewer?: boolean } | undefined;
   if (Array.isArray(changes.items) && changes.items.length) {
     const q = botQuote({ items: changes.items, city: str("city") ?? null }) as any;
     if (!q?.ok || q.quote || q.handToOwner || !(q.total > 0)) {
       return createSuccessResponse({ update: { ok: false, reason: q?.error ? String(q.error) : "artigos sob orçamento: o dono atualiza", handToOwner: true } });
     }
-    requote = { total: q.total, what: (q.lines ?? []).map((l: { label: string }) => l.label).join(" + "), service: str("service") };
+    requote = { total: q.total, what: (q.lines ?? []).map((l: { label: string }) => l.label).join(" + "), service: str("service"), fewer: changes.fewer === true };
   }
   const saidTotal = typeof changes.saidTotal === "number" && changes.saidTotal > 0 ? changes.saidTotal : undefined;
   let plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal }, now);
@@ -731,7 +731,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
     extraError = await env.extras({ calendar_event_id: eventId, added_at: now.toISOString(), value: plan.added.value, my_cut: plan.added.cut, description: `Acrescento: ${plan.added.what}`.slice(0, 300) }).catch(e => String(e));
   }
   if (requote && plan.ok && env.notifyOwner) {
-    await env.notifyOwner(`Artigos acrescentados: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.${extraError ? `\n\nO acréscimo não ficou nos fechos de hoje (${extraError.slice(0, 200)}): conta no dia em que o serviço foi marcado.` : ""}`).catch(() => null);
+    await env.notifyOwner(`${requote.fewer ? "Artigos retirados" : "Artigos acrescentados"}: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento já foi atualizado no calendário.${extraError ? `\n\nO acréscimo não ficou nos fechos de hoje (${extraError.slice(0, 200)}): conta no dia em que o serviço foi marcado.` : ""}`).catch(() => null);
   }
   if (saidTotal && plan.ok && env.notifyOwner) {
     await env.notifyOwner(`Total do evento acertado: ${plan.title.slice(0, 90)}`, `${(plan.summary ?? []).join("\n")}\n\nO evento tinha um total diferente do que o cliente recebeu na confirmação; ficou o do cliente e a equipa recebe a atualização.`).catch(() => null);

@@ -131,6 +131,13 @@ describe('planBookingUpdate: items added after booking (Diana, 3 Nov 2026)', () 
   it('never lowers a booked price by itself', () => {
     expect(planBookingUpdate(diana, '919326650', { requote: { total: 99, what: 'x' } }, at)).toMatchObject({ ok: false });
   });
+  it('items taken out: the lower total and the service go in, no extra closing (Elisabete, 20 Nov 2026)', () => {
+    const eli = { ...diana, summary: 'Serviço 79€ (158€) Limpeza + impermeabilização Essencial (à base de água) sofá 3 lugares com chaise - 910090056 - Elisabete - Rua das Caleiras, 31, 4470-156 Maia' };
+    const p = planBookingUpdate(eli, '910090056', { requote: { total: 89, what: 'Sofá 3 lugares limpeza', service: 'Limpeza de sofá 3 lugares com chaise', fewer: true } }, at);
+    if (!p.ok) throw new Error(p.reason);
+    expect(p.title).toBe('Serviço 45€ (89€) Limpeza de sofá 3 lugares com chaise - 910090056 - Elisabete - Rua das Caleiras, 31, 4470-156 Maia');
+    expect(p.added).toBeUndefined();
+  });
 });
 
 describe('planBookingUpdate: total told to the client wins (Alfredo, 16 Nov 2026)', () => {
