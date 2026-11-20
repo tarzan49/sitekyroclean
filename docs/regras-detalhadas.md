@@ -989,3 +989,12 @@ Sofás e poltronas reclináveis elétricos aceitam-se (motor na estrutura, não 
 
 A Elisabete (Maia, Porto 1) marcou limpeza + impermeabilização Essencial (158€). De manhã pediu só a limpeza; o leitor das marcações (kyro-bot `bookingUpdate.ts`) só sabia mandar artigos acrescentados, por isso escreveu uma nota e o título ficou com a impermeabilização. A `bot-api` recusava qualquer total mais baixo ("o dono decide"). Às 13:02 o "Como correu?" perguntou pela "limpeza e impermeabilização Essencial". Dono: "sempre que houver um serviço deste tipo, tens que automaticamente autocorrigir".
 Agora: o leitor devolve `items` (o serviço todo depois da mudança), `service` e `fewer: true` quando o cliente diz claramente o que tira ou escolhe um nível mais baixo; a `bot-api` (`planBookingUpdate`) aceita o total mais baixo só com `fewer` (regatear continua recusado), reescreve título, Artigos e Total, avisa o dono ("Artigos retirados") e a equipa recebe a atualização. Serviço do dia: o valor final (ex.: 89€ + 40€ do tratamento da urina) o dono acerta no calendário.
+
+## Seguimentos 24 h + 72 h (dono, 20 Nov 2026)
+
+"Todos os clientes que já demonstraram interesse é obrigatório agora [...] enviar follow-up 24 horas e se eles não responderem ao de 24 horas, enviar follow-up [...] a partir de 72 horas."
+
+- [RETIRADA 20/11] "UM seguimento no dia a seguir", "máx. 15/dia" e a passagem ao dono acima de 200€ (`RECOVERY_OWNER_ABOVE_EUR`).
+- kyro-bot `recovery.ts`: `followUpStage` = 1 (20–23 h depois da última mensagem do cliente, texto livre na janela de 24 h) ou 2 (72 h a 7 dias, só se ele não respondeu; o 3.º bloco nosso desde a mensagem dele trava). O 2.º vai no modelo `seguimento_cliente_kyro` ("Olá {{1}}, daqui é a Kyro Clean Solutions. Sobre {{2}}: {{3}}"), com outro ângulo e `last_one`; enquanto o modelo não estiver APPROVED, o 2.º não sai e o registo diz quantos esperam.
+- `retomar_conversa` nunca existiu na conta da 360dialog: todos os envios fora das 24 h (fila de seguimentos, avaliação) passam a usar `FOLLOW_UP_TEMPLATE` (cloud.ts).
+- `recovery_bot` ligado a 20/11 pelo dono ("Sim, liga"). Cron de hora a hora 9h–20h, até 5 por hora e 40 por dia.
