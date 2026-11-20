@@ -999,7 +999,8 @@ Agora: o leitor devolve `items` (o serviço todo depois da mudança), `service` 
 - [RETIRADA 20/11] "UM seguimento no dia a seguir", "máx. 15/dia" e a passagem ao dono acima de 200€ (`RECOVERY_OWNER_ABOVE_EUR`).
 - kyro-bot `recovery.ts`: `followUpStage` = 1 (20–23 h depois da última mensagem do cliente, texto livre na janela de 24 h) ou 2 (72 h a 7 dias, só se ele não respondeu; o 3.º bloco nosso desde a mensagem dele trava). O 2.º vai no modelo `seguimento_cliente_kyro` ("Olá {{1}}, daqui é a Kyro Clean Solutions. Sobre {{2}}: {{3}}"), com outro ângulo e `last_one`; enquanto o modelo não estiver APPROVED, o 2.º não sai e o registo diz quantos esperam.
 - `retomar_conversa` nunca existiu na conta da 360dialog: todos os envios fora das 24 h (fila de seguimentos, avaliação) passam a usar `FOLLOW_UP_TEMPLATE` (cloud.ts).
-- `recovery_bot` ligado a 20/11 pelo dono ("Sim, liga"). Cron de hora a hora 9h–20h, até 5 por hora e 40 por dia.
+- `recovery_bot` ligado a 20/11 pelo dono ("Sim, liga"). Até 40 por dia.
+- Horas (dono, 20 Nov: "a hora em que mais fecha [...] enviares os follow-ups a essas horas"; "Sim, avança com essas horas"): 281 fechos do CRM (`service_requests.booked_at`), 248 com o "sim" do cliente encontrado na conversa (última mensagem dele até 6 h antes do evento; 21 sem conversa no bot, 8 sem mensagem nos 3 dias antes, 4 com o sim mais de 6 h antes). Por hora: 8h 6, 9h 10, 10h 16, 11h 25, 12h 26, 13h 20, 14h 16, 15h 17, 16h 17, 17h 21, 18h 18, 19h 16, 20h 14, 21h 8, 22h 6, 23h 9, 0h–7h 3. Blocos: 11h–13h = 71 em 3 h (~24/h, o melhor); 15h–20h = 103 em 6 h (~17/h); 21h–23h = 23. Terça o dia mais forte (59), sábado e domingo os mais fracos (22). Regra: seguimentos só às 11h–13h; o 1.º às 17h–20h quando nenhuma das 11h–13h cabe nas 24 h (ex.: escreveu às 9h); o 2.º só às 11h–13h. Silêncio mínimo de 5 h antes do 1.º. Cron `0 11-13,17-20`, até 10 por hora.
 
 
 ## Algarve só às sextas-feiras (dono, 20 Nov 2026)
