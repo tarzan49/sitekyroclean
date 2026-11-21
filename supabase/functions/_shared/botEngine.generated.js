@@ -4206,7 +4206,8 @@ var usesMediaRule = (serviceDay) => serviceDay >= PROCEDURE_MEDIA_RULE_FROM;
 var mediaOk = (got) => got.before && got.after || got.video;
 function procedurePay(got, rule = PROCEDURE_PAY_RULE) {
   if (rule === "media_50_review_5") return {
-    teamShare: got.before && got.after && got.video ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE,
+    teamShare: PROCEDURE_FULL_SHARE,
+    // sem penalização dos 45% (dono, 21 Nov)
     bonus: got.review ? PROCEDURE_REVIEW_BONUS : 0
   };
   if (rule === "all_or_45") return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
@@ -4755,7 +4756,7 @@ function planBookingUpdate(ev, phone, c, now) {
   return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancelled, summary: said, added };
 }
 function noteChosenTime(note) {
-  const m = /(?:escolh|confirm|combin|prefer|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
+  const m = /(?:escolh|confirm|combin|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
   if (!m) return null;
   const h = Number(m[1]), min = Number(m[2] ?? m[3] ?? 0);
   return h >= 7 && h <= 21 && min < 60 ? { minutes: h * 60 + min } : null;

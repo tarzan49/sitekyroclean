@@ -173,7 +173,7 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
 
 /** "Cliente escolheu as 13h", "confirmou às 13:30": the hour a note says the client chose, or null. */
 export function noteChosenTime(note: string): { minutes: number } | null {
-  const m = /(?:escolh|confirm|combin|prefer|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
+  const m = /(?:escolh|confirm|combin|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
   if (!m) return null;
   const h = Number(m[1]), min = Number(m[2] ?? m[3] ?? 0);
   return h >= 7 && h <= 21 && min < 60 ? { minutes: h * 60 + min } : null;
