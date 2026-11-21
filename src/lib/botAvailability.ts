@@ -402,6 +402,10 @@ export function isMadeira(cityOrAddress: unknown): boolean {
 }
 
 export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 21 Nov 2026: "não marques mais serviços para domingo, para o Porto. Tenta marcar todos para a próxima semana".
+  { zone: 'Porto', from: '2026-11-21', until: '2026-11-22', closed: [{ date: '2026-11-22' }], onlyPreferred: true,
+    prefer: ['2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27', '2026-11-28'],
+    note: 'Domingo (dia 22) já não temos vaga no Porto: oferece a próxima semana, a partir de segunda (dia 23).' },
   // Owner, 18 Nov 2026: "nao enchas tanto quinta e sexta [...] amanha lisboa 1 ta mt cheio, mete para sexta e sabado mais para a tarde".
   { zone: 'Lisboa', from: '2026-11-18', until: '2026-11-21', prefer: ['2026-11-20', '2026-11-21'],
     note: 'Quinta (dia 19) a Lisboa 1 já está muito cheia: oferece primeiro sexta (dia 20) e sábado (dia 21), de preferência à tarde (sábado até às 18h). Quinta só se o cliente pedir.' },
