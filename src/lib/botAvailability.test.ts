@@ -319,12 +319,14 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect(full.suggestion?.slots).toHaveLength(2);
     expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);
   });
-  it('Algarve: never hours from the bot, only the next Friday (owner, 18 and 20 Nov 2026)', () => {
+  it('Algarve: never hours from the bot, only the next Thursday (owner, 18 and 21 Nov 2026)', () => {
     const r = ok(botAvailability({ city: 'Faro', date: '2026-10-08' }, [], NOW));
     expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams]).toEqual([[], null, true, ALGARVE_FRIDAY_RULE, ['Algarve']]);
-    expect(r.handToOwner).toMatch(/^Algarve: só sexta-feira \(\d{2}\/\d{2}\)/);
+    expect(r.handToOwner).toMatch(/^Algarve: só quinta-feira \(\d{2}\/\d{2}\)/);
     const fri = ok(botAvailability({ city: 'Quarteira' }, [], new Date('2026-11-20T13:00:00Z')));
     expect([fri.fridayOnly, fri.handToOwner]).toEqual(['2026-11-26', 'Algarve: só quinta-feira (26/11); o dono confirma a hora no calendário']);
+    // Thursday itself = the next Thursday (never today).
+    expect(ok(botAvailability({ city: 'Faro' }, [], new Date('2026-11-26T09:00:00Z'))).fridayOnly).toBe('2026-12-03');
     // 18 Nov was the last "bot day" in the Algarve: no hours that day either.
     const today = ok(botAvailability({ city: 'Tavira', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], new Date('2026-11-18T08:00:00Z')));
     expect([today.askWeek, today.free, today.suggestion]).toEqual([true, [], null]);

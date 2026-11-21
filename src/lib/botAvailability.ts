@@ -386,11 +386,10 @@ export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra' | 'Aveiro';
 export const askTeamRule = (team: AskTeam) => team === 'Viana' ? VIANA_ASK_TEAM_RULE
   : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 /**
- * Algarve only on Fridays (dono, 20 Nov 2026: "O Algarve é só sexta-feira, sempre que a pessoa sugerir outra data [...]
- * nesse dia já não temos disponibilidade, temos na próxima sexta-feira"): still no hours (the owner gives the hour),
- * but the bot never asks the week or the day; it offers the next Friday (`fridayOnly`).
+ * Algarve only on Thursdays (dono, 21 Nov 2026, replaces the Friday rule of 20 Nov): still no hours (the owner gives
+ * the hour), the bot never asks the week or the day; it offers the next Thursday (field kept as `fridayOnly`).
  */
-export const ALGARVE_FRIDAY_RULE = 'Algarve só às sextas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima sexta-feira (fridayOnly). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima sexta-feira, dia X." A hora confirmamos a seguir.';
+export const ALGARVE_FRIDAY_RULE = 'Algarve só às quintas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima quinta-feira (fridayOnly traz a data). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima quinta-feira, dia X." A hora confirmamos a seguir.';
 export const ASK_WEEK_RULE = 'Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.';
 const MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 /** The client's text names Madeira (never São João da Madeira, a Porto-area town). */
@@ -763,13 +762,11 @@ function nextFriday(now: Date): string {
   do d.setUTCDate(d.getUTCDate() + 1); while (d.getUTCDay() !== 5);
   return d.toISOString().slice(0, 10);
 }
-/** Algarve week swapped to another day (dono, 21 Nov 2026: a equipa vai ao Algarve na quinta 26/11, só essa semana). */
-export const ALGARVE_DAY_OVERRIDE: Readonly<Record<string, string>> = { '2026-11-27': '2026-11-26' };
+/** Algarve only on Thursdays (dono, 21 Nov 2026: "a partir de agora é só quinta-feira, remove essa regra de sexta"). */
 function nextAlgarveDay(now: Date): string {
-  const today = lisbon(now.getTime()).date;
-  const friday = nextFriday(now);
-  const swapped = ALGARVE_DAY_OVERRIDE[friday];
-  return swapped && swapped > today ? swapped : friday;
+  const d = new Date(`${lisbon(now.getTime()).date}T12:00:00Z`);
+  do d.setUTCDate(d.getUTCDate() + 1); while (d.getUTCDay() !== 4);
+  return d.toISOString().slice(0, 10);
 }
 export const SMALL_ORDER_MIN_TOTAL = 110;
 /** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
@@ -998,11 +995,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
   }
   if (req.ownerTime !== true && area === 'Algarve') {
-    const friday = nextAlgarveDay(now);
-    const dayName = new Date(`${friday}T12:00:00Z`).getUTCDay() === 4 ? 'quinta-feira' : 'sexta-feira';
+    const thursday = nextAlgarveDay(now);
     return { ...base, region: area, teams: [...(ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area])],
-      handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
-      askWeek: true, askWeekRule: dayName === 'sexta-feira' ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll('sextas-feiras', 'quintas-feiras (só esta semana)').replaceAll('sexta-feira', 'quinta-feira'), fridayOnly: friday };
+      handToOwner: `Algarve: só quinta-feira (${thursday.slice(8, 10)}/${thursday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      askWeek: true, askWeekRule: ALGARVE_FRIDAY_RULE, fridayOnly: thursday };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];

@@ -3096,7 +3096,7 @@ var MAX_DAYS = 14;
 var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
 var VIANA_ASK_TEAM_RULE = "Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
 var askTeamRule = (team) => team === "Viana" ? VIANA_ASK_TEAM_RULE : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
-var ALGARVE_FRIDAY_RULE = 'Algarve só às sextas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima sexta-feira (fridayOnly). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima sexta-feira, dia X." A hora confirmamos a seguir.';
+var ALGARVE_FRIDAY_RULE = 'Algarve só às quintas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima quinta-feira (fridayOnly traz a data). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima quinta-feira, dia X." A hora confirmamos a seguir.';
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
 var MADEIRA_PLACES = /(^|[^a-z])(funchal|madeira|camara de lobos|machico|canico|porto santo)([^a-z]|$)/;
 function isMadeira(cityOrAddress) {
@@ -3413,12 +3413,12 @@ function nextFriday(now) {
   while (d.getUTCDay() !== 5);
   return d.toISOString().slice(0, 10);
 }
-var ALGARVE_DAY_OVERRIDE = { "2026-11-27": "2026-11-26" };
 function nextAlgarveDay(now) {
-  const today = lisbon(now.getTime()).date;
-  const friday = nextFriday(now);
-  const swapped = ALGARVE_DAY_OVERRIDE[friday];
-  return swapped && swapped > today ? swapped : friday;
+  const d = /* @__PURE__ */ new Date(`${lisbon(now.getTime()).date}T12:00:00Z`);
+  do
+    d.setUTCDate(d.getUTCDate() + 1);
+  while (d.getUTCDay() !== 4);
+  return d.toISOString().slice(0, 10);
 }
 var SMALL_ORDER_MIN_TOTAL = 110;
 var NORTH_MIN_TOTAL = 79;
@@ -3614,16 +3614,15 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
   }
   if (req.ownerTime !== true && area === "Algarve") {
-    const friday = nextAlgarveDay(now);
-    const dayName = (/* @__PURE__ */ new Date(`${friday}T12:00:00Z`)).getUTCDay() === 4 ? "quinta-feira" : "sexta-feira";
+    const thursday = nextAlgarveDay(now);
     return {
       ...base,
       region: area,
       teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
-      handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      handToOwner: `Algarve: só quinta-feira (${thursday.slice(8, 10)}/${thursday.slice(5, 7)}); o dono confirma a hora no calendário`,
       askWeek: true,
-      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll("sextas-feiras", "quintas-feiras (só esta semana)").replaceAll("sexta-feira", "quinta-feira"),
-      fridayOnly: friday
+      askWeekRule: ALGARVE_FRIDAY_RULE,
+      fridayOnly: thursday
     };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
