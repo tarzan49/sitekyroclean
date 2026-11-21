@@ -3109,6 +3109,16 @@ function isMadeira(cityOrAddress) {
   return MADEIRA_PLACES.test(fold3(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ""));
 }
 var DAY_RULES = [
+  // Owner, 21 Nov 2026: "não marques mais serviços para domingo, para o Porto. Tenta marcar todos para a próxima semana".
+  {
+    zone: "Porto",
+    from: "2026-11-21",
+    until: "2026-11-22",
+    closed: [{ date: "2026-11-22" }],
+    onlyPreferred: true,
+    prefer: ["2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27", "2026-11-28"],
+    note: "Domingo (dia 22) já não temos vaga no Porto: oferece a próxima semana, a partir de segunda (dia 23)."
+  },
   // Owner, 18 Nov 2026: "nao enchas tanto quinta e sexta [...] amanha lisboa 1 ta mt cheio, mete para sexta e sabado mais para a tarde".
   {
     zone: "Lisboa",
@@ -3403,6 +3413,13 @@ function nextFriday(now) {
   while (d.getUTCDay() !== 5);
   return d.toISOString().slice(0, 10);
 }
+var ALGARVE_DAY_OVERRIDE = { "2026-11-27": "2026-11-26" };
+function nextAlgarveDay(now) {
+  const today = lisbon(now.getTime()).date;
+  const friday = nextFriday(now);
+  const swapped = ALGARVE_DAY_OVERRIDE[friday];
+  return swapped && swapped > today ? swapped : friday;
+}
 var SMALL_ORDER_MIN_TOTAL = 110;
 var NORTH_MIN_TOTAL = 79;
 var SMALL_ORDER_MIN_BY_CITY = { "Aveiro": NORTH_MIN_TOTAL };
@@ -3597,14 +3614,15 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
     return botAvailability({ ...req, date: friday, _friday: true }, events, now, rules);
   }
   if (req.ownerTime !== true && area === "Algarve") {
-    const friday = nextFriday(now);
+    const friday = nextAlgarveDay(now);
+    const dayName = (/* @__PURE__ */ new Date(`${friday}T12:00:00Z`)).getUTCDay() === 4 ? "quinta-feira" : "sexta-feira";
     return {
       ...base,
       region: area,
       teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
-      handToOwner: `Algarve: só sexta-feira (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
       askWeek: true,
-      askWeekRule: ALGARVE_FRIDAY_RULE,
+      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll("sextas-feiras", "quintas-feiras (só esta semana)").replaceAll("sexta-feira", "quinta-feira"),
       fridayOnly: friday
     };
   }

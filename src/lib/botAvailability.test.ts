@@ -324,7 +324,7 @@ describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre
     expect([r.free, r.suggestion, r.askWeek, r.askWeekRule, r.teams]).toEqual([[], null, true, ALGARVE_FRIDAY_RULE, ['Algarve']]);
     expect(r.handToOwner).toMatch(/^Algarve: só sexta-feira \(\d{2}\/\d{2}\)/);
     const fri = ok(botAvailability({ city: 'Quarteira' }, [], new Date('2026-11-20T13:00:00Z')));
-    expect([fri.fridayOnly, fri.handToOwner]).toEqual(['2026-11-27', 'Algarve: só sexta-feira (27/11); o dono confirma a hora no calendário']);
+    expect([fri.fridayOnly, fri.handToOwner]).toEqual(['2026-11-26', 'Algarve: só quinta-feira (26/11); o dono confirma a hora no calendário']);
     // 18 Nov was the last "bot day" in the Algarve: no hours that day either.
     const today = ok(botAvailability({ city: 'Tavira', items: [{ kind: 'sofa', size: '3-lugares' }] }, [], new Date('2026-11-18T08:00:00Z')));
     expect([today.askWeek, today.free, today.suggestion]).toEqual([true, [], null]);

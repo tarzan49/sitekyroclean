@@ -763,6 +763,14 @@ function nextFriday(now: Date): string {
   do d.setUTCDate(d.getUTCDate() + 1); while (d.getUTCDay() !== 5);
   return d.toISOString().slice(0, 10);
 }
+/** Algarve week swapped to another day (dono, 21 Nov 2026: a equipa vai ao Algarve na quinta 26/11, só essa semana). */
+export const ALGARVE_DAY_OVERRIDE: Readonly<Record<string, string>> = { '2026-11-27': '2026-11-26' };
+function nextAlgarveDay(now: Date): string {
+  const today = lisbon(now.getTime()).date;
+  const friday = nextFriday(now);
+  const swapped = ALGARVE_DAY_OVERRIDE[friday];
+  return swapped && swapped > today ? swapped : friday;
+}
 export const SMALL_ORDER_MIN_TOTAL = 110;
 /** Per-city minimum where it differs (owner, 3 Nov 2026: "o mínimo de Viana são 100 eur"). */
 // Owner, 15 Nov 2026: "tudo a norte que forem orçamento de valor igual ou superior a 79 eur tens que dar sempre disponibilidade".
@@ -990,10 +998,11 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     return botAvailability({ ...req, date: friday, _friday: true } as AvailabilityRequest, events, now, rules);
   }
   if (req.ownerTime !== true && area === 'Algarve') {
-    const friday = nextFriday(now);
+    const friday = nextAlgarveDay(now);
+    const dayName = new Date(`${friday}T12:00:00Z`).getUTCDay() === 4 ? 'quinta-feira' : 'sexta-feira';
     return { ...base, region: area, teams: [...(ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area])],
-      handToOwner: `Algarve: só sexta-feira (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
-      askWeek: true, askWeekRule: ALGARVE_FRIDAY_RULE, fridayOnly: friday };
+      handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
+      askWeek: true, askWeekRule: dayName === 'sexta-feira' ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll('sextas-feiras', 'quintas-feiras (só esta semana)').replaceAll('sexta-feira', 'quinta-feira'), fridayOnly: friday };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];
