@@ -78,15 +78,13 @@ Deno.test("the day after, a reminder; at the end of the 7th day, closed with a n
 
   const { store } = fakeStore([rec], services);
   const day1 = await json(await procedureDue(events, store, new Date("2026-10-16T09:30:00Z")));
-  assertEquals((day1.reminders as Row[]).map(r => r.reminderIndex), [0]);
+  assertEquals((day1.reminders as Row[]).map(r => r.reminderIndex), []) // dono 21/11: só o seguimento dos 30 min;
   assertEquals(day1.closed, []);
 
   const late = fakeStore([{ ...rec, reminders_sent: 2 }], services);
   const day8 = await json(await procedureDue(events, late.store, new Date("2026-10-23T00:10:00Z")));
   assertEquals(day8.reminders, []);
-  assertEquals((day8.closed as Row[]).map(c => c.message), [
-    "O prazo do serviço Ana, Paranhos, 15/10, acabou sem fotografia de depois, vídeo e avaliação do cliente. O procedimento deste serviço ficou incompleto.",
-  ]);
+  assertEquals(day8.closed, []); // dono 21/11: sem aviso de prazo às equipas
   assertEquals(late.table.get("s1")?.status, "fechado");
   // Next round: already closed, no second notice.
   assertEquals((await json(await procedureDue(events, late.store, new Date("2026-10-23T09:00:00Z")))).closed, []);
@@ -127,7 +125,7 @@ Deno.test("from 6/11 a closed procedure writes one adjustment: 5% of the value w
   store.addAdjustment = async row => { added.push(row); return null; };
   const day8 = await json(await procedureDue(events, store, new Date("2026-11-14T08:00:00Z")));
   assertEquals(added, [{ team: "Braga", day: "2026-11-06", label: "Larry, Braga: 5% sem fotografias e vídeo", amount: 4 }]);
-  assertEquals((day8.closed as Row[]).length, 1);
+  assertEquals((day8.closed as Row[]).length, 0); // dono 21/11: a percentagem fica nas contas, sem aviso
   await procedureDue(events, store, new Date("2026-11-14T09:00:00Z"));
   assertEquals(added.length, 1);
 });

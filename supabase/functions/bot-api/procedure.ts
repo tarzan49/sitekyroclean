@@ -132,7 +132,9 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     if (!ev) return [];
     const check = checkProcedure(r, reviewsFor(reviews, r.service_request_id), yesterday);
     const index = reminderDue(r, check, now);
-    if (index === null) return [];
+    // Um só seguimento, 30 min depois do "Serviço terminado", e mais nenhum: sem lembretes ao dia 1 e 5
+    // (dono, 16 e 21 Nov: "demasiadas mensagens de spam").
+    if (index !== 0 || !r.prompted_at || r.prompted_at < FIRST_NUDGE_FROM) return [];
     const facts = labelFor(serviceByEvent.get(r.calendar_event_id), ev);
     const label = facts.label;
     return [{ eventId: r.calendar_event_id, team: r.team, reminderIndex: index, label, phone: clientPhoneFromTitle(ev.summary), firstName: facts.firstName, serviceStart: ev.start!, message: procedureReminderMessage(label, check, r.service_day, { first: index === 0 && !!r.prompted_at && r.prompted_at >= FIRST_NUDGE_FROM, what: serviceByEvent.get(r.calendar_event_id)?.description as string | null }) }];
@@ -157,7 +159,8 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
       if (adjErr) safeLog("warn", "[bot-api] procedure adjustment", { message: adjErr });
     }
     // Only photos or video count against the team; a missing review is no notice (owner, 6 Nov).
-    if (change.status !== "fechado" || !check.missing.some((i: string) => i !== "review")) continue;
+    // Sem aviso de "o prazo acabou" às equipas (dono, 21 Nov: spam). A percentagem fica só nas contas.
+    if (true) continue;
     closed.push({ eventId: r.calendar_event_id, team: r.team, message: procedureClosedMessage(label, r.service_day, check.missing, adjustment ? check.pay : null) });
   }
   // A rug pickup visit is not the end of the service: the rug is not washed nor delivered yet, so no
