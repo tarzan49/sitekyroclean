@@ -706,7 +706,7 @@ async function updateBooking(body: Row, env: BotEnv): Promise<Response> {
       busyTeam = team;
       const takes = teamTakesJob(team, ev, plan.start);
       const why = takes ? `a equipa ${team} já tem um serviço a essa hora` : `a equipa ${team} já não faz este serviço nesse dia e nenhuma outra equipa da zona está livre a essa hora`;
-      plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, extra, date: undefined, time: undefined }, now);
+      plan = planBookingUpdate(ev, phone, { ...asked, requote, saidTotal, extra, date: undefined, time: undefined, keepTime: true }, now);
       if (env.notifyOwner) await env.notifyOwner(`Mudar de hora: a equipa ${team} ${takes ? "está ocupada" : "já não faz este serviço"}`,
         `${asked.date ? `O cliente combinou ${asked.date} às ${asked.time}` : "O cliente mudou os artigos"}, mas ${why}. O evento ficou na hora antiga: muda a cor para outra equipa e a hora, ou fala com o cliente.\n\n${ev.summary}`).catch(() => null);
     }

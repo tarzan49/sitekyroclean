@@ -10,6 +10,23 @@ const ev = {
 const now = new Date('2026-10-15T18:42:00Z');
 
 describe('planBookingUpdate', () => {
+  it('an hour the client chose moves the event on its own day, never only a note (Lisboa 1, Amadora, 21 Nov)', () => {
+    const e = { ...ev, description: 'Equipa: Porto 1\nHora por confirmar: 9h ou 13h\n\nbot:x' };
+    const byTime = planBookingUpdate(e, '914000111', { time: '13:00' }, now);
+    if (!byTime.ok) throw new Error(byTime.reason);
+    expect([byTime.start, byTime.moved]).toEqual(['2026-10-17T12:00:00.000Z', true]);
+    expect(byTime.description).not.toMatch(/Hora por confirmar/);
+    const byNote = planBookingUpdate(e, '914000111', { note: 'Cliente escolheu as 13h (19/10, 20:20). Confirmado pela equipa' }, now);
+    if (!byNote.ok) throw new Error(byNote.reason);
+    expect([byNote.start, byNote.end, byNote.moved]).toEqual(['2026-10-17T12:00:00.000Z', '2026-10-17T13:00:00.000Z', true]);
+    // Same hour as the event: a plain note.
+    const same = planBookingUpdate(e, '914000111', { note: 'Cliente confirmou as 9h' }, now);
+    expect(same).toMatchObject({ ok: true, moved: false });
+    // The team is busy (bot-api keeps the hour): the contradicting note is refused.
+    expect(planBookingUpdate(e, '914000111', { note: 'Cliente escolheu as 13h', keepTime: true }, now)).toMatchObject({ ok: false });
+    // The chosen hour is already past: refused, never written as a note.
+    expect(planBookingUpdate(e, '914000111', { note: 'Cliente escolheu as 13h' }, new Date('2026-10-18T10:00:00Z'))).toMatchObject({ ok: false });
+  });
   it('adds the postcode and the floor to the address, and a dated line before the bot mark', () => {
     const p = planBookingUpdate(ev, '351914000111', { postcode: '4500-266', floor: 'moradia, sem andar' }, now);
     if (!p.ok) throw new Error(p.reason);

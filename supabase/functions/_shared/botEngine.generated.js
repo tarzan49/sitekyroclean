@@ -4678,6 +4678,14 @@ function planBookingUpdate(ev, phone, c, now) {
       said.push(floor);
     }
   }
+  const evDay = lisbon(Date.parse(ev.start));
+  const chosen = noteChosenTime(note);
+  if (c.time && !c.date) c = { ...c, date: evDay.date };
+  if (!c.time && chosen && chosen.minutes !== evDay.minutes) {
+    if (c.keepTime) return { ok: false, reason: `a nota diz que o cliente escolheu as ${hm(chosen.minutes)}, o evento está às ${hm(evDay.minutes)}: o dono muda a hora` };
+    c = { ...c, date: c.date ?? evDay.date, time: hm(chosen.minutes) };
+  }
+  if (c.keepTime) c = { ...c, date: void 0, time: void 0 };
   let start = ev.start, end = ev.end, moved = false;
   if (c.date && c.time && /^\d{4}-\d{2}-\d{2}$/.test(c.date) && /^\d{1,2}:\d{2}$/.test(c.time)) {
     const [h, m] = c.time.split(":").map(Number);
@@ -4691,8 +4699,11 @@ function planBookingUpdate(ev, phone, c, now) {
       said.push(`mudou de ${was.date.slice(8)}/${was.date.slice(5, 7)} às ${hm(was.minutes)} para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time}`);
     }
   }
+  if (chosen && !moved && c.time && Date.parse(start) !== lisbonToUtc(c.date, chosen.minutes)) {
+    return { ok: false, reason: `a nota diz que o cliente escolheu as ${hm(chosen.minutes)} e o evento não pode ir para essa hora: o dono muda` };
+  }
   let title = parts.join(" - ");
-  let description = ev.description;
+  let description = moved ? ev.description.split("\n").filter((l) => !/^\s*hora por confirmar\b/i.test(l)).join("\n") : ev.description;
   let added;
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
@@ -4742,6 +4753,12 @@ function planBookingUpdate(ev, phone, c, now) {
   if (markAt >= 0) lines.splice(markAt, 0, line, "");
   else lines.push("", line);
   return { ok: true, title, description: lines.join("\n").replace(/\n{3,}/g, "\n\n").slice(0, 4e3), start, end, moved, cancel: !!cancelled, summary: said, added };
+}
+function noteChosenTime(note) {
+  const m = /(?:escolh|confirm|combin|prefer|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2] ?? m[3] ?? 0);
+  return h >= 7 && h <= 21 && min < 60 ? { minutes: h * 60 + min } : null;
 }
 var hm = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 function fold6(s) {

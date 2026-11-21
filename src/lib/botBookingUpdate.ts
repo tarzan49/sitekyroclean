@@ -32,6 +32,8 @@ export interface BookingChanges {
    * It joins the service in the title and counts as a closing of its own, like items added.
    */
   extra?: string;
+  /** bot-api's second plan after the team was busy at the new hour: the event keeps its hour. */
+  keepTime?: boolean;
 }
 export interface BookingEvent { id: string; summary: string; description: string; start: string | null; end: string | null }
 export type BookingUpdatePlan =
@@ -79,6 +81,18 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     if (floor && !compact(parts.join(' - ') + notes).includes(compact(floor))) { parts[at] = `${parts[at]}, ${floor}`; said.push(floor); }
   }
 
+  // Lisboa 1, 21 Nov 2026 (Amadora, 149€): the event said "Hora por confirmar: 9h ou 13h" at 09:00, the client chose 13h,
+  // the reader wrote it only as a note ("Cliente escolheu as 13h") and the team went at 9h to an empty house.
+  // An hour alone moves on the event's own day, and a note that says the client chose another hour moves the event too,
+  // or the update is refused: never a note that contradicts the event's start.
+  const evDay = lisbon(Date.parse(ev.start));
+  const chosen = noteChosenTime(note);
+  if (c.time && !c.date) c = { ...c, date: evDay.date };
+  if (!c.time && chosen && chosen.minutes !== evDay.minutes) {
+    if (c.keepTime) return { ok: false, reason: `a nota diz que o cliente escolheu as ${hm(chosen.minutes)}, o evento está às ${hm(evDay.minutes)}: o dono muda a hora` };
+    c = { ...c, date: c.date ?? evDay.date, time: hm(chosen.minutes) };
+  }
+  if (c.keepTime) c = { ...c, date: undefined, time: undefined };
   let start = ev.start, end = ev.end, moved = false;
   if (c.date && c.time && /^\d{4}-\d{2}-\d{2}$/.test(c.date) && /^\d{1,2}:\d{2}$/.test(c.time)) {
     const [h, m] = c.time.split(':').map(Number);
@@ -90,8 +104,11 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
       said.push(`mudou de ${was.date.slice(8)}/${was.date.slice(5, 7)} às ${hm(was.minutes)} para ${c.date.slice(8)}/${c.date.slice(5, 7)} às ${c.time}`);
     }
   }
+  if (chosen && !moved && c.time && Date.parse(start) !== lisbonToUtc(c.date!, chosen.minutes)) {
+    return { ok: false, reason: `a nota diz que o cliente escolheu as ${hm(chosen.minutes)} e o evento não pode ir para essa hora: o dono muda` };
+  }
   let title = parts.join(' - ');
-  let description = ev.description;
+  let description = moved ? ev.description.split('\n').filter(l => !/^\s*hora por confirmar\b/i.test(l)).join('\n') : ev.description;
   let added: { value: number; cut: number; what: string } | undefined;
   if (c.requote) {
     const head = /^(\s*(?:a confirmar\s*·\s*)?servi[cç]o\s+)[\d,.?]+€\s*\(([\d,.?]+)€\)((?:\s*\(an[uú]ncio[^)]*\))?)\s*([^-]*?)\s*(?= - |$)/i.exec(title);
@@ -154,6 +171,13 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
   return { ok: true, title, description: lines.join('\n').replace(/\n{3,}/g, '\n\n').slice(0, 4000), start, end, moved, cancel: !!cancelled, summary: said, added };
 }
 
+/** "Cliente escolheu as 13h", "confirmou às 13:30": the hour a note says the client chose, or null. */
+export function noteChosenTime(note: string): { minutes: number } | null {
+  const m = /(?:escolh|confirm|combin|prefer|aceit|opt(?:ou|a)|fica(?:mos)? (?:com|para))[\p{L}]*\D{0,20}?(?<!\d)(\d{1,2})(?:\s*h(?:oras?)?\s*(\d{2})?|:(\d{2}))(?!\d)/iu.exec(note);
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2] ?? m[3] ?? 0);
+  return h >= 7 && h <= 21 && min < 60 ? { minutes: h * 60 + min } : null;
+}
 const hm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
 function fold(s: string) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' '); }
 const compact = (s: string) => fold(s).replace(/[^a-z0-9]/g, '');
