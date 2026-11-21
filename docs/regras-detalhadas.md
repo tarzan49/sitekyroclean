@@ -1004,7 +1004,7 @@ Agora: o leitor devolve `items` (o serviço todo depois da mudança), `service` 
 - Horas (dono, 20 Nov: "a hora em que mais fecha [...] enviares os follow-ups a essas horas"; "Sim, avança com essas horas"): 281 fechos do CRM (`service_requests.booked_at`), 248 com o "sim" do cliente encontrado na conversa (última mensagem dele até 6 h antes do evento; 21 sem conversa no bot, 8 sem mensagem nos 3 dias antes, 4 com o sim mais de 6 h antes). Por hora: 8h 6, 9h 10, 10h 16, 11h 25, 12h 26, 13h 20, 14h 16, 15h 17, 16h 17, 17h 21, 18h 18, 19h 16, 20h 14, 21h 8, 22h 6, 23h 9, 0h–7h 3. Blocos: 11h–13h = 71 em 3 h (~24/h, o melhor); 15h–20h = 103 em 6 h (~17/h); 21h–23h = 23. Terça o dia mais forte (59), sábado e domingo os mais fracos (22). Regra: seguimentos só às 11h–13h; o 1.º às 17h–20h quando nenhuma das 11h–13h cabe nas 24 h (ex.: escreveu às 9h); o 2.º só às 11h–13h. Silêncio mínimo de 5 h antes do 1.º. Cron `0 11-13,17-20`, até 10 por hora.
 
 
-## [RETIRADA 21/11] Algarve só às sextas-feiras (dono, 20 Nov 2026)
+## Algarve só às sextas-feiras (dono, 20 Nov 2026)
 
 "A partir de agora para o Algarve, quando a pessoa sugere um dia, diz nesse dia já não temos disponibilidade, temos na próxima sexta-feira. Porque vamos ter que começar a marcar tudo para sexta-feira. [...] O Algarve é só sexta-feira, sempre que a pessoa sugerir outra data, já sabes o que fazer."
 
@@ -1029,10 +1029,3 @@ Correções: canto 119€ (`QuizTypes`), com imper = 119€ + imper 3L+2L [RETIR
 "Muitas vezes a cliente diz que está tudo bem, mas depois faz uma reclamação." O "correu bem" passa o check-in a `waiting`; 10 min depois (`REVIEW_WAIT_S`) o sweep lê as mensagens do cliente desde o sim: alguma negativa (`classifyAnswer`) = estado `negative`, email "queixa depois do correu bem" ao dono, sem link; senão sai o pedido. Vale também para o elogio antes do "Como correu?" (`procedure.ts`).
 
 - Algarve semana 26/11 (dono, 21 Nov): "O Hub vai ao Algarve na quinta" → só essa semana, quinta 26/11 em vez da sexta 27/11 (`ALGARVE_DAY_OVERRIDE` em botAvailability.ts; kyro-bot askWeek/agent leem o dia da data). Marcações de sexta passam para quinta, com o sim do cliente.
-
-## Algarve só às quintas-feiras (dono, 21 Nov 2026)
-
-"Vais remover a regra do Algarve só trabalha às sextas [...] O Joab, que é da equipa do Algarve, vai estar no Algarve na quinta, portanto todos os serviços do Algarve só são marcados para quinta-feira. A partir de agora é só quinta-feira, remove essa regra de sexta."
-
-- `botAvailability`: todo o Algarve devolve `askWeek: true` (sem horas) e `fridayOnly` = a próxima quinta (nunca o próprio dia). O nome do campo ficou para não partir o kyro-bot; o texto segue o dia da semana da data. Sai o `ALGARVE_DAY_OVERRIDE` da semana de 26/11.
-- kyro-bot `askWeek.ts` / `agent.ts`: propõe a próxima quinta; outro dia = "Nesse dia já não temos disponibilidade, temos na próxima quinta-feira, dia X." Travão em `tests/regras-retiradas.test.ts` contra "Algarve só às sextas".
