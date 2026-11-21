@@ -93,9 +93,9 @@ describe('the pay rule lives in one function', () => {
     const noVideo = checkProcedure(rec({ ...day, ...got, video_msg_id: null, video_at: null }), [], '2026-11-13');
     expect(noVideo.status).toBe('fechado');
     expect(noVideo.missing).toEqual(['video']);
-    expect(procedureAdjustment(rec(day), noVideo, 80, 'Ana')).toMatchObject({ amount: 4, label: 'Ana: 5% sem fotografias e vídeo' });
+    expect(procedureAdjustment(rec(day), noVideo, 80, 'Ana')).toBeNull(); // dono 21/11: sem os 45%
     const both = checkProcedure(rec(day), [review], '2026-11-13');
-    expect(procedureAdjustment(rec(day), both, 80, 'Ana')?.amount).toBe(-1);
+    expect(procedureAdjustment(rec(day), both, 80, 'Ana')?.amount).toBe(-5);
   });
   it('the 6/11 rule leaves out older services and the teams that were not told', () => {
     const none = { pay: { teamShare: 45, bonus: 0 } };

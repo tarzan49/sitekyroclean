@@ -124,10 +124,10 @@ Deno.test("from 6/11 a closed procedure writes one adjustment: 5% of the value w
   const added: Row[] = [];
   store.addAdjustment = async row => { added.push(row); return null; };
   const day8 = await json(await procedureDue(events, store, new Date("2026-11-14T08:00:00Z")));
-  assertEquals(added, [{ team: "Braga", day: "2026-11-06", label: "Larry, Braga: 5% sem fotografias e vídeo", amount: 4 }]);
+  assertEquals(added, []); // dono 21/11: sem os 45%
   assertEquals((day8.closed as Row[]).length, 0); // dono 21/11: a percentagem fica nas contas, sem aviso
   await procedureDue(events, store, new Date("2026-11-14T09:00:00Z"));
-  assertEquals(added.length, 1);
+  assertEquals(added.length, 0);
 });
 
 Deno.test("client review request: once, at the end of the service, never to a paused, opted-out or reviewed client", async () => {

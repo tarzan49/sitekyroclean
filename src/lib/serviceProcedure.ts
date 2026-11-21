@@ -70,7 +70,7 @@ export const mediaOk = (got: { before: boolean; after: boolean; video: boolean }
 
 export function procedurePay(got: { before: boolean; after: boolean; video: boolean; review: boolean }, rule: ProcedurePayRule = PROCEDURE_PAY_RULE): ProcedurePay {
   if (rule === 'media_50_review_5') return {
-    teamShare: got.before && got.after && got.video ? PROCEDURE_FULL_SHARE : PROCEDURE_REDUCED_SHARE,
+    teamShare: PROCEDURE_FULL_SHARE, // sem penalização dos 45% (dono, 21 Nov)
     bonus: got.review ? PROCEDURE_REVIEW_BONUS : 0,
   };
   if (rule === 'all_or_45') return mediaOk(got) && got.review ? { teamShare: PROCEDURE_FULL_SHARE, bonus: PROCEDURE_REVIEW_BONUS } : { teamShare: PROCEDURE_REDUCED_SHARE, bonus: 0 };
