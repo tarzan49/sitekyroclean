@@ -2557,6 +2557,13 @@ function withSameVisitSpecial(input, r) {
   if (!input || typeof input !== "object") return none;
   const inp = input;
   const q = r;
+  if (q.ok && !q.blackFriday && typeof q.antiMiteGift === "number" && Array.isArray(inp.items)) {
+    const items = inp.items.map((i) => i?.treatment === "clean+anti-acaros" ? { ...i, treatment: "clean" } : i);
+    const clean = withSameVisitSpecial({ ...inp, items }, botQuoteCore({ ...inp, items }));
+    const cur = finalOrderPrice(r);
+    if (clean.sameVisitSpecial && cur !== null && clean.sameVisitSpecial.total < cur)
+      return { ...r, sameVisitSpecial: clean.sameVisitSpecial, mattressMiteOffer: { normal: q.antiMiteGift, total: clean.sameVisitSpecial.total } };
+  }
   if (!q.ok || q.blackFriday || q.mattressMiteOffer || q.antiMiteGift || q.rugCombo?.ok && (q.rugCombo.travelWaived ?? 0) > 0) return none;
   if (sameVisitPieces(inp) < SAME_VISIT_SPECIAL_MIN_PIECES) return none;
   const normal = finalOrderPrice(r);

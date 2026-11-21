@@ -1029,3 +1029,12 @@ Correções: canto 119€ (`QuizTypes`), com imper = 119€ + imper 3L+2L [RETIR
 "Muitas vezes a cliente diz que está tudo bem, mas depois faz uma reclamação." O "correu bem" passa o check-in a `waiting`; 10 min depois (`REVIEW_WAIT_S`) o sweep lê as mensagens do cliente desde o sim: alguma negativa (`classifyAnswer`) = estado `negative`, email "queixa depois do correu bem" ao dono, sem link; senão sai o pedido. Vale também para o elogio antes do "Como correu?" (`procedure.ts`).
 
 - Algarve semana 26/11 (dono, 21 Nov): "O Hub vai ao Algarve na quinta" → só essa semana, quinta 26/11 em vez da sexta 27/11 (`ALGARVE_DAY_OVERRIDE` em botAvailability.ts; kyro-bot askWeek/agent leem o dia da data). Marcações de sexta passam para quinta, com o sim do cliente.
+
+### Cátia, Braga (dono, 21 Nov 2026)
+- [RETIRADA 21/11] "Um 3 lugares com chaise do tamanho de um canto conta como canto (comoCanto), e depois de dizermos canto mantém-se" (S18, 20/11). Dono: "Desde quando é que um sofá de canto é um sofá com uma chaise longue?" Agora: chaise de qualquer tamanho = preço pelos lugares; canto só o L.
+- Sofá sem fotografia não leva preço: pede-se a fotografia primeiro.
+- O colchão foi cotado sozinho (79€ / 99€) depois do sofá: peça acrescentada = calcular_orcamento com o pedido inteiro (mesma visita, anti-ácaros oferecido).
+- "Quase, Cátia… é só somar as duas parcelas": proibido; total sempre escrito, também somando valores do dono (OWNER_FOLLOW_FEEDBACK mudado).
+- "Quando a obra acabar é só dizer-nos": adiamento = propor reservar data (DEFER_PAY alargado).
+- Resposta das 22:19 não saiu: Meta 500 (#131000) antes da 1.ª bolha e o código não repetia "Envio parou". Agora repete até 3 vezes quando nenhuma bolha saiu (engine.ts).
+- Motor: Premium + colchão com anti-ácaros dava 344€ e sem ele 289€; agora fica 289€ com o anti-ácaros oferecido.

@@ -506,6 +506,16 @@ function withSameVisitSpecial<T extends { ok: boolean }>(input: unknown, r: T): 
   if (!input || typeof input !== 'object') return none;
   const inp = input as Record<string, unknown>;
   const q = r as unknown as { ok: boolean; blackFriday?: unknown; mattressMiteOffer?: unknown; antiMiteGift?: unknown; rugCombo?: { ok?: boolean; travelWaived?: number } | null };
+  // Big order with anti-mites (antiMiteGift): never dearer than the same order with cleaning-only mattresses and the
+  // same-visit condition; then that price, with the anti-mites offered (owner, 21 Nov 2026, Cátia: Premium + colchão
+  // com anti-ácaros 344€ vs 289€ sem ele).
+  if (q.ok && !q.blackFriday && typeof q.antiMiteGift === 'number' && Array.isArray(inp.items)) {
+    const items = (inp.items as Record<string, unknown>[]).map(i => (i?.treatment === 'clean+anti-acaros' ? { ...i, treatment: 'clean' } : i));
+    const clean = withSameVisitSpecial({ ...inp, items }, botQuoteCore({ ...inp, items }) as unknown as { ok: boolean });
+    const cur = finalOrderPrice(r);
+    if (clean.sameVisitSpecial && cur !== null && clean.sameVisitSpecial.total < cur)
+      return { ...r, sameVisitSpecial: clean.sameVisitSpecial, mattressMiteOffer: { normal: q.antiMiteGift as number, total: clean.sameVisitSpecial.total } } as never;
+  }
   if (!q.ok || q.blackFriday || q.mattressMiteOffer || q.antiMiteGift || (q.rugCombo?.ok && (q.rugCombo.travelWaived ?? 0) > 0)) return none;
   if (sameVisitPieces(inp) < SAME_VISIT_SPECIAL_MIN_PIECES) return none;
   const normal = finalOrderPrice(r);
