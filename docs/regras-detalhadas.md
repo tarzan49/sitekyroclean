@@ -1027,3 +1027,5 @@ Correções: canto 119€ (`QuizTypes`), com imper = 119€ + imper 3L+2L [RETIR
 
 ### Pedido de avaliação espera 10 min (dono, 20 Nov 2026)
 "Muitas vezes a cliente diz que está tudo bem, mas depois faz uma reclamação." O "correu bem" passa o check-in a `waiting`; 10 min depois (`REVIEW_WAIT_S`) o sweep lê as mensagens do cliente desde o sim: alguma negativa (`classifyAnswer`) = estado `negative`, email "queixa depois do correu bem" ao dono, sem link; senão sai o pedido. Vale também para o elogio antes do "Como correu?" (`procedure.ts`).
+
+- Algarve semana 26/11 (dono, 21 Nov): "O Hub vai ao Algarve na quinta" → só essa semana, quinta 26/11 em vez da sexta 27/11 (`ALGARVE_DAY_OVERRIDE` em botAvailability.ts; kyro-bot askWeek/agent leem o dia da data). Marcações de sexta passam para quinta, com o sim do cliente.
