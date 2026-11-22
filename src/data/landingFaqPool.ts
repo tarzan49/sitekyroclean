@@ -1,4 +1,4 @@
-import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
+import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, DEPOSIT_RULE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
 import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
 
@@ -35,6 +35,7 @@ const common: readonly FaqEntry[] = [
       : `A deslocação é cobrada separadamente dos serviços. A taxa da tabela para ${municipality} é ${fee}€. Confirmamos a morada e o total do pedido antes da marcação.`;
   } },
   { id: 'orcamento-gratuito', topic: 'orcamento', question: 'Pedir orçamento tem algum custo ou compromisso?', answer: `O orçamento é gratuito e sem compromisso. Envie fotografias, quantidades e localidade para avaliarmos o pedido. ${RESPONSE_PROMISE}.` },
+  { id: 'sinal', topic: 'orcamento', question: 'Preciso de pagar algo antes do serviço?', answer: DEPOSIT_RULE },
   { id: 'marcacao', topic: 'preparacao', question: 'É possível marcar para hoje ou amanhã?', answer: AVAILABILITY_PROMISE },
   { id: 'acesso', topic: 'preparacao', question: 'Que informações sobre o acesso devo indicar?', answer: 'Indique o piso, a existência de elevador e eventuais restrições de acesso ou estacionamento. Estes detalhes ajudam a equipa a organizar a visita e a confirmar as condições antes da marcação.' },
   { id: 'fotografias', topic: 'preparacao', question: 'Que fotografias ajudam a preparar o orçamento?', answer: 'Envie uma fotografia da peça ou área completa e pormenores das manchas, do desgaste e da etiqueta do material, se existir. Avise também se já aplicou algum produto.' },

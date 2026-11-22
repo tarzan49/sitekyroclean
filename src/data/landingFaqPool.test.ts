@@ -13,7 +13,7 @@ describe('landing FAQ library', () => {
     const distinctQuestions = new Set<string>();
     for (const service of services) {
       const pool = getLandingFaqPool(service.slug as LandingService);
-      expect(pool.length).toBe(40);
+      expect(pool.length).toBe(41);
       expect(new Set(pool.map(faq => faq.id)).size).toBe(pool.length);
       expect(new Set(pool.map(faq => faq.question)).size).toBe(pool.length);
       expect(new Set(pool.map(faq => faq.topic)).size).toBe(4);
@@ -24,7 +24,7 @@ describe('landing FAQ library', () => {
         expect(answer).not.toMatch(/—|\{city\}|\{travelFee\}|99\s*%|esteriliza[çc][aã]o garantida/);
       }
     }
-    expect(distinctQuestions.size).toBe(180);
+    expect(distinctQuestions.size).toBe(181);
   });
 
   it('uses the canonical municipality fee, never a fee guessed from a parish name', () => {
@@ -47,7 +47,7 @@ describe('landing FAQ library', () => {
     }
     const available = new Set(services.flatMap(service => getLandingFaqPool(service.slug as LandingService).map(entry => entry.id)));
     expect([...available].filter(id => !used.has(id))).toEqual([]);
-    expect(used.size).toBe(180);
+    expect(used.size).toBe(181);
   });
 
   it('does not silently substitute sofas for an unsupported service', () => {

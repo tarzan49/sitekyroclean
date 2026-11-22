@@ -1,4 +1,4 @@
-import { SATISFACTION_PROMISE, SATISFACTION_PHOTOS, PRICE_PROMISE } from '../constants/commercialPolicy';
+import { DEPOSIT_RULE, SATISFACTION_PROMISE, SATISFACTION_PHOTOS, PRICE_PROMISE } from '../constants/commercialPolicy';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, WHATSAPP_BASE, PHONE_DISPLAY } from '@/constants/business';
@@ -40,6 +40,7 @@ const PoliticaDevolucoes = () => (
           <p>
             <strong>Ao confirmar a marcação do serviço</strong>, o cliente solicita expressamente o início imediato da prestação e declara ter sido informado de que, após a conclusão do serviço, perde o direito de livre resolução, nos termos do artigo 17.º, n.º 1, alínea a) do referido diploma.
           </p>
+          <p>{DEPOSIT_RULE}</p>
         </Section>
 
         <Section title="3. Reclamações">

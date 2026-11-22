@@ -1050,3 +1050,8 @@ O bot deu 159/99€ (3 lugares) a um sofá de 6 lugares com chaise que tinha vis
 - **Só impermeabilização = sem desconto (2026-11-22, dono, Rosângela):** "impermeabilizações, se for só impermeabilizações, nunca faço desconto, porque é um produto bastante caro"; "não lhe expliques que nunca fazemos desconto [...] tenta-lhe dizer [...] estamos a oferecer a deslocação". O bot tinha dado 151€ em vez de 159€ (5% do `askedDiscount`). Agora `botQuote` devolve `askedDiscount: null` e `waterproofingOnlyNoDiscount.travelOffer` {total, travel} quando nenhuma peça leva limpeza. Camadas: botQuote.ts, respostas-bot-whatsapp.md linha 30, CLAUDE.md §4.
 
 - [22/11] Desmarcação: o bot propõe sempre reagendar com duas horas reais na mesma mensagem, mesmo que a cliente vá a outro sítio (S62 ganha a S49/S50). Caso de 22/11: o bot só perguntou "o que pesou mais".
+
+
+## Sinal nas reservas com antecedência (dono, 22 Nov 2026)
+
+Dono: "pedidos acima de 300 euros pedir um sinal", depois "o sinal é não reembolsável", "tem de ser para clientes com reservas com mais de 2 semanas de antecedência", "não existe valor mínimo". Aceitou 15% com mínimo de 20€ e a opção A (sem pagamento no site: o bot pede o sinal por MB Way/transferência). O site diz a regra nas FAQ (`sinal`) e na política de devoluções. Falta decidir se uma remarcação mantém o sinal.

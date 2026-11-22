@@ -10,6 +10,16 @@ export const SATISFACTION_PROMISE = 'Se não ficar satisfeito, contacte-nos até
 // Dono, 20 Nov: a repetição das 48 h pede fotografias das zonas, como diz o certificado de limpeza.
 export const SATISFACTION_PHOTOS = 'Para pedir a repetição, envie fotografias das zonas em causa dentro dessas 48 horas.';
 export const PRICE_PROMISE = 'A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.';
+// Sinal (dono, 22 Nov): reservas para daqui a mais de 2 semanas, qualquer valor; 15% com mínimo de 20€, não reembolsável, desconta no total.
+export const DEPOSIT_MIN_DAYS_AHEAD = 14;
+export const DEPOSIT_RATE = 0.15;
+export const DEPOSIT_MIN_EUR = 20;
+/** Sinal em euros (arredondado à dezena, mínimo 20€, nunca acima do total) ou 0 se a data for dentro de 2 semanas. */
+export function depositFor(total: number, daysAhead: number): number {
+  if (daysAhead <= DEPOSIT_MIN_DAYS_AHEAD || total <= 0) return 0;
+  return Math.min(total, Math.max(DEPOSIT_MIN_EUR, Math.round((total * DEPOSIT_RATE) / 10) * 10));
+}
+export const DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável.`;
 export const AVAILABILITY_PROMISE = 'Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.';
 export const COVERAGE_PROMISE = 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.';
 export const WEEKLY_REQUESTS = 'Recebemos habitualmente 50 a 60 pedidos de orçamento por semana.';
