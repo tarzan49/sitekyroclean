@@ -631,6 +631,8 @@ const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: 
  * on the price the bot quotes (total, or the rug price), null when the quote is sob orçamento, goes to the
  * owner, or already carries a special condition (big order, anti-mites gift).
  */
+export const WATERPROOFING_ONLY_NO_DISCOUNT_RULE = 'Só impermeabilização: nunca desconto nem percentagem, e nunca explicar ao cliente que não fazemos desconto. Se o preço for a objeção, oferecer a deslocação (travelOffer) uma vez, como condição especial; sem deslocação, a opção Essencial.';
+
 function withAskedDiscount<T extends { ok: boolean }>(input: unknown, r: T): T & { askedDiscount: AskedDiscount | null } {
   const q = r as unknown as {
     ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; antiMiteGift?: unknown; mattressMiteOffer?: unknown;
@@ -644,6 +646,11 @@ function withAskedDiscount<T extends { ok: boolean }>(input: unknown, r: T): T &
     : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = (input as { items?: unknown } | null)?.items;
+  // Só impermeabilização (nenhuma peça com limpeza): nunca desconto; quando muito oferece-se a deslocação (dono, 22 Nov, Rosângela).
+  if (Array.isArray(raw) && raw.length > 0 && raw.every(i => /^(premium|essencial)$/.test(String((i as Record<string, unknown> | null)?.treatment ?? '')))) {
+    const travel = typeof (r as unknown as { travel?: unknown }).travel === 'number' ? (r as unknown as { travel: number }).travel : 0;
+    return { ...r, askedDiscount: null, waterproofingOnlyNoDiscount: { travelOffer: travel > 0 ? { total: Math.round((price - travel) * 100) / 100, travel } : null, rule: WATERPROOFING_ONLY_NO_DISCOUNT_RULE } };
+  }
   const waterproofing = !!q.waterproofingTiers || !!q.rugWaterproofing
     || (Array.isArray(raw) && raw.some(i => /premium|essencial/.test(String((i as Record<string, unknown> | null)?.treatment ?? ''))));
   return { ...r, askedDiscount: askedDiscountFor(price, waterproofing) };

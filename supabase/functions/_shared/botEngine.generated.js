@@ -2653,12 +2653,17 @@ function withMattressMiteOffer(input, r) {
   return { ...r, mattressMiteOffer: { normal, total: clean.total } };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
+var WATERPROOFING_ONLY_NO_DISCOUNT_RULE = "Só impermeabilização: nunca desconto nem percentagem, e nunca explicar ao cliente que não fazemos desconto. Se o preço for a objeção, oferecer a deslocação (travelOffer) uma vez, como condição especial; sem deslocação, a opção Essencial.";
 function withAskedDiscount(input, r) {
   const q = r;
   if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday || r.sameVisitSpecial) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = input?.items;
+  if (Array.isArray(raw) && raw.length > 0 && raw.every((i) => /^(premium|essencial)$/.test(String(i?.treatment ?? "")))) {
+    const travel = typeof r.travel === "number" ? r.travel : 0;
+    return { ...r, askedDiscount: null, waterproofingOnlyNoDiscount: { travelOffer: travel > 0 ? { total: Math.round((price - travel) * 100) / 100, travel } : null, rule: WATERPROOFING_ONLY_NO_DISCOUNT_RULE } };
+  }
   const waterproofing = !!q.waterproofingTiers || !!q.rugWaterproofing || Array.isArray(raw) && raw.some((i) => /premium|essencial/.test(String(i?.treatment ?? "")));
   return { ...r, askedDiscount: askedDiscountFor(price, waterproofing) };
 }
