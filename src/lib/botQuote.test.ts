@@ -228,8 +228,8 @@ describe('puffs (owner, 21 Oct 2026)', () => {
 
   it('a corner sofa is waterproofed as a 5-seat sofa, the U rule (owner, 20 Nov 2026, Ana Marques)', () => {
     const l = (treatment: string) => ok({ items: [{ kind: 'sofa', size: 'canto', treatment }], city: 'Porto' });
-    expect(l('premium')).toMatchObject({ quote: false, total: 179 });
-    expect(l('essencial')).toMatchObject({ quote: false, total: 129 });
+    expect(l('premium')).toMatchObject({ quote: false, total: 199 });
+    expect(l('essencial')).toMatchObject({ quote: false, total: 139 });
     expect(l('clean+premium').subtotal).toBe(119 + 150);
     expect(l('clean+essencial').subtotal).toBe(119 + 90);
     expect(l('clean+premium').waterproofingTiers).toMatchObject({ premium: 269, essencial: 209 });

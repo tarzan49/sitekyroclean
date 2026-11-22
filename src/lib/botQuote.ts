@@ -272,13 +272,14 @@ function uWaterproofingQuote(input: Record<string, unknown>) {
   if (!Array.isArray(raw)) return null;
   const treatmentOf = (r: unknown) => String((r as Record<string, unknown>).treatment ?? '');
   const isRealU = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === 'u';
-  // A corner sofa waterproofed alone = a U alone, 179€ / 129€ travel included (owner, 20 Nov 2026: canto = 5 lugares).
+  // A corner sofa waterproofed alone: 199€ / 139€ travel included (owner, 22 Nov 2026: "fica em 199 e 139 sofa de canto"; was 179/129 as a U).
+  const CANTO_WATERPROOFING_ALONE = { premium: 199, essencial: 139 } as const;
   const isCantoAlone = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === 'canto' && ['premium', 'essencial'].includes(treatmentOf(r));
   const cantoAsU = !raw.some(isRealU);
   // A 5, 6 or 7 seat sofa waterproofed alone: same travel-included path, own price (dono, 22 Nov 2026, Rosângela).
   const seatsOf = (r: unknown) => { const v = (r as Record<string, unknown>).seats; return typeof v === 'number' && Number.isInteger(v) ? v : 5; };
   const isFiveAlone = (r: unknown) => !!r && typeof r === 'object' && (r as Record<string, unknown>).kind === 'sofa' && (r as Record<string, unknown>).size === '5-lugares' && ['premium', 'essencial'].includes(treatmentOf(r)) && seatsOf(r) <= 7;
-  const aloneFixed = (r: unknown) => (isFiveAlone(r) ? (seatsOf(r) >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE) : U_WATERPROOFING_ALONE);
+  const aloneFixed = (r: unknown) => (isCantoAlone(r) ? CANTO_WATERPROOFING_ALONE : isFiveAlone(r) ? (seatsOf(r) >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE) : U_WATERPROOFING_ALONE);
   const isU = (r: unknown) => isRealU(r) || (cantoAsU && isCantoAlone(r)) || isFiveAlone(r);
   const isUw = (r: unknown) => isU(r) && ['clean+premium', 'clean+essencial', 'premium', 'essencial'].includes(treatmentOf(r));
   const uItems = raw.filter(isUw) as Record<string, unknown>[];

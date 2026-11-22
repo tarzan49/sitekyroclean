@@ -2349,6 +2349,7 @@ function uWaterproofingQuote(input) {
   if (!Array.isArray(raw)) return null;
   const treatmentOf = (r) => String(r.treatment ?? "");
   const isRealU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
+  const CANTO_WATERPROOFING_ALONE = { premium: 199, essencial: 139 };
   const isCantoAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "canto" && ["premium", "essencial"].includes(treatmentOf(r));
   const cantoAsU = !raw.some(isRealU);
   const seatsOf = (r) => {
@@ -2356,7 +2357,7 @@ function uWaterproofingQuote(input) {
     return typeof v === "number" && Number.isInteger(v) ? v : 5;
   };
   const isFiveAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "5-lugares" && ["premium", "essencial"].includes(treatmentOf(r)) && seatsOf(r) <= 7;
-  const aloneFixed = (r) => isFiveAlone(r) ? seatsOf(r) >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE : U_WATERPROOFING_ALONE;
+  const aloneFixed = (r) => isCantoAlone(r) ? CANTO_WATERPROOFING_ALONE : isFiveAlone(r) ? seatsOf(r) >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE : U_WATERPROOFING_ALONE;
   const isU = (r) => isRealU(r) || cantoAsU && isCantoAlone(r) || isFiveAlone(r);
   const isUw = (r) => isU(r) && ["clean+premium", "clean+essencial", "premium", "essencial"].includes(treatmentOf(r));
   const uItems = raw.filter(isUw);
