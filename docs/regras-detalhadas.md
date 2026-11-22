@@ -1041,3 +1041,8 @@ Correções: canto 119€ (`QuizTypes`), com imper = 119€ + imper 3L+2L [RETIR
 
 ### Impermeabilização Porto/Braga: horas a partir de amanhã (dono, 22 Nov 2026, Roberto)
 [RETIRADA 22/11] a regra de 18 Nov "todas as impermeabilizações do Porto e Braga sem horas (askWeek)". O Roberto aceitou o Premium (369€) às 11:19 e ficou 10 min sem resposta: a resposta estava retida e a ponte já tinha saído nessa semana. Dono: "tu podes marcar na mesma uma hora e eu aprovo a hora final"; "para o mesmo dia nós vemos o horário, se for uma impermeabilização premium. Se for para amanhã, podes sugerir". Código: `botAvailability.ts` (`noSameDay`). kyro-bot: retido sem ponte sai ao fim de 1 min (`HELD_NO_BRIDGE_S`).
+
+
+## Tabela de sofás por lugares (dono, 22 Nov 2026, Rosângela Moura, Viana)
+
+O bot deu 159/99€ (3 lugares) a um sofá de 6 lugares com chaise que tinha visto ser grande. Dono: os lugares contam-se pelos assentos; um 6 lugares com chaise não é canto. Imper deste sofá no mínimo 249€, +100€ com limpeza. Tabela dada pelo dono (sozinho, deslocação incluída): 3L limpeza 89, imper Premium 159, Essencial 99; 4L 109/189/129; 5L 119/219/159; 6L 129/249/189. A cliente recebeu a correção 249/189€ às 13:48 (a 1.ª mensagem não pôde ser apagada: a API oficial não edita nem apaga).
