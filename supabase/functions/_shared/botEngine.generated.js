@@ -3430,7 +3430,7 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
 }
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
-var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", ...FRIDAY_ONLY_CITIES]);
+var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set([...FRIDAY_ONLY_CITIES]);
 var NORTH_WATERPROOFING_ASK_WEEK_REGIONS = /* @__PURE__ */ new Set(["Porto", "Braga"]);
 var LEIRIA_WATERPROOFING_TEAMS = ["Lisboa 1"];
 function teamsForCity(city, zone, waterproofing, total, day, rugPickup = false) {
@@ -3593,7 +3593,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const fridayDone = req._friday === true;
-  if (req.ownerTime !== true && city === "Viana do Castelo") {
+  if (req.ownerTime !== true && city === "Viana do Castelo" && !hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     return {
       ...base,

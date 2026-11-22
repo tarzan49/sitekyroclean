@@ -744,7 +744,7 @@ export const FRIDAY_ONLY_CITIES: ReadonlySet<string> = new Set(['Leiria', 'Batal
  * askWeek for every job already (isMadeira). Cleanings in these towns keep their rule (Viana: Braga team from
  * NORTH_MIN_TOTAL; Leiria zone: next Friday, Coimbra team).
  */
-export const WATERPROOFING_ASK_WEEK_CITIES: ReadonlySet<string> = new Set(['Viana do Castelo', ...FRIDAY_ONLY_CITIES]);
+export const WATERPROOFING_ASK_WEEK_CITIES: ReadonlySet<string> = new Set([...FRIDAY_ONLY_CITIES]);
 /** Waterproofing in the north: no hours from the engine, the owner approves them with the team (owner, 18 Nov 2026). */
 export const NORTH_WATERPROOFING_ASK_WEEK_REGIONS: ReadonlySet<string> = new Set(['Porto', 'Braga']);
 export const NORTH_WATERPROOFING_ASK_WEEK_FROM = '2026-11-18';
@@ -960,7 +960,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // Owner, 18 Nov 2026 ("Em Viana, não podes dar disponibilidades sem perguntar primeiro à equipa"): every
   // job in Viana do Castelo closes without an hour; the Viana team (LigLav) is asked first, with the photo or
   // video of the item, that it is in Viana, and its availability. The hour comes from the team.
-  if (req.ownerTime !== true && city === 'Viana do Castelo') {
+  // Owner, 22 Nov 2026 (Rosângela): "não é a LigLav que faz impermeabilizações", "porto 1, não tens que perguntar":
+  // waterproofing in Viana goes to Porto 1 with hours like Braga; only the cleanings ask the Viana team.
+  if (req.ownerTime !== true && city === 'Viana do Castelo' && !hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     // The Viana team takes the cleanings (owner, 18 Nov 2026: "Sem horas, confirmo eu"); waterproofing keeps the Porto teams.
     return { ...base, region: area, teams: [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))],

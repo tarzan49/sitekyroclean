@@ -541,7 +541,7 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
   const essencial = [{ kind: 'sofa', size: '3-lugares', treatment: 'essencial' }];
   const cleaning = [{ kind: 'sofa', size: '3-lugares' }];
   it('as cidades: Viana do Castelo e a zona de Leiria', () => {
-    expect([...WATERPROOFING_ASK_WEEK_CITIES]).toEqual(['Viana do Castelo', 'Leiria', 'Batalha', 'Marinha Grande', 'Porto de Mós', 'Ourém', 'Fátima', 'Pombal', 'Alcobaça', 'Nazaré']);
+    expect([...WATERPROOFING_ASK_WEEK_CITIES]).toEqual(['Leiria', 'Batalha', 'Marinha Grande', 'Porto de Mós', 'Ourém', 'Fátima', 'Pombal', 'Alcobaça', 'Nazaré']);
   });
   it('Leiria: impermeabilização sem horas, sempre na Lisboa 1; a limpeza pergunta-se à equipa de Leiria', () => {
     for (const city of ['Leiria', 'Marinha Grande', 'Nazaré']) {
@@ -561,11 +561,13 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
     expect(chooseTeam([], 'Leiria', '2026-11-20T15:00:00Z', '2026-11-20T16:00:00Z')).toBe('Coimbra');
   });
   it('Viana do Castelo: sem horas em tudo, pergunta-se primeiro à equipa de Viana (dono, 18 Nov)', () => {
-    for (const items of [premium, cleaning]) {
-      const r = ok(botAvailability({ city: 'Viana do Castelo', items, total: 109 }, [], now));
-      expect([r.free, r.suggestion, r.askWeek, r.askTeam]).toEqual([[], null, true, 'Viana']);
-      expect(r.handToOwner).toMatch(/perguntar primeiro à equipa de Viana/);
-    }
+    const r = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 109 }, [], now));
+    expect([r.free, r.suggestion, r.askWeek, r.askTeam]).toEqual([[], null, true, 'Viana']);
+    expect(r.handToOwner).toMatch(/perguntar primeiro à equipa de Viana/);
+    // Dono, 22 Nov 2026 (Rosângela): a impermeabilização em Viana é da Porto 1, com horas, sem perguntar à LigLav.
+    const imper = ok(botAvailability({ city: 'Viana do Castelo', items: premium, total: 249 }, [], now));
+    expect([imper.askTeam, imper.askWeek, imper.teams]).toEqual([undefined, undefined, ['Porto 1']]);
+    expect(imper.free.length).toBeGreaterThan(0);
     // Equipa Viana (dono, 18 Nov 2026): as limpezas de Viana são dela, a impermeabilização fica nas equipas do Porto.
     expect(ok(botAvailability({ city: 'Viana do Castelo', items: cleaning }, [], now)).teams).toEqual(['Viana']);
     expect(ok(botAvailability({ city: 'Viana do Castelo', items: premium }, [], now)).teams).not.toContain('Viana');
