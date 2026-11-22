@@ -354,9 +354,19 @@ export function clientPhoneFromTitle(summary: string): string | null {
     if (!/^[+\d\s().]+$/.test(part.trim())) continue;
     const d = part.replace(/\D/g, '').replace(/^00/, '');
     if (/^[29]\d{8}$/.test(d)) return `351${d}`;
-    if (d.length >= 11 && d.length <= 15) return d;
+    // 10 dígitos também (21 Nov 2026, Simone: "2389855856" é o número da conversa dela e o "Como correu?" nunca saiu).
+    if (d.length >= 10 && d.length <= 15) return d;
   }
   return null;
+}
+
+/** Telefone do cliente: o título primeiro; sem ele, um telemóvel português marcado como telefone na descrição ou na morada (Viana, 21 Nov 2026). */
+export function clientPhoneOfEvent(summary: string, description?: string | null, location?: string | null): string | null {
+  const fromTitle = clientPhoneFromTitle(summary);
+  if (fromTitle) return fromTitle;
+  // Só ao lado de "Telefone"/"Tel"/"Contacto"/wa.me: a descrição também pode ter o número da equipa.
+  const m = `${description ?? ''}\n${location ?? ''}`.match(/(?:tel(?:efone|em[óo]vel)?|contacto|wa\.me\/)[^\d\n]{0,6}(?:\+?351[\s.]?)?(9[1236]\d(?:[\s.]?\d){6})(?!\d)/i);
+  return m ? `351${m[1].replace(/\D/g, '')}` : null;
 }
 
 /** A resposta do bot depois de receber fotografias ou vídeo. */

@@ -169,7 +169,9 @@ Deno.test("client review request: once, at the end of the service, never to a pa
   assertEquals((body.clientReviews as Row[]).map(c => c.eventId), ["s3"]);
   assert(String((body.clientReviews as Row[])[0].message).includes("g.page/r/CRc7F7lX3xcEECE/review"));
   assert(String(table.get("s2")!.client_review_skip).startsWith("em pausa"));
-  assertEquals(table.get("s4")!.client_review_skip, "sem telefone no título");
+  // No phone: nothing stored (a phone added to the title later still gets the question), the bot tells the owner.
+  assertEquals(table.get("s4")!.client_review_skip, undefined);
+  assertEquals((body.clientReviewSkips as Row[]).map(c => [c.eventId, c.reason]), [["s4", "sem telefone no título"]]);
 });
 
 Deno.test("a service moved to another day gets the message again, for the team of the new day; files already sent keep it (5/11)", async () => {

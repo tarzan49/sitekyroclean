@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkProcedure, clientPhoneFromTitle, clientReviewDue, factsFromTitle, isRugPickupVisit, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
+  checkProcedure, clientPhoneFromTitle, clientPhoneOfEvent, clientReviewDue, factsFromTitle, isRugPickupVisit, procedureAccountDelta, procedureApplies, procedureShots, procedureClientMessage, procedureClosedMessage, procedurePay, procedurePromptMessage,
   procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, slotForMedia,
   procedureAdjustment, REVIEW_LINKS, type ProcedureRecord,
 } from './serviceProcedure';
@@ -243,6 +243,12 @@ describe('client review request: only at the end of the service', () => {
     expect(clientPhoneFromTitle('Serviço 40€ (80€) Limpeza de sofá - 912 000 000 - Ana Teste - Rua Inventada 1')).toBe('351912000000');
     expect(clientPhoneFromTitle('Serviço 40€ (80€) sofá - +44 7700 900000 - Ana')).toBe('447700900000');
     expect(clientPhoneFromTitle('Serviço 40€ (80€) sofá - Ana - Rua 5 de Outubro 12')).toBeNull();
+  });
+  it('10-digit chat numbers and a phone marked in the description count (21 Nov 2026, Simone, Viana)', () => {
+    expect(clientPhoneFromTitle('Serviço 40€ (79€) Limpeza de sofá 2 lugares - 2389855856 - Simone - Amadora')).toBe('2389855856');
+    expect(clientPhoneOfEvent('Serviço 45€ (89€) colchão - Viana do Castelo', 'Equipa: Viana\nTelefone: 962 651 620')).toBe('351962651620');
+    expect(clientPhoneOfEvent('Serviço 45€ (89€) colchão - Viana do Castelo', 'Equipa: Viana\nRua 12, 4900-000')).toBeNull();
+    expect(clientPhoneOfEvent('Serviço - 912 000 000 - Ana', 'Telefone: 962 651 620')).toBe('351912000000');
   });
 });
 

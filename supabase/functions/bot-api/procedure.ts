@@ -9,7 +9,7 @@
 // request goes from the bot to the client at the end of the service, no longer
 // through the team; `clientReviewDue` decides when).
 import {
-  addDays, checkProcedure, clientPhoneFromTitle, clientReviewDue, eventTeam, isRugPickupVisit, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
+  addDays, checkProcedure, clientPhoneFromTitle, clientPhoneOfEvent, clientReviewDue, eventTeam, isRugPickupVisit, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
   procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
@@ -176,13 +176,20 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const ev = liveEvent(r);
     if (!ev?.start || !ev.end || Date.parse(ev.end) < nowMs - PROMPT_WINDOW_MS) return [];
     if (!clientReviewDue({ start: ev.start, end: ev.end }, r, now)) return [];
-    return [{ r, ev, phone: clientPhoneFromTitle(ev.summary) }];
+    return [{ r, ev, phone: clientPhoneOfEvent(ev.summary, ev.description, (ev as { location?: string }).location) }];
   });
   const keys9 = [...new Set(reviewCands.map(c => c.phone?.slice(-9)).filter((v): v is string => !!v))];
   const clients = keys9.length ? await store.clients(keys9) : [];
   if ("error" in clients) return createErrorResponse(clients.error, 502);
   const clientReviews: { eventId: string; phone: string; firstName: string | null; serviceStart: string; message: string }[] = [];
+  // Sem telefone não se grava a falta (21 Nov 2026, Simone e Viana: ficou "sem telefone no título" e ninguém soube):
+  // o bot avisa o dono e, com o telefone posto no título, a pergunta sai na volta seguinte.
+  const clientReviewSkips: { eventId: string; label: string; reason: string }[] = [];
   for (const { r, ev, phone } of reviewCands) {
+    if (!phone && !isRugPickup(r, ev)) {
+      clientReviewSkips.push({ eventId: r.calendar_event_id, label: `${r.team}, ${labelFor(serviceByEvent.get(r.calendar_event_id), ev).label}, ${r.service_day}`, reason: "sem telefone no título" });
+      continue;
+    }
     const c = phone ? clients.find(x => String(x.phone ?? "").replace(/\D/g, "").endsWith(phone.slice(-9))) : undefined;
     const skip = isRugPickup(r, ev) ? PICKUP_SKIP
       : !phone ? "sem telefone no título"
@@ -209,7 +216,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     const ev = liveEvent(r);
     if (!ev?.start || !ev.end || Date.parse(ev.end) < nowMs - PROMPT_WINDOW_MS) return [];
     if (!clientReviewDue({ start: ev.start, end: ev.end }, r, now)) return [];
-    return [{ r, ev, phone: clientPhoneFromTitle(ev.summary) }];
+    return [{ r, ev, phone: clientPhoneOfEvent(ev.summary, ev.description, (ev as { location?: string }).location) }];
   });
   const certKeys = [...new Set(certCands.map(c => c.phone?.slice(-9)).filter((v): v is string => !!v && !keys9.includes(v)))];
   const certClients = certKeys.length ? await store.clients(certKeys) : [];
@@ -231,7 +238,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     clientCertificates.push({ eventId: r.calendar_event_id, phone: phone!, serviceRequestId: r.service_request_id,
       firstName: labelFor(serviceByEvent.get(r.calendar_event_id), ev).firstName, serviceStart: ev.start! });
   }
-  return createSuccessResponse({ prompts, reminders, closed, clientReviews, clientCertificates, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
+  return createSuccessResponse({ prompts, reminders, closed, clientReviews, clientReviewSkips, clientCertificates, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
 }
 
 /** The bot sent the message of a service (or a reminder) to the team: keep the WhatsApp ids. */

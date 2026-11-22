@@ -563,6 +563,8 @@ var SOFA_DRYING_RANGE = "2 a 5 horas";
 var SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;
 var SATISFACTION_PROMISE = "Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Após esse prazo, esta garantia comercial de repetição deixa de se aplicar, sem prejuízo dos direitos legais.";
 var PRICE_PROMISE = "A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.";
+var DEPOSIT_MIN_EUR = 20;
+var DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável.`;
 var AVAILABILITY_PROMISE = "Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.";
 var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.";
 var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
@@ -4394,9 +4396,16 @@ function clientPhoneFromTitle(summary) {
     if (!/^[+\d\s().]+$/.test(part.trim())) continue;
     const d = part.replace(/\D/g, "").replace(/^00/, "");
     if (/^[29]\d{8}$/.test(d)) return `351${d}`;
-    if (d.length >= 11 && d.length <= 15) return d;
+    if (d.length >= 10 && d.length <= 15) return d;
   }
   return null;
+}
+function clientPhoneOfEvent(summary, description, location) {
+  const fromTitle = clientPhoneFromTitle(summary);
+  if (fromTitle) return fromTitle;
+  const m = `${description ?? ""}
+${location ?? ""}`.match(/(?:tel(?:efone|em[óo]vel)?|contacto|wa\.me\/)[^\d\n]{0,6}(?:\+?351[\s.]?)?(9[1236]\d(?:[\s.]?\d){6})(?!\d)/i);
+  return m ? `351${m[1].replace(/\D/g, "")}` : null;
 }
 function procedureReceiptMessage(label, received, check) {
   const got = received.length ? `Recebido para ${label}: ${missingText(received)}.` : `Para ${label}:`;
@@ -4986,6 +4995,7 @@ export {
   certificateNumber,
   checkProcedure,
   clientPhoneFromTitle,
+  clientPhoneOfEvent,
   clientReviewDue,
   describeQuizOrder,
   eventTeam,
