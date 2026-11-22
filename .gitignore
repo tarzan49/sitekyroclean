@@ -58,3 +58,4 @@ supabase/.temp/
 
 # Exportações de conversas/serviços com valores por trabalho: nunca no repositório público.
 scripts/*-raw.txt
+reports/
