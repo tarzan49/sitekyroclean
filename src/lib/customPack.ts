@@ -25,8 +25,8 @@ export function packItemValid(item: CustomPackItem) {
   return item.kind === 'chairs' || (item.kind === 'sofa' ? sofaPrices : mattressPrices).some(p => p.id === item.size);
 }
 
-/** Waterproofing on top of the cleaning of a 6 or 7 seat sofa, bot only (owner, 9 Nov 2026). */
-export const SEAT6_WATERPROOFING_EXTRA = { premium: 180, essencial: 120 } as const;
+/** Waterproofing on top of the cleaning of a 6 or 7 seat sofa, bot only (dono, 22 Nov 2026, Rosângela: compacto 349/289€). */
+export const SEAT6_WATERPROOFING_EXTRA = { premium: 220, essencial: 160 } as const;
 
 const PERK_TREATMENT: Record<PackExtra, PerkTreatment> = { none: 'none', premium: 'waterproofing', essencial: 'waterproofing', 'anti-acaros': 'anti-acaros' };
 

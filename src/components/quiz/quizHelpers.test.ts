@@ -120,10 +120,10 @@ describe('sofa waterproofing upsell reduction', () => {
   // pack = limpeza + impermeabilização sozinha - 10€ (dono, 2026-11-03).
   it('prices the 4-seat sofa like the other sizes', () => {
     const four = sofaPrices.find(p => p.id === '4-lugares')!;
-    expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 109, 179]);
-    expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(198);
-    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(268);
-    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'essencial', false)).toBe(109);
+    expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 119, 179]) // dono, 22 Nov 2026, Rosângela;
+    expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(209);
+    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(269);
+    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'essencial', false)).toBe(119);
     expect(calcSofaUnitPrice(four, false, 'waterproofing', 'premium', false)).toBe(179);
   });
   it('keeps large sofas subject to quotation', () => {

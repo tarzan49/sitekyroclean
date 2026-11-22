@@ -28,11 +28,11 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('the same sofa with Essencial is 158€ and travel is on us (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+essencial' }], city: 'Oeiras' });
-    expect([r.subtotal, r.travel, r.total]).toEqual([158, 0, 158]);
+    expect([r.subtotal, r.travel, r.total]).toEqual([159, 0, 159]);
   });
   it('waterproofing alone: Essencial 39/69/89/109, Premium 79/119/149/179 (reply 3.2)', () => {
     const price = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' }).subtotal;
-    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'essencial'))).toEqual([39, 69, 89, 109]);
+    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'essencial'))).toEqual([39, 69, 89, 119]);
     expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'premium'))).toEqual([79, 119, 149, 179]);
   });
   it('waterproofing: the same travel on both versions, never more than 10€ (owner, 15 Oct 2026: 139/114 in Setúbal)', () => {
@@ -64,7 +64,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
     const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
-    expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 198, 268, 159]);
+    expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 209, 269, 159]);
     expect(ok({ items: [{ kind: 'sofa', size: '4-lugares' }], city: 'Porto' }).handToOwner).toBe(false);
     const pack = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '4-lugares' }], city: 'Porto' });
     expect(pack.lines.map(l => l.amount)).toEqual([69, 79]);
@@ -87,7 +87,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('5+ seats: cleaning is 119 (owner, 2026-10-06), also as an item added to another order', () => {
     const alone = ok({ items: [{ kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
-    expect([alone.lines[0].amount, alone.quote, alone.handToOwner]).toEqual([119, false, false]);
+    expect([alone.total, alone.quote, alone.handToOwner]).toEqual([119, false, false]); // final com deslocação (dono, 22 Nov 2026, Rosângela)
     const added = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
     expect(added.lines.map(l => l.amount)).toEqual([69, 119]);
   });
@@ -112,7 +112,8 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('hands to the owner: delicate rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs from the site, unknown or case-by-case localities', () => {
     expect(ok({ items: [{ kind: 'rug', width: 2, length: 3, material: 'seda' }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);
-    for (const treatment of ['clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium']) {
+    // 5 seats with waterproofing are priced since 22 Nov 2026 (Rosângela); the anti-mites stays with the owner.
+    for (const treatment of ['clean+anti-acaros']) {
       const r = ok({ items: [{ kind: 'sofa', size: '5-lugares', treatment }], city: 'Porto' });
       expect([r.lines[0].amount, r.quote, r.handToOwner], treatment).toEqual([null, true, true]);
     }
@@ -242,12 +243,12 @@ describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
     expect(sub({ size: '5-lugares', seats: 6, look: 'compacto' })).toBe(129);
     expect(sub({ size: '5-lugares', seats: 7, look: 'medio' })).toBe(139);
     expect(sub({ size: 'u', seats: 6, look: 'grande' })).toBe(149);
-    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+premium' })).toBe(329);
-    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+essencial' })).toBe(269);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+premium' })).toBe(369);
+    expect(sub({ size: '5-lugares', seats: 6, look: 'grande', treatment: 'clean+essencial' })).toBe(309); // +220/+160 (dono, 22 Nov 2026, Rosângela)
   });
   it('needs the look, keeps 5 seats at 119 and sends 8+ to the owner', () => {
     expect(botQuote({ items: [{ kind: 'sofa', size: '5-lugares', seats: 6 }], city: 'Porto' }).ok).toBe(false);
-    expect(sub({ size: '5-lugares', seats: 5 })).toBe(119);
+    expect(ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 5 }], city: 'Porto' }).total).toBe(119);
     expect(ok({ items: [{ kind: 'sofa', size: '5-lugares', seats: 8 }], city: 'Porto' }).quote).toBe(true);
   });
 });
@@ -290,8 +291,8 @@ describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
   it('no quote: sofá 3L Oeiras 89€ → 80€; pack 3L Premium 218€ → 207€; tapete pelo preço em casa', () => {
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' }).askedDiscount).toMatchObject({ pct: 10, total: 80, saving: 9 });
     const pack = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }], city: 'Porto' });
-    expect(pack.total).toBe(218);
-    expect(pack.askedDiscount).toMatchObject({ pct: 5, total: 207, saving: 11 });
+    expect(pack.total).toBe(219);
+    expect(pack.askedDiscount).toMatchObject({ pct: 5, total: 208, saving: 11 });
     const rug = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
     expect(rug.rugEstimate?.ok && rug.askedDiscount?.total).toBe(rug.rugEstimate?.ok ? Math.floor(rug.rugEstimate.homePrice * 0.9) : -1);
   });

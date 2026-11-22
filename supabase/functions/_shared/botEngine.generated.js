@@ -178,8 +178,9 @@ function calculateTravelFee(baseFee, servicesTotal) {
 var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },
   { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 138, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
-  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 168, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
-  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 208, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 70 },
+  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 169, originalBothPrice: 169, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
+  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 219, originalBothPrice: 219, waterproofingPremiumPrice: 179, packPremiumDelta: 60 },
+  // dono, 22 Nov 2026, Rosângela: 3L pack 219/159, 4L imper 189/129 e pack 269/209 (com deslocação)
   { id: "5-lugares", label: "5+ Lugares", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "canto", label: "Canto", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "4+-lugares", label: "Em U ou modular", cleaningPrice: "Sob orçamento", waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" }
@@ -369,7 +370,7 @@ function packItemValid(item) {
   if (item.kind === "rug" || item.kind === "carpet") return [item.width, item.length].every((s) => Number.isFinite(dimension(s)) && dimension(s) > 0);
   return item.kind === "chairs" || (item.kind === "sofa" ? sofaPrices : mattressPrices).some((p) => p.id === item.size);
 }
-var SEAT6_WATERPROOFING_EXTRA = { premium: 180, essencial: 120 };
+var SEAT6_WATERPROOFING_EXTRA = { premium: 220, essencial: 160 };
 var PERK_TREATMENT = { none: "none", premium: "waterproofing", essencial: "waterproofing", "anti-acaros": "anti-acaros" };
 function customPackLine(item) {
   const options = item.kind === "sofa" ? sofaPrices : mattressPrices;
@@ -2340,6 +2341,9 @@ var headboardQuote = (sizes, city, withOthers, othersTotal) => {
 };
 var U_WATERPROOFING_EXTRA = { premium: 150, essencial: 90 };
 var U_WATERPROOFING_ALONE = { premium: 179, essencial: 129 };
+var SEAT5_WATERPROOFING_ALONE = { premium: 219, essencial: 159 };
+var SEAT5_WATERPROOFING_EXTRA = { premium: 190, essencial: 130 };
+var SEAT6_WATERPROOFING_ALONE = { premium: 249, essencial: 189 };
 function uWaterproofingQuote(input) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
@@ -2347,7 +2351,13 @@ function uWaterproofingQuote(input) {
   const isRealU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
   const isCantoAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "canto" && ["premium", "essencial"].includes(treatmentOf(r));
   const cantoAsU = !raw.some(isRealU);
-  const isU = (r) => isRealU(r) || cantoAsU && isCantoAlone(r);
+  const seatsOf = (r) => {
+    const v = r.seats;
+    return typeof v === "number" && Number.isInteger(v) ? v : 5;
+  };
+  const isFiveAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "5-lugares" && ["premium", "essencial"].includes(treatmentOf(r)) && seatsOf(r) <= 7;
+  const aloneFixed = (r) => isFiveAlone(r) ? seatsOf(r) >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE : U_WATERPROOFING_ALONE;
+  const isU = (r) => isRealU(r) || cantoAsU && isCantoAlone(r) || isFiveAlone(r);
   const isUw = (r) => isU(r) && ["clean+premium", "clean+essencial", "premium", "essencial"].includes(treatmentOf(r));
   const uItems = raw.filter(isUw);
   if (!uItems.length) return null;
@@ -2363,11 +2373,13 @@ function uWaterproofingQuote(input) {
     const base2 = others.length ? botQuoteCore({ ...input, items: others }) : null;
     if (base2 && (!base2.ok || base2.quote || base2.total === null)) return null;
     const rest = base2 && base2.ok && base2.total !== null ? base2.total : 0;
-    const premium2 = cents(rest + U_WATERPROOFING_ALONE.premium * n);
-    const essencial2 = cents(rest + U_WATERPROOFING_ALONE.essencial * n);
+    const sumOf = (t) => uItems.reduce((sum2, r) => sum2 + aloneFixed(r)[t] * (typeof r.qty === "number" ? r.qty : 1), 0);
+    const premium2 = cents(rest + sumOf("premium"));
+    const essencial2 = cents(rest + sumOf("essencial"));
     const total2 = tier === "premium" ? premium2 : essencial2;
-    const amount2 = U_WATERPROOFING_ALONE[tier] * n;
-    const line = { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} ${uItems.every(isCantoAlone) ? "sofá de canto" : "sofá em U"}`, amount: amount2, tablePrice: amount2, perkApplied: false, perkNote: void 0, quote: false };
+    const amount2 = sumOf(tier);
+    const aloneLabel = uItems.every(isCantoAlone) ? "sofá de canto" : uItems.every(isFiveAlone) ? uItems.every((r) => seatsOf(r) >= 6) ? "sofá de 6 ou 7 lugares" : "sofá de 5 lugares" : "sofá em U";
+    const line = { label: `Impermeabilização ${tier === "premium" ? "Premium" : "Essencial"} ${aloneLabel}`, amount: amount2, tablePrice: amount2, perkApplied: false, perkNote: void 0, quote: false };
     return {
       ok: true,
       city,
@@ -2749,6 +2761,17 @@ function botQuoteInner(input) {
     if ("ok" in item) return item;
     if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
       items.push({ ...item, waterproofingFixed: item.primary === "waterproofing" ? U_WATERPROOFING_ALONE : U_WATERPROOFING_EXTRA });
+      rawOf.push(raw);
+      continue;
+    }
+    if (rawItems.length === 1 && raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
+      const fee = locationPrices[resolveBotCity(rawCity) ?? ""];
+      items.push(fee === 10 ? { ...item, unitPrice: 109 } : item);
+      rawOf.push(raw);
+      continue;
+    }
+    if (item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.primary !== "waterproofing" && (item.extra === "premium" || item.extra === "essencial")) {
+      items.push({ ...item, waterproofingFixed: SEAT5_WATERPROOFING_EXTRA });
       rawOf.push(raw);
       continue;
     }

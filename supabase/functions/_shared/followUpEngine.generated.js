@@ -191,8 +191,9 @@ var PACK_PERK_BULLETS = [
 var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },
   { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 138, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
-  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 168, originalBothPrice: 168, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
-  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 109, bothPrice: 208, originalBothPrice: 208, waterproofingPremiumPrice: 179, packPremiumDelta: 70 },
+  { waterproofingUpsellDiscount: 10, id: "3-lugares", label: "3 Lugares", cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 169, originalBothPrice: 169, waterproofingPremiumPrice: 149, packPremiumDelta: 60 },
+  { waterproofingUpsellDiscount: 10, id: "4-lugares", label: "4 Lugares", cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 219, originalBothPrice: 219, waterproofingPremiumPrice: 179, packPremiumDelta: 60 },
+  // dono, 22 Nov 2026, Rosângela: 3L pack 219/159, 4L imper 189/129 e pack 269/209 (com deslocação)
   { id: "5-lugares", label: "5+ Lugares", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "canto", label: "Canto", cleaningPrice: 119, waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" },
   { id: "4+-lugares", label: "Em U ou modular", cleaningPrice: "Sob orçamento", waterproofingPrice: "Sob orçamento", bothPrice: "Sob orçamento", waterproofingPremiumPrice: "Sob orçamento" }
