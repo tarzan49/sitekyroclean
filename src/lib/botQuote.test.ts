@@ -332,11 +332,12 @@ describe('sofá de pele (dono, 20 Nov 2026: tratamento da pele +40€, +60€ em
 
 describe('condição especial na mesma visita, no total final (dono, 20 Nov 2026, Ana Marques)', () => {
   const ana = (treatment: string) => ok({ city: 'Armação de Pêra', items: [{ kind: 'sofa', size: 'canto', treatment }, { kind: 'rug', width: 2.5, length: 3.5 }], headboards: ['casal'] });
-  it('cada peça ao preço de tabela, o total × 0,9 a acabar em 9, em cada opção', () => {
+  // A impermeabilização nunca leva desconto (dono, 22 Nov 2026, Eduardo): a condição é só na limpeza.
+  it('a limpeza × 0,9 a acabar em 9; a impermeabilização por cima a preço cheio', () => {
     expect(ana('clean').sameVisitSpecial).toMatchObject({ normal: 247, total: 219 });
-    expect(ana('clean+premium').sameVisitSpecial).toMatchObject({ normal: 397, total: 349 });
-    expect(ana('clean+essencial').sameVisitSpecial).toMatchObject({ normal: 337, total: 299 });
-    expect(ana('clean+premium').sameVisitSpecial.options).toEqual({ cleaning: { normal: 247, total: 219 }, premium: { normal: 397, total: 349 }, essencial: { normal: 337, total: 299 } });
+    expect(ana('clean+premium').sameVisitSpecial).toMatchObject({ normal: 397, total: 369 });
+    expect(ana('clean+essencial').sameVisitSpecial).toMatchObject({ normal: 337, total: 309 });
+    expect(ana('clean+premium').sameVisitSpecial.options).toEqual({ cleaning: { normal: 247, total: 219 }, premium: { normal: 397, total: 369 }, essencial: { normal: 337, total: 309 } });
     expect(ana('clean').rugCombo.comboPrice).toBe(208);
     expect(ana('clean').askedDiscount).toBeNull();
   });

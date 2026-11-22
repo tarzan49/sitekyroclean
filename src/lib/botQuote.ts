@@ -547,13 +547,21 @@ function withSameVisitSpecial<T extends { ok: boolean }>(input: unknown, r: T): 
     const v = botQuoteCore({ ...inp, items });
     return (v as { ok: boolean }).ok ? finalOrderPrice(v) : null;
   };
+  // Waterproofing never takes a discount (owner, 22 Nov 2026, Eduardo: "a preços de impermeabilizações não há
+  // descontos"): the condition is only on the cleaning; the waterproofing is added on top at full price.
+  const cleanNormal = wp ? variant('clean') : normal;
+  const cleaning = price(cleanNormal);
+  const withWp = (v: number | null): SameVisitPrice | null =>
+    v === null ? null : { normal: v, total: cleaning ? cents(cleaning.total + (v - cleaning.normal)) : v };
   const options = wp
-    ? { cleaning: price(variant('clean')), premium: price(variant('premium')), essencial: price(variant('essencial')) }
-    : { cleaning: price(normal), premium: null, essencial: null };
+    ? { cleaning, premium: withWp(variant('premium')), essencial: withWp(variant('essencial')) }
+    : { cleaning, premium: null, essencial: null };
+  const own = wp ? withWp(normal) : cleaning;
+  if (!own || own.total >= own.normal) return none;
   return {
     ...r,
     bigOrder: null, closeNow: { ok: false, reason: 'já leva a condição especial da mesma visita (sameVisitSpecial)' },
-    sameVisitSpecial: { normal, total: sameVisitSpecialPrice(normal), options, rule: SAME_VISIT_SPECIAL_RULE },
+    sameVisitSpecial: { normal, total: own.total, options, rule: SAME_VISIT_SPECIAL_RULE },
   };
 }
 

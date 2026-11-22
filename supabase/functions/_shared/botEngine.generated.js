@@ -2595,12 +2595,17 @@ function withSameVisitSpecial(input, r) {
     const v = botQuoteCore({ ...inp, items });
     return v.ok ? finalOrderPrice(v) : null;
   };
-  const options = wp ? { cleaning: price(variant("clean")), premium: price(variant("premium")), essencial: price(variant("essencial")) } : { cleaning: price(normal), premium: null, essencial: null };
+  const cleanNormal = wp ? variant("clean") : normal;
+  const cleaning = price(cleanNormal);
+  const withWp = (v) => v === null ? null : { normal: v, total: cleaning ? cents(cleaning.total + (v - cleaning.normal)) : v };
+  const options = wp ? { cleaning, premium: withWp(variant("premium")), essencial: withWp(variant("essencial")) } : { cleaning, premium: null, essencial: null };
+  const own = wp ? withWp(normal) : cleaning;
+  if (!own || own.total >= own.normal) return none;
   return {
     ...r,
     bigOrder: null,
     closeNow: { ok: false, reason: "já leva a condição especial da mesma visita (sameVisitSpecial)" },
-    sameVisitSpecial: { normal, total: sameVisitSpecialPrice(normal), options, rule: SAME_VISIT_SPECIAL_RULE }
+    sameVisitSpecial: { normal, total: own.total, options, rule: SAME_VISIT_SPECIAL_RULE }
   };
 }
 var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
