@@ -3404,7 +3404,6 @@ var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
 var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set(["Viana do Castelo", ...FRIDAY_ONLY_CITIES]);
 var NORTH_WATERPROOFING_ASK_WEEK_REGIONS = /* @__PURE__ */ new Set(["Porto", "Braga"]);
-var NORTH_WATERPROOFING_ASK_WEEK_FROM = "2026-11-18";
 var LEIRIA_WATERPROOFING_TEAMS = ["Lisboa 1"];
 function teamsForCity(city, zone, waterproofing, total, day, rugPickup = false) {
   if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
@@ -3578,18 +3577,6 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       askTeam: "Viana"
     };
   }
-  if (req.ownerTime !== true && lisbon(now.getTime()).date >= NORTH_WATERPROOFING_ASK_WEEK_FROM && NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && hasWaterproofing(req.items)) {
-    const total = orderTotal(req, city);
-    const teams2 = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
-    return {
-      ...base,
-      region: area,
-      teams: teams2,
-      handToOwner: `Impermeabilização em ${city}: o dono confirma a hora com a equipa antes de a dar ao cliente`,
-      askWeek: true,
-      askWeekRule: ASK_WEEK_RULE
-    };
-  }
   if (req.ownerTime !== true && city === "Aveiro") {
     return { ...base, region: area, teams: ["Porto 3", "Porto 2"], handToOwner: askTeamRule("Aveiro"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Aveiro" };
   }
@@ -3672,7 +3659,8 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const closedAt2 = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap((r) => r.prefer ?? []))].filter((d) => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some((r) => r.onlyPreferred);
-  const firstDay = waterproofingFrom > today ? waterproofingFrom : today;
+  const noSameDay = NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && waterproofingKind(req?.items, orderTotal(req, city)) === "premium";
+  const firstDay = [waterproofingFrom, noSameDay ? tomorrow : "", today].sort().pop();
   const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
   const tooEarly = (date) => date < firstDay;
   const dayOrder = onlyDay && !tooEarly(onlyDay) ? [onlyDay] : [...preferred, ...ahead.filter((d) => !preferred.includes(d))];

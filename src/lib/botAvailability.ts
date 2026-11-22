@@ -967,15 +967,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
       handToOwner: VIANA_ASK_TEAM_RULE,
       askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Viana' };
   }
-  // Owner, 18 Nov 2026 ("acalma-te a marcar impermeabilizações no norte, só marcas horários que eu aprovar com
-  // as equipas"): every waterproofing in the Porto and Braga zones closes without an hour; he checks with the team.
-  if (req.ownerTime !== true && lisbon(now.getTime()).date >= NORTH_WATERPROOFING_ASK_WEEK_FROM && NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && hasWaterproofing(req.items)) {
-    const total = orderTotal(req, city);
-    const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];
-    return { ...base, region: area, teams,
-      handToOwner: `Impermeabilização em ${city}: o dono confirma a hora com a equipa antes de a dar ao cliente`,
-      askWeek: true, askWeekRule: ASK_WEEK_RULE };
-  }
+  // Owner, 22 Nov 2026 (Roberto): "tu podes marcar na mesma uma hora e eu aprovo a hora final": Porto and Braga
+  // waterproofing get hours like any other job (the 18 Nov askWeek rule is retired); he approves on the calendar.
   // Aveiro (owner, 19 Nov 2026: "Serviços em aveiro tb precisamos de saber a disponibilidade" + "Equipa Porto 3"): the
   // cleanings close without an hour; Porto 3 (Denise) is asked, and Porto 2 (Aleixo) if she can't (kyro-bot
   // TEAM_ASK_FALLBACK). Waterproofing stays with the north rule above.
@@ -1043,7 +1036,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const closedAt = (date: string, m: number) => active.some(r => r.closed?.some(c => c.date === date && (c.fromHour === undefined || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap(r => r.prefer ?? []))].filter(d => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some(r => r.onlyPreferred);
-  const firstDay = waterproofingFrom > today ? waterproofingFrom : today;
+  // Owner, 22 Nov 2026: Premium waterproofing in the Porto and Braga zones never gets a same-day hour from the bot
+  // ("para o mesmo dia nós vemos o horário"); from tomorrow on it offers the teams' free hours and he approves.
+  const noSameDay = NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && waterproofingKind(req?.items, orderTotal(req, city)) === 'premium';
+  const firstDay = [waterproofingFrom, noSameDay ? tomorrow : '', today].sort().pop()!;
   const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
   const tooEarly = (date: string) => date < firstDay;
   const dayOrder = onlyDay && !tooEarly(onlyDay) ? [onlyDay] : [...preferred, ...ahead.filter(d => !preferred.includes(d))];

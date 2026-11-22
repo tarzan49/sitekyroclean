@@ -1038,3 +1038,6 @@ Correções: canto 119€ (`QuizTypes`), com imper = 119€ + imper 3L+2L [RETIR
 - "Quando a obra acabar é só dizer-nos": adiamento = propor reservar data (DEFER_PAY alargado).
 - Resposta das 22:19 não saiu: Meta 500 (#131000) antes da 1.ª bolha e o código não repetia "Envio parou". Agora repete até 3 vezes quando nenhuma bolha saiu (engine.ts).
 - Motor: Premium + colchão com anti-ácaros dava 344€ e sem ele 289€; agora fica 289€ com o anti-ácaros oferecido.
+
+### Impermeabilização Porto/Braga: horas a partir de amanhã (dono, 22 Nov 2026, Roberto)
+[RETIRADA 22/11] a regra de 18 Nov "todas as impermeabilizações do Porto e Braga sem horas (askWeek)". O Roberto aceitou o Premium (369€) às 11:19 e ficou 10 min sem resposta: a resposta estava retida e a ponte já tinha saído nessa semana. Dono: "tu podes marcar na mesma uma hora e eu aprovo a hora final"; "para o mesmo dia nós vemos o horário, se for uma impermeabilização premium. Se for para amanhã, podes sugerir". Código: `botAvailability.ts` (`noSameDay`). kyro-bot: retido sem ponte sai ao fim de 1 min (`HELD_NO_BRIDGE_S`).
