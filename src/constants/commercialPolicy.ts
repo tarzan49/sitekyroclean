@@ -19,7 +19,7 @@ export function depositFor(total: number, daysAhead: number): number {
   if (daysAhead <= DEPOSIT_MIN_DAYS_AHEAD || total <= 0) return 0;
   return Math.min(total, Math.max(DEPOSIT_MIN_EUR, Math.round((total * DEPOSIT_RATE) / 10) * 10));
 }
-export const DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável.`;
+export const DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável; se remarcar, passa para a nova data.`;
 export const AVAILABILITY_PROMISE = 'Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.';
 export const COVERAGE_PROMISE = 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.';
 export const WEEKLY_REQUESTS = 'Recebemos habitualmente 50 a 60 pedidos de orçamento por semana.';

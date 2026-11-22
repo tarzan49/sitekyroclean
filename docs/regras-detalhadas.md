@@ -1055,3 +1055,5 @@ O bot deu 159/99€ (3 lugares) a um sofá de 6 lugares com chaise que tinha vis
 ## Sinal nas reservas com antecedência (dono, 22 Nov 2026)
 
 Dono: "pedidos acima de 300 euros pedir um sinal", depois "o sinal é não reembolsável", "tem de ser para clientes com reservas com mais de 2 semanas de antecedência", "não existe valor mínimo". Aceitou 15% com mínimo de 20€ e a opção A (sem pagamento no site: o bot pede o sinal por MB Way/transferência). O site diz a regra nas FAQ (`sinal`) e na política de devoluções. Falta decidir se uma remarcação mantém o sinal.
+
+Dono, 23 Nov: "Sim, passa": numa remarcação o sinal passa para a nova data.
