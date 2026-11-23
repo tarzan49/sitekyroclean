@@ -193,6 +193,12 @@ var SMALL_ORDER_NEAR_PARISHES = [
   "Forte da Casa",
   "Vialonga"
 ];
+var foldPlace = (v) => ` ${v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+function isSmallOrderFarPlace(city, place) {
+  if (!city || !SMALL_ORDER_FAR_CITIES.has(city)) return false;
+  const text2 = foldPlace(place ?? "");
+  return !SMALL_ORDER_NEAR_PARISHES.some((p) => text2.includes(foldPlace(p)));
+}
 var SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
 function calculateTravelFee(baseFee, servicesTotal) {
   if (isBlackFriday()) return 0;
@@ -619,7 +625,7 @@ var RUG_PICKUP_FEE_RULE = `A recolha e entrega tem um custo adicional de ${RUG_P
 var travelFees = Object.values(locationPrices);
 var TRAVEL_FEE_MIN = Math.min(...travelFees);
 var TRAVEL_FEE_MAX = Math.max(...travelFees);
-var TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
+var TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
 var SERVICE_CONDITIONS = [
   PRICE_PROMISE,
   TRAVEL_PROMISE,
@@ -2560,17 +2566,11 @@ function rugWaterproofingQuote(input) {
 function botQuote(input) {
   return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
 }
-function smallOrderFarPlace(rawCity) {
-  const city = resolveBotCity(rawCity);
-  if (!city || !SMALL_ORDER_FAR_CITIES.has(city) || typeof rawCity !== "string") return false;
-  const text2 = ` ${fold2(rawCity).replace(/[^a-z0-9]+/g, " ")} `;
-  return !SMALL_ORDER_NEAR_PARISHES.some((p) => text2.includes(` ${fold2(p).replace(/[^a-z0-9]+/g, " ")} `));
-}
 function withSmallOrderFarSurcharge(input, r) {
   const none = { ...r, smallOrderSurcharge: null };
   const inp = input ?? {};
   const q = r;
-  if (!q.ok || q.quote || q.handToOwner || q.sharedTrip || !smallOrderFarPlace(inp.city)) return none;
+  if (!q.ok || q.quote || q.handToOwner || q.sharedTrip || !isSmallOrderFarPlace(resolveBotCity(inp.city), typeof inp.city === "string" ? inp.city : "")) return none;
   const add = (price, travel2) => typeof price === "number" && price - travel2 < SMALL_ORDER_FAR_MIN;
   const travel = q.travel ?? 0;
   const t = q.waterproofingTiers;

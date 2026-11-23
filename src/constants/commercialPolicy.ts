@@ -1,5 +1,5 @@
 // Regras confirmadas pelo responsável em 10/09/2026. Importável também em Node.
-import { locationPrices } from './travel';
+import { locationPrices, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE } from './travel';
 import { cities } from '../data/serviceCatalog';
 export const RESPONSE_PROMISE = 'Resposta em menos de 1 minuto';
 export const DRYING_PROMISE = 'Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço.';
@@ -83,7 +83,7 @@ export const RUG_TRAVEL_RULE = 'Em tapetes e alcatifas, a deslocação também �
 const travelFees = Object.values(locationPrices);
 export const TRAVEL_FEE_MIN = Math.min(...travelFees);
 export const TRAVEL_FEE_MAX = Math.max(...travelFees);
-export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
+export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
 
 /**
  * O bloco "Condições do serviço e garantia" que aparece no fundo de todas as

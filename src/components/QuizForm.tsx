@@ -17,6 +17,7 @@ import {
 } from './quiz';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
+import { SMALL_ORDER_FAR_MIN } from '@/constants/travel';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizChairsAddonUpsell, { ChairAddonActions } from './quiz/steps/QuizChairsAddonUpsell';
@@ -238,6 +239,7 @@ const QuizForm = ({
     calculateServicePrice,
     travelCost,
     finalTravelCost,
+    smallOrderSurchargeCost,
     rugPickupCost,
     rugTravelOnQuote,
     totalPrice,
@@ -406,7 +408,7 @@ Serviço: ${serviceLabel}
 Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
-Deslocação: ${rugPickupCost !== null ? `incluída na recolha e entrega (${rugPickupCost}€)` : rugTravelOnQuote ? 'sob orçamento' : `${finalTravelCost}€`}
+Deslocação: ${rugPickupCost !== null ? `incluída na recolha e entrega (${rugPickupCost}€)` : rugTravelOnQuote ? 'sob orçamento' : `${finalTravelCost}€${smallOrderSurchargeCost ? ` (inclui ${smallOrderSurchargeCost}€ por ser um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ nesta zona)` : ''}`}
 ESTIMATIVA: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
@@ -624,7 +626,8 @@ ${formData.description || 'Sem observações adicionais'}
           {currentStep !== totalSteps && (currentStep !== 0 || formData.location !== '') && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <QuizEstimate
               totalPrice={totalPrice}
-              travelCost={rugPickupCost ?? finalTravelCost}
+              travelCost={rugPickupCost ?? finalTravelCost - smallOrderSurchargeCost}
+              smallOrderSurcharge={smallOrderSurchargeCost}
               travelRowLabel={rugPickupCost !== null ? 'Recolha e entrega' : undefined}
               travelOnQuote={rugTravelOnQuote}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
@@ -656,8 +659,8 @@ ${formData.description || 'Sem observações adicionais'}
                 setLocationQuery={setLocationQuery}
                 scrollContainerRef={scrollContainerRef}
                 travelOnQuote={formData.service === 'carpet'}
-                onCitySelect={(city) => {
-                  updateFormData({ location: city });
+                onCitySelect={(city, place) => {
+                  updateFormData({ location: city, locationPlace: place });
                   if (skipToUpsell) {
                     setCurrentStep(3);
                     setActiveUpsellScreen(calcInitialUpsellScreen(initialService, initialServiceType));
@@ -808,7 +811,7 @@ ${formData.description || 'Sem observações adicionais'}
                 explícito, aprovado em mockup 2026-09-06). */}
             {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
-                travelFee={formData.service === 'carpet' ? travelCost : finalTravelCost}
+                travelFee={formData.service === 'carpet' ? travelCost : finalTravelCost - smallOrderSurchargeCost}
                 primaryTablePrice={calculateServicePrice}
                 primaryService={formData.service}
                 upsellItems={upsellItems}

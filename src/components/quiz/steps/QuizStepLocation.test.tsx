@@ -1,53 +1,53 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import QuizStepLocation from './QuizStepLocation';
-import { detectServiceCity } from '@/lib/locationDetection';
-vi.mock('@/lib/locationDetection', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/locationDetection')>(), detectServiceCity: vi.fn() }));
+import { detectServiceLocation } from '@/lib/locationDetection';
+vi.mock('@/lib/locationDetection', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/locationDetection')>(), detectServiceLocation: vi.fn() }));
 afterEach(() => { cleanup(); vi.resetAllMocks(); });
 const props = { location: '', locationQuery: '', setLocationQuery: vi.fn(), scrollContainerRef: { current: null }, onCitySelect: vi.fn() };
 describe('location step', () => {
   it('selects the detected locality but only advances after confirmation', async () => {
-    vi.mocked(detectServiceCity).mockResolvedValue('Maia');
+    vi.mocked(detectServiceLocation).mockResolvedValue({ city: 'Maia', place: '' });
     render(<QuizStepLocation {...props} />);
     await screen.findByText('Localidade detetada');
     expect(screen.getByText('Deslocação para Maia')).toBeTruthy();
     expect(props.onCitySelect).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
-    expect(props.onCitySelect).toHaveBeenCalledWith('Maia');
+    expect(props.onCitySelect).toHaveBeenCalledWith('Maia', '');
   });
   it('keeps manual search available when permission is denied', async () => {
-    vi.mocked(detectServiceCity).mockRejectedValue(new Error('Localização recusada'));
+    vi.mocked(detectServiceLocation).mockRejectedValue(new Error('Localização recusada'));
     render(<QuizStepLocation {...props} locationQuery="Lisboa" />);
     await screen.findByText('Localização recusada');
     fireEvent.click(screen.getByRole('button', { name: 'Lisboa' }));
     expect(screen.getByText('Deslocação para Lisboa')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
-    expect(props.onCitySelect).toHaveBeenCalledWith('Lisboa');
+    expect(props.onCitySelect).toHaveBeenCalledWith('Lisboa', '');
   });
   it('never overwrites a manual choice with a delayed location response', async () => {
-    let resolve!: (city: string) => void;
-    vi.mocked(detectServiceCity).mockImplementation(() => new Promise(r => { resolve = r; }));
+    let resolve!: (v: { city: string; place: string }) => void;
+    vi.mocked(detectServiceLocation).mockImplementation(() => new Promise(r => { resolve = r; }));
     render(<QuizStepLocation {...props} locationQuery="Lisboa" />);
     fireEvent.click(screen.getByRole('button', { name: 'Lisboa' }));
-    resolve('Maia');
+    resolve({ city: 'Maia', place: '' });
     await waitFor(() => expect(screen.getByText('Deslocação para Lisboa')).toBeTruthy());
     expect(screen.queryByText('Localidade detetada')).toBeNull();
   });
   it('offers regional choices only after detection, and preserves existing location on back', async () => {
     render(<QuizStepLocation {...props} location="Cascais" />);
-    expect(detectServiceCity).not.toHaveBeenCalled();
+    expect(detectServiceLocation).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Alterar localidade' }));
     expect(screen.getByText('Outras localidades na sua região')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Matosinhos' })).toBeNull();
   });
   it('finds a served parish by its own name and charges its municipality', async () => {
-    vi.mocked(detectServiceCity).mockRejectedValue(new Error('Localização recusada'));
+    vi.mocked(detectServiceLocation).mockRejectedValue(new Error('Localização recusada'));
     render(<QuizStepLocation {...props} locationQuery="Comporta" />);
     await screen.findByText('Localização recusada');
     expect(screen.queryByText(/Localidade não encontrada/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Comporta, Alcácer do Sal' }));
     expect(screen.getByText('Deslocação para Alcácer do Sal')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
-    expect(props.onCitySelect).toHaveBeenCalledWith('Alcácer do Sal');
+    expect(props.onCitySelect).toHaveBeenCalledWith('Alcácer do Sal', 'Comporta');
   });
 });

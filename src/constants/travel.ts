@@ -163,6 +163,17 @@ export const SMALL_ORDER_NEAR_PARISHES: readonly string[] = [
   // Vila Franca de Xira: Póvoa de Santa Iria 17,9, Forte da Casa 19,7, Vialonga 20
   'Póvoa de Santa Iria', 'Forte da Casa', 'Vialonga',
 ];
+const foldPlace = (v: string) => ` ${v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `;
+/** O sítio fica a mais de 20 km de carro de Odivelas: concelho da lista e o texto do sítio (freguesia) sem nenhuma freguesia perto. */
+export function isSmallOrderFarPlace(city: string | null | undefined, place?: string | null): boolean {
+  if (!city || !SMALL_ORDER_FAR_CITIES.has(city)) return false;
+  const text = foldPlace(place ?? '');
+  return !SMALL_ORDER_NEAR_PARISHES.some(p => text.includes(foldPlace(p)));
+}
+/** Acréscimo de um serviço pequeno longe de Odivelas: 10€ quando o valor dos serviços (sem deslocação) fica abaixo de 49€. */
+export function smallOrderFarSurcharge(city: string | null | undefined, place: string | null | undefined, servicesTotal: number): number {
+  return servicesTotal > 0 && servicesTotal < SMALL_ORDER_FAR_MIN && isSmallOrderFarPlace(city, place) ? SMALL_ORDER_FAR_SURCHARGE : 0;
+}
 export const SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
 
 /** Services and extras at their actual quoted prices, excluding travel. */

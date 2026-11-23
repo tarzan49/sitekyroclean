@@ -1,3 +1,4 @@
+import { SMALL_ORDER_FAR_MIN } from '@/constants/travel';
 import { useEffect, useRef, useState } from 'react';
 
 interface QuizEstimateProps {
@@ -11,9 +12,11 @@ interface QuizEstimateProps {
   // casa, a deslocação é sob orçamento.
   travelRowLabel?: string;
   travelOnQuote?: boolean;
+  // Serviço abaixo de 49€ longe de Odivelas (dono, 23 Nov 2026): já dentro do totalPrice.
+  smallOrderSurcharge?: number;
 }
 
-export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, location, travelCost, travelRowLabel, travelOnQuote = false }: QuizEstimateProps) {
+export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, location, travelCost, travelRowLabel, travelOnQuote = false, smallOrderSurcharge = 0 }: QuizEstimateProps) {
   const target = Math.round(totalPrice);
   const [amount, setAmount] = useState(target);
   const displayed = useRef(target);
@@ -58,6 +61,9 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
       {travelCost !== undefined && travelCost > 0 && !travelOnly && (
         <p className="text-sm text-white/80 -mt-0.5">Inclui {travelCost}€ de {travelRowLabel ? travelRowLabel.toLowerCase() : 'deslocação'}{location ? ` a ${location}` : ''}</p>
       )}
+      {smallOrderSurcharge > 0 && !travelOnly && (
+        <p className="text-sm text-gold -mt-0.5">Inclui {smallOrderSurcharge}€ por ser um serviço abaixo de {SMALL_ORDER_FAR_MIN}€ nesta zona. Junte outra peça na mesma visita e deixa de ter este acréscimo.</p>
+      )}
       {travelOnQuote && !travelOnly && (
         <p className="text-sm text-white/80 -mt-0.5">Deslocação{location ? ` a ${location}` : ''} sob orçamento</p>
       )}
@@ -65,8 +71,9 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
         <details className="mt-2 [@media(max-height:800px)]:mt-1 text-sm text-white/70">
           <summary className="cursor-pointer py-1 text-white/80 hover:text-gold">Ver composição do orçamento</summary>
           <dl className="mt-1 space-y-1 border-t border-white/10 pt-2">
-            <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost)}€</dd></div>
+            <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost - smallOrderSurcharge)}€</dd></div>
             <div className="flex justify-between gap-3"><dt>{travelRowLabel ?? 'Deslocação'}{location ? ` · ${location}` : ''}</dt><dd>{travelOnQuote ? 'Sob orçamento' : travelCost === 0 && location ? 'Gratuita' : `${travelCost}€`}</dd></div>
+            {smallOrderSurcharge > 0 && <div className="flex justify-between gap-3"><dt>Serviço abaixo de {SMALL_ORDER_FAR_MIN}€</dt><dd>{smallOrderSurcharge}€</dd></div>}
             {needsQuote && <div className="text-gold">Acrescem os serviços sob orçamento.</div>}
           </dl>
         </details>

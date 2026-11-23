@@ -14,7 +14,7 @@
  */
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
-import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee, SMALL_ORDER_FAR_CITIES, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE, SMALL_ORDER_NEAR_PARISHES, SMALL_ORDER_FAR_RULE } from '../constants/travel';
+import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee, isSmallOrderFarPlace, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE, SMALL_ORDER_FAR_RULE } from '../constants/travel';
 import { isBlackFriday, blackFridayPricesActive, BLACK_FRIDAY_PRICES } from '../constants/campaigns';
 import { rugPickupFee, rugPickupOffered, NO_RUG_PICKUP_RULE, RUG_PICKUP_ASKED_RULE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS } from '../constants/rugMeasure';
@@ -475,14 +475,6 @@ export function botQuote(input: unknown) {
   return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
 }
 
-/** The client's place is one of the far municipalities and not one of its parishes within 20 km of Odivelas. */
-function smallOrderFarPlace(rawCity: unknown): boolean {
-  const city = resolveBotCity(rawCity);
-  if (!city || !SMALL_ORDER_FAR_CITIES.has(city) || typeof rawCity !== 'string') return false;
-  const text = ` ${fold(rawCity).replace(/[^a-z0-9]+/g, ' ')} `;
-  return !SMALL_ORDER_NEAR_PARISHES.some(p => text.includes(` ${fold(p).replace(/[^a-z0-9]+/g, ' ')} `));
-}
-
 /**
  * Small order far from Odivelas (dono, 23 Nov 2026): a service under 49€ (travel apart) in a place more than
  * 20 km by car from Odivelas gets +10€, unless another piece joins the visit. Each option is judged on its own
@@ -492,7 +484,7 @@ function withSmallOrderFarSurcharge<T extends { ok: boolean }>(input: unknown, r
   const none = { ...r, smallOrderSurcharge: null };
   const inp = (input ?? {}) as Record<string, unknown>;
   const q = r as unknown as { ok: boolean; total?: number | null; travel?: number | null; quote?: boolean; handToOwner?: boolean; sharedTrip?: boolean; waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null };
-  if (!q.ok || q.quote || q.handToOwner || q.sharedTrip || !smallOrderFarPlace(inp.city)) return none;
+  if (!q.ok || q.quote || q.handToOwner || q.sharedTrip || !isSmallOrderFarPlace(resolveBotCity(inp.city), typeof inp.city === 'string' ? inp.city : '')) return none;
   const add = (price: number | null | undefined, travel: number) => typeof price === 'number' && price - travel < SMALL_ORDER_FAR_MIN;
   const travel = q.travel ?? 0;
   const t = q.waterproofingTiers;

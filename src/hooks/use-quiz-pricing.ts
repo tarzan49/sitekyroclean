@@ -1,4 +1,4 @@
-import { calculateTravelFee } from '@/constants/travel';
+import { calculateTravelFee, smallOrderFarSurcharge } from '@/constants/travel';
 import { rugPickupFee } from '@/constants/commercialPolicy';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
@@ -90,7 +90,10 @@ export function useQuizPricing(
   const rugPickupCost = isRugService && formData.carpetKind !== 'alcatifa' && formData.rugPickup
     ? rugPickupFee(carpetTotalArea(carpetItems), formData.location) : null;
   const rugTravelOnQuote = isRugService && rugPickupCost === null;
-  const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
+  // Serviço abaixo de 49€ a mais de 20 km de carro de Odivelas = +10€ (dono, 23 Nov 2026), somado à
+  // deslocação para o total, o recibo, o email e o CRM baterem certo; o resumo mostra-o numa linha própria.
+  const smallOrderSurchargeCost = isRugService ? 0 : smallOrderFarSurcharge(formData.location, formData.locationPlace, safePrice(calculateServicePrice) + upsellItemsTotal);
+  const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal) + smallOrderSurchargeCost;
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + (rugPickupCost ?? 0);
   // Sofás: qualquer unidade a que o motor não dá preço (canto, em U ou
   // modular; 5+ lugares com impermeabilização ou anti-ácaros), pela mesma
@@ -133,6 +136,7 @@ export function useQuizPricing(
     calculateServicePrice,
     travelCost,
     finalTravelCost,
+    smallOrderSurchargeCost,
     rugPickupCost,
     rugTravelOnQuote,
     totalPrice,

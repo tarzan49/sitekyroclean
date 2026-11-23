@@ -43,7 +43,8 @@ export function matchServiceCity(data: { countryCode?: string; city?: string; lo
   }
 }
 
-export async function detectServiceCity(signal: AbortSignal): Promise<string> {
+/** City plus the place words the reverse geocoder gave (parish, town), for the small-order rule (travel.ts). */
+export async function detectServiceLocation(signal: AbortSignal): Promise<{ city: string; place: string }> {
   if (!navigator.geolocation) throw new Error('Escreva a sua localidade abaixo e continuamos.');
   const position = await new Promise<GeolocationPosition>((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, () => reject(new Error('Sem problema. Escreva a sua localidade abaixo e continuamos.')), { timeout: 10000, maximumAge: 0, enableHighAccuracy: false });
@@ -53,7 +54,13 @@ export async function detectServiceCity(signal: AbortSignal): Promise<string> {
   // Client-side only, current device coordinates with browser consent. No coordinates are stored.
   const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?${query}`, { signal, referrerPolicy: 'no-referrer' });
   if (!response.ok) throw new Error('Não conseguimos identificar a cidade. Escreva a sua localidade abaixo e continuamos.');
-  const city = matchServiceCity(await response.json());
+  const data = await response.json();
+  const city = matchServiceCity(data);
   if (!city) throw new Error('Não identificámos uma localidade servida na sua posição. Pesquise onde pretende o serviço.');
-  return city;
+  const place = [data.locality, data.city, data.localityName].filter((v): v is string => typeof v === 'string' && v !== '').join(', ');
+  return { city, place };
+}
+
+export async function detectServiceCity(signal: AbortSignal): Promise<string> {
+  return (await detectServiceLocation(signal)).city;
 }

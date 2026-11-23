@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { locationPrices } from '@/components/quiz/QuizTypes';
 import { cities } from '@/data/serviceCatalog';
-import { detectServiceCity, searchServiceLocations, type LocationOption } from '@/lib/locationDetection';
+import { detectServiceLocation, searchServiceLocations, type LocationOption } from '@/lib/locationDetection';
 import { Button } from '@/components/ui/button';
 
 interface QuizStepLocationProps {
@@ -10,13 +10,15 @@ interface QuizStepLocationProps {
   locationQuery: string;
   setLocationQuery: (q: string) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
-  onCitySelect: (city: string) => void;
+  // place = freguesia escolhida ou dada pelo GPS (serviço pequeno longe de Odivelas, travel.ts).
+  onCitySelect: (city: string, place: string) => void;
   // Tapetes e alcatifas: a deslocação entra no orçamento (dono, 2026-10-05).
   travelOnQuote?: boolean;
 }
 
 const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollContainerRef, onCitySelect, travelOnQuote = false }: QuizStepLocationProps) => {
   const [selected, setSelected] = useState(location);
+  const [place, setPlace] = useState('');
   const [detected, setDetected] = useState('');
   const [editing, setEditing] = useState(!location);
   const [loading, setLoading] = useState(!location);
@@ -37,10 +39,11 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
       controller.abort();
       if (active) { setLoading(false); setMessage('A localização está a demorar. Pode escrever a sua localidade abaixo.'); }
     }, 16000);
-    detectServiceCity(controller.signal).then(city => {
+    detectServiceLocation(controller.signal).then(({ city, place: found }) => {
       if (!active || controller.signal.aborted || manuallyEdited.current) return;
       setDetected(city);
       setSelected(city);
+      setPlace(found);
       setEditing(false);
     }).catch(error => {
       if (active && !controller.signal.aborted) setMessage(error instanceof Error ? error.message : 'Escreva a sua localidade abaixo e continuamos.');
@@ -49,7 +52,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
   }, [location, attempt]);
 
   const stopDetection = () => { manuallyEdited.current = true; request.current?.abort(); setLoading(false); setMessage(''); };
-  const choose = (city: string) => { stopDetection(); setSelected(city); setEditing(false); setLocationQuery(''); };
+  const choose = (city: string, parish?: string) => { stopDetection(); setSelected(city); setPlace(parish ?? ''); setEditing(false); setLocationQuery(''); };
   const area = cities.find(city => city.name === (detected || selected))?.area;
   const regional = area ? cities.filter(city => city.area === area && city.name !== selected && locationPrices[city.name] !== undefined).map(city => city.name).slice(0, 4) : [];
   const matches: LocationOption[] = locationQuery.trim() ? searchServiceLocations(locationQuery) : regional.map(city => ({ city }));
@@ -73,13 +76,13 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
         <label htmlFor="quiz-location-search" className="block text-base text-white/80 mb-2">{selected ? 'Onde pretende o serviço?' : 'Localidade do serviço'}</label>
         <input ref={input} id="quiz-location-search" type="search" placeholder="Pesquisar localidade" value={locationQuery} onChange={event => { stopDetection(); setLocationQuery(event.target.value); }} onFocus={() => { if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0; }} autoComplete="off" className="w-full h-12 px-4 text-base bg-[#1a2a1a] border border-gold/25 focus:border-gold rounded-xl text-white placeholder:text-white/80" />
         {!locationQuery && regional.length > 0 && <p className="pt-2 text-sm text-white/80">Outras localidades na sua região</p>}
-        {matches.length > 0 && <div className="border border-white/10 rounded-xl overflow-hidden bg-[#1a2a1a]">{matches.map(({ city, parish }) => <button type="button" key={`${parish ?? ''}|${city}`} onClick={() => choose(city)} className="w-full min-h-12 flex justify-between items-center gap-3 px-4 py-3 text-left text-base text-white border-b border-white/5 last:border-0 hover:bg-gold/10">{parish ? <span>{parish}<span className="text-white/70">, {city}</span></span> : city}<ChevronRight className="w-4 h-4 text-white/80 shrink-0" /></button>)}</div>}
+        {matches.length > 0 && <div className="border border-white/10 rounded-xl overflow-hidden bg-[#1a2a1a]">{matches.map(({ city, parish }) => <button type="button" key={`${parish ?? ''}|${city}`} onClick={() => choose(city, parish)} className="w-full min-h-12 flex justify-between items-center gap-3 px-4 py-3 text-left text-base text-white border-b border-white/5 last:border-0 hover:bg-gold/10">{parish ? <span>{parish}<span className="text-white/70">, {city}</span></span> : city}<ChevronRight className="w-4 h-4 text-white/80 shrink-0" /></button>)}</div>}
         {locationQuery && matches.length === 0 && <p className="text-base text-white/80 py-2">Localidade não encontrada. Tente o nome do concelho.</p>}
         {!loading && <button type="button" onClick={() => { manuallyEdited.current = false; setAttempt(value => value + 1); }} className="min-h-11 text-base text-gold flex items-center gap-2"><Navigation className="w-4 h-4" />Usar a minha localização</button>}
       </div>}
 
       {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-base text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{travelOnQuote ? 'Sob orçamento' : `${locationPrices[selected]} €`}</span></div><p className="text-sm text-white/80 mt-2">{travelOnQuote ? 'Em tapetes e alcatifas, a deslocação entra no orçamento.' : 'Este valor será somado ao serviço no total.'}</p></div>}
-      <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold tracking-wider uppercase rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
+      <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected, place); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold tracking-wider uppercase rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
     </div>
   );
 };

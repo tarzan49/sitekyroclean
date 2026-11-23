@@ -26,6 +26,8 @@ export interface QuizFormData {
   // impermeabilização acima (decisão feita no ecrã a seguir às quantidades).
   chairAntiAcaros: boolean;
   location: string;
+  // Freguesia/sítio escolhido no passo da localidade (serviço pequeno longe de Odivelas, travel.ts).
+  locationPlace?: string;
   otherLocation: string;
   timing: string;
   contactMethod: string;
