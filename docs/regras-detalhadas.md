@@ -1063,3 +1063,6 @@ Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com 
 
 ### Sofá "em L" = perguntar lugares + fotografia (dono, 23 Nov 2026, Andreza)
 "Tens q parar considerar sofa em L como um sofa de canto [...] maior parte das pessoas considera sofa em L como um sofa de 3 lugares com chaise, pede lhe foto, sempre q alg disser sofa em L pergunta quantos lugares o sofa tem e pede a foto para ter a ctz." Substitui "Em L é sempre size canto" (Ricardo, 17/10) [RETIRADA 23/11]. Bot: S18 linha 216.
+
+### Chaise = um lugar (dono, 23 Nov 2026, Joana Duarte, Lagos)
+"NAO EXISTE 'MAIS A CHAISE' NUNCA EXISTIU [...] A CHAISE INCLUI SE SEMPRE NOS LUGARES." Na fotografia contam-se os assentos e a chaise conta como um: 3 assentos + chaise = 4 lugares. "4 lugares com chaise" dito pelo cliente = 4 já com a chaise. Retira o "chaise não muda" de 22 Nov. kyro-bot: ficheiro do bot, `bot-contract.md`, `tests/regras-retiradas.test.ts`.
