@@ -660,3 +660,16 @@ describe('mesmo dia (dono, 23 Nov 2026)', () => {
     }
   });
 });
+
+describe('concelhos do distrito de Coimbra sem deslocação definida (dono, 23 Nov 2026, Tábua)', () => {
+  it('Tábua pergunta à equipa de Coimbra, sem horas', () => {
+    const r = botAvailability({ city: 'Tábua', items: [] } as never, [], new Date('2026-11-23T10:00:00Z')) as { askTeam?: string; region?: string; free?: unknown[] };
+    expect(r.askTeam).toBe('Coimbra');
+    expect(r.region).toBe('Coimbra');
+    expect(r.free).toEqual([]);
+  });
+  it('Mortágua (Viseu) continua fora da lista', () => {
+    const r = botAvailability({ city: 'Mortágua' } as never, [], new Date('2026-11-23T10:00:00Z')) as { askTeam?: string };
+    expect(r.askTeam).toBeUndefined();
+  });
+});

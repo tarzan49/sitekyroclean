@@ -3560,6 +3560,31 @@ function suggestionText(slots) {
   const [a, b] = slots;
   return a.date === b.date ? `${a.label} às ${a.time} ou às ${b.time}` : `${a.label} às ${a.time} ou ${b.label} às ${b.time}`;
 }
+var COIMBRA_DISTRICT_NO_FEE = [
+  "Tábua",
+  "Oliveira do Hospital",
+  "Arganil",
+  "Lousã",
+  "Miranda do Corvo",
+  "Penacova",
+  "Condeixa-a-Nova",
+  "Condeixa",
+  "Cantanhede",
+  "Mira",
+  "Montemor-o-Velho",
+  "Soure",
+  "Penela",
+  "Góis",
+  "Pampilhosa da Serra",
+  "Vila Nova de Poiares",
+  "Poiares"
+];
+function coimbraDistrictTown(input) {
+  if (typeof input !== "string") return null;
+  const t = ` ${input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]+/g, " ")} `;
+  return COIMBRA_DISTRICT_NO_FEE.find((n) => t.includes(` ${n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]+/g, " ")} `)) ?? null;
+}
+var COIMBRA_DISTRICT_FEE_NOTE = "deslocação ainda por definir pelo dono para esta localidade: não dês valor de deslocação, diz que a confirmamos com a hora";
 function botAvailability(req, events, now, rules = DAY_RULES) {
   const city = resolveBotCity(req?.city);
   const durationRaw = Number(req?.durationMin);
@@ -3569,7 +3594,11 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   if (req.ownerTime !== true && isMadeira(req.city) && ASK_WEEK_ZONES.has("Madeira")) {
     return { ...base, city: null, region: null, teams: [], handToOwner: askTeamRule("Funchal"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Funchal" };
   }
-  if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
+  if (!city) {
+    const town = coimbraDistrictTown(req?.city);
+    if (town && req.ownerTime !== true) return { ...base, city: town, region: "Coimbra", teams: [], handToOwner: `${askTeamRule("Coimbra")} (${COIMBRA_DISTRICT_FEE_NOTE})`, askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Coimbra" };
+    return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
+  }
   const area = CITY_REGION.get(fold3(city));
   if (EXTENDED_TRIP_CITIES.has(city) && city !== "Aveiro") {
     if (req.date !== void 0 && (typeof req.date !== "string" || !DATE.test(req.date))) return { error: "date tem de ser AAAA-MM-DD" };
