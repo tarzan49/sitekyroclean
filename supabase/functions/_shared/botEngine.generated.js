@@ -2180,20 +2180,6 @@ for (const [municipality, names] of Object.entries(BOT_ONLY_PARISHES)) {
   }
 }
 
-// src/lib/botAskedDiscount.ts
-var ASKED_DISCOUNT_PCT = { cleaning: 10, waterproofing: 5, waterproofingAbove: 10 };
-var ASKED_DISCOUNT_WATERPROOFING_BIG_FROM = 500;
-var ASKED_DISCOUNT_FLOOR = Math.min(...Object.values(locationPrices));
-var ASKED_DISCOUNT_RULE = "Só se o preço for a objeção (achou caro, tem orçamento, tem outro orçamento ou pediu melhor preço); uma vez por conversa; diz 'condição especial', nunca 'desconto'.";
-function askedDiscountFor(total, waterproofing) {
-  if (typeof total !== "number" || !Number.isFinite(total) || total <= 0) return null;
-  const pct = !waterproofing ? ASKED_DISCOUNT_PCT.cleaning : total > ASKED_DISCOUNT_WATERPROOFING_BIG_FROM ? ASKED_DISCOUNT_PCT.waterproofingAbove : ASKED_DISCOUNT_PCT.waterproofing;
-  const next = Math.max(ASKED_DISCOUNT_FLOOR, Math.floor(total * (100 - pct) / 100 + 1e-9));
-  const saving = Math.round((total - next) * 100) / 100;
-  if (saving <= 0) return null;
-  return { pct, total: next, saving, rule: ASKED_DISCOUNT_RULE };
-}
-
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
 var KINDS = ["sofa", "mattress", "chairs", "rug", "carpet"];
@@ -2609,19 +2595,8 @@ function withMattressMiteOffer(input, r) {
   return { ...r, mattressMiteOffer: { normal, total: clean.total } };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
-var WATERPROOFING_ONLY_NO_DISCOUNT_RULE = "Só impermeabilização: nunca desconto nem percentagem, e nunca explicar ao cliente que não fazemos desconto. Se o preço for a objeção, oferecer a deslocação (travelOffer) uma vez, como condição especial; sem deslocação, a opção Essencial.";
-function withAskedDiscount(input, r) {
-  const q = r;
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday) return { ...r, askedDiscount: null };
-  const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
-  if (price === null) return { ...r, askedDiscount: null };
-  const raw = input?.items;
-  if (Array.isArray(raw) && raw.length > 0 && raw.every((i) => /^(premium|essencial)$/.test(String(i?.treatment ?? "")))) {
-    const travel = typeof r.travel === "number" ? r.travel : 0;
-    return { ...r, askedDiscount: null, waterproofingOnlyNoDiscount: { travelOffer: travel > 0 ? { total: Math.round((price - travel) * 100) / 100, travel } : null, rule: WATERPROOFING_ONLY_NO_DISCOUNT_RULE } };
-  }
-  const waterproofing = !!q.waterproofingTiers || !!q.rugWaterproofing || Array.isArray(raw) && raw.some((i) => /premium|essencial/.test(String(i?.treatment ?? "")));
-  return { ...r, askedDiscount: askedDiscountFor(price, waterproofing) };
+function withAskedDiscount(_input, r) {
+  return { ...r, askedDiscount: null };
 }
 function withAntiMiteGift(input, r) {
   const b = r.bigOrder;

@@ -281,34 +281,13 @@ describe('condição da mesma visita retirada (dono, 23 Nov 2026, Joana Duarte)'
   });
 });
 
-describe('descida de preço a pedido do cliente (dono, 12 Nov 2026)', () => {
-  it('limpeza 10%; com impermeabilização 5% até 500€ e 10% acima; arredondado para baixo', () => {
-    expect(ASKED_DISCOUNT_PCT).toEqual({ cleaning: 10, waterproofing: 5, waterproofingAbove: 10 });
-    expect(askedDiscountFor(79, false)).toMatchObject({ pct: 10, total: 71, saving: 8 });
-    expect(askedDiscountFor(218, true)).toMatchObject({ pct: 5, total: 207, saving: 11 });
-    expect(askedDiscountFor(500, true)).toMatchObject({ pct: 5, total: 475 });
-    expect(askedDiscountFor(900, true)).toMatchObject({ pct: 10, total: 810, saving: 90 });
-    expect(askedDiscountFor(900, false)).toMatchObject({ pct: 10, total: 810 });
-    // Never below the engine's minimum travel.
-    expect(askedDiscountFor(11, false)?.total).toBe(10);
-    expect(askedDiscountFor(10, false)).toBeNull();
-    expect(askedDiscountFor(79, false)?.rule).toMatch(/condição especial/);
-  });
-  it('no quote: sofá 3L Oeiras 89€ → 80€; pack 3L Premium 218€ → 207€; tapete pelo preço em casa', () => {
-    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' }).askedDiscount).toMatchObject({ pct: 10, total: 80, saving: 9 });
-    const pack = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }], city: 'Porto' });
-    expect(pack.total).toBe(219);
-    expect(pack.askedDiscount).toMatchObject({ pct: 5, total: 208, saving: 11 });
-    const rug = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
-    expect(rug.rugEstimate?.ok && rug.askedDiscount?.total).toBe(rug.rugEstimate?.ok ? Math.floor(rug.rugEstimate.homePrice * 0.9) : -1);
-  });
-  it('null quando é sob orçamento, vai ao dono ou já leva condição especial (pedido grande)', () => {
-    expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5 }], city: 'Lisboa' }).askedDiscount).toBeNull();
-    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Madrid' }).askedDiscount).toBeNull();
-    const big = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Porto' });
-    expect(big.bigOrder).not.toBeNull();
-    expect(big.askedDiscount).toBeNull();
-    const several = ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment: 'clean+premium' }, { kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
+describe('nunca desconto a pedido (dono, 23 Nov 2026, Antónia)', () => {
+  it('askedDiscount vem sempre null', () => {
+    for (const items of [[{ kind: 'sofa', seats: 3 }], [{ kind: 'sofa', seats: 3, treatment: 'premium' }], [{ kind: 'sofa', seats: 3, treatment: 'premium', cleaning: false }]]) {
+      const q = botQuote({ city: 'Oeiras', items }) as { askedDiscount?: unknown; waterproofingOnlyNoDiscount?: unknown };
+      expect(q.askedDiscount).toBeNull();
+      expect(q.waterproofingOnlyNoDiscount).toBeUndefined();
+    }
   });
 });
 
