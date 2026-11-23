@@ -768,11 +768,23 @@ function edicoesNasCopias(existentes, eventosDoDono) {
  * `mapaDuvidoso`: o Maps não encontrou a morada completa, e a descrição avisa
  * a equipa para a confirmar com o cliente antes de sair.
  */
+/**
+ * A equipa vê sempre o contacto do cliente no título da cópia (dono, 23/11/2026:
+ * a cliente de Viana tinha o telefone só na descrição e a equipa não o viu).
+ * Se o título não tem número, vai o da descrição (ou da linha bot:).
+ */
+function tituloComTelefone(titulo, descricao) {
+  if (/(?:^|\D)(?:351)?[29]\d{8}(?!\d)/.test(titulo.replace(/(\d)[ .](?=\d)/g, '$1'))) return titulo;
+  const texto = descricao.replace(/(\d)[ .](?=\d)/g, '$1');
+  const achado = /(?:^|\D)(?:\+?351)?([29]\d{8})(?!\d)/.exec(texto);
+  return achado ? titulo + ' - ' + achado[1] : titulo;
+}
+
 function corpoDaCopia(origem, mapaDuvidoso) {
   const escrita = limpar(origem.location) || moradaDoEvento(origem);
   const aviso = mapaDuvidoso && escrita ? 'ATENÇÃO: o Google Maps não encontrou esta morada completa. Confirmar a morada com o cliente antes de sair.' : '';
   const corpo = {
-    summary: origem.summary || '',
+    summary: tituloComTelefone(origem.summary || '', origem.description || ''),
     location: escrita || '',
     description: [aviso, origem.description || ''].filter(Boolean).join('\n\n'),
     start: horaEmPortugal(origem.start),
