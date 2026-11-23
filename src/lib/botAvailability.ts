@@ -404,6 +404,9 @@ export function isMadeira(cityOrAddress: unknown): boolean {
 }
 
 export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 23 Nov 2026 (Antónia): "não marques mais serviços para o Porto hoje, marca tudo amanhã ou para depois".
+  { zone: 'Porto', from: '2026-11-23', until: '2026-11-23', closed: [{ date: '2026-11-23' }],
+    note: 'Hoje (segunda, dia 23) já não temos vaga no Porto: oferece amanhã (terça, dia 24) ou depois.' },
   // Owner, 21 Nov 2026: "não marques mais serviços para domingo, para o Porto. Tenta marcar todos para a próxima semana".
   { zone: 'Porto', from: '2026-11-21', until: '2026-11-22', closed: [{ date: '2026-11-22' }], onlyPreferred: true,
     prefer: ['2026-11-23', '2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27', '2026-11-28'],

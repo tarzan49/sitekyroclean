@@ -3089,6 +3089,14 @@ function isMadeira(cityOrAddress) {
   return MADEIRA_PLACES.test(fold3(cityOrAddress).replace(/s(ao|\.) joao da madeira/g, ""));
 }
 var DAY_RULES = [
+  // Owner, 23 Nov 2026 (Antónia): "não marques mais serviços para o Porto hoje, marca tudo amanhã ou para depois".
+  {
+    zone: "Porto",
+    from: "2026-11-23",
+    until: "2026-11-23",
+    closed: [{ date: "2026-11-23" }],
+    note: "Hoje (segunda, dia 23) já não temos vaga no Porto: oferece amanhã (terça, dia 24) ou depois."
+  },
   // Owner, 21 Nov 2026: "não marques mais serviços para domingo, para o Porto. Tenta marcar todos para a próxima semana".
   {
     zone: "Porto",
