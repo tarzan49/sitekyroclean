@@ -1060,3 +1060,6 @@ Dono, 23 Nov: "Sim, passa": numa remarcação o sinal passa para a nova data.
 
 ### [RETIRADA 23/11] Condição especial da mesma visita (`sameVisitSpecial`)
 Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com o colchão de casal o motor fez 149€ × 0,9 = 134€ → 129€ (a acabar em 9, para baixo), o colchão ficou a 35€. "REMOVE ESSA CONDICAO". Desde 23/11: várias peças = soma da tabela, sem condição; desconto só pelo `askedDiscount`. `SAME_VISIT_SPECIAL_RETIRED` em `botQuote.ts`; kyro-bot `tests/regras-retiradas.test.ts`. À Joana: 149€, colchão a 55€ em vez de 79€ (mensagem do dono).
+
+### Sofá "em L" = perguntar lugares + fotografia (dono, 23 Nov 2026, Andreza)
+"Tens q parar considerar sofa em L como um sofa de canto [...] maior parte das pessoas considera sofa em L como um sofa de 3 lugares com chaise, pede lhe foto, sempre q alg disser sofa em L pergunta quantos lugares o sofa tem e pede a foto para ter a ctz." Substitui "Em L é sempre size canto" (Ricardo, 17/10) [RETIRADA 23/11]. Bot: S18 linha 216.
