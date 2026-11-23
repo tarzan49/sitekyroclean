@@ -3073,7 +3073,8 @@ var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
 var ASK_WEEK_ZONES = /* @__PURE__ */ new Set(["Coimbra", "Madeira", "Algarve"]);
-var VIANA_ASK_TEAM_RULE = "Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
+var VIANA_ASK_TEAM_BELOW = 100;
+var VIANA_ASK_TEAM_RULE = "Viana do Castelo (limpezas abaixo de 100€): nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.";
 var askTeamRule = (team) => team === "Viana" ? VIANA_ASK_TEAM_RULE : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 var ALGARVE_FRIDAY_RULE = 'Algarve só às sextas-feiras. Não dês horas e nunca perguntes a semana nem o dia: fecha o serviço (preço e morada) e propõe a próxima sexta-feira (fridayOnly). Se a pessoa sugerir outro dia: "Nesse dia já não temos disponibilidade, temos na próxima sexta-feira, dia X." A hora confirmamos a seguir.';
 var ASK_WEEK_RULE = "Não dês horas. Fecha o serviço (preço e morada) e pergunta que semana e que dia lhe dá mais jeito; diz que vamos conferir no calendário e confirmamos a seguir.";
@@ -3375,12 +3376,13 @@ function chooseTeam(events, city, startIso, endIso, waterproofing = false, clean
 var SMALL_ORDER_CITIES = /* @__PURE__ */ new Set(["Aveiro"]);
 var FRIDAY_ONLY_CITIES = /* @__PURE__ */ new Set(["Leiria", "Batalha", "Marinha Grande", "Porto de Mós", "Ourém", "Fátima", "Pombal", "Alcobaça", "Nazaré"]);
 var WATERPROOFING_ASK_WEEK_CITIES = /* @__PURE__ */ new Set([...FRIDAY_ONLY_CITIES]);
-var NORTH_WATERPROOFING_ASK_WEEK_REGIONS = /* @__PURE__ */ new Set(["Porto", "Braga"]);
 var LEIRIA_WATERPROOFING_TEAMS = ["Lisboa 1"];
 function teamsForCity(city, zone, waterproofing, total, day, rugPickup = false) {
   if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
   const townTeam = city ? Object.keys(TOWN_TEAMS).find((t) => TOWN_TEAMS[t] === city) : void 0;
-  if (townTeam && !waterproofing && !rugPickup) return [townTeam];
+  const bigViana = townTeam === "Viana" && typeof total === "number" && total >= VIANA_ASK_TEAM_BELOW;
+  if (townTeam && !waterproofing && !rugPickup && !bigViana) return [townTeam];
+  if (bigViana && !waterproofing && !rugPickup) return teamsFor(zone, waterproofing, total, day, rugPickup).filter((t) => t !== "Viana");
   return teamsFor(zone, waterproofing, total, day, rugPickup);
 }
 function nextFriday(now) {
@@ -3537,8 +3539,9 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
   const fridayDone = req._friday === true;
-  if (req.ownerTime !== true && city === "Viana do Castelo" && !hasWaterproofing(req.items)) {
-    const total = orderTotal(req, city);
+  const vianaTotal = city === "Viana do Castelo" ? orderTotal(req, city) : null;
+  if (req.ownerTime !== true && city === "Viana do Castelo" && !hasWaterproofing(req.items) && (vianaTotal === null || vianaTotal < VIANA_ASK_TEAM_BELOW)) {
+    const total = vianaTotal;
     return {
       ...base,
       region: area,
@@ -3614,7 +3617,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? "" : "";
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === "Porto" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === "Porto" || city === "Viana do Castelo" ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area].join("/")} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: "Impermeabilização nesta zona: o responsável escolhe a equipa e a hora" };
   const cleaning = !waterproofingOnly(req?.items);
@@ -3631,7 +3634,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   const closedAt2 = (date, m) => active.some((r) => r.closed?.some((c) => c.date === date && (c.fromHour === void 0 || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap((r) => r.prefer ?? []))].filter((d) => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some((r) => r.onlyPreferred);
-  const noSameDay = NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && waterproofingKind(req?.items, orderTotal(req, city)) === "premium";
+  const noSameDay = (area === "Braga" || city === "Viana do Castelo") && hasWaterproofing(req?.items);
   const firstDay = [waterproofingFrom, noSameDay ? tomorrow : "", today].sort().pop();
   const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
   const tooEarly = (date) => date < firstDay;

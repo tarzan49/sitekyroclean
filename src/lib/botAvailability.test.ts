@@ -560,8 +560,8 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
     expect(chooseTeam([], 'Rua X 1, Marinha Grande', '2026-11-20T15:00:00Z', '2026-11-20T16:30:00Z', true)).toBe('Lisboa 1');
     expect(chooseTeam([], 'Leiria', '2026-11-20T15:00:00Z', '2026-11-20T16:00:00Z')).toBe('Coimbra');
   });
-  it('Viana do Castelo: sem horas em tudo, pergunta-se primeiro à equipa de Viana (dono, 18 Nov)', () => {
-    const r = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 109 }, [], now));
+  it('Viana do Castelo: limpezas abaixo de 100€ perguntam primeiro à equipa de Viana (dono, 23 Nov)', () => {
+    const r = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 89 }, [], now));
     expect([r.free, r.suggestion, r.askWeek, r.askTeam]).toEqual([[], null, true, 'Viana']);
     expect(r.handToOwner).toMatch(/perguntar primeiro à equipa de Viana/);
     // Dono, 22 Nov 2026 (Rosângela): a impermeabilização em Viana é da Porto 1, com horas, sem perguntar à LigLav.
@@ -586,7 +586,8 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
     for (const city of ['Matosinhos', 'Porto', 'Braga']) {
       const r = ok(botAvailability({ city, items: premium, days: 14 }, [], new Date('2026-11-23T08:00:00Z')));
       expect(r.askWeek, city).toBeUndefined();
-      expect(r.free.every((f: { date?: string }) => !f.date || f.date > '2026-11-23'), city).toBe(true); // nunca no próprio dia
+      // Dono, 23 Nov 2026: só a zona de Braga (e Viana) nunca no próprio dia; o Porto pode.
+      if (city === 'Braga') expect(r.free.every((f: { date?: string }) => !f.date || f.date > '2026-11-23'), city).toBe(true);
     }
   });
 });
@@ -637,5 +638,23 @@ describe('Porto 1 limpezas a partir de 135€ (dono, 19 Nov)', () => {
     expect(teamsFor('Porto', false, 139, '2026-11-23')).toContain('Porto 1');
     expect(teamsFor('Porto', false, 109, '2026-11-23')).not.toContain('Porto 1');
     expect(teamsFor('Porto', true, 158, '2026-11-23')).not.toContain('Porto 1');
+  });
+});
+
+describe('mesmo dia (dono, 23 Nov 2026)', () => {
+  const at = new Date('2026-11-24T08:00:00Z');
+  const premium = [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }];
+  const cleaning = [{ kind: 'sofa', size: '3-lugares' }];
+  it('Viana: limpeza de 100€ ou mais dá horas, sem perguntar à equipa', () => {
+    const r = botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 119, days: 14 } as never, [], at) as { askTeam?: string; teams: string[]; free: { date?: string }[] };
+    expect([r.askTeam, r.teams]).toEqual([undefined, ['Braga']]);
+    expect(r.free.length).toBeGreaterThan(0);
+  });
+  it('impermeabilização em Braga e Viana nunca no próprio dia; no Porto pode', () => {
+    for (const city of ['Braga', 'Viana do Castelo']) {
+      const r = botAvailability({ city, items: premium, total: 249, days: 14 } as never, [], at) as { free: { date?: string }[] };
+      expect(r.free.length, city).toBeGreaterThan(0);
+      expect(r.free.every(f => !f.date || f.date > '2026-11-24'), city).toBe(true);
+    }
   });
 });

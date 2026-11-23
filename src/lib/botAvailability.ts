@@ -376,7 +376,9 @@ export interface DayRule {
  * A time the owner gave (`ownerTime`) is still booked.
  */
 export const ASK_WEEK_ZONES: ReadonlySet<TeamZone | 'Madeira'> = new Set<TeamZone | 'Madeira'>(['Coimbra', 'Madeira', 'Algarve']);
-export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo: nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.';
+/** Viana cleanings below this total ask the Viana team first (owner, 23 Nov 2026). */
+export const VIANA_ASK_TEAM_BELOW = 100;
+export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo (limpezas abaixo de 100€): nunca dar horas sem perguntar primeiro à equipa de Viana (LigLav), a todas as pessoas, com a fotografia ou o vídeo do artigo, a dizer que é em Viana e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.';
 /**
  * Owner, 19 Nov 2026 ("Nestas equipas (viana, funchal, leiria, coimbra) que nao podemos marcar sem avisar [...] tu tens
  * q perguntar a equipa (foto + detalhe do serviço + disponibilidade)"): these zones never get hours from the calendar;
@@ -754,7 +756,10 @@ export const LEIRIA_WATERPROOFING_TEAMS: readonly string[] = ['Lisboa 1'];
 export function teamsForCity(city: string | null, zone: TeamZone, waterproofing: boolean | 'premium', total?: number | null, day?: string, rugPickup = false): readonly string[] {
   if (waterproofing && city && FRIDAY_ONLY_CITIES.has(city)) return LEIRIA_WATERPROOFING_TEAMS;
   const townTeam = city ? Object.keys(TOWN_TEAMS).find(t => TOWN_TEAMS[t] === city) : undefined;
-  if (townTeam && !waterproofing && !rugPickup) return [townTeam];
+  // Owner, 23 Nov 2026: Viana cleanings from 100€ go to the Braga team (its calendar, real hours); below, the Viana team.
+  const bigViana = townTeam === 'Viana' && typeof total === 'number' && total >= VIANA_ASK_TEAM_BELOW;
+  if (townTeam && !waterproofing && !rugPickup && !bigViana) return [townTeam];
+  if (bigViana && !waterproofing && !rugPickup) return teamsFor(zone, waterproofing, total, day, rugPickup).filter(t => t !== 'Viana');
   return teamsFor(zone, waterproofing, total, day, rugPickup);
 }
 function nextFriday(now: Date): string {
@@ -962,8 +967,10 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   // video of the item, that it is in Viana, and its availability. The hour comes from the team.
   // Owner, 22 Nov 2026 (Rosângela): "não é a LigLav que faz impermeabilizações", "porto 1, não tens que perguntar":
   // waterproofing in Viana goes to Porto 1 with hours like Braga; only the cleanings ask the Viana team.
-  if (req.ownerTime !== true && city === 'Viana do Castelo' && !hasWaterproofing(req.items)) {
-    const total = orderTotal(req, city);
+  // Owner, 23 Nov 2026: only Viana cleanings below 100€ ask the team first; from 100€ they get real hours (same day allowed).
+  const vianaTotal = city === 'Viana do Castelo' ? orderTotal(req, city) : null;
+  if (req.ownerTime !== true && city === 'Viana do Castelo' && !hasWaterproofing(req.items) && (vianaTotal === null || vianaTotal < VIANA_ASK_TEAM_BELOW)) {
+    const total = vianaTotal;
     // The Viana team takes the cleanings (owner, 18 Nov 2026: "Sem horas, confirmo eu"); waterproofing keeps the Porto teams.
     return { ...base, region: area, teams: [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))],
       handToOwner: VIANA_ASK_TEAM_RULE,
@@ -1017,7 +1024,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const tomorrow = addDays(lisbon(now.getTime()).date, 1);
   const waterproofingFrom = hasWaterproofing(req?.items) ? WATERPROOFING_FROM[area] ?? '' : '';
   const rugPickup = req.rugPickup === true;
-  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === 'Porto' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
+  const teams = [...teamsForCity(city, area, waterproofingKind(req?.items, orderTotal(req, city)), area === 'Porto' || city === 'Viana do Castelo' ? orderTotal(req, city) : null, waterproofingFrom > tomorrow ? waterproofingFrom : tomorrow, rugPickup)];
   if (!teams.length && rugPickup && RUG_PICKUP_TEAMS[area]) return { ...base, region: area, teams: [], handToOwner: `Recolha de tapetes na zona de ${area}: só a equipa ${RUG_PICKUP_TEAMS[area]!.join('/')} recolhe e não pode este serviço, o responsável escolhe a equipa e a hora` };
   if (!teams.length) return { ...base, region: area, teams: [], handToOwner: 'Impermeabilização nesta zona: o responsável escolhe a equipa e a hora' };
   const cleaning = !waterproofingOnly(req?.items);
@@ -1038,9 +1045,9 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const closedAt = (date: string, m: number) => active.some(r => r.closed?.some(c => c.date === date && (c.fromHour === undefined || m < c.fromHour * 60)));
   const preferred = [...new Set(active.flatMap(r => r.prefer ?? []))].filter(d => d >= today && d <= addDays(today, MAX_DAYS - 1)).sort();
   const onlyPreferred = active.some(r => r.onlyPreferred);
-  // Owner, 22 Nov 2026: Premium waterproofing in the Porto and Braga zones never gets a same-day hour from the bot
-  // ("para o mesmo dia nós vemos o horário"); from tomorrow on it offers the teams' free hours and he approves.
-  const noSameDay = NORTH_WATERPROOFING_ASK_WEEK_REGIONS.has(area) && waterproofingKind(req?.items, orderTotal(req, city)) === 'premium';
+  // Owner, 23 Nov 2026: waterproofing (any level) in the Braga team zone and in Viana never on the same day, the
+  // earliest is tomorrow; Porto (cleanings and waterproofing) and Braga cleanings may get same-day hours.
+  const noSameDay = (area === 'Braga' || city === 'Viana do Castelo') && hasWaterproofing(req?.items);
   const firstDay = [waterproofingFrom, noSameDay ? tomorrow : '', today].sort().pop()!;
   const ahead = Array.from({ length: span }, (_, i) => addDays(firstDay, i));
   const tooEarly = (date: string) => date < firstDay;

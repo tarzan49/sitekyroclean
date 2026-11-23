@@ -260,8 +260,8 @@ Deno.test("availability: Algarve and waterproofing in Viana/Leiria close without
   const viana = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares", treatment: "essencial" }] });
   // Dono, 22 Nov 2026 (Rosângela): a impermeabilização em Viana dá horas (equipas do Porto), sem perguntar à LigLav.
   assertEquals([viana.askWeek, viana.askTeam], [undefined, undefined]);
-  // Viana (dono, 18 Nov 2026): limpeza também sem horas, na equipa Viana; o dono confirma com a equipa antes de marcar.
-  const vianaClean = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares" }], total: 109 });
+  // Viana (dono, 23 Nov 2026): só a limpeza abaixo de 100€ pergunta primeiro à equipa Viana; de 100€ para cima dá horas.
+  const vianaClean = await ask({ city: "Viana do Castelo", items: [{ kind: "sofa", size: "3-lugares" }], total: 89 });
   assertEquals([vianaClean.askWeek, vianaClean.teams, vianaClean.free], [true, ["Viana"], []]);
 });
 

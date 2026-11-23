@@ -1066,3 +1066,16 @@ Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com 
 
 ### Chaise dentro dos lugares, nunca +1 (dono, 23 Nov 2026, Joana Duarte, Lagos)
 "NAO EXISTE 'MAIS A CHAISE' NUNCA EXISTIU [...] A CHAISE INCLUI SE SEMPRE NOS LUGARES." [CORRIGIDA 23/11: a sessão leu ao contrário.] A chaise está dentro da contagem e nunca soma um lugar: 3 lugares com chaise = 3 lugares. "4 lugares com chaise" dito pelo cliente = 4 já com a chaise. Retira o "chaise não muda" de 22 Nov. kyro-bot: ficheiro do bot, `bot-contract.md`, `tests/regras-retiradas.test.ts`.
+
+
+## Horas: mesmo dia, Viana e "já lhe digo as horas" (dono, 23 Nov 2026)
+
+- Só dão "já lhe digo as horas livres" (sem horas, pergunta-se primeiro à equipa: askTeam/askWeek): limpezas de Viana do Castelo abaixo de 100€ (equipa Viana/LigLav), Coimbra, Funchal, Algarve, zona de Leiria e Aveiro. Em todas as outras zonas o bot dá as horas reais da `availability` na mesma mensagem; nunca diz "já lhe digo as horas" sem as dar.
+- Viana do Castelo: limpezas de 100€ ou mais vão para a equipa Braga, com o calendário dela e horas reais, também para hoje (`VIANA_ASK_TEAM_BELOW` em `botAvailability.ts`). `[RETIRADA 23/11]` "Viana do Castelo, tudo sem horas" (18 Nov).
+- Impermeabilização na zona de Braga e em Viana (Porto 1): nunca no próprio dia, a mais cedo é amanhã (`noSameDay`). Porto (limpezas e impermeabilizações) e limpezas de Braga: horas para hoje permitidas. `[RETIRADA 23/11]` "a Premium do Porto e Braga nunca no próprio dia" (22 Nov).
+- Bug corrigido no mesmo dia: o `perguntar_equipa` mandava todas as zonas para o contacto da LigLav; agora cada zona vai ao seu (`TEAM_ASK_CHATS`: Funchal, Leiria, Coimbra, Aveiro = Porto 3) e o `total` passa à `availability`.
+- Por decidir: o contacto para a pergunta à equipa nas impermeabilizações de Braga/Viana (Porto 1) e nas impermeabilizações da zona de Leiria (Lisboa 1), e no Algarve; até lá Braga/Viana dão horas a partir de amanhã, Leiria e Algarve continuam como estavam.
+
+## Manchas antigas e pelo gasto (dono, 23 Nov 2026, Antónia Venda)
+
+Manchas antigas, já esfregadas ou de origem desconhecida, e pelo gasto: o bot nunca afirma o resultado. Diz que a mancha pode sair ou ficar muito mais clara, mas que "não conseguimos dar a garantia de que saia por completo". Estreita a regra de 17 Nov ("nunca 'não garantimos'") só nestes casos; o travão `noPromise` do kyro-bot não apanha esta frase.
