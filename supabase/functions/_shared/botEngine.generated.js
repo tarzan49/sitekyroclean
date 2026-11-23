@@ -70,6 +70,23 @@ var locationPrices = {
   "Coimbra": 10,
   "Figueira da Foz": 20,
   // ~45 min pela A14
+  // Dono, 2026-11-24: concelhos do distrito de Coimbra pelos escalões de 28/09, por distância de carro ao
+  // centro de Coimbra: até ~30 km 15€, mais longe 20€.
+  "Condeixa-a-Nova": 15,
+  "Penacova": 15,
+  "Miranda do Corvo": 15,
+  "Lousã": 15,
+  "Montemor-o-Velho": 15,
+  "Vila Nova de Poiares": 15,
+  "Cantanhede": 15,
+  "Penela": 20,
+  "Soure": 20,
+  "Mira": 20,
+  "Góis": 20,
+  "Arganil": 20,
+  "Tábua": 20,
+  "Oliveira do Hospital": 20,
+  "Pampilhosa da Serra": 20,
   // Dono, 2026-11-15: escalões pelo centro de Leiria (como Braga):
   // centro 10€, arredores próximos (até ~15 km) 15€, mais longe 20€.
   "Leiria": 10,
@@ -517,6 +534,22 @@ var cities = [
   // calendarServices.ts): o dono ainda não quis uma equipa Coimbra.
   { name: "Coimbra", slug: "coimbra", region: "primary", area: "coimbra", description: "cidade universitária às margens do Mondego" },
   { name: "Figueira da Foz", slug: "figueira-da-foz", region: "secondary", area: "coimbra", description: "cidade de praia na foz do Mondego" },
+  // Distrito de Coimbra (dono 2026-11-24, escalões pelo centro de Coimbra)
+  { name: "Condeixa-a-Nova", slug: "condeixa-a-nova", region: "secondary", area: "coimbra", description: "vila das ruínas de Conímbriga, a sul de Coimbra" },
+  { name: "Penacova", slug: "penacova", region: "secondary", area: "coimbra", description: "vila sobre o Mondego, a montante de Coimbra" },
+  { name: "Miranda do Corvo", slug: "miranda-do-corvo", region: "secondary", area: "coimbra", description: "vila à porta da Serra da Lousã" },
+  { name: "Lousã", slug: "lousa", region: "secondary", area: "coimbra", description: "vila da serra e das aldeias de xisto" },
+  { name: "Montemor-o-Velho", slug: "montemor-o-velho", region: "secondary", area: "coimbra", description: "vila do castelo, nos campos do Baixo Mondego" },
+  { name: "Vila Nova de Poiares", slug: "vila-nova-de-poiares", region: "secondary", area: "coimbra", description: "vila entre Coimbra e a serra" },
+  { name: "Cantanhede", slug: "cantanhede", region: "secondary", area: "coimbra", description: "cidade da Gândara, a noroeste de Coimbra" },
+  { name: "Penela", slug: "penela", region: "secondary", area: "coimbra", description: "vila do castelo, a sul de Coimbra" },
+  { name: "Soure", slug: "soure", region: "secondary", area: "coimbra", description: "vila entre Coimbra e Pombal" },
+  { name: "Mira", slug: "mira", region: "secondary", area: "coimbra", description: "vila da praia e da lagoa, no litoral da Gândara" },
+  { name: "Góis", slug: "gois", region: "secondary", area: "coimbra", description: "vila da serra, junto ao rio Ceira" },
+  { name: "Arganil", slug: "arganil", region: "secondary", area: "coimbra", description: "vila da Beira Serra, junto ao rio Alva" },
+  { name: "Tábua", slug: "tabua", region: "secondary", area: "coimbra", description: "vila da Beira Serra, entre Coimbra e a Estrela" },
+  { name: "Oliveira do Hospital", slug: "oliveira-do-hospital", region: "secondary", area: "coimbra", description: "cidade da Beira Serra, à vista da Estrela" },
+  { name: "Pampilhosa da Serra", slug: "pampilhosa-da-serra", region: "secondary", area: "coimbra", description: "vila da serra, no interior do distrito de Coimbra" },
   // Leiria e Batalha (equipa Coimbra, dono 2026-10-26)
   { name: "Leiria", slug: "leiria", region: "secondary", area: "coimbra", description: "cidade do castelo, no centro litoral" },
   { name: "Batalha", slug: "batalha", region: "secondary", area: "coimbra", description: "vila do mosteiro, junto a Leiria" },
@@ -2846,6 +2879,21 @@ var CITY_COORDS = {
   "Aveiro": [40.6405, -8.6538],
   "Coimbra": [40.2112, -8.4291],
   "Figueira da Foz": [40.1486, -8.8557],
+  "Condeixa-a-Nova": [40.113, -8.497],
+  "Penacova": [40.27, -8.281],
+  "Miranda do Corvo": [40.093, -8.333],
+  "Lousã": [40.1125, -8.2467],
+  "Montemor-o-Velho": [40.172, -8.683],
+  "Vila Nova de Poiares": [40.211, -8.258],
+  "Cantanhede": [40.346, -8.594],
+  "Penela": [39.977, -8.39],
+  "Soure": [40.059, -8.626],
+  "Mira": [40.428, -8.737],
+  "Góis": [40.156, -8.111],
+  "Arganil": [40.218, -8.054],
+  "Tábua": [40.36, -8.029],
+  "Oliveira do Hospital": [40.3597, -7.8617],
+  "Pampilhosa da Serra": [40.047, -7.952],
   "Leiria": [39.7438, -8.8071],
   "Batalha": [39.6579, -8.8244],
   "Marinha Grande": [39.7477, -8.9322],
@@ -3584,7 +3632,6 @@ function coimbraDistrictTown(input) {
   const t = ` ${input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]+/g, " ")} `;
   return COIMBRA_DISTRICT_NO_FEE.find((n) => t.includes(` ${n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]+/g, " ")} `)) ?? null;
 }
-var COIMBRA_DISTRICT_FEE_NOTE = "deslocação ainda por definir pelo dono para esta localidade: não dês valor de deslocação, diz que a confirmamos com a hora";
 function botAvailability(req, events, now, rules = DAY_RULES) {
   const city = resolveBotCity(req?.city);
   const durationRaw = Number(req?.durationMin);
@@ -3596,7 +3643,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
   }
   if (!city) {
     const town = coimbraDistrictTown(req?.city);
-    if (town && req.ownerTime !== true) return { ...base, city: town, region: "Coimbra", teams: [], handToOwner: `${askTeamRule("Coimbra")} (${COIMBRA_DISTRICT_FEE_NOTE})`, askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Coimbra" };
+    if (town && req.ownerTime !== true) return { ...base, city: town, region: "Coimbra", teams: [], handToOwner: askTeamRule("Coimbra"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Coimbra" };
     return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
   }
   const area = CITY_REGION.get(fold3(city));

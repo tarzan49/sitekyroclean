@@ -7,6 +7,7 @@ const WITH_ARTICLE: Record<string, 'o' | 'a'> = {
   Porto: 'o', Barreiro: 'o', Seixal: 'o', Montijo: 'o',
   Amadora: 'a', Moita: 'a', 'Figueira da Foz': 'a', Batalha: 'a', 'Marinha Grande': 'a', 'Nazaré': 'a', 'Caniço': 'o',
   Maia: 'a', Trofa: 'a', 'Póvoa de Varzim': 'a', 'Póvoa de Lanhoso': 'a',
+  'Lousã': 'a', 'Pampilhosa da Serra': 'a',
 };
 
 describe('preposição das cidades', () => {

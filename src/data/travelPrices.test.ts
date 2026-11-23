@@ -41,7 +41,7 @@ describe('travel fees shared by quote and SEO pages', () => {
     expect(locationPrices.Coimbra).toBe(10);
     expect(EXTENDED_TRIP_CITIES.has('Coimbra')).toBe(false);
     expect(locationPrices['Figueira da Foz']).toBe(20);
-    expect(cities.filter(city => city.area === 'coimbra').map(city => city.name).sort()).toEqual(['Alcobaça', 'Batalha', 'Coimbra', 'Figueira da Foz', 'Fátima', 'Leiria', 'Marinha Grande', 'Nazaré', 'Ourém', 'Pombal', 'Porto de Mós']);
+    expect(cities.filter(city => city.area === 'coimbra').map(city => city.name).sort()).toEqual(['Alcobaça', 'Arganil', 'Batalha', 'Cantanhede', 'Coimbra', 'Condeixa-a-Nova', 'Figueira da Foz', 'Fátima', 'Góis', 'Leiria', 'Lousã', 'Marinha Grande', 'Mira', 'Miranda do Corvo', 'Montemor-o-Velho', 'Nazaré', 'Oliveira do Hospital', 'Ourém', 'Pampilhosa da Serra', 'Penacova', 'Penela', 'Pombal', 'Porto de Mós', 'Soure', 'Tábua', 'Vila Nova de Poiares']);
     expect(locationPrices.Leiria).toBe(10);
   });
 });

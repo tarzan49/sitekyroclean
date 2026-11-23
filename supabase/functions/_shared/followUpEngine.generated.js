@@ -187,6 +187,11 @@ var PACK_PERK_BULLETS = [
   "Uma só deslocação para a visita toda, cobrada uma única vez."
 ];
 
+// src/constants/travel.ts
+var SMALL_ORDER_FAR_SURCHARGE = 10;
+var SMALL_ORDER_FAR_MIN = 49;
+var SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
+
 // src/components/quiz/QuizTypes.ts
 var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },

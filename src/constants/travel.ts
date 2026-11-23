@@ -39,6 +39,23 @@ export const locationPrices: Record<string, number> = {
   // alargada: saiu de EXTENDED_TRIP_CITIES.
   'Coimbra': 10,
   'Figueira da Foz': 20, // ~45 min pela A14
+  // Dono, 2026-11-24: concelhos do distrito de Coimbra pelos escalões de 28/09, por distância de carro ao
+  // centro de Coimbra: até ~30 km 15€, mais longe 20€.
+  'Condeixa-a-Nova': 15,
+  'Penacova': 15,
+  'Miranda do Corvo': 15,
+  'Lousã': 15,
+  'Montemor-o-Velho': 15,
+  'Vila Nova de Poiares': 15,
+  'Cantanhede': 15,
+  'Penela': 20,
+  'Soure': 20,
+  'Mira': 20,
+  'Góis': 20,
+  'Arganil': 20,
+  'Tábua': 20,
+  'Oliveira do Hospital': 20,
+  'Pampilhosa da Serra': 20,
   // Dono, 2026-11-15: escalões pelo centro de Leiria (como Braga):
   // centro 10€, arredores próximos (até ~15 km) 15€, mais longe 20€.
   'Leiria': 10,

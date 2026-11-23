@@ -1133,3 +1133,10 @@ O bot passou para a API direta da Meta a 23 Nov (22h). A 360dialog é cancelada 
 
 ### Questionário: horas (dono, 24 Nov 2026)
 "AS HORAS PARA PORTO E LISBOA SAEM LOGO SE O ORÇAMENTO JA TIVER VALOR SE FOR SOB ORÇAMENTO E ELA SOUBER O VALOR PELO CHAT DAS AS HORAS A FORMA QUE EU TE MANDEI." A mensagem automática do questionário fica como está ("Já lhe envio de seguida as horas que temos livres."; mudei-a sem ordem a 23/11 e foi reposta). Com valor: a seguir, as provas, o extra e as duas horas. Sob orçamento: orçamento, extra, "Qual das opções", horas depois de escolher. Na API oficial, a quem ainda não escreveu só se pode mandar o modelo `seguimento_cliente_kyro`; a 23/11 três pedidos receberam-no 4 a 13 h depois (360dialog sem saldo) e o funil a seguir falhou "Fora das 24 h". Dono: "Sim, as horas dentro": nesse caso as duas horas da bot-api substituem a promessa dentro da própria mensagem (Porto e Lisboa, pedidos com valor; com askTeam, askWeek, sexta ou dono, a mensagem fica como está), e o funil sai quando o cliente responder.
+
+## Deslocação no distrito de Coimbra (dono, 24 Nov 2026)
+
+Os 15 concelhos do distrito de Coimbra acrescentados a 23 Nov ao `botAvailability` (Tábua, cliente Vitor, caía em "Localidade fora da lista") entram em `locationPrices` e `cities` (área coimbra, equipa Coimbra, askTeam) pelos escalões do dono de 28/09 (Coimbra 10€, arredores 15€, mais longe 20€), por distância de carro ao centro de Coimbra:
+- 15€ (até ~30 km): Condeixa-a-Nova, Penacova, Miranda do Corvo, Lousã, Montemor-o-Velho, Vila Nova de Poiares, Cantanhede.
+- 20€: Penela, Soure, Mira, Góis, Arganil, Tábua, Oliveira do Hospital, Pampilhosa da Serra.
+Saiu a nota "deslocação ainda por definir: não dês valor de deslocação" (`COIMBRA_DISTRICT_FEE_NOTE`); `COIMBRA_DISTRICT_NO_FEE` fica só para os nomes curtos (Condeixa, Poiares). Ao Vitor já se disse "sem deslocação": para ele mantém-se (preço já dado ganha). As páginas de SEO das 15 cidades passam a existir (+360 rotas).

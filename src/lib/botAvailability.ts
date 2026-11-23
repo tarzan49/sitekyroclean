@@ -942,9 +942,10 @@ function suggestionText(slots: Slot[]): string {
 }
 
 /**
- * Concelhos of the Coimbra district with no entry in locationPrices yet (owner, 23 Nov 2026: Tábua, Vitor, fell into
- * "Localidade fora da lista" with no askTeam). Same treatment as Coimbra (askTeam 'Coimbra'); the travel fee is still
- * to be set by the owner, so the bot says it is confirmed with the hour. Mortágua is Viseu, Mealhada Aveiro: not here.
+ * Concelhos of the Coimbra district (owner, 23 Nov 2026: Tábua, Vitor, fell into "Localidade fora da lista" with no
+ * askTeam). Same treatment as Coimbra (askTeam 'Coimbra'). Since 24 Nov they are in locationPrices and `cities`
+ * (15€/20€ by distance to Coimbra); this list only catches the short names (Condeixa, Poiares) and spellings that
+ * resolveBotCity misses. Mortágua is Viseu, Mealhada Aveiro: not here.
  */
 export const COIMBRA_DISTRICT_NO_FEE = ['Tábua', 'Oliveira do Hospital', 'Arganil', 'Lousã', 'Miranda do Corvo', 'Penacova',
   'Condeixa-a-Nova', 'Condeixa', 'Cantanhede', 'Mira', 'Montemor-o-Velho', 'Soure', 'Penela', 'Góis', 'Pampilhosa da Serra',
@@ -954,7 +955,6 @@ export function coimbraDistrictTown(input: unknown): string | null {
   const t = ` ${input.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, ' ')} `;
   return COIMBRA_DISTRICT_NO_FEE.find(n => t.includes(` ${n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, ' ')} `)) ?? null;
 }
-export const COIMBRA_DISTRICT_FEE_NOTE = 'deslocação ainda por definir pelo dono para esta localidade: não dês valor de deslocação, diz que a confirmamos com a hora';
 
 export function botAvailability(req: AvailabilityRequest, events: AvailabilityEvent[], now: Date, rules: readonly DayRule[] = DAY_RULES): AvailabilityResult {
   const city = resolveBotCity(req?.city);
@@ -971,7 +971,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   }
   if (!city) {
     const town = coimbraDistrictTown(req?.city);
-    if (town && req.ownerTime !== true) return { ...base, city: town, region: 'Coimbra', teams: [], handToOwner: `${askTeamRule('Coimbra')} (${COIMBRA_DISTRICT_FEE_NOTE})`, askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Coimbra' };
+    if (town && req.ownerTime !== true) return { ...base, city: town, region: 'Coimbra', teams: [], handToOwner: askTeamRule('Coimbra'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Coimbra' };
     return { ...base, region: null, teams: [], handToOwner: 'Localidade fora da lista: confirmar com o responsável' };
   }
   const area = CITY_REGION.get(fold(city));
