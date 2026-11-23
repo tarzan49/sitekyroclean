@@ -1130,3 +1130,6 @@ Email do questionário: responde-se com a mensagem automática que já existia e
 
 ### 360dialog
 O bot passou para a API direta da Meta a 23 Nov (22h). A 360dialog é cancelada antes de 30 Nov (dono, 23 Nov: "é obrigatório"), depois de o cartão ficar na conta do WhatsApp na Meta.
+
+### Questionário: horas (dono, 24 Nov 2026)
+"AS HORAS PARA PORTO E LISBOA SAEM LOGO SE O ORÇAMENTO JA TIVER VALOR SE FOR SOB ORÇAMENTO E ELA SOUBER O VALOR PELO CHAT DAS AS HORAS A FORMA QUE EU TE MANDEI." A mensagem automática do questionário fica como está ("Já lhe envio de seguida as horas que temos livres."; mudei-a sem ordem a 23/11 e foi reposta). Com valor: a seguir, as provas, o extra e as duas horas. Sob orçamento: orçamento, extra, "Qual das opções", horas depois de escolher. Na API oficial, a quem ainda não escreveu só se pode mandar o modelo `seguimento_cliente_kyro`; a 23/11 três pedidos receberam-no 4 a 13 h depois (360dialog sem saldo) e o funil a seguir falhou "Fora das 24 h". Dono: "Sim, as horas dentro": nesse caso as duas horas da bot-api substituem a promessa dentro da própria mensagem (Porto e Lisboa, pedidos com valor; com askTeam, askWeek, sexta ou dono, a mensagem fica como está), e o funil sai quando o cliente responder.
