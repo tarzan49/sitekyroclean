@@ -384,7 +384,7 @@ export const VIANA_ASK_TEAM_RULE = 'Viana do Castelo (limpezas abaixo de 100€)
  * q perguntar a equipa (foto + detalhe do serviço + disponibilidade)"): these zones never get hours from the calendar;
  * the bot asks the team (perguntar_equipa) and the hour is the team's. Aveiro (owner, 19 Nov 2026: "Equipa Porto 3 OU Porto 2"): Denise first, then Aleixo.
  */
-export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra' | 'Aveiro';
+export type AskTeam = 'Viana' | 'Funchal' | 'Leiria' | 'Coimbra' | 'Aveiro' | 'Porto 1';
 export const askTeamRule = (team: AskTeam) => team === 'Viana' ? VIANA_ASK_TEAM_RULE
   : `${team}: nunca dar horas sem perguntar primeiro à equipa de ${team}, com a fotografia ou o vídeo do artigo, o detalhe do serviço e a pedir a disponibilidade; a hora dada ao cliente é a que a equipa disser.`;
 /**
@@ -979,6 +979,14 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
       handToOwner: VIANA_ASK_TEAM_RULE,
       askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Viana' };
   }
+  // Owner, 23 Nov 2026: Porto 1 waterproofing in the Braga zone and Viana asks Manel first (photo + detail +
+  // availability, askTeam 'Porto 1'); the hour is his, tomorrow at the earliest. Other teams there: hours from tomorrow.
+  if (req.ownerTime !== true && (area === 'Braga' || city === 'Viana do Castelo') && hasWaterproofing(req.items)) {
+    const total = orderTotal(req, city);
+    const day = typeof req.date === 'string' && DATE.test(req.date) ? req.date : addDays(lisbon(now.getTime()).date, 1);
+    const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, day)];
+    if (teams[0] === 'Porto 1') return { ...base, region: area, teams, handToOwner: askTeamRule('Porto 1'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Porto 1' };
+  }
   // Owner, 22 Nov 2026 (Roberto): "tu podes marcar na mesma uma hora e eu aprovo a hora final": Porto and Braga
   // waterproofing get hours like any other job (the 18 Nov askWeek rule is retired); he approves on the calendar.
   // Aveiro (owner, 19 Nov 2026: "Serviços em aveiro tb precisamos de saber a disponibilidade" + "Equipa Porto 3"): the
@@ -987,6 +995,8 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   if (req.ownerTime !== true && city === 'Aveiro') {
     return { ...base, region: area, teams: ['Porto 3', 'Porto 2'], handToOwner: askTeamRule('Aveiro'), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: 'Aveiro' };
   }
+  // Owner, 23 Nov 2026 (correction): the Leiria zone never gets hours. Waterproofing (Lisboa 1) never asks the team:
+  // the owner gives the hour (askWeek); cleanings ask the Leiria team.
   if (req.ownerTime !== true && WATERPROOFING_ASK_WEEK_CITIES.has(city) && hasWaterproofing(req.items)) {
     const total = orderTotal(req, city);
     const teams = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, addDays(lisbon(now.getTime()).date, 1))];

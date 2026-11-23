@@ -1074,7 +1074,8 @@ Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com 
 - Viana do Castelo: limpezas de 100€ ou mais vão para a equipa Braga, com o calendário dela e horas reais, também para hoje (`VIANA_ASK_TEAM_BELOW` em `botAvailability.ts`). `[RETIRADA 23/11]` "Viana do Castelo, tudo sem horas" (18 Nov).
 - Impermeabilização na zona de Braga e em Viana (Porto 1): nunca no próprio dia, a mais cedo é amanhã (`noSameDay`). Porto (limpezas e impermeabilizações) e limpezas de Braga: horas para hoje permitidas. `[RETIRADA 23/11]` "a Premium do Porto e Braga nunca no próprio dia" (22 Nov).
 - Bug corrigido no mesmo dia: o `perguntar_equipa` mandava todas as zonas para o contacto da LigLav; agora cada zona vai ao seu (`TEAM_ASK_CHATS`: Funchal, Leiria, Coimbra, Aveiro = Porto 3) e o `total` passa à `availability`.
-- Por decidir: o contacto para a pergunta à equipa nas impermeabilizações de Braga/Viana (Porto 1) e nas impermeabilizações da zona de Leiria (Lisboa 1), e no Algarve; até lá Braga/Viana dão horas a partir de amanhã, Leiria e Algarve continuam como estavam.
+- Respostas do dono (23 Nov): impermeabilização da Porto 1 na zona de Braga e em Viana = pergunta-se primeiro ao Manel (`askTeam: 'Porto 1'`, número de `PROCEDURE_ONLY_TO`), a mais cedo amanhã; as outras equipas aí dão horas a partir de amanhã. Zona de Leiria: sem horas em tudo; limpezas perguntam à equipa de Leiria, impermeabilização (Lisboa 1) nunca pergunta a ninguém, o dono dá a hora (askWeek). Algarve: o dono confirma (fridayOnly), sem perguntar à equipa.
+- Os textos ao cliente e à resposta da equipa (`CLIENT_WAIT_TEXT`, `TEAM_ASK_FEEDBACK`, `equipaRespondeu`) já não dizem "equipa de Viana" nas outras zonas.
 
 ## Manchas antigas e pelo gasto (dono, 23 Nov 2026, Antónia Venda)
 

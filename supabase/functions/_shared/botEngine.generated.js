@@ -3535,6 +3535,12 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       askTeam: "Viana"
     };
   }
+  if (req.ownerTime !== true && (area === "Braga" || city === "Viana do Castelo") && hasWaterproofing(req.items)) {
+    const total = orderTotal(req, city);
+    const day = typeof req.date === "string" && DATE.test(req.date) ? req.date : addDays(lisbon(now.getTime()).date, 1);
+    const teams2 = [...teamsForCity(city, area, waterproofingKind(req.items, total), total, day)];
+    if (teams2[0] === "Porto 1") return { ...base, region: area, teams: teams2, handToOwner: askTeamRule("Porto 1"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Porto 1" };
+  }
   if (req.ownerTime !== true && city === "Aveiro") {
     return { ...base, region: area, teams: ["Porto 3", "Porto 2"], handToOwner: askTeamRule("Aveiro"), askWeek: true, askWeekRule: ASK_WEEK_RULE, askTeam: "Aveiro" };
   }

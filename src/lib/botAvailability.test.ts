@@ -278,7 +278,8 @@ describe('two-person teams and the team the bot books on', () => {
     expect(chooseTeam([], 'Porto', ...at15, true)).toBe('Porto 1');
     const premium = [{ kind: 'sofa', qty: 1, treatment: 'premium' }];
     // Denise (Porto 3) does no waterproofing (owner, 28 Oct 2026: "se for imper ou imper e limpeza tem q ser porto 1").
-    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).teams).toEqual(['Porto 2']);
+    // Dono, 23 Nov 2026: Porto 1 na zona de Braga = pergunta-se primeiro ao Manel.
+    expect(ok(botAvailability({ city: 'Guimarães', items: premium, date: '2026-10-08' }, [], NOW)).askTeam).toBe('Porto 1');
     expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Guimarães', ...at15, true)).toBeNull();
     expect(chooseTeam([porto1('15:00', '16:00', 'Ana')], 'Porto', ...at15, true)).toBeNull();
     expect(ok(botAvailability({ city: 'Guimarães', items: [{ kind: 'sofa', qty: 1 }], date: '2026-10-08' }, [], NOW)).teams).toEqual(['Braga']);
@@ -455,7 +456,8 @@ describe('Porto 1 closed from 6 Nov 2026, 20:00', () => {
     for (const city of ['Porto', 'Guimarães']) {
       const r = ok(botAvailability({ city, items: premium }, [], now));
       expect(r.teams).toEqual(['Porto 1']);
-      expect(r.askWeek).toBeUndefined(); // gives hours; owner approves on the calendar (22 Nov 2026)
+      // Porto: hours, owner approves (22 Nov); Braga zone: ask Manel first (askTeam 'Porto 1', dono 23 Nov).
+      expect(r.askTeam).toBe(city === 'Porto' ? undefined : 'Porto 1');
     }
     expect(ok(botAvailability({ city: 'Porto', items: [{ kind: 'sofa', qty: 1, treatment: 'clean' }] }, [], now)).teams).not.toContain('Porto 1');
     expect(chooseTeam([], 'Porto', '2026-12-01T10:00:00Z', '2026-12-01T12:00:00Z', 'premium', false, 300)).toBe('Porto 1');
@@ -564,10 +566,9 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
     const r = ok(botAvailability({ city: 'Viana do Castelo', items: cleaning, total: 89 }, [], now));
     expect([r.free, r.suggestion, r.askWeek, r.askTeam]).toEqual([[], null, true, 'Viana']);
     expect(r.handToOwner).toMatch(/perguntar primeiro à equipa de Viana/);
-    // Dono, 22 Nov 2026 (Rosângela): a impermeabilização em Viana é da Porto 1, com horas, sem perguntar à LigLav.
+    // Dono, 23 Nov 2026: a impermeabilização em Viana é da Porto 1 e pergunta-se primeiro ao Manel (askTeam 'Porto 1').
     const imper = ok(botAvailability({ city: 'Viana do Castelo', items: premium, total: 249 }, [], now));
-    expect([imper.askTeam, imper.askWeek, imper.teams]).toEqual([undefined, undefined, ['Porto 1']]);
-    expect(imper.free.length).toBeGreaterThan(0);
+    expect([imper.askTeam, imper.teams]).toEqual(['Porto 1', ['Porto 1']]);
     // Equipa Viana (dono, 18 Nov 2026): as limpezas de Viana são dela, a impermeabilização fica nas equipas do Porto.
     expect(ok(botAvailability({ city: 'Viana do Castelo', items: cleaning }, [], now)).teams).toEqual(['Viana']);
     expect(ok(botAvailability({ city: 'Viana do Castelo', items: premium }, [], now)).teams).not.toContain('Viana');
@@ -585,9 +586,9 @@ describe('impermeabilização em Viana, Leiria e Funchal: fecha sem hora; Algarv
   it('Porto e Braga: impermeabilização dá horas, o dono aprova depois (dono, 22 Nov 2026, Roberto)', () => {
     for (const city of ['Matosinhos', 'Porto', 'Braga']) {
       const r = ok(botAvailability({ city, items: premium, days: 14 }, [], new Date('2026-11-23T08:00:00Z')));
-      expect(r.askWeek, city).toBeUndefined();
-      // Dono, 23 Nov 2026: só a zona de Braga (e Viana) nunca no próprio dia; o Porto pode.
-      if (city === 'Braga') expect(r.free.every((f: { date?: string }) => !f.date || f.date > '2026-11-23'), city).toBe(true);
+      if (city !== 'Braga') expect(r.askWeek, city).toBeUndefined();
+      // Dono, 23 Nov 2026: o Porto pode no próprio dia; na zona de Braga a Porto 1 pergunta primeiro ao Manel.
+      if (city === 'Braga') expect(r.askTeam, city).toBe('Porto 1');
     }
   });
 });
@@ -650,10 +651,11 @@ describe('mesmo dia (dono, 23 Nov 2026)', () => {
     expect([r.askTeam, r.teams]).toEqual([undefined, ['Braga']]);
     expect(r.free.length).toBeGreaterThan(0);
   });
-  it('impermeabilização em Braga e Viana nunca no próprio dia; no Porto pode', () => {
+  it('impermeabilização em Braga e Viana: Porto 1 pergunta ao Manel; Essencial (outra equipa) a partir de amanhã', () => {
     for (const city of ['Braga', 'Viana do Castelo']) {
-      const r = botAvailability({ city, items: premium, total: 249, days: 14 } as never, [], at) as { free: { date?: string }[] };
-      expect(r.free.length, city).toBeGreaterThan(0);
+      expect((botAvailability({ city, items: premium, total: 249 } as never, [], at) as { askTeam?: string }).askTeam, city).toBe('Porto 1');
+      const r = botAvailability({ city, items: [{ kind: 'sofa', size: '3-lugares', treatment: 'essencial' }], days: 14 } as never, [], at) as { free: { date?: string }[]; askTeam?: string };
+      if (r.askTeam) continue;
       expect(r.free.every(f => !f.date || f.date > '2026-11-24'), city).toBe(true);
     }
   });
