@@ -1101,7 +1101,7 @@ Regra: qualquer telemóvel português que apareça na conversa é procurado tamb
 
 ### Tempos de resposta (dono, 23 Nov 2026)
 
-Dono: "uma resposta tem que demorar 10/15 segundos se for algo rápido e no máximo 49 segundos se for algo demorado para escrever". Substitui a regra de 17 Nov onde contradiz. Medido a 23 Nov antes da correção: mensagem → 1.ª bolha mediana 36 s, → última bolha 59 s. Causas: bolhas de 10 s + 100 ms/carácter até 30 s; alvo de 49 s na 1.ª resposta de cada conversa; `claude -p` em esforço médio em todas; reescritas completas nos travões; fila de 3 escritas. Correções no kyro-bot (14a4b98): bolhas 1,5–5 s (~30 ms/carácter), 1.ª bolha logo que pronta com mínimo de 8 s desde a mensagem, provas 1–2 s entre si, respostas leves (cliente sem pedido de preço, horas, dia, peça ou fotografia) em `--effort low` e 6 turnos, prazo de 40 s para a reescrita (sai a 1.ª versão se não tiver travão grave: valor, hora/dia, opções, desconto, reserva), e `output.timing` (`calls_ms`, `rewrites`) em cada `bot_drafts`.
+Dono: "uma resposta tem que demorar 10/15 segundos se for algo rápido e no máximo 49 segundos se for algo demorado para escrever". Substitui a regra de 17 Nov onde contradiz. Medido a 23 Nov antes da correção: mensagem → 1.ª bolha mediana 36 s, → última bolha 59 s. Causas: bolhas de 10 s + 100 ms/carácter até 30 s; alvo de 49 s na 1.ª resposta de cada conversa; `claude -p` em esforço médio em todas; reescritas completas nos travões; fila de 3 escritas. Correções no kyro-bot (14a4b98): bolhas 1,5–5 s (~30 ms/carácter), 1.ª bolha logo que pronta com mínimo de 8 s desde a mensagem, provas 1–2 s entre si, respostas leves (cliente sem pedido de preço, horas, dia, peça ou fotografia) em `--effort low`, prazo de 40 s para a reescrita (sai a 1.ª versão se não tiver travão grave: valor, hora/dia, opções, desconto, reserva), e `output.timing` (`calls_ms`, `rewrites`) em cada `bot_drafts`.
 
 ### Correções de 23 Nov 2026 (Vitor, Tábua)
 
@@ -1109,3 +1109,24 @@ Dono: "uma resposta tem que demorar 10/15 segundos se for algo rápido e no máx
 - Concelhos do distrito de Coimbra sem entrada em `locationPrices` (Tábua, Oliveira do Hospital, Arganil, Lousã, Miranda do Corvo, Penacova, Condeixa-a-Nova, Cantanhede, Mira, Montemor-o-Velho, Soure, Penela, Góis, Pampilhosa da Serra, Vila Nova de Poiares): `askTeam: 'Coimbra'` como Coimbra, deslocação por definir pelo dono (`COIMBRA_DISTRICT_NO_FEE` em `botAvailability.ts`). Mortágua é Viseu e Mealhada é Aveiro: ficam de fora.
 - Provas: "sem a limpeza" já não traz vídeo de limpeza (`dropNegated`); nunca mais de 2 provas (sai primeiro o antes/depois).
 - Travão: "continuam disponíveis"/"mantêm-se" sobre horas que nunca enviámos = reescrever (`stillAvailableIssues`).
+
+## Funil único para todos os contactos (dono, 23 Nov 2026, noite)
+
+O dono passou o dia a ver o bot sem intervir. Falhas que viu: emails do questionário por responder há dias, 5 a 6 fotografias/vídeos de uma vez ("as pessoas olham e dizem: aquilo é IA"), descontos que não existem, colchões sem upsell de anti-ácaros e sofás sem upsell de impermeabilização, mensagens pouco claras, e a mulher do Roberto tratada como orçamento novo quando ele tinha escrito na conversa que já estava tudo combinado com ela.
+
+Regra (vale para questionário, WhatsApp, anúncios e email, sem exceção):
+1. Orçamento detalhado de cada artigo pedido.
+2. Uma prova por artigo pedido, nunca mais: fotografia de antes e depois escolhida pelo dono, editada como ele quer: nas palavras dele, sofá = "2 fotografias na horizontal"; colchão, cadeiras, tapete e alcatifa = "2 fotografias na vertical". Impermeabilização = só o vídeo da Pepsi (`video-pepsi-sofa`). Acabaram-se os vídeos do processo: só se o cliente perguntar "como funciona?".
+3. Sugestão de upsell com os benefícios e um gancho ligado ao cliente: inverno = proteção anti-manchas e anti-líquidos; alergias = anti-ácaros; cheiro de cão/animais = anti-odor. Vídeo no upsell só se for impermeabilização.
+4. "Qual das opções faz mais sentido para si?"
+5. Só depois de o cliente escolher: "Temos disponibilidade [dia] às [hora] ou [hora]."
+Email do questionário: responde-se com a mensagem automática que já existia e, nela, este funil.
+
+### [RETIRADA 23/11] Provas no orçamento (dono, 7 Nov)
+"limpeza = vídeo do problema do cliente (anúncio aprovado com a 1.ª frase do problema, pontos no fim) + antes/depois" deixou de valer: a limpeza leva só o antes/depois do artigo.
+
+### [RETIRADA 23/11] Funil compacto do questionário (17 e 19 Nov)
+"1 texto com preço de cada artigo e horas + 1 prova, sem upsell até responder" e "vaga, prova e fotografia das peças, sem voltar a vender" deixaram de valer: o questionário leva o funil único, com upsell, e as horas só depois de o cliente escolher.
+
+### 360dialog
+O bot passou para a API direta da Meta a 23 Nov (22h). A 360dialog é cancelada antes de 30 Nov (dono, 23 Nov: "é obrigatório"), depois de o cartão ficar na conta do WhatsApp na Meta.
