@@ -564,7 +564,7 @@ var SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da
 var SATISFACTION_PROMISE = "Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Após esse prazo, esta garantia comercial de repetição deixa de se aplicar, sem prejuízo dos direitos legais.";
 var PRICE_PROMISE = "A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.";
 var DEPOSIT_MIN_EUR = 20;
-var DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável.`;
+var DEPOSIT_RULE = `Para reservas com mais de 2 semanas de antecedência pedimos um sinal de 15% (mínimo ${DEPOSIT_MIN_EUR}€), pago por MB Way ou transferência, que desconta no total. A data fica reservada quando recebemos o comprovativo. O sinal não é reembolsável; se remarcar, passa para a nova data.`;
 var AVAILABILITY_PROMISE = "Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.";
 var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.";
 var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
@@ -2567,8 +2567,10 @@ function sameVisitPieces(input) {
   const extras = [typeof input.puffs === "number" && input.puffs > 0, typeof input.armchairs === "number" && input.armchairs > 0, Array.isArray(input.headboards) && input.headboards.length > 0].filter(Boolean).length;
   return items + extras;
 }
+var SAME_VISIT_SPECIAL_RETIRED = true;
 function withSameVisitSpecial(input, r) {
   const none = { ...r, sameVisitSpecial: null };
+  if (SAME_VISIT_SPECIAL_RETIRED) return none;
   if (!input || typeof input !== "object") return none;
   const inp = input;
   const q = r;

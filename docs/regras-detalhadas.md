@@ -1057,3 +1057,6 @@ O bot deu 159/99€ (3 lugares) a um sofá de 6 lugares com chaise que tinha vis
 Dono: "pedidos acima de 300 euros pedir um sinal", depois "o sinal é não reembolsável", "tem de ser para clientes com reservas com mais de 2 semanas de antecedência", "não existe valor mínimo". Aceitou 15% com mínimo de 20€ e a opção A (sem pagamento no site: o bot pede o sinal por MB Way/transferência). O site diz a regra nas FAQ (`sinal`) e na política de devoluções. Falta decidir se uma remarcação mantém o sinal.
 
 Dono, 23 Nov: "Sim, passa": numa remarcação o sinal passa para a nova data.
+
+### [RETIRADA 23/11] Condição especial da mesma visita (`sameVisitSpecial`)
+Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com o colchão de casal o motor fez 149€ × 0,9 = 134€ → 129€ (a acabar em 9, para baixo), o colchão ficou a 35€. "REMOVE ESSA CONDICAO". Desde 23/11: várias peças = soma da tabela, sem condição; desconto só pelo `askedDiscount`. `SAME_VISIT_SPECIAL_RETIRED` em `botQuote.ts`; kyro-bot `tests/regras-retiradas.test.ts`. À Joana: 149€, colchão a 55€ em vez de 79€ (mensagem do dono).

@@ -513,8 +513,12 @@ function sameVisitPieces(input: Record<string, unknown>): number {
   const extras = [typeof input.puffs === 'number' && input.puffs > 0, typeof input.armchairs === 'number' && input.armchairs > 0, Array.isArray(input.headboards) && input.headboards.length > 0].filter(Boolean).length;
   return items + extras;
 }
+export const SAME_VISIT_SPECIAL_RETIRED = true;
 function withSameVisitSpecial<T extends { ok: boolean }>(input: unknown, r: T): T & { sameVisitSpecial: (SameVisitPrice & { options: { cleaning: SameVisitPrice | null; premium: SameVisitPrice | null; essencial: SameVisitPrice | null }; rule: string }) | null } {
   const none = { ...r, sameVisitSpecial: null };
+  // RETIRADA 23/11 (dono, Joana Duarte: sofá 94€ + colchão = 129€, colchão de casal a 35€): sem condição
+  // especial da mesma visita; cada peça a preço de tabela, somado.
+  if (SAME_VISIT_SPECIAL_RETIRED) return none;
   if (!input || typeof input !== 'object') return none;
   const inp = input as Record<string, unknown>;
   const q = r as unknown as { ok: boolean; blackFriday?: unknown; mattressMiteOffer?: unknown; antiMiteGift?: unknown; rugCombo?: { ok?: boolean; travelWaived?: number } | null };
