@@ -421,10 +421,10 @@ describe('o que muda nos calendários das equipas', () => {
       expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
       expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
       expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
-      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra', 'Lavanda = Equipa Viana']) {
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Grafite = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Banana = Equipa Algarve', 'Flamingo = Equipa Coimbra', 'Lavanda = Equipa Viana', 'Pavão = Equipa Funchal 1']) {
         expect(mensagem.texto).toContain(linha);
       }
-      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa algarve", "equipa coimbra" ou "equipa viana"');
+      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa porto 3", "equipa braga", "equipa lisboa 1", "equipa algarve", "equipa coimbra", "equipa viana" ou "equipa funchal 1"');
       expect(gs.mensagemParaDono(primeira.novos.slice(0, 1)).assunto).toBe('Escolhe a equipa deste serviço');
     });
   });
