@@ -92,6 +92,9 @@ export function planBookingUpdate(ev: BookingEvent, phone: string, c: BookingCha
     if (c.keepTime) return { ok: false, reason: `a nota diz que o cliente escolheu as ${hm(chosen.minutes)}, o evento está às ${hm(evDay.minutes)}: o dono muda a hora` };
     c = { ...c, date: c.date ?? evDay.date, time: hm(chosen.minutes) };
   }
+  // A new day without an hour ("quinta-feira, dia 26, à tarde") moves the event to that day at its own hour; never left
+  // on the old day (owner, 23 Nov 2026, Maria José: Algarve moved from Friday to Thursday, the event stayed on Friday).
+  if (!c.keepTime && c.date && !c.time && /^\d{4}-\d{2}-\d{2}$/.test(c.date) && c.date !== evDay.date) c = { ...c, time: hm(evDay.minutes) };
   if (c.keepTime) c = { ...c, date: undefined, time: undefined };
   let start = ev.start, end = ev.end, moved = false;
   if (c.date && c.time && /^\d{4}-\d{2}-\d{2}$/.test(c.date) && /^\d{1,2}:\d{2}$/.test(c.time)) {

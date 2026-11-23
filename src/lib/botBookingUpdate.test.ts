@@ -10,6 +10,11 @@ const ev = {
 const now = new Date('2026-10-15T18:42:00Z');
 
 describe('planBookingUpdate', () => {
+  it('a new day without an hour moves the event to that day at its own hour (Maria José, Algarve, 23 Nov)', () => {
+    const p = planBookingUpdate(ev, '914000111', { date: '2026-10-16' }, now);
+    if (!p.ok) throw new Error(p.reason);
+    expect([p.start, p.end, p.moved]).toEqual(['2026-10-16T08:00:00.000Z', '2026-10-16T09:00:00.000Z', true]);
+  });
   it('an hour the client chose moves the event on its own day, never only a note (Lisboa 1, Amadora, 21 Nov)', () => {
     const e = { ...ev, description: 'Equipa: Porto 1\nHora por confirmar: 9h ou 13h\n\nbot:x' };
     const byTime = planBookingUpdate(e, '914000111', { time: '13:00' }, now);
