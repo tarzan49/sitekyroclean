@@ -1080,3 +1080,11 @@ Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com 
 ## Manchas antigas e pelo gasto (dono, 23 Nov 2026, Antónia Venda)
 
 Manchas antigas, já esfregadas ou de origem desconhecida, e pelo gasto: o bot nunca afirma o resultado. Diz que a mancha pode sair ou ficar muito mais clara, mas que "não conseguimos dar a garantia de que saia por completo". Estreita a regra de 17 Nov ("nunca 'não garantimos'") só nestes casos; o travão `noPromise` do kyro-bot não apanha esta frase.
+
+### Duas peças na mesma conversa: o dia novo é da peça da última pergunta (dono, 23 Nov 2026, Antónia Venda)
+
+A Antónia tinha o tapete da cama (62€, Águas Santas) marcado para terça 24/11 às 10h e pedia orçamento para a carpete de Lourosa (99€) de uma cliente dela. Às 14:24 (hora de Portugal) saiu-lhe a pergunta "já tem a disponibilidade da sua cliente para a carpete de Lourosa? Temos amanhã às 9h ou às 12h"; ela respondeu "Não pode tem de ser Sexta pelas 19h". O bot leu isso como sendo para o tapete da cama, confirmou-lhe "Fica o tapete da cama para sexta às 19h" e o evento passou para 27/11 às 19h. Essa pergunta das 14:24 não ficou na base do bot (há o estado "sent" da Meta, mas nenhuma mensagem gravada), por isso o bot nem a viu. Dono: "criaste uma confusão do crl no serviço de amanhã às 10".
+
+Regra: com duas peças ou dois serviços na conversa, um dia ou hora novos são da peça sobre a qual fizemos a última pergunta. Nunca se muda um serviço já marcado sem o cliente dizer que é esse; na dúvida pergunta-se numa linha ("É para a carpete de Lourosa ou para o tapete da cama?") e o marcado fica como está. Camadas: bot S62, `bot-contract.md`, leitor do calendário (kyro-bot `src/bot/bookingUpdate.ts`: sem date/time quando há outra peça na conversa e o cliente não nomeou esta; uma confirmação nossa não chega).
+
+Corrigido no dia: evento de volta a 24/11 às 10h e mensagem à Antónia com as duas marcações e o pedido da morada de Lourosa.
