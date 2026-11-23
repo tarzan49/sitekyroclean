@@ -703,7 +703,7 @@ function comboOf(rug, othersPrice) {
     usualPrice,
     comboPrice,
     travelWaived: usualPrice - comboPrice,
-    rule: "Lavagem em casa, na mesma visita: comboPrice = preço de tabela de cada peça, sem desconto na linha do tapete. A condição especial da mesma visita vem só no fim, sobre o total (sameVisitSpecial). Depois a impermeabilização como opção, a prova e as horas."
+    rule: "Lavagem em casa, na mesma visita: comboPrice = preço de tabela de cada peça, sem desconto na linha do tapete. Várias peças = soma da tabela, sem condição especial. Depois a impermeabilização como opção, a prova e as horas."
   };
 }
 var ASSUMED_NOTE = "Material por confirmar: este é o preço de tapete comum (microfibra, sintético). Dá-o já e acrescenta numa frase curta que, se o tapete for de juta ou sisal, o valor é ajustado (a lã paga o mesmo). Se a fotografia mostrar claramente juta, sisal, seda, viscose ou persa, recalcula com esse material antes de responder. ";
@@ -2544,73 +2544,7 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withAskedDiscount(input, withSameVisitSpecial(input, withBlackFridayPrices(input, botQuoteCore(input))));
-}
-var SAME_VISIT_SPECIAL_FACTOR = 0.9;
-var SAME_VISIT_SPECIAL_MIN_PIECES = 2;
-var SAME_VISIT_SPECIAL_RULE = 'Várias peças na mesma visita: dá cada peça ao preço de tabela (lines, cabeceiras, puffs, cadeirões) e no fim, numa linha, "Condição especial na mesma visita: fica tudo por [total]€ (em vez de [normal]€)." Com opções, faz o mesmo em cada uma (Só a limpeza / Premium / Essencial) com os valores de options. Nunca percentagem nem a palavra desconto, nunca o desconto numa peça. Sem outra condição por cima (nem askedDiscount nem bigOrder).';
-var sameVisitEnd9 = (v) => Math.floor((v + 1) / 10) * 10 - 1;
-function sameVisitSpecialPrice(normal) {
-  return sameVisitEnd9(Math.floor(normal * SAME_VISIT_SPECIAL_FACTOR * 100) / 100);
-}
-function finalOrderPrice(r) {
-  const q = r;
-  if (!q.ok || q.handToOwner) return null;
-  const base = q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : !q.quote && typeof q.total === "number" ? q.total : null;
-  if (base === null) return null;
-  const extras = [q.puff, q.armchair, q.headboard].reduce((s, e) => s + (e && typeof e.amount === "number" ? e.amount : 0), 0);
-  return cents(base + extras);
-}
-function sameVisitPieces(input) {
-  const raw = Array.isArray(input.items) ? input.items : [];
-  const items = raw.reduce((n, i) => n + (i?.kind === "chairs" ? 1 : typeof i?.qty === "number" && i.qty > 0 ? i.qty : 1), 0);
-  const extras = [typeof input.puffs === "number" && input.puffs > 0, typeof input.armchairs === "number" && input.armchairs > 0, Array.isArray(input.headboards) && input.headboards.length > 0].filter(Boolean).length;
-  return items + extras;
-}
-var SAME_VISIT_SPECIAL_RETIRED = true;
-function withSameVisitSpecial(input, r) {
-  const none = { ...r, sameVisitSpecial: null };
-  if (SAME_VISIT_SPECIAL_RETIRED) return none;
-  if (!input || typeof input !== "object") return none;
-  const inp = input;
-  const q = r;
-  if (q.ok && !q.blackFriday && typeof q.antiMiteGift === "number" && Array.isArray(inp.items)) {
-    const items = inp.items.map((i) => i?.treatment === "clean+anti-acaros" ? { ...i, treatment: "clean" } : i);
-    const clean = withSameVisitSpecial({ ...inp, items }, botQuoteCore({ ...inp, items }));
-    const cur = finalOrderPrice(r);
-    if (clean.sameVisitSpecial && cur !== null && clean.sameVisitSpecial.total < cur)
-      return { ...r, sameVisitSpecial: clean.sameVisitSpecial, mattressMiteOffer: { normal: q.antiMiteGift, total: clean.sameVisitSpecial.total } };
-  }
-  if (!q.ok || q.blackFriday || q.mattressMiteOffer || q.antiMiteGift || q.rugCombo?.ok && (q.rugCombo.travelWaived ?? 0) > 0) return none;
-  if (sameVisitPieces(inp) < SAME_VISIT_SPECIAL_MIN_PIECES) return none;
-  const normal = finalOrderPrice(r);
-  if (normal === null) return none;
-  const price = (v) => v === null ? null : { normal: v, total: sameVisitSpecialPrice(v) };
-  const raw = Array.isArray(inp.items) ? inp.items : [];
-  const treatmentOf = (i) => String(i?.treatment ?? "clean");
-  const wp = raw.some((i) => /premium|essencial/.test(treatmentOf(i)));
-  const variant = (to) => {
-    if (to === "clean" && raw.some((i) => /^(premium|essencial)$/.test(treatmentOf(i)))) return null;
-    const items = raw.map((i) => {
-      const t = treatmentOf(i);
-      if (!/premium|essencial/.test(t)) return i;
-      return { ...i, treatment: to === "clean" ? "clean" : t.startsWith("clean") ? `clean+${to}` : to };
-    });
-    const v = botQuoteCore({ ...inp, items });
-    return v.ok ? finalOrderPrice(v) : null;
-  };
-  const cleanNormal = wp ? variant("clean") : normal;
-  const cleaning = price(cleanNormal);
-  const withWp = (v) => v === null ? null : { normal: v, total: cleaning ? cents(cleaning.total + (v - cleaning.normal)) : v };
-  const options = wp ? { cleaning, premium: withWp(variant("premium")), essencial: withWp(variant("essencial")) } : { cleaning, premium: null, essencial: null };
-  const own = wp ? withWp(normal) : cleaning;
-  if (!own || own.total >= own.normal) return none;
-  return {
-    ...r,
-    bigOrder: null,
-    closeNow: { ok: false, reason: "já leva a condição especial da mesma visita (sameVisitSpecial)" },
-    sameVisitSpecial: { normal, total: own.total, options, rule: SAME_VISIT_SPECIAL_RULE }
-  };
+  return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
 }
 var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
 function withBlackFridayPrices(input, r) {
@@ -2678,7 +2612,7 @@ var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null 
 var WATERPROOFING_ONLY_NO_DISCOUNT_RULE = "Só impermeabilização: nunca desconto nem percentagem, e nunca explicar ao cliente que não fazemos desconto. Se o preço for a objeção, oferecer a deslocação (travelOffer) uma vez, como condição especial; sem deslocação, a opção Essencial.";
 function withAskedDiscount(input, r) {
   const q = r;
-  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday || r.sameVisitSpecial) return { ...r, askedDiscount: null };
+  if (!q.ok || q.handToOwner || q.bigOrder || q.antiMiteGift || q.mattressMiteOffer || r.blackFriday) return { ...r, askedDiscount: null };
   const price = !q.quote && typeof q.total === "number" ? q.total : q.rugCombo?.ok && typeof q.rugCombo.comboPrice === "number" ? q.rugCombo.comboPrice : q.rugEstimate?.ok && typeof q.rugEstimate.homePrice === "number" ? q.rugEstimate.homePrice : null;
   if (price === null) return { ...r, askedDiscount: null };
   const raw = input?.items;
