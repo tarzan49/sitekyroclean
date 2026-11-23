@@ -248,7 +248,7 @@ async function findOrder(body: Row, leads: LeadsStore): Promise<Response> {
   });
 }
 
-const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, service, service_type, details, location, value, quiz_order";
+const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, email, service, service_type, details, location, value, quiz_order";
 /** How far back the bot server may ask for new orders (it asks every minute; this only bounds a restart). */
 const NEW_ORDERS_MAX_HOURS = 48;
 
@@ -291,6 +291,8 @@ async function newOrders(body: Row, leads: LeadsStore): Promise<Response> {
       number: r.booking_id,
       createdAt: r.created_at,
       phone: String(r.phone),
+      // The bot also answers the questionnaire by email (owner, 23 Nov 2026: "A pessoa envia-te o e-mail com o questionário [...] vais responder com a mensagem que já existia").
+      email: typeof r.email === "string" ? r.email.trim() : "",
       message: buildWhatsAppMessage(Object.fromEntries(Object.entries(r).map(([k, v]) => [k, typeof v === "string" ? v : ""])), orderPrice(r)),
     }));
   return createSuccessResponse({ orders });

@@ -130,7 +130,8 @@ function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedP
     [...price.lines.map(l => `• ${l.label.replace(/ · 1 un\./, "").replace(/ · (\d+) (?:un\.|unidades)/, " · $1").replace("Só limpeza", "limpeza")}: ${euro(l.amount)}`),
       price.travel > 0 ? `• Deslocação: ${euro(price.travel)}` : "• Deslocação incluída"].join("\n"),
     `Total: ${euro(price.total)}`,
-    "Já lhe envio de seguida as horas que temos livres.",
+    // Funil único (dono, 23/11/2026): primeiro as opções, as horas só depois de a pessoa escolher.
+    "De seguida deixamos-lhe as opções que temos para si.",
   ].join("\n\n");
 }
 
