@@ -166,6 +166,34 @@ var EXTENDED_TRIP_CITIES = /* @__PURE__ */ new Set([
   "Santiago do Cacém",
   "Sines"
 ]);
+var SMALL_ORDER_FAR_SURCHARGE = 10;
+var SMALL_ORDER_FAR_MIN = 49;
+var SMALL_ORDER_FAR_CITIES = /* @__PURE__ */ new Set(["Oeiras", "Sintra", "Cascais", "Vila Franca de Xira", "Mafra"]);
+var SMALL_ORDER_NEAR_PARISHES = [
+  // Oeiras: Algés 18,1, Linda-a-Velha 14,3, Cruz Quebrada 16,2, Dafundo 15, Carnaxide 14,6, Queijas 16,1, Barcarena 16,6
+  "Algés",
+  "Linda-a-Velha",
+  "Cruz Quebrada",
+  "Dafundo",
+  "Carnaxide",
+  "Queijas",
+  "Barcarena",
+  // Sintra: Casal de Cambra 7,3, Queluz 10,5, Belas 14,6, Massamá 15,7, Monte Abraão 14,3, Cacém 17,5, Agualva 16,1, Mira-Sintra 17,7, Almargem do Bispo 14,4
+  "Casal de Cambra",
+  "Queluz",
+  "Belas",
+  "Massamá",
+  "Monte Abraão",
+  "Cacém",
+  "Agualva",
+  "Mira-Sintra",
+  "Almargem do Bispo",
+  // Vila Franca de Xira: Póvoa de Santa Iria 17,9, Forte da Casa 19,7, Vialonga 20
+  "Póvoa de Santa Iria",
+  "Forte da Casa",
+  "Vialonga"
+];
+var SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
 function calculateTravelFee(baseFee, servicesTotal) {
   if (isBlackFriday()) return 0;
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
@@ -2530,7 +2558,34 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withAskedDiscount(input, withBlackFridayPrices(input, botQuoteCore(input)));
+  return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
+}
+function smallOrderFarPlace(rawCity) {
+  const city = resolveBotCity(rawCity);
+  if (!city || !SMALL_ORDER_FAR_CITIES.has(city) || typeof rawCity !== "string") return false;
+  const text2 = ` ${fold2(rawCity).replace(/[^a-z0-9]+/g, " ")} `;
+  return !SMALL_ORDER_NEAR_PARISHES.some((p) => text2.includes(` ${fold2(p).replace(/[^a-z0-9]+/g, " ")} `));
+}
+function withSmallOrderFarSurcharge(input, r) {
+  const none = { ...r, smallOrderSurcharge: null };
+  const inp = input ?? {};
+  const q = r;
+  if (!q.ok || q.quote || q.handToOwner || q.sharedTrip || !smallOrderFarPlace(inp.city)) return none;
+  const add = (price, travel2) => typeof price === "number" && price - travel2 < SMALL_ORDER_FAR_MIN;
+  const travel = q.travel ?? 0;
+  const t = q.waterproofingTiers;
+  const totalHit = add(q.total, travel);
+  const premiumHit = !!t && add(t.premium, t.travel);
+  const essencialHit = !!t && add(t.essencial, t.travel);
+  if (!totalHit && !premiumHit && !essencialHit) return none;
+  const out = { ...r };
+  if (totalHit) out.total = cents(q.total + SMALL_ORDER_FAR_SURCHARGE);
+  if (t) out.waterproofingTiers = {
+    ...t,
+    premium: premiumHit ? cents(t.premium + SMALL_ORDER_FAR_SURCHARGE) : t.premium,
+    essencial: essencialHit ? cents(t.essencial + SMALL_ORDER_FAR_SURCHARGE) : t.essencial
+  };
+  return { ...out, smallOrderSurcharge: { amount: SMALL_ORDER_FAR_SURCHARGE, min: SMALL_ORDER_FAR_MIN, rule: SMALL_ORDER_FAR_RULE } };
 }
 var BLACK_FRIDAY_RULE = 'Preço Black Friday (até 30/11, conta a data da marcação; o serviço pode ser em dezembro), deslocação incluída: mostra o antes e o agora, "Sofá de 3 lugares: antes [normal]€, agora [total]€ (Black Friday, deslocação incluída)". Sem condição especial por cima. As impermeabilizações não mudam.';
 function withBlackFridayPrices(input, r) {

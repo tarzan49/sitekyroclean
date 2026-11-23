@@ -143,6 +143,28 @@ export const EXTENDED_TRIP_CITIES: ReadonlySet<string> = new Set([
   'Alcácer do Sal', 'Grândola', 'Santiago do Cacém', 'Sines',
 ]);
 
+/**
+ * Pedido pequeno longe de Odivelas (dono, 23 Nov 2026): "de odivelas os serviços abaixo de 49 euros tens
+ * q acrescentar mais 10 euros para aqueles q ficam a mais de 20 km de carro". A margem sul fica de fora
+ * (o Rodolfo, em Fernão Ferro, vai a praticamente todo o lado). Distâncias por estrada a partir de Odivelas
+ * (OSRM, 23 Nov): Lisboa, Amadora e Loures ficam todas abaixo de 20 km; Oeiras vila 22,5, Paço de Arcos 20,9,
+ * Porto Salvo 20,8; Sintra vila 27,6, Rio de Mouro 22,9, Mem Martins 23,2; Cascais 23 a 35; Vila Franca 27 a 35
+ * (Alverca 26,8); Mafra 21 a 43. As freguesias perto (até 20 km) ficam sem acréscimo.
+ */
+export const SMALL_ORDER_FAR_SURCHARGE = 10;
+export const SMALL_ORDER_FAR_MIN = 49;
+export const SMALL_ORDER_FAR_CITIES: ReadonlySet<string> = new Set(['Oeiras', 'Sintra', 'Cascais', 'Vila Franca de Xira', 'Mafra']);
+/** Freguesias desses concelhos a 20 km ou menos de Odivelas por estrada (23 Nov 2026). */
+export const SMALL_ORDER_NEAR_PARISHES: readonly string[] = [
+  // Oeiras: Algés 18,1, Linda-a-Velha 14,3, Cruz Quebrada 16,2, Dafundo 15, Carnaxide 14,6, Queijas 16,1, Barcarena 16,6
+  'Algés', 'Linda-a-Velha', 'Cruz Quebrada', 'Dafundo', 'Carnaxide', 'Queijas', 'Barcarena',
+  // Sintra: Casal de Cambra 7,3, Queluz 10,5, Belas 14,6, Massamá 15,7, Monte Abraão 14,3, Cacém 17,5, Agualva 16,1, Mira-Sintra 17,7, Almargem do Bispo 14,4
+  'Casal de Cambra', 'Queluz', 'Belas', 'Massamá', 'Monte Abraão', 'Cacém', 'Agualva', 'Mira-Sintra', 'Almargem do Bispo',
+  // Vila Franca de Xira: Póvoa de Santa Iria 17,9, Forte da Casa 19,7, Vialonga 20
+  'Póvoa de Santa Iria', 'Forte da Casa', 'Vialonga',
+];
+export const SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
+
 /** Services and extras at their actual quoted prices, excluding travel. */
 export function calculateTravelFee(baseFee: number, servicesTotal: number): number {
   if (isBlackFriday()) return 0;
