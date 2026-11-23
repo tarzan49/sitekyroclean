@@ -661,7 +661,6 @@ var RUG_RATE_COMMON = 10;
 var RUG_RATE_NATURAL = 12;
 var RUG_ESTIMATE_MIN_AREA_M2 = 3;
 var RUG_SMALL_COMBO_EXTRA = 10;
-var RUG_VISIT_SOFA_PRICE = 70;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
 var DELICATE = /\b(seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
@@ -726,10 +725,11 @@ function rugEstimate(rugs, city) {
     homePrice,
     pickupFee,
     pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
-    sofaUpsellPrice: RUG_VISIT_SOFA_PRICE,
+    // No special condition on a sofa added to the rug's visit: table price, one travel (owner, 23 Nov 2026, Maria José).
+    sofaUpsellPrice: sofaCleaningPrice("3-lugares"),
     sofaUsualPrice: sofaCleaningPrice("3-lugares") + travelFee,
     ...materialAssumed ? { materialAssumed: true } : {},
-    rule: (materialAssumed ? ASSUMED_NOTE : "") + "Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice, em vez de sofaUsualPrice."
+    rule: (materialAssumed ? ASSUMED_NOTE : "") + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço de tabela, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.'
   };
 }
 
