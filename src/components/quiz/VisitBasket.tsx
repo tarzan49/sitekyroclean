@@ -254,7 +254,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label="Orçamento da visita">
+    // Computador (dono, 24 Nov: "no PC está horrível, super confuso"): cartão centrado da largura de um telemóvel,
+    // por cima da página escurecida; no telemóvel continua a ocupar o ecrã todo.
+    <div className="fixed inset-0 z-[100] md:flex md:items-center md:justify-center md:bg-black/60 md:p-6" onClick={e => { if (e.target === e.currentTarget && window.matchMedia('(min-width: 768px)').matches) onClose(); }}>
+    <div className="relative flex h-full w-full flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white md:h-[min(760px,92vh)] md:max-w-[520px] md:overflow-hidden md:rounded-3xl md:border md:border-[#D4AF37]/30 md:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]" role="dialog" aria-modal="true" aria-label="Orçamento da visita">
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         {step === 'contact'
           ? <button type="button" onClick={() => setStep('basket')} className="flex min-h-11 items-center gap-1 text-sm font-semibold text-white"><ArrowLeft className="h-4 w-4" />Voltar</button>
@@ -336,7 +339,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         )}
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+      <footer className="fixed inset-x-0 bottom-0 md:absolute border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{groupGifts(quote.gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <div className="mb-2 flex items-baseline justify-between">
           <span className="text-sm text-white/70">Total, deslocação incluída</span>
@@ -348,6 +351,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       </footer>
 
       {editing && <ItemSheet item={editing} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
+    </div>
     </div>
   );
 }
@@ -376,8 +380,8 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
-    <div className="fixed inset-0 z-[110] flex items-end bg-black/40" onClick={onCancel}>
-      <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl border-t border-[#D4AF37]/40 bg-[#0B2F2A] text-white p-4 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[110] flex items-end bg-black/40 md:items-center md:justify-center md:p-6" onClick={onCancel}>
+      <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl md:max-w-[480px] md:rounded-3xl border-t border-[#D4AF37]/40 bg-[#0B2F2A] text-white p-4 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
         <div className="-mx-4 -mt-4 mb-3 h-28 overflow-hidden rounded-t-3xl relative"><img src={PHOTO[item.kind]} alt="" className="h-full w-full object-cover" /><span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] to-transparent" /><h3 className="absolute bottom-2 left-4 font-playfair text-2xl font-semibold text-white">{KIND_LABEL[item.kind]}</h3></div>
 
         {item.kind === 'sofa' && <>
