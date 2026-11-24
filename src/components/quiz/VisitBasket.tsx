@@ -209,18 +209,29 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
   return { kind: 'gift', value: g.value, what };
 }
 /** "Se juntar X, poupa Y": só o que se confirma no total para qualquer tamanho da peça (o mínimo), pelo motor. */
+const JOIN_PACKS = ['none', 'essencial', 'premium'] as const;
 const JOIN_VARIANTS: Record<BasketKind, Partial<BasketItem>[]> = {
-  sofa: ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].map(size => ({ size, pack: 'none' as const })),
-  mattress: ['solteiro', 'casal', 'king'].map(size => ({ size, pack: 'none' as const })),
-  chairs: [1, 2, 4, 6, 12].map(qty => ({ qty, pack: 'none' as const })),
-  rug: [['1,2', '1,7'], ['2', '3'], ['2,5', '3,5']].flatMap(([width, length]) => ['sintético ou lã', 'juta ou sisal'].map(rugMaterial => ({ width, length, rugMaterial }))),
-  carpet: [['3', '4'], ['4', '6'], ['6', '8']].map(([width, length]) => ({ width, length })),
+  sofa: [...['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].map(size => ({ size })), { size: '5-lugares', seats: 6 }]
+    .flatMap(z => [...JOIN_PACKS.map(pack => ({ ...z, pack })), { ...z, pack: 'none' as const, leather: true }]),
+  mattress: ['solteiro', 'casal', 'king'].flatMap(size => (['none', 'premium'] as const).map(pack => ({ size, pack }))),
+  chairs: [1, 2, 4, 6, 8, 12].flatMap(qty => JOIN_PACKS.map(pack => ({ qty, pack }))),
+  rug: [['1,2', '1,7'], ['2', '3'], ['2,5', '3,5'], ['3', '4'], ['4', '5']].flatMap(([width, length]) => ['sintético ou lã', 'juta ou sisal'].map(rugMaterial => ({ width, length, rugMaterial }))),
+  carpet: [['3', '4'], ['4', '6'], ['6', '8'], ['8', '10'], ['10', '15']].map(([width, length]) => ({ width, length })),
 };
 const savingOf = (q: { usual: number | null; total: number | null }) => (q.usual !== null && q.total !== null ? q.usual - q.total : 0);
 export function joinSaving(city: string, items: BasketItem[], kind: BasketKind): number {
-  const before = savingOf(quoteBasket(city, items));
+  const q = quoteBasket(city, items), before = savingOf(q), giftValue = (x: typeof q) => x.gifts.reduce((t, g) => t + g.normal, 0);
   let min = Infinity;
-  for (const v of JOIN_VARIANTS[kind]) { min = Math.min(min, savingOf(quoteBasket(city, [...items, newItem(kind, v)])) - before); if (min < 5) return 0; }
+  for (const v of JOIN_VARIANTS[kind]) {
+    const extra = newItem(kind, v), both = quoteBasket(city, [...items, extra]), alone = aloneTotal(city, extra);
+    if (both.total === null || q.total === null || alone === null) return 0;
+    const shown = savingOf(both) - before;
+    // O que juntar poupa mesmo (os dois pedidos em separado menos a visita, mais a oferta nova): 6 cadeiras Blindado não
+    // mostram riscado sozinhas e o riscado do conjunto trazia a poupança delas, "Se juntar um colchão, poupa 120€" (eram 40€).
+    const real = q.total + alone - both.total + giftValue(both) - giftValue(q);
+    min = Math.min(min, real >= shown - 1 ? shown : real);
+    if (min < 5) return 0;
+  }
   return Number.isFinite(min) ? Math.round(min * 100) / 100 : 0;
 }
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };

@@ -110,15 +110,23 @@ describe('"Se juntar X, poupa Y": nunca mais do que o total mostra, para qualque
   const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
   const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
   const saving = (b: BasketItem[]) => { const q = quoteBasket('Lisboa', b); return q.usual !== null && q.total !== null ? q.usual - q.total : 0; };
-  const baskets: Record<string, BasketItem[]> = { 'colchão': [M()], 'colchão AA': [M({ pack: 'premium' })], '3L': [S('3-lugares')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], '3L pele': [S('3-lugares', { leather: true })], '6 cadeiras': [chairs(6, 'none')], '3L + 2L': [S('3-lugares'), S('2-lugares')], '3L + colchão': [S('3-lugares'), M()], 'tapete': [newItem('rug', { width: '2', length: '3', rugMaterial: 'sintético ou lã' })] };
+  const baskets: Record<string, BasketItem[]> = { '6 cadeiras Blindado': [chairs(6, 'premium')], '1L Blindado': [S('1-lugar', { pack: 'premium' })], '4L + colchão': [S('4-lugares'), M()], 'colchão': [M()], 'colchão AA': [M({ pack: 'premium' })], '3L': [S('3-lugares')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], '3L pele': [S('3-lugares', { leather: true })], '6 cadeiras': [chairs(6, 'none')], '3L + 2L': [S('3-lugares'), S('2-lugares')], '3L + colchão': [S('3-lugares'), M()], 'tapete': [newItem('rug', { width: '2', length: '3', rugMaterial: 'sintético ou lã' })] };
   const joins: [Parameters<typeof joinSaving>[2], BasketItem][] = [
     ...['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].map(z => ['sofa', S(z)] as [Parameters<typeof joinSaving>[2], BasketItem]),
     ...['solteiro', 'casal', 'king'].map(size => ['mattress', M({ size })] as [Parameters<typeof joinSaving>[2], BasketItem]),
     ...[1, 2, 3, 4, 6, 8, 12].map(n => ['chairs', chairs(n, 'none')] as [Parameters<typeof joinSaving>[2], BasketItem]),
-    ...[['1,2', '1,7'], ['1,6', '2,3'], ['2,5', '3,5']].map(([width, length]) => ['rug', newItem('rug', { width, length, rugMaterial: 'juta ou sisal' })] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].flatMap(size => [newItem('sofa', { size, pack: 'premium' }), newItem('sofa', { size, pack: 'essencial' }), newItem('sofa', { size, pack: 'none', leather: true })]).map(x => ['sofa', x] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...[newItem('sofa', { size: '5-lugares', seats: 6, pack: 'none' }), newItem('sofa', { size: '5-lugares', seats: 6, pack: 'premium' }), newItem('mattress', { size: 'casal', pack: 'premium' }), chairs(1, 'premium'), chairs(6, 'premium'), chairs(9, 'essencial'), newItem('carpet', { width: '5', length: '6' }), newItem('carpet', { width: '9', length: '9' })].map(x => [x.kind, x] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...[['1,2', '1,7'], ['1,6', '2,3'], ['2,5', '3,5'], ['3', '4'], ['3', '5']].map(([width, length]) => ['rug', newItem('rug', { width, length, rugMaterial: 'juta ou sisal' })] as [Parameters<typeof joinSaving>[2], BasketItem]),
   ];
   for (const [bn, b] of Object.entries(baskets)) it(bn, () => {
-    for (const [kind, x] of joins) { const said = joinSaving('Lisboa', b, kind); if (said > 0) expect(saving([...b, x]) - saving(b), `${bn} + ${kind} ${x.size ?? x.qty}: diz ${said}`).toBeGreaterThanOrEqual(said - 1); }
+    for (const [kind, x] of joins) {
+      const said = joinSaving('Lisboa', b, kind);
+      if (said <= 0) continue;
+      const q0 = quoteBasket('Lisboa', b), q1 = quoteBasket('Lisboa', [...b, x]), g = (q: typeof q0) => q.gifts.reduce((t, y) => t + y.normal, 0);
+      expect(q0.total! + aloneTotal('Lisboa', x)! - q1.total! + g(q1) - g(q0), `${bn} + ${kind}: diz ${said}, real`).toBeGreaterThanOrEqual(said - 1);
+      expect(saving([...b, x]) - saving(b), `${bn} + ${kind} ${x.size ?? x.qty}: diz ${said}`).toBeGreaterThanOrEqual(said - 1);
+    }
   });
 });
 
