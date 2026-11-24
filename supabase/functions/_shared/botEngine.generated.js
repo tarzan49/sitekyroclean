@@ -2801,7 +2801,7 @@ function withVisitGifts(input, r) {
     const one = innerPriced({ ...noExtras, ...x });
     return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === "number" ? one.rugEstimate.homePrice : null);
   };
-  const parts = [...restore(base).map((i) => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter((k) => typeof inp[k] === "number" && inp[k] > 0 || Array.isArray(inp[k]) && inp[k].length > 0).map((k) => aloneOf({ items: [], [k]: inp[k] }))];
+  const parts = restore(base).map((i) => aloneOf({ items: [i] }));
   const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
@@ -2815,6 +2815,11 @@ function withVisitGifts(input, r) {
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
+  const shift = cents(final - (typeof q.total === "number" ? q.total : final));
+  for (const k of ["puff", "armchair", "headboard"]) {
+    const e = r[k];
+    if (shift && e && typeof e.total === "number" && !(rc && typeof rc.comboPrice === "number")) out[k] = { ...e, total: cents(e.total + shift) };
+  }
   const giftSum = cents(usual - paid);
   const t = r.waterproofingTiers;
   const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;

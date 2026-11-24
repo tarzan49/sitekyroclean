@@ -687,7 +687,8 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     const one = innerPriced({ ...noExtras, ...x }) as Priced & { rugEstimate?: { homePrice?: number | null } | null };
     return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === 'number' ? one.rugEstimate.homePrice : null);
   };
-  const parts = [...restore(base).map(i => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter(k => (typeof inp[k] === 'number' && (inp[k] as number) > 0) || (Array.isArray(inp[k]) && (inp[k] as unknown[]).length > 0)).map(k => aloneOf({ items: [], [k]: inp[k] }))];
+  // Puffs, armchairs and headboards are priced apart (puff.total = total + their price), so only the items enter here.
+  const parts = restore(base).map(i => aloneOf({ items: [i] }));
   const sumAlone = parts.every((v): v is number => typeof v === 'number') ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
@@ -699,6 +700,12 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
+  // The extras' own totals (total + their price) follow the new total.
+  const shift = cents(final - (typeof q.total === 'number' ? q.total : final));
+  for (const k of ['puff', 'armchair', 'headboard']) {
+    const e = (r as unknown as Record<string, { total?: number } | null | undefined>)[k];
+    if (shift && e && typeof e.total === 'number' && !(rc && typeof rc.comboPrice === 'number')) out[k] = { ...e, total: cents(e.total + shift) };
+  }
   // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
   const giftSum = cents(usual - paid);
   const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
