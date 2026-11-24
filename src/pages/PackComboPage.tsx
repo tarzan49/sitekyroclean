@@ -8,6 +8,8 @@ import SectionHeader from '@/components/SectionHeader';
 import PackConfigurator from '@/components/PackConfigurator';
 import WaterproofPackPicker from '@/components/WaterproofPackPicker';
 import WaterproofPackSections from '@/components/WaterproofPackSections';
+import SofaMattressPicker from '@/components/SofaMattressPicker';
+import CompactFAQ from '@/components/CompactFAQ';
 import CustomerReviews from '@/components/CustomerReviews';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import SofaProcessGuide from '@/components/SofaProcessGuide';
@@ -57,7 +59,7 @@ export default function PackComboPage() {
   useEffect(() => setOpenNext(null), [pathname]);
 
   // Secções de ecrã inteiro com encaixe no scroll (index.css): só nas páginas já compactadas.
-  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao';
+  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao' || data?.pack.id === 'sofa-colchao';
   useEffect(() => {
     if (!snapPage) return;
     document.documentElement.classList.add('snap-sections');
@@ -70,6 +72,7 @@ export default function PackComboPage() {
   const { pack, city } = data;
   const priceFrom = packPriceFrom(pack, city.name);
   const simpleKind = pack.id === 'sofa-impermeabilizacao' ? 'sofa' as const : pack.id === 'cadeiras-impermeabilizacao' ? 'chairs' as const : null;
+  const combo = pack.id === 'sofa-colchao'; // novo formato (dono, 24 Nov)
   const travelFee = locationPrices[city.name];
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.id, city.name))}`;
   const packServices = [pack.service1Slug, pack.service2Slug].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
@@ -126,8 +129,8 @@ export default function PackComboPage() {
       {/* 1. O que está incluído, e já com o configurador. */}
       <section id="montar" className="scroll-mt-20 py-14 md:py-20 lg:py-10 bg-[#FDFDF9]">
         <div className={container}>
-          {simpleKind
-            ? <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(city.name)} {city.name}</em></h2>
+          {simpleKind || combo
+            ? <h2 className={`${combo ? 'mb-4' : 'mb-8'} md:mb-10 type-section-title font-playfair text-[#111111]`}>O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(city.name)} {city.name}</em></h2>
             : <SectionHeader
               overline={pack.name}
               heading="Monte o seu pack"
@@ -135,8 +138,8 @@ export default function PackComboPage() {
               subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal.`}
               className="lg:!mb-5"
             />}
-          <div className={simpleKind ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
-            {simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
+          <div className={simpleKind || combo ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
+            {combo ? <SofaMattressPicker city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
               initialKinds={PACK_KINDS[pack.id]}
               initialExtra={PACK_INITIAL_EXTRA[pack.id]}
               initialCity={city.name}
@@ -158,7 +161,11 @@ export default function PackComboPage() {
       {simpleKind && <WaterproofPackSections kind={simpleKind} cityLabel={`${cityPrep(city.name)} ${city.name}`} faqs={faqs} />}
 
       {/* 3. Porquê um pack: as regalias, ditas depois de já ter montado o pedido. Branco: alterna com o verde da secção 2. */}
-      {!simpleKind && <>
+      {combo && <>
+        <SofaProcessGuide real city={city.name} cityPrep={cityPrep(city.name)} />
+        <CompactFAQ id="duvidas" dark faqs={faqs} heading={`Perguntas sobre o pack ${cityPrep(city.name)} ${city.name}`} />
+      </>}
+      {!simpleKind && !combo && <>
       <section id="regalias" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
         <div className={container}>
           <SectionHeader
