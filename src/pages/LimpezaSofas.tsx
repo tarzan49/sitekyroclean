@@ -15,6 +15,13 @@ import SectionHeader from "@/components/SectionHeader";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
+import { useState } from "react";
+import SofaPricePicker from "@/components/SofaPricePicker";
+import CustomerReviews from "@/components/CustomerReviews";
+import CompactFAQ from "@/components/CompactFAQ";
+import { pickReviewSubset } from "@/data/reviewsPool";
+import { cities } from "@/data/serviceCatalog";
+import { useSnapSections } from "@/hooks/useSnapSections";
 
 const sofaGuarantee: GuaranteeItem[] = [
   {
@@ -65,6 +72,9 @@ const expertTips: ExpertTip[] = [
 const pillar = getPillarPage('/limpeza-sofas');
 
 const LimpezaSofas = () => {
+  // Modelo novo (dono, 24 Nov): secções de ecrã inteiro; o preço pede a localidade (a deslocação muda com ela).
+  useSnapSections(true);
+  const [city, setCity] = useState('Lisboa');
   return (
     <QuizServiceProvider value="sofa">
     <>
@@ -74,24 +84,36 @@ const LimpezaSofas = () => {
           title={pillar.h1}
           serviceSlug="limpeza-sofas"
         />
-        <ServicePriceSection serviceSlug="limpeza-sofas" />
+        <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="mb-3 flex items-center justify-between gap-3 md:mb-6">
+              <h2 className="type-section-title font-playfair text-[#111111]">O seu <em className="not-italic" style={{ color: "#D4AF37" }}>preço</em></h2>
+              <label className="flex items-center gap-1.5 text-xs text-[#555]"><span className="sr-only sm:not-sr-only">Localidade</span>
+                <select aria-label="Localidade do sofá" value={city} onChange={e => setCity(e.target.value)} className="h-9 max-w-[150px] rounded-lg border-2 border-[#D4AF37] bg-white px-2 text-sm font-semibold text-[#1A1A1A]">
+                  {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={city} source="pillar_picker_limpeza-sofas" /></div>
+          </div>
+        </section>
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug="limpeza-sofas" seed="limpeza-sofas" heading="" />
+            <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <CustomerReviews reviews={pickReviewSubset('limpeza-sofas', 'limpeza-sofas', 6)} />
           </div>
         </section>
 
         <ServiceExamplesGallery serviceSlug="limpeza-sofas" />
-        <SofaProcessGuide />
+        <SofaProcessGuide real />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de sofá"
           items={sofaGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
+        <CompactFAQ id="duvidas" faqs={pillar.faqs} heading="Perguntas Frequentes" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel={pillar.serviceName} />
         <ServiceSchema

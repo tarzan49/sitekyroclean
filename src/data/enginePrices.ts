@@ -13,7 +13,7 @@
 // (ver a armadilha das constantes duplicadas no CLAUDE.md).
 import { sofaPrices, mattressPrices, type PriceOption } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '../components/quiz/quizHelpers';
-import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM } from '../constants/chairPricing';
+import { CHAIR_WATERPROOF_BIG_ESSENTIAL, CHAIR_WATERPROOF_BIG_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_CLEAN_MID_FROM, CHAIR_CLEAN_BIG_FROM, chairCleanUnit } from '../constants/chairPricing';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL, mattressAntiAcarosPrice } from '../constants/antiAcarosPricing';
 
 /** `49` → "49€"; `12.5` → "12,50€". Vírgula decimal, como em todo o site. */
@@ -48,8 +48,8 @@ export const CHAIR_CLEANING_FROM = required(calcChairClean(1), 'uma cadeira');
 /** Impermeabilização sozinha (sem limpeza), sofá mais barato. */
 export const SOFA_WATERPROOF_ESSENCIAL_FROM = cheapest(sofaPrices, 'waterproofingPrice', 'sofaPrices');
 export const SOFA_WATERPROOF_PREMIUM_FROM = cheapest(sofaPrices, 'waterproofingPremiumPrice', 'sofaPrices');
-export const CHAIR_WATERPROOF_ESSENCIAL_UNIT = CHAIR_WATERPROOF_ESSENTIAL;
-export const CHAIR_WATERPROOF_PREMIUM_UNIT = CHAIR_WATERPROOF_PREMIUM;
+export const CHAIR_WATERPROOF_ESSENCIAL_UNIT = CHAIR_WATERPROOF_BIG_ESSENTIAL;
+export const CHAIR_WATERPROOF_PREMIUM_UNIT = CHAIR_WATERPROOF_BIG_PREMIUM;
 /** Até 4 cadeiras a impermeabilização custa mais por cadeira (dono, 2026-10-09). */
 export const CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT = CHAIR_WATERPROOF_SMALL_ESSENTIAL;
 export const CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT = CHAIR_WATERPROOF_SMALL_PREMIUM;
@@ -121,46 +121,33 @@ export interface ChairTier { first: number; last: number; unit: number }
  * escalões são as sequências com o mesmo preço. Acaba quando o motor passa a
  * devolver `null` (sob orçamento).
  */
-export function chairCleaningTiers(): { tiers: ChairTier[]; quoteFrom: number } {
-  const tiers: ChairTier[] = [];
-  let qty = 1;
-  for (; qty < 100; qty++) {
-    const total = calcChairClean(qty);
-    if (total === null) break;
-    const unit = Math.round((total - (calcChairClean(qty - 1) ?? 0)) * 100) / 100;
-    const last = tiers[tiers.length - 1];
-    if (last && last.unit === unit) last.last = qty;
-    else tiers.push({ first: qty, last: qty, unit });
-  }
-  return { tiers, quoteFrom: qty };
+export function chairCleaningTiers(): { tiers: ChairTier[]; quoteFrom: null } {
+  // Tabela única do dono (24 Nov 2026): o preço por cadeira vale para todas as cadeiras do pedido.
+  return {
+    tiers: [
+      { first: 1, last: CHAIR_CLEAN_MID_FROM - 1, unit: chairCleanUnit(1) },
+      { first: CHAIR_CLEAN_MID_FROM, last: CHAIR_CLEAN_BIG_FROM - 1, unit: chairCleanUnit(CHAIR_CLEAN_MID_FROM) },
+      { first: CHAIR_CLEAN_BIG_FROM, last: Infinity, unit: chairCleanUnit(CHAIR_CLEAN_BIG_FROM) },
+    ],
+    quoteFrom: null,
+  };
 }
 
-const ordinal = (n: number) => `${n}.ª`;
+const tierRange = (tier: ChairTier) => tier.last === Infinity ? `a partir da ${tier.first}.ª` : tier.first === 1 ? `as primeiras ${tier.last}` : `da ${tier.first}.ª à ${tier.last}.ª`;
 
-/** "As primeiras 4 cadeiras custam 20€ cada, a 5.ª e a 6.ª 15€ cada, ..." */
+/** "As primeiras 4 cadeiras custam 20€ cada; da 5.ª à 7.ª, 17,50€ cada; a partir da 8.ª, 15€ cada." */
 export function chairTierSentence(): string {
-  const { tiers, quoteFrom } = chairCleaningTiers();
-  const parts = tiers.map((tier, index) => {
-    const price = `${formatEuro(tier.unit)} cada`;
-    if (index === 0) return `as primeiras ${tier.last} cadeiras custam ${price}`;
-    if (tier.first === tier.last) return `a ${ordinal(tier.first)} ${price}`;
-    if (tier.last === tier.first + 1) return `a ${ordinal(tier.first)} e a ${ordinal(tier.last)} ${price}`;
-    return `da ${ordinal(tier.first)} à ${ordinal(tier.last)} ${price}`;
-  });
-  const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts[0];
-  return `${list.charAt(0).toUpperCase()}${list.slice(1)}. A partir de ${quoteFrom} cadeiras, o preço é sob orçamento.`;
+  const { tiers } = chairCleaningTiers();
+  const s = tiers.map((tier, i) => `${tierRange(tier)}${i === 0 ? ' cadeiras' : ''}, ${formatEuro(tier.unit)} cada`).join('; ');
+  return `${s.charAt(0).toUpperCase()}${s.slice(1)}.`;
 }
 
-/** Linhas de tabela: "1ª a 4ª cadeira · 20€/un", ..., "10+ cadeiras · Sob orçamento". */
+/** Linhas de tabela: "1 a 4 cadeiras · 20€/un", ..., "8+ cadeiras · 15€/un". */
 export function chairTierRows(): { item: string; price: string }[] {
-  const { tiers, quoteFrom } = chairCleaningTiers();
-  return [
-    ...tiers.map(tier => ({
-      item: tier.first === tier.last ? `${tier.first}ª cadeira` : `${tier.first}ª a ${tier.last}ª cadeira`,
-      price: `${formatEuro(tier.unit)}/un`,
-    })),
-    { item: `${quoteFrom}+ cadeiras`, price: 'Sob orçamento' },
-  ];
+  return chairCleaningTiers().tiers.map(tier => ({
+    item: tier.last === Infinity ? `${tier.first}.ª cadeira em diante` : `${tier.first}.ª a ${tier.last}.ª cadeira`,
+    price: `${formatEuro(tier.unit)}/un`,
+  }));
 }
 
 // ─── Rótulo do preço de partida ─────────────────────────────────────
@@ -194,14 +181,7 @@ export const CHAIR_PRICE_TITLE = CHAIR_PRICE_LABEL;
  * A partir de 10 cadeiras é sob orçamento (ver `chairTierSentence`).
  */
 export function chairPriceBreakdown(): string {
-  const { tiers } = chairCleaningTiers();
-  return tiers.map((tier, index) => {
-    const price = formatEuro(tier.unit);
-    if (index === 0) return `${price} por cadeira até ${tier.last}`;
-    if (tier.first === tier.last) return `${price} a ${ordinal(tier.first)}`;
-    if (tier.last === tier.first + 1) return `${price} a ${ordinal(tier.first)} e ${ordinal(tier.last)}`;
-    return `${price} da ${ordinal(tier.first)} à ${ordinal(tier.last)}`;
-  }).join(', ');
+  return chairCleaningTiers().tiers.map(tier => `${formatEuro(tier.unit)} por cadeira ${tierRange(tier)}`).join(', ');
 }
 
 /**

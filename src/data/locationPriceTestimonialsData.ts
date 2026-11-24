@@ -1,4 +1,4 @@
-import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
+import { CHAIR_WATERPROOF_BIG_ESSENTIAL } from '../constants/chairPricing';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean } from '../components/quiz/quizHelpers';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
@@ -98,6 +98,6 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 4 lugares',          price: tablePrice(sofa('4-lugares')?.waterproofingPrice) },
     { item: 'Sofá 5+ lugares',         price: tablePrice(sofa('5-lugares')?.waterproofingPrice) },
     { item: 'Sofá de canto, em U ou modular', price: 'Sob orçamento' },
-    { item: 'Cadeiras',               price: `desde ${CHAIR_WATERPROOF_ESSENTIAL}€/cad` },
+    { item: 'Cadeiras',               price: `desde ${CHAIR_WATERPROOF_BIG_ESSENTIAL}€/cad` },
   ],
 };

@@ -1521,7 +1521,7 @@ export function prerenderRoutes(outDir: string): number {
   // template: é o mesmo nó em todas as páginas.
   {
     const homeBody = generatePageBody({
-      h1: 'Estofos como novos, ao domicílio.',
+      h1: 'Os seus estofos como novos, ainda hoje.',
       intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
       links: [
         ...services.map(service => ({ href: service.baseRoute, label: service.name })),

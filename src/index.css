@@ -771,3 +771,20 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #marca-tecido .grid { gap: 8px; }
   html.snap-sections #marca-tecido .grid > div { padding: 12px 14px; }
 }
+/* Página principal de serviço (dono, 24 Nov): blocos longos em cartões a deslizar no telemóvel. */
+@media (max-width: 767px) {
+  html.snap-sections #compromisso .grid, html.snap-sections #dicas .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
+  html.snap-sections #compromisso .grid > *, html.snap-sections #dicas .grid > * { flex: 0 0 80%; scroll-snap-align: start; }
+  html.snap-sections #localidades button[aria-expanded] { padding-top: 12px; padding-bottom: 12px; }
+  html.snap-sections #localidades button[aria-expanded] span.mt-1 { display: none; }
+  html.snap-sections #localidades > div > div:first-child { margin-bottom: 14px; }
+}
+@media (max-width: 767px) {
+  /* A secção do preço tem o botão de WhatsApp: a barra fixa esconde-se, não precisa do espaço de baixo. */
+  html.snap-sections section#precos { padding-bottom: 16px !important; }
+}
+@media (max-width: 767px) {
+  /* Passo a passo em história: um pouco mais baixo quando o título ocupa duas linhas (tapetes, cidades longas). */
+  html.snap-sections #processo .md\:hidden video, html.snap-sections #processo .md\:hidden img { max-height: 44svh; }
+  html.snap-sections #processo > div > div:first-child { margin-bottom: 14px; }
+}

@@ -1,21 +1,14 @@
-// Impermeabilização de cadeiras, preço por cadeira, como serviço principal ou
-// extra (dono, 2026-10-09): de 1 a 4 cadeiras, 30€ Premium e 23€ Essencial; a
-// partir de 5, 25€ e 18€. O total nunca desce abaixo do de 4 cadeiras, para 5
-// nunca custarem menos do que 4: 5 cadeiras em Essencial ficam a 92€ (4 × 23€),
-// não a 90€. Os dois valores "a partir de 5" são os "desde" que o site anuncia.
-export const CHAIR_WATERPROOF_ESSENTIAL = 18;
-export const CHAIR_WATERPROOF_PREMIUM = 25;
+// Impermeabilização de cadeiras pela posição (dono, 24 Nov 2026): 1.ª–4.ª Premium 25€ / Essencial 15€;
+// 5.ª–8.ª 22,50€ / 12,50€; 9.ª em diante 20€ / 10€.
+// Cada cadeira paga o preço da sua posição. O produto custa ~2–5€ por cadeira (5 L ≈ 3,5 sofás).
 export const CHAIR_WATERPROOF_SMALL_MAX = 4;
-export const CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
-export const CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
-// A partir de 9 cadeiras (dono, 19 Nov 2026, 12 cadeiras a 516€/432€ com limpeza: "até 8 cadeiras é ok
-// fazeres 25, mas depois disto tens de descer o preço"; "12,5€ a limpeza, 22,5€ a premium ... e a outra
-// fazes a 15"): impermeabilização Premium 22,50€ e Essencial 15€ por cadeira, em todas; e, no bot, a
-// limpeza que vai com a impermeabilização fica a 12,50€ por cadeira (limpeza sozinha mantém o preço).
+export const CHAIR_WATERPROOF_SMALL_PREMIUM = 25;
+export const CHAIR_WATERPROOF_SMALL_ESSENTIAL = 15;
+export const CHAIR_WATERPROOF_PREMIUM = 22.5;
+export const CHAIR_WATERPROOF_ESSENTIAL = 12.5;
 export const CHAIR_WATERPROOF_BIG_FROM = 9;
-export const CHAIR_WATERPROOF_BIG_PREMIUM = 22.5;
-export const CHAIR_WATERPROOF_BIG_ESSENTIAL = 15;
-export const WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG = 12.5;
+export const CHAIR_WATERPROOF_BIG_PREMIUM = 20;
+export const CHAIR_WATERPROOF_BIG_ESSENTIAL = 10;
 
 // Cadeira em que o único estofo é o tampo do assento (sem encosto nem braços estofados): impermeabilização
 // a 18€ Premium e 12€ Essencial por cadeira, qualquer quantidade (dono, 14 Nov 2026, André, 6 cadeiras:
@@ -28,37 +21,49 @@ export type ChairWaterproofTier = 'premium' | 'essencial';
 export function chairWaterproofTotal(qty: number, tier: ChairWaterproofTier, seatOnly = false): number | null {
   if (!Number.isSafeInteger(qty) || qty <= 0) return null;
   if (seatOnly) return qty * (tier === 'premium' ? CHAIR_SEAT_ONLY_WATERPROOF_PREMIUM : CHAIR_SEAT_ONLY_WATERPROOF_ESSENTIAL);
-  const small = tier === 'premium' ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
-  if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
-  const mid = tier === 'premium' ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
-  if (qty < CHAIR_WATERPROOF_BIG_FROM) return Math.max(qty * mid, CHAIR_WATERPROOF_SMALL_MAX * small);
-  // From 9 the price per chair drops; the total never falls below that of 8 (same rule as 4 → 5).
-  const big = tier === 'premium' ? CHAIR_WATERPROOF_BIG_PREMIUM : CHAIR_WATERPROOF_BIG_ESSENTIAL;
-  return Math.max(qty * big, (CHAIR_WATERPROOF_BIG_FROM - 1) * mid);
+  // Cada cadeira paga o preço da sua posição, não cumulativo (dono, 24 Nov 2026).
+  let total = 0;
+  for (let n = 1; n <= qty; n++) total += tier === 'premium'
+    ? (n >= CHAIR_WATERPROOF_BIG_FROM ? CHAIR_WATERPROOF_BIG_PREMIUM : n > CHAIR_WATERPROOF_SMALL_MAX ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_SMALL_PREMIUM)
+    : (n >= CHAIR_WATERPROOF_BIG_FROM ? CHAIR_WATERPROOF_BIG_ESSENTIAL : n > CHAIR_WATERPROOF_SMALL_MAX ? CHAIR_WATERPROOF_ESSENTIAL : CHAIR_WATERPROOF_SMALL_ESSENTIAL);
+  return Math.round(total * 100) / 100;
 }
 
-// Limpeza de cadeiras no WhatsApp, preço por cadeira (dono, 12 Nov 2026: "isso só
-// se aplica ao site. Se for orçamento por WhatsApp, é 20 euros a cadeira … ou 25
-// se forem menos de 4"; a partir de 8, 18€). Conta o total de cadeiras a limpar
-// no pedido; a deslocação soma-se como em tudo (travel.ts). O site mantém os
-// escalões de calcChairClean (20€ até 4, 15€ a 5.ª e 6.ª, 12,50€ da 7.ª à 9.ª).
-export const WHATSAPP_CHAIR_CLEAN_SMALL = 25;
-export const WHATSAPP_CHAIR_CLEAN_SMALL_MAX = 3;
-export const WHATSAPP_CHAIR_CLEAN = 20;
-export const WHATSAPP_CHAIR_CLEAN_BIG_FROM = 8;
-export const WHATSAPP_CHAIR_CLEAN_BIG = 18;
+// Limpeza de cadeiras, a mesma tabela no site, no bot, nos orçamentos e nas ofertas (dono, 24 Nov 2026).
+// Cada cadeira paga o preço da sua posição (não cumulativo): 1.ª–4.ª 20€, 5.ª–8.ª 15€, 9.ª em diante 10€
+// (12 cadeiras = 180€). Com impermeabilização a limpeza fica a metade (10 / 7,50 / 5€). Impermeabilização
+// pela posição: Premium 25 / 22,50 / 20€, Essencial 15 / 12,50 / 10€. Limpeza + imper acaba no 9 mais perto
+// (12 cadeiras: Premium 359€, Essencial 239€; dono: "359 acho que é um bom número"). Deslocação à parte.
+export const CHAIR_CLEAN_UNIT = 20;
+export const CHAIR_CLEAN_MID_FROM = 5;
+export const CHAIR_CLEAN_MID = 15;
+export const CHAIR_CLEAN_BIG_FROM = 9;
+export const CHAIR_CLEAN_BIG = 10;
+export const CHAIR_CLEAN_WATERPROOF_FACTOR = 0.5;
 
-// A partir de 9 cadeiras, limpeza sozinha a 15€ cada (dono, 19 Nov 2026, 12 cadeiras a 18€: "Fazes a 15€ a
-// cadeira ... 18€ uma cadeira para limpar ... está maluco"); o total nunca fica abaixo do de 8 (8 × 18€).
-export const WHATSAPP_CHAIR_CLEAN_HUGE_FROM = 9;
-export const WHATSAPP_CHAIR_CLEAN_HUGE = 15;
+export function chairCleanUnit(qty: number): number {
+  return qty >= CHAIR_CLEAN_BIG_FROM ? CHAIR_CLEAN_BIG : qty >= CHAIR_CLEAN_MID_FROM ? CHAIR_CLEAN_MID : CHAIR_CLEAN_UNIT;
+}
 
-export function whatsappChairCleanUnit(totalChairs: number): number | null {
-  if (!Number.isSafeInteger(totalChairs) || totalChairs <= 0) return null;
-  if (totalChairs >= WHATSAPP_CHAIR_CLEAN_HUGE_FROM) {
-    const floor = (WHATSAPP_CHAIR_CLEAN_HUGE_FROM - 1) * WHATSAPP_CHAIR_CLEAN_BIG;
-    return Math.max(WHATSAPP_CHAIR_CLEAN_HUGE, Math.ceil((floor / totalChairs) * 100) / 100);
-  }
-  if (totalChairs <= WHATSAPP_CHAIR_CLEAN_SMALL_MAX) return WHATSAPP_CHAIR_CLEAN_SMALL;
-  return totalChairs >= WHATSAPP_CHAIR_CLEAN_BIG_FROM ? WHATSAPP_CHAIR_CLEAN_BIG : WHATSAPP_CHAIR_CLEAN;
+/** Limpeza de `qty` cadeiras: cada cadeira paga o preço da sua posição (1.ª–4.ª 20€, 5.ª–7.ª 17,50€, 8.ª+ 15€;
+ * dono, 24 Nov 2026: "não é cumulativo"); `waterproofQty` levam também impermeabilização (−5€ cada).
+ * `before` = cadeiras já contadas noutras linhas do mesmo pedido. */
+export function chairCleanTotal(qty: number, waterproofQty = 0, before = 0): number | null {
+  if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  const wp = Math.min(Math.max(0, Math.floor(waterproofQty)), qty);
+  let total = 0;
+  // As primeiras `wp` cadeiras desta linha levam impermeabilização: a limpeza fica a metade.
+  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k) * (k <= wp ? CHAIR_CLEAN_WATERPROOF_FACTOR : 1);
+  return Math.round(total * 100) / 100;
+}
+
+/** Total que acaba em 9, para baixo (dono, 24 Nov 2026: Premium e Essencial das cadeiras "a acabar em 9"). */
+export const endIn9Down = (total: number): number => {
+  if (total < 9) return total;
+  const lo = Math.floor((total + 1) / 10) * 10 - 1;
+  return total - lo <= lo + 10 - total ? lo : lo + 10; // o 9 mais perto
+};
+/** Preço riscado dos packs de cadeiras: o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026). */
+export function chairPackWas(qty: number, tier: ChairWaterproofTier): number {
+  return qty * endIn9Down(chairCleanTotal(1, 1)! + chairWaterproofTotal(1, tier)!);
 }

@@ -18,7 +18,7 @@ export const SERVICE_PROCESS_GUIDES = {
     ],
   },
   'limpeza-cadeiras': {
-    heading: 'A limpeza das suas cadeiras', subtitle, image: '/images/services/process-cadeiras.webp',
+    heading: 'A limpeza das cadeiras', subtitle, image: '/images/services/process-cadeiras.webp',
     steps: [
       step('Avaliação', 'Cada cadeira merece uma avaliação.', 'Observamos o assento, o encosto e o tecido. Identificamos manchas e explicamos as limitações antes da limpeza.', 'Avaliação do tecido de uma cadeira estofada'),
       step('Aplicação', 'O produto adequado ao estofo.', 'Aplicamos o produto nas zonas estofadas, com cuidado junto à madeira e aos restantes materiais da estrutura.', 'Aplicação de produto no assento estofado'),

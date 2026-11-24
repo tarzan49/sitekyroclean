@@ -1,3 +1,4 @@
+import { endIn9Down } from '@/constants/chairPricing';
 import { calculateTravelFee, smallOrderFarSurcharge } from '@/constants/travel';
 import { rugPickupFee } from '@/constants/commercialPolicy';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
@@ -51,17 +52,21 @@ export function useQuizPricing(
         const isPremium = formData.waterproofingTier === 'premium';
         const calcWaterproof = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
         const chairQty = parseInt(formData.chairQuantity);
+        let chairs = 0;
         if (!isNaN(chairQty) && chairQty > 0) {
-          price += formData.serviceType === 'waterproofing'
+          chairs += formData.serviceType === 'waterproofing'
             ? (calcWaterproof(chairQty) ?? 0)
-            : (calcChairClean(chairQty) ?? 0);
+            : (calcChairClean(chairQty, Math.min(formData.chairWaterproofQty || 0, chairQty)) ?? 0);
         }
         const addonQty = formData.chairWaterproofQty;
         if (addonQty > 0) {
-          price += formData.serviceType === 'waterproofing'
-            ? (calcChairClean(addonQty) ?? 0)
+          chairs += formData.serviceType === 'waterproofing'
+            ? (calcChairClean(addonQty, addonQty) ?? 0)
             : (calcWaterproof(addonQty) ?? 0);
+          // Limpeza + impermeabilização: total a acabar em 9, para baixo (dono, 24 Nov 2026).
+          chairs = endIn9Down(chairs);
         }
+        price += chairs;
         // Anti-ácaros das cadeiras: mesma regra e mesmo preço que o recibo
         // (chairAntiAcarosQty), nunca junto com a impermeabilização.
         price += calcChairAntiAcaros(formData);

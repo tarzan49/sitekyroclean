@@ -12,6 +12,7 @@ import essencialChair from '@/assets/picker-essencial-cadeira.webp';
 import { type PackExtra } from '@/lib/customPack';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
+import { chairPackWas } from '@/constants/chairPricing';
 import { formatEuro } from '@/data/enginePrices';
 
 type Kind = 'sofa' | 'chairs';
@@ -62,6 +63,8 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
       const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
       return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null;
     };
+    // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026: "em vez de 39 × 12, paga 359").
+    if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
     const clean = one('clean');
     const pick = (t: string) => { const w = one(t); return clean !== null && w !== null ? clean + w : null; };
     return { premium: pick('premium'), essencial: pick('essencial') } as Record<string, number | null>;
@@ -131,9 +134,8 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
             return (
               <button key={o.extra} type="button" role="radio" aria-checked={active} onClick={() => setExtra(o.extra)}
                 className={`relative flex min-h-[58px] items-stretch rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
-                {o.top && <span className="absolute -top-3 right-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
-                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="h-0 min-h-full w-[76px] shrink-0 rounded-l-[14px] object-cover md:w-[100px]" />
-                <span className="flex min-w-0 flex-1 flex-col justify-center px-3 py-2">
+                {o.top && <span className="absolute -top-3 left-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
+                <span className="flex min-w-0 flex-1 flex-col justify-center px-4 py-2.5 text-left">
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>
                   <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
                 </span>

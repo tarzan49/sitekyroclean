@@ -11,33 +11,37 @@ import { sofaPrices, mattressPrices, initialFormData } from './QuizTypes';
 // em silêncio para 0€) — os testes fixam os limiares exatos dos comentários
 // no código-fonte, para uma alteração futura a um dos três não desalinhar
 // silenciosamente os outros dois.
-describe('calcChairClean (1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+ sob orçamento)', () => {
+// Dono, 24 Nov 2026: cada cadeira paga o preço da sua posição (não é cumulativo, sem regra do mínimo).
+describe('calcChairClean (dono, 24 Nov 2026: 1.ª a 4.ª 20€, 5.ª a 7.ª 17,50€, 8.ª em diante 15€; -5€ por cadeira impermeabilizada)', () => {
   it('is null for 0 or negative', () => {
     expect(calcChairClean(0)).toBeNull();
     expect(calcChairClean(-1)).toBeNull();
   });
-  it('is null at the 10+ boundary (not only >10)', () => {
-    expect(calcChairClean(10)).toBeNull();
-    expect(calcChairClean(11)).toBeNull();
-  });
-  it('charges the last chair at 9', () => {
-    expect(calcChairClean(9)).toBeCloseTo(4 * 20 + 2 * 15 + 3 * 12.5); // 152.5
+  it('prices any quantity, no more "sob orçamento" at 10+', () => {
+    expect(calcChairClean(10)).toBeCloseTo(177.5);
+    expect(calcChairClean(12)).toBeCloseTo(207.5);
+    expect(calcChairClean(40)).toBeCloseTo(80 + 52.5 + 33 * 15);
   });
   it.each([
-    [1, 20], [4, 80], [5, 95], [6, 110], [7, 122.5],
-  ])('qty=%i -> %i€', (qty, expected) => {
+    [1, 20], [4, 80], [5, 97.5], [6, 115], [7, 132.5], [8, 147.5], [9, 162.5],
+  ])('qty=%i -> %s€', (qty, expected) => {
     expect(calcChairClean(qty)).toBeCloseTo(expected);
+  });
+  it('one more chair never costs less', () => {
+    for (let q = 1; q < 30; q++) expect(calcChairClean(q + 1)!).toBeGreaterThan(calcChairClean(q)!);
+  });
+  it('each waterproofed chair costs 5€ less to clean', () => {
+    expect(calcChairClean(4, 4)).toBeCloseTo(60);
+    expect(calcChairClean(12, 12)).toBeCloseTo(147.5);
   });
 });
 
-describe('chair protection per chair: 30€/23€ up to 4 chairs, 25€/18€ from 5 (owner, 2026-10-09)', () => {
+describe('chair protection per chair by position (dono, 24 Nov 2026: Premium 25/22,50/20€, Essencial 15/12,50/10€)', () => {
   it.each([
-    [1, 30, 23], [2, 60, 46], [4, 120, 92],
-    // 5 x 18 = 90 would be less than 4 chairs (92): never below the 4-chair total.
-    [5, 125, 92], [6, 150, 108], [8, 200, 144],
-    // From 9 (owner, 19 Nov 2026): 22,50€ / 15€ each, never below the 8-chair total (9 x 15 = 135 < 144).
-    [9, 202.5, 144], [10, 225, 150], [12, 270, 180], [100, 2250, 1500],
-  ])('%i chairs: Premium %i€, Essencial %i€', (qty, premium, essencial) => {
+    [1, 25, 15], [2, 50, 30], [4, 100, 60],
+    [5, 122.5, 72.5], [6, 145, 85], [8, 187.5, 107.5],
+    [9, 207.5, 117.5], [10, 227.5, 127.5], [12, 267.5, 147.5], [100, 2027.5, 1027.5],
+  ])('%i chairs: Premium %s€, Essencial %s€', (qty, premium, essencial) => {
     expect(calcChairWaterproofPremium(qty)).toBe(premium);
     expect(calcChairWaterproof(qty)).toBe(essencial);
   });

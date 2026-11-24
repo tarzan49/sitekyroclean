@@ -22,7 +22,7 @@ import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 import { type AskedDiscount } from './botAskedDiscount';
-import { whatsappChairCleanUnit, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
+import { chairPackWas, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -163,11 +163,13 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   const aloneSmall = items.every(i => i.primary === 'waterproofing' || !isWaterproofing(i)) && !items.some(i => i.primary === 'cleaning') && premium.subtotal <= 200;
   // Owner, 18 Nov 2026 (Altieres, sofá 3L + cadeiras with "Deslocação: 10€"): waterproofing of several pieces
   // (two or more lines in the order) never carries travel in 10€ towns; one piece alone keeps the rule above.
-  const severalPieces = items.length > 1 && items.some(isWaterproofing);
-  // Owner, 19 Nov 2026 (Hugo, sofá 3L chaise + 4 cadeiras quoted 149 + 4×30 = 269€): chairs waterproofed with
-  // another piece always go at the 5+ rate (25€ Premium / 18€ Essencial), whatever the count.
-  const chairBulk = (tier: 'premium' | 'essencial') => severalPieces ? items.filter(i => i.kind === 'chairs' && isWaterproofing(i) && !i.seatOnly && i.qty <= CHAIR_WATERPROOF_SMALL_MAX)
-    .reduce((s, i) => s + i.qty * (tier === 'premium' ? CHAIR_WATERPROOF_SMALL_PREMIUM - CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL - CHAIR_WATERPROOF_ESSENTIAL), 0) : 0;
+  // A chairs waterproofing row that only covers chairs cleaned in another row (the quiz sends it like that)
+  // is the same piece, not a second one: it must price like one clean+waterproofing row (owner, 24 Nov 2026).
+  const cleanedChairs = items.some(i => i.kind === 'chairs' && i.primary !== 'waterproofing');
+  const pieces = items.filter(i => !(cleanedChairs && i.kind === 'chairs' && i.primary === 'waterproofing')).length;
+  const severalPieces = pieces > 1 && items.some(isWaterproofing);
+  // Hugo rule (19 Nov, chairs with another piece at the 5+ rate) retired 24 Nov 2026: chairs priced by position.
+  const chairBulk = (_tier: 'premium' | 'essencial') => 0;
   const travel = isBlackFriday() || (severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX) ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   return {
     travel,
@@ -472,7 +474,40 @@ function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fa
 }
 
 export function botQuote(input: unknown) {
-  return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
+  return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
+}
+
+/**
+ * Colchão com anti-ácaros: o anti-ácaros feito à parte custa 40€ por colchão (dono, 24 Nov 2026: "sim 40€ nos
+ * colchões"). `separate` = o mesmo pedido só com a limpeza + 40€ por colchão com anti-ácaros; é o preço riscado
+ * ("em vez de") do pack limpeza + anti-ácaros, no site e no WhatsApp.
+ */
+export const MATTRESS_MITES_SEPARATE = 40;
+export const MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
+function withMattressMitePack<T extends { ok: boolean }>(input: unknown, r: T): T & { mattressMitePack: { separate: number; total: number; perMattress: number; rule: string } | null } {
+  const none = { ...r, mattressMitePack: null };
+  const q = r as unknown as { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean };
+  const items = (input as { items?: unknown } | null)?.items;
+  if (!q.ok || q.quote || q.handToOwner || typeof q.total !== 'number' || !Array.isArray(items)) return none;
+  const isMite = (i: unknown) => { const x = (i ?? {}) as Record<string, unknown>; return x.kind === 'mattress' && x.treatment === 'clean+anti-acaros'; };
+  const n = items.filter(isMite).reduce((s: number, i) => s + (Number((i as Record<string, unknown>).qty) || 1), 0);
+  if (!n) return none;
+  const clean = botQuote({ ...(input as object), items: items.map(i => (isMite(i) ? { ...(i as object), treatment: 'clean' } : i)) }) as { ok: boolean; total?: number | null; quote?: boolean };
+  if (!clean.ok || clean.quote || typeof clean.total !== 'number') return none;
+  const separate = clean.total + MATTRESS_MITES_SEPARATE * n;
+  return separate > q.total ? { ...r, mattressMitePack: { separate, total: q.total, perMattress: MATTRESS_MITES_SEPARATE, rule: MATTRESS_MITE_PACK_RULE } } : none;
+}
+
+/** Chairs alone with cleaning + waterproofing, 5 or more: the "em vez de" = the price of one chair × the quantity
+ * (owner, 24 Nov 2026: "em vez de pagar 39 vezes 12, paga 359"). `chairsWas` is null otherwise. */
+function withChairsWas<T extends object>(input: unknown, r: T): T & { chairsWas: number | null } {
+  const raw = (input as { items?: unknown })?.items;
+  const only = Array.isArray(raw) && raw.length === 1 ? raw[0] as Record<string, unknown> : null;
+  const tier = only?.treatment === 'clean+premium' ? 'premium' : only?.treatment === 'clean+essencial' ? 'essencial' : null;
+  const qty = Number(only?.qty);
+  const total = (r as { total?: unknown }).total;
+  const was = only?.kind === 'chairs' && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= 5 && typeof total === 'number' ? chairPackWas(qty, tier) : null;
+  return { ...r, chairsWas: was !== null && typeof total === 'number' && was > total ? was : null };
 }
 
 /**
@@ -562,14 +597,18 @@ function botQuoteCore(input: unknown) {
 /**
  * Pieces joined in the same visit (owner, 24 Nov 2026, "escada A"): the total never goes down; instead a
  * treatment is offered, always shown with the struck-through price ("dizes sempre o preço riscado").
- * 2+ pieces with a mattress: anti-mites on the mattress; 3+ pieces with chairs: + anti-mites on the chairs;
- * 4+ pieces with a rug: + anti-odor on the rug. A mattress order of 150€ or more keeps its gift (19 Nov).
- * `usual` = price with the offered treatments (the struck price); `total` = what the client pays (cleaning
- * only). Never on top of the big-order condition (above 300€). Works with a rug in the order (rugCombo).
+ * One gift per piece beyond the first: the mattress anti-mites first, then each time the cheapest
+ * treatment left in the visit (anti-mites on chairs or a sofa, anti-odor on a rug or carpet). Armchairs,
+ * puffs and headboards count as pieces. A mattress order of 150€ or more keeps its gift (19 Nov). A mattress
+ * or chairs the client already asked with anti-mites can be the gift (the base is cleaning only). The mattress
+ * anti-mites shows its separate price, 40€ per mattress (owner, 24 Nov 2026: "sim, muda para 40€").
+ * `usual` = price with the offered treatments (the struck price); `total` = what the client pays, up to the
+ * next price ending in 9. Same gifts on the Premium / Essencial options (`tiers`). Above 300€ it replaces
+ * the big-order cut. Works with a rug in the order (rugCombo).
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
-export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nunca chamar desconto; o total é o de tabela.';
+export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -577,39 +616,81 @@ const pricedTotal = (r: Priced): number | null => {
   if (typeof r.rugCombo?.comboPrice === 'number') return r.rugCombo.comboPrice;
   return !r.quote && typeof r.total === 'number' ? r.total : null;
 };
-function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
+type TierGift = { usual: number; total: number };
+function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r as unknown as Priced;
-  const rawIn = (input as { items?: unknown } | null)?.items;
-  if (q.bigOrder || pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  const inp = (input ?? {}) as Record<string, unknown>;
+  const rawIn = inp.items;
+  // Above 300€ the ladder replaces the big-order cut (owner, 24 Nov 2026: the total never goes down); with no gift the big order stays.
+  if (pricedTotal({ ...q, total: q.bigOrder ? (q.bigOrder as { normal: number }).normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
-  // A mattress the client already asked with anti-mites gets it offered too (19 Nov): the base is cleaning only.
-  const raw = rawIn.map(i => (rec(i).kind === 'mattress' && rec(i).treatment === 'clean+anti-acaros' ? { ...rec(i), treatment: 'clean' } : i));
-  const total = pricedTotal(innerPriced({ ...(input as object), items: raw }));
-  if (total === null) return none;
-  const cleanOnly = (i: unknown) => [undefined, 'clean'].includes(rec(i).treatment as string | undefined);
-  const pieces = raw.length;
-  const steps: { piece: VisitGift['piece']; treatment: VisitGift['treatment']; min: number; match: (i: unknown) => boolean; apply: (i: unknown) => unknown }[] = [
-    { piece: 'mattress', treatment: 'anti-acaros', min: 2, match: i => rec(i).kind === 'mattress' && cleanOnly(i), apply: i => ({ ...rec(i), treatment: 'clean+anti-acaros' }) },
-    { piece: 'chairs', treatment: 'anti-acaros', min: 3, match: i => rec(i).kind === 'chairs' && cleanOnly(i) && !rec(i).seatOnly, apply: i => ({ ...rec(i), treatment: 'clean+anti-acaros' }) },
-    { piece: 'rug', treatment: 'anti-odor', min: 4, match: i => rec(i).kind === 'rug' && cleanOnly(i) && rec(i).odor !== true, apply: i => ({ ...rec(i), odor: true }) },
-  ];
-  const gifts: VisitGift[] = [];
-  let items = raw as unknown[];
-  let usual = total;
-  for (const s of steps) {
-    const mattressAlone = s.piece === 'mattress' && total >= MATTRESS_MITE_OFFER_MIN;
-    if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
-    const next = items.map(i => (s.match(i) ? s.apply(i) : i));
-    const priced = pricedTotal(innerPriced({ ...(input as object), items: next }));
-    if (priced === null || priced <= usual) continue;
-    gifts.push({ piece: s.piece, treatment: s.treatment, normal: cents(priced - usual) });
-    items = next;
-    usual = priced;
+  const price = (items: unknown[]) => pricedTotal(innerPriced({ ...inp, items }));
+  const treat = (i: unknown) => rec(i).treatment as string | undefined;
+  const clean = (i: unknown) => treat(i) === undefined || treat(i) === 'clean';
+  // A mattress or chairs already asked with anti-mites: candidates on a cleaning base; restored (paid) when not offered.
+  const asked = new Set<number>();
+  const base = rawIn.map((i, n) => (['mattress', 'chairs'].includes(rec(i).kind as string) && treat(i) === 'clean+anti-acaros' ? (asked.add(n), { ...rec(i), treatment: 'clean' }) : i));
+  const extras = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'].filter(k => typeof inp[k] === 'number' && (inp[k] as number) > 0).length;
+  const pieces = rawIn.length + extras;
+  const candidate = (i: unknown): { piece: VisitGift['piece']; treatment: VisitGift['treatment']; apply: unknown } | null => {
+    const x = rec(i);
+    if (!clean(i)) return null;
+    if (x.kind === 'mattress') return { piece: 'mattress', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if (x.kind === 'chairs' && !x.seatOnly) return { piece: 'chairs', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if (x.kind === 'sofa' && !x.leather) return { piece: 'sofa', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if ((x.kind === 'rug' || x.kind === 'carpet') && x.odor !== true) return { piece: x.kind, treatment: 'anti-odor', apply: { ...x, odor: true } };
+    return null;
+  };
+  const baseTotal = price(base);
+  if (baseTotal === null) return none;
+  const giftsAllowed = Math.max(pieces - 1, baseTotal >= MATTRESS_MITE_OFFER_MIN && base.some(i => rec(i).kind === 'mattress') ? 1 : 0);
+  const gifted = new Map<number, VisitGift>();
+  let withGifts = base.slice();
+  let usualBase = baseTotal;
+  while (gifted.size < giftsAllowed) {
+    let best: { n: number; gift: VisitGift; items: unknown[]; priced: number } | null = null;
+    for (const [n, i] of withGifts.entries()) {
+      if (gifted.has(n)) continue;
+      const c = candidate(i);
+      if (!c) continue;
+      const items = withGifts.map((y, k) => (k === n ? c.apply : y));
+      const priced = price(items);
+      if (priced === null || priced <= usualBase) continue;
+      const mattresses = c.piece === 'mattress' ? Number(rec(i).qty) || 1 : 0;
+      const gift: VisitGift = { piece: c.piece, treatment: c.treatment, normal: c.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - usualBase) };
+      // The mattress goes first (owner's ladder), then the cheapest treatment left.
+      const better = !best || (c.piece === 'mattress') !== (best.gift.piece === 'mattress') ? !best || c.piece === 'mattress' : gift.normal < best.gift.normal;
+      if (better) best = { n, gift, items, priced };
+    }
+    if (!best) break;
+    gifted.set(best.n, best.gift);
+    withGifts = best.items;
+    usualBase = best.priced;
   }
-  if (!gifts.length) return none;
+  if (!gifted.size) return none;
+  // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
+  const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
+  const total = price(restore(base));
+  if (total === null || price(restore(withGifts)) === null) return none;
+  const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
+  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
+  // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
+  const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
+  const final = up9(total);
+  const out = { ...r } as Record<string, unknown>;
+  const rc = q.rugCombo;
+  if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
+  else out.total = final;
+  // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
+  const giftSum = cents(usual - total);
+  const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
+  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: cents(v + giftSum), total: up9(v) } : null);
+  const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
+  if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
+  if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
   const m = gifts.find(g => g.piece === 'mattress');
-  return { ...r, visitGifts: { gifts, usual, total, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total } : null };
+  return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
 const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });
@@ -675,7 +756,7 @@ function withBigOrder<T extends { ok: boolean }>(r: T): T & { bigOrder: { normal
 
 function botQuoteInner(input: unknown) {
   if (!input || typeof input !== 'object') return fail('O pedido tem de ter items e city');
-  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, largeArmchairs: rawLarge, headboards: rawHeadboards, site: rawSite } = input as Record<string, unknown>;
+  const { items: rawItemsIn, city: rawCity, sharedTrip: rawShared, puffs: rawPuffs, armchairs: rawArmchairs, largeArmchairs: rawLarge, headboards: rawHeadboards } = input as Record<string, unknown>;
   const puffs = rawPuffs ?? 0;
   if (typeof puffs !== 'number' || !Number.isInteger(puffs) || puffs < 0 || puffs > 20) return fail('puffs tem de ser um inteiro entre 0 e 20');
   const armchairs = rawArmchairs ?? 0;
@@ -735,12 +816,7 @@ function botQuoteInner(input: unknown) {
     items.push(item);
     rawOf.push(raw);
   }
-  // Chairs on WhatsApp (owner, 12 Nov 2026): 25€ each up to 3, 20€ from 4, 18€ from 8, counted over all
-  // the chairs to clean in the order; travel apart. The site's tiers (20/15/12,50€) are the site's only:
-  // an order from the site's questionnaire (`site: true`, quizOrder quoteRequest) keeps the price it showed.
-  const chairsToClean = items.filter(i => i.kind === 'chairs' && i.primary !== 'waterproofing').reduce((sum, i) => sum + i.qty, 0);
-  const chairUnit = rawSite === true ? null : whatsappChairCleanUnit(chairsToClean);
-  if (chairUnit) for (const [n, i] of items.entries()) if (i.kind === 'chairs' && i.primary !== 'waterproofing') items[n] = { ...i, unitPrice: chairUnit };
+  // Chairs: one table for site and bot (owner, 24 Nov 2026), chairPricing.chairCleanTotal via customPack.
   const city = resolveBotCity(rawCity);
   const result = calculateCustomPack(items, city ?? '');
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? '') : null;
@@ -820,4 +896,62 @@ function botQuoteInner(input: unknown) {
   const leather = leatherFor(items, rawOf);
   if (!leather) return { ...withOdor, leatherTreatment: null as { amount: number; perSofa: number; rule: string } | null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === 'sofa' && (rawOf[n] as Record<string, unknown>)?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } as { amount: number; perSofa: number; rule: string } | null };
+}
+
+/**
+ * "Poupa X€" (owner, 24 Nov 2026, same logic as the site's pack widgets): with several pieces or cleaning +
+ * waterproofing, the struck price is the SAME order done separately (each service alone with its own travel;
+ * waterproofing alone as a visit of its own), priced by this engine, never an invented value. The total and the
+ * struck price both go up to the next price ending in 9; `saving` = the difference. Gifts of the visit (escada A)
+ * are added to the separate price at their normal value. Also on the Premium / Essencial options (`tiers`).
+ */
+export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+const up9Total = (x: number) => { const n = Math.ceil(x - 1e-9); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
+type SepTier = { separate: number; total: number; saving: number };
+function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
+  const none = { ...r, separatePrice: null } as T;
+  const q = r as unknown as Priced & { blackFriday?: unknown; waterproofingTiers?: { premium: number | null; essencial: number | null } | null; visitGifts?: { gifts: VisitGift[] } | null };
+  const inp = (input ?? {}) as Record<string, unknown>;
+  const items = inp.items;
+  if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder || q.rugCombo) return none;
+  if (['armchairs', 'largeArmchairs', 'puffs', 'headboards'].some(k => typeof inp[k] === 'number' && (inp[k] as number) > 0)) return none;
+  // Chairs alone: their struck price is chairsWas (1 chair × quantity; owner, 24 Nov 2026), never this one.
+  if (items.every(i => (i as Record<string, unknown>)?.kind === 'chairs')) return none;
+  const total = pricedTotal(q);
+  if (total === null) return none;
+  const alone = (i: unknown) => pricedTotal(innerPriced({ ...inp, items: [i] }));
+  const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
+  // One item split into its separate visits: cleaning alone + waterproofing alone.
+  const visits = (i: unknown, tier?: 'premium' | 'essencial'): unknown[] | null => {
+    const raw = (rec(i).treatment as string | undefined) ?? 'clean';
+    const t = tier && /^clean\+(premium|essencial)$/.test(raw) ? 'clean' : raw;
+    const wp = tier && t === 'clean' ? tier : t.startsWith('clean+') && (t.endsWith('premium') || t.endsWith('essencial')) ? t.slice(6) : null;
+    if (!wp) return [i];
+    const asWp = alone({ ...rec(i), treatment: wp }) === null ? null : { ...rec(i), treatment: wp };
+    if (tier && !asWp) return [i]; // not waterproofable (mattress, rug): only its cleaning
+    return asWp ? [{ ...rec(i), treatment: 'clean' }, asWp] : null;
+  };
+  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + g.normal, 0);
+  const sepOf = (tier?: 'premium' | 'essencial'): number | null => {
+    const parts: unknown[] = [];
+    for (const i of items) { const v = visits(i, tier); if (!v) return null; parts.push(...v); }
+    if (parts.length < 2) return null;
+    let sum = 0;
+    for (const p of parts) { const v = alone(p); if (v === null) return null; sum += v; }
+    return sum + giftSum;
+  };
+  const make = (sep: number | null, tot: number | null): SepTier | null => {
+    if (sep === null || tot === null) return null;
+    const t9 = up9Total(tot), s9 = up9Total(sep);
+    return s9 > t9 ? { separate: s9, total: t9, saving: s9 - t9 } : null;
+  };
+  const main = make(sepOf(), total);
+  const wt = q.waterproofingTiers;
+  const tiers = wt ? { premium: make(sepOf('premium'), wt.premium), essencial: make(sepOf('essencial'), wt.essencial) } : null;
+  if (!main && !(tiers && (tiers.premium || tiers.essencial))) return none;
+  const out = { ...r } as Record<string, unknown>;
+  if (main) out.total = main.total;
+  if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
+  // Typed as T (the result is read as JSON by the bot): a wider type here makes botQuote's type circular.
+  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, rule: SEPARATE_PRICE_RULE } } as T;
 }

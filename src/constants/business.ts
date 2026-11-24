@@ -50,5 +50,5 @@ export const REVIEW_COUNT = "210";
 // Clientes (dono, 2026-11-17: +1450; antes +1350).
 export const CLIENTS_SERVED_LABEL = "+1450";
 
-// Serviços feitos (dono, 2026-10-29: "+1350 serviços feitos"; antes +1200).
-export const SERVICES_COMPLETED_LABEL = "+1350";
+// Serviços feitos (dono, 2026-11-24: "+1450 serviços"; antes +1350).
+export const SERVICES_COMPLETED_LABEL = "+1450";

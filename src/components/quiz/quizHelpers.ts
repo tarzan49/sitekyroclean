@@ -1,4 +1,4 @@
-import { chairWaterproofTotal } from '../../constants/chairPricing';
+import { chairWaterproofTotal, chairCleanTotal } from '../../constants/chairPricing';
 import { sofaAntiAcarosPrice, chairAntiAcarosTotal } from '../../constants/antiAcarosPricing';
 import { priceWithPackPerks, perkChairsFree, type PerkLineInput } from '../../constants/packPerks';
 import { sofaPrices, mattressPrices } from './QuizTypes';
@@ -207,11 +207,9 @@ export function quizServiceTypeLabel(
 // é sempre sob orçamento, com ou sem impermeabilização (pedido explícito,
 // era ">10" aqui e ">=10" nas duas de baixo, o desalinhamento causava um
 // bug real de preço a cair silenciosamente para a limpeza sozinha a 10).
-export function calcChairClean(qty: number): number | null {
-  if (qty <= 0 || qty >= 10) return null;
-  if (qty <= 4) return qty * 20;
-  if (qty <= 6) return 4 * 20 + (qty - 4) * 15;
-  return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
+// Limpeza de cadeiras: a tabela única do dono (24 Nov), chairPricing.chairCleanTotal.
+export function calcChairClean(qty: number, waterproofQty = 0): number | null {
+  return chairCleanTotal(qty, waterproofQty);
 }
 
 // Proteção: por cadeira, mais cara de 1 a 4 cadeiras (constants/chairPricing.ts).

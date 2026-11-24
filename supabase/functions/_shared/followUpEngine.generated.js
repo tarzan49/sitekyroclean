@@ -199,6 +199,24 @@ var mattressPrices = [
   { id: "king", label: "King / Queen", cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 104, originalBothPrice: 124 }
 ];
 
+// src/constants/chairPricing.ts
+var CHAIR_CLEAN_UNIT = 20;
+var CHAIR_CLEAN_MID_FROM = 5;
+var CHAIR_CLEAN_MID = 15;
+var CHAIR_CLEAN_BIG_FROM = 9;
+var CHAIR_CLEAN_BIG = 10;
+var CHAIR_CLEAN_WATERPROOF_FACTOR = 0.5;
+function chairCleanUnit(qty) {
+  return qty >= CHAIR_CLEAN_BIG_FROM ? CHAIR_CLEAN_BIG : qty >= CHAIR_CLEAN_MID_FROM ? CHAIR_CLEAN_MID : CHAIR_CLEAN_UNIT;
+}
+function chairCleanTotal(qty, waterproofQty = 0, before = 0) {
+  if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  const wp = Math.min(Math.max(0, Math.floor(waterproofQty)), qty);
+  let total = 0;
+  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k) * (k <= wp ? CHAIR_CLEAN_WATERPROOF_FACTOR : 1);
+  return Math.round(total * 100) / 100;
+}
+
 // src/constants/antiAcarosPricing.ts
 var SOFA_ANTI_ACAROS_PRICE = {
   "1-lugar": 20,
@@ -228,11 +246,8 @@ function calcPackPricing(option2, packOn, isWaterproofBase, fallbackDelta = null
   const displayPrice = packOn ? packPrice : basePrice;
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
-function calcChairClean(qty) {
-  if (qty <= 0 || qty >= 10) return null;
-  if (qty <= 4) return qty * 20;
-  if (qty <= 6) return 4 * 20 + (qty - 4) * 15;
-  return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
+function calcChairClean(qty, waterproofQty = 0) {
+  return chairCleanTotal(qty, waterproofQty);
 }
 
 // src/data/enginePrices.ts
@@ -273,17 +288,14 @@ function mattressCleaningPrice(id) {
   return priced(option(mattressPrices, id, "mattressPrices").cleaningPrice, `a limpeza do colchão "${id}"`);
 }
 function chairCleaningTiers() {
-  const tiers = [];
-  let qty = 1;
-  for (; qty < 100; qty++) {
-    const total = calcChairClean(qty);
-    if (total === null) break;
-    const unit = Math.round((total - (calcChairClean(qty - 1) ?? 0)) * 100) / 100;
-    const last = tiers[tiers.length - 1];
-    if (last && last.unit === unit) last.last = qty;
-    else tiers.push({ first: qty, last: qty, unit });
-  }
-  return { tiers, quoteFrom: qty };
+  return {
+    tiers: [
+      { first: 1, last: CHAIR_CLEAN_MID_FROM - 1, unit: chairCleanUnit(1) },
+      { first: CHAIR_CLEAN_MID_FROM, last: CHAIR_CLEAN_BIG_FROM - 1, unit: chairCleanUnit(CHAIR_CLEAN_MID_FROM) },
+      { first: CHAIR_CLEAN_BIG_FROM, last: Infinity, unit: chairCleanUnit(CHAIR_CLEAN_BIG_FROM) }
+    ],
+    quoteFrom: null
+  };
 }
 var chairUnits = chairCleaningTiers().tiers.map((tier) => tier.unit);
 var CHAIR_UNIT_MIN = Math.min(...chairUnits);

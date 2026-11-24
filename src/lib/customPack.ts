@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcSofaUnitPrice, calcMattressUnitPrice } from '../components/quiz/quizHelpers';
-import { chairWaterproofTotal, whatsappChairCleanUnit, CHAIR_WATERPROOF_BIG_FROM, WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG } from '../constants/chairPricing';
+import { chairWaterproofTotal, endIn9Down, chairCleanTotal, CHAIR_CLEAN_WATERPROOF_FACTOR } from '../constants/chairPricing';
 import { chairAntiAcarosTotal } from '../constants/antiAcarosPricing';
 import { locationPrices, calculateTravelFee } from '../constants/travel';
 import { priceWithPackPerks, type PerkTreatment } from '../constants/packPerks';
@@ -33,7 +33,8 @@ const PERK_TREATMENT: Record<PackExtra, PerkTreatment> = { none: 'none', premium
 /** Preço de tabela de um artigo, com o tratamento escolhido. As contas por
  * unidade são as mesmas do quiz (calcSofaUnitPrice, calcMattressUnitPrice e
  * os preços das cadeiras), e o anti-ácaros vem de constants/antiAcarosPricing.ts. */
-export function customPackLine(item: CustomPackItem) {
+/** `chairsBefore`: chairs to clean in earlier rows of the order (each chair pays its position's price, owner 24 Nov 2026). */
+export function customPackLine(item: CustomPackItem, chairsBefore = 0) {
   const options = item.kind === 'sofa' ? sofaPrices : mattressPrices;
   const option = options.find(p => p.id === item.size);
   let amount: number | null = null;
@@ -48,18 +49,15 @@ export function customPackLine(item: CustomPackItem) {
     const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
     amount = unit === null ? null : unit * item.qty;
   } else if (item.kind === 'chairs') {
-    // Bot only: `unitPrice` = the WhatsApp price per chair (chairPricing whatsappChairCleanUnit, owner 12 Nov 2026).
-    // 9 or more chairs cleaned and waterproofed (bot): the cleaning drops to 12,50€ each (owner, 19 Nov 2026).
-    const bigPack = !!item.unitPrice && !item.seatOnly && (item.extra === 'premium' || item.extra === 'essencial') && item.qty >= CHAIR_WATERPROOF_BIG_FROM;
-    // The pack total never falls below that of 8 chairs at the 8-chair prices (owner's rule: one more never costs less).
-    const eight = CHAIR_WATERPROOF_BIG_FROM - 1;
-    const eightPack = bigPack ? (whatsappChairCleanUnit(eight) ?? 0) * eight + (chairWaterproofTotal(eight, item.extra === 'premium' ? 'premium' : 'essencial') ?? 0) : 0;
-    const bigWp = bigPack ? (chairWaterproofTotal(item.qty, item.extra === 'premium' ? 'premium' : 'essencial') ?? 0) : 0;
-    amount = bigPack ? Math.max(WHATSAPP_CHAIR_CLEAN_WITH_WATERPROOF_BIG * item.qty + bigWp, eightPack) - bigWp : item.unitPrice ? item.unitPrice * item.qty : calcChairClean(item.qty);
+    // One table for site and bot (owner, 24 Nov 2026): chairPricing.chairCleanTotal; each chair that is also
+    // waterproofed costs 5€ less to clean.
+    const withWp = item.extra === 'premium' || item.extra === 'essencial';
+    amount = chairCleanTotal(item.qty, withWp ? item.qty : 0, chairsBefore);
     if (amount !== null) {
       if (item.extra === 'premium') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'premium', true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === 'essencial') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'essencial', true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === 'anti-acaros') amount += chairAntiAcarosTotal(item.qty) ?? 0;
+      if (item.extra === 'premium' || item.extra === 'essencial') amount = endIn9Down(amount);
     }
   } else if (item.kind === 'sofa' && item.unitPrice && item.primary !== 'waterproofing' && item.extra !== 'anti-acaros') {
     // Bot only: a sofa of 6 or 7 seats, cleaning judged on the photo (botQuote SEAT6_LOOK_PRICES), plus
@@ -93,17 +91,39 @@ export function customPackLine(item: CustomPackItem) {
 // preço de pack ia para tudo o que viesse depois da primeira linha, incluindo
 // um segundo sofá, e o mesmo pedido custava menos aqui do que no quiz.
 export function calculateCustomPack(items: CustomPackItem[], city: string) {
-  // Dez ou mais cadeiras a LIMPAR, mesmo em linhas separadas: sob orçamento.
-  // A impermeabilização sem limpeza tem preço por cadeira com qualquer
-  // quantidade (dono, 2026-10-09: 10 cadeiras a 25€ Premium / 18€ Essencial),
-  // como no quiz, por isso não conta nem fica sob orçamento.
-  const waterproofingOnly = (item: CustomPackItem) => item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial');
-  const chairsToClean = items.filter(i => i.kind === 'chairs' && !waterproofingOnly(i)).reduce((sum, i) => sum + i.qty, 0);
+  // Cadeiras: qualquer quantidade tem preço (tabela única do dono, 24 Nov 2026; 8+ a 15€ cada).
+  let chairsSeen = 0;
   const table = items.map(item => {
-    const line = customPackLine(item);
-    // The WhatsApp bot prices any number of chairs (unitPrice, owner 12 Nov 2026); the site keeps 10+ sob orçamento.
-    return item.kind === 'chairs' && !waterproofingOnly(item) && !item.unitPrice && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    if (item.kind !== 'chairs' || item.primary === 'waterproofing') return customPackLine(item);
+    const line = customPackLine(item, chairsSeen);
+    chairsSeen += item.qty;
+    return line;
   });
+  // Waterproofing sent as its own chairs row (the quiz does this): the cleaned chairs it covers clean at half,
+  // and cleaning + waterproofing ends in 9 like a combined row (owner, 24 Nov 2026).
+  const wpRows = items.map((i, n) => i.kind === 'chairs' && i.primary === 'waterproofing' && (i.extra === 'premium' || i.extra === 'essencial') ? n : -1).filter(n => n >= 0);
+  let wpLeft = wpRows.reduce((sum, n) => sum + items[n].qty, 0);
+  if (wpLeft > 0) {
+    let seen = 0;
+    items.forEach((item, n) => {
+      const line = table[n];
+      if (item.kind !== 'chairs' || item.primary === 'waterproofing') return;
+      const before = seen; seen += item.qty;
+      if (wpLeft <= 0 || item.extra === 'premium' || item.extra === 'essencial' || line.amount == null) return;
+      const off = Math.min(wpLeft, item.qty);
+      wpLeft -= off;
+      const amount = chairCleanTotal(item.qty, off, before)!;
+      table[n] = { ...line, amount, ...('tablePrice' in line && typeof line.tablePrice === 'number' ? { tablePrice: amount } : {}) };
+    });
+    const wpRow = wpRows[0];
+    const sum = table.filter((_, n) => items[n].kind === 'chairs').reduce((s2, l) => s2 + (l.amount ?? 0), 0);
+    const diff = sum - endIn9Down(sum);
+    if (diff !== 0 && table[wpRow].amount != null) {
+      // tablePrice too: priceWithPackPerks below rebuilds each line's amount from its tablePrice.
+      const wpLine = table[wpRow];
+      table[wpRow] = { ...wpLine, amount: wpLine.amount! - diff, ...('tablePrice' in wpLine && typeof wpLine.tablePrice === 'number' ? { tablePrice: wpLine.tablePrice - diff } : {}) };
+    }
+  }
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({
     kind: item.kind, sizeId: item.size, qty: item.qty, tablePrice: table[i].tablePrice, treatment: PERK_TREATMENT[item.extra],

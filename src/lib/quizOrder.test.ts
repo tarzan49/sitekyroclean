@@ -55,7 +55,7 @@ describe('buildQuizOrder', () => {
   it('chairs: the main treatment on all, the other on the chosen ones, same sum as the receipt', () => {
     const o = order({ service: 'chairs', chairQuantity: '6', chairWaterproofQty: 6, waterproofingTier: 'essencial' });
     expect(o.quote.items).toEqual([{ kind: 'chairs', qty: 6, treatment: 'clean' }, { kind: 'chairs', qty: 6, treatment: 'essencial' }]);
-    // A site order keeps the site's prices (site: true, owner 12 Nov 2026); WhatsApp chairs cost more.
+    // One table for site and WhatsApp; each waterproofed chair costs 5€ less to clean (dono, 24 Nov 2026): 115 - 30 + 85 = 170, line rounded down to 169.
     const quote = botQuote({ items: o.quote.items, city: 'Porto', site: true });
     const receipt = buildReceiptLines({ ...base, service: 'chairs', chairQuantity: '6', chairWaterproofQty: 6, waterproofingTier: 'essencial', finalTravelCost: 0 });
     expect(quote.ok && quote.subtotal).toBe(receipt.reduce((s, l) => s + (l.total ?? 0), 0));

@@ -18,7 +18,7 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
       chairQuantity: '10', chairWaterproofQty: 0,
     });
     expect(p.hasSobOrcamento).toBe(false);
-    expect(p.calculateServicePrice).toBe(250);
+    expect(p.calculateServicePrice).toBe(227.5); // Premium by position: 4 x 25 + 3 x 22,50 + 3 x 20 (dono, 24 Nov 2026)
   });
 
   it('9 chairs (just under the sob-orçamento threshold) still has a real fixed price', () => {
@@ -108,8 +108,8 @@ describe('anti-acaros on sofas and chairs', () => {
     expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(80 + 20);
     // Nunca as duas coisas: com impermeabilização, o anti-ácaros não conta
     // (mesma regra que o recibo, chairAntiAcarosQty).
-    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'essencial' }).calculateServicePrice).toBe(80 + 92);
-    expect(pricing({ service: 'chairs', serviceType: 'waterproofing', waterproofingTier: 'essencial', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(92);
+    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'essencial' }).calculateServicePrice).toBe(119); // 80 - 4 x 5 + 4 x 15 = 120, rounded down to end in 9 (dono, 24 Nov 2026)
+    expect(pricing({ service: 'chairs', serviceType: 'waterproofing', waterproofingTier: 'essencial', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(60);
   });
 });
 

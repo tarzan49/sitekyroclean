@@ -38,7 +38,6 @@ import {
   CHAIR_ANTI_MITE_UNIT_LABEL,
   CHAIR_PRICE_TITLE,
   chairTierSentence,
-  chairCleaningTiers,
 } from './enginePrices';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
@@ -84,7 +83,6 @@ function sizeList(options: PriceOption[]): string {
 }
 
 const TRAVEL = `A deslocação é à parte, a partir de ${TRAVEL_FEE_MIN}€, e o preço é confirmado antes da marcação.`;
-const { quoteFrom: CHAIR_QUOTE_FROM } = chairCleaningTiers();
 
 export const PILLAR_PAGES: PillarPage[] = [
   {
@@ -162,7 +160,7 @@ export const PILLAR_PAGES: PillarPage[] = [
       { question: 'A limpeza de cadeiras é recomendada só quando estão muito manchadas?', answer: 'Não. Quanto mais cedo se intervém, melhores são os resultados e maior é a durabilidade do tecido. A limpeza regular evita acumulação de nódoas, cheiros e gordura corporal, mantendo o aspeto "como novo" por muito mais tempo.' },
       { question: 'É seguro limpar cadeiras de tecido mais delicado (veludo, linho, etc.)?', answer: 'Sim. Antes de iniciar, avaliamos sempre o tipo de tecido e escolhemos produtos adequados. Em materiais mais delicados, ajustamos a pressão, a quantidade de água e os movimentos para garantir segurança máxima.' },
       { question: 'Cadeiras em pele ou pele sintética podem ser impermeabilizadas?', answer: 'Não fazemos, porque não faz sentido: a pele e a pele sintética já não deixam entrar os líquidos. Nestas cadeiras fazemos a limpeza, e na pele a hidratação. A impermeabilização fica para as cadeiras de tecido.' },
-      { question: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', answer: `Sim. Para restaurantes, hotéis e escritórios, a partir de ${CHAIR_QUOTE_FROM} cadeiras o orçamento é feito à medida da quantidade e do espaço. Contacte-nos para um orçamento personalizado.` },
+      { question: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', answer: `Sim. Para restaurantes, hotéis e escritórios, o preço por cadeira desce com a quantidade: ${chairTierSentence()} Peça o orçamento no WhatsApp.` },
     ],
   },
   {

@@ -12,6 +12,9 @@ import WaterproofPackPicker from './WaterproofPackPicker';
 import CompactFAQ from './CompactFAQ';
 import ChairProcessStory from './ChairProcessStory';
 import TreatmentPackPicker from './TreatmentPackPicker';
+import ServiceProcessStory, { hasProcessStory } from './ServiceProcessStory';
+import CarpetPricePicker from './CarpetPricePicker';
+import { isNewModel } from '@/lib/newModel';
 import PriceFactors from './PriceFactors';
 import { ServiceTrustDesktop, ServiceTrustMobile } from './ServiceTrustBlock';
 import CustomerReviews from './CustomerReviews';
@@ -23,7 +26,8 @@ import ServicePackBanner from './ServicePackBanner';
 import DirectoryGroup from './DirectoryGroup';
 import QuizFormLazy from './QuizFormLazy';
 import { type PackChoice } from './WaterproofPackPicker';
-import { choiceToItem } from './quiz/basketChoice';
+import { choiceToItem, treatmentToItem } from './quiz/basketChoice';
+import type { BasketItem } from './quiz/VisitBasket';
 const VisitBasketLazy = lazy(() => import('./quiz/VisitBasket'));
 import { isAdsVisit } from './AdsLandingNavigation';
 
@@ -46,19 +50,19 @@ export default function LandingServiceSections() {
   }, [pathname, fromHtml]);
   const model = fromHtml ?? (loaded?.path === pathname ? loaded.model : null);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
-  const [basket, setBasket] = useState<PackChoice | null>(null);
+  const [basket, setBasket] = useState<BasketItem | null>(null);
   if (!model) return null;
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
   // Novo modelo em teste (limpeza de sofás por cidade): escolha de preço simples com os totais do bot.
-  const newModel = model.serviceSlug === 'limpeza-sofas' || (['limpeza-cadeiras', 'limpeza-colchoes'].includes(model.serviceSlug) && model.family === 'localidade'); // sofás: todas as famílias; cadeiras: por cidade (dono, 24 Nov)
+  const newModel = isNewModel(model); // regra única em src/lib/newModel.ts (dono, 24 Nov)
   const pickerKind = model.serviceSlug === 'limpeza-cadeiras' ? 'chairs' as const : 'sofa' as const;
   const sections = {
     precos: newModel ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
         <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{model.prep} {model.locationName}</em></h2>
         <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">
-          {model.serviceSlug === 'limpeza-colchoes' ? <TreatmentPackPicker kind="mattress" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} /> : <WaterproofPackPicker kind={pickerKind} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(c)} />}
+          {model.serviceSlug === 'limpeza-alcatifas' ? <CarpetPricePicker city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} /> : model.serviceSlug === 'limpeza-tapetes' ? <TreatmentPackPicker kind="rug" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : model.serviceSlug === 'limpeza-colchoes' ? <TreatmentPackPicker kind="mattress" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : <WaterproofPackPicker kind={pickerKind} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(choiceToItem(c))} />}
         </div>
       </div>
     </section> : <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
@@ -92,7 +96,7 @@ export default function LandingServiceSections() {
       alt: card.image?.alt ?? card.title,
     }))} />,
     duvidas: newModel ? <CompactFAQ key={model.path} id="duvidas" dark faqs={model.faqs} heading={model.faqHeading} /> : <div id="duvidas" className="scroll-mt-20"><ServiceFAQ key={model.path} faqs={model.faqs} heading={model.faqHeading} /></div>,
-    processo: newModel && (model.serviceSlug === 'limpeza-cadeiras' || model.serviceSlug === 'limpeza-colchoes') ? <ChairProcessStory key={model.path} service={model.serviceSlug} city={model.locationName} cityPrep={model.prep} /> : model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
+    processo: newModel && hasProcessStory(model.serviceSlug) ? <ServiceProcessStory key={model.path} service={model.serviceSlug} city={model.locationName} cityPrep={model.prep} /> : newModel && (model.serviceSlug === 'limpeza-cadeiras' || model.serviceSlug === 'limpeza-colchoes') ? <ChairProcessStory key={model.path} service={model.serviceSlug} city={model.locationName} cityPrep={model.prep} /> : model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
     'mesma-visita': <div id="mesma-visita" className="scroll-mt-20"><ServicePackBanner packSlugs={model.packSlugs} city={model.municipalitySlug} variant="dark" /></div>,
     zonas: <section id="zonas" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
@@ -107,7 +111,7 @@ export default function LandingServiceSections() {
   };
   return <>
     {LANDING_SECTION_ORDER.filter(section => section !== 'zonas' || !hideDirectory).map(section => <div key={section} data-landing-section={section}>{sections[section]}</div>)}
-    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={model.municipalityName} initialItems={[choiceToItem(basket)]} /></Suspense>}
+    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={model.municipalityName} initialItems={[basket]} /></Suspense>}
     <QuizFormLazy isOpen={isQuizOpen} onClose={closeQuiz} initialLocation={model.municipalityName} initialService={quizService} initialServiceType={model.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'} initialCarpetKind={model.serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'} />
   </>;
 }
