@@ -23,10 +23,10 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
 | Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo | — | — | — | FEITO (24 Nov): topo novo (ResourceHubHero, também no índice do blog) + widget de preço no fim (ResourcePriceSection), texto corrido sem encaixe |
-| Artigos do blog | — | — | — | FEITO (24 Nov): topo (CommercialHero) + ResourcePriceSection do serviço do artigo no fim |
+| Artigos do blog, /blog, glossário, estudo, perguntas | — | — | — | FEITO (25 Nov): cada página na sua lógica (texto corrido, sem encaixe), títulos no formato único, introdução do artigo visível, preço do bot no fim |
 | /sobre, /areas-de-servico | — | — | — | FEITO (24 Nov): secções de ecrã inteiro com encaixe |
 | /problemas/* (nacionais) e por cidade | — | — | — | todos os serviços FEITO (25 Nov): sofás, tapetes, alcatifas, colchões, cadeiras, impermeabilização |
-| /en/* (turistas) | — | — | — | FEITO (24 Nov): encaixe, situações a deslizar, 4 perguntas; o guia longo /en/airbnb-portugal-cleaning-guide fica como artigo |
+| /en/* | — | — | — | FEITO (25 Nov): topo num ecrã (667 px no telemóvel, 620 no computador); o guia Airbnb fica artigo, com o texto todo no HTML estático |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
 

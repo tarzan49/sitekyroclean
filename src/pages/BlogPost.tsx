@@ -3,7 +3,6 @@ import ServiceFAQ from "@/components/ServiceFAQ";
 import ResourceLeadCard from "@/components/ResourceLeadCard";
 import ResourceNav from "@/components/ResourceNav";
 import CommercialHero from '@/components/CommercialHero';
-import ServicePriceSection from '@/components/ServicePriceSection';
 import ServiceReviewsGrid from '@/components/ServiceReviewsGrid';
 import ServicePackBanner from '@/components/ServicePackBanner';
 import SectionHeader from '@/components/SectionHeader';
@@ -123,14 +122,16 @@ const BlogPost = () => {
           whatsappHref={getResourceWhatsapp(post)} source={`blog-${post.slug}`} />
         <section className="py-12 md:py-16 bg-kyro-green" aria-label="Avaliações de clientes">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações reais" heading="Nas palavras dos nossos" goldWord="clientes" light={false} subtitle="Transcrições de quem já recebeu a nossa equipa." />
+            <SectionHeader heading="Nas palavras dos nossos" goldWord="clientes" light={false} />
             <ServiceReviewsGrid serviceSlug={serviceSlug} seed={`blog-${post.slug}`} heading="" />
           </div>
         </section>
 
         {/* ── Conteúdo ── */}
         <article id="guia" className="container mx-auto px-5 max-w-4xl py-12 sm:py-16 scroll-mt-20">
-          <SectionHeader overline="Guia prático" heading="O que precisa de" goldWord="saber" subtitle={post.intro} />
+          <SectionHeader heading="O que precisa de" goldWord="saber" />
+          {/* A introdução é texto do artigo, não subtítulo: está no HTML estático e tem de se ler na página. */}
+          <p className="type-reading mb-6 text-[#505650]">{post.intro}</p>
           <p className="text-sm text-[#505650] mb-7">Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={DEFAULT_AUTHOR.href} className="underline">{post.author}</Link></p>
           <nav aria-label="Neste guia" className="mb-8 border-b border-[#dfe5df] pb-6">
             <h2 className="text-base font-semibold text-[#173e2b] mb-3">Neste guia</h2>
@@ -210,7 +211,7 @@ const BlogPost = () => {
         {related.length > 0 && (
           <section className="bg-[#F5F4F0] border-t border-[#E8E4DE] py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-              <h2 className="type-card-title mb-4">Continue a ler</h2><div className="grid gap-3">
+              <h2 className="type-section-title font-playfair mb-4 text-[#111111]">Continue a <em className="not-italic" style={{ color: '#D4AF37' }}>ler</em></h2><div className="grid gap-3">
                 {related.map(p => <Link key={p.slug} to={`/blog/${p.slug}`} className="flex items-center justify-between gap-4 py-3 border-b border-[#dfe5df] text-[#173e2b]">{p.title}<ArrowRight className="w-4 h-4" /></Link>)}
               </div>
             </div>

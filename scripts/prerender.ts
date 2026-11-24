@@ -1,3 +1,4 @@
+import { EN_GUIDE_DESCRIPTION, EN_GUIDE_SECTIONS, EN_GUIDE_FAQS, EN_GUIDE_TAKEAWAYS } from '../src/data/enGuideContent';
 import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
@@ -1378,7 +1379,7 @@ export function prerenderRoutes(outDir: string): number {
   {
     const url = '/en/airbnb-portugal-cleaning-guide';
     const title = 'Airbnb & Short-Term Rental Cleaning in Portugal | Host Guide | Kyro Clean';
-    const desc = "A practical guide for Airbnb and short-term rental hosts in Portugal: turnover cleaning timelines, what to photograph for damage claims, and realistic costs for sofa, mattress and rug cleaning.";
+    const desc = EN_GUIDE_DESCRIPTION;
     emit(
       url,
       title,
@@ -1386,16 +1387,12 @@ export function prerenderRoutes(outDir: string): number {
       {
         h1: 'Airbnb & short-term rental cleaning in Portugal',
         intro: desc,
-        benefits: [
-          // Dois-pontos, não travessão: o EnGuidePage.tsx já escreve esta frase
-          // assim, e o travessão é proibido em conteúdo visível do site.
-          'Photograph damage before cleaning it: timestamped before/after is the standard most platforms ask for.',
-          'Same-day is often possible, but the earlier in the day you reach out, the better your odds.',
-          `Prices start from €${SOFA_CLEANING_FROM} (sofa) / €${MATTRESS_CLEANING_FROM} (mattress); rugs are quoted per piece, always confirmed before we start.`,
-          'Before/after photo documentation is standard on every job, no need to request it separately.',
-        ],
+        // Mesmo texto da página (src/data/enGuideContent.ts): secções, resumo e perguntas.
+        articleSections: EN_GUIDE_SECTIONS.map(x => ({ heading: x.title, body: x.body.join('\n\n') })),
+        benefits: EN_GUIDE_TAKEAWAYS,
+        faqs: EN_GUIDE_FAQS,
       },
-      [buildBreadcrumbSchema([
+      [buildFaqSchema(EN_GUIDE_FAQS), buildBreadcrumbSchema([
         { name: 'Home', url: BASE_URL + '/' },
         { name: 'Airbnb & Short-Term Rental Cleaning Guide', url: BASE_URL + url },
       ])],

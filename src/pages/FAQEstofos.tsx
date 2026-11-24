@@ -31,7 +31,7 @@ export default function FAQEstofos() {
         </div>
         <ResourceLeadCard />
       </div>
-      <section className="py-8 border-t border-[#dfe5df]"><h2 className="type-card-title mb-4">Preços e cuidados por serviço</h2><div className="flex flex-wrap gap-3">{RESOURCE_SERVICES.map(s=><Link key={s.href} to={s.href} className="border border-[#dfe5df] rounded-sm px-4 py-3 text-[#173e2b] min-h-11">{s.label}</Link>)}</div></section>
+      <section className="py-8 border-t border-[#dfe5df]"><h2 className="type-section-title font-playfair mb-4 text-[#111111]">Preços e cuidados por <em className="not-italic" style={{ color: '#D4AF37' }}>serviço</em></h2><div className="flex flex-wrap gap-3">{RESOURCE_SERVICES.map(s=><Link key={s.href} to={s.href} className="border border-[#dfe5df] rounded-sm px-4 py-3 text-[#173e2b] min-h-11">{s.label}</Link>)}</div></section>
     </div>
     <ResourcePriceSection source="resource_price_faq_estofos" />
   </main><Footer /></>;

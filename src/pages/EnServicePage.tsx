@@ -113,85 +113,23 @@ const EnServicePage = () => {
       <main>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-        {/* ═══ HERO + SNAPSHOT ═══ */}
-        <div data-mobile-hero="photo" className="relative overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" width={1280} height={720} />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
-
-          <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
-            <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-              <div className="max-w-3xl">
-                <PageBreadcrumb items={[
-                  { label: "Home", to: "/" },
-                  { label: page.h1 },
-                ]} />
-
-                <div className="inline-flex items-start mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      {page.audience === "host" ? "For Hosts & Property Managers" : "Local cleaning team"}
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="type-page-title font-playfair      text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
-                  {page.h1}{" "}<span style={{ color: "#D4AF37" }}>{page.h1Gold}</span>
-                </h1>
-
-                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {page.intro}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-4 mb-6">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
-                      ))}
-                    </div>
-                    <span className="text-white font-bold text-base">{REVIEW_RATING}</span>
-                    <span className="text-white/80 text-sm">Google</span>
-                  </div>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/80 text-sm font-medium">{REVIEW_COUNT}+ reviews</span>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/80 text-sm font-medium">{CLIENTS_SERVED_LABEL} clients</span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
-                  <div className="relative group flex-1">
-                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <a
-                      href={waHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
-                    >
-                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-base font-semibold tracking-[0.18em] uppercase">Message on WhatsApp</span>
-                    </a>
-                  </div>
-                  <a
-                    href={`tel:${PHONE_TEL}`}
-                    className="flex-1 flex items-center justify-center gap-2 h-[58px] md:h-[52px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
-                  >
-                    <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                    <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
-                  </a>
-                </div>
-
-                <p className="text-white/80 text-base mt-4">{EN_AVAILABILITY_PROMISE}</p><p className="text-white/80 text-base mt-2">{EN_DRYING_PROMISE}</p><p className="text-white/80 text-sm mt-4">Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
-              </div>
+        {/* Topo de ecrã inteiro (modelo novo): fotografia, título, prova e um pedido. */}
+        <section data-en-hero className="relative flex flex-col justify-end overflow-hidden bg-[#071a12] text-white">
+          <img src={heroImg} alt="Professional upholstery cleaning" className="absolute inset-0 h-full w-full object-cover" loading="eager" width={1280} height={720} />
+          <div className="absolute inset-0" aria-hidden="true" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.45) 0%, rgba(7,26,18,0.72) 45%, rgba(7,26,18,0.97) 85%)" }} />
+          <div className="relative mx-auto w-full max-w-7xl px-5 pb-3 pt-16 sm:px-6 lg:px-8">
+            <div className="hidden md:block"><PageBreadcrumb items={[{ label: "Home", to: "/" }, { label: page.h1 }]} /></div>
+            <h1 className="font-playfair mb-2 max-w-3xl text-[26px] font-semibold leading-tight text-white md:text-4xl">{page.h1}{" "}<em className="not-italic text-[#D4AF37]">{page.h1Gold}</em></h1>
+            <p className="mb-3 max-w-2xl text-[13px] leading-snug text-white/85 md:text-[15px]">{page.intro}</p>
+            <p className="mb-3 flex flex-wrap gap-x-3 text-[13px] text-white/85"><span><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> Google</span><span>{REVIEW_COUNT}+ reviews</span><span>{CLIENTS_SERVED_LABEL} clients</span></p>
+            <div className="flex max-w-xl gap-2">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="en_hero" className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Message on WhatsApp</a>
+              <a href={`tel:${PHONE_TEL}`} data-tracking-source="en_hero" aria-label={`Call ${PHONE_DISPLAY}`} className="flex min-h-[48px] min-w-[48px] items-center justify-center gap-2 rounded-lg border border-white/30 px-3 text-base font-semibold text-white hover:bg-white/10"><Phone className="h-4 w-4 shrink-0" /><span className="hidden sm:inline">{PHONE_DISPLAY}</span></a>
             </div>
-            <img src={heroImg} alt="Professional upholstery cleaning" width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
-          </section>
-
-          <ServiceSnapshotStats stats={stats} />
-        </div>
+            <p className="mt-2 text-[12px] leading-snug text-white/75">{EN_AVAILABILITY_PROMISE} {EN_DRYING_PROMISE} Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
+          </div>
+          <div className="relative"><ServiceSnapshotStats stats={stats} /></div>
+        </section>
 
         {/* ═══ SCENARIOS ═══ */}
         <section id="handle" className="py-14 md:py-20 bg-[#FDFDF9]">

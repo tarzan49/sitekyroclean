@@ -92,7 +92,7 @@ const Estudo = () => {
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-2">Método</h2>
+            <h2 className="type-section-title font-playfair mb-2 text-[#111111]"><em className="not-italic" style={{ color: "#D4AF37" }}>Método</em></h2>
             <p className="text-neutral-700 leading-relaxed mb-5">
               Está primeiro, e não no fim, porque um número sem método não é verificável.
               Quem quiser contestar qualquer valor desta página precisa de saber isto antes de o ler.
@@ -111,7 +111,7 @@ const Estudo = () => {
           ))}
 
           <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-2">O que estes números não dizem</h2>
+            <h2 className="type-section-title font-playfair mb-2 text-[#111111]">O que estes números não <em className="not-italic" style={{ color: "#D4AF37" }}>dizem</em></h2>
             <p className="text-neutral-700 leading-relaxed mb-5">
               Um estudo que só diz aquilo que lhe convém não serve para ser citado.
               Estes são os limites reais destes dados.
@@ -126,7 +126,7 @@ const Estudo = () => {
           </section>
 
           <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Usar estes dados</h2>
+            <h2 className="type-section-title font-playfair mb-4 text-[#111111]">Usar estes <em className="not-italic" style={{ color: "#D4AF37" }}>dados</em></h2>
             <p className="text-neutral-700 leading-relaxed">
               Os números desta página podem ser citados com atribuição à Kyro Clean Solutions,
               indicando o período ({formatStudyDate(STUDY_PERIOD.start)} a {formatStudyDate(STUDY_PERIOD.end)},
@@ -160,7 +160,7 @@ const Estudo = () => {
  */
 const StudySection = ({ table }: { table: StudyTable }) => (
   <section className="mb-12">
-    <h2 className="font-playfair text-2xl sm:text-3xl mb-4">{table.heading}</h2>
+    <h2 className="type-section-title font-playfair mb-4 text-[#111111]">{table.heading.split(" ").slice(0, -1).join(" ")} <em className="not-italic" style={{ color: "#D4AF37" }}>{table.heading.split(" ").slice(-1)}</em></h2>
 
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       <table className="w-full bg-white border border-neutral-200 rounded-xl overflow-hidden text-sm">

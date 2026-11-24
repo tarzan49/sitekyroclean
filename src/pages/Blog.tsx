@@ -1,3 +1,4 @@
+import ResourcePriceSection from '@/components/ResourcePriceSection';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Search } from 'lucide-react';
@@ -42,5 +43,6 @@ export default function Blog() {
       </div>
       {!visible.length && <div className="py-10"><p>Nenhum guia encontrado. Experimente outro assunto.</p><button onClick={()=>{setQuery('');setCategory('Todos');}} className="underline py-3 min-h-11">Ver todos os guias</button></div>}
     </section>
+    <ResourcePriceSection source="resource_price_blog" />
   </main><Footer /></>;
 }

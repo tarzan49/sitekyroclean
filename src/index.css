@@ -882,3 +882,9 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
   html.snap-sections details.group\/directory > summary { min-height: 40px; padding-top: 6px; padding-bottom: 6px; }
   html.snap-sections #processo .md\:grid figcaption { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 }
+
+/* Topo das páginas em inglês: ocupa um ecrã e não mais (25 Nov). */
+[data-en-hero] { min-height: 100svh; }
+html.snap-sections main > section[data-en-hero] { min-height: 100svh; padding-top: 0 !important; padding-bottom: 0 !important; justify-content: flex-end; }
+[data-en-hero] [class*="grid"] svg { display: none; }
+[data-en-hero] > div:last-child .grid { padding-top: 6px; padding-bottom: 8px; }
