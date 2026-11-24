@@ -22,7 +22,7 @@ import imperPhoto from '@/assets/picker-premium-sofa.webp';
 // Primeiro ecrã: vídeos reais da equipa a limpar em vez de fotografias (dono, 24 Nov: "vídeos de fundo a fazer a
 // limpeza, com opacidade mais alta, na horizontal"). Os mesmos da página inicial; o tapete é a máquina de extração.
 import sofaClip from '@/assets/sofa-processo/extracao.mp4';
-import mattressClip from '@/assets/colchoes-processo/mancha-pulverizacao.mp4';
+import mattressClip from '@/assets/colchoes-processo/extracao-colchao-inteiro.mp4';
 import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
 import rugClip from '@/assets/tapete-processo/limpeza-soalho.mp4';
 import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
@@ -42,8 +42,9 @@ import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
 // Cartões do material (dono, 25 Nov: "assim como é no que vamos impermeabilizar"): fotografias reais de serviços.
 import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
 import matPele from '@/assets/widget-materiais/sofa-pele.webp';
-import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
-import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
+import cadeirasInteiras from '@/assets/quiz-materiais/cadeiras-inteiras.webp';
+import matJuta from '@/assets/quiz-materiais/tapete-juta-inteiro.webp';
+import matComum from '@/assets/quiz-materiais/tapete-la-inteiro.webp';
 import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
 import baCadeiras from '@/assets/quiz-antes-depois/cadeiras.webp';
 import baTapete from '@/assets/quiz-antes-depois/tapete.webp';
@@ -325,7 +326,7 @@ const CLIP: Record<BasketKind, string> = { sofa: sofaClip, mattress: mattressCli
 /** A imagem enquanto o vídeo carrega é um fotograma do próprio vídeo (dono, 25 Nov: "nos tapetes tem que ter um vídeo de
  *  limpeza de tapetes": via-se uma fotografia de catálogo), e o ponto do vídeo que fica sempre à vista. */
 const CLIP_POSTER: Record<string, string> = { [sofaClip]: capaSofa, [mattressClip]: capaColchao, [chairsClip]: capaCadeiras, [rugClip]: capaTapete, [carpetClip]: capaAlcatifa, [imperClip]: capaImper, [imperChairsClip]: capaImperCadeiras };
-const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 40%', [mattressClip]: '50% 60%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
+const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 40%', [mattressClip]: '50% 42%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
 function waterproofFrom(city: string): string {
   const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
   const v = r.ok ? r.lines?.[0]?.amount : null;
@@ -627,13 +628,18 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <header className="flex items-center border-b border-white/10 px-2 py-2">
             <button type="button" onClick={() => setImperPick(false)} className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:bg-white/10"><ArrowLeft className="h-5 w-5" />Voltar</button>
           </header>
-          <div className="flex-1 overflow-y-auto px-4 pt-4">
-            <h2 className="type-section-title font-playfair mb-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>impermeabilizar?</em></h2>
-            <div className="grid grid-cols-2 gap-3">
-              {([{ kind: 'sofa', label: 'Sofá', clip: imperClip, photo: imperPhoto }, { kind: 'chairs', label: 'Cadeiras', clip: imperChairsClip, photo: PHOTO.chairs }] as const).map(o => (
-                <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
-                  <video src={o.clip} poster={o.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-                  <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/45 px-3 py-2 backdrop-blur-md"><span className="text-lg font-bold text-white">{o.label}</span><Plus className="h-5 w-5" style={{ color: GOLD }} strokeWidth={3} /></span>
+          <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-4 [&>*]:shrink-0">
+            {/* O vídeo da Pepsi em cima e fotografias nos cartões (dono, 25 Nov: "abres e não há vídeo [...] colocava o vídeo da Pepsi em cima"). */}
+            <div className="relative -mx-4 mb-4 min-h-40 shrink-0 grow overflow-hidden">
+              <video src={imperClip} poster={CLIP_POSTER[imperClip]} autoPlay muted loop playsInline preload="auto" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: CLIP_AT[imperClip] }} />
+              <span className="absolute inset-x-0 bottom-0 h-32 max-h-full bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/55 to-transparent" />
+              <h2 className="type-section-title font-playfair absolute bottom-2 left-4 right-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>impermeabilizar?</em></h2>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              {([{ kind: 'sofa', label: 'Sofá', photo: matTecido }, { kind: 'chairs', label: 'Cadeiras', photo: cadeirasInteiras }] as const).map(o => (
+                <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-[130px] overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+                  <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-gradient-to-t from-black/75 to-transparent px-3 pb-2 pt-6"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5" style={{ color: GOLD }} strokeWidth={3} /></span>
                 </button>
               ))}
             </div>
