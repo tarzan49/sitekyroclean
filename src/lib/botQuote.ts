@@ -590,7 +590,7 @@ function botQuoteCore(input: unknown) {
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -620,15 +620,20 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const gifts: VisitGift[] = [];
   let items = raw as unknown[];
   let usual = total;
+  let real = total; // o preço de tabela com as ofertas até aqui (a base de cada diferença)
   for (const s of steps) {
     const mattressAlone = s.piece === 'mattress' && total >= MATTRESS_MITE_OFFER_MIN;
     if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
     const next = items.map(i => (s.match(i) ? s.apply(i) : i));
     const priced = pricedTotal(innerPriced({ ...(input as object), items: next }));
-    if (priced === null || priced <= usual) continue;
-    gifts.push({ piece: s.piece, treatment: s.treatment, normal: cents(priced - usual) });
+    if (priced === null || priced <= real) continue;
+    // Colchão: o anti-ácaros oferecido vale o preço à parte, 40€ por colchão (dono, 24 Nov 2026: "sim, muda para 40€").
+    const mattresses = s.piece === 'mattress' ? items.filter(s.match).reduce((n: number, i) => n + (Number(rec(i).qty) || 1), 0) : 0;
+    const normal = s.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - real);
+    gifts.push({ piece: s.piece, treatment: s.treatment, normal });
     items = next;
-    usual = priced;
+    real = priced;
+    usual = cents(usual + normal);
   }
   if (!gifts.length) return none;
   const m = gifts.find(g => g.piece === 'mattress');

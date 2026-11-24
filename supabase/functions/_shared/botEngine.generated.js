@@ -2687,7 +2687,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2713,15 +2713,19 @@ function withVisitGifts(input, r) {
   const gifts = [];
   let items = raw;
   let usual = total;
+  let real = total;
   for (const s of steps) {
     const mattressAlone = s.piece === "mattress" && total >= MATTRESS_MITE_OFFER_MIN;
     if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
     const next = items.map((i) => s.match(i) ? s.apply(i) : i);
     const priced2 = pricedTotal(innerPriced({ ...input, items: next }));
-    if (priced2 === null || priced2 <= usual) continue;
-    gifts.push({ piece: s.piece, treatment: s.treatment, normal: cents(priced2 - usual) });
+    if (priced2 === null || priced2 <= real) continue;
+    const mattresses = s.piece === "mattress" ? items.filter(s.match).reduce((n, i) => n + (Number(rec(i).qty) || 1), 0) : 0;
+    const normal = s.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - real);
+    gifts.push({ piece: s.piece, treatment: s.treatment, normal });
     items = next;
-    usual = priced2;
+    real = priced2;
+    usual = cents(usual + normal);
   }
   if (!gifts.length) return none;
   const m = gifts.find((g) => g.piece === "mattress");

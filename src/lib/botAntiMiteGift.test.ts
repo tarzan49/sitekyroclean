@@ -25,7 +25,7 @@ describe('anti-ácaros no colchão oferecido a partir de 150€ (dono, 19/11/202
     const q = botQuote({ city: 'Porto', items }) as any;
     const mites = botQuote({ city: 'Porto', items: [items[0], { ...items[1], treatment: 'clean+anti-acaros' }] }) as any;
     expect(q.total).toBeGreaterThanOrEqual(150);
-    expect(q.mattressMiteOffer).toEqual({ normal: 20, total: q.total });
+    expect(q.mattressMiteOffer).toEqual({ normal: 40, total: q.total }) // 40€ à parte (dono, 24 Nov);
     expect(q.total % 10).toBe(9);
     expect(mites.mattressMiteOffer).toEqual(q.mattressMiteOffer);
     expect(q.askedDiscount).toBeNull();

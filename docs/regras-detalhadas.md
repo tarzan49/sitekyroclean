@@ -1183,3 +1183,8 @@ Dono: "O preço máximo de limpeza de uma cadeira é 20 euros. entre 1-4 cadeira
 
 ## Packs: regalias no artigo acrescentado [RETIRADA 24/11]
 Dono, 23 Nov 2026 (Joana Duarte): 2 ou mais peças na mesma visita = cada peça ao preço de tabela, somado, sem condição especial. Em 24 Nov o motor ainda dava "preço de pack" (colchão −14€, 1 cadeira oferecida por cada 4, sofá acrescentado a 35/55/65/79€, tapete "limpe 5 m², pague 4"), no site e no bot. Desligado em `src/constants/packPerks.ts` (`PACK_PERKS_ON = false`), textos do site e do ficheiro do bot (linha 765) acertados.
+
+
+## Anti-ácaros no colchão à parte = 40€ (dono, 24 Nov 2026)
+
+"Números riscados, senão as pessoas não compram"; "sim 40€ nos colchões"; "sim, muda para 40€". O pack limpeza + anti-ácaros do colchão mostra riscado a limpeza + 40€ por colchão (`mattressMitePack` no `botQuote`, site e bot). A oferta do anti-ácaros no colchão (escada A, 150€+) passa de "normalmente 20€" `[RETIRADA 24/11]` para 40€ (`visitGifts`, `mattressMiteOffer`). No sofá não há riscado: o pack já é a limpeza + o acréscimo de tabela.

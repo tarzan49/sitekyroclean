@@ -1,3 +1,4 @@
+// Anti-ácaros no colchão oferecido vale 40€ (preço à parte; dono, 24 Nov 2026).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from './botQuote';
 
@@ -7,11 +8,11 @@ const g = (items: unknown[]) => (botQuote({ items, city: 'Lisboa' }) as any).vis
 
 describe('visitGifts (escada A)', () => {
   it('sofá + colchão: anti-ácaros no colchão, total sobe ao 9 seguinte (148 -> 149)', () => {
-    expect(g([S, M])).toMatchObject({ total: 149, usual: 168, gifts: [{ piece: 'mattress', normal: 20 }] });
+    expect(g([S, M])).toMatchObject({ total: 149, usual: 188, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
   it('3 peças: + anti-ácaros nas cadeiras', () => {
     expect(g([S, M, C]).total % 10).toBe(9);
-    expect(g([S, M, C])).toMatchObject({ gifts: [{ piece: 'mattress', normal: 20 }, { piece: 'chairs', normal: 30 }] });
+    expect(g([S, M, C])).toMatchObject({ gifts: [{ piece: 'mattress', normal: 40 }, { piece: 'chairs', normal: 30 }] });
   });
   it('4 peças com tapete: + anti-odor no tapete', () => {
     const v = g([S, M, C, R]);
