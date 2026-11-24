@@ -100,8 +100,6 @@ import imperAgua09 from "@/assets/before-after-pool/imper-agua-09.mp4";
 import imperAgua09Poster from "@/assets/before-after-pool/imper-agua-09-poster.webp";
 import imperAgua10 from "@/assets/before-after-pool/imper-agua-10.mp4";
 import imperAgua10Poster from "@/assets/before-after-pool/imper-agua-10-poster.webp";
-import imperAgua11 from "@/assets/before-after-pool/imper-agua-11.mp4";
-import imperAgua11Poster from "@/assets/before-after-pool/imper-agua-11-poster.webp";
 import imperAgua12 from "@/assets/before-after-pool/imper-agua-12.mp4";
 import imperAgua12Poster from "@/assets/before-after-pool/imper-agua-12-poster.webp";
 import imperAgua13 from "@/assets/before-after-pool/imper-agua-13.mp4";
@@ -231,7 +229,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
   ],
-  // 15 vídeos do teste com líquido, acelerados, escolhidos e ordenados (dono, 24/11/2026).
+  // 14 vídeos do teste com líquido, acelerados, escolhidos e ordenados (dono, 24/11/2026).
   impermeabilizacao: [
     { kind: "video", src: imperAgua01, poster: imperAgua01Poster },
     { kind: "video", src: imperAgua02, poster: imperAgua02Poster },
@@ -243,7 +241,6 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "video", src: imperAgua08, poster: imperAgua08Poster },
     { kind: "video", src: imperAgua09, poster: imperAgua09Poster },
     { kind: "video", src: imperAgua10, poster: imperAgua10Poster },
-    { kind: "video", src: imperAgua11, poster: imperAgua11Poster },
     { kind: "video", src: imperAgua12, poster: imperAgua12Poster },
     { kind: "video", src: imperAgua13, poster: imperAgua13Poster },
     { kind: "video", src: imperAgua14, poster: imperAgua14Poster },
