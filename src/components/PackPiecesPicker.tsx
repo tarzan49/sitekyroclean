@@ -48,7 +48,7 @@ function Choice({ items, value, onChange, label, compact }: { items: T[]; value:
       const active = value === t.id;
       return <button key={t.id} type="button" role="radio" aria-checked={active} onClick={() => onChange(t.id)}
         className={`relative flex flex-col overflow-hidden rounded-xl border-2 text-left transition-all ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
-        {!compact && <img src={t.img} alt="" loading="lazy" decoding="async" className="h-11 w-full object-cover md:h-[52px]" />}
+        {!compact && <img src={t.img} alt="" loading="lazy" decoding="async" className="h-9 w-full object-cover md:h-[52px]" />}
         <span className="px-2 py-1.5">
           <span className="block text-[13px] font-bold leading-tight text-[#1A1A1A]">{t.label}</span>
           <span className="block text-[11px] leading-tight text-[#1A1A1A]/75">{t.note}</span>

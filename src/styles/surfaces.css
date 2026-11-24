@@ -67,7 +67,8 @@ section[class*="bg-[#FDFDF9]"]{background:var(--kyro-paper)!important}
   [data-commercial-hero][data-mobile-hero] [data-hero-part="title"]{font-size:28px;line-height:1.12}
   /* Freguesias de nome muito comprido: o título em 4 linhas empurrava o topo para fora do ecrã (24 Nov). */
   [data-commercial-hero][data-mobile-hero] [data-hero-part="title"][data-long-title]{font-size:23px}
-  [data-commercial-hero][data-mobile-hero] [data-hero-part="title"][data-long-title="xl"]{font-size:19px}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="title"][data-long-title="xl"]{font-size:17.5px}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="title"][data-long-title="lg"]{font-size:20px}
   [data-commercial-hero][data-mobile-hero] [data-hero-part="subtitle"]{font-size:14px;line-height:1.45;margin-top:8px;margin-bottom:14px}
   [data-commercial-hero][data-mobile-hero] [data-hero-part="proof"]{margin-bottom:12px}
   [data-commercial-hero][data-mobile-hero] [data-hero-part="prices"]{min-height:36px;margin-top:2px}

@@ -16,7 +16,7 @@ export default function LeatherProcessSection({ heading = 'Como cuidamos do seu 
       <ol className="space-y-1.5 md:space-y-2">
         {steps.map((s, i) => <li key={s.label} className="flex items-center gap-3 rounded-xl border border-[#E5E0D3] bg-white px-3 py-1.5 md:py-2">
           <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#D4AF37] text-sm font-bold text-white">{i + 1}</span>
-          <span className="min-w-0"><span className="block text-[14px] font-semibold text-[#1A1A1A]">{s.label}</span><span className="text-[12.5px] leading-snug text-[#555] line-clamp-1 md:line-clamp-2">{s.description}</span></span>
+          <span className="min-w-0"><span className="block text-[14px] font-semibold text-[#1A1A1A]">{s.label}</span><span className="block text-[12.5px] leading-snug text-[#555]"><span className="md:hidden">{s.title}</span><span className="max-md:hidden [@media(max-height:690px)]:hidden">{s.description}</span><span className="hidden [@media(max-height:690px)]:md:inline">{s.title}</span></span></span>
         </li>)}
       </ol>
     </div>
