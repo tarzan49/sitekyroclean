@@ -586,11 +586,11 @@ function botQuoteCore(input: unknown) {
  * 2+ pieces with a mattress: anti-mites on the mattress; 3+ pieces with chairs: + anti-mites on the chairs;
  * 4+ pieces with a rug: + anti-odor on the rug. A mattress order of 150€ or more keeps its gift (19 Nov).
  * `usual` = price with the offered treatments (the struck price); `total` = what the client pays (cleaning
- * only, up to the next price ending in 9). Never on top of the big-order condition (above 300€). Works with a rug in the order (rugCombo).
+ * only, up to the next price ending in 9). Same gifts on the Premium / Essencial options (`tiers`). Above 300€ it replaces the big-order cut. Works with a rug in the order (rugCombo).
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nunca chamar desconto; o total é o de tabela.';
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -598,11 +598,13 @@ const pricedTotal = (r: Priced): number | null => {
   if (typeof r.rugCombo?.comboPrice === 'number') return r.rugCombo.comboPrice;
   return !r.quote && typeof r.total === 'number' ? r.total : null;
 };
-function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
+type TierGift = { usual: number; total: number };
+function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r as unknown as Priced;
   const rawIn = (input as { items?: unknown } | null)?.items;
-  if (q.bigOrder || pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  // Above 300€ the ladder replaces the big-order cut (owner, 24 Nov 2026: the total never goes down); with no gift the big order stays.
+  if (pricedTotal({ ...q, total: q.bigOrder ? (q.bigOrder as { normal: number }).normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
   // A mattress the client already asked with anti-mites gets it offered too (19 Nov): the base is cleaning only.
   const raw = rawIn.map(i => (rec(i).kind === 'mattress' && rec(i).treatment === 'clean+anti-acaros' ? { ...rec(i), treatment: 'clean' } : i));
@@ -637,7 +639,14 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const rc = (r as unknown as Priced).rugCombo;
   if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
-  return { ...(out as T), visitGifts: { gifts, usual, total: final, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
+  const giftSum = cents(usual - total);
+  const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
+  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: cents(v + giftSum), total: up9(v) } : null);
+  const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
+  if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
+  if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
+  return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
 const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });
