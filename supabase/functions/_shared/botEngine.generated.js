@@ -433,7 +433,7 @@ function customPackLine(item, chairsBefore = 0) {
       if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
-      if (item.extra === "premium" || item.extra === "essencial") amount2 = endIn9Down(amount2);
+      if ((item.extra === "premium" || item.extra === "essencial") && item.primary !== "waterproofing") amount2 = endIn9Down(amount2);
     }
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
     const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
@@ -466,7 +466,7 @@ function calculateCustomPack(items, city) {
   const wpRows = items.map((i, n) => i.kind === "chairs" && i.primary === "waterproofing" && (i.extra === "premium" || i.extra === "essencial") ? n : -1).filter((n) => n >= 0);
   let wpLeft = wpRows.reduce((sum2, n) => sum2 + items[n].qty, 0);
   if (wpLeft > 0) {
-    let seen = 0;
+    let seen = 0, covered = 0;
     items.forEach((item, n) => {
       const line = table[n];
       if (item.kind !== "chairs" || item.primary === "waterproofing") return;
@@ -475,13 +475,14 @@ function calculateCustomPack(items, city) {
       if (wpLeft <= 0 || item.extra === "premium" || item.extra === "essencial" || line.amount == null) return;
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
+      covered += off;
       const amount2 = chairCleanTotal(item.qty, off, before);
       table[n] = { ...line, amount: amount2, ..."tablePrice" in line && typeof line.tablePrice === "number" ? { tablePrice: amount2 } : {} };
     });
     const wpRow = wpRows[0];
     const sum2 = table.filter((_, n) => items[n].kind === "chairs").reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum2 - endIn9Down(sum2);
-    if (diff !== 0 && table[wpRow].amount != null) {
+    if (covered > 0 && diff !== 0 && table[wpRow].amount != null) {
       const wpLine = table[wpRow];
       table[wpRow] = { ...wpLine, amount: wpLine.amount - diff, ..."tablePrice" in wpLine && typeof wpLine.tablePrice === "number" ? { tablePrice: wpLine.tablePrice - diff } : {} };
     }
@@ -2734,7 +2735,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2794,19 +2795,29 @@ function withVisitGifts(input, r) {
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
+  const EXTRA_KEYS = ["armchairs", "largeArmchairs", "puffs", "headboards"];
+  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !EXTRA_KEYS.includes(k)));
+  const aloneOf = (x) => {
+    const one = innerPriced({ ...noExtras, ...x });
+    return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === "number" ? one.rugEstimate.homePrice : null);
+  };
+  const parts = [...restore(base).map((i) => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter((k) => typeof inp[k] === "number" && inp[k] > 0 || Array.isArray(inp[k]) && inp[k].length > 0).map((k) => aloneOf({ items: [], [k]: inp[k] }))];
+  const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
+  const lift = Math.max(0, cents(sumAlone - total));
+  const paid = cents(total + lift);
+  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
-  const final = up9(total);
+  const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
-  const giftSum = cents(usual - total);
+  const giftSum = cents(usual - paid);
   const t = r.waterproofingTiers;
-  const tier = (v) => typeof v === "number" ? { usual: cents(v + giftSum), total: up9(v) } : null;
+  const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) {
@@ -2814,7 +2825,7 @@ function withVisitGifts(input, r) {
     out.antiMiteGift = null;
   }
   const m = gifts.find((g) => g.piece === "mattress");
-  return { ...out, visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  return { ...out, visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {
@@ -2983,7 +2994,7 @@ function botQuoteInner(input) {
   if (!leather) return { ...withOdor, leatherTreatment: null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
 }
-var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
 var up9Total = (x) => {
   const n = Math.ceil(x - 1e-9);
   return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
@@ -3038,7 +3049,9 @@ function withSeparatePrice(input, r) {
   const out = { ...r };
   if (main) out.total = main.total;
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
-  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, rule: SEPARATE_PRICE_RULE } };
+  const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
+  const withoutGift = plain === null ? null : up9Total(plain);
+  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } };
 }
 
 // src/constants/cityCoords.ts

@@ -58,16 +58,15 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
   // É a única comparação permitida (pack contra separado; regra do dono, 19 Nov).
   const separate = useMemo(() => {
     if (kind === 'sofa' && size === PHOTO_SIZE) return {} as Record<string, number | null>;
-    const one = (treatment: string) => {
-      const item = kind === 'sofa' ? (size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment } : { kind: 'sofa', size, treatment }) : { kind: 'chairs', qty, treatment };
-      const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-      return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null;
-    };
     // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026: "em vez de 39 × 12, paga 359").
     if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
-    const clean = one('clean');
-    const pick = (t: string) => { const w = one(t); return clean !== null && w !== null ? clean + w : null; };
-    return { premium: pick('premium'), essencial: pick('essencial') } as Record<string, number | null>;
+    // Sofás: o separatePrice do motor, o MESMO valor que o bot diz no WhatsApp (dono, 24 Nov 2026).
+    const pick = (t: string) => {
+      const item = size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: t } : { kind: 'sofa', size, treatment: t };
+      const r = botQuote({ city, items: [item] }) as { separatePrice?: { separate: number } | null };
+      return r.separatePrice?.separate ?? null;
+    };
+    return { premium: pick('clean+premium'), essencial: pick('clean+essencial') } as Record<string, number | null>;
   }, [kind, size, qty, city]);
 
   const seats = Number(size.split('-')[0]);
@@ -120,6 +119,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
           </div>
         )}
         {onMore && <button type="button" onClick={() => onMore({ kind, size, qty, extra })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {onMore && <p className="mt-1.5 text-center text-xs leading-relaxed text-[#666] md:text-sm">Junte outra peça à mesma visita e oferecemos-lhe um tratamento: anti-ácaros, anti-odor e outros.</p>}
         <p className={`${byPhoto ? '' : 'hidden'} mt-2 text-xs leading-relaxed text-[#666] md:mt-3 md:text-sm`}>{kind === 'sofa' ? (byPhoto ? 'Envie-nos uma fotografia do sofá e dizemos-lhe o preço em menos de 1 minuto.' : 'Sofá de canto, em U ou com mais de 6 lugares: o preço é dado pela fotografia.') : `Mais de ${CHAIR_MAX} cadeiras: peça o preço no WhatsApp.`}</p>
       </div>
 

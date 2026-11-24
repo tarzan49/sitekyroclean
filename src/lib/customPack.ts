@@ -57,7 +57,7 @@ export function customPackLine(item: CustomPackItem, chairsBefore = 0) {
       if (item.extra === 'premium') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'premium', true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === 'essencial') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'essencial', true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === 'anti-acaros') amount += chairAntiAcarosTotal(item.qty) ?? 0;
-      if (item.extra === 'premium' || item.extra === 'essencial') amount = endIn9Down(amount);
+      if ((item.extra === 'premium' || item.extra === 'essencial') && item.primary !== 'waterproofing') amount = endIn9Down(amount);
     }
   } else if (item.kind === 'sofa' && item.unitPrice && item.primary !== 'waterproofing' && item.extra !== 'anti-acaros') {
     // Bot only: a sofa of 6 or 7 seats, cleaning judged on the photo (botQuote SEAT6_LOOK_PRICES), plus
@@ -104,7 +104,7 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
   const wpRows = items.map((i, n) => i.kind === 'chairs' && i.primary === 'waterproofing' && (i.extra === 'premium' || i.extra === 'essencial') ? n : -1).filter(n => n >= 0);
   let wpLeft = wpRows.reduce((sum, n) => sum + items[n].qty, 0);
   if (wpLeft > 0) {
-    let seen = 0;
+    let seen = 0, covered = 0;
     items.forEach((item, n) => {
       const line = table[n];
       if (item.kind !== 'chairs' || item.primary === 'waterproofing') return;
@@ -112,13 +112,15 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
       if (wpLeft <= 0 || item.extra === 'premium' || item.extra === 'essencial' || line.amount == null) return;
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
+      covered += off;
       const amount = chairCleanTotal(item.qty, off, before)!;
       table[n] = { ...line, amount, ...('tablePrice' in line && typeof line.tablePrice === 'number' ? { tablePrice: amount } : {}) };
     });
     const wpRow = wpRows[0];
     const sum = table.filter((_, n) => items[n].kind === 'chairs').reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum - endIn9Down(sum);
-    if (diff !== 0 && table[wpRow].amount != null) {
+    // Waterproofing alone (no cleaned chairs it covers) keeps its exact price.
+    if (covered > 0 && diff !== 0 && table[wpRow].amount != null) {
       // tablePrice too: priceWithPackPerks below rebuilds each line's amount from its tablePrice.
       const wpLine = table[wpRow];
       table[wpRow] = { ...wpLine, amount: wpLine.amount! - diff, ...('tablePrice' in wpLine && typeof wpLine.tablePrice === 'number' ? { tablePrice: wpLine.tablePrice - diff } : {}) };

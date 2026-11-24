@@ -132,7 +132,7 @@ describe('custom pack commercial rules', () => {
   });
   it('prices ten chairs by position across rows, no more sob orçamento (dono, 24 Nov 2026)', () => {
     const result = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 10 }], 'Braga');
-    expect(result.lines.map(line => line.amount)).toEqual([177.5]);
+    expect(result.lines.map(line => line.amount)).toEqual([160]);
     expect(result.quote).toBe(false);
     const split = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 5 }, { ...makePackItem('chairs','b'), qty: 5 }], 'Braga');
     expect(split.quote).toBe(false);

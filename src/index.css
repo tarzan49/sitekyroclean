@@ -770,6 +770,8 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #marca-tecido p.mb-5 { margin-bottom: 10px; }
   html.snap-sections #marca-tecido .grid { gap: 8px; }
   html.snap-sections #marca-tecido .grid > div { padding: 12px 14px; }
+  /* Marcas de colchão: o texto do material é mais longo; mais compacto para caber num ecrã (packs-tratamento, 24 Nov). */
+  html.snap-sections #marca-tecido .grid > div span { font-size: 13px; line-height: 1.45; }
 }
 /* Página principal de serviço (dono, 24 Nov): blocos longos em cartões a deslizar no telemóvel. */
 @media (max-width: 767px) {
@@ -787,4 +789,12 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   /* Passo a passo em história: um pouco mais baixo quando o título ocupa duas linhas (tapetes, cidades longas). */
   html.snap-sections #processo .md\:hidden video, html.snap-sections #processo .md\:hidden img { max-height: 44svh; }
   html.snap-sections #processo > div > div:first-child { margin-bottom: 14px; }
+}
+
+/* Página inicial: o topo (HeroV1, #orcamento) mantém a sua disposição própria dentro do encaixe. */
+html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-bottom: 28px; }
+@media (max-width: 767px) {
+  /* "Aproveite a mesma visita": cartões fortes a deslizar no telemóvel (cabe num ecrã). */
+  html.snap-sections #mesma-visita .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
+  html.snap-sections #mesma-visita .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
 }

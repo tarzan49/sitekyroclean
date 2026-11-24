@@ -4,6 +4,14 @@ import { formatEuro } from '@/data/enginePrices';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { Check, Droplet, FlaskConical } from "lucide-react";
 import Header from "@/components/Header";
+import { useState } from "react";
+import ImperPricePicker from "@/components/ImperPricePicker";
+import ServiceProcessStory from "@/components/ServiceProcessStory";
+import CustomerReviews from "@/components/CustomerReviews";
+import CompactFAQ from "@/components/CompactFAQ";
+import { pickReviewSubset } from "@/data/reviewsPool";
+import { cities } from "@/data/serviceCatalog";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
@@ -117,95 +125,49 @@ const waterproofingTiers: WaterproofingTier[] = [
   },
 ];
 
-const WaterproofingTierComparison = () => (
-  <section className="py-14 md:py-20 bg-white">
-    <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-      <SectionHeader
-        overline="Duas Versões"
-        heading="Essencial ou"
-        goldWord="Premium?"
-        subtitle="A impermeabilização de sofás e cadeiras existe em duas versões. Preços fixos, sem letras pequenas: escolha a que faz mais sentido para a sua casa."
-      />
-      <div className="grid sm:grid-cols-2 gap-6 md:gap-8">
-        {waterproofingTiers.map((tier) => (
-          <div
-            key={tier.name}
-            className="relative flex flex-col overflow-hidden"
-            style={
-              tier.highlighted
-                ? { background: "var(--kyro-surface)", boxShadow: "0 12px 50px rgba(16,43,35,0.18)" }
-                : { background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.10)" }
-            }
-          >
-            {tier.badge && (
-              <span
-                className="absolute top-5 right-5 text-sm font-bold tracking-[0.18em] uppercase px-2.5 py-1"
-                style={{ background: "linear-gradient(90deg,#D4AF37,#EDD96A)", color: "#071a12" }}
-              >
-                {tier.badge}
-              </span>
-            )}
-            <div
-              className="p-7 md:p-8"
-              style={{ borderTop: `2px solid ${tier.highlighted ? "#D4AF37" : "rgba(212,175,55,0.7)"}` }}
-            >
-              <div className="flex items-center gap-2.5 mb-4">
-                <tier.icon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-                <p className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.50)" }}>
-                  {tier.base}
-                </p>
-              </div>
-              <h3
-                className="type-card-title font-playfair    mb-5"
-                style={{ color: tier.highlighted ? "#ffffff" : "#111111" }}
-              >
-                {tier.name}
-              </h3>
-
-              <div className="space-y-2.5 mb-6 pb-6" style={{ borderBottom: `1px solid ${tier.highlighted ? "rgba(255,255,255,0.10)" : "rgba(17,17,17,0.08)"}` }}>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-base" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Sofá 1L / 2L / 3L</span>
-                  <span className="font-playfair font-bold text-base tabular-nums" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.sofaPrice}</span>
-                </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-base" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Cadeiras</span>
-                  <span className="font-playfair font-bold text-base tabular-nums text-right" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.chairPrice}</span>
-                </div>
-              </div>
-
-              <p className="text-base font-semibold mb-1" style={{ color: tier.highlighted ? "#ffffff" : "#111111" }}>
-                {tier.durability}
-              </p>
-              <p className="text-base mb-6" style={{ color: tier.highlighted ? "rgba(255,255,255,0.50)" : "rgba(17,17,17,0.50)" }}>
-                {tier.washes}
-              </p>
-
-              <div className="flex flex-col gap-2.5">
-                {tier.features.map((f, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} strokeWidth={2.5} />
-                    <span className="text-base leading-snug" style={{ color: tier.highlighted ? "rgba(255,255,255,0.75)" : "rgba(17,17,17,0.70)" }}>
-                      {f.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+// "Essencial ou Premium?" num ecrã (dono, 24 Nov: cada secção cabe inteira): comparação lado a lado, sem cartões compridos.
+const WaterproofingTierComparison = () => {
+  const [p, e] = waterproofingTiers;
+  // Versão curta dos mesmos factos de waterproofingTiers, para caber num ecrã.
+  const rows: [string, string, string][] = [
+    ['Base', 'Solvente', 'Água'],
+    ['Duração', 'Até 10 anos', '1 a 2 anos'],
+    ['Lavagens', 'Até 5', 'Até 2'],
+    ['Ideal para', 'Crianças, animais, uso intenso', 'Uso moderado, 1.ª proteção'],
+    ['Cadeiras', p.chairPrice, e.chairPrice],
+  ];
+  return (
+    <section id="versoes" className="py-14 md:py-20 bg-white">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
+        <SectionHeader heading="Essencial ou" goldWord="Premium?" />
+        <div className="overflow-hidden rounded-2xl border border-[#E5E0D3]">
+          <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)] bg-[#0c241a] text-white">
+            <span className="p-3" />
+            <span className="relative flex flex-wrap items-center gap-1.5 p-3 text-base font-bold">{p.name}<span className="block w-fit rounded-full bg-[#D4AF37] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#0c241a]">{p.badge}</span></span>
+            <span className="p-3 text-base font-bold">{e.name}</span>
           </div>
-        ))}
+          {rows.map(([label, a, b], i) => (
+            <div key={label} className={`grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)] text-[13px] leading-snug md:text-sm ${i % 2 ? 'bg-[#FDFDF9]' : 'bg-white'}`}>
+              <span className="p-3 font-semibold text-[#555]">{label}</span>
+              <span className="p-3 font-medium text-[#1A1A1A]">{a}</span>
+              <span className="p-3 text-[#1A1A1A]">{b}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-[#666]">Preços de sofá no seu preço, acima, pela localidade. Só em tecido: na pele não fazemos impermeabilização.</p>
       </div>
-      <p className="text-center text-base mt-8" style={{ color: "rgba(17,17,17,0.45)" }}>
-        Colchões continuam a ter apenas higienização, sem opção de impermeabilização. O Pack Proteção Total está sempre associado à versão Essencial.
-      </p>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
 // PageHead e do HTML estático (scripts/prerender.ts).
 const pillar = getPillarPage('/impermeabilizacao');
 
 const Impermeabilizacao = () => {
+  // Modelo novo (dono, 24 Nov): secções de ecrã inteiro; o preço pede a localidade.
+  useSnapSections(true);
+  const [city, setCity] = useState("Lisboa");
   return (
     <>
       <Header />
@@ -214,25 +176,37 @@ const Impermeabilizacao = () => {
           title={pillar.h1}
           serviceSlug="impermeabilizacao"
         />
-        <ServicePriceSection serviceSlug="impermeabilizacao" />
+        <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="mb-3 flex items-center justify-between gap-3 md:mb-6">
+              <h2 className="type-section-title font-playfair text-[#111111]">O seu <em className="not-italic" style={{ color: "#D4AF37" }}>preço</em></h2>
+              <label className="flex items-center gap-1.5 text-xs text-[#555]"><span className="sr-only sm:not-sr-only">Localidade</span>
+                <select aria-label="Localidade" value={city} onChange={e => setCity(e.target.value)} className="h-9 max-w-[150px] rounded-lg border-2 border-[#D4AF37] bg-white px-2 text-sm font-semibold text-[#1A1A1A]">
+                  {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ImperPricePicker city={city} source="pillar_picker_impermeabilizacao" /></div>
+          </div>
+        </section>
         <WaterproofingTierComparison />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug="impermeabilizacao" seed="impermeabilizacao" heading="" />
+            <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <CustomerReviews reviews={pickReviewSubset("impermeabilizacao", "impermeabilizacao", 6)} />
           </div>
         </section>
 
         <ServiceExamplesGallery serviceSlug="impermeabilizacao" />
-        <ServiceProcessGuide serviceSlug="impermeabilizacao" />
+        <ServiceProcessStory service="impermeabilizacao" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada impermeabilização"
           items={impermeabilizacaoGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
+        <CompactFAQ id="duvidas" faqs={pillar.faqs} heading="Perguntas Frequentes" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel={pillar.serviceName} />
         <ServiceSchema

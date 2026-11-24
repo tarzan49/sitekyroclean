@@ -6,7 +6,7 @@ import { GOOGLE_REVIEWS_VIEW_URL } from '@/constants/google';
 /** A transparent trust strip that leaves the cleaning result unobstructed. */
 export default function HomeHeroTrust() {
   return (
-    <div className="mx-auto flex w-fit max-w-full items-center justify-center gap-4 text-white md:gap-7">
+    <div className="mx-auto grid w-full max-w-sm grid-cols-[1fr_auto_1fr] items-center gap-4 text-center text-white md:max-w-none md:gap-7">
       <div className="shrink-0">
         <span className="block font-playfair text-[26px] font-semibold leading-none text-[#E7CE73] md:text-[34px]">{SERVICES_COMPLETED_LABEL}</span>
         <span className="mt-1.5 block text-[10px] leading-tight text-white/80 md:text-xs">serviços realizados</span>
@@ -18,7 +18,7 @@ export default function HomeHeroTrust() {
         rel="noopener noreferrer"
         className="group block rounded-sm py-1 outline-offset-4 transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"
       >
-        <span className="flex items-center gap-2">
+        <span className="flex items-center justify-center gap-2">
           <GoogleG className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
           <span className="font-playfair text-[26px] font-semibold leading-none md:text-[34px]">{REVIEW_RATING}</span>
           <span className="sr-only"> em 5 estrelas,</span>

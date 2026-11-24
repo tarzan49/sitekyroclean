@@ -13,9 +13,10 @@ import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
-import ServicePriceSection from "@/components/ServicePriceSection";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
-import ServiceFAQ from "@/components/ServiceFAQ";
+import CompactFAQ from "@/components/CompactFAQ";
+import ChairProcessStory from "@/components/ChairProcessStory";
+import ServicePricePicker from "@/components/ServicePricePicker";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug, marcasCadeiras } from "@/data/marcaCadeirasData";
 import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from "@/data/marcaCities";
 import { cityPrep } from "@/data/serviceCatalog";
@@ -37,6 +38,7 @@ const PROCESS_STEPS = MARCA_PROCESS_STEPS.cadeiras.map((step, index) => ({ ...st
 
 const MarcaCadeirasPage = () => {
   const { pathname } = useLocation();
+  useSnapSections(true); // modelo novo (dono, 24 Nov)
 
   const data = useMemo(() => {
     const route = getAllMarcaCadeirasRoutes().find(r => r.path === pathname);
@@ -121,10 +123,15 @@ const MarcaCadeirasPage = () => {
         <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-cadeiras" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildMarcaWaMessage('cadeiras', marca.name, city.name))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
-        <ServicePriceSection serviceSlug="limpeza-cadeiras" initialLocation={city.name} />
+        <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ServicePricePicker service="limpeza-cadeiras" city={city.name} source={`marca_picker_${marca.slug}`} /></div>
+          </div>
+        </section>
 
         {/* ═══ MATERIAL: NÃO FAZER / FAZER ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="marca-tecido" className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Material"
@@ -153,53 +160,13 @@ const MarcaCadeirasPage = () => {
           </div>
         </section>
 
-        {/* ═══ PROCESSO ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Como Trabalhamos"
-              heading="O nosso processo de limpeza para as"
-              goldWord={marca.name}
-              subtitle={marca.cleaningProcess}
-            />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {PROCESS_STEPS.map((step) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.label} className="relative overflow-hidden flex items-start gap-4 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
-                      <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#111111] mb-1">{step.title}</p>
-                      <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        {/* ═══ PROCESSO: vídeos reais (modelo novo, dono 24 Nov) ═══ */}
+        <ChairProcessStory service="limpeza-cadeiras" cityPrep={prep} steps={PROCESS_STEPS.map(st => ({ label: st.title, description: st.desc }))} heading={{ text: 'Como limpamos as', gold: marca.name }} />
 
-        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
-        <ServiceAutoCarousel
-          comparison={false}
-          overline="Resultados Reais"
-          heading={`Antes e depois: cadeiras ${marca.name}`}
-          subtitle={`Transformação real em limpeza de cadeiras ${prep} ${city.name}, resultado visível no próprio dia.`}
-          slides={[
-            { src: galProcesso, label: "Processo" },
-            { src: galResultado, label: "Resultado" },
-          ]}
-          variant="dark"
-        />
+        
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ
-          faqs={marca.faqs}
-          heading={`Perguntas sobre cadeiras ${marca.name}`}
-          variant="dark"
-        />
+        <CompactFAQ id="duvidas" dark faqs={marca.faqs} heading={`Perguntas sobre cadeiras ${marca.name}`} />
 
         {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
