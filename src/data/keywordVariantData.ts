@@ -11,6 +11,7 @@ import { municipiosComFreguesias } from './freguesiaSeoData';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -78,7 +79,7 @@ const SERVICE_META: Record<ServiceKey, {
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: RUG_PRICE_FROM                              },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: formatEuro(CHAIR_CLEANING_FROM),     waterproofPriceFrom: formatEuro(CHAIR_WATERPROOF_ESSENTIAL) },
-  alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: 'Sob orçamento'                             },
+  alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: CARPET_PRICE_FROM                             },
 };
 
 // Impermeabilizacao variant: canonical always points to /impermeabilizacao-{location}

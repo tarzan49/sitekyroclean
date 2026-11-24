@@ -41,6 +41,7 @@ import {
   chairCleaningTiers,
 } from './enginePrices';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export type PillarSlug = 'limpeza-sofas' | 'limpeza-colchoes' | 'limpeza-tapetes' | 'limpeza-cadeiras' | 'limpeza-alcatifas' | 'impermeabilizacao';
 
@@ -175,7 +176,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     h1: 'Higienização Profissional de Alcatifas',
     priceFrom: catalog('limpeza-alcatifas').priceFrom,
     faqs: [
-      { question: 'Quanto custa a limpeza de alcatifa?', answer: 'A limpeza de alcatifa é sempre sob orçamento. Indique a largura e o comprimento de cada área, a localidade e envie fotografias.' },
+      { question: 'Quanto custa a limpeza de alcatifa?', answer: `${CARPET_PRICE_NOTE} Indique a largura e o comprimento de cada área e vê logo o valor.` },
       { question: 'Qual a diferença entre tapete e alcatifa?', answer: 'Tapetes são peças soltas; alcatifas são revestimentos fixos que cobrem toda a divisão. Tratamos ambos ao domicílio com equipamento profissional.' },
       { question: 'Limpam alcatifas de escritório?', answer: 'Sim. Temos disponibilidade para escritórios, hotéis, clínicas e outros espaços comerciais, incluindo fora do horário comercial.' },
       { question: 'A alcatifa fica molhada muito tempo?', answer: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 2 a 5 horas, dependendo da espessura e da ventilação.' },

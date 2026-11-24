@@ -505,10 +505,13 @@ function calculateCustomPack(items, city) {
 // src/constants/rugRates.ts
 var RUG_RATE_COMMON = 10;
 var RUG_RATE_NATURAL = 12;
+var RUG_RATE_CARPET = 7;
 
 // src/constants/rugSitePrice.ts
 var RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
 var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, com a deslocação incluída; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
+var CARPET_PRICE_FROM = `Desde ${RUG_RATE_CARPET}€/m²`;
+var CARPET_PRICE_NOTE = `${RUG_RATE_CARPET}€/m² de alcatifa, com a deslocação incluída.`;
 
 // src/data/serviceCatalog.ts
 var cities = [
@@ -737,9 +740,11 @@ var RUG_SMALL_COMBO_EXTRA = 10;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 var NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
 var DELICATE = /\b(seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
+var rateOf = (c) => c === "carpet" ? RUG_RATE_CARPET : c === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON;
 function rugMaterialClass(material) {
   if (typeof material !== "string" || !material.trim()) return "common";
   const m = fold(material);
+  if (m === "alcatifa") return "carpet";
   if (DELICATE.test(m)) return "delicate";
   if (NATURAL.test(m)) return "natural";
   return "common";
@@ -786,14 +791,14 @@ function rugEstimate(rugs, city) {
   const classes = rugs.map((r) => rugMaterialClass(r.material));
   if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
-  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
+  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * rateOf(classes[i]), 0);
   const travelFee = locationPrices[city];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2, city);
+  const pickupFee = classes.includes("carpet") ? null : rugPickupFee(areaM2, city);
   return {
     ok: true,
     areaM2,
-    ratePerM2: [...new Set(classes.map((c) => c === "natural" ? RUG_RATE_NATURAL : RUG_RATE_COMMON))],
+    ratePerM2: [...new Set(classes.map(rateOf))],
     travelFee,
     homePrice,
     pickupFee,
@@ -2804,12 +2809,14 @@ function botQuoteInner(input) {
   const tiersOut = tiers && sharedTrip ? { travel: 0, premium: tiers.premium === null ? null : cents(tiers.premium - tiers.travel), essencial: tiers.essencial === null ? null : cents(tiers.essencial - tiers.travel) } : tiers;
   const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
   const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
-  const rugsOnly = items.every((i) => i.kind === "rug");
-  const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: rawOf[n].material })), city) : null;
-  const rugIdx = items.flatMap((i, n) => i.kind === "rug" ? [n] : []);
-  const others = items.filter((i) => i.kind !== "rug");
+  const isRugLike = (k) => k === "rug" || k === "carpet";
+  const matOf = (n) => items[n].kind === "carpet" ? "alcatifa" : rawOf[n].material;
+  const rugsOnly = items.every((i) => isRugLike(i.kind));
+  const rugPrice = rugsOnly ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: matOf(n) })), city) : null;
+  const rugIdx = items.flatMap((i, n) => isRugLike(i.kind) ? [n] : []);
+  const others = items.filter((i) => !isRugLike(i.kind));
   const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? "") : null;
-  const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: rawOf[n].material })), othersResult.subtotal, city) : null;
+  const rugCombo = othersResult && !othersResult.quote ? rugComboEstimate(rugIdx.map((n) => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: matOf(n) })), othersResult.subtotal, city) : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = result.quote && !rugPriced || city === null || extendedTrip && !sharedTrip;
   const out = {

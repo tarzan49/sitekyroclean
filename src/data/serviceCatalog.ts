@@ -13,6 +13,7 @@
 
 // Default "from" price shown when a specific service price isn't available
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 export const DEFAULT_PRICE_FROM = "49€";
 
 export const services = [
@@ -20,7 +21,7 @@ export const services = [
   { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "59€", icon: "mattress" },
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: RUG_PRICE_FROM, icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
-  { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "Sob orçamento", icon: "rug" },
+  { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: CARPET_PRICE_FROM, icon: "rug" },
   { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "39€", icon: "waterproof" },
 ] as const;
 

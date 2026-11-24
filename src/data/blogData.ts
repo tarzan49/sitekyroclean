@@ -386,7 +386,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Como pedir o preço",
-        "body": "O preço do tapete sai das medidas, com a deslocação incluída; a alcatifa é sob orçamento. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
+        "body": "O preço do tapete sai das medidas, com a deslocação incluída, tal como na alcatifa. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
       },
       {
         "heading": "O material vem antes da máquina",
@@ -404,7 +404,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "faq": [
       {
         "q": "Há tabela por metro quadrado?",
-        "a": "O tapete tem preço por m², com a deslocação incluída (juta e sisal com valor ajustado). A alcatifa é sob orçamento, com medidas e avaliação do material e estado."
+        "a": "O tapete tem preço por m², com a deslocação incluída (juta e sisal com valor ajustado). A alcatifa também tem preço por m², com a deslocação incluída."
       },
       {
         "q": "Recolhem e entregam qualquer tapete?",
@@ -735,7 +735,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Medir e distinguir as zonas",
-        "body": "Indique largura e comprimento das áreas, corredores e salas. Fotografias das zonas de passagem e das manchas ajudam a preparar a proposta. A alcatifa é sempre sob orçamento, sem tabela fixa por metro quadrado."
+        "body": "Indique largura e comprimento das áreas, corredores e salas. Fotografias das zonas de passagem e das manchas ajudam a preparar a proposta. A alcatifa tem preço por metro quadrado, com a deslocação incluída."
       },
       {
         "heading": "Combinar o acesso ao escritório",
@@ -1549,14 +1549,14 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "slug": "quanto-custa-limpar-alcatifa",
     "title": "Quanto custa limpar uma alcatifa?",
     "metaTitle": "Quanto custa limpar uma alcatifa? | Kyro Clean",
-    "metaDescription": "A limpeza de alcatifas é sempre sob orçamento. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
+    "metaDescription": "A limpeza de alcatifas tem preço por m², com a deslocação incluída. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
     "publishDate": "2026-05-20",
     "updatedDate": "2026-09-21",
     "author": DEFAULT_AUTHOR.name,
     "readingTime": 2,
     "category": "Preços",
     "heroAlt": "Imagem ilustrativa sobre quanto custa limpar uma alcatifa",
-    "intro": "A limpeza de alcatifas é sempre sob orçamento. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
+    "intro": "A limpeza de alcatifas tem preço por m², com a deslocação incluída. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
     "sections": [
       {
         "heading": "Não há preço fixo por metro quadrado",

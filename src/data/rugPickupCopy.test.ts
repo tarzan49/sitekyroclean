@@ -93,10 +93,9 @@ describe('recolha dos tapetes', () => {
     expect(RUG_PICKUP_RULE).toContain(`entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²`);
   });
 
-  it('em tapetes e alcatifas a deslocação é sob orçamento, sem valor de tabela (dono, 2026-10-05)', () => {
-    // Tapetes têm valor desde 24 Nov 2026 (dono): só a alcatifa continua sem valor.
-    for (const slug of ['limpeza-alcatifas'] as const) {
-      expect(commercialHeroPriceLine(slug, 'Porto')).not.toMatch(/\d\s*€/);
+  it('em tapetes e alcatifas a deslocação vem incluída no preço por m² (dono, 24 Nov 2026)', () => {
+    for (const slug of ['limpeza-tapetes', 'limpeza-alcatifas'] as const) {
+      expect(commercialHeroPriceLine(slug, 'Porto')).toMatch(/€\/m², com a deslocação incluída/);
       const travelFaq = getLandingFaqs({ serviceSlug: slug, pageKey: 'teste', municipality: 'Porto', family: 'localidade' })
         .concat(getLandingFaqs({ serviceSlug: slug, pageKey: 'outra', municipality: 'Porto', family: 'preco' }))
         .find(f => /deslocação está incluída/.test(f.question));

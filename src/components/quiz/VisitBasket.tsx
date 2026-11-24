@@ -1,7 +1,7 @@
 // Cesto da visita (dono, 24 Nov 2026): o questionário novo, em dois ecrãs.
 // 1) O cesto: o que veio do widget de preço já lá está; juntam-se sofás, colchões, cadeiras, tapetes e
 //    alcatifas na mesma visita, cada um com o seu pack. O total é o do bot (botQuote do pedido inteiro,
-//    deslocação incluída), nunca escrito à mão. Tapetes com o preço do bot (24 Nov 2026); alcatifas só as medidas.
+//    deslocação incluída), nunca escrito à mão. Tapetes e alcatifas com o preço do bot (24 Nov 2026).
 // 2) Contacto: nome e telemóvel. O pedido vai pelo mesmo envio (submit-lead + quiz_order), por isso a
 //    mensagem automática e o funil do bot no WhatsApp continuam iguais.
 import { useEffect, useMemo, useState } from 'react';
@@ -80,20 +80,19 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   // só tapetes = rugEstimate.homePrice (deslocação incluída); com outras peças = rugCombo.comboPrice.
   // Alcatifa continua sob orçamento.
   const rx = r as Quote & { rugEstimate?: { ok: boolean; homePrice?: number } | null; rugCombo?: { ok: boolean; rugsWashing?: number; comboPrice?: number } | null };
-  const hasCarpet = items.some(i => i.kind === 'carpet');
-  const rugValid = valid.filter(v => v.kind === 'rug');
+  const rugValid = valid.filter(v => v.kind === 'rug' || v.kind === 'carpet');
   const othersValid = valid.length - rugValid.length;
   const rugAlone = rugValid.length > 0 && othersValid === 0 && rx.rugEstimate?.ok && typeof rx.rugEstimate.homePrice === 'number' ? rx.rugEstimate.homePrice : null;
   const rugCombo = rugValid.length > 0 && othersValid > 0 && rx.rugCombo?.ok && typeof rx.rugCombo.comboPrice === 'number' ? rx.rugCombo : null;
   const rugLine = rugAlone ?? rugCombo?.rugsWashing ?? null;
   let k = 0;
-  const lines = q.map((x, i) => (x ? (isRug(items[i].kind) ? (k++, items[i].kind === 'rug' && rugValid.length === 1 ? rugLine : null) : r.lines?.[k++]?.amount ?? null) : null));
-  const missingRug = items.some(i => i.kind === 'rug') && rugAlone === null && !rugCombo;
-  if (!hasCarpet && !missingRug && (rugAlone !== null || rugCombo)) {
-    const othersSob = (r.lines ?? []).some((l, j) => l.quote && valid[j]?.kind !== 'rug');
+  const lines = q.map((x, i) => (x ? (isRug(items[i].kind) ? (k++, rugValid.length === 1 ? rugLine : null) : r.lines?.[k++]?.amount ?? null) : null));
+  const missingRug = items.some(i => isRug(i.kind)) && rugAlone === null && !rugCombo;
+  if (!missingRug && (rugAlone !== null || rugCombo)) {
+    const othersSob = (r.lines ?? []).some((l, j) => l.quote && valid[j]?.kind !== 'rug' && valid[j]?.kind !== 'carpet');
     if (!othersSob) return { total: rugAlone ?? rugCombo!.comboPrice!, travel: rugAlone !== null ? null : 0, sob: false, lines };
   }
-  const sob = hasCarpet || missingRug || !!r.quote;
+  const sob = missingRug || !!r.quote;
   const known = sob ? lines.reduce<number>((s, v) => s + (v ?? 0), 0) + (r.travel ?? 0) : null;
   return { total: sob ? (known && known > 0 ? known : null) : (typeof r.total === 'number' ? r.total : null), travel: r.travel ?? null, sob, lines };
 }
@@ -125,7 +124,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
   if (!isOpen) return null;
 
-  const priceText = quote.total === null ? 'Sob orçamento' : quote.sob ? `${formatEuro(quote.total)} + alcatifa sob orçamento` : formatEuro(quote.total);
+  const priceText = quote.total === null ? 'Sob orçamento' : quote.sob ? `${formatEuro(quote.total)} + artigos sob orçamento` : formatEuro(quote.total);
   const phoneOk = phone.replace(/\D/g, '').length >= 9;
   const canContinue = items.length > 0 && city.trim().length > 1;
 
@@ -185,7 +184,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <li key={it.id} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white p-3">
                   <button type="button" onClick={() => setEditing(it)} className="min-w-0 flex-1 text-left">
                     <span className="block text-sm font-bold text-[#111]">{itemLabel(it)}</span>
-                    <span className="text-xs text-[#1A1A1A]/60">{it.kind === 'carpet' ? 'Sob orçamento, conforme as medidas' : 'Tocar para alterar'}</span>
+                    <span className="text-xs text-[#1A1A1A]/60">Tocar para alterar</span>
                   </button>
                   {quote.lines[i] != null && <span className="text-sm font-bold text-[#111]">{formatEuro(quote.lines[i] as number)}</span>}
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-11 items-center justify-center rounded-full text-[#1A1A1A]/50 hover:bg-black/5"><Trash2 className="h-4 w-4" /></button>
@@ -206,7 +205,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <>
             <h3 className="mb-3 font-playfair text-2xl font-bold text-[#111]">Para onde enviamos as <span style={{ color: GOLD }}>horas</span>?</h3>
             <ul className="mb-4 space-y-1 rounded-2xl border border-black/10 bg-white p-3 text-sm text-[#111]">
-              {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{it.kind === 'carpet' ? 'sob orçamento' : quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : ''}</span></li>)}
+              {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : ''}</span></li>)}
               <li className="border-t border-black/10 pt-1 text-xs text-[#1A1A1A]/60">{city}, deslocação incluída no total</li>
             </ul>
             <label className="mb-3 block"><span className="mb-1 block text-xs font-semibold text-[#1A1A1A]/70">Nome</span>

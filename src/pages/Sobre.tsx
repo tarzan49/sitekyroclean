@@ -102,8 +102,8 @@ const Sobre = () => {
                     {service.name}
                   </Link>
                   <p className="text-sm text-neutral-600 mt-1">
-                    {service.priceFrom === "Sob orçamento"
-                      ? "Sob orçamento, conforme as medidas"
+                    {/\/m²/.test(service.priceFrom)
+                      ? `${service.priceFrom}, com a deslocação incluída`
                       : isPricedPerChair(service.slug)
                         ? startingPriceLabel(service.slug, service.priceFrom)
                         : `${startingPriceLabel(service.slug, service.priceFrom)} por artigo`}

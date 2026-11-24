@@ -21,6 +21,7 @@ import iconCarpet    from "@/assets/icon-carpet.webp";
 import iconMattress  from "@/assets/icon-mattress.webp";
 import iconChair     from "@/assets/icon-chair.webp";
 import iconRug       from "@/assets/icon-rug.webp";
+import { CARPET_PRICE_FROM } from "@/constants/rugSitePrice";
 
 /* ─── Tune these ─────────────────────────────────────────────────── */
 const GAP         = 28;    // px between cards
@@ -251,7 +252,7 @@ const Services = () => {
     // Cadeiras: por cadeira, nunca "a partir de" (pedido do dono, 26/09/2026).
     { title: "Limpeza de Cadeiras", price: CHAIR_PRICE_SHORT.replace('a partir de ', ''), image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras" },
     { title: "Limpeza de Tapetes", price: RUG_PRICE_FROM, image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes" },
-    { title: "Limpeza de Alcatifas", price: "Sob orçamento", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas" },
+    { title: "Limpeza de Alcatifas", price: CARPET_PRICE_FROM, image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas" },
   ];
 
   /* Extended array for infinite loop: [last CLONES, ...all N, first CLONES] */

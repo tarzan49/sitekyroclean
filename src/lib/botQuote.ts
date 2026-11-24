@@ -725,16 +725,19 @@ function botQuoteInner(input: unknown) {
   const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
   // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
   // Anything mixed with other items still goes to the owner.
-  const rugsOnly = items.every(i => i.kind === 'rug');
+  // Alcatifas pelo mesmo motor, 7€/m² (dono, 24 Nov 2026).
+  const isRugLike = (k: string) => k === 'rug' || k === 'carpet';
+  const matOf = (n: number) => (items[n].kind === 'carpet' ? 'alcatifa' : (rawOf[n] as Record<string, unknown>).material);
+  const rugsOnly = items.every(i => isRugLike(i.kind));
   const rugPrice = rugsOnly
-    ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: (rawOf[n] as Record<string, unknown>).material })), city)
+    ? rugEstimate(items.map((i, n) => ({ width: Number(i.width), length: Number(i.length), qty: i.qty, material: matOf(n) })), city)
     : null;
   // Rugs mixed with priced items: one visit, travel offered (owner, 17 Oct 2026).
-  const rugIdx = items.flatMap((i, n) => (i.kind === 'rug' ? [n] : []));
-  const others = items.filter(i => i.kind !== 'rug');
+  const rugIdx = items.flatMap((i, n) => (isRugLike(i.kind) ? [n] : []));
+  const others = items.filter(i => !isRugLike(i.kind));
   const othersResult = !rugsOnly && rugIdx.length && others.length ? calculateCustomPack(others, city ?? '') : null;
   const rugCombo = othersResult && !othersResult.quote
-    ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: (rawOf[n] as Record<string, unknown>).material })), othersResult.subtotal, city)
+    ? rugComboEstimate(rugIdx.map(n => ({ width: Number(items[n].width), length: Number(items[n].length), qty: items[n].qty, material: matOf(n) })), othersResult.subtotal, city)
     : null;
   const rugPriced = rugPrice?.ok === true || rugCombo?.ok === true;
   const handToOwner = (result.quote && !rugPriced) || city === null || (extendedTrip && !sharedTrip);

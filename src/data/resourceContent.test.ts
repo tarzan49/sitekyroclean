@@ -26,9 +26,9 @@ describe('recursos comerciais e inventário', () => {
       expect(model.priceRows.length).toBeGreaterThan(0);
       expect(model.reviews).toEqual(pickReviewSubset(model.serviceSlug, `/blog/${post.slug}:blog-${post.slug}`, 6));
       expect(resourceHeroSubtitle(post)).not.toContain('?.');
-      if (/alcatifas/.test(model.serviceSlug)) {
-        expect(model.priceRows.every(row => /sob orçamento/i.test(row.price))).toBe(true);
-        expect(getResourceOffer(post).title).toContain('sob orçamento');
+      if (/tapetes|alcatifas/.test(model.serviceSlug)) {
+        // Tapetes e alcatifas com valor do motor (dono, 24 Nov 2026).
+        expect(getResourceOffer(post).title).toContain('€/m²');
       }
     }
   });

@@ -21,8 +21,8 @@ import { locationPrices } from '../constants/travel';
 import { rugPickupFee } from '../constants/commercialPolicy';
 import { sofaCleaningPrice } from '../data/enginePrices';
 
-import { RUG_RATE_COMMON, RUG_RATE_NATURAL } from '../constants/rugRates';
-export { RUG_RATE_COMMON, RUG_RATE_NATURAL };
+import { RUG_RATE_COMMON, RUG_RATE_NATURAL, RUG_RATE_CARPET } from '../constants/rugRates';
+export { RUG_RATE_COMMON, RUG_RATE_NATURAL, RUG_RATE_CARPET };
 export const RUG_ESTIMATE_MIN_AREA_M2 = 3;
 /** A rug under 3 m² added to other items costs 10€ more (owner, 22 Oct 2026). */
 export const RUG_SMALL_COMBO_EXTRA = 10;
@@ -37,12 +37,14 @@ const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().to
 const NATURAL = /\b(juta|sisal|rafia|coco|fibra natural|fibras naturais|seagrass)\b/;
 const DELICATE = /\b(seda|silk|viscose|persa|persia|oriental|arraiolos|feito a mao|tecido a mao|hand ?made|kilim|tibetano|nepal)\b/;
 
-export type RugMaterial = 'common' | 'natural' | 'delicate';
+export type RugMaterial = 'common' | 'natural' | 'delicate' | 'carpet';
+const rateOf = (c: RugMaterial) => (c === 'carpet' ? RUG_RATE_CARPET : c === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON);
 
 /** The material class from what the client or the bot wrote (rugEstimate refuses a missing one). */
 export function rugMaterialClass(material: unknown): RugMaterial {
   if (typeof material !== 'string' || !material.trim()) return 'common';
   const m = fold(material);
+  if (m === 'alcatifa') return 'carpet';
   if (DELICATE.test(m)) return 'delicate';
   if (NATURAL.test(m)) return 'natural';
   return 'common';
@@ -120,14 +122,15 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   const classes = rugs.map(r => rugMaterialClass(r.material));
   if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
-  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * (classes[i] === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON), 0);
+  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * rateOf(classes[i]), 0);
   const travelFee = locationPrices[city as keyof typeof locationPrices];
   const homePrice = roundToNine(washing + travelFee);
-  const pickupFee = rugPickupFee(areaM2, city);
+  // Alcatifa nunca tem recolha.
+  const pickupFee = classes.includes('carpet') ? null : rugPickupFee(areaM2, city);
   return {
     ok: true,
     areaM2,
-    ratePerM2: [...new Set(classes.map(c => (c === 'natural' ? RUG_RATE_NATURAL : RUG_RATE_COMMON)))],
+    ratePerM2: [...new Set(classes.map(rateOf))],
     travelFee,
     homePrice,
     pickupFee,

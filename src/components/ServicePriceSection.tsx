@@ -7,6 +7,7 @@ import { getTrustPointsForSeed } from "@/constants/serviceTrustPool";
 import SectionHeader from "@/components/SectionHeader";
 import PriceWidget from "@/components/PriceWidget";
 import { useState } from "react";
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from "@/constants/rugSitePrice";
 
 // Todos os 6 serviços já usam pools de variedade (ver getTrustPointsForSeed
 // em serviceTrustPool.ts) — o antigo fallback de pontos fixos por serviço
@@ -17,7 +18,7 @@ const SERVICE_SUBTITLE: Record<string, string> = {
   'limpeza-colchoes':  'Preço fixo por tamanho de colchão. Orçamento confirmado antes de qualquer intervenção.',
   'limpeza-tapetes':   'Orçamento à medida de cada tapete. Sem surpresas, sem custos escondidos.',
   'limpeza-cadeiras':  'Preço por cadeira com desconto progressivo em lotes. Confirmado antes de avançar.',
-  'limpeza-alcatifas': 'Orçamento à medida de cada espaço. Sem preço fixo por m², sem surpresas.',
+  'limpeza-alcatifas': CARPET_PRICE_NOTE,
   'impermeabilizacao': 'Preço fixo, combinável com limpeza ou em separado. Sem compromisso.',
 };
 

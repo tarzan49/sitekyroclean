@@ -85,8 +85,8 @@ export function buildLlmsTxt(): string {
   for (const service of services) {
     // Cadeiras: "20€ por cadeira" e os escalões do motor, nunca "desde 20€",
     // que se lia como o total do serviço (ver `startingPriceLabel`).
-    const price = service.priceFrom === 'Sob orçamento'
-      ? 'sob orçamento, conforme as medidas.'
+    const price = /\/m²/.test(service.priceFrom)
+      ? `${service.priceFrom.toLowerCase()}, com a deslocação incluída.`
       : isPricedPerChair(service.slug)
         ? `${startingPriceLabel(service.slug, service.priceFrom)}. ${chairTierSentence()}`
         : `${startingPriceLabel(service.slug, service.priceFrom, 'mid')} por artigo.`;

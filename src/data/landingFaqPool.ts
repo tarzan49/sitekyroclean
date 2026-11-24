@@ -1,6 +1,7 @@
 import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, DEPOSIT_RULE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
 import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
+import { CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 /** Shared by React and prerender. Do not import assets, React or locationSeoData here. */
 export const LANDING_FAQ_COUNT = 4;
@@ -28,7 +29,7 @@ const common: readonly FaqEntry[] = [
   { id: 'estimativa', topic: 'orcamento', question: 'O valor do simulador é o preço final?', answer: PRICE_PROMISE },
   { id: 'deslocacao', topic: 'orcamento', question: 'A deslocação está incluída no preço do serviço?', answer: ({ municipality, serviceSlug }) => {
     // Tapetes e alcatifas: a deslocação entra no orçamento (dono, 2026-10-05).
-    if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return `Em tapetes e alcatifas, a deslocação faz parte do orçamento, confirmado antes da marcação. ${RUG_PICKUP_FEE_RULE}`;
+    if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return `Em tapetes e alcatifas, a deslocação já vem incluída no preço. ${RUG_PICKUP_FEE_RULE}`;
     const fee = locationPrices[municipality];
     return fee === undefined
       ? 'A deslocação é cobrada separadamente. Indique a localidade e a morada para confirmarmos o valor antes da marcação.'
@@ -106,7 +107,7 @@ const initialByService: Record<LandingService, readonly FaqEntry[]> = {
     { id: 'cadeira-manutencao', topic: 'cuidados', question: 'Como evito acumulação de sujidade nos assentos?', answer: 'Remova regularmente resíduos soltos pelo método permitido na etiqueta e trate derrames sem esfregar. Não use sempre o mesmo produto em cadeiras com revestimentos diferentes sem verificar a compatibilidade.' },
   ],
   'limpeza-alcatifas': [
-    { id: 'alcatifa-preco', topic: 'orcamento', question: 'A limpeza de alcatifa tem preço fixo por metro quadrado?', answer: 'Não. A limpeza de alcatifas é sempre sob orçamento, conforme a área, o estado e as condições do espaço. Envie as medidas e fotografias para receber a proposta.' },
+    { id: 'alcatifa-preco', topic: 'orcamento', question: 'A limpeza de alcatifa tem preço fixo por metro quadrado?', answer: `Sim: ${CARPET_PRICE_NOTE} Confirmamos a área, o estado e as condições do espaço. Envie as medidas e fotografias para receber a proposta.` },
     { id: 'alcatifa-divisoes', topic: 'orcamento', question: 'Como meço alcatifa em várias divisões?', answer: 'Indique largura e comprimento de cada área separadamente. Assinale corredores, recantos e zonas que não entram no pedido, para evitar contar áreas a mais ou omitir partes a limpar.' },
     { id: 'alcatifa-escadas', topic: 'orcamento', question: 'Como peço orçamento para escadas alcatifadas?', answer: 'Indique o número de degraus, as dimensões aproximadas e os patamares. Envie fotografias de conjunto e pormenor; escadas não devem ser descritas apenas como uma divisão plana.' },
     { id: 'alcatifa-mobiliario', topic: 'preparacao', question: 'A divisão precisa de ficar completamente vazia?', answer: 'Combine quais as áreas a limpar e os móveis que podem ser deslocados em segurança. Identifique mobiliário fixo ou pesado para definirmos previamente o acesso e o âmbito da intervenção.' },
