@@ -57,6 +57,8 @@ export interface QuizLeadPayload {
   description?: string;
   carpetKind?: 'tapete' | 'alcatifa';
   rugPickup?: boolean;
+  /** Cesto da visita (VisitBasket): o pedido já pronto para o bot, com os itens exatos do motor. */
+  basketOrder?: import('@/lib/quizOrder').QuizOrder;
 }
 
 function generateBookingId(): string {
@@ -97,7 +99,7 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string, leadId: strin
     notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
     // O pedido como dados, para o bot do WhatsApp não voltar a perguntar o que
     // a pessoa já escolheu aqui (dono, 2026-10-10). Ver src/lib/quizOrder.ts.
-    quiz_order: buildQuizOrder(payload, buildReceiptLines(payload)),
+    quiz_order: payload.basketOrder ?? buildQuizOrder(payload, buildReceiptLines(payload)),
   };
 }
 

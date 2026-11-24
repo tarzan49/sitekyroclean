@@ -35,7 +35,8 @@ const PHOTO: Record<'sofa' | 'chairs', Record<string, string>> = {
   chairs: { premium: premiumChair, essencial: essencialChair, none: afterOf('cadeiras') },
 };
 
-interface Props { kind: Kind; city: string; source: string; onMore?: () => void }
+export interface PackChoice { kind: Kind; size: string; qty: number; extra: PackExtra }
+interface Props { kind: Kind; city: string; source: string; onMore?: (choice: PackChoice) => void }
 
 export default function WaterproofPackPicker({ kind, city, source, onMore }: Props) {
   const [size, setSize] = useState('3-lugares');
@@ -115,7 +116,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
             <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-12 w-12 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-5 w-5" /></button>
           </div>
         )}
-        {onMore && <button type="button" onClick={onMore} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {onMore && <button type="button" onClick={() => onMore({ kind, size, qty, extra })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
         <p className={`${byPhoto ? '' : 'hidden'} mt-2 text-xs leading-relaxed text-[#666] md:mt-3 md:text-sm`}>{kind === 'sofa' ? (byPhoto ? 'Envie-nos uma fotografia do sofá e dizemos-lhe o preço em menos de 1 minuto.' : 'Sofá de canto, em U ou com mais de 6 lugares: o preço é dado pela fotografia.') : `Mais de ${CHAIR_MAX} cadeiras: peça o preço no WhatsApp.`}</p>
       </div>
 

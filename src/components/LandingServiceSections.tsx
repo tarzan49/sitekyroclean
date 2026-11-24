@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { bootstrapLandingModel } from '@/data/landingModelBootstrap';
 import type { LandingPageModel } from '@/data/landingPageModel';
@@ -20,6 +20,9 @@ import ServiceProcessGuide from './ServiceProcessGuide';
 import ServicePackBanner from './ServicePackBanner';
 import DirectoryGroup from './DirectoryGroup';
 import QuizFormLazy from './QuizFormLazy';
+import { type PackChoice } from './WaterproofPackPicker';
+import { choiceToItem } from './quiz/basketChoice';
+const VisitBasketLazy = lazy(() => import('./quiz/VisitBasket'));
 import { isAdsVisit } from './AdsLandingNavigation';
 
 const container = 'max-w-7xl mx-auto px-5 sm:px-6 lg:px-8';
@@ -41,6 +44,7 @@ export default function LandingServiceSections() {
   }, [pathname, fromHtml]);
   const model = fromHtml ?? (loaded?.path === pathname ? loaded.model : null);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
+  const [basket, setBasket] = useState<PackChoice | null>(null);
   if (!model) return null;
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
@@ -51,7 +55,7 @@ export default function LandingServiceSections() {
       <div className={container}>
         <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{model.prep} {model.locationName}</em></h2>
         <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">
-          <WaterproofPackPicker kind="sofa" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={openQuiz} />
+          <WaterproofPackPicker kind="sofa" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(c)} />
         </div>
       </div>
     </section> : <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
@@ -100,6 +104,7 @@ export default function LandingServiceSections() {
   };
   return <>
     {LANDING_SECTION_ORDER.filter(section => section !== 'zonas' || !hideDirectory).map(section => <div key={section} data-landing-section={section}>{sections[section]}</div>)}
+    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={model.municipalityName} initialItems={[choiceToItem(basket)]} /></Suspense>}
     <QuizFormLazy isOpen={isQuizOpen} onClose={closeQuiz} initialLocation={model.municipalityName} initialService={quizService} initialServiceType={model.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'} initialCarpetKind={model.serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'} />
   </>;
 }
