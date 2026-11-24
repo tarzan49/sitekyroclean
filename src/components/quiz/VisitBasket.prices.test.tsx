@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, newItem, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, newItem, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -54,4 +54,9 @@ describe('sofás e colchões com quantidade: linha = motor com a quantidade real
       expect(struckOf('Lisboa', newItem('sofa', { size, qty: 1, pack }))).toBe(m.separatePrice?.separate ?? m.total);
     }
   });
+});
+
+describe('localidade: só com preço fechado do motor se diz "deslocação incluída"', () => {
+  for (const c of ['Lisboa', ' lisboa ', 'Carnaxide', 'Vila Nova de Gaia', 'Faro', 'Funchal']) it(`${c} tem preço`, () => expect(cityKnown(c)).toBe(true));
+  for (const c of ['', 'L', 'Li', 'Xpto', 'Évora', 'Ponta Delgada']) it(`"${c}" não tem`, () => expect(cityKnown(c)).toBe(false));
 });
