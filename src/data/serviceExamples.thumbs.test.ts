@@ -17,3 +17,16 @@ describe('miniaturas da galeria de exemplos', () => {
     }
   });
 });
+
+// Todas as fotografias de problema que as páginas podem escolher (cidades e freguesias rodam entre elas),
+// não só as das páginas nacionais: 24 Nov, as fotografias novas da impermeabilização ficaram sem miniatura.
+import { readdirSync, readFileSync } from 'node:fs';
+
+describe('miniaturas de todas as fotografias de problema', () => {
+  const files = readdirSync(resolve('src/data')).filter(f => /ProblemImages\.ts$/.test(f));
+  const ids = files.flatMap(f => [...readFileSync(resolve('src/data', f), 'utf8').matchAll(/"id":\s*"([^"]+)",[\s\S]{0,120}?"src":\s*"\/images\/landing-problems\//g)].map(m => m[1]));
+  it('encontra as fotografias', () => expect(ids.length).toBeGreaterThan(20));
+  it.each(ids)('%s tem miniaturas 400 e 800', id => {
+    for (const w of [400, 800]) expect(existsSync(resolve(`public/images/service-examples/${id}-${w}.webp`)), `${id}-${w}.webp`).toBe(true);
+  });
+});
