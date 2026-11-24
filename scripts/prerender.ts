@@ -1354,7 +1354,7 @@ export function prerenderRoutes(outDir: string): number {
           { name: 'Home',  url: BASE_URL + '/' },
           { name: p.h1,    url: `${BASE_URL}${url}` },
         ]),
-        buildFaqSchema(p.faqs),
+        buildFaqSchema(p.faqs.slice(0, 4)),
       ];
       emit(
         url,
@@ -1365,7 +1365,7 @@ export function prerenderRoutes(outDir: string): number {
           intro: p.intro,
           problems: p.scenarios.map(s => ({ title: s.title, description: s.body })),
           benefits: p.whyUs,
-          faqs: p.faqs,
+          faqs: p.faqs.slice(0, 4), // 4 perguntas, como na página (dono, 24 Nov)
         },
         schemas,
         'en',

@@ -1,3 +1,5 @@
+import CompactFAQ from "@/components/CompactFAQ";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE, EN_DRYING_PROMISE } from '@/constants/commercialPolicy';
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
@@ -42,6 +44,7 @@ function getHostStats(): SnapshotStat[] {
 }
 
 const EnServicePage = () => {
+  useSnapSections(true); // modelo novo (dono, 24 Nov)
   const { slug } = useParams<{ slug: string }>();
   const page = slug ? getEnPageBySlug(slug) : null;
 
@@ -191,12 +194,12 @@ const EnServicePage = () => {
         </div>
 
         {/* ═══ SCENARIOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section id="handle" className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Common Situations" heading="What we" goldWord="handle" light={true} />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+            <SectionHeader heading="What we" goldWord="handle" light={true} />
+            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0">
               {page.scenarios.map((s, idx) => (
-                <div key={idx} className="relative overflow-hidden flex flex-col p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                <div key={idx} className="relative flex w-[85%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white p-5 sm:w-auto md:p-7" style={{ borderTop: "3px solid #D4AF37" }}>
                   <p className="font-playfair text-lg font-bold mb-2 leading-tight text-[#111111]">{s.title}</p>
                   <p className="text-base text-[#505650] leading-relaxed">{s.body}</p>
                 </div>
@@ -206,16 +209,14 @@ const EnServicePage = () => {
         </section>
 
         {/* ═══ WHY US ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="why" className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Why Kyro Clean" heading="Why guests and hosts" goldWord="choose us" light={false} />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+            <SectionHeader heading="Why choose" goldWord="Kyro" light={false} />
+            <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-px">
               {page.whyUs.map((reason, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3.5 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
-                    <CheckCircle2 className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                  </div>
-                  <span className="text-base text-white/75 leading-relaxed pt-1.5">{reason}</span>
+                <div key={idx} className="relative flex items-start gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 md:p-6">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "#D4AF37" }} />
+                  <span className="text-[14px] leading-snug text-white/85 md:text-base">{reason}</span>
                 </div>
               ))}
             </div>
@@ -223,7 +224,7 @@ const EnServicePage = () => {
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ faqs={page.faqs} heading="Frequently Asked Questions" overline="FAQ" description="Prices, care and what to expect. Select a question to read the answer." variant="dark" />
+        <CompactFAQ id="duvidas" faqs={page.faqs.slice(0, 4)} heading="Frequently Asked Questions" />
 
         {page.audience === "host" && (
           <section className="py-8 bg-[#FDFDF9] border-t border-[#111111]/8 text-center px-5">
