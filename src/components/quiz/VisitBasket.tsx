@@ -15,6 +15,7 @@ import { type QuizLeadPayload } from '@/services/submissionService';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
 import QuizFurnitureImage from './QuizFurnitureImage';
+import { CARPET_TIERS } from '@/constants/rugRates';
 import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
 import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
 import imperPhoto from '@/assets/picker-premium-sofa.webp';
@@ -841,6 +842,8 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
                 </button>;
               })}
             </div>
+            {/* Escalões à vista (dono, 24 Nov: "OPÇÃO A"): quanto maior a área, menos por m², só de CARPET_TIERS. */}
+            {item.kind === 'carpet' && <p className="text-center text-[11px] font-semibold text-white/70">{CARPET_TIERS.map((t, i) => (i + 1 < CARPET_TIERS.length ? `até ${CARPET_TIERS[i + 1].from} m² ${t.rate}€` : `${t.from} m² ou mais ${t.rate}€/m²`)).join(' · ')}</p>}
             <p className="mb-1 mt-2 text-xs font-semibold text-white/70">{preset ? 'Ou escreva a medida certa, em metros' : 'Medida em metros (de uma ponta à outra)'}</p>
             <div className="mb-3 grid grid-cols-2 gap-2">
               <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
