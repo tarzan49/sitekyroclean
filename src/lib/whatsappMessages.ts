@@ -221,6 +221,7 @@ export function buildSubmittedWaMessage(reference?: string | null, opts: { photo
 const PACK_MESSAGES: Record<string, { request: string; kind: ItemKind }> = {
   'sofa-colchao': { request: 'limpar o meu sofá e o meu colchão', kind: 'sofaColchao' },
   'sofa-impermeabilizacao': { request: 'limpar e impermeabilizar o meu sofá', kind: 'sofa' },
+  'cadeiras-impermeabilizacao': { request: 'limpar e impermeabilizar as minhas cadeiras', kind: 'cadeiras' },
   'sala-completa': { request: 'limpar o sofá, as cadeiras e o tapete da sala', kind: 'salaCompleta' },
   'quarto-completo': { request: 'limpar o meu colchão e o meu tapete', kind: 'quartoCompleto' },
 };
