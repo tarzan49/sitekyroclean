@@ -14,6 +14,7 @@ import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { buildWaUrl, type QuizLeadPayload } from '@/services/submissionService';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
 import QuizFurnitureImage from './QuizFurnitureImage';
+import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 import { Star } from 'lucide-react';
 import type { QuizOrder } from '@/lib/quizOrder';
@@ -78,6 +79,16 @@ type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: num
 export type BasketGift = NonNullable<Quote['visitGifts']>['gifts'][number];
 const GIFT_LABEL: Record<string, string> = { 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'sofa:anti-acaros': 'o anti-ácaros no sofá', 'rug:anti-odor': 'o anti-odor no tapete', 'carpet:anti-odor': 'o anti-odor na alcatifa', 'rug:anti-acaros': 'o anti-ácaros no tapete', 'carpet:anti-acaros': 'o anti-ácaros na alcatifa', 'sofa:anti-odor': 'o anti-odor no sofá' };
 export const giftLabel = (g: BasketGift) => GIFT_LABEL[`${g.piece}:${g.treatment}`] ?? g.treatment;
+const PLURAL: Record<string, string> = { mattress: 'colchões', rug: 'tapetes', carpet: 'alcatifas', sofa: 'sofás', chairs: 'cadeiras' };
+/** Uma linha por oferta igual: duas ofertas de anti-odor em dois tapetes = "o anti-odor nos 2 tapetes", com os valores somados. */
+export function groupGifts(gifts: BasketGift[]): { key: string; text: string; normal: number }[] {
+  const out = new Map<string, { g: BasketGift; n: number; normal: number }>();
+  for (const g of gifts) { const k = `${g.piece}:${g.treatment}`; const o = out.get(k); if (o) { o.n++; o.normal += g.normal; } else out.set(k, { g, n: 1, normal: g.normal }); }
+  return [...out.entries()].map(([key, { g, n, normal }]) => {
+    const what = g.treatment === 'anti-odor' ? 'o anti-odor' : 'o anti-ácaros';
+    return { key, normal: Math.round(normal * 100) / 100, text: n > 1 ? `${what} ${g.piece === 'chairs' ? 'nas' : g.piece === 'carpet' ? 'nas' : 'nos'} ${n} ${PLURAL[g.piece] ?? g.piece}` : giftLabel(g) };
+  });
+}
 
 export function quoteBasket(city: string, items: BasketItem[]) {
   const q = items.map(toQuote);
@@ -95,7 +106,9 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   const rugCombo = rugValid.length > 0 && othersValid > 0 && rx.rugCombo?.ok && typeof rx.rugCombo.comboPrice === 'number' ? rx.rugCombo : null;
   const rugLine = rugAlone ?? rugCombo?.rugsWashing ?? null;
   let k = 0;
-  const lines = q.map((x, i) => (x ? (isRug(items[i].kind) ? (k++, rugValid.length === 1 ? rugLine : null) : r.lines?.[k++]?.amount ?? null) : null));
+  // Vários tapetes: o motor dá um só valor para todos (lavagem somada); fica na linha do primeiro e os outros dizem "incluído".
+  let firstRug = true;
+  const lines = q.map((x, i) => (x ? (isRug(items[i].kind) ? (k++, firstRug ? (firstRug = false, rugLine) : null) : r.lines?.[k++]?.amount ?? null) : null));
   const missingRug = items.some(i => isRug(i.kind)) && rugAlone === null && !rugCombo;
   if (!missingRug && (rugAlone !== null || rugCombo)) {
     const othersSob = (r.lines ?? []).some((l, j) => l.quote && valid[j]?.kind !== 'rug' && valid[j]?.kind !== 'carpet');
@@ -113,9 +126,21 @@ function readSaved(): { city: string; items: BasketItem[] } | null {
   try { const v = JSON.parse(sessionStorage.getItem(SAVE_KEY) ?? 'null'); return v && Array.isArray(v.items) ? v : null; } catch { return null; }
 }
 
-interface Props { isOpen: boolean; onClose: () => void; initialCity?: string; initialItems?: BasketItem[] }
+// Fotografias reais da equipa, as mesmas do questionário antigo (dono gostou destas).
+const PHOTO: Record<BasketKind, string> = { sofa: '/images/services/sofa.webp', mattress: '/images/services/colchao.webp', chairs: '/images/services/cadeira.webp', rug: '/images/services/tapete.webp', carpet: '/images/services/process-alcatifas.webp' };
+/** "Desde" de cada artigo, pelo motor do bot (o artigo mais pequeno, só limpeza, sem deslocação); tapetes e alcatifas por m². */
+function fromPrice(city: string, k: BasketKind): string {
+  if (k === 'rug') return RUG_PRICE_FROM;
+  if (k === 'carpet') return CARPET_PRICE_FROM;
+  const item = k === 'sofa' ? { kind: 'sofa', size: '1-lugar' } : k === 'mattress' ? { kind: 'mattress', size: 'solteiro' } : { kind: 'chairs', qty: 1 };
+  const r = botQuote({ city: city || 'Lisboa', items: [{ ...item, treatment: 'clean' }] }) as Quote;
+  const v = r.ok ? r.lines?.[0]?.amount : null;
+  return typeof v === 'number' ? `desde ${formatEuro(v)}` : '';
+}
 
-export default function VisitBasket({ isOpen, onClose, initialCity = '', initialItems = [] }: Props) {
+interface Props { isOpen: boolean; onClose: () => void; initialCity?: string; initialItems?: BasketItem[]; startKind?: BasketKind }
+
+export default function VisitBasket({ isOpen, onClose, initialCity = '', initialItems = [], startKind }: Props) {
   const navigate = useNavigate();
   const [city, setCity] = useState(initialCity);
   const [items, setItems] = useState<BasketItem[]>(initialItems);
@@ -132,9 +157,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
     if (!isOpen) return;
     // O cesto guardado na sessão volta se a página se refizer (recarregar, voltar atrás): nunca se perde um artigo.
     const saved = readSaved();
-    const same = saved && initialItems[0] && saved.items[0] && ['kind', 'size', 'seats', 'pack', 'qty'].every(k => (saved.items[0] as unknown as Record<string, unknown>)[k] === (initialItems[0] as unknown as Record<string, unknown>)[k]);
+    const same = saved && (!initialItems.length || saved.items[0] && initialItems[0] && ['kind', 'size', 'seats', 'pack', 'qty'].every(k => (saved.items[0] as unknown as Record<string, unknown>)[k] === (initialItems[0] as unknown as Record<string, unknown>)[k]));
     setCity(same ? saved.city : initialCity); setItems(same ? saved.items : initialItems); setStep('basket'); setFailed(false); setTestOrder(null);
-    if (!initialItems.length) setEditing(null);
+    // Aberto numa página de um serviço (tapetes, colchões…) sem artigo escolhido: abre logo esse artigo.
+    setEditing(!initialItems.length && startKind && !(saved && saved.items.length) ? newItem(startKind) : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
   useEffect(() => { if (isOpen && items !== initialItems) try { sessionStorage.setItem(SAVE_KEY, JSON.stringify({ city, items })); } catch { /* sem armazenamento */ } }, [isOpen, city, items]);
@@ -153,7 +179,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   const send = async () => {
     const labels = items.map(itemLabel);
     const main = items[0];
-    const giftText = quote.gifts.map(g => `oferecemos ${giftLabel(g)} (normalmente ${formatEuro(g.normal)})`).join('; ');
+    const giftText = groupGifts(quote.gifts).map(g => `oferecemos ${g.text} (normalmente ${formatEuro(g.normal)})`).join('; ');
     const details = [labels.join(' | '), giftText].filter(Boolean).join(' | ');
     const payload: QuizLeadPayload = {
       name: name.trim(), phone: phone.trim(), email: '', photos: [], finalLocation: city.trim(),
@@ -220,34 +246,54 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
         {step === 'basket' ? (
           <>
-            <label className="mb-4 block">
-              <span className="mb-1 block text-xs font-semibold text-white/70">Localidade</span>
-              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Ex.: Lisboa" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base text-white outline-none focus:border-[#D4AF37]" />
+            {items.length === 0 ? (
+              <>
+                <h2 className="mb-3 font-playfair text-2xl font-semibold text-white">O que vamos <span style={{ color: GOLD }}>limpar</span>?</h2>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map((k, idx) => (
+                    <button key={k} type="button" onClick={() => setEditing(newItem(k))} className={`group relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98] ${idx === 4 ? 'col-span-2 h-28' : 'h-36'}`}>
+                      <img src={PHOTO[k]} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      <span className="absolute inset-0 bg-gradient-to-t from-[#071a12] via-[#071a12]/40 to-transparent" />
+                      <span className="absolute inset-x-3 bottom-2.5">
+                        <span className="block text-base font-bold text-white">{KIND_LABEL[k]}</span>
+                        <span className="block text-xs font-semibold text-[#E8C964]">{fromPrice(city, k)}</span>
+                      </span>
+                      <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-4 w-4" strokeWidth={3} /></span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+            <div className="sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 bg-[#0B2F2A]/95 px-4 pb-3 pt-1 backdrop-blur">
+              <p className="mb-2 text-sm font-semibold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></p>
+              <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+                {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(k => (
+                  <button key={k} type="button" onClick={() => setEditing(newItem(k))} className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#D4AF37]/60 bg-white/[0.05] pl-1.5 pr-3 text-sm font-bold text-white hover:bg-[#D4AF37]/15">
+                    <img src={PHOTO[k]} alt="" className="h-8 w-8 rounded-full object-cover" />{KIND_LABEL[k]}<Plus className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+
+            <label className="mb-3 mt-3 flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-3">
+              <span className="text-xs font-semibold text-white/60">Localidade</span>
+              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Ex.: Lisboa" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
 
-            <ul className="space-y-2">
+            {items.length > 0 && <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-white/[0.04]">
               {items.map((it, i) => (
-                <li key={it.id} className="flex items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3">
-                  {imgOf(it)}
-                  <button type="button" onClick={() => setEditing(it)} className="min-w-0 flex-1 text-left">
-                    <span className="block text-sm font-bold text-white">{itemLabel(it)}</span>
-                    <span className="text-xs text-white/60">Tocar para alterar</span>
+                <li key={it.id} className="flex h-12 items-center gap-2 pl-2">
+                  <button type="button" onClick={() => setEditing(it)} className="flex min-w-0 flex-1 items-center gap-2 text-left" aria-label={`Alterar ${itemLabel(it)}`}>
+                    <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-8 w-8 sm:h-8 sm:w-8" />
+                    <span className="truncate text-sm font-semibold text-white">{itemLabel(it)}</span>
                   </button>
-                  {quote.lines[i] != null && <span className="text-sm font-bold text-white">{formatEuro(quote.lines[i] as number)}</span>}
-                  <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-11 items-center justify-center rounded-full text-white/50 hover:bg-white/10"><Trash2 className="h-4 w-4" /></button>
+                  <span className="shrink-0 text-sm font-bold text-white">{quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : isRug(it.kind) && items.filter(x => isRug(x.kind)).length > 1 && quote.lines.some((v, j) => v != null && isRug(items[j].kind)) ? <span className="text-xs font-normal text-white/60">incluído</span> : null}</span>
+                  <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
-            </ul>
-
-            <h3 className="mb-2 mt-6 font-playfair text-xl font-bold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></h3>
-            <div className="grid grid-cols-2 gap-2">
-              {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(k => (
-                <button key={k} type="button" onClick={() => setEditing(newItem(k))} className="flex min-h-16 items-center gap-2 rounded-2xl border-2 border-[#D4AF37]/45 bg-white/[0.04] px-3 text-sm font-bold text-white hover:bg-[#D4AF37]/10">
-                  {imgOf({ kind: k, size: k === 'sofa' ? '3-lugares' : k === 'mattress' ? 'casal' : undefined })}<span className="flex-1 text-left">{KIND_LABEL[k]}</span><Plus className="h-4 w-4 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
-                </button>
-              ))}
-            </div>
+            </ul>}
           </>
         ) : (
           <>
@@ -267,7 +313,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       </div>
 
       <footer className="fixed inset-x-0 bottom-0 border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{quote.gifts.map((g, gi) => <li key={`${g.piece}${gi}`}>Oferecemos {giftLabel(g)}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
+        {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{groupGifts(quote.gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <div className="mb-2 flex items-baseline justify-between">
           <span className="text-sm text-white/70">Total, deslocação incluída</span>
           <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">+ tapetes sob orçamento</span>}</span>
@@ -303,7 +349,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
   return (
     <div className="fixed inset-0 z-[110] flex items-end bg-black/40" onClick={onCancel}>
       <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl border-t border-[#D4AF37]/40 bg-[#0B2F2A] text-white p-4 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
-        <h3 className="mb-3 font-playfair text-xl font-bold text-white">{KIND_LABEL[item.kind]}</h3>
+        <div className="-mx-4 -mt-4 mb-3 h-28 overflow-hidden rounded-t-3xl relative"><img src={PHOTO[item.kind]} alt="" className="h-full w-full object-cover" /><span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] to-transparent" /><h3 className="absolute bottom-2 left-4 font-playfair text-2xl font-semibold text-white">{KIND_LABEL[item.kind]}</h3></div>
 
         {item.kind === 'sofa' && <>
           <p className="mb-1 text-xs font-semibold text-white/70">Lugares</p>
