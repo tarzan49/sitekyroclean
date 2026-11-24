@@ -1,6 +1,6 @@
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { clearPrerenderedSchema } from '../lib/seoSchema';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, MessageCircle, ShieldCheck } from 'lucide-react';
 import Header from '@/components/Header';
@@ -22,6 +22,9 @@ import { buildTreatmentWaMessage } from '@/lib/whatsappMessages';
 export default function TreatmentPage() {
   const { pathname } = useLocation();
   const page = getTreatmentPage(pathname) ?? getExpansionPage(pathname);
+  // Página nacional (sem cidade): a pessoa escolhe a localidade, para o preço e a mensagem não dizerem
+  // sempre "em Lisboa" (auditoria das mensagens, 24 Nov).
+  const [pickCity, setPickCity] = useState('Lisboa');
   useSnapSections(Boolean(page));
   useEffect(() => {
     clearPrerenderedSchema();
@@ -44,7 +47,8 @@ export default function TreatmentPage() {
     <section id="precos" className="scroll-mt-20 bg-[#FDFDF9] py-14 md:py-20">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{page.city ? `${cityPrep(page.city.name)} ${page.city.name}` : 'com o tratamento'}</em></h2>
-        <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><TreatmentPackPicker kind="mattress" city={page.city?.name ?? 'Lisboa'} source={`treatment_picker_${treatment?.slug ?? 'tratamento'}`} /></div>
+        {!page.city && <select value={pickCity} onChange={e => setPickCity(e.target.value)} aria-label="Localidade" className="mb-3 h-11 w-full max-w-xs rounded-xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">{cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}</select>}
+        <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><TreatmentPackPicker kind="mattress" city={page.city?.name ?? pickCity} source={`treatment_picker_${treatment?.slug ?? 'tratamento'}`} /></div>
       </div>
     </section>
     <section id="avaliacoes" className="scroll-mt-20 bg-kyro-green py-14 md:py-20 text-white">
