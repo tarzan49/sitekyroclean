@@ -102,15 +102,15 @@ export default function TreatmentPackPicker({ kind, city, source }: Props) {
             const value = totals[o.id];
             return (
               <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setChoice(o.id)}
-                className={`relative flex min-h-[58px] items-center rounded-2xl border-2 px-4 py-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
-                {o.top && <span className="absolute -top-3 right-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
+                className={`relative flex min-h-[58px] items-center rounded-2xl border-2 px-4 py-2.5 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                {o.top && <span className="absolute -top-3 left-4 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
                 <span className="flex min-w-0 flex-1 flex-col justify-center">
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.title}</span>
                   <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
                 </span>
                 <span className="flex items-center gap-2 pl-2">
                   <span className="flex flex-col items-end leading-tight">
-                  {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="text-[11px] text-[#888] line-through">{formatEuro(struck)}</span>}
+                  {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="mb-0.5 text-[12px] text-[#888] line-through">{formatEuro(struck)}</span>}
                   <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">Sob orçamento</span> : formatEuro(value)}</span>
                   </span>
                   <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
