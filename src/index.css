@@ -821,3 +821,7 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
   /* Títulos de secção mais juntos ao conteúdo em todas as páginas com encaixe (cada secção cabe num ecrã). */
   html.snap-sections main section > div > div.mb-8:first-child { margin-bottom: 14px; }
 }
+@media (max-width: 767px) {
+  /* Diretórios de links (DirectoryGroup) nas páginas com encaixe: linhas baixas, os links continuam todos no HTML. */
+  html.snap-sections details.group\/directory > summary { min-height: 44px; padding-top: 8px; padding-bottom: 8px; font-size: 15px; }
+}

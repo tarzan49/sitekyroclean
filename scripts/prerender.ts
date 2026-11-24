@@ -1157,12 +1157,12 @@ export function prerenderRoutes(outDir: string): number {
           // introdução, e o hub não ligava a nenhuma das 244 páginas de pack.
           breadcrumb: [{ label: 'Início', href: '/' }, { label: 'Guia de Packs' }],
           h1: 'Packs de Limpeza',
-          intro: 'Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
+          intro: 'Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Na página de cada pack escolhe os tamanhos e vê o total.',
           problems: packs.map(pack => ({ title: pack.name, description: packIntro(pack, PACK_HOOK[pack.id] ?? pack.description) })),
           howItWorks: PACK_PERK_LIMIT,
           benefits: PACK_PERK_BULLETS,
           links: packs.flatMap(pack => packCities.map(city => ({ href: `/${pack.slug}-${city.slug}`, label: `${pack.name}: ${city.name}` }))),
-          linksHeading: 'Todos os packs por localidade',
+          linksHeading: 'Packs por localidade',
         },
         extraSchemas: [
           buildBreadcrumbSchema([

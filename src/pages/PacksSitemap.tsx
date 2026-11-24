@@ -1,3 +1,4 @@
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { useState } from "react";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import { Link } from "react-router-dom";
@@ -28,6 +29,7 @@ function packChips(packId: string): string[] {
 }
 
 const PacksSitemap = () => {
+  useSnapSections(true); // modelo novo (dono, 24 Nov)
   const [citySlug, setCitySlug] = useState<string>(packCities[0].slug);
   const city = packCities.find(c => c.slug === citySlug) ?? packCities[0];
 
@@ -76,7 +78,7 @@ const PacksSitemap = () => {
               Packs de Limpeza
             </h1>
             <p className="text-white/80 text-base max-w-xl mb-6">
-              Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.
+              Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Na página de cada pack escolhe os tamanhos e vê o total.
             </p>
             <label htmlFor="pack-city" className="block text-sm font-semibold text-white mb-2">
               Onde fica a sua casa?
@@ -97,15 +99,12 @@ const PacksSitemap = () => {
         </section>
 
         {/* Os quatro packs */}
-        <section className="py-10 md:py-14 bg-[#FDFDF9]">
+        <section id="packs" className="py-10 md:py-14 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="type-section-title font-playfair text-[#111111] mb-1">Escolha o ponto de partida</h2>
-            <p className="text-base text-[#505650] mb-6">
-              Cada pack abre o configurador já com estes artigos. Pode mudar tamanhos, quantidades e tratamentos antes de pedir.
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
+            <h2 className="type-section-title font-playfair text-[#111111] mb-4">Escolha o seu <em className="not-italic" style={{ color: "#D4AF37" }}>pack</em></h2>
+            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0">
               {packs.map(pack => (
-                <article key={pack.id} className="flex flex-col rounded-2xl border border-[#E8E4DE] bg-white p-5 md:p-6">
+                <article key={pack.id} className="flex w-[86%] shrink-0 snap-start flex-col rounded-2xl border border-[#E8E4DE] bg-white p-5 md:w-auto md:p-6" style={{ borderTop: "3px solid #D4AF37" }}>
                   <ul className="flex flex-wrap gap-1.5 mb-3" aria-label="Inclui">
                     {packChips(pack.id).map(chip => (
                       <li key={chip} className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-sm font-semibold text-[#111111]">
@@ -120,7 +119,7 @@ const PacksSitemap = () => {
                     to={`/${pack.slug}-${city.slug}`}
                     className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 text-base font-semibold text-white hover:bg-[#0d3c47] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"
                   >
-                    Configurar {cityPrep(city.name)} {city.name}
+                    Ver o preço {cityPrep(city.name)} {city.name}
                     <ArrowRight aria-hidden="true" className="h-4 w-4" style={{ color: "#D4AF37" }} />
                   </Link>
                 </article>
@@ -133,7 +132,7 @@ const PacksSitemap = () => {
         <section className="pb-10 md:pb-14 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-[#E8E4DE] bg-white p-5 md:p-6">
-              <h2 className="type-section-title font-playfair text-[#111111] mb-4">Como funciona um pack</h2>
+              <h2 className="type-section-title font-playfair text-[#111111] mb-4">Como funciona um <em className="not-italic" style={{ color: "#D4AF37" }}>pack</em></h2>
               <ul className="space-y-3">
                 {PACK_PERK_BULLETS.map(bullet => (
                   <li key={bullet} className="flex gap-3 text-base text-[#333]">
@@ -150,10 +149,7 @@ const PacksSitemap = () => {
         {/* Diretório completo: mantém as 244 ligações no HTML */}
         <section className="py-10 md:py-14 bg-white border-t border-[#E8E4DE]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="type-section-title font-playfair text-[#111111] mb-2">Todos os packs por localidade</h2>
-            <p className="text-base text-[#505650] mb-4">
-              Pedido por WhatsApp · {RESPONSE_PROMISE}
-            </p>
+            <h2 className="type-section-title font-playfair text-[#111111] mb-4">Packs por <em className="not-italic" style={{ color: "#D4AF37" }}>localidade</em></h2>
             {packs.map(pack => (
               <DirectoryGroup key={pack.id} title={pack.name}>
                 {packCities.map(c => (
