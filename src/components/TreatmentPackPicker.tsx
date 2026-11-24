@@ -11,6 +11,7 @@ import { Check, Minus, Plus, MessageCircle } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
+import SofaCounters, { sofaItems, sofaWhat, type SofaCounts } from '@/components/SofaCounters';
 import { cityPrep } from '@/data/serviceCatalog';
 
 export type TreatmentKind = 'sofa' | 'mattress' | 'rug';
@@ -39,13 +40,14 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
   const [rugL, setRugL] = useState(3);
   const [choice, setChoice] = useState<Option['id']>('treat');
   // Quantas peças iguais (dono, 25 Nov) e o cesto da visita quando a página não traz o seu ("em todas no site").
-  const [count, setCount] = useState(1);
+  // Sofás por tamanho, combináveis, com o total em pequeno (dono, 25 Nov).
+  const [counts, setCounts] = useState<SofaCounts>({ '3-lugares': 1 });
   // Colchões: quantos de cada tamanho, cada um com o seu contador (dono, 25 Nov: "em cada tipo quantos colchões").
   const [mCounts, setMCounts] = useState<Record<string, number>>({ solteiro: 0, casal: 1, king: 0 });
   const bump = (id: string, d: number) => setMCounts(c => { const next = { ...c, [id]: Math.max(0, Math.min(9, (c[id] ?? 0) + d)) }; return Object.values(next).some(v => v > 0) ? next : c; });
   const mItems = (treatment: string) => MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => ({ kind: 'mattress', size: x.id, treatment, qty: mCounts[x.id] }));
   const [basket, setBasket] = useState<BasketItem | null>(null);
-  const more = (c: TreatmentChoice) => { const firstSize = kind === 'mattress' ? (MATTRESS_SIZES.find(x => mCounts[x.id] > 0)?.id ?? 'casal') : c.size; const withQty = { ...c, size: firstSize, qty: kind === 'rug' ? 1 : kind === 'mattress' ? mCounts[firstSize] : count }; if (onMore) onMore(withQty); else setBasket(treatmentToItem(withQty)); };
+  const more = (c: TreatmentChoice) => { const firstSize = kind === 'mattress' ? (MATTRESS_SIZES.find(x => mCounts[x.id] > 0)?.id ?? 'casal') : kind === 'sofa' ? (SOFA_SIZES.find(id => (counts[id] ?? 0) > 0) ?? '3-lugares') : c.size; const withQty = { ...c, size: firstSize, qty: kind === 'rug' ? 1 : kind === 'mattress' ? mCounts[firstSize] : (counts[firstSize] ?? 1) }; if (onMore) onMore(withQty); else setBasket(treatmentToItem(withQty)); };
 
   // Os mesmos totais que o bot dá no WhatsApp, com a deslocação da cidade.
   const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
@@ -55,24 +57,23 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
       return [o.id, r.ok && r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null];
     }
     const treatment = treat ? 'clean+anti-acaros' : 'clean';
-    const items = kind === 'mattress' ? mItems(treatment) : [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: count } : { kind: 'sofa', size, treatment, qty: count }];
+    const items = kind === 'mattress' ? mItems(treatment) : sofaItems(counts, treatment);
     const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
     // "Só limpeza" é mesmo só a limpeza: com várias peças o motor junta ofertas (escada A) ao total;
     // aqui usa-se o total sem a oferta, senão a opção sem tratamento já trazia o anti-ácaros (dono, 25 Nov).
     const plain = !treat && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     return [o.id, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
-  })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, count, mCounts, city]);
-  const gift = useMemo(() => kind === 'rug' ? null : visitGiftFor(city, kind === 'mattress' ? mItems('clean') : [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', qty: count } : { kind: 'sofa', size, treatment: 'clean', qty: count }]), [kind, size, count, mCounts, city]);
+  })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, counts, mCounts, city]);
+  const gift = useMemo(() => kind === 'rug' ? null : visitGiftFor(city, kind === 'mattress' ? mItems('clean') : sofaItems(counts, 'clean')), [kind, size, counts, mCounts, city]);
   // Preço riscado do bot: limpeza + anti-ácaros feito à parte (40€ por colchão; dono, 24 Nov).
   const struck = useMemo(() => {
     if (kind !== 'mattress') return null;
     const r = botQuote({ city, items: mItems('clean+anti-acaros') }) as { mattressMitePack?: { separate: number } | null };
     return r.mattressMitePack?.separate ?? null;
-  }, [kind, size, count, mCounts, city]);
+  }, [kind, size, counts, mCounts, city]);
 
   const m = (v: number) => String(v).replace('.', ',');
-  const seats = Number(size.split('-')[0]);
-  const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => `${mCounts[x.id]} ${mCounts[x.id] === 1 ? 'colchão' : 'colchões'} ${x.label.toLowerCase()}`).join(' e ') : `${count > 1 ? `${count} sofás` : 'um sofá'} de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
+  const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => `${mCounts[x.id]} ${mCounts[x.id] === 1 ? 'colchão' : 'colchões'} ${x.label.toLowerCase()}`).join(' e ') : `${sofaWhat(counts)}`;
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
@@ -85,11 +86,6 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
         <p className="hidden text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37] md:block">Passo 1</p>
         <div className="mb-2 flex items-center justify-between gap-2 md:mb-4 md:mt-1">
           <p className="text-base font-semibold text-[#1A1A1A] md:text-lg">{kind === 'rug' ? 'Medidas aproximadas do tapete' : kind === 'mattress' ? 'Quantos colchões de cada tamanho?' : 'Quantos lugares tem o sofá?'}</p>
-          {kind === 'sofa' && <div className="ml-auto flex shrink-0 items-center gap-1.5" aria-label="Quantidade">
-            <button type="button" aria-label="Menos um" onClick={() => setCount(c => Math.max(1, c - 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
-            <span className="min-w-[1.5rem] text-center text-sm font-semibold text-[#1A1A1A]">×{count}</span>
-            <button type="button" aria-label="Mais um" onClick={() => setCount(c => Math.min(6, c + 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
-          </div>}
         </div>
         {kind === 'rug' ? (
           <div className="grid grid-cols-2 gap-2">
@@ -104,6 +100,8 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
               </div>
             ))}
           </div>
+        ) : kind === 'sofa' ? (
+          <SofaCounters counts={counts} onChange={setCounts} />
         ) : (
           <div className={`grid gap-1.5 md:gap-2 ${kind === 'mattress' ? 'grid-cols-3' : 'grid-cols-6 md:grid-cols-3'}`} role="radiogroup" aria-label={kind === 'mattress' ? 'Tamanho' : 'Lugares'}>
             {kind === 'mattress' ? MATTRESS_SIZES.map(o => {
@@ -118,14 +116,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
                   </div>
                 </div>
               );
-            }) : SOFA_SIZES.map(id => ({ id, label: id.split('-')[0] })).map(o => {
-              const active = size === o.id;
-              return (
-                <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setSize(o.id)} className={box(active)}>
-                  <span className={`text-xl font-semibold leading-none ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{o.label}</span>
-                </button>
-              );
-            })}
+            }) : null}
           </div>
         )}
         <button type="button" onClick={() => more({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>

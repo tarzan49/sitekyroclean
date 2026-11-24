@@ -19,6 +19,7 @@ import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { chairPackWas } from '@/constants/chairPricing';
 import { formatEuro } from '@/data/enginePrices';
+import SofaCounters from '@/components/SofaCounters';
 
 type Kind = 'sofa' | 'chairs';
 const SOFA_SIZES = ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares', '6-lugares']; // até 6; canto/U/7+ pede-se no WhatsApp (dono, 24 Nov)
@@ -109,24 +110,10 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
       <div>
         <p className="hidden text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37] md:block">Passo 1</p>
         <div className={`${compact && kind !== 'sofa' ? 'hidden md:flex ' : 'flex '}mb-2 items-center justify-between gap-2 md:mb-4 md:mt-1`}>
-          <p className={`${compact ? 'hidden md:block ' : ''}text-base font-semibold text-[#1A1A1A] md:text-lg`}>{kind === 'sofa' ? 'Quantos sofás de cada tamanho?' : 'Quantas cadeiras?'}</p>
+          <p className={`${compact ? 'hidden md:block ' : ''}text-base font-semibold text-[#1A1A1A] md:text-lg`}>{kind === 'sofa' ? 'Quantos lugares tem o sofá?' : 'Quantas cadeiras?'}</p>
         </div>
         {kind === 'sofa' ? (
-          <div className="grid grid-cols-3 gap-1.5 md:grid-cols-2 md:gap-2" aria-label="Sofás por tamanho">
-            {SOFA_SIZES.map(id => {
-              const n = sofaCounts[id] ?? 0;
-              return (
-                <div key={id} className={`flex flex-col items-center gap-0.5 rounded-xl border-2 px-1 pb-0.5 pt-1.5 transition-all md:min-h-[48px] md:py-1 md:flex-row md:justify-between md:gap-1 md:pl-2.5 ${n > 0 ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#E5E0D3] bg-white'}`}>
-                  <span className={`whitespace-nowrap text-[13px] font-semibold leading-none md:text-sm md:leading-tight ${n > 0 ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{seatLabel(id)}</span>
-                  <div className="flex items-center gap-0.5">
-                    <button type="button" aria-label={`Menos um sofá de ${seatLabel(id)}`} onClick={() => bumpSofa(id, -1)} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
-                    <span className="w-5 text-center text-base font-bold text-[#1A1A1A]">{n}</span>
-                    <button type="button" aria-label={`Mais um sofá de ${seatLabel(id)}`} onClick={() => bumpSofa(id, 1)} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <SofaCounters counts={sofaCounts} onChange={setSofaCounts} />
         ) : (
           <div className="flex items-center justify-between rounded-2xl border-2 border-[#E5E0D3] bg-white p-1 md:p-2">
             <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] md:h-12 md:w-12 text-[#1A1A1A] hover:bg-[#E9E3D3]"><Minus className="h-5 w-5" /></button>
