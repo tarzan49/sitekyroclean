@@ -17,6 +17,7 @@ import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import SofaPricePicker from "@/components/SofaPricePicker";
+import LeatherSofaPicker from "@/components/LeatherSofaPicker";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
@@ -132,10 +133,10 @@ const MaterialPage = () => {
 
         <CommercialHero title={data.h1} subtitle={`Cuidados profissionais para ${data.name.toLowerCase()}.`} serviceSlug={data.serviceSlug} city={cityName ?? undefined} price={servicePrice} image={heroImg} breadcrumbs={[{ label: "Início", to: "/" }, { label: data.serviceName, to: `/${data.serviceSlug}` }, { label: `${data.name}${cityName ? ` · ${cityName}` : ""}` }]} whatsappHref={waHref} source={`material_hero_${data.slug}`} />
 
-        {fabric ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+        {sofaNew ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(cityName!)} {cityName}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={cityName!} source={`material_picker_${data.slug}`} /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{fabric ? <SofaPricePicker city={cityName!} source={`material_picker_${data.slug}`} /> : <LeatherSofaPicker city={cityName!} source={`material_picker_${data.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />}
 
