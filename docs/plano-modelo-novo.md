@@ -11,10 +11,10 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 |---|---|---|---|---|
 | LocationServicePage (cidade) | 612 | 102 | FEITO | cadeiras na branch packs-tratamento; resto por fazer |
 | FreguesiaServicePage | 4656 | 776 | FEITO (24 Nov) | por fazer |
-| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO, falta OK do dono | por fazer |
-| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás, falta OK; `impermeabilizacao-sofa-*` é do serviço impermeabilização | por fazer |
+| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | por fazer |
+| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | por fazer |
 | PackComboPage | 510+ | — | FEITO (todos os packs) | — |
-| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | POR FAZER (secções próprias) | por fazer |
+| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO, falta OK do dono | por fazer |
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | POR FAZER (secções próprias) | tapetes 412 |
 | MarcaSofaPage | 416 | 416 | POR FAZER | MarcaColchao 312, MarcaCadeiras 312 |
 | TreatmentPage (`/tratamento-anti-acaros-*`) | 206 | — | — | por fazer |
