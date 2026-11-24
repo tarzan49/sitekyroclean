@@ -742,3 +742,8 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { font-size: 15px; line-height: 1.45; -webkit-line-clamp: 4; }
   html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin-top: 10px; }
 }
+@media (max-width: 767px) {
+  html.snap-sections #problemas .grid { gap: 8px; }
+  html.snap-sections #problemas figcaption { padding-top: 6px; }
+  html.snap-sections #problemas .grid + p { margin-top: 8px; }
+}
