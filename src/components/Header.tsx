@@ -54,6 +54,13 @@ const Header = () => {
   const [servicesOpen, setServicesOpen] = useState(false);
   const closeTimer = useRef<number>();
   const openServices = () => { window.clearTimeout(closeTimer.current); void loadServiceList(); setServicesOpen(true); };
+  // O rato abre ao passar: o clique a seguir nunca o fecha (no toque e no teclado abre e fecha).
+  const pressed = useRef<{ mouse: boolean; open: boolean } | null>(null);
+  const toggleServices = () => {
+    const p = pressed.current; pressed.current = null;
+    if (p?.mouse) return openServices();
+    if (p ? p.open : servicesOpen) setServicesOpen(false); else openServices();
+  };
   const closeServicesSoon = () => { window.clearTimeout(closeTimer.current); closeTimer.current = window.setTimeout(() => setServicesOpen(false), 140); };
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
   useEffect(() => { setServicesOpen(false); }, [location.pathname]);
@@ -113,7 +120,7 @@ const Header = () => {
             onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setServicesOpen(false); }}
             onKeyDown={e => { if (e.key === "Escape") setServicesOpen(false); }}
           >
-            <button type="button" aria-expanded={servicesOpen} aria-controls="menu-servicos" onClick={() => (servicesOpen ? setServicesOpen(false) : openServices())} className={`${navItem(isServicePage || servicesOpen)} gap-1`}>
+            <button type="button" aria-expanded={servicesOpen} aria-controls="menu-servicos" onPointerDown={e => { pressed.current = { mouse: e.pointerType === 'mouse', open: servicesOpen }; }} onClick={toggleServices} className={`${navItem(isServicePage || servicesOpen)} gap-1`}>
               Serviços
               <ChevronDown className={`h-4 w-4 opacity-60 transition-transform duration-200 ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
