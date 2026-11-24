@@ -386,7 +386,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Como pedir o preço",
-        "body": "Tapetes e alcatifas são sempre sob orçamento. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
+        "body": "O preço do tapete sai das medidas, com a deslocação incluída; a alcatifa é sob orçamento. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
       },
       {
         "heading": "O material vem antes da máquina",
@@ -404,7 +404,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "faq": [
       {
         "q": "Há tabela por metro quadrado?",
-        "a": "Não. Tapetes e alcatifas são sempre sob orçamento, com medidas e avaliação do material e estado."
+        "a": "O tapete tem preço por m², com a deslocação incluída (juta e sisal com valor ajustado). A alcatifa é sob orçamento, com medidas e avaliação do material e estado."
       },
       {
         "q": "Recolhem e entregam qualquer tapete?",
@@ -1590,7 +1590,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Também limpam tapetes soltos?",
-        "a": "Sim, mediante avaliação própria. Tapetes também são sempre sob orçamento, com medidas de cada peça."
+        "a": "Sim, mediante avaliação própria. Os tapetes têm preço pelas medidas de cada peça."
       }
     ],
     "relatedService": {

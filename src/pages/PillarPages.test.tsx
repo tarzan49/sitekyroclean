@@ -44,7 +44,7 @@ describe('páginas-pilar depois de montar', () => {
       expect(faqPages[0].mainEntity.map((entry: { name: string }) => entry.name)).toEqual(page.faqs.map(faq => faq.question));
 
       const service = blocks.flatMap(block => block['@graph'] ?? []).find((node: { '@type'?: string }) => node['@type'] === 'Service');
-      if (/orçamento/i.test(page.priceFrom)) expect(service, page.path).not.toHaveProperty('offers');
+      if (/orçamento|\/m²/i.test(page.priceFrom)) expect(service, page.path).not.toHaveProperty('offers');
       else expect(service.offers.price, page.path).toBe(page.priceFrom.replace('€', ''));
       cleanup();
     }

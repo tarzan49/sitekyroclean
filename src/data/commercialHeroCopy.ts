@@ -3,6 +3,7 @@ import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { RUG_SERVICE_SLUGS, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
 import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
@@ -54,6 +55,8 @@ export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `$
  */
 export const commercialHeroPriceLine = (serviceSlug: string, municipality?: string, price?: string): string => {
   // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
+  // Tapetes com valor desde 24 Nov 2026 (dono); alcatifas continuam sob orçamento.
+  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}, com a deslocação incluída.`;
   if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;
@@ -73,6 +76,7 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
  * tabela de preços e no HTML estático.
  */
 export const commercialHeroPaidPriceLine = (serviceSlug: string, price?: string): string => {
+  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}.`;
   if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento.';
   const value = price ?? services.find(item => item.slug === serviceSlug)?.priceFrom ?? 'Sob orçamento';
   return /orçamento/i.test(value) ? 'Sob orçamento' : startingPriceLabel(serviceSlug, value);

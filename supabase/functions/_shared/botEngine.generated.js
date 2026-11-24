@@ -502,6 +502,14 @@ function calculateCustomPack(items, city) {
   };
 }
 
+// src/constants/rugRates.ts
+var RUG_RATE_COMMON = 10;
+var RUG_RATE_NATURAL = 12;
+
+// src/constants/rugSitePrice.ts
+var RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
+var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, com a deslocação incluída; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
+
 // src/data/serviceCatalog.ts
 var cities = [
   // Área Metropolitana do Porto: Primary
@@ -724,8 +732,6 @@ var CHAIR_PRICE_LABEL = `Desde ${formatEuro(CHAIR_UNIT_MIN)}`;
 var CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
 
 // src/lib/botRugEstimate.ts
-var RUG_RATE_COMMON = 10;
-var RUG_RATE_NATURAL = 12;
 var RUG_ESTIMATE_MIN_AREA_M2 = 3;
 var RUG_SMALL_COMBO_EXTRA = 10;
 var fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();

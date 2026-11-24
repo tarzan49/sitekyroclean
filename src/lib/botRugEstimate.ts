@@ -21,8 +21,8 @@ import { locationPrices } from '../constants/travel';
 import { rugPickupFee } from '../constants/commercialPolicy';
 import { sofaCleaningPrice } from '../data/enginePrices';
 
-export const RUG_RATE_COMMON = 10;
-export const RUG_RATE_NATURAL = 12;
+import { RUG_RATE_COMMON, RUG_RATE_NATURAL } from '../constants/rugRates';
+export { RUG_RATE_COMMON, RUG_RATE_NATURAL };
 export const RUG_ESTIMATE_MIN_AREA_M2 = 3;
 /** A rug under 3 m² added to other items costs 10€ more (owner, 22 Oct 2026). */
 export const RUG_SMALL_COMBO_EXTRA = 10;

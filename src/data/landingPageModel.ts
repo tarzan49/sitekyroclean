@@ -27,6 +27,7 @@ import { marcasCadeiras } from './marcaCadeirasData';
 const BRAND_NAMES = new Map<string, string>([...marcas, ...marcasColchao, ...marcasCadeiras].map(m => [m.slug, m.name]));
 import { METRO_CITIES } from '../constants/metroCities';
 import { MARCA_CITY_SLUGS } from './marcaCities';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 const serviceSlugs = { sofa: 'limpeza-sofas', colchao: 'limpeza-colchoes', tapetes: 'limpeza-tapetes', cadeiras: 'limpeza-cadeiras', alcatifas: 'limpeza-alcatifas' } as const;
 const variantLabels = { higienizacao: 'Higienização', lavagem: 'Lavagem', impermeabilizacao: 'Impermeabilização' } as const;
@@ -188,7 +189,7 @@ export function getLandingPageModel(pathname: string) {
     : family === 'variante' ? (parish ? `${locationName}, ${municipalityName}` : locationName) : municipalitySlug;
   const priceVerb = variantKey === 'impermeabilizacao' && serviceKey === 'cadeiras' ? 'impermeabilizar cadeiras' : LANDING_PRICE_VERBS[serviceSlug];
   const fee = locationPrices[municipalityName];
-  const pricingDescription = `${serviceSlug === 'limpeza-tapetes' ? 'Orçamento à medida de cada tapete.' : serviceSlug === 'limpeza-alcatifas' ? 'Orçamento à medida de cada espaço, sem preço fixo por m².' : 'Estimativa confirmada antes da marcação.'} ${RUG_SERVICE_SLUGS.includes(serviceSlug) ? 'Deslocação também sob orçamento.' : fee === undefined ? 'Deslocação confirmada antes da marcação.' : `Deslocação +${fee}€ para ${municipalityName}.`} Orçamento gratuito e sem compromisso.`;
+  const pricingDescription = `${serviceSlug === 'limpeza-tapetes' ? RUG_PRICE_NOTE : serviceSlug === 'limpeza-alcatifas' ? 'Orçamento à medida de cada espaço, sem preço fixo por m².' : 'Estimativa confirmada antes da marcação.'} ${serviceSlug === 'limpeza-tapetes' ? 'Preço pelas medidas de cada tapete.' : RUG_SERVICE_SLUGS.includes(serviceSlug) ? 'Deslocação também sob orçamento.' : fee === undefined ? 'Deslocação confirmada antes da marcação.' : `Deslocação +${fee}€ para ${municipalityName}.`} Orçamento gratuito e sem compromisso.`;
   const packSlugs = SERVICE_PACK_SLUGS[serviceSlug];
   const packLinks: LandingLink[] = packs.filter(pack => packSlugs.includes(pack.slug)).map(pack => ({ label: pack.name, href: `/${pack.slug}-${municipalitySlug}` }));
   const directory: LandingDirectoryGroup[] = [];

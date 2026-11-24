@@ -1,3 +1,5 @@
+import { RUG_PRICE_FROM } from '../constants/rugSitePrice';
+import { RUG_RATE_COMMON, RUG_RATE_NATURAL } from '../constants/rugRates';
 import { describe, it, expect } from 'vitest';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '@/components/quiz/quizHelpers';
@@ -63,7 +65,9 @@ describe('preços de partida lidos do motor', () => {
   it('o preço de partida do catálogo (hero, schema, llms.txt) coincide com o motor', () => {
     for (const service of services) {
       const engine = CLEANING_FROM_BY_SERVICE[service.slug];
-      if (engine === null) expect(service.priceFrom, service.slug).toMatch(/orçamento/i);
+      // Tapetes: taxa por m² do motor (dono, 24 Nov 2026).
+      if (service.slug === 'limpeza-tapetes') expect(service.priceFrom).toBe(RUG_PRICE_FROM);
+      else if (engine === null) expect(service.priceFrom, service.slug).toMatch(/orçamento/i);
       else expect(service.priceFrom, service.slug).toBe(formatEuro(engine));
     }
   });
@@ -177,7 +181,7 @@ describe('páginas de preço dos problemas', () => {
       ...mattressPrices.flatMap(size => [mattressCleaningPrice(size.id), mattressCleanAndAntiMitePrice(size.id)]),
       ...chairCleaningTiers().tiers.map(tier => tier.unit),
       SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
-      TRAVEL_FEE_MIN, TRAVEL_FEE_MAX, PACK_PERK_MIN_ORDER,
+      TRAVEL_FEE_MIN, TRAVEL_FEE_MAX, PACK_PERK_MIN_ORDER, RUG_RATE_COMMON, RUG_RATE_NATURAL,
     ].filter((value): value is number => typeof value === 'number').map(formatEuro);
     const strings = (value: unknown): string[] => typeof value === 'string' ? [value]
       : Array.isArray(value) ? value.flatMap(strings)

@@ -190,6 +190,8 @@ export function buildOfferNode(
 export function priceFromLabel(label: string | number | null | undefined): string | null {
   if (typeof label === "number") return Number.isFinite(label) && label > 0 ? String(label) : null;
   if (!label || /orçamento|consulta/i.test(label)) return null;
+  // Preço por m² (tapetes, dono 24 Nov 2026) não é o preço do serviço: sem oferta no schema.
+  if (/\/m²/.test(label)) return null;
   const match = /\d+(?:[.,]\d+)?/.exec(label);
   if (!match) return null;
   const value = Number(match[0].replace(",", "."));

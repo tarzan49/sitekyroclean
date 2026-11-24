@@ -26,7 +26,7 @@ describe('recursos comerciais e inventário', () => {
       expect(model.priceRows.length).toBeGreaterThan(0);
       expect(model.reviews).toEqual(pickReviewSubset(model.serviceSlug, `/blog/${post.slug}:blog-${post.slug}`, 6));
       expect(resourceHeroSubtitle(post)).not.toContain('?.');
-      if (/tapetes|alcatifas/.test(model.serviceSlug)) {
+      if (/alcatifas/.test(model.serviceSlug)) {
         expect(model.priceRows.every(row => /sob orçamento/i.test(row.price))).toBe(true);
         expect(getResourceOffer(post).title).toContain('sob orçamento');
       }

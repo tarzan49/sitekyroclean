@@ -1,6 +1,7 @@
 import type { LandingFaqContext, LandingService } from './landingFaqPool';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
 import { cityPrep, cityPrepDe } from './serviceCatalog';
+import { RUG_PRICE_FROM } from '../constants/rugSitePrice';
 
 interface EditorialContext {
   family: LandingFaqContext['family'];
@@ -28,11 +29,13 @@ export function getLandingEditorial(context: EditorialContext) {
   // Barreiro" na mesma página cujo título dizia "no Barreiro".
   const where = `${cityPrep(place)} ${place}`;
   const consultation = EXTENDED_TRIP_CITIES.has(municipality);
-  const quoteOnly = serviceSlug === 'limpeza-tapetes' || serviceSlug === 'limpeza-alcatifas';
+  // Tapetes com valor do motor desde 24 Nov 2026 (dono); alcatifa continua sob orçamento.
+  const quoteOnly = serviceSlug === 'limpeza-alcatifas';
+  const rugPriced = serviceSlug === 'limpeza-tapetes';
   const metaWhere = family === 'freguesia' ? `em ${place}, ${municipality}` : where;
   let intro: string;
   if (family === 'preco') {
-    intro = `${serviceLabel} ${where}: ${quoteOnly ? 'serviço sob orçamento' : 'estimativa conforme os artigos e as opções escolhidas'}. ${brief.budget}`;
+    intro = `${serviceLabel} ${where}: ${quoteOnly ? 'serviço sob orçamento' : rugPriced ? `${RUG_PRICE_FROM.toLowerCase()}, com a deslocação incluída` : 'estimativa conforme os artigos e as opções escolhidas'}. ${brief.budget}`;
   } else if (family === 'freguesia') {
     intro = `${serviceLabel} em ${place}, município ${cityPrepDe(municipality)} ${municipality}, com ${brief.assessment}. ${brief.request}`;
   } else if (family === 'variante') {
@@ -41,6 +44,6 @@ export function getLandingEditorial(context: EditorialContext) {
     intro = `${serviceLabel} ${where}, com ${brief.assessment}. ${brief.request}`;
   }
   if (consultation) intro += ' Disponibilidade sob consulta.';
-  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento, incluindo a deslocação' : 'Orçamento gratuito, com deslocação discriminada'}.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
+  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento, incluindo a deslocação' : rugPriced ? `${RUG_PRICE_FROM}, com a deslocação incluída` : 'Orçamento gratuito, com deslocação discriminada'}.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
   return { intro, metaDescription };
 }

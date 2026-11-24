@@ -6,6 +6,7 @@ import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE } from '../constants/commercialPolicy';
 import { startingPriceLabel } from './enginePrices';
 import { problemCityName } from './problemCitySeoData';
+import { RUG_PRICE_FROM } from '../constants/rugSitePrice';
 
 const introductions: Record<ProblemPage['category'], string> = {
   manchas: 'Cuidados profissionais para as manchas no seu estofo.',
@@ -55,8 +56,10 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
   const isQuote = /orçamento/i.test(price);
   const fee = city ? locationPrices[city] : undefined;
   // "Limpeza desde 49€"; nas cadeiras "Limpeza a 20€ por cadeira" (ver `startingPriceLabel`).
-  const priceLabel = isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} ${startingPriceLabel(service.slug, price, 'mid')}`;
-  const travelLabel = fee === undefined ? 'Deslocação a partir de 10€' : `Deslocação ${fee}€`;
+  // Tapetes: a taxa do motor, com a deslocação incluída (dono, 24 Nov 2026).
+  const rugPriced = service.slug === 'limpeza-tapetes';
+  const priceLabel = rugPriced ? `Limpeza ${RUG_PRICE_FROM.toLowerCase()}` : isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} ${startingPriceLabel(service.slug, price, 'mid')}`;
+  const travelLabel = rugPriced ? 'Deslocação incluída' : fee === undefined ? 'Deslocação a partir de 10€' : `Deslocação ${fee}€`;
   return {
     // Nas perguntas (páginas de preço) a cidade entra antes do "?". Com cidade,
     // o nome sem localidade (`problemCityName`), o mesmo do título e da migalha.

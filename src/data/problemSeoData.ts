@@ -8,6 +8,7 @@ import {
 } from './enginePrices';
 import { cities, cityPrep, cityPrepCap } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -1500,7 +1501,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "Um tapete que encolheu volta ao tamanho?", answer: "Não. O encolhimento da lã é permanente, porque as escamas da fibra prenderam umas nas outras e não voltam a abrir. Esticar à força só danifica a trama. É por isso que prevenir é a única coisa que funciona." },
       { question: "Porque não se pode usar água quente em lã?", answer: "Porque o calor combinado com humidade faz as escamas da fibra abrirem e engatarem. É o mesmo mecanismo que encolhe uma camisola de lã na máquina. Em sintéticos não acontece, e é por isso que o mesmo método não serve para tudo." },
       { question: "Posso lavar o tapete de lã em casa?", answer: "Com água fria e sem encharcar, é possível tratar uma mancha localizada. Uma lavagem completa em casa é onde os acidentes acontecem: água quente, secagem pendurada ao sol, ou o tapete a ficar dias húmido, que traz o problema do cheiro a somar ao do encolhimento." },
-      { question: "Porque é que os tapetes são sempre sob orçamento?", answer: "Porque o método depende da fibra, da construção, da base e do que o teste de cor mostrar, e nada disso se sabe ao telefone. Medimos, vemos e só então damos preço. É também a nossa proteção contra aceitar uma peça que não admite o tratamento pedido." },
+      { question: "Quanto custa lavar um tapete?", answer: `${RUG_PRICE_NOTE} Seda, viscose, persa e tapetes feitos à mão têm preço próprio, depois de vermos as fotografias.` },
     ],
     relatedProblems: ["tapete-la", "tapete-persa", "manchas-tapete", "preco-limpeza-tapete"],
     relatedServices: ["limpeza-tapetes"],

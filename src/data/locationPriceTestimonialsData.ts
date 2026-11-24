@@ -1,6 +1,7 @@
 import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean } from '../components/quiz/quizHelpers';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 // Os preços da tabela saem das mesmas tabelas que o quiz cobra, para a
 // tabela de uma página nunca anunciar um número que o orçamento não pratica.
@@ -81,7 +82,7 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Colchão king / queen',    price: tablePrice(mattress('king')?.cleaningPrice) },
   ],
   'limpeza-tapetes': [
-    { item: 'Tapetes (m²)',             price: 'Sob orçamento' },
+    { item: 'Tapetes (m²)',             price: RUG_PRICE_FROM },
   ],
   'limpeza-cadeiras': [
     { item: 'Cadeiras',                 price: `${calcChairClean(1)}€/cad` },

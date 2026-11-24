@@ -8,6 +8,7 @@ import { cities, services, cityPrep } from "./serviceCatalog";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
 import { PRICE_FACTORS } from './priceFactors';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export interface PricePageData {
   serviceSlug: string;
@@ -69,7 +70,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Cabeceira estofada", price: "Sob orçamento", note: "add-on" },
   ],
   "limpeza-tapetes": [
-    { item: "Tapetes (qualquer dimensão)", price: "Sob orçamento", note: "medido à peça, largura x comprimento" },
+    { item: "Tapetes (qualquer dimensão)", price: RUG_PRICE_FROM, note: "lavagem em casa, deslocação incluída" },
     { item: "Tapete persa/oriental", price: "Sob orçamento", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [

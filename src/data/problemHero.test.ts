@@ -32,8 +32,9 @@ describe('problem hero content', () => {
     expect(getProblemHero(problem('manchas-sofa'), 'Porto').location).toBe('no Porto');
     expect(getProblemHero(problem('manchas-sofa')).travelLabel).toBe('Deslocação a partir de 10€');
   });
-  it('never presents a numeric starting price for rugs or fitted carpets', () => {
-    for (const item of getAllProblems().filter(item => ['limpeza-tapetes', 'limpeza-alcatifas'].includes(item.relatedServices[0]))) {
+  it('never presents a numeric starting price for fitted carpets; rugs show the engine rate', () => {
+    for (const item of getAllProblems().filter(item => item.relatedServices[0] === 'limpeza-tapetes')) expect(getProblemHero(item).priceLabel).toBe('Limpeza desde 10€/m²');
+    for (const item of getAllProblems().filter(item => item.relatedServices[0] === 'limpeza-alcatifas')) {
       const hero = getProblemHero(item);
       expect(hero.priceLabel).toBe('Sob orçamento');
       expect(hero.priceLinkLabel).toBe('Como pedir orçamento');

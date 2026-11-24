@@ -7,6 +7,7 @@ import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE, PRICE_PROMISE, 
 import { locationPrices } from '../constants/travel';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import type { BlogPost } from './blogData';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export const RESOURCE_BLOG_TITLE = 'Guias de limpeza, cuidados e preços';
 export const RESOURCE_BLOG_INTRO = 'Encontre a resposta para o seu estofo e saiba como pedir o serviço certo.';
@@ -22,7 +23,7 @@ export const RESOURCE_SERVICES = [
   { href: '/impermeabilizacao', label: 'Impermeabilização' },
 ];
 export const RESOURCE_FAQS = [
-  { id: 'preco-e-deslocacao', question: 'Como sei o preço e o que está incluído?', answer: `${PRICE_PROMISE} ${RESOURCE_TRAVEL} Tapetes e alcatifas são sempre sob orçamento, deslocação incluída, com largura e comprimento de cada peça ou área. ${TREATMENT_EXTRAS}` },
+  { id: 'preco-e-deslocacao', question: 'Como sei o preço e o que está incluído?', answer: `${PRICE_PROMISE} ${RESOURCE_TRAVEL} Tapetes: ${RUG_PRICE_NOTE} Alcatifas são sob orçamento, com a largura e o comprimento de cada área. ${TREATMENT_EXTRAS}` },
   { id: 'preparar-e-marcar', question: 'Como preparo a visita e confirmo a disponibilidade?', answer: `Envie fotografias, medidas e localidade. Deixe espaço de trabalho e acesso a água e eletricidade conforme combinado; não aplique produtos previamente. ${RESPONSE_PROMISE}. ${AVAILABILITY_PROMISE} ${COVERAGE_PROMISE} Aveiro e Alentejo Litoral sob consulta.` },
   { id: 'secagem-e-protecao', question: 'Quando posso voltar a utilizar a peça?', answer: `${DRYING_PROMISE} Aguarde a secagem completa e siga as instruções dadas no final. A impermeabilização tem um tempo de cura próprio, que pode exigir 24 horas. A proteção é aplicada apenas em sofás e cadeiras compatíveis.` },
   { id: 'garantia-e-manchas', question: 'E se as manchas não saírem ou eu não ficar satisfeito?', answer: `Avaliamos o tecido, a origem da mancha e os produtos já aplicados. Não prometemos remover todas as manchas nem reparar desgaste. Esses limites são explicados antes do trabalho e as manchas preexistentes não excluem a repetição gratuita. ${SATISFACTION_PROMISE}` },
@@ -31,8 +32,9 @@ export const RESOURCE_FAQS = [
 export function getResourceOffer(post?: BlogPost) {
   const href = post?.relatedService.href ?? '/#servicos';
   const base = { href, title: 'Vamos avaliar o seu caso?', detail: 'Envie fotografias, medidas e localidade. Confirmamos o serviço adequado e o preço antes de marcar.', action: 'Pedir orçamento por WhatsApp', link: 'Ver serviços e preços' };
-  if (href === '/limpeza-alcatifas' || href === '/limpeza-tapetes') {
-    const label = href === '/limpeza-alcatifas' ? 'Alcatifas' : 'Tapetes';
+  if (href === '/limpeza-tapetes') return { ...base, title: `Tapetes ${RUG_PRICE_FROM.toLowerCase()}`, detail: 'Envie largura × comprimento e localidade: o preço sai das medidas, com a deslocação incluída.', link: 'Ver limpeza de tapetes' };
+  if (href === '/limpeza-alcatifas') {
+    const label = 'Alcatifas';
     return { ...base, title: `${label} sob orçamento`, detail: 'Envie largura × comprimento, fotografias e localidade. Receba uma proposta para a sua peça ou área.', link: `Ver limpeza de ${label.toLowerCase()}` };
   }
   if (href === '/limpeza-sofas') return { ...base, title: `Limpeza de sofás desde ${sofaPrices[0].cleaningPrice}€`, detail: 'Valor de partida para 1 lugar. Envie uma fotografia do sofá e indique a sua localidade.', link: 'Ver preços de sofás' };

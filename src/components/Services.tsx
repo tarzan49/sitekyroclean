@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { RUG_PRICE_FROM } from "@/constants/rugSitePrice";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CHAIR_PRICE_SHORT, formatEuro, SOFA_WATERPROOF_ESSENCIAL_FROM } from "@/data/enginePrices";
@@ -249,7 +250,7 @@ const Services = () => {
     { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás" },
     // Cadeiras: por cadeira, nunca "a partir de" (pedido do dono, 26/09/2026).
     { title: "Limpeza de Cadeiras", price: CHAIR_PRICE_SHORT.replace('a partir de ', ''), image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras" },
-    { title: "Limpeza de Tapetes", price: "Sob orçamento", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes" },
+    { title: "Limpeza de Tapetes", price: RUG_PRICE_FROM, image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes" },
     { title: "Limpeza de Alcatifas", price: "Sob orçamento", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas" },
   ];
 

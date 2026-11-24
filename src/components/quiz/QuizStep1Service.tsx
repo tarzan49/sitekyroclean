@@ -1,4 +1,5 @@
 ﻿import { cn } from '@/lib/utils';
+import { RUG_PRICE_FROM } from "@/constants/rugSitePrice";
 import { CHAIR_PRICE_SHORT } from '@/data/enginePrices';
 
 interface QuizStep1ServiceProps {
@@ -20,7 +21,7 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
   const serviceOptions = [
     { id: 'sofa',     label: 'Sofá',     sublabel: 'a partir de 49€' },
     { id: 'mattress', label: 'Colchão',  sublabel: 'a partir de 59€' },
-    { id: 'carpet',   label: 'Tapete',   sublabel: 'Sob orçamento' },
+    { id: 'carpet',   label: 'Tapete',   sublabel: RUG_PRICE_FROM },
     // Por cadeira, não "a partir de": o preço é de cada cadeira e desce com a
     // quantidade (pedido do dono, 26/09/2026). Vem do motor, como o resto.
     { id: 'chairs',   label: 'Cadeiras', sublabel: CHAIR_PRICE_SHORT },

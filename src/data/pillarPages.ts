@@ -40,6 +40,7 @@ import {
   chairTierSentence,
   chairCleaningTiers,
 } from './enginePrices';
+import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export type PillarSlug = 'limpeza-sofas' | 'limpeza-colchoes' | 'limpeza-tapetes' | 'limpeza-cadeiras' | 'limpeza-alcatifas' | 'impermeabilizacao';
 
@@ -130,11 +131,11 @@ export const PILLAR_PAGES: PillarPage[] = [
     serviceName: 'Limpeza de Tapetes',
     breadcrumbLabel: catalog('limpeza-tapetes').name,
     title: 'Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions',
-    description: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. Sempre sob orçamento.',
+    description: `Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. ${RUG_PRICE_FROM}, deslocação incluída.`,
     h1: 'Higienização Profissional de Tapetes',
     priceFrom: catalog('limpeza-tapetes').priceFrom,
     faqs: [
-      { question: 'Quanto custa a limpeza de tapete?', answer: 'Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². Peça um orçamento gratuito e sem compromisso.' },
+      { question: 'Quanto custa a limpeza de tapete?', answer: `${RUG_PRICE_NOTE} Indique a largura e o comprimento de cada tapete e vê logo o valor.` },
       { question: 'Quanto tempo demora a limpeza de tapete?', answer: 'Depende do tamanho: cerca de 3 a 4 minutos por m², ou seja, 20 a 25 minutos num tapete de 2 x 3 m. O tapete fica seco em 2 a 5 horas, dependendo da espessura e do material.' },
       { question: 'Que tipos de tapete limpam?', answer: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
       { question: 'A limpeza profunda remove mesmo cheiros e manchas antigas?', answer: 'Conseguimos reduzir significativamente cheiros a humidade, animais e uso diário, e remover a grande maioria das manchas. Em alguns casos muito antigos ou já oxidados o tecido pode não voltar a 100%, mas explicamos sempre o cenário realista antes de avançar.' },

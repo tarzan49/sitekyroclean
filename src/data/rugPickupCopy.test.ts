@@ -94,7 +94,8 @@ describe('recolha dos tapetes', () => {
   });
 
   it('em tapetes e alcatifas a deslocação é sob orçamento, sem valor de tabela (dono, 2026-10-05)', () => {
-    for (const slug of ['limpeza-tapetes', 'limpeza-alcatifas'] as const) {
+    // Tapetes têm valor desde 24 Nov 2026 (dono): só a alcatifa continua sem valor.
+    for (const slug of ['limpeza-alcatifas'] as const) {
       expect(commercialHeroPriceLine(slug, 'Porto')).not.toMatch(/\d\s*€/);
       const travelFaq = getLandingFaqs({ serviceSlug: slug, pageKey: 'teste', municipality: 'Porto', family: 'localidade' })
         .concat(getLandingFaqs({ serviceSlug: slug, pageKey: 'outra', municipality: 'Porto', family: 'preco' }))

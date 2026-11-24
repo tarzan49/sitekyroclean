@@ -33,7 +33,7 @@ describe('oferta a partir de um rótulo de preço', () => {
     expect((mattress.offers as { price: string }).price).toBe('59');
   });
 
-  it('o catálogo da homepage continua sem preço em tapetes e alcatifas', () => {
+  it('o catálogo da homepage não leva preço por m² nem sob orçamento (tapetes e alcatifas)', () => {
     const offers = buildHomepageBusinessNode().hasOfferCatalog.itemListElement;
     for (const offer of offers) {
       const quoteOnly = /Tapetes|Alcatifas/.test(offer.itemOffered.name);

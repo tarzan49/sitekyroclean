@@ -40,7 +40,8 @@ describe('mandatory commercial hero', () => {
       expect(stats).not.toContain('avaliações');
       expect(stats).toContain('<1 min');
       expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? 'Ativação' : 'Secagem');
-      if (['limpeza-tapetes', 'limpeza-alcatifas'].includes(serviceSlug)) expect(container.textContent).toContain('Sob orçamento');
+      if (serviceSlug === 'limpeza-alcatifas') expect(container.textContent).toContain('Sob orçamento');
+      if (serviceSlug === 'limpeza-tapetes') expect(container.textContent).toContain('10€/m²');
       cleanup();
     }
   });
