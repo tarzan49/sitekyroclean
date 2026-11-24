@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id = 'perguntas', dark = false }: Props) {
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(() => { const i = faqs.length <= 4 ? faqs.findIndex(f => f.answer.length <= 240) : -1; return i < 0 ? null : i; });
   const words = heading.trim().split(' ');
   const gold = words.pop() ?? '';
   const rest = words.join(' ');

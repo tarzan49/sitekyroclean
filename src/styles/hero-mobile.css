@@ -105,7 +105,9 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
 @media (max-width: 767px) and (min-height: 640px) {
   html.snap-sections #duvidas button[aria-expanded] > span:first-child, html.snap-sections #perguntas button[aria-expanded] > span:first-child { font-size: 16px; line-height: 1.35; }
   html.snap-sections #dicas .grid h3 { font-size: 16.5px; }
-  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 18.5px; line-height: 1.5; -webkit-line-clamp: 7; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 17.5px; line-height: 1.5; -webkit-line-clamp: 6; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] [data-len="s"] blockquote p { font-size: 22px; line-height: 1.4; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] [data-len="m"] blockquote p { font-size: 19.5px; line-height: 1.45; }
   html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { font-size: 14px; }
   html.snap-sections #beneficios .grid > div > span { font-size: 15px; line-height: 1.45; }
   html.snap-sections #marca-tecido .grid > div span { font-size: 15px; }

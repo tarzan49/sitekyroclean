@@ -10,6 +10,12 @@ import { cities, cityPrep } from '@/data/serviceCatalog';
 import SofaCounters, { sofaWhat, type SofaCounts } from '@/components/SofaCounters';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import type { BasketItem, BasketPack } from '@/components/quiz/VisitBasket';
+import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
+import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
+import baCadeiras from '@/assets/quiz-antes-depois/cadeiras.webp';
+import baTapete from '@/assets/quiz-antes-depois/tapete.webp';
+import carpetPoster from '@/assets/alcatifa-processo/extracao-poster.jpg';
+import imperPoster from '@/assets/before-after-pool/imper-agua-01-poster.webp';
 import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
 import matPele from '@/assets/widget-materiais/sofa-pele.webp';
 import matComum from '@/assets/quiz-materiais/tapete-la-inteiro.webp';
@@ -50,7 +56,10 @@ const SIZES = {
   rug: [{ label: 'Pequeno', w: '1,2', l: '1,7' }, { label: 'Médio', w: '1,6', l: '2,3' }, { label: 'Grande', w: '2', l: '3' }, { label: 'Muito grande', w: '2,5', l: '3,5' }],
   carpet: [{ label: 'Quarto', w: '3', l: '4' }, { label: 'Sala', w: '4', l: '6' }, { label: 'Escritório', w: '6', l: '8' }, { label: 'Espaço grande', w: '10', l: '10' }],
 };
-const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga', 'Matosinhos', 'Almada'];
+const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga'];
+// Passo da localidade no telemóvel: a fotografia real do artigo em cima (as do antes e depois do orçamento), para o
+// ecrã encher com conteúdo e nunca com botões esticados (dono, 25 Nov: "achas que a disposição disto é assim?").
+const CITY_PHOTO: Record<StepKind, { src: string; pair: boolean }> = { sofa: { src: baSofa, pair: true }, mattress: { src: baColchao, pair: true }, chairs: { src: baCadeiras, pair: true }, rug: { src: baTapete, pair: true }, carpet: { src: carpetPoster, pair: false }, imper: { src: imperPoster, pair: false } };
 const num = (v: string) => { const n = parseFloat(v.replace(',', '.')); return n > 0 ? n : 0; };
 const seatId = (n: number) => `${n}-${n === 1 ? 'lugar' : 'lugares'}`;
 
@@ -163,9 +172,14 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   let questions: ReactNode;
   if (!city) {
     questions = <>
-      <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-3 md:text-lg">Onde é o serviço?</p>
-      <div className="grid grid-cols-2 gap-2">{FIRST_CITIES.map(c => <button key={c} type="button" onClick={() => { warm(); onCity?.(c); }} data-fill-tile className={`min-h-12 px-2 text-base ${tile(false)}`}>{c}</button>)}</div>
-      <select aria-label="Outra localidade" value="" onChange={e => onCity?.(e.target.value)} className="mt-2 h-12 w-full rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">
+      <div className="relative mb-4 overflow-hidden rounded-2xl md:hidden">
+        <img src={CITY_PHOTO[kind].src} alt="" width={520} height={440} loading="lazy" decoding="async" className="h-[210px] w-full object-cover" />
+        {CITY_PHOTO[kind].pair && <><span className="absolute left-2.5 top-2.5 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white">Antes</span>
+        <span className="absolute right-2.5 top-2.5 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white">Depois</span></>}
+      </div>
+      <p className="mb-2.5 text-lg font-semibold text-[#1A1A1A] md:mb-3">Onde é o serviço?</p>
+      <div className="grid grid-cols-2 gap-2">{FIRST_CITIES.map(c => <button key={c} type="button" onClick={() => { warm(); onCity?.(c); }} className={`min-h-[52px] px-2 text-base ${tile(false)}`}>{c}</button>)}</div>
+      <select aria-label="Outra localidade" value="" onChange={e => onCity?.(e.target.value)} className="mt-2 h-[52px] w-full rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">
         <option value="" disabled>Outra localidade</option>
         {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
       </select>
@@ -182,8 +196,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
         ? <SofaCounters counts={counts} onChange={setCounts} hideSummary />
         : <>
             {title('Quantos lugares?', 'Pode juntar vários')}
-            <div className="grid grid-cols-3 gap-2">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} data-fill-tile className={`flex min-h-[112px] flex-col items-center justify-center gap-1 px-1 py-2 text-base md:min-h-[128px] ${tile(false)}`}>
-              <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-11 w-16 sm:h-12 sm:w-16" />{n === 1 ? '1 lugar' : `${n} lugares`}
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} className={`flex min-h-[118px] [@media(max-height:699px)]:min-h-[92px] [@media(max-height:699px)]:py-1 flex-col items-center justify-center gap-1 px-1 py-2 text-[17px] md:min-h-[128px] md:text-base ${tile(false)}`}>
+              <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-16 w-28 [@media(max-height:699px)]:h-10 [@media(max-height:699px)]:w-20 md:h-12 md:w-16" />{n === 1 ? '1 lugar' : `${n} lugares`}
               <span className="flex items-center text-[11px] text-[#D4AF37]"><Plus className="mr-0.5 h-3 w-3" strokeWidth={3} aria-hidden />Juntar</span>
             </button>)}</div>
             <p className="mt-2 text-xs leading-snug text-[#666]">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
@@ -191,7 +205,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
       {what === 'mattress' && <>
         {title('Que tamanho?', 'Pode juntar vários')}
         <div className={`grid gap-2 ${MATTRESS.some(x => (mCounts[x.id] ?? 0) > 0) ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-3'}`}>{MATTRESS.map(m => { const n = mCounts[m.id] ?? 0; const wide = !MATTRESS.some(x => (mCounts[x.id] ?? 0) > 0); return (
-          <div key={m.id} data-fill-tile role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none items-center justify-center gap-0.5 px-1 py-2 text-center text-sm ${wide ? 'max-sm:min-h-[104px] max-sm:justify-between max-sm:px-5 max-sm:text-lg sm:flex-col' : 'flex-col'} ${tile(n > 0)}`}>
+          <div key={m.id} role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none items-center justify-center gap-0.5 px-1 py-2 text-center text-sm ${wide ? 'max-sm:min-h-[104px] max-sm:[@media(min-height:700px)]:min-h-[128px] max-sm:justify-between max-sm:px-5 max-sm:text-lg sm:flex-col' : 'flex-col'} ${tile(n > 0)}`}>
             <QuizFurnitureImage service="mattress" sizeId={m.id} className={wide ? 'h-20 w-28 sm:h-10 sm:w-14' : 'h-10 w-14'} />{m.label}
             {n > 0 ? <span className="mt-0.5 flex items-center gap-1">
               <button type="button" aria-label={`Menos um colchão ${m.label}`} onClick={e => { e.stopPropagation(); bumpMattress(m.id, -1); }} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-full bg-white/80 text-[#0B2F2A]"><Minus className="h-3.5 w-3.5" /></button>
@@ -202,7 +216,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
       </>}
       {what === 'chairs' && <>
         {title('Quantas cadeiras?')}
-        <div className="grid grid-cols-3 gap-2">{CHAIRS.map(n => <button key={n} type="button" aria-pressed={!ownQty && qty === n} onClick={() => { setOwnQty(false); setQty(n); warm(); }} className={`${sized ? 'h-10 min-h-0 text-sm' : 'flex min-h-[104px] flex-col items-center justify-center gap-1 text-base'} ${tile(!ownQty && qty === n)}`}>{!sized && <QuizFurnitureImage service="chairs" className="h-11 w-11 sm:h-12 sm:w-12" />}{n} cadeiras</button>)}</div>
+        <div className={`grid gap-2 md:grid-cols-3 ${sized ? 'grid-cols-3' : 'grid-cols-2'}`}>{CHAIRS.map(n => <button key={n} type="button" aria-pressed={!ownQty && qty === n} onClick={() => { setOwnQty(false); setQty(n); warm(); }} className={`${sized ? 'h-10 min-h-0 text-sm' : 'flex min-h-[112px] flex-col items-center justify-center gap-1 text-[17px] md:min-h-[104px] md:text-base'} ${tile(!ownQty && qty === n)}`}>{!sized && <QuizFurnitureImage service="chairs" className="h-16 w-16 md:h-12 md:w-12" />}{n} cadeiras</button>)}</div>
         {!ownQty && !sized && <button type="button" onClick={() => { setOwnQty(true); setQty(0); warm(); }} className={`mt-2 h-12 w-full text-base ${tile(false)}`}>Outro número</button>}
         {ownQty && !sized && <label className="mt-2 flex items-center justify-between gap-3 rounded-2xl border-2 border-[#D4AF37]/60 bg-white px-3 py-1.5">
           <span className="text-sm font-semibold text-[#1A1A1A]">Número de cadeiras</span>
@@ -226,7 +240,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
     </>;
   }
 
-  const row = (on: boolean) => `flex min-h-[54px] w-full items-center justify-between gap-2 px-3.5 py-1.5 text-left md:min-h-[72px] md:px-5 ${tile(on)}`;
+  const row = (on: boolean) => `flex min-h-[54px] max-md:[@media(min-height:700px)]:min-h-[70px] w-full items-center justify-between gap-2 px-3.5 py-1.5 text-left md:min-h-[72px] md:px-5 ${tile(on)}`;
   const text = (name: string, note: string) => <span className="min-w-0"><span className="block text-base font-bold leading-tight md:text-lg">{name}</span><span className="block text-xs font-normal leading-snug opacity-75 md:text-sm">{note}</span></span>;
   const addOn = () => { const a = add(); return a.plus === null ? null : <span className="flex shrink-0 flex-col items-end leading-tight">{a.was !== null && <span className="text-[11px] opacity-60 line-through">+{formatEuro(a.was)}</span>}<span className="text-lg font-bold">{a.plus > 0 ? `+${formatEuro(a.plus)}` : 'Oferecido'}</span></span>; };
   const area = isRug ? (Math.round(num(dims.w) * num(dims.l) * 100) / 100).toLocaleString('pt-PT') : '';

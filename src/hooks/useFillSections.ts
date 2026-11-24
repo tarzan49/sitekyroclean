@@ -16,8 +16,10 @@ function maxRatio(box: HTMLElement) {
   if (!w || !h) return small ? 1.25 : 1.05;
   return Math.min(1.4, Math.max(small ? 1.25 : 0.95, (h / w) * 1.3));
 }
-const TILE_MAX = 108;
-const ROW_MAX = 78;
+// Nunca esticar caixas vazias (dono, 25 Nov: "achas que a disposição disto é assim?"): quem enche são as fotografias;
+// as linhas e os cartões só ganham um pouco de ar.
+const TILE_MAX = 76;
+const ROW_MAX = 72;
 
 type Saved = { el: HTMLElement; css: string };
 
@@ -72,10 +74,13 @@ function fill(section: HTMLElement, saved: Saved[]) {
     const rows = rowsOf(boxes);
     const add = spare / rows.length;
     const plan = rows.flat().map(el => ({ el, h: el.offsetHeight, w: el.offsetWidth }));
+    // Fotografias lado a lado ficam sempre à mesma altura.
+    const rowCap = new Map<HTMLElement, number>();
+    for (const r of rows) if (r.length > 1) { const c = Math.min(...r.map(e => Math.max(e.offsetHeight, e.offsetWidth * maxRatio(e)))); r.forEach(e => rowCap.set(e, c)); }
     for (const { el, h, w } of plan) {
       // Moldura em pé no topo (cadeiras, impermeabilização): cresce inteira, na mesma proporção.
       const upright = hero && h > w * 1.1 && rows.every(r => r.length === 1);
-      const max = upright ? (window.innerWidth - 40) * h / w : Math.max(h, w * (hero ? 0.88 : maxRatio(el)));
+      const max = upright ? (window.innerWidth - 40) * h / w : Math.max(h, rowCap.get(el) ?? w * (hero ? 0.88 : maxRatio(el)));
       // Se a secção não cabe, a fotografia encolhe (nunca abaixo de metade) em vez de empurrar o resto para fora do ecrã.
       const next = Math.floor(add < 0 ? Math.max(h * 0.5, h + add) : Math.min(max, h + add));
       keep(el);
@@ -100,18 +105,18 @@ function fill(section: HTMLElement, saved: Saved[]) {
     spare = spareNow() - 4;
   };
   const q = (s: string) => [...section.querySelectorAll<HTMLElement>(s)];
-  grow(q('[aria-roledescription="testemunho"] > figure, [aria-roledescription="testemunho"] > *').filter((e, i, a) => a.indexOf(e) === i), 420);
+  grow(q('[aria-roledescription="testemunho"] > figure, [aria-roledescription="testemunho"] > *').filter((e, i, a) => a.indexOf(e) === i), 400);
   if (spare < 16) return;
   const tiles = q('[data-fill-tile]');
-  grow(tiles, rowsOf(tiles).length <= 2 ? TILE_MAX * 1.5 : TILE_MAX);
+  grow(tiles, TILE_MAX);
   if (spare < 16) return;
-  grow(q('[data-fill-row], button[aria-expanded], details > summary, a.group').filter(e => !e.closest('[data-no-fill]') && e.offsetWidth > section.offsetWidth * 0.6), ROW_MAX + 30);
+  grow(q('[data-fill-row], button[aria-expanded], details > summary, a.group').filter(e => !e.closest('[data-no-fill]') && e.offsetWidth > section.offsetWidth * 0.6), ROW_MAX);
   if (spare < 40 || hero || section.querySelector('[data-price-picker]') || section.id === 'montar') return;
   // O resto (cartões de texto, listas): mais espaço dentro de cada um, repartido por igual.
   const cells = q('.grid > *, ul > li, ol > li, dl > div').filter(e => isShown(e) && e.offsetWidth > 100 && e.offsetHeight > 24 && !e.parentElement?.parentElement?.querySelector(':scope > [aria-expanded]') && !e.closest('[data-no-fill], [role="dialog"], [aria-roledescription], details') && !e.querySelector('.grid, ul, ol, img, video, button, select, input, h2'));
   if (cells.length < 2) return;
   const rows = rowsOf(cells);
-  const pad = Math.floor(Math.min(spare / rows.length, 56) / 2);
+  const pad = Math.floor(Math.min(spare / rows.length, 20) / 2);
   for (const el of cells) {
     const cs = getComputedStyle(el); const t = parseFloat(cs.paddingTop); const b = parseFloat(cs.paddingBottom);
     keep(el); el.style.paddingTop = `${t + pad}px`; el.style.paddingBottom = `${b + pad}px`;
