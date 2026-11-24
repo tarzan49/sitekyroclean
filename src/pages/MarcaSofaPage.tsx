@@ -53,6 +53,11 @@ const MARCA_HERO: Record<string, string> = {
 const PROCESS_ICONS = [Search, Droplets, ShieldCheck, Wind];
 const PROCESS_STEPS = MARCA_PROCESS_STEPS.sofa.map((step, index) => ({ ...step, icon: PROCESS_ICONS[index] ?? Search, label: String(index + 1).padStart(2, "0") }));
 
+import WaterproofPackPicker from "@/components/WaterproofPackPicker";
+import SofaProcessGuide from "@/components/SofaProcessGuide";
+import CompactFAQ from "@/components/CompactFAQ";
+import { useSnapSections } from "@/hooks/useSnapSections";
+
 const MarcaSofaPage = () => {
   const { pathname } = useLocation();
 
@@ -62,6 +67,9 @@ const MarcaSofaPage = () => {
     return getMarcaByCityAndSlug(route.marcaSlug, route.citySlug);
   }, [pathname]);
 
+  // Modelo novo nas marcas de sofá em tecido (dono, 24 Nov); pele nunca leva impermeabilização.
+  const fabric = !!data && !/pele|couro/i.test(data.marca.material);
+  useSnapSections(fabric);
   const pageUrl = `${SITE_URL}${pathname}`;
   // Título, descrição, <h1>, migalha e preço: os mesmos que o scripts/prerender.ts
   // escreve no HTML estático (marcaPageCopy em marcaCities.ts).
@@ -139,10 +147,15 @@ const MarcaSofaPage = () => {
         <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-sofas" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildMarcaWaMessage('sofa', marca.name, city.name))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
-        <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />
+        {fabric ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><WaterproofPackPicker kind="sofa" city={city.name} source={`marca_picker_${marca.slug}`} /></div>
+          </div>
+        </section> : <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />}
 
         {/* ═══ MATERIAL: NÃO FAZER / FAZER ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="marca-tecido" className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Material"
@@ -172,6 +185,8 @@ const MarcaSofaPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
+        {fabric ? <SofaProcessGuide real steps={PROCESS_STEPS.map(st => ({ label: st.title, description: st.desc }))} heading={{ text: 'Como limpamos o', gold: marca.name }} /> : <>
+        {/* ═══ PROCESSO ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
@@ -199,6 +214,8 @@ const MarcaSofaPage = () => {
           </div>
         </section>
 
+        </>}
+
         {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         <ServiceAutoCarousel
           comparison={false}
@@ -213,11 +230,11 @@ const MarcaSofaPage = () => {
         />
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ
+        {fabric ? <CompactFAQ id="duvidas" dark faqs={marca.faqs} heading={`Perguntas sobre sofás ${marca.name}`} /> : <ServiceFAQ
           faqs={marca.faqs}
           heading={`Perguntas sobre sofás ${marca.name}`}
           variant="dark"
-        />
+        />}
 
         {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
