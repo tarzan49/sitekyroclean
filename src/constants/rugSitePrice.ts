@@ -6,4 +6,10 @@ export const RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
 export const RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, mais a deslocação; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
 export const CARPET_PRICE_FROM = `Desde ${RUG_RATE_CARPET}€/m²`;
 const carpetTierText = CARPET_TIERS.slice(0, -1).map((t, i) => `até ${CARPET_TIERS[i + 1].from} m² ${t.rate}€/m²`).join(', ');
+/** Os escalões por extenso, ao lado do "Desde 5€/m²" onde houver espaço (dono, 24 Nov: "OPCAO A"). */
+export const CARPET_TIER_ROWS = CARPET_TIERS.map((t, i) => ({
+  area: i === CARPET_TIERS.length - 1 ? `mais de ${t.from} m²` : i === 0 ? `até ${CARPET_TIERS[1].from} m²` : `${t.from} a ${CARPET_TIERS[i + 1].from} m²`,
+  rate: t.rate,
+}));
+export const CARPET_TIERS_SENTENCE = CARPET_TIER_ROWS.map(t => `${t.area} ${t.rate}€/m²`).join(', ');
 export const CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), mais a deslocação.`;

@@ -4,7 +4,7 @@ import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { RUG_SERVICE_SLUGS, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
 import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
-import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE, CARPET_TIERS_SENTENCE } from '../constants/rugSitePrice';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
@@ -58,7 +58,7 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
   // Tapetes e alcatifas com valor do motor desde 24 Nov 2026 (dono).
   if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}, mais a deslocação.`;
-  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}, mais a deslocação.`;
+  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}: ${CARPET_TIERS_SENTENCE}, mais a deslocação.`;
   if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;

@@ -1,6 +1,6 @@
 import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { describe, expect, it } from 'vitest';
-import { bigOrderPrice, botQuote, listBotCities, resolveBotCity } from './botQuote';
+import { botQuote, listBotCities, resolveBotCity } from './botQuote';
 import { locationPrices } from '../constants/travel';
 import { askedDiscountFor, ASKED_DISCOUNT_PCT } from './botAskedDiscount';
 
@@ -214,17 +214,6 @@ describe('puffs (owner, 21 Oct 2026)', () => {
     expect(botQuote({ items: [], city: 'Lisboa', headboards: ['gigante'] }).ok).toBe(false);
     expect(botQuote({ items: [], city: 'Lisboa', headboards: ['casal'], puffs: 1 }).ok).toBe(false);
   });
-  it('orders above 300€ carry the owner\'s special condition: travel off, 7% off cleaning (4% with waterproofing), ending in 9, at least 20€ (25 Oct 2026)', () => {
-    expect(bigOrderPrice(415, 0, false)).toBe(379);
-    expect(bigOrderPrice(441, 15, true)).toBe(399);
-    expect(bigOrderPrice(305, 0, true)).toBe(279);
-    const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal', qty: 2 }, { kind: 'chairs', qty: 6 }], city: 'Porto' });
-    // Com colchão a escada A (24 Nov 2026) substitui a condição: nunca desconto, oferta e total acabado em 9.
-    expect(r.bigOrder).toBeNull();
-    expect((r as any).visitGifts.total % 10).toBe(9);
-    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).bigOrder).toBeNull();
-  });
-
   it('a corner sofa is waterproofed as a 5-seat sofa, the U rule (owner, 20 Nov 2026, Ana Marques)', () => {
     const l = (treatment: string) => ok({ items: [{ kind: 'sofa', size: 'canto', treatment }], city: 'Porto' });
     expect(l('premium')).toMatchObject({ quote: false, total: 199 });
@@ -270,7 +259,7 @@ describe('anti-odor em tapetes (dono, 24 Nov 2026: sempre 5€ o m²)', () => {
     expect(plain.rugOdor).toBeNull();
     // Carpet: sob orçamento, the line is there for the owner.
     expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5, odor: true }], city: 'Lisboa' }).lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor alcatifa 4 x 5 m', amount: 100 });
-    expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', odor: true }], city: 'Lisboa' }).ok).toBe(false);
+    expect(botQuote({ items: [{ kind: 'chairs', qty: 4, odor: true }], city: 'Lisboa' }).ok).toBe(false);
     expect(botQuote({ items: [{ kind: 'rug', width: 2, length: 3, odor: 'sim' }], city: 'Lisboa' }).ok).toBe(false);
   });
 });

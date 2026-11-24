@@ -1267,3 +1267,19 @@ O dono: "o comercial não faz muito sentido o valor estar lá [...] o contacto t
 Cliente pediu impermeabilização de "4 lugares com duas chaise longues"; o bot deu 189/129€ (4 lugares) sem ver a fotografia e manteve depois de a ver. "Isto leva imenso impermeabilizante"; "contas o preço de 5, 4 lugares com 2 chaise long é como se adicionasse mais um lugar"; há outros com a chaise ainda maior que são "tipo 6", julgados pela fotografia. O preço já dado ficou.
 - Motor: `uAsSeats` em `botQuote.ts` troca `u` de N lugares pelo sofá de N+1 (7 fica 7; anti-ácaros continua sob orçamento). 6 lugares por chaises maiores = `5-lugares` + `seats` 6 + `look`.
 - [RETIRADA 24/11] U só impermeabilização 179/129€ e limpeza do U + 150/90€ (ficava abaixo de um 4 lugares).
+
+## Regras de preço, uma a uma (dono, 24 Nov 2026 à noite)
+
+Decididas pelo dono uma a uma, com os números do motor (testes: `src/lib/botQuote.regras24nov.test.ts`).
+
+1. **Várias peças: preços cheios + tratamento oferecido (escada A), como estava.** Ao fim da tarde respondeu "Todos os pedidos" a tirar o tratamento do total (149€ no sofá 3L + colchão, com o anti-ácaros por mais 20€); à noite voltou atrás: "manter os preços originais, ou seja, manter o preço total de colchão e o preço total de sofá, e oferecer o anti-[ácaros] no colchão, por exemplo. Isso era inteligente. Assim não estamos a fazer descontos e não estamos a perder tickets." Ganha a última. A versão com a sugestão paga ficou no ramo `backup/regras-visitTreatment-24nov`, sem ir para a master.
+2. **Acima de 300€ nunca desce** ("A"; "12 cadeiras, os 359"; 30 cadeiras só limpeza: "Sim, pode ser, 360. Sem riscado, como assim? Podes riscar tipo um preço qualquer"). Riscado só verdadeiro: 1 cadeira × a quantidade (20€ × 30 = 600€); 2 sofás 3L Blindado 439 (499), 3L + 2L Blindado 399 (459). [RETIRADA 24/11] condição de 7%/4% (`bigOrder`, 25/10) e anti-ácaros oferecido em vez do desconto nos pedidos grandes (30/10).
+3. **Cadeiras do mesmo serviço em duas linhas = uma** ("Sim, como 6"). Serviços diferentes: 4 limpeza + 2 Blindado 139 (90 + 79 = 169), sem oferta, porque cadeiras são uma só peça. Também acerta a limpeza + a impermeabilização mandadas em duas linhas com outra peça (6 cadeiras Protegido + colchão king: 309 em duas linhas, 229 numa).
+4. **Só tapetes/alcatifas (riscado e anti-odor)**: "A" foi dado com a sugestão paga; depois de a regra 1 voltar atrás fica por decidir. Nada mudou.
+5. **1–2 cadeiras Protegido nas cidades de 20€**: "Fica assim" (39 / 59).
+6. **+10€ de serviço pequeno**: duas linhas de cadeiras não são outra peça ("Não, leva os +10€"): Cascais, 1 limpeza + 1 Protegido 59.
+7. **Anti-odor**: "Sim, esses preços" (sofá +40), colchão "casa e 99 e solteiro e 89", king "109€", sempre com limpeza e a acabar em 9 (`pieceOdor`). [RETIRADA 24/11] colchão +25/+30/+40 somado à mão.
+8. **Alcatifas**: fica "Desde 5€/m²", com os escalões ao lado ("e OPCAO A").
+9. **Riscado dos packs de cadeiras a partir de 4** ("Sim, em todo o lado"): 139 (156), 99 (116).
+
+Corrigido no caminho: o riscado da opção Premium contava a impermeabilização de cadeiras só limpas (3L Blindado + 6 cadeiras: 559€, agora 399€). Por decidir: pares de sofás só limpeza, só tapetes, "2 lugares mais chaise" (Fão, 94 ou 84).

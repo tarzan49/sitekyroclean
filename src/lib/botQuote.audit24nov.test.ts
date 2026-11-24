@@ -106,10 +106,6 @@ describe('auditoria, 2.ª passagem (24 Nov 2026)', () => {
     expect(paid(q('Funchal', [chairs(4, 'clean+essencial'), chairs(6, 'clean+essencial')]))).toBeGreaterThanOrEqual(paid(q('Funchal', [chairs(4, 'clean'), chairs(6, 'clean+essencial')])));
     expect(paid(q('Faro', [chairs(4, 'clean+essencial'), rug(3, 4)]))).toBeGreaterThanOrEqual(paid(q('Faro', [chairs(4, 'clean'), rug(3, 4)])));
   });
-  it('quando a oferta se perde no arredondamento ao 9 não há riscado (nunca um +10 inventado)', () => {
-    const r = q('Coimbra', [chairs(1, 'clean+anti-acaros'), chairs(12, 'clean+anti-acaros')]);
-    expect([r.visitGifts.usual, r.visitGifts.total, r.separatePrice]).toEqual([279, 279, null]);
-  });
 });
 
 describe('Blindado 5L/6L acima de 300€ (dono, 25 Nov 2026: "Sim, também")', () => {
@@ -147,14 +143,11 @@ describe('riscado das cadeiras (dono, 25 Nov 2026: "Sim, limita")', () => {
     expect([q('Lisboa', [chairs(12, 'clean+premium')]).total, q('Lisboa', [chairs(12, 'clean+premium')]).chairsWas]).toEqual([359, 459]);
     expect(q('Lisboa', [chairs(100, 'clean+premium')]).chairsWas).toBe(3099);
   });
-  it('duas linhas de cadeiras: o riscado é as duas sozinhas + a oferta, ao 9, e nunca um valor inventado', () => {
-    const r = q('Lisboa', [chairs(1, 'clean'), chairs(1, 'clean')]);
-    expect([r.total, r.visitGifts.usual, r.separatePrice]).toEqual([69, 69, null]);
-    for (const city of ['Lisboa', 'Coimbra']) for (let a = 1; a <= 14; a++) for (let b = 1; b <= 14; b++) for (const [s, t] of [['clean', 'clean'], ['clean', 'clean+anti-acaros'], ['clean+anti-acaros', 'clean+anti-acaros']]) {
+  it('cadeiras em várias linhas são uma peça: nunca oferta, e nunca acima de cada linha sozinha (dono, 24 Nov: "Sim, como 6")', () => {
+    for (const city of ['Lisboa', 'Coimbra']) for (let a = 1; a <= 14; a++) for (let b = 1; b <= 14; b++) for (const [s, t] of [['clean', 'clean'], ['clean', 'clean+anti-acaros'], ['clean', 'clean+premium']]) {
       const x = q(city, [chairs(a, s), chairs(b, t)]);
-      if (!x.visitGifts || x.visitGifts.usual <= x.visitGifts.total) continue;
-      const sum = q(city, [chairs(a, s)]).total + q(city, [chairs(b, t)]).total + x.visitGifts.gifts.reduce((n: number, g: Q) => n + g.normal, 0);
-      expect(x.visitGifts.usual).toBeLessThan(sum + 10);
+      expect(x.visitGifts).toBeNull();
+      if (s === t) expect(x.total).toBe(q(city, [chairs(a + b, s)]).total);
     }
   });
 });

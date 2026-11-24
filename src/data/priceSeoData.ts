@@ -9,7 +9,7 @@ import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
 import { PRICE_FACTORS } from './priceFactors';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
-import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE, CARPET_TIERS_SENTENCE } from '../constants/rugSitePrice';
 
 export interface PricePageData {
   serviceSlug: string;
@@ -79,7 +79,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     ...chairTierRows(),
   ],
   "limpeza-alcatifas": [
-    { item: "Alcatifas (qualquer dimensão)", price: CARPET_PRICE_FROM, note: "deslocação incluída" },
+    { item: "Alcatifas (qualquer dimensão)", price: CARPET_PRICE_FROM, note: `${CARPET_TIERS_SENTENCE}, com a deslocação incluída` },
   ],
   "impermeabilizacao": [
     { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").waterproofingPrice), note: `Essencial, ${eur(sofaSize("1-lugar").waterproofingPremiumPrice!)} na Premium` },
