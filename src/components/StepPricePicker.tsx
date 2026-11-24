@@ -10,8 +10,8 @@ import { cities, cityPrep } from '@/data/serviceCatalog';
 import SofaCounters, { sofaWhat, type SofaCounts } from '@/components/SofaCounters';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import type { BasketItem, BasketPack } from '@/components/quiz/VisitBasket';
-import matTecido from '@/assets/quiz-materiais/sofa-tecido.webp';
-import matPele from '@/assets/quiz-materiais/sofa-pele.webp';
+import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
+import matPele from '@/assets/widget-materiais/sofa-pele.webp';
 import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
 import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
 import imperSofaPhoto from '@/assets/picker-premium-sofa.webp';
@@ -65,14 +65,15 @@ function PriceTag({ shown, struck: raw, on = false }: { shown: number | null; st
 
 const tile = (on: boolean) => `rounded-2xl border-2 font-semibold transition-colors ${on ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-[#0B2F2A]' : 'border-[#E5E0D3] bg-white text-[#1A1A1A] hover:border-[#D4AF37]'}`;
 
-/** Cartões com fotografia (material, peça): a escolha é o próprio botão e enche o ecrã. */
-function PhotoCards<T extends string>({ ask, options, onPick }: { ask: string; options: { id: T; label: string; photo: string }[]; onPick: (id: T) => void }) {
+/** Cartões com fotografia (material, peça): a escolha é o próprio botão e enche o ecrã. Sofás sempre na horizontal
+ *  (dono, 24 Nov 2026: "tem que ser 2 fotos horizontal se for sofá"); as outras peças, na vertical. */
+function PhotoCards<T extends string>({ ask, options, onPick, wide = false }: { ask: string; options: { id: T; label: string; photo: string }[]; onPick: (id: T) => void; wide?: boolean }) {
   return <>
     <p className="mb-3 text-lg font-semibold text-[#1A1A1A] md:text-xl">{ask}</p>
-    <div className="grid grid-cols-2 gap-3 md:gap-5">
-      {options.map(o => <button key={o.id} type="button" onClick={() => onPick(o.id)} className="group relative h-[min(38svh,330px)] overflow-hidden rounded-2xl text-left shadow-[0_18px_40px_-18px_rgba(11,47,42,0.55)] ring-1 ring-black/5 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98] md:h-[min(44svh,340px)]">
+    <div className={`grid gap-3 md:grid-cols-2 md:gap-5 ${wide ? '' : 'grid-cols-2'}`}>
+      {options.map(o => <button key={o.id} type="button" onClick={() => onPick(o.id)} className={`group relative overflow-hidden ${wide ? 'aspect-[2/1] max-h-[21svh] w-full md:max-h-none md:aspect-[8/5]' : 'h-[min(38svh,330px)] md:h-[min(44svh,340px)]'} rounded-2xl text-left shadow-[0_18px_40px_-18px_rgba(11,47,42,0.55)] ring-1 ring-black/5 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]`}>
         <img src={o.photo} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/15 to-transparent" aria-hidden />
+        <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/80 via-transparent to-transparent" aria-hidden />
         <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-3 md:p-5"><span className="whitespace-nowrap font-playfair text-[17px] font-semibold leading-tight text-white md:text-2xl">{o.label}</span><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br md:h-10 md:w-10 from-[#E8C964] to-[#D4AF37] text-[#0B2F2A]"><ChevronRight className="h-5 w-5" strokeWidth={2.5} aria-hidden /></span></span>
       </button>)}
     </div>
@@ -172,7 +173,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   } else if (!pieceOk) {
     questions = <PhotoCards ask="O que quer impermeabilizar?" options={[{ id: 'sofa' as const, label: 'Sofá', photo: imperSofaPhoto }, { id: 'chairs' as const, label: 'Cadeiras', photo: imperChairPhoto }]} onPick={p => { setPiece(p); warm(); }} />;
   } else if (mat && material === null) {
-    questions = <PhotoCards ask={mat.ask} options={mat.options} onPick={pickMaterial} />;
+    questions = <PhotoCards ask={mat.ask} options={mat.options} onPick={pickMaterial} wide={kind === 'sofa'} />;
   } else {
     questions = <>
       {imper && <Pills label="Peça" options={[{ id: 'sofa' as const, label: 'Sofá' }, { id: 'chairs' as const, label: 'Cadeiras' }]} value={piece!} onPick={p => { setPiece(p); setPack(null); }} />}

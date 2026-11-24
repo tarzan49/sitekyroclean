@@ -48,7 +48,7 @@ function Choice({ items, value, onChange, label, compact }: { items: T[]; value:
       const active = value === t.id;
       return <button key={t.id} type="button" role="radio" aria-checked={active} onClick={() => onChange(t.id)}
         className={`relative flex flex-col overflow-hidden rounded-xl border-2 text-left transition-all ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
-        {!compact && <img src={t.img} alt="" loading="lazy" decoding="async" className="h-[52px] w-full object-cover" />}
+        {!compact && <img src={t.img} alt="" loading="lazy" decoding="async" className="h-11 w-full object-cover md:h-[52px]" />}
         <span className="px-2 py-1.5">
           <span className="block text-[13px] font-bold leading-tight text-[#1A1A1A]">{t.label}</span>
           <span className="block text-[11px] leading-tight text-[#1A1A1A]/75">{t.note}</span>
@@ -157,10 +157,10 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
         </div>
         {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#D4AF37]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-          className="mt-2 flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
+          className="mt-1.5 flex min-h-[46px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
           <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp
         </a>
-        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-1.5 hidden h-10 min-h-0 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white text-sm md:flex font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} /></Suspense>}
     </div>
