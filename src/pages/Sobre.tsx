@@ -115,7 +115,7 @@ const Sobre = () => {
         <section id="como" className="bg-kyro-green py-14 text-white">
           <div className="mx-auto max-w-4xl px-5 sm:px-6">
             <div className="mb-8"><h2 className="type-section-title font-playfair text-white">{gold("Onde e como", "trabalhamos")}</h2></div>
-            <div className="space-y-2.5 text-[14px] leading-snug text-white/85">
+            <div className="space-y-4 text-[16.5px] leading-relaxed text-white/85 md:space-y-2.5 md:text-[14px] md:leading-snug">
               <p>{COVERAGE_PROMISE}</p>
               <p>Ao todo são {cities.length} cidades com página própria por serviço. A lista completa, incluindo freguesias, está em <Link to="/areas-de-servico" className="underline underline-offset-4 hover:text-[#D4AF37]">áreas de serviço</Link>.</p>
               <p>O orçamento é pedido por WhatsApp, telefone ou pelo simulador do site. {RESPONSE_PROMISE}.</p>

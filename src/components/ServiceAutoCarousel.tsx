@@ -124,7 +124,7 @@ const ServiceAutoCarousel = ({
             the page (the hero), so this is just 2 standalone photos — no
             antes/depois slider, no duplicate of that section. */}
         {!comparison && (
-          <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-3xl">
+          <div className="grid gap-3 sm:grid-cols-2 md:gap-4 max-w-3xl">
             {slides.slice(0, 2).map((slide, i) => slide.src ? (
               <figure key={slide.src}>
                 <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />

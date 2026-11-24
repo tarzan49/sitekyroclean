@@ -50,7 +50,7 @@ function fill(section: HTMLElement, saved: Saved[]) {
   const px = (v: string) => parseFloat(root.getPropertyValue(v)) || 0;
   const hero = section.hasAttribute('data-commercial-hero');
   const home = document.documentElement.classList.contains('snap-home');
-  const target = hero ? px('--app-h') : px('--app-max') - (home ? 0 : px('--header-h'));
+  const target = hero ? px('--app-h') : px('--app-max') - (home ? 0 : root.getPropertyValue('--header-h').trim() ? px('--header-h') : 64);
   if (!target) return;
   const spareNow = () => {
     const old = section.style.cssText;

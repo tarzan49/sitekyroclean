@@ -190,9 +190,9 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </>)}
       {what === 'mattress' && <>
         {title('Que tamanho?', 'Pode juntar vários')}
-        <div className="grid grid-cols-3 gap-2">{MATTRESS.map(m => { const n = mCounts[m.id] ?? 0; return (
-          <div key={m.id} data-fill-tile role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none flex-col items-center justify-center gap-0.5 px-1 py-2 text-center text-sm ${tile(n > 0)}`}>
-            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-10 w-14 sm:h-10 sm:w-14" />{m.label}
+        <div className={`grid gap-2 ${MATTRESS.some(x => (mCounts[x.id] ?? 0) > 0) ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-3'}`}>{MATTRESS.map(m => { const n = mCounts[m.id] ?? 0; const wide = !MATTRESS.some(x => (mCounts[x.id] ?? 0) > 0); return (
+          <div key={m.id} data-fill-tile role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none items-center justify-center gap-0.5 px-1 py-2 text-center text-sm ${wide ? 'max-sm:min-h-[104px] max-sm:justify-between max-sm:px-5 max-sm:text-lg sm:flex-col' : 'flex-col'} ${tile(n > 0)}`}>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className={wide ? 'h-20 w-28 sm:h-10 sm:w-14' : 'h-10 w-14'} />{m.label}
             {n > 0 ? <span className="mt-0.5 flex items-center gap-1">
               <button type="button" aria-label={`Menos um colchão ${m.label}`} onClick={e => { e.stopPropagation(); bumpMattress(m.id, -1); }} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-full bg-white/80 text-[#0B2F2A]"><Minus className="h-3.5 w-3.5" /></button>
               <span className="w-4 text-center text-base font-bold">{n}</span>

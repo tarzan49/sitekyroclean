@@ -141,7 +141,7 @@ const CommercialPage = () => {
                 <ul>{sector.items.map((it, i) => (
                   <li key={it.item} className="flex gap-4 border-t border-white/15 py-3 first:border-t-0">
                     <span className="font-playfair w-7 shrink-0 text-xl text-[#D4AF37]">{i + 1}</span>
-                    <span><span className="block text-base font-semibold text-white">{it.item}</span><span className="block text-[13px] leading-snug text-white/75">{it.detail}</span></span>
+                    <span><span className="block text-base font-semibold text-white">{it.item}</span><span className="block text-[15px] leading-snug text-white/75 md:text-[13px]">{it.detail}</span></span>
                   </li>
                 ))}</ul>
               </div>
@@ -174,12 +174,12 @@ const CommercialPage = () => {
               <ul className="space-y-2">
                 {sector.rules.map(r => (
                   <li key={r.source} className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-                    <p className="text-[14px] leading-snug text-white/90">{r.text}</p>
+                    <p className="text-[17px] leading-relaxed text-white/90 md:text-[14px] md:leading-snug">{r.text}</p>
                     <a href={r.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-[12px] text-[#D4AF37] hover:underline"><FileText className="h-3.5 w-3.5" />{r.source}</a>
                   </li>
                 ))}
               </ul>
-              {sector.rulesNote && <p className="mt-3 text-[13px] leading-snug text-white/75">{sector.rulesNote}</p>}
+              {sector.rulesNote && <p className="mt-4 text-[15px] leading-relaxed md:text-[13px] md:leading-snug text-white/75">{sector.rulesNote}</p>}
             </div>
           </section>
         )}

@@ -135,11 +135,11 @@ const EnServicePage = () => {
         <section id="handle" className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader heading="What we" goldWord="handle" light={true} />
-            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0">
+            <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
               {page.scenarios.map((s, idx) => (
-                <div key={idx} className="relative flex w-[85%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white p-5 sm:w-auto md:p-7" style={{ borderTop: "3px solid #D4AF37" }}>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight text-[#111111]">{s.title}</p>
-                  <p className="text-base text-[#505650] leading-relaxed">{s.body}</p>
+                <div key={idx} className="relative flex flex-col justify-center overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white px-4 py-2.5 md:p-7" style={{ borderTop: "3px solid #D4AF37" }}>
+                  <p className="font-playfair mb-1 text-[17px] font-bold md:mb-2 md:text-lg leading-tight text-[#111111]">{s.title}</p>
+                  <p className="text-[14px] leading-[1.32] text-[#505650] md:text-base md:leading-relaxed">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -152,7 +152,7 @@ const EnServicePage = () => {
             <SectionHeader heading="Why choose" goldWord="Kyro" light={false} />
             <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-px">
               {page.whyUs.map((reason, idx) => (
-                <div key={idx} className="relative flex items-start gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 md:p-6">
+                <div key={idx} className="relative flex items-start gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 md:p-6">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "#D4AF37" }} />
                   <span className="text-[14px] leading-snug text-white/85 md:text-base">{reason}</span>
                 </div>
