@@ -14,7 +14,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | cadeiras e colchões FEITO (24 Nov) |
 | SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras e colchões (higienização, lavagem, limpeza) FEITO (24 Nov) |
 | PackComboPage | 510+ | — | FEITO (todos os packs) | — |
-| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO, falta OK do dono | por fazer |
+| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO, falta OK do dono | colchões FEITO (24 Nov; ácaros, alergias, cheiro, manchas, urina, preço); não há problemas de cadeiras |
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | FEITO em tecido, falta OK; PELE por fazer (precisa de widget sem impermeabilização: limpeza + tratamento da pele) | tapetes 412 |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312, MarcaCadeiras 312 |
 | TreatmentPage (`/tratamento-anti-acaros-*`) | 206 | — | — | por fazer |
