@@ -96,7 +96,7 @@ export function itemLabel(it: BasketItem): string {
 
 type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: number | null; lines?: { amount: number | null; quote: boolean }[]; visitGifts?: { withoutGift?: number | null; gifts: { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number }[]; usual: number; total: number } | null };
 export type BasketGift = NonNullable<Quote['visitGifts']>['gifts'][number];
-const GIFT_LABEL: Record<string, string> = { 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'sofa:anti-acaros': 'o anti-ácaros no sofá', 'rug:anti-odor': 'o anti-odor no tapete', 'carpet:anti-odor': 'o anti-odor na alcatifa', 'rug:anti-acaros': 'o anti-ácaros no tapete', 'carpet:anti-acaros': 'o anti-ácaros na alcatifa', 'sofa:anti-odor': 'o anti-odor no sofá' };
+const GIFT_LABEL: Record<string, string> = { 'sofa:tratamento-pele': 'o tratamento da pele no sofá', 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'sofa:anti-acaros': 'o anti-ácaros no sofá', 'rug:anti-odor': 'o anti-odor no tapete', 'carpet:anti-odor': 'o anti-odor na alcatifa', 'rug:anti-acaros': 'o anti-ácaros no tapete', 'carpet:anti-acaros': 'o anti-ácaros na alcatifa', 'sofa:anti-odor': 'o anti-odor no sofá' };
 export const giftLabel = (g: BasketGift) => GIFT_LABEL[`${g.piece}:${g.treatment}`] ?? g.treatment;
 const PLURAL: Record<string, string> = { mattress: 'colchões', rug: 'tapetes', carpet: 'alcatifas', sofa: 'sofás', chairs: 'cadeiras' };
 /** Uma linha por oferta igual: duas ofertas de anti-odor em dois tapetes = "o anti-odor nos 2 tapetes", com os valores somados. */
@@ -161,6 +161,14 @@ export function packSaving(city: string, it: BasketItem): number | null {
   const v = r.separatePrice?.saving;
   return typeof v === 'number' && v > 0 ? v : null;
 }
+/** O que cada cartão do "Juntar à mesma visita" mostra: a impermeabilização, a poupança do pack; as outras, a oferta que trazem. */
+function promoOf(city: string, items: BasketItem[], e: { key: string; kind: BasketKind; over?: Partial<BasketItem> }): { kind: 'save' | 'gift'; value: number } | null {
+  const it = newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) });
+  if (e.key === 'imper') { const p = packSaving(city, it); if (p) return { kind: 'save', value: p }; }
+  const g = giftsUnlocked(city, items, it);
+  return g ? { kind: 'gift', value: g.value } : null;
+}
+const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -391,19 +399,26 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
             <p className="mb-1 text-base font-semibold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></p>
-            <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[#E8C964]"><Gift className="h-3.5 w-3.5 shrink-0" />Cada peça a mais traz um tratamento oferecido</p>
+            {(() => {
+              // "Se juntar X, poupa Y" (dono, 25 Nov): a peça que mais dá, pelo motor; sem nenhuma, a frase geral.
+              const best = ENTRY.map(e => ({ e, p: promoOf(city, items, e) })).filter(x => x.p).sort((x, y) => y.p!.value - x.p!.value)[0];
+              return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{best ? <>Se juntar {JOIN_NAME[best.e.key]}, poupa {formatEuro(best.p!.value)}</> : 'Cada peça a mais traz um tratamento oferecido'}</p>;
+            })()}
             <div className="grid grid-cols-3 gap-2">
-              {ENTRY.map(e => (
-                <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className="group relative h-[96px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
+              {ENTRY.map(e => {
+                const promo = promoOf(city, items, e);
+                return (
+                <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className="group relative h-[100px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
                   <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-                  <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/95 via-[#071a12]/30 to-transparent" />
-                  <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-4 w-4" strokeWidth={3} /></span>
-                  <span className="absolute inset-x-1.5 bottom-1.5">
+                  <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A] shadow"><Plus className="h-4 w-4" strokeWidth={3} /></span>
+                  {/* Faixa escura e desfocada por baixo do texto (dono, 25 Nov: "mais premium, opacidade na parte das letras"). */}
+                  <span className="absolute inset-x-0 bottom-0 border-t border-[#D4AF37]/20 bg-[#071a12]/75 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
                     <span className={`block whitespace-nowrap font-bold leading-tight text-white ${e.label.length > 12 ? 'text-[10.5px] tracking-tighter' : 'text-[13px]'}`}>{e.label}</span>
-                    {(() => { if (e.key === 'imper') { const p = packSaving(city, newItem(e.kind, e.over)); return p ? <span className="block whitespace-nowrap text-[11px] font-bold leading-tight text-[#E8C964]">+ poupa {formatEuro(p)}</span> : null; } return null; })() ?? (() => { const g = giftsUnlocked(city, items, newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) })); return g ? <span className="block whitespace-nowrap text-[11px] font-bold leading-tight text-[#E8C964]">+ oferta de {formatEuro(g.value)}</span> : null; })()}
+                    {promo && <span className="mt-0.5 inline-block whitespace-nowrap rounded-full bg-gradient-to-r from-[#D4AF37] to-[#E8C964] px-1.5 py-px text-[10px] font-bold leading-tight text-[#0B2F2A]">{promo.kind === 'save' ? `poupa ${formatEuro(promo.value)}` : `+ oferta de ${formatEuro(promo.value)}`}</span>}
                   </span>
                 </button>
-              ))}
+                );
+              })}
             </div>
             </>
             )}
@@ -487,7 +502,10 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(seats === s)} onClick={() => set(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
             <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}</button>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
-          <button type="button" className={`${chip(!!item.leather)} mb-3 w-full`} onClick={() => set({ leather: !item.leather })}>{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</button>
+          <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
+            <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
+            {item.leather && (() => { const a = priceWith({ leather: true }), b = priceWith({ leather: false, pack: 'none' }); return a !== null && b !== null ? <span className="text-base font-bold text-white">{a - b > 0 ? `+${formatEuro(a - b)}` : 'oferecido'}</span> : null; })()}
+          </button>
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho?</p>
