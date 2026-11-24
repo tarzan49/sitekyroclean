@@ -825,3 +825,9 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
   /* Diretórios de links (DirectoryGroup) nas páginas com encaixe: linhas baixas, os links continuam todos no HTML. */
   html.snap-sections details.group\/directory > summary { min-height: 44px; padding-top: 8px; padding-bottom: 8px; font-size: 15px; }
 }
+/* Páginas principais: a lista de localidades no fim cabe num ecrã também no computador (packs-tratamento, 24 Nov). */
+@media (min-width: 768px) {
+  html.snap-sections #localidades .divide-y > div > button { padding-top: 8px; padding-bottom: 8px; }
+  html.snap-sections #localidades .relative.mb-5 { margin-bottom: 12px; }
+  html.snap-sections #localidades .mb-8 { margin-bottom: 16px; }
+}
