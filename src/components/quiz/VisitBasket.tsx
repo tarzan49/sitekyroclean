@@ -42,7 +42,13 @@ export interface BasketItem {
   width?: string;         // tapete/alcatifa, em metros
   length?: string;
   odor?: boolean;         // tapete/alcatifa: anti-odor (5€/m², só com a limpeza)
+  imperOnly?: boolean;    // sofá/cadeiras: só a impermeabilização, sem limpeza (dono, 25 Nov)
 }
+// Cartão "Impermeabilização" (dono, 25 Nov): só a impermeabilização (sem limpeza), primeiro a peça, depois Premium ou Essencial.
+const IMPER_ONLY: { pack: BasketPack; name: string; note: string }[] = [
+  { pack: 'premium', name: 'Premium', note: 'À base de solvente, até 10 anos' },
+  { pack: 'essencial', name: 'Essencial', note: 'À base de água, 1 a 2 anos' },
+];
 
 const PACKS: { pack: BasketPack; name: string; note: string }[] = [
   { pack: 'premium', name: 'Blindado', note: 'Limpeza + Premium, até 10 anos' },
@@ -79,7 +85,7 @@ function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
     return w && l ? { kind: it.kind, qty: 1, treatment: 'clean', width: w, length: l, ...(it.odor ? { odor: true } : {}) } : null;
   }
   if (it.kind === 'mattress') return { kind: 'mattress', size: it.size, qty: it.qty, treatment: it.pack === 'premium' ? 'clean+anti-acaros' : 'clean' };
-  const treatment = it.leather || it.pack === 'none' ? 'clean' : it.pack === 'premium' ? 'clean+premium' : 'clean+essencial';
+  const treatment = it.imperOnly && !it.leather && it.pack !== 'none' ? it.pack : it.leather || it.pack === 'none' ? 'clean' : it.pack === 'premium' ? 'clean+premium' : 'clean+essencial';
   if (it.kind === 'chairs') return { kind: 'chairs', qty: it.qty, treatment };
   const six = it.seats === 6;
   return { kind: 'sofa', size: six ? '5-lugares' : it.size, qty: it.qty, treatment, ...(six ? { seats: 6, look: 'compacto' } : {}), ...(it.leather ? { leather: true } : {}) };
@@ -88,7 +94,7 @@ function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
 export function itemLabel(it: BasketItem): string {
   if (isRug(it.kind)) return `${KIND_LABEL[it.kind]}${num(it.width) && num(it.length) ? ` ${it.width} × ${it.length} m` : ''}${it.odor ? ' + anti-odor' : ''}`;
   if (it.kind === 'mattress') return `${it.qty > 1 ? `${it.qty} × ` : ''}Colchão ${MATTRESS.find(m => m.id === it.size)?.label ?? ''}${it.pack === 'premium' ? ' + anti-ácaros' : ''}`;
-  const pack = it.leather ? 'pele: limpeza + tratamento da pele' : PACKS.find(p => p.pack === it.pack)!.name;
+  const pack = it.leather ? 'pele: limpeza + tratamento da pele' : it.imperOnly ? `só impermeabilização ${IMPER_ONLY.find(p => p.pack === it.pack)?.name ?? ''}` : PACKS.find(p => p.pack === it.pack)!.name;
   if (it.kind === 'chairs') return `${it.qty} cadeiras · ${pack}`;
   const seats = it.seats ?? Number(it.size?.split('-')[0]);
   return `${it.qty > 1 ? `${it.qty} × ` : ''}Sofá ${seats} ${seats === 1 ? 'lugar' : 'lugares'} · ${pack}`;
@@ -164,7 +170,12 @@ export function packSaving(city: string, it: BasketItem): number | null {
 /** O que cada cartão do "Juntar à mesma visita" mostra: a impermeabilização, a poupança do pack; as outras, a oferta que trazem. */
 function promoOf(city: string, items: BasketItem[], e: { key: string; kind: BasketKind; over?: Partial<BasketItem> }): { kind: 'save' | 'gift'; value: number; what: string } | null {
   const it = newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) });
-  if (e.key === 'imper') { const p = packSaving(city, it); if (p) return { kind: 'save', value: p, what: '+ com a limpeza' }; }
+  // Impermeabilização sozinha: a vantagem é a deslocação já paga pelas outras peças (dono, 25 Nov).
+  if (e.key === 'imper') {
+    if (!items.length) return null;
+    const alone = aloneTotal(city, it), q = quoteBasket(city, [...items, it]), line = q.sob ? null : q.lines[items.length] ?? null;
+    return alone !== null && line !== null && alone > line ? { kind: 'save', value: Math.round((alone - line) * 100) / 100, what: '+ sem deslocação' } : null;
+  }
   const g = giftsUnlocked(city, items, it);
   if (!g) return null;
   // O tratamento dito pelo nome (dono, 25 Nov: a oferta tem de ser o gancho do cartão).
@@ -205,7 +216,7 @@ function fromPrice(city: string, k: BasketKind): string {
 // do motor, o mesmo dos heróis. Impermeabilização = sofá com a proteção (Protegido; o pack escolhe-se na folha).
 const ENTRY: { key: string; kind: BasketKind; label: string; short?: string; photo: string; clip: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
   { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, clip: sofaClip, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
-  { key: 'imper', kind: 'sofa', label: 'Impermeabilização', short: 'Impermea\u00ADbilização', photo: imperPhoto, clip: imperClip, over: { pack: 'essencial' }, from: c => waterproofFrom(c) },
+  { key: 'imper', kind: 'sofa', label: 'Impermeabilização', short: 'Impermea\u00ADbilização', photo: imperPhoto, clip: imperClip, over: { pack: 'premium', imperOnly: true }, from: c => waterproofFrom(c) },
   { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, clip: mattressClip, from: c => fromPrice(c, 'mattress') },
   { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, clip: chairsClip, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
   { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, clip: rugClip, from: c => fromPrice(c, 'rug') },
@@ -225,6 +236,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   const [city, setCity] = useState(initialCity);
   const [items, setItems] = useState<BasketItem[]>(initialItems);
   const [editing, setEditing] = useState<BasketItem | null>(null);
+  const [imperPick, setImperPick] = useState(false);
+  const pick = (e: (typeof ENTRY)[number]) => (e.key === 'imper' ? setImperPick(true) : setEditing(newItem(e.kind, e.over)));
   const [step, setStep] = useState<'basket' | 'contact'>('basket');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -249,9 +262,9 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   // Voltar atrás (dono, 25 Nov: "não consegues voltar para trás nunca"): cada ecrã é um passo no histórico do
   // navegador, por isso o voltar do telemóvel faz o mesmo que o botão Voltar (fecha a peça, volta do contacto ao
   // cesto e, por fim, fecha o questionário) em vez de sair do site.
-  const level = isOpen ? 1 + (editing ? 1 : 0) + (step === 'contact' ? 1 : 0) : 0;
-  const live = useRef({ level, editing, step, onClose });
-  live.current = { level, editing, step, onClose };
+  const level = isOpen ? 1 + (editing || imperPick ? 1 : 0) + (step === 'contact' ? 1 : 0) : 0;
+  const live = useRef({ level, editing, imperPick, step, onClose });
+  live.current = { level, editing, imperPick, step, onClose };
   const hist = useRef({ depth: 0, skip: 0, leaving: false, timer: 0 });
   useEffect(() => {
     const h = hist.current;
@@ -261,7 +274,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       if (h.skip > 0) { h.skip -= 1; return; }
       const s = live.current;
       if (s.level <= h.depth) return;
-      if (s.editing) setEditing(null); else if (s.step === 'contact') setStep('basket'); else s.onClose();
+      if (s.editing) setEditing(null); else if (s.imperPick) setImperPick(false); else if (s.step === 'contact') setStep('basket'); else s.onClose();
     };
     window.addEventListener('popstate', onPop);
     return () => {
@@ -371,7 +384,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             </label>
                 <div className="grid grid-cols-2 gap-2">
                   {ENTRY.map(e => (
-                    <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
+                    <button key={e.key} type="button" onClick={() => pick(e)} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
                       <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                       <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
@@ -420,7 +433,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               {ENTRY.map(e => {
                 const promo = promoOf(city, items, e);
                 return (
-                <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className={`group relative h-[116px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
+                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[116px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
                   <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
                   {/* O gancho (dono, 25 Nov): a oferta em destaque, em cima, com o presente e o valor. */}
                   {promo && <span className={`absolute left-1.5 top-1.5 flex max-w-[calc(100%-12px)] items-center overflow-hidden whitespace-nowrap rounded-lg bg-[#D4AF37] px-1.5 py-1 font-extrabold uppercase leading-none text-[#0B2F2A] ${promo.value >= 100 ? 'gap-0.5 text-[9.5px] tracking-tight' : 'gap-1 text-[11px] tracking-wide'} shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]`}>
@@ -470,6 +483,25 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : 'Receber o preço e as horas no WhatsApp'}</button>}
       </footer>
 
+      {imperPick && !editing && (
+        <div className="absolute inset-0 z-20 flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label="Impermeabilização">
+          <header className="flex items-center border-b border-white/10 px-2 py-2">
+            <button type="button" onClick={() => setImperPick(false)} className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:bg-white/10"><ArrowLeft className="h-5 w-5" />Voltar</button>
+          </header>
+          <div className="flex-1 overflow-y-auto px-4 pt-4">
+            <h2 className="type-section-title font-playfair mb-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>impermeabilizar?</em></h2>
+            <div className="grid grid-cols-2 gap-3">
+              {([{ kind: 'sofa', label: 'Sofá', clip: imperClip, photo: imperPhoto }, { kind: 'chairs', label: 'Cadeiras', clip: chairsClip, photo: PHOTO.chairs }] as const).map(o => (
+                <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+                  <video src={o.clip} poster={o.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+                  <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/45 px-3 py-2 backdrop-blur-md"><span className="text-lg font-bold text-white">{o.label}</span><Plus className="h-5 w-5" style={{ color: GOLD }} strokeWidth={3} /></span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-white/60">Só em tecido. Para limpar e impermeabilizar na mesma visita, escolha o sofá ou as cadeiras no ecrã anterior.</p>
+          </div>
+        </div>
+      )}
       {editing && <ItemSheet item={editing} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
     </div>
     </div>
@@ -550,7 +582,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
         <div className="relative -mx-4 mb-4 h-40 overflow-hidden">
           <video src={clip} poster={PHOTO[item.kind]} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="h-full w-full object-cover" />
           <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/20 to-transparent" />
-          <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{KIND_LABEL[item.kind]}</h3>
+          <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{item.imperOnly ? <>Impermeabilização <span className="block text-lg" style={{ color: GOLD }}>{item.kind === 'chairs' ? 'das cadeiras' : 'do sofá'}</span></> : KIND_LABEL[item.kind]}</h3>
         </div>
 
         {item.kind === 'sofa' && <>
@@ -558,10 +590,10 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(seats === s)} onClick={() => set(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
             <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}<PriceTag small {...packPrice(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })} /></button>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
-          <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
+          {!item.imperOnly && <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
             <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
             <AddOnTag {...addOn({ leather: true }, { leather: false, pack: 'none' })} />
-          </button>
+          </button>}
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho?</p>
@@ -576,7 +608,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
           <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
           <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
         </div>}
-        {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{PACKS.map(p => (
+        {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => (
           <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
             <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
             <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack })} />{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
