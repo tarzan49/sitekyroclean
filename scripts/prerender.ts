@@ -49,7 +49,7 @@ import { getAllProblemCityRoutes, getProblemCities, problemCityBenefits, problem
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
-import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, otherPacksInCity } from '../src/data/packComboData';
+import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity } from '../src/data/packComboData';
 import { PACK_PERK_RULE, PACK_PERK_LIMIT, PACK_PERK_BULLETS } from '../src/constants/packPerks';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug, marcas } from '../src/data/marcaSofaData';
 import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from '../src/data/marcaCities';
@@ -977,14 +977,14 @@ export function prerenderRoutes(outDir: string): number {
         {
           breadcrumb: crumbs.map(crumb => ({ label: crumb.name, href: crumb.url.replace(BASE_URL, '') })),
           h1: heading,
-          intro: `${data.pack.tagline}. ${data.pack.description}`,
+          intro: packIntro(data.pack),
           howItWorks: `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e tapetes e alcatifas ficam sempre sob orçamento.`,
           faqs,
           links,
           linksHeading: `Serviços e packs ${prep} ${data.city.name}`,
         },
         [
-          buildServiceSchema(data.pack.name, data.city.name, packPriceFrom(data.pack)),
+          buildServiceSchema(data.pack.name, data.city.name, packPriceFrom(data.pack, data.city.name)),
           buildBreadcrumbSchema(crumbs),
           buildFaqSchema(faqs),
         ],
@@ -1157,7 +1157,7 @@ export function prerenderRoutes(outDir: string): number {
           breadcrumb: [{ label: 'Início', href: '/' }, { label: 'Guia de Packs' }],
           h1: 'Packs de Limpeza',
           intro: 'Vários artigos na mesma visita: uma só deslocação e preço de pack em cada artigo que acrescentar. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
-          problems: packs.map(pack => ({ title: pack.name, description: `${pack.tagline}. ${PACK_HOOK[pack.id] ?? pack.description}` })),
+          problems: packs.map(pack => ({ title: pack.name, description: packIntro(pack, PACK_HOOK[pack.id] ?? pack.description) })),
           howItWorks: PACK_PERK_LIMIT,
           benefits: PACK_PERK_BULLETS,
           links: packs.flatMap(pack => packCities.map(city => ({ href: `/${pack.slug}-${city.slug}`, label: `${pack.name}: ${city.name}` }))),

@@ -30,10 +30,12 @@ interface Props {
   // Visita vinda de um anúncio (`isAdsVisit`): o hero perde o espaço do
   // cabeçalho fixo, que o `AdsLandingHeader` não tem.
   paid?: boolean;
+  // O `price` já é o valor final a mostrar (ex.: total de um pack); não passa pela regra do preço por cadeira.
+  exactPrice?: boolean;
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
@@ -43,7 +45,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
     ? [primaryCategory, secondaryCategory]
     : primaryCategory;
   const items = breadcrumbs ?? [{ label: 'Início', to: '/' }, { label: service?.name ?? title, to: service?.baseRoute }, ...(city ? [{ label: city }] : [])];
-  const startingPrice = commercialHeroPaidPriceLine(serviceSlug, price);
+  const startingPrice = exactPrice && price ? `Desde ${price}` : commercialHeroPaidPriceLine(serviceSlug, price);
   const priceValue = startingPrice.replace(/^Desde\s+/, '');
   const words = title.trim().split(' ');
   const gold = words.pop();
@@ -51,13 +53,13 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
   // copy, que o prerender importa em Node para gerar o HTML estático.
   const statIcons = { rating: GoogleG, duration: Hourglass, response: Clock, drying: Timer };
   const stats = commercialHeroStats(serviceSlug).map(stat => ({ ...stat, icon: statIcons[stat.key] }));
-  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
+  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[100svh] lg:flex-col">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
       <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" width={1280} height={720} />
     </picture>
     <div className="absolute inset-0 -z-10" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,.48) 0%, rgba(0,0,0,.54) 55%, rgba(0,0,0,.68) 100%)' }} />
-    <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8 pb-4 sm:pb-8">
+    <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8 pb-4 sm:pb-8 lg:flex lg:w-full lg:flex-1 lg:flex-col lg:justify-center">
       <div className="grid items-center gap-4 lg:grid-cols-2 lg:gap-12">
         <div className="min-w-0">
           <nav data-hero-part="breadcrumb" aria-label="Breadcrumb" className="mb-2 flex flex-wrap items-center gap-x-2 text-[11px] leading-relaxed text-white/85" style={{ fontFamily: 'var(--font-kyro)' }}>

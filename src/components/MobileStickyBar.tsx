@@ -23,6 +23,7 @@ const MobileStickyBar = () => {
 
   return (
     <div
+      data-sticky-bar
       className={`fixed inset-x-0 z-30 transition-[transform,bottom] duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
       // `--kyro-consent-h` é a altura do aviso de cookies enquanto está aberto
       // (CookieBanner.tsx). Com ele fechado vale 0 e a barra fica no fundo.

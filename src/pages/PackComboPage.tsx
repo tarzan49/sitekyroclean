@@ -6,13 +6,15 @@ import Footer from '@/components/Footer';
 import CommercialHero from '@/components/CommercialHero';
 import SectionHeader from '@/components/SectionHeader';
 import PackConfigurator from '@/components/PackConfigurator';
+import WaterproofPackPicker from '@/components/WaterproofPackPicker';
+import WaterproofPackSections from '@/components/WaterproofPackSections';
 import CustomerReviews from '@/components/CustomerReviews';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import SofaProcessGuide from '@/components/SofaProcessGuide';
 import ServiceFAQ from '@/components/ServiceFAQ';
 import ServiceLocationSchema from '@/components/ServiceLocationSchema';
 import NotFound from '@/pages/NotFound';
-import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, otherPacksInCity, PACK_KINDS, PACK_INITIAL_EXTRA } from '@/data/packComboData';
+import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity, PACK_KINDS, PACK_INITIAL_EXTRA } from '@/data/packComboData';
 import { services, cityPrep } from '@/data/serviceCatalog';
 import { pickReviewSubset } from '@/data/reviewsPool';
 import { locationPrices } from '@/constants/travel';
@@ -54,10 +56,20 @@ export default function PackComboPage() {
   const [openNext, setOpenNext] = useState<string | null>(null);
   useEffect(() => setOpenNext(null), [pathname]);
 
+  // Secções de ecrã inteiro com encaixe no scroll (index.css): só nas páginas já compactadas.
+  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao';
+  useEffect(() => {
+    if (!snapPage) return;
+    document.documentElement.classList.add('snap-sections');
+    return () => document.documentElement.classList.remove('snap-sections');
+  }, [snapPage]);
+
+
   if (!data) return <NotFound />;
 
   const { pack, city } = data;
-  const priceFrom = packPriceFrom(pack);
+  const priceFrom = packPriceFrom(pack, city.name);
+  const simpleKind = pack.id === 'sofa-impermeabilizacao' ? 'sofa' as const : pack.id === 'cadeiras-impermeabilizacao' ? 'chairs' as const : null;
   const travelFee = locationPrices[city.name];
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.id, city.name))}`;
   const packServices = [pack.service1Slug, pack.service2Slug].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
@@ -99,11 +111,12 @@ export default function PackComboPage() {
     <main>
       <CommercialHero
         title={heading}
-        subtitle={`${pack.tagline}. ${pack.description}`}
+        subtitle={packIntro(pack)}
         serviceSlug={pack.service1Slug}
-        secondaryServiceSlug={pack.service2Slug}
+        secondaryServiceSlug={simpleKind === 'chairs' ? undefined : pack.service2Slug}
         city={city.name}
         price={priceFrom}
+        exactPrice={Boolean(simpleKind)}
         breadcrumbs={[{ label: 'Início', to: '/' }, { label: 'Packs', to: '/guia-de-packs' }, { label: heading }]}
         whatsappHref={waHref}
         source={`pack_hero_${pack.id}_${city.slug}`}
@@ -113,20 +126,22 @@ export default function PackComboPage() {
       {/* 1. O que está incluído, e já com o configurador. */}
       <section id="montar" className="scroll-mt-20 py-14 md:py-20 lg:py-10 bg-[#FDFDF9]">
         <div className={container}>
-          <SectionHeader
-            overline={pack.name}
-            heading="Monte o seu pack"
-            goldWord={`${cityPrep(city.name)} ${city.name}`}
-            subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal.`}
-            className="lg:!mb-5"
-          />
-          <div className="bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4">
-            <PackConfigurator
+          {simpleKind
+            ? <h2 className="mb-3 text-2xl font-semibold leading-tight text-[#1A1A1A] md:mb-4 md:text-3xl">Veja o seu preço <span className="text-[#D4AF37]">{cityPrep(city.name)} {city.name}</span></h2>
+            : <SectionHeader
+              overline={pack.name}
+              heading="Monte o seu pack"
+              goldWord={`${cityPrep(city.name)} ${city.name}`}
+              subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal.`}
+              className="lg:!mb-5"
+            />}
+          <div className={simpleKind ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
+            {simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
               initialKinds={PACK_KINDS[pack.id]}
               initialExtra={PACK_INITIAL_EXTRA[pack.id]}
               initialCity={city.name}
               source={`pack_configurator_${pack.id}_${city.slug}`}
-            />
+            />}
           </div>
         </div>
       </section>
@@ -139,7 +154,11 @@ export default function PackComboPage() {
         </div>
       </section>
 
+      {/* Packs de limpeza + impermeabilização: secções próprias (proteção, visita, perguntas). */}
+      {simpleKind && <WaterproofPackSections kind={simpleKind} cityLabel={`${cityPrep(city.name)} ${city.name}`} faqs={faqs} />}
+
       {/* 3. Porquê um pack: as regalias, ditas depois de já ter montado o pedido. Branco: alterna com o verde da secção 2. */}
+      {!simpleKind && <>
       <section id="regalias" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
         <div className={container}>
           <SectionHeader
@@ -185,6 +204,7 @@ export default function PackComboPage() {
 
       {/* 5. Dúvidas do pack, com schema. Branco: alterna com o verde da secção 4. */}
       <ServiceFAQ faqs={faqs} heading={`Perguntas sobre a ${pack.name.toLowerCase()} ${cityPrep(city.name)} ${city.name}`} variant="light" />
+      </>}
 
       {/* 6. Onde ir a seguir, sem deixar a página sem saída. Mesma estrutura e paleta da secção "Áreas de serviço" (ServiceCityLinks): cabeçalho editorial e linhas em acordeão (pedido do dono, 2026-09-24). */}
       {(() => {

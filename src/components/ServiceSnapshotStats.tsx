@@ -34,7 +34,7 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
             >
               <div className={singleRow ? "mb-1.5" : "flex items-center justify-center gap-2 mb-1.5 md:block"}>
                 <s.icon className={singleRow ? "w-4 h-4 mx-auto mb-2.5" : "w-4 h-4 shrink-0 md:mx-auto md:mb-2.5"} style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-                <p className={singleRow ? "font-playfair font-semibold text-[clamp(17px,5vw,21px)] md:text-2xl leading-tight text-white whitespace-nowrap" : "min-w-0 font-playfair font-semibold text-[22px] leading-tight text-white md:font-bold md:text-3xl md:leading-none md:text-[#D4AF37]"}>
+                <p className={singleRow ? "font-playfair font-semibold text-[clamp(17px,5vw,21px)] md:text-2xl leading-tight text-[#D4AF37] whitespace-nowrap" : "min-w-0 font-playfair font-semibold text-[22px] leading-tight text-white md:font-bold md:text-3xl md:leading-none md:text-[#D4AF37]"}>
                   {s.value.includes('★') ? <>{s.value.replace('★', '')}<span className="text-[#D4AF37] ml-0.5">★</span></> : s.value.replace('<1 min', '<1 min').replace('2 a 5h', '2 a 5 h')}
                 </p>
               </div>

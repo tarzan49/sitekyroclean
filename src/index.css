@@ -668,3 +668,66 @@ section.sr-inactive {
 .blog-body ul { list-style: disc; }
 .blog-body ol { list-style: decimal; }
 .blog-body li::marker { color: #b8945f; }
+
+/* Secções de ecrã inteiro (por agora só nos packs de sofá e cadeiras; as outras páginas entram depois de compactadas), computador e telemóvel (dono, 24 Nov):
+   cada secção ocupa o ecrã sem mostrar faixas das vizinhas, e o scroll encaixa
+   suavemente na secção seguinte. Secções mais altas do que o ecrã deixam ler
+   até ao fim antes de encaixar (comportamento do scroll-snap). */
+html.snap-sections { scroll-snap-type: y mandatory; scroll-padding-top: var(--header-h, 64px); }
+html.snap-sections main > section { scroll-snap-align: start; scroll-margin-top: 0 !important; min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
+html.snap-sections main > section[data-commercial-hero] { min-height: 100svh; }
+html.snap-sections footer { scroll-snap-align: end; }
+@media (prefers-reduced-motion: reduce) { html.snap-sections { scroll-snap-type: y proximity; } }
+/* Compactação das secções para caberem num ecrã (só nas páginas com encaixe). */
+html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16px; padding-bottom: 16px; }
+@media (max-width: 767px) {
+  html.snap-sections [data-commercial-hero] { padding-top: calc(var(--header-h, 57px) + 6px); }
+  html.snap-sections [data-hero-part="breadcrumb"],
+  html.snap-sections [data-hero-part="prices"],
+  html.snap-sections [data-commercial-hero] [aria-label="Escolher exemplo"] { display: none; }
+  /* As 3 informações (duração, resposta, secagem) ficam, numa faixa baixa. */
+  html.snap-sections [data-hero-part="stats"] .grid { padding-top: 6px; padding-bottom: 8px; }
+  html.snap-sections [data-hero-part="stats"] svg { display: none; }
+  html.snap-sections [data-hero-part="stats"] .grid > * > * { margin-top: 0; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child { aspect-ratio: 3 / 2; width: 100%; }
+  html.snap-sections [data-hero-part="title"] { font-size: 1.35rem; }
+  html.snap-sections [data-hero-part="subtitle"] { -webkit-line-clamp: 2; }
+  html.snap-sections [data-hero-part="proof"] > * { min-height: 44px; }
+  html.snap-sections [data-commercial-hero] .grid.items-center.gap-4 { gap: 6px; }
+  html.snap-sections [data-hero-part="title"] { font-size: 1.5rem; }
+  html.snap-sections [data-hero-part="subtitle"] { font-size: 13px; margin: 6px 0 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  html.snap-sections [data-hero-part="proof"] { margin-bottom: 8px; }
+  html.snap-sections [data-hero-part="whatsapp"] { min-height: 46px; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { display: none; }
+  /* Avaliações: o selo do Google já está no topo da página. */
+  html.snap-sections #avaliacoes a.inline-flex[target="_blank"] { display: none; }
+  html.snap-sections #avaliacoes h2 { font-size: 1.5rem; }
+  html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16px; padding-bottom: 16px; }
+}
+@media (min-width: 768px) {
+  html.snap-sections [data-commercial-hero] { padding-top: calc(var(--header-h, 61px) + 16px); }
+  html.snap-sections [data-commercial-hero] [aria-label="Escolher exemplo"] { display: none; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child { width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
+  html.snap-sections #avaliacoes a.inline-flex[target="_blank"] { display: none; }
+}
+@media (min-width: 768px) { html.snap-sections [data-hero-part="stats"] .grid { padding-top: 12px; padding-bottom: 12px; } }
+@media (min-width: 768px) {
+  html.snap-sections [data-hero-part="title"] { font-size: 2.2rem; }
+  html.snap-sections [data-hero-part="subtitle"] { font-size: 15px; margin-top: 8px; margin-bottom: 12px; }
+  html.snap-sections [data-hero-part="prices"] { display: none; }
+  html.snap-sections [data-hero-part="proof"] { margin-bottom: 12px; }
+  html.snap-sections [data-commercial-hero] > div:nth-of-type(3) { padding-bottom: 16px; }
+}
+/* Avaliações num só ecrã: cabeçalho junto, texto de cada avaliação em 4 linhas (o link abre a completa). */
+html.snap-sections #avaliacoes .mb-10 { margin-bottom: 16px; }
+html.snap-sections #avaliacoes .mb-10 p:last-child { display: none; }
+html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin-top: 12px; }
+@media (min-width: 768px) { html.snap-sections #avaliacoes h2 { font-size: 2rem; } html.snap-sections #avaliacoes .mb-10 { margin-bottom: 8px; } }
+/* Nas páginas de ecrã inteiro a barra fixa tapava o fundo de cada secção; o menu já tem o WhatsApp. */
+html.snap-sections [data-sticky-bar] { display: none; }
+/* O conteúdo de cada secção ocupa a largura toda (a centragem vertical em flex tirava-lha). */
+html.snap-sections main > section > * { width: 100%; }
+/* Telemóvel: o menu esconde-se ao descer, por isso a secção encaixa no topo do ecrã. */
+@media (max-width: 767px) { html.snap-sections { scroll-padding-top: 0; } html.snap-sections main > section { min-height: 100svh; } }

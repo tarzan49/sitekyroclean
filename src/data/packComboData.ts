@@ -3,6 +3,7 @@ import { locationPrices } from '../constants/travel';
 import { PACK_PERK_MATTRESS_OFF, PACK_PERK_CHAIRS_SET, PACK_PERK_LIMIT, PACK_PERK_RULE, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE } from '../constants/packPerks';
 import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import type { PackKind, PackExtra } from '../lib/customPack';
+import { botQuote } from '../lib/botQuote';
 import { formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, CHAIR_CLEANING_FROM, CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT, CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT, CHAIR_WATERPROOF_ESSENCIAL_UNIT } from './enginePrices';
 // These are editable starting combinations, not separate price lists.
 // Live amounts come from the same article tables used by the quote form.
@@ -13,8 +14,8 @@ import { formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FRO
 export interface PackCombo { id: string; name: string; slug: string; tagline: string; description: string; service1Slug: string; service2Slug: string; }
 export const packs: PackCombo[] = [
   { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Comece com sofá e colchão e adapte os tamanhos, quantidades e tratamentos. A estimativa e a deslocação aparecem no resumo.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
-  { id: 'sofa-impermeabilizacao', name: 'Limpeza e Impermeabilização de Sofá', slug: 'pack-sofa-impermeabilizacao', tagline: 'Limpe e proteja o seu sofá', description: 'Escolha limpeza com impermeabilização Premium até 10 anos, ou Essencial de 1 a 2 anos. O preço acompanha o tamanho e a versão escolhida.', service1Slug: 'limpeza-sofas', service2Slug: 'impermeabilizacao' },
-  { id: 'cadeiras-impermeabilizacao', name: 'Limpeza e Impermeabilização de Cadeiras', slug: 'pack-cadeiras-impermeabilizacao', tagline: 'Limpe e proteja as cadeiras da sala de jantar', description: 'Escolha o número de cadeiras e a impermeabilização Premium até 10 anos, ou Essencial de 1 a 2 anos. O preço por cadeira desce com a quantidade.', service1Slug: 'limpeza-cadeiras', service2Slug: 'impermeabilizacao' },
+  { id: 'sofa-impermeabilizacao', name: 'Limpeza e Impermeabilização de Sofá', slug: 'pack-sofa-impermeabilizacao', tagline: 'O seu sofá já não é novo, mas gostava que voltasse a parecer?', description: 'Tiramos a sujidade das fibras com uma limpeza profunda e protegemo-lo a seguir: vinho, café ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'impermeabilizacao' },
+  { id: 'cadeiras-impermeabilizacao', name: 'Limpeza e Impermeabilização de Cadeiras', slug: 'pack-cadeiras-impermeabilizacao', tagline: 'As cadeiras da mesa são as primeiras a sofrer com cada refeição?', description: 'Limpamos o tecido a fundo e protegemo-lo a seguir: molho, vinho ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, e o preço por cadeira desce com a quantidade.', service1Slug: 'limpeza-cadeiras', service2Slug: 'impermeabilizacao' },
   { id: 'sala-completa', name: 'Limpeza de Sofá, Cadeiras e Tapete', slug: 'pack-sala-completa', tagline: 'Sofá, cadeiras e tapetes à sua medida', description: 'Escolha os artigos da sala. Os tapetes ficam sempre sob orçamento: indique largura e comprimento de cada peça.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-tapetes' },
   { id: 'quarto-completo', name: 'Limpeza de Colchão e Tapete', slug: 'pack-quarto-completo', tagline: 'Personalize os cuidados do quarto', description: 'Combine colchões e tapetes e acrescente, se pretender, o tratamento anti-ácaros. Tapetes sempre sob orçamento, mediante medidas.', service1Slug: 'limpeza-colchoes', service2Slug: 'limpeza-tapetes' },
 ];
@@ -51,10 +52,14 @@ export const PACK_HOOK: Record<string, string> = {
 };
 
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */
-export function packPriceFrom(pack: PackCombo): string {
-  // Packs de impermeabilização: o "desde" é o da limpeza + proteção, nunca o de um serviço sozinho.
-  if (pack.id === 'sofa-impermeabilizacao') return formatEuro(SOFA_CLEAN_AND_PROTECT_FROM);
-  if (pack.id === 'cadeiras-impermeabilizacao') return `${formatEuro(CHAIR_CLEANING_FROM + CHAIR_WATERPROOF_ESSENCIAL_UNIT)}/cadeira`;
+export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
+  // Packs de limpeza + impermeabilização: o total mais baixo que o bot dá (dono, 24 Nov: preços iguais aos do bot),
+  // limpeza + Essencial de 1 lugar ou de 1 cadeira, com a deslocação da cidade.
+  if (pack.id === 'sofa-impermeabilizacao' || pack.id === 'cadeiras-impermeabilizacao') {
+    const item = pack.id === 'sofa-impermeabilizacao' ? { kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' } : { kind: 'chairs', qty: 1, treatment: 'clean+essencial' };
+    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
+    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total);
+  }
   const amounts = [pack.service1Slug, pack.service2Slug]
     .map(slug => services.find(s => s.slug === slug)?.priceFrom ?? '')
     .map(value => Number(value.replace('€', '').trim()))
@@ -66,6 +71,8 @@ export function packPriceFrom(pack: PackCombo): string {
 export function packFaqs(pack: PackCombo, cityName: string): { question: string; answer: string }[] {
   const fee = locationPrices[cityName];
   const travel = fee === undefined ? 'a deslocação é confirmada pela morada, a partir de 10€' : `a deslocação é de ${fee}€`;
+  // Packs de limpeza + impermeabilização: só as 5 perguntas próprias (dono, 24 Nov: as genéricas ninguém lê).
+  if (WATERPROOF_PACK_FAQS[pack.id]) return [waterproofPriceFaq(pack.id, cityName), ...WATERPROOF_COMMON];
   return [
     {
       question: `Quanto custa a ${pack.name.toLowerCase()} ${cityPrep(cityName)} ${cityName}?`,
@@ -85,6 +92,27 @@ export function packFaqs(pack: PackCombo, cityName: string): { question: string;
     },
     ...(WATERPROOF_PACK_FAQS[pack.id] ?? []),
   ];
+}
+
+/** Pergunta do preço com os totais do bot (botQuote), com a deslocação da cidade (dono, 24 Nov). */
+function waterproofPriceFaq(packId: string, cityName: string) {
+  const t = (item: Record<string, unknown>) => {
+    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
+    return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
+  };
+  const where = `${cityPrep(cityName)} ${cityName}`;
+  if (packId === 'sofa-impermeabilizacao') {
+    const s3 = (tr: string) => t({ kind: 'sofa', size: '3-lugares', treatment: tr });
+    return {
+      question: 'Quanto custa limpar e impermeabilizar um sofá?',
+      answer: `${where}, com a deslocação incluída: um sofá de 3 lugares fica em ${s3('clean+premium')} com a Premium ou ${s3('clean+essencial')} com a Essencial (só a limpeza, ${s3('clean')}). A partir de ${t({ kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' })} num sofá de 1 lugar. Escolha os lugares no início da página para ver o seu valor.`,
+    };
+  }
+  const c = (q: number, tr: string) => t({ kind: 'chairs', qty: q, treatment: tr });
+  return {
+    question: 'Quanto custa limpar e impermeabilizar cadeiras?',
+    answer: `${where}, com a deslocação incluída: 6 cadeiras ficam em ${c(6, 'clean+premium')} com a Premium ou ${c(6, 'clean+essencial')} com a Essencial (só a limpeza, ${c(6, 'clean')}). Uma cadeira, desde ${c(1, 'clean+essencial')}. Escolha o número de cadeiras no início da página para ver o seu valor.`,
+  };
 }
 
 /** Perguntas próprias dos packs com impermeabilização. Preços do motor (enginePrices). */
@@ -122,6 +150,11 @@ const WATERPROOF_PACK_FAQS: Record<string, { question: string; answer: string }[
     ...WATERPROOF_COMMON,
   ],
 };
+
+/** Junta a frase de abertura e a descrição sem pôr ponto depois de uma pergunta. */
+export function packIntro(pack: PackCombo, text = pack.description): string {
+  return /[?!.]$/.test(pack.tagline) ? `${pack.tagline} ${text}` : `${pack.tagline}. ${text}`;
+}
 
 /** Os outros packs, para a página se ligar aos irmãos na mesma cidade. */
 export function otherPacksInCity(packId: string, citySlug: string) {

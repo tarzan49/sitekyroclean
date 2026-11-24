@@ -22,6 +22,9 @@ export default function ServiceResultsGallery({ category, light = false, interva
   const thumbnailsRef = useRef<HTMLDivElement>(null);
   const item = pool[index % pool.length];
   const itemCategory = singleCategory ?? (item as { category?: BeforeAfterCategory }).category;
+  // Moldura fixa em 4:3 quando a galeria mistura tipos ou é de vídeos verticais (impermeabilização):
+  // o hero não muda de altura e as 3 características por baixo ficam no ecrã.
+  const fixedFrame = !singleCategory || singleCategory === "impermeabilizacao";
 
   useEffect(() => {
     const rail = thumbnailsRef.current;
@@ -55,7 +58,9 @@ export default function ServiceResultsGallery({ category, light = false, interva
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`overflow-hidden ${itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[3/4]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
+      {/* Galeria com tipos misturados (ex.: sofá + impermeabilização): moldura fixa em 4:3,
+          para o hero não mudar de altura quando passa um vídeo vertical. */}
+      <div className={`overflow-hidden ${fixedFrame ? "w-full aspect-[4/3] bg-black/40" : itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[3/4]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
         {item.kind === "pair" ? (
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
@@ -66,7 +71,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <div className="relative h-full w-full">
             <video key={index} src={item.src} poster={item.poster} autoPlay muted playsInline preload={priority && index === 0 ? "auto" : "metadata"}
               aria-label={item.alt ?? "Vídeo real: água derramada num sofá impermeabilizado escorre sem entrar no tecido"}
-              className="h-full w-full object-cover"
+              className={`h-full w-full ${fixedFrame ? "object-contain" : "object-cover"}`}
               onEnded={event => {
                 if (playing && !hovered && !focused && pool.length > 1) setIndex(current => (current + 1) % pool.length);
                 else event.currentTarget.play().catch(() => {});

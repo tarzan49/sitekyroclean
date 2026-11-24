@@ -1,5 +1,5 @@
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, MessageCircle, Phone } from "lucide-react";
 import {
   Sheet,
@@ -29,6 +29,13 @@ const serviceLinks = [
 ];
 
 const Header = () => {
+  // Altura real do menu fixo, para as secções de ecrã inteiro (index.css, dono 24 Nov).
+  useEffect(() => {
+    const set = () => document.documentElement.style.setProperty("--header-h", `${document.querySelector("header")?.getBoundingClientRect().height ?? 64}px`);
+    set();
+    window.addEventListener("resize", set);
+    return () => window.removeEventListener("resize", set);
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen]     = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
