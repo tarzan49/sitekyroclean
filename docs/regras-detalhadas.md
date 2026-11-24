@@ -1288,3 +1288,7 @@ Corrigido no caminho: o riscado da opção Premium contava a impermeabilização
 
 **"Pele de pêssego" = pele (dono, 24 Nov 2026, Rosa, Gaia):** o bot perguntou tecido ou pele, a cliente disse "Pele de pêssego" e ele escreveu "Sendo em tecido" e ofereceu Premium 219€ / Essencial 159€. Certo: só limpeza 89€ ou 129€ com o tratamento da pele. O material dito pelo cliente decide no código (kyro-bot `leatherGuard.ts`: `clientMaterial`, `applySaidMaterial`, `saidLeatherIssues`).
 - Cartões de material do sofá (widget e questionário): 2 fotografias sempre na horizontal, reais da equipa (dono, 24 Nov 2026: "Tem que ser 2 fotos horizontal se for sofá"); nada de castanho: dourado em degradê no escolhido, sem botões que não fazem nada ("Escolha o material").
+
+## Nunca pôr o preço em dúvida; askTeam sem semana nem dia (dono, 24 Nov 2026, Câmara de Lobos)
+
+Dono: "quando é que eu te ensinei que tu dizes a alguém se o valor fizer sentido?". O modelo inventou a frase (não estava em nenhuma regra). `dropIfPriceOk` (kyro-bot `agent.ts`) corta-a antes de sair. A mesma conversa pediu a semana e o dia porque a regra de 12/11 (Funchal e Coimbra = askWeek) ficou no contrato e na S59 depois da de 19/11 (askTeam) [RETIRADA 24/11]; `tavira0211Issues` trava a pergunta quando a ferramenta devolve askTeam. Câmara de Lobos é Madeira: sem horas do motor, a hora é a da equipa do Funchal.
