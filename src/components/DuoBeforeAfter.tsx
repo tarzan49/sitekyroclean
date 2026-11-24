@@ -10,7 +10,6 @@ function Half({ pair, run, label }: { pair: Pair; run: number; label: string }) 
   return <div className="relative aspect-[3/4] overflow-hidden bg-[#0c241a]">
     <img src={pair.before} alt={`${label} antes da limpeza`} decoding="async" className="absolute inset-0 h-full w-full object-cover" />
     <img key={run} src={pair.after} alt={`${label} depois da limpeza`} decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ animation: 'kyro-reveal 4.5s ease-in-out forwards' }} />
-    <span className="absolute bottom-2 left-2 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#D4AF37]">{label}</span>
   </div>;
 }
 
