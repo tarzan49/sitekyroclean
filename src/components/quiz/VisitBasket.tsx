@@ -172,6 +172,13 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
   return { kind: 'gift', value: g.value, what };
 }
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
+/** A peça pedida sozinha com cada serviço em separado (separatePrice.separate do motor). */
+function separateOf(city: string, it: BasketItem): number | null {
+  const q = toQuote(it);
+  if (!q) return null;
+  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { separate?: number } | null };
+  return typeof r.separatePrice?.separate === 'number' ? r.separatePrice.separate : null;
+}
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -487,6 +494,16 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
   // era o que a visita subia, não um preço).
   const totalWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? null : q.total; };
   const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? q.lines[others.length] ?? null : Math.round((q.total - (others.length ? base : 0)) * 100) / 100; };
+  // Preço de cada opção (dono, 25 Nov: "tens que meter os preços riscados [...] tudo direitinho"): com outras peças
+  // a deslocação já está paga, por isso mostra-se a linha desta peça na visita (sem a 2.ª deslocação); riscado =
+  // esta peça pedida sozinha (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice do motor).
+  const packPrice = (p: Partial<BasketItem>) => {
+    const it = { ...item, ...p };
+    const alone = aloneTotal(city, it);
+    const shown = others.length ? (() => { const q = quoteBasket(city, [...others, it]); return q.sob ? null : q.lines[others.length] ?? null; })() : alone;
+    const sep = separateOf(city, it) ?? alone;
+    return { shown, struck: sep !== null && shown !== null && sep > shown ? sep : null };
+  };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
@@ -530,7 +547,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
         {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{PACKS.map(p => (
           <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
             <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-            <span className="flex items-center gap-2">{(() => { const v = aloneTotal(city, { ...item, pack: p.pack }); return v === null ? null : <span className="text-base font-bold text-white">{formatEuro(v)}</span>; })()}{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+            <span className="flex items-center gap-2">{(() => { const { shown, struck } = packPrice({ pack: p.pack }); return shown === null ? null : <span className="text-right leading-tight">{struck !== null && <span className="mr-1.5 text-xs font-normal text-white/50 line-through">{formatEuro(struck)}</span>}<span className="text-base font-bold text-white">{formatEuro(shown)}</span>{struck !== null && <span className="block text-[11px] font-bold text-[#E8C964]">Poupa {formatEuro(struck - shown)}</span>}</span>; })()}{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
           </button>))}</div>}
         {rug && (() => {
           const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
