@@ -6,7 +6,7 @@ import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import QuizTopBadge from '@/components/quiz/QuizTopBadge';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calculateCustomPack, makePackItem, PACK_KIND_LABEL, type PackKind, type CustomPackItem, type PackExtra } from '@/lib/customPack';
-import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_PRICES } from '@/constants/packPerks';
+import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_PRICES, PACK_PERKS_ON } from '@/constants/packPerks';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
 import { WHATSAPP_BASE } from '@/constants/business';
 
@@ -325,7 +325,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
             {prices.savings > 0 && <div className="flex items-baseline justify-between font-semibold text-[#D4AF37]"><dt className="flex items-center gap-1"><BadgePercent className="h-4 w-4" />Poupa com o pack</dt><dd className="tabular-nums">{money(prices.savings)}</dd></div>}
           </dl>
           {prices.quote && <p className="mt-1.5 text-xs text-[#D4AF37]">+ artigos ou extras sob orçamento</p>}
-          {hasExtras && !prices.perkEligible && <p className="mt-1.5 text-xs leading-snug text-gold">
+          {PACK_PERKS_ON && hasExtras && !prices.perkEligible && <p className="mt-1.5 text-xs leading-snug text-gold">
             Faltam {money(PACK_PERK_MIN_ORDER - prices.tableSubtotal)} de subtotal para o preço de pack nos artigos acrescentados.
           </p>}
           {!hasExtras && items.length > 0 && <p className="mt-1.5 text-xs leading-snug text-white/60">

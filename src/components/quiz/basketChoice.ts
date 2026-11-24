@@ -5,7 +5,9 @@ import type { BasketItem } from './VisitBasket';
 
 export function choiceToItem(c: PackChoice): BasketItem {
   const id = `w${Date.now()}`;
-  if (c.kind === 'chairs') return { id, kind: 'chairs', qty: c.qty, pack: c.extra };
-  if (c.size === '6-lugares') return { id, kind: 'sofa', size: '5-lugares', seats: 6, qty: 1, pack: c.extra };
-  return { id, kind: 'sofa', size: c.size === 'foto' ? '3-lugares' : c.size, qty: 1, pack: c.extra };
+  // O widget só oferece Blindado/Protegido/Renovado; outro extra entra como só limpeza.
+  const pack: BasketItem['pack'] = c.extra === 'premium' || c.extra === 'essencial' ? c.extra : 'none';
+  if (c.kind === 'chairs') return { id, kind: 'chairs', qty: c.qty, pack };
+  if (c.size === '6-lugares') return { id, kind: 'sofa', size: '5-lugares', seats: 6, qty: 1, pack };
+  return { id, kind: 'sofa', size: c.size === 'foto' ? '3-lugares' : c.size, qty: 1, pack };
 }

@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { describe, expect, it } from 'vitest';
 import { bigOrderPrice, botQuote, listBotCities, resolveBotCity } from './botQuote';
 import { locationPrices } from '../constants/travel';
@@ -62,7 +63,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(pack?.travel).toBeLessThanOrEqual(10);
     expect(ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Sines' }).travel).toBe(20);
   });
-  it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
+  it.skipIf(!PACK_PERKS_ON)('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
     const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
     expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 209, 269, 159]);
     expect(ok({ items: [{ kind: 'sofa', size: '4-lugares' }], city: 'Porto' }).handToOwner).toBe(false);
@@ -91,7 +92,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const added = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
     expect(added.lines.map(l => l.amount)).toEqual([69, 119]);
   });
-  it('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
+  it.skipIf(!PACK_PERKS_ON)('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
     expect(r.lines.map(l => l.amount)).toEqual([79, 55]);
     expect([r.subtotal, r.savings, r.travel, r.total]).toEqual([134, 14, 0, 134]);
@@ -253,15 +254,15 @@ describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
   });
 });
 
-describe('anti-odor em tapetes (dono, 12 Nov 2026: +15€, 5€ o m²)', () => {
-  it('máx(15€, 5€ × m², para baixo), numa linha própria, somado ao preço do tapete', () => {
+describe('anti-odor em tapetes (dono, 24 Nov 2026: sempre 5€ o m²)', () => {
+  it('5€ × m², para baixo, sem mínimo, numa linha própria, somado ao preço do tapete', () => {
     const plain = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
     const smelly = ok({ items: [{ kind: 'rug', width: 2, length: 3, odor: true }], city: 'Lisboa' });
-    expect(smelly.rugOdor).toMatchObject({ amount: 30, min: 15, perM2: 5 });
+    expect(smelly.rugOdor).toMatchObject({ amount: 30, min: 0, perM2: 5 });
     expect(smelly.lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor tapete 2 x 3 m', amount: 30 });
     expect(smelly.rugEstimate?.ok && plain.rugEstimate?.ok && smelly.rugEstimate.homePrice - plain.rugEstimate.homePrice).toBe(30);
-    // A small rug pays the 15€ floor; 1,55 x 2,35 = 3,64 m² → 18€.
-    expect(ok({ items: [{ kind: 'rug', width: 1.2, length: 1.7, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(15);
+    // No floor since 24 Nov: 1,2 x 1,7 = 2,04 m² → 10€; 1,55 x 2,35 = 3,64 m² → 18€.
+    expect(ok({ items: [{ kind: 'rug', width: 1.2, length: 1.7, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(10);
     expect(ok({ items: [{ kind: 'rug', width: 1.55, length: 2.35, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(18);
     // With a sofa in the same visit: on the combo price.
     const combo = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });

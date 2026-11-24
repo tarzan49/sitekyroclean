@@ -49,7 +49,7 @@ import { getAllProblemCityRoutes, getProblemCities, problemCityBenefits, problem
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
-import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity } from '../src/data/packComboData';
+import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity, MITES_PACKS } from '../src/data/packComboData';
 import { PACK_PERK_RULE, PACK_PERK_LIMIT, PACK_PERK_BULLETS } from '../src/constants/packPerks';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug, marcas } from '../src/data/marcaSofaData';
 import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from '../src/data/marcaCities';
@@ -955,7 +955,7 @@ export function prerenderRoutes(outDir: string): number {
       const heading = `${data.pack.name} ${prep} ${data.city.name}`;
       const title = `${heading} | Kyro Clean Solutions`;
       const desc  = `${data.pack.description} Serviço ao domicílio ${prep} ${data.city.name}.`;
-      const packServiceLinks = [data.pack.service1Slug, data.pack.service2Slug]
+      const packServiceLinks = [...new Set([data.pack.service1Slug, data.pack.service2Slug])]
         .map(slug => services.find(item => item.slug === slug))
         .filter((item): item is typeof services[number] => Boolean(item))
         .map(item => ({ href: `/${item.slug}-${data.city.slug}`, label: `${item.name} ${prep} ${data.city.name}` }));
@@ -978,7 +978,7 @@ export function prerenderRoutes(outDir: string): number {
           breadcrumb: crumbs.map(crumb => ({ label: crumb.name, href: crumb.url.replace(BASE_URL, '') })),
           h1: heading,
           intro: packIntro(data.pack),
-          howItWorks: `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e tapetes e alcatifas ficam sempre sob orçamento.`,
+          howItWorks: data.pack.id === 'tapete-anti-odor' ? 'Indique as medidas aproximadas do tapete e escolha a lavagem com anti-odor ou só a lavagem: o preço final aparece logo, com a deslocação incluída. O anti-odor é 5€ por m² e só existe com a lavagem, na mesma visita.' : MITES_PACKS[data.pack.id] ? 'Escolha o tamanho no início da página e veja o total com a deslocação incluída: limpeza com anti-ácaros (produto Bactran) ou só a limpeza. A extração retira o pó e os ácaros das fibras; o Bactran elimina bactérias, bolores e odores.' : `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e tapetes e alcatifas ficam sempre sob orçamento.`,
           faqs,
           links,
           linksHeading: `Serviços e packs ${prep} ${data.city.name}`,
@@ -1149,14 +1149,14 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/guia-de-packs',
         title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
-        desc: 'Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita, com preço de pack no artigo acrescentado. Orçamento grátis.',
+        desc: 'Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita e uma só deslocação. Orçamento grátis.',
         content: {
           // O mesmo que a página React mostra: os quatro packs, a regra do
           // preço de pack e o diretório completo. Antes só havia <h1> e
           // introdução, e o hub não ligava a nenhuma das 244 páginas de pack.
           breadcrumb: [{ label: 'Início', href: '/' }, { label: 'Guia de Packs' }],
           h1: 'Packs de Limpeza',
-          intro: 'Vários artigos na mesma visita: uma só deslocação e preço de pack em cada artigo que acrescentar. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
+          intro: 'Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
           problems: packs.map(pack => ({ title: pack.name, description: packIntro(pack, PACK_HOOK[pack.id] ?? pack.description) })),
           howItWorks: PACK_PERK_LIMIT,
           benefits: PACK_PERK_BULLETS,

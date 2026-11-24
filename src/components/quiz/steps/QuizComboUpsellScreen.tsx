@@ -461,7 +461,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
         Quer limpar mais alguma coisa?
       </h2>
       <p className="text-sm text-white/80 text-center max-w-xs leading-relaxed -mt-1">
-        Preço reduzido em cada artigo que juntar a esta visita, a partir de {PACK_PERK_MIN_ORDER}€ de subtotal. Deslocação excluída.
+        Cada artigo ao preço de tabela, com uma só deslocação.
       </p>
 
       {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.

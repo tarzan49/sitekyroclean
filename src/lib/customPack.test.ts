@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { describe, it, expect } from 'vitest';
 import { calculateCustomPack, makePackItem, customPackLine, packItemValid } from './customPack';
 import { sofaPrices } from '../components/quiz/QuizTypes';
@@ -28,7 +29,7 @@ describe('custom pack commercial rules', () => {
   // 2026-09-23 (decisão do responsável): o pack não desconta o pedido todo —
   // dá as mesmas regalias do upsell do quiz ao artigo acrescentado. Os preços
   // vivem em constants/packPerks.ts e são partilhados com o quiz.
-  it('charges the table price for the first article and the pack price for the next', () => {
+  it.skipIf(!PACK_PERKS_ON)('charges the table price for the first article and the pack price for the next', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'king' }];
     const result = calculateCustomPack(items, 'Barcelos');
     expect(result.lines[0].amount).toBe(79);
@@ -39,13 +40,13 @@ describe('custom pack commercial rules', () => {
     expect(result.subtotal).toBe(144);
     expect(result.savings).toBe(PACK_PERK_MATTRESS_OFF);
   });
-  it('prices an added sofa at the same fixed amount the quiz upsell shows', () => {
+  it.skipIf(!PACK_PERKS_ON)('prices an added sofa at the same fixed amount the quiz upsell shows', () => {
     for (const size of Object.keys(PACK_PERK_SOFA_PRICE)) {
       const items = [{ ...makePackItem('mattress', 'm'), size: 'casal' }, { ...makePackItem('sofa', 's'), size }];
       expect(calculateCustomPack(items, 'Braga').lines[1].amount).toBe(PACK_PERK_SOFA_PRICE[size]);
     }
   });
-  it('offers one chair per set of four when chairs are added to the pack', () => {
+  it.skipIf(!PACK_PERKS_ON)('offers one chair per set of four when chairs are added to the pack', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '2-lugares' }, { ...makePackItem('chairs', 'c'), qty: 8 }];
     const result = calculateCustomPack(items, 'Braga');
     const table = result.lines[1].tablePrice!;
@@ -59,7 +60,7 @@ describe('custom pack commercial rules', () => {
     expect(result.lines[1].perkApplied).toBe(false);
     expect(result.lines[1].amount).toBe(result.lines[1].tablePrice);
   });
-  it('still discounts an added mattress with anti-acaros (owner exception, 2026-09-24)', () => {
+  it.skipIf(!PACK_PERKS_ON)('still discounts an added mattress with anti-acaros (owner exception, 2026-09-24)', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'king', extra: 'anti-acaros' as const }];
     const result = calculateCustomPack(items, 'Braga');
     expect(result.lines[1].perkApplied).toBe(true);
@@ -85,7 +86,7 @@ describe('custom pack commercial rules', () => {
     expect(result.lines[1].amount).toBe(result.lines[1].tablePrice);
     expect(result.savings).toBe(0);
   });
-  it('unlocks the pack price for the second article once the table subtotal reaches the minimum', () => {
+  it.skipIf(!PACK_PERKS_ON)('unlocks the pack price for the second article once the table subtotal reaches the minimum', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '2-lugares' }, { ...makePackItem('chairs', 'c'), qty: 4 }];
     const result = calculateCustomPack(items, 'Braga');
     expect(result.tableSubtotal).toBeGreaterThanOrEqual(PACK_PERK_MIN_ORDER);
@@ -105,7 +106,7 @@ describe('custom pack commercial rules', () => {
     expect(mattresses.lines[2].amount).toBe(79);
     expect(mattresses.lines[2].isMain).toBe(true);
   });
-  it('gives an added rug the same per-m² offer as the quiz, only when the pack applies', () => {
+  it.skipIf(!PACK_PERKS_ON)('gives an added rug the same per-m² offer as the quiz, only when the pack applies', () => {
     const eligible = calculateCustomPack([{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'casal' }, { ...makePackItem('rug', 'r'), width: '2', length: '3' }], 'Braga');
     expect(eligible.lines[2].amount).toBeNull();
     expect(eligible.lines[2].perkNote).toBe(PACK_PERK_RUG_NOTE);

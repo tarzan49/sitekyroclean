@@ -370,11 +370,11 @@ function addToPrices<T extends object>(r: T, amount: number, lines: QuoteLine[],
 }
 
 /**
- * Anti-odour on a rug or carpet (cheiro, urina), bot only (owner, 12 Nov 2026: "+15€ de anti-odor;
- * dependendo dos m², 5€ o m²"): per rug, the larger of 15€ and 5€ × its m², rounded down. Item flag
+ * Anti-odour on a rug or carpet (cheiro, urina), bot only (owner, 24 Nov 2026: "anti odor sera sempre
+ * 5 euros m2"; the 15€ floor of 12 Nov is gone): per rug, 5€ × its m², rounded down. Item flag
  * `odor: true` on the rug's cleaning item; its own line, already summed into the prices.
  */
-export const RUG_ODOR = { min: 15, perM2: 5 } as const;
+export const RUG_ODOR = { min: 0, perM2: 5 } as const;
 export const RUG_ODOR_RULE = 'Já está somado ao preço (total, ou homePrice/pickupPrice/comboPrice nos tapetes): não somes outra vez. Diz o anti-odor numa linha à parte.';
 const rugOdorUnit = (w: number, l: number) => Math.max(RUG_ODOR.min, Math.floor(w * l * RUG_ODOR.perM2 + 1e-9));
 

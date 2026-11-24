@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Clock, Hourglass, MessageCircle, Star, Timer } from 'lucide-react';
 import { GoogleG } from './icons/GoogleG';
 import HeroBeforeAfterPool from './HeroBeforeAfterPool';
+import DuoBeforeAfter, { type DuoSide } from './DuoBeforeAfter';
 import ServiceSnapshotStats from './ServiceSnapshotStats';
 import type { BreadcrumbItem } from './PageBreadcrumb';
 import { categoryForServiceSlug } from '@/data/beforeAfterPool';
@@ -18,6 +19,8 @@ interface Props {
   // Páginas de pack combinam dois serviços — a galeria antes/depois
   // intercala as duas categorias em vez de mostrar só a do serviceSlug.
   secondaryServiceSlug?: string;
+  /** Antes/depois das duas peças lado a lado, com um + (pack sofá + colchão). */
+  duo?: { left: DuoSide; right: DuoSide; third?: DuoSide };
   city?: string;
   municipality?: string;
   price?: string;
@@ -35,7 +38,7 @@ interface Props {
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false, duo }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
@@ -87,7 +90,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">
-          {category && <HeroBeforeAfterPool category={category} className="border-t-2 border-[#D4AF37]" />}
+          {duo ? <DuoBeforeAfter left={duo.left} right={duo.right} third={duo.third} className="border-t-2 border-[#D4AF37]" /> : category && <HeroBeforeAfterPool category={category} className="border-t-2 border-[#D4AF37]" />}
         </div>
       </div>
     </div>
