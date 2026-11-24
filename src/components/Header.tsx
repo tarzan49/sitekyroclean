@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/hover-card";
 import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
-import { WHATSAPP_BASE, PHONE_TEL } from "@/constants/business";
+import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const serviceLinks = [
@@ -27,6 +27,8 @@ const serviceLinks = [
   { to: '/limpeza-cadeiras', label: 'Cadeiras' },
   { to: '/impermeabilizacao',label: 'Impermeabilização' },
 ];
+// No menu do telemóvel: as 5 peças + os packs, aos pares, e a impermeabilização em linha inteira.
+const mobileServiceLinks = [...serviceLinks.slice(0, 5), { to: '/guia-de-packs', label: 'Packs' }, serviceLinks[5]];
 
 const Header = () => {
   // Altura real do menu fixo, para as secções de ecrã inteiro (index.css, dono 24 Nov).
@@ -37,7 +39,6 @@ const Header = () => {
     return () => window.removeEventListener("resize", set);
   }, []);
   const [mobileMenuOpen, setMobileMenuOpen]     = useState(false);
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const navigate  = useNavigate();
   const location  = useLocation();
@@ -210,102 +211,51 @@ const Header = () => {
               </button>
             </SheetTrigger>
 
-            <SheetContent side="left" className="w-[270px] max-w-[90vw] p-0 flex flex-col rounded-none">
-              <SheetHeader className="px-6 py-5 border-b border-[#111111]/8">
+            {/* Menu do telemóvel premium (dono, 24 Nov): verde escuro, letra grande, dourado só no essencial. */}
+            <SheetContent side="left" className="w-[86vw] max-w-[340px] p-0 flex flex-col rounded-none border-r-0 bg-[#0c241a] text-white [&>button]:text-white [&>button]:opacity-80">
+              <SheetHeader className="px-6 pt-5 pb-4 border-b border-white/10">
                 <SheetTitle className="text-left">
-                  <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-                    <span className="font-playfair text-base font-normal text-[#111111] leading-none">
-                      Kyro Clean Solutions
+                  <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block">
+                    <span className="block font-playfair text-xl font-normal text-white leading-none">Kyro Clean Solutions</span>
+                    <span className="mt-2 flex items-center gap-1.5 text-xs font-normal text-white/70">
+                      <span className="text-[#D4AF37] tracking-[0.1em]">★★★★★</span>{REVIEW_RATING} · +{REVIEW_COUNT} avaliações Google
                     </span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>
 
-              <nav className="flex-1 flex flex-col px-4 py-4 gap-0.5 overflow-y-auto">
-                <button
-                  onClick={scrollToTop}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
-                >
-                  Início
-                </button>
-
-                <div>
-                  <button
-                    onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                    className="w-full text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 flex items-center justify-between transition-colors"
-                  >
-                    Serviços
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {mobileServicesOpen && (
-                    <div className="pl-4 pb-2 space-y-0.5">
-                      {serviceLinks.map(s => (
-                        <Link
-                          key={s.to}
-                          to={s.to}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`block text-[11px] tracking-[0.08em] uppercase py-3 px-3 transition-colors ${
-                            location.pathname === s.to
-                              ? 'text-[#111111]'
-                              : 'text-[#111111]/40 hover:text-[#111111]'
-                          }`}
-                        >
-                          {s.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+              <nav className="flex-1 overflow-y-auto px-6 pt-4 pb-2">
+                <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">Serviços</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {mobileServiceLinks.map(s => {
+                    const active = location.pathname === s.to;
+                    return <Link key={s.to} to={s.to} onClick={() => setMobileMenuOpen(false)}
+                      className={`${s.to === '/impermeabilizacao' ? 'col-span-2 ' : ''}flex min-h-11 items-center rounded-xl border px-3 text-[15px] font-medium transition-colors ${active ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/15 bg-white/[0.04] text-white/90 active:bg-white/10'}`}>
+                      {s.label}
+                    </Link>;
+                  })}
                 </div>
-
-                <button
-                  onClick={() => scrollToSection('testemunhos')}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
-                >
-                  Testemunhos
-                </button>
-
-                <Link
-                  to="/blog"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
-                >
-                  Blog
-                </Link>
-
-                <Link
-                  to="/perguntas-frequentes-limpeza-estofos"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
-                >
-                  FAQ
-                </Link>
+                <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-2">
+                  <button onClick={() => scrollToSection('testemunhos')} className="flex min-h-11 items-center font-playfair text-[17px] text-white">Testemunhos</button>
+                  <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className="flex min-h-11 items-center font-playfair text-[17px] text-white">Blog</Link>
+                  <Link to="/perguntas-frequentes-limpeza-estofos" onClick={() => setMobileMenuOpen(false)} className="flex min-h-11 items-center font-playfair text-[17px] text-white">FAQ</Link>
+                </div>
               </nav>
 
-              <div className="px-4 pb-6 pt-3 border-t border-[#111111]/8 space-y-2.5">
-                <button
-                  onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
-                  className="w-full border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#D4AF37]/6 transition-colors"
-                >
+              <div className="px-6 pb-5 pt-3 border-t border-white/10 space-y-2">
+                <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="header_mobile_menu"
+                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]">
+                  <MessageCircle className="w-4 h-4" strokeWidth={2.2} />
+                  Pedir preço no WhatsApp
+                </a>
+                <button onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
+                  className="flex min-h-12 w-full items-center justify-center rounded-xl border border-[#D4AF37] text-[15px] font-semibold text-[#D4AF37]">
                   Agendar limpeza
                 </button>
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-tracking-source="header_mobile_menu"
-                  className="w-full border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" strokeWidth={2} />
-                  WhatsApp
-                </a>
-                <a
-                  href={`tel:${PHONE_TEL}`}
-                  data-tracking-source="header_mobile_menu"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#111111]/70" strokeWidth={2} />
-                  Ligar
+                <a href={`tel:${PHONE_TEL}`} data-tracking-source="header_mobile_menu" onClick={() => setMobileMenuOpen(false)}
+                  className="flex min-h-11 w-full items-center justify-center gap-2 text-sm text-white/75">
+                  <Phone className="w-4 h-4" strokeWidth={2} />
+                  Ligar {PHONE_DISPLAY}
                 </a>
               </div>
             </SheetContent>
