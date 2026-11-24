@@ -797,6 +797,12 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #mesma-visita .grid, html.snap-sections [data-pack-banner] .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
   html.snap-sections #mesma-visita .grid > *, html.snap-sections [data-pack-banner] .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
 }
+/* "Aproveite a mesma visita" vive dentro de um div (#mesma-visita): sem isto não era ponto de paragem e o encaixe
+   podia saltá-la entre o passo a passo e as zonas (24 Nov). Ocupa o ecrã como as outras. */
+html.snap-sections main #mesma-visita { scroll-snap-align: start; scroll-margin-top: 0 !important; }
+html.snap-sections main #mesma-visita > section { min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
+html.snap-sections main #mesma-visita > section > * { width: 100%; }
+@media (max-width: 767px) { html.snap-sections main #mesma-visita > section { padding-bottom: 92px; } }
 html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-top: 76px !important; padding-bottom: 28px !important; }
 @media (min-width: 768px) { html.snap-sections main > section#orcamento { padding-top: 100px; padding-bottom: 100px; } }
 html.snap-sections main > div#testemunhos { scroll-snap-align: start; }
