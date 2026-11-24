@@ -58,7 +58,7 @@ import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug, marcasCadeira
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { glossaryTerms } from '../src/data/glossaryTerms';
-import { getAllCommercialRoutes, getCommercialPageData, COMMERCIAL_CITIES } from '../src/data/commercialSeoData';
+import { getAllCommercialRoutes, getCommercialPageData, getSector, COMMERCIAL_CITIES, SECTORS, CONTRACT_POINTS } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildHowToNode, buildServicePageSchema, offerForPriceLabel } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
@@ -1472,30 +1472,32 @@ export function prerenderRoutes(outDir: string): number {
   {
     const prev = count;
     for (const route of getAllCommercialRoutes()) {
-      const data = getCommercialPageData(route.citySlug);
-      if (!data) continue;
+      // A mesma página para setor e cidade (CommercialPage): o HTML diz o mesmo que o React.
+      const sector = getSector(route.citySlug);
+      const data = sector ? null : getCommercialPageData(route.citySlug);
+      const page = sector ?? data;
+      if (!page) continue;
       const schemas: object[] = [
         buildBreadcrumbSchema([
           { name: 'Início', url: BASE_URL + '/' },
-          { name: data.h1, url: BASE_URL + route.path },
+          { name: page.h1, url: BASE_URL + route.path },
         ]),
       ];
+      const cityLinks = COMMERCIAL_CITIES.filter(city => city.slug !== route.citySlug).map(city => ({ href: `/limpeza-comercial-${city.slug}`, label: `Limpeza comercial ${cityPrep(city.name)} ${city.name}` }));
+      const sectorLinks = SECTORS.filter(s => s.key !== route.citySlug).map(s => ({ href: `/limpeza-comercial-${s.key}`, label: `${s.label}: ${s.short}` }));
       emit(
         route.path,
-        data.title,
-        data.metaDescription,
+        page.title,
+        page.metaDescription,
         {
-          h1: data.h1,
-          intro: data.intro,
-          localSection: data.coverage,
-          problems: data.segments.map(s => ({ title: s.label, description: `${s.painPoints.join(' ')} ${s.solution}` })),
-          benefits: data.benefits,
-          faqs: data.faqs,
-          // As 20 páginas B2B não tinham nenhuma ligação interna: nunca houve
-          // hub para elas. O rodapé passou a ligar as quatro cabeças de
-          // região; estas ligações entre cidades alcançam as restantes.
-          links: COMMERCIAL_CITIES.filter(city => city.slug !== route.citySlug).map(city => ({ href: `/limpeza-comercial-${city.slug}`, label: `Limpeza comercial ${cityPrep(city.name)} ${city.name}` })),
-          linksHeading: 'Limpeza comercial noutras cidades',
+          h1: page.h1,
+          intro: page.intro,
+          localSection: sector ? (sector.rules.map(r => `${r.text} (${r.source})`).join(' ') + (sector.rulesNote ? ` ${sector.rulesNote}` : '')) || undefined : data!.coverage,
+          problems: sector ? sector.items.map(it => ({ title: it.item, description: it.detail })) : SECTORS.map(s => ({ title: s.label, description: s.short })),
+          benefits: [...CONTRACT_POINTS, 'Lumiere Restaurante (avaliação Google): "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️"'],
+          faqs: page.faqs,
+          links: [...sectorLinks, ...cityLinks],
+          linksHeading: 'Limpeza comercial por setor e por cidade',
         },
         schemas,
       );

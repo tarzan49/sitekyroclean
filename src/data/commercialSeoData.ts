@@ -1,110 +1,181 @@
 import { locationPrices } from '../constants/travel';
-// B2B / commercial SEO pages — restaurantes, hotéis e escritórios que precisam
-// de limpeza de estofos em regime de contrato recorrente, não o cliente
-// avulso do quiz. CTA e tom diferentes de propósito: orçamento personalizado
-// por WhatsApp, não o calculador de preço fixo (o preço de um contrato
-// depende do número de peças e da frequência, não faz sentido num quiz).
-//
-// Cidades: as praças de maior densidade comercial/hoteleira dentro das 3
-// regiões onde a Kyro já opera (Porto/Norte, Coimbra, Lisboa/AML, Algarve) — mesmo
-// critério já usado em packComboData.ts/marcaSofaData.ts para escolher
-// "cidades grandes" sem replicar as ~53 cidades todas.
+import { cities, cityPrep } from './serviceCatalog';
+// Páginas comerciais (B2B). Dono, 24 Nov: "aumenta para o país todo [...] já trabalhamos com hotéis,
+// restaurantes, cafés, com tudo [...] layout como as outras, só que específicas, com mais profissionalismo".
+// Duas famílias, no mesmo molde (CommercialPage):
+//   /limpeza-comercial-{cidade}  = as 102 cidades onde operamos (`cities`), com os setores ligados;
+//   /limpeza-comercial-{setor}   = uma página nacional por setor, com o que limpamos nesse setor e as
+//                                  obrigações legais lidas na fonte (nunca inventadas).
+// Setor × cidade ficaria com 400+ páginas quase iguais; fica setor nacional + cidade (por confirmar com o dono).
+// Nada de descontos de contrato, visitas grátis nem testemunhos que não existam: só factos do negócio.
 
-import { cityPrep } from "./serviceCatalog";
+export type CommercialRegion = 'Porto' | 'Braga' | 'Coimbra' | 'Lisboa' | 'Algarve' | 'Madeira';
 
 export interface CommercialCity {
   name: string;
   slug: string;
-  region: "Porto" | "Coimbra" | "Lisboa" | "Algarve" | "Madeira";
+  region: CommercialRegion;
 }
 
-export const COMMERCIAL_CITIES: CommercialCity[] = [
-  // Porto / Norte
-  { name: "Porto", slug: "porto", region: "Porto" },
-  { name: "Vila Nova de Gaia", slug: "vila-nova-de-gaia", region: "Porto" },
-  { name: "Matosinhos", slug: "matosinhos", region: "Porto" },
-  { name: "Braga", slug: "braga", region: "Porto" },
-  { name: "Guimarães", slug: "guimaraes", region: "Porto" },
-  { name: "Barcelos", slug: "barcelos", region: "Porto" },
-  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "Porto" },
-  { name: "Maia", slug: "maia", region: "Porto" },
-  { name: "Póvoa de Varzim", slug: "povoa-de-varzim", region: "Porto" },
-  // Norte Litoral (2026-09-28): hotelaria e restauração de praia
-  { name: "Vila do Conde", slug: "vila-do-conde", region: "Porto" },
-  { name: "Espinho", slug: "espinho", region: "Porto" },
-  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "Porto" },
-  // Coimbra e Centro (trabalhador local desde 2026-09-28)
-  { name: "Coimbra", slug: "coimbra", region: "Coimbra" },
-  { name: "Figueira da Foz", slug: "figueira-da-foz", region: "Coimbra" },
-  { name: "Leiria", slug: "leiria", region: "Coimbra" },
-  { name: "Fátima", slug: "fatima", region: "Coimbra" },
-  { name: "Nazaré", slug: "nazare", region: "Coimbra" },
-  // Madeira (equipa própria; dono, 17 Nov): hotelaria e alojamento local
-  { name: "Funchal", slug: "funchal", region: "Madeira" },
-  { name: "Santa Cruz", slug: "santa-cruz", region: "Madeira" },
-  // Lisboa / Área Metropolitana
-  { name: "Lisboa", slug: "lisboa", region: "Lisboa" },
-  { name: "Cascais", slug: "cascais", region: "Lisboa" },
-  { name: "Sintra", slug: "sintra", region: "Lisboa" },
-  { name: "Oeiras", slug: "oeiras", region: "Lisboa" },
-  { name: "Almada", slug: "almada", region: "Lisboa" },
-  { name: "Setúbal", slug: "setubal", region: "Lisboa" },
-  { name: "Sesimbra", slug: "sesimbra", region: "Lisboa" },
-  // Algarve
-  { name: "Faro", slug: "faro", region: "Algarve" },
-  { name: "Albufeira", slug: "albufeira", region: "Algarve" },
-  { name: "Portimão", slug: "portimao", region: "Algarve" },
-  { name: "Lagos", slug: "lagos", region: "Algarve" },
-  { name: "Loulé", slug: "loule", region: "Algarve" },
-  { name: "Tavira", slug: "tavira", region: "Algarve" },
-];
+const AREA_REGION: Record<string, CommercialRegion> = {
+  porto: 'Porto', braga: 'Braga', coimbra: 'Coimbra', lisboa: 'Lisboa', algarve: 'Algarve', madeira: 'Madeira',
+};
 
-export type SegmentKey = "restaurantes" | "hoteis" | "escritorios";
+export const COMMERCIAL_CITIES: CommercialCity[] = cities.map(c => ({
+  name: c.name,
+  slug: c.slug,
+  region: AREA_REGION[c.area] ?? 'Lisboa',
+}));
 
-export interface SegmentContent {
+export type SegmentKey = 'hoteis' | 'alojamento-local' | 'restaurantes' | 'escritorios';
+
+export interface SectorRule {
+  /** O que a norma obriga, em paráfrase fiel. */
+  text: string;
+  /** Diploma e ponto exatos. */
+  source: string;
+  url: string;
+}
+
+export interface SectorData {
   key: SegmentKey;
+  /** Rótulo curto nos cartões. */
   label: string;
-  overline: string;
-  painPoints: string[];
-  solution: string;
+  /** Uma linha nos cartões das páginas de cidade. */
+  short: string;
+  video: 'hotel' | 'alojamento' | 'restaurante' | 'escritorio';
+  title: string;
+  metaDescription: string;
+  h1: string;
+  intro: string;
+  /** O que limpamos neste setor (peça + porquê). */
+  items: { item: string; detail: string }[];
+  rules: SectorRule[];
+  /** Frase que liga as regras ao serviço, sem afirmar mais do que a norma diz. */
+  rulesNote: string;
+  faqs: { question: string; answer: string }[];
 }
 
-const SEGMENTS: Omit<SegmentContent, "painPoints" | "solution">[] = [
-  { key: "restaurantes", label: "Restaurantes", overline: "Hotelaria e Restauração" },
-  { key: "hoteis", label: "Hotéis e Alojamento Local", overline: "Hotelaria" },
-  { key: "escritorios", label: "Escritórios", overline: "Espaços de Trabalho" },
+// Pontos do contrato: só o que é verdade em qualquer serviço da Kyro (CLAUDE.md §3).
+export const CONTRACT_POINTS: string[] = [
+  'Fatura com IVA em nome da empresa (preços sem IVA, +23%), paga por transferência',
+  'Marcamos antes de abrir, depois de fechar ou ao fim de semana',
+  'Fotografias de antes e depois no fim de cada visita',
+  'Secagem de 2 a 5 horas; com impermeabilização, 24 horas sem uso',
+  'Uma visita, por época ou regular: a frequência é sua',
+  'Um só contacto no WhatsApp para pedir ou mudar',
 ];
 
-function segmentContent(segment: SegmentKey, cityName: string, prep: string): { painPoints: string[]; solution: string } {
-  switch (segment) {
-    case "restaurantes":
-      return {
-        painPoints: [
-          `Estofos de bancos e cadeiras acumulam manchas de comida, gordura e vinho todos os dias, visíveis a quem entra ${prep} ${cityName}`,
-          "Odores de cozinha e de clientes fumadores absorvem-se no tecido e não saem com limpeza normal",
-          "Fecho para limpeza profunda não é opção",
-        ],
-        solution: `Limpeza e desodorização profissional de bancos, cadeiras e sofás de espera, fora do horário de serviço (antes da abertura, depois do fecho ou em dia de descanso), com secagem rápida para não atrasar a reabertura.`,
-      };
-    case "hoteis":
-      return {
-        painPoints: [
-          `Rotatividade alta de hóspedes exige estofos de quartos e áreas comuns sempre apresentáveis, com pouca margem entre check-out e check-in ${prep} ${cityName}`,
-          "Manchas, odores e alergénios em colchões e cabeceiras afetam diretamente as avaliações online",
-          "Grandes volumes (dezenas de quartos) exigem uma equipa que cumpra prazos apertados",
-        ],
-        solution: "Higienização de colchões, cabeceiras, cadeirões e sofás de lobby em regime de contrato recorrente, com agendamento por lotes de quartos e relatório fotográfico por peça, para o rececionista confirmar antes de libertar o quarto.",
-      };
-    case "escritorios":
-      return {
-        painPoints: [
-          `Cadeiras e sofás de receção refletem diretamente a imagem da empresa a clientes e visitas ${prep} ${cityName}`,
-          "Uso intensivo em open-space acumula ácaros e alergénios que afetam a qualidade do ar",
-          "Coordenar acesso ao escritório fora do horário comercial é normalmente complicado",
-        ],
-        solution: "Higienização periódica de cadeiras de escritório, sofás de receção e áreas de espera, agendada para fins de semana ou fora de horas, com fatura mensal única para toda a conta.",
-      };
-  }
+const IVA_FAQ = { question: 'Passam fatura com IVA?', answer: 'Sim, sempre em nome da empresa e com o NIF. Os preços são sem IVA e acrescem 23%; o pagamento é feito por transferência para a conta da Kyro.' };
+const HOURS_FAQ = { question: 'Trabalham fora do horário de funcionamento?', answer: 'Sim. Marcamos antes de abrir, depois de fechar ou ao fim de semana, conforme o espaço. A secagem leva 2 a 5 horas.' };
+const PRICE_FAQ = { question: 'Como é feito o preço?', answer: 'Pelo número e tipo de peças e pela frequência. Envie-nos fotografias e as quantidades no WhatsApp e respondemos com a proposta.' };
+
+export const SECTORS: SectorData[] = [
+  {
+    key: 'hoteis',
+    label: 'Hotéis',
+    short: 'Colchões, cabeceiras, cadeirões e sofás de lobby',
+    video: 'hotel',
+    title: 'Limpeza de Colchões e Estofos para Hotéis | Kyro Clean',
+    metaDescription: 'Limpeza e higienização de colchões, cabeceiras, cadeirões e sofás de lobby para hotéis em todo o país. Por lotes de quartos, fatura com IVA, proposta no WhatsApp.',
+    h1: 'Limpeza de colchões e estofos para hotéis',
+    intro: 'Colchões, cabeceiras, cadeirões e sofás de lobby limpos por extração, quarto a quarto, sem parar a ocupação.',
+    items: [
+      { item: 'Colchões', detail: 'Extração com água quente e anti-ácaros (Bactran), por lotes de quartos.' },
+      { item: 'Cabeceiras estofadas', detail: 'Limpas no próprio quarto, sem desmontar.' },
+      { item: 'Cadeirões e sofás-cama', detail: 'Nos quartos e nas suítes, com impermeabilização opcional.' },
+      { item: 'Sofás de lobby e bar', detail: 'Fora das horas de maior movimento.' },
+      { item: 'Alcatifas e tapetes', detail: 'Corredores, quartos e salas de reunião.' },
+    ],
+    rules: [
+      { text: 'Hotéis, aldeamentos e apartamentos turísticos, em todas as categorias: colchões higienizados pelo menos uma vez em cada três anos, com registo documental.', source: 'Portaria n.º 327/2008, Anexo I n.º 80A (e Anexos II e III n.º 65A), na redação da Portaria n.º 309/2015', url: 'https://diariodarepublica.pt/dr/detalhe/portaria/309-2015-70386134' },
+    ],
+    rulesNote: 'Cada colchão que limpamos fica com fotografias de antes e depois e a fatura com a data, que pode guardar como registo.',
+    faqs: [
+      { question: 'Conseguem fazer vários quartos no mesmo dia?', answer: 'Sim. Combinamos lotes de quartos com a governanta, conforme as saídas e entradas, e cada colchão seca em 2 a 5 horas.' },
+      HOURS_FAQ,
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
+  },
+  {
+    key: 'alojamento-local',
+    label: 'Alojamento local',
+    short: 'Colchões, sofás-cama e sofás entre reservas',
+    video: 'alojamento',
+    title: 'Limpeza de Colchões e Sofás para Alojamento Local | Kyro Clean',
+    metaDescription: 'Limpeza de colchões, sofás e sofás-cama para alojamento local entre reservas, em todo o país. Fatura com IVA, fotografias de antes e depois, proposta no WhatsApp.',
+    h1: 'Limpeza de colchões e sofás para alojamento local',
+    intro: 'Colchões, sofás e sofás-cama limpos entre reservas, com secagem de 2 a 5 horas e fotografias para o anfitrião.',
+    items: [
+      { item: 'Colchões', detail: 'Extração e anti-ácaros entre check-out e check-in.' },
+      { item: 'Sofás e sofás-cama', detail: 'Manchas de café, vinho ou maquilhagem, entre duas estadias.' },
+      { item: 'Impermeabilização', detail: 'O líquido fica à superfície e limpa-se com um pano.' },
+      { item: 'Tapetes', detail: 'Lavados no local, com a deslocação incluída no preço.' },
+    ],
+    rules: [
+      { text: 'Os estabelecimentos de alojamento local devem reunir sempre condições de higiene e limpeza, e manter as instalações e equipamentos em boas condições de conservação.', source: 'Decreto-Lei n.º 128/2014, art. 12.º, n.º 1, al. a) e n.º 4', url: 'https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/2014-56406355' },
+    ],
+    rulesNote: 'A lei não fixa prazos para colchões ou sofás no alojamento local; as fotografias e a fatura de cada visita mostram que a limpeza foi feita.',
+    faqs: [
+      { question: 'Dá para fazer entre duas reservas?', answer: 'Sim, se houver pelo menos meio dia livre: a secagem leva 2 a 5 horas. Com impermeabilização, o sofá fica 24 horas sem uso.' },
+      { question: 'Tenho de estar presente?', answer: 'Não é preciso, desde que a equipa tenha acesso ao alojamento. No fim enviamos as fotografias de antes e depois.' },
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
+  },
+  {
+    key: 'restaurantes',
+    label: 'Restaurantes e cafés',
+    short: 'Cadeiras, bancos corridos e sofás de sala',
+    video: 'restaurante',
+    title: 'Limpeza de Cadeiras e Bancos para Restaurantes e Cafés | Kyro Clean',
+    metaDescription: 'Limpeza de cadeiras estofadas, bancos corridos e sofás para restaurantes, cafés e bares em todo o país, antes de abrir ou no dia de folga. Fatura com IVA.',
+    h1: 'Limpeza de cadeiras e bancos para restaurantes e cafés',
+    intro: 'Cadeiras estofadas, bancos corridos e sofás de sala limpos antes de abrir ou no dia de folga.',
+    items: [
+      { item: 'Cadeiras estofadas', detail: 'Gordura, vinho e molhos saem com pré-tratamento e extração.' },
+      { item: 'Bancos corridos', detail: 'Em tecido, veludo ou pele, no próprio local.' },
+      { item: 'Sofás de esplanada coberta e lounge', detail: 'Antes da época ou depois dela.' },
+      { item: 'Impermeabilização', detail: 'Os derrames ficam à superfície e limpam-se com um pano.' },
+    ],
+    rules: [],
+    rulesNote: '',
+    faqs: [
+      { question: 'Podem vir no dia de folga?', answer: 'Sim, é o mais comum. Também vimos de manhã antes de abrir: as cadeiras secam em 2 a 5 horas.' },
+      { question: 'Limpam bancos em pele?', answer: 'Sim. Na pele fazemos limpeza e hidratação; a impermeabilização é só para tecido.' },
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
+  },
+  {
+    key: 'escritorios',
+    label: 'Escritórios',
+    short: 'Cadeiras de trabalho, sofás de receção e alcatifas',
+    video: 'escritorio',
+    title: 'Limpeza de Cadeiras, Sofás e Alcatifas para Escritórios | Kyro Clean',
+    metaDescription: 'Limpeza de cadeiras de escritório, sofás de receção e alcatifas em todo o país, ao fim do dia ou ao fim de semana. Fatura com IVA, proposta no WhatsApp.',
+    h1: 'Limpeza de cadeiras, sofás e alcatifas para escritórios',
+    intro: 'Cadeiras de trabalho, sofás de receção e alcatifas limpos ao fim do dia ou ao fim de semana.',
+    items: [
+      { item: 'Cadeiras de trabalho', detail: 'Assento e encosto, onde se acumula o suor e o pó do dia a dia.' },
+      { item: 'Sofás e poltronas de receção', detail: 'A primeira coisa que um cliente vê.' },
+      { item: 'Alcatifas', detail: 'Extração por área, com preço por escalões de metros quadrados.' },
+      { item: 'Salas de reunião', detail: 'Cadeiras e alcatifa na mesma visita.' },
+    ],
+    rules: [],
+    rulesNote: '',
+    faqs: [
+      { question: 'Podem vir ao fim de semana?', answer: 'Sim. Ao fim de semana ou ao fim do dia: na segunda de manhã está tudo seco.' },
+      { question: 'Fazem muitas cadeiras de uma vez?', answer: 'Sim. O preço por cadeira desce a partir da 5.ª e da 9.ª cadeira.' },
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
+  },
+];
+
+export function getSector(slug: string): SectorData | null {
+  return SECTORS.find(s => s.key === slug) ?? null;
 }
 
 export interface CommercialPageData {
@@ -113,78 +184,36 @@ export interface CommercialPageData {
   metaDescription: string;
   h1: string;
   intro: string;
-  segments: SegmentContent[];
-  benefits: string[];
-  faqs: { question: string; answer: string }[];
   coverage: string;
-}
-
-const BENEFITS: string[] = [
-  "Contrato recorrente com desconto face ao preço avulso, faturado mensalmente",
-  "Agendamento fora do horário de funcionamento, sem interromper a atividade",
-  "Um único ponto de contacto para toda a conta, sem burocracia por visita",
-  "Produtos certificados, seguros para espaços com circulação de clientes e público",
-  "Relatório fotográfico antes/depois por peça, incluído em todos os contratos",
-  "Equipa fixa, familiarizada com o espaço, sem repetir explicações a cada visita",
-];
-
-// Seleção estável por cidade. As 20 páginas comerciais partilhavam exatamente
-// as mesmas perguntas e beneficios, o que as punha nos 0,90 de sobreposição
-// entre si. Sem uma biblioteca B2B maior, o que se pode fazer honestamente é
-// variar quais aparecem e por que ordem, e acrescentar a cobertura real da
-// cidade. Não se inventam factos nem testemunhos: a lista de clientes reais
-// ainda não foi entregue (ver CLAUDE.md).
-function stableOrder<T>(items: T[], seed: string): T[] {
-  let hash = 2166136261;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash ^= seed.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return items
-    .map((item, index) => ({ item, key: Math.imul(hash ^ (index + 1), 2654435761) >>> 0 }))
-    .sort((a, b) => a.key - b.key)
-    .map(entry => entry.item);
-}
-
-function allFaqs(cityName: string, prep: string): { question: string; answer: string }[] {
-  return [
-    { question: "Como funciona a faturação de um contrato?", answer: "Emitimos uma fatura mensal única para todas as visitas do período, com o detalhe de peças tratadas. Não precisa de aprovar cada visita individualmente." },
-    { question: "Conseguem trabalhar fora do horário de funcionamento?", answer: `Sim, é o modelo mais comum nos nossos contratos ${prep} ${cityName}: antes da abertura, depois do fecho, ou aos fins de semana, consoante o que for melhor para o seu negócio.` },
-    { question: "Qual a frequência recomendada?", answer: "Depende do volume de circulação: mensal para escritórios e restaurantes de menor movimento, quinzenal ou semanal para hotéis e espaços de alta rotatividade. Ajustamos o contrato à sua realidade." },
-    { question: "Como é feito o acesso ao espaço se não estivermos presentes?", answer: "Coordenamos diretamente com o responsável do espaço (gerente, rececionista, facilities). Muitos dos nossos contratos funcionam com chave ou código de acesso entregue à equipa fixa." },
-    { question: "O preço é fixo como no site para clientes particulares?", answer: "Não. O preço de um contrato depende do número e tipo de peças, frequência e volume. Enviamos uma proposta personalizada após uma primeira visita de avaliação, gratuita e sem compromisso." },
-  ];
-}
-
-function faqsFor(cityName: string, prep: string, citySlug: string) {
-  return stableOrder(allFaqs(cityName, prep), `faq:${citySlug}`).slice(0, 4);
+  faqs: { question: string; answer: string }[];
 }
 
 export function getCommercialPageData(citySlug: string): CommercialPageData | null {
   const city = COMMERCIAL_CITIES.find(c => c.slug === citySlug);
   if (!city) return null;
   const prep = cityPrep(city.name);
-
-  const segments: SegmentContent[] = SEGMENTS.map(s => ({
-    ...s,
-    ...segmentContent(s.key, city.name, prep),
-  }));
-
+  const fee = locationPrices[city.name];
   return {
     city,
-    title: `Limpeza Comercial de Estofos ${prep} ${city.name} | Restaurantes, Hotéis e Escritórios | Kyro Clean`,
-    metaDescription: `Contratos de limpeza e higienização de estofos para restaurantes, hotéis e escritórios ${prep} ${city.name}. Agendamento fora de horas, faturação mensal, equipa fixa. Orçamento personalizado.`,
-    h1: `Limpeza Comercial de Estofos ${prep} ${city.name}`,
-    intro: `Contratos de limpeza recorrente para restaurantes, hotéis e escritórios ${prep} ${city.name}. A mesma extração profissional que usamos em milhares de casas particulares, adaptada ao ritmo do seu negócio: fora de horas, com fatura mensal e uma equipa fixa que já conhece o espaço.`,
-    segments,
-    benefits: stableOrder(BENEFITS, `ben:${city.slug}`),
-    faqs: faqsFor(city.name, prep, city.slug),
-    // Cobertura e taxa reais desta cidade: o dado mais honesto que a distingue
-    // da seguinte, porque varia mesmo entre 10, 15 e 20 euros.
-    coverage: `Servimos ${prep} ${city.name} e arredores.${locationPrices[city.name] === undefined ? ' Deslocação confirmada na proposta.' : ` Deslocação ${prep} ${city.name}: +${locationPrices[city.name]}€ por visita, incluída na proposta de contrato.`} Avaliação inicial gratuita e sem compromisso.`,
+    title: `Limpeza Comercial de Estofos ${prep} ${city.name} | Hotéis, Restaurantes e Escritórios | Kyro Clean`,
+    metaDescription: `Limpeza de colchões, cadeiras, sofás e alcatifas para hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name}. Fatura com IVA, fora de horas, proposta no WhatsApp.`,
+    h1: `Limpeza comercial de estofos ${prep} ${city.name}`,
+    intro: `Hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name}: colchões, cadeiras, sofás e alcatifas limpos fora de horas, com fatura com IVA.`,
+    coverage: fee === undefined
+      ? `Servimos ${prep} ${city.name} e arredores; a deslocação vem na proposta.`
+      : `Servimos ${prep} ${city.name} e arredores; deslocação de ${fee}€ por visita, já na proposta.`,
+    faqs: [
+      { question: `Trabalham com empresas ${prep} ${city.name}?`, answer: `Sim. Hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name} e arredores, com a mesma equipa que faz os serviços da zona.` },
+      HOURS_FAQ,
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
   };
 }
 
 export function getAllCommercialRoutes(): { path: string; citySlug: string }[] {
-  return COMMERCIAL_CITIES.map(c => ({ path: `/limpeza-comercial-${c.slug}`, citySlug: c.slug }));
+  return [
+    ...SECTORS.map(s => ({ path: `/limpeza-comercial-${s.key}`, citySlug: s.key })),
+    ...COMMERCIAL_CITIES.map(c => ({ path: `/limpeza-comercial-${c.slug}`, citySlug: c.slug })),
+  ];
 }

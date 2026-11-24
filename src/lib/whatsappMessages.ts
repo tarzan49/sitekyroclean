@@ -197,8 +197,10 @@ export function buildTreatmentWaMessage(treatmentSlug: string | undefined, cityN
 }
 
 /** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
-export function buildCommercialWaMessage(cityName: string): string {
-  return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta e a vossa disponibilidade?`;
+export function buildCommercialWaMessage(cityName?: string, sectorLabel?: string): string {
+  const where = cityName ? ` ${cityPrep(cityName)} ${cityName}` : '';
+  const what = sectorLabel ? sectorLabel.toLowerCase() : 'restaurante/hotel/escritório';
+  return `Olá! Tenho um negócio${where} (${what}) e queria limpar os estofos. Podem dizer-me o preço e a disponibilidade?`;
 }
 
 /**

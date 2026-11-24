@@ -18,7 +18,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido FEITO (OK); pele: widget Renovado/Renovado + Pele FEITO, encaixe desligado (falta passo a passo sem vídeos de tecido) | tapetes 412 FEITO (24 Nov) |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
 | TreatmentPage (`/tratamento-anti-acaros-*`, `/desbacterizacao-*`) | 206 | — | — | FEITO (24 Nov): texto encurtado com o OK do dono |
-| CommercialPage | 32 | — | — | FEITO (24 Nov, 169072e2); alargar a todas as cidades e por setor: sessão "Páginas comerciais por setor e em todo o país" |
+| CommercialPage | 106 (102 cidades + 4 setores) | — | — | FEITO, falta OK do dono (24 Nov): setores hotéis, alojamento local, restaurantes e cafés, escritórios; regra legal lida: Portaria 327/2008 n.º 80A (colchões de 3 em 3 anos) |
 | Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); /limpeza-colchoes e /limpeza-cadeiras FEITO (24 Nov, packs-tratamento) |
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
