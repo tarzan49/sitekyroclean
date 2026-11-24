@@ -2687,7 +2687,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nunca chamar desconto; o total é o de tabela.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2698,7 +2698,7 @@ function withVisitGifts(input, r) {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r;
   const rawIn = input?.items;
-  if (q.bigOrder || pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  if (pricedTotal({ ...q, total: q.bigOrder ? q.bigOrder.normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i) => i ?? {};
   const raw = rawIn.map((i) => rec(i).kind === "mattress" && rec(i).treatment === "clean+anti-acaros" ? { ...rec(i), treatment: "clean" } : i);
   const total = pricedTotal(innerPriced({ ...input, items: raw }));
@@ -2734,7 +2734,16 @@ function withVisitGifts(input, r) {
   const rc = r.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
-  return { ...out, visitGifts: { gifts, usual, total: final, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  const giftSum = cents(usual - total);
+  const t = r.waterproofingTiers;
+  const tier = (v) => typeof v === "number" ? { usual: cents(v + giftSum), total: up9(v) } : null;
+  const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
+  if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
+  if (q.bigOrder) {
+    out.bigOrder = null;
+    out.antiMiteGift = null;
+  }
+  return { ...out, visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {
