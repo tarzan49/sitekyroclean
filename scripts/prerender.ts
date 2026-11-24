@@ -1191,15 +1191,6 @@ export function prerenderRoutes(outDir: string): number {
         },
       },
       {
-        path: '/antes-depois-limpeza',
-        title: 'Antes e Depois | Resultados Reais de Limpeza Profissional | Kyro Clean',
-        desc: 'Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Sem filtros, sem retoques.',
-        content: {
-          h1: 'Antes e Depois: Resultados Reais',
-          intro: 'Galeria com fotografias reais de trabalhos realizados pela Kyro Clean Solutions. Resultados antes e depois de limpeza de sofás, colchões, tapetes e cadeiras. Sem filtros nem retoques.',
-        },
-      },
-      {
         path: '/areas-de-servico',
         title: 'Áreas de Serviço | Porto, Lisboa e Todo o País | Kyro Clean Solutions',
         desc: 'Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.',

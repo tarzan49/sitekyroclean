@@ -148,7 +148,6 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
     xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),
     xmlUrl(STUDY_ROUTE, 'monthly', '0.6', DATES.estudo),
-    xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];
 
   // 2. Location pages (service × city)

@@ -26,7 +26,6 @@ const serviceLinks = [
   { to: '/limpeza-alcatifas',label: 'Alcatifas' },
   { to: '/limpeza-cadeiras', label: 'Cadeiras' },
   { to: '/impermeabilizacao',label: 'Impermeabilização' },
-  { to: '/antes-depois-limpeza', label: 'Antes e Depois' },
 ];
 
 const Header = () => {

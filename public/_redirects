@@ -32,3 +32,6 @@
 # Página de autor removida em 2026-11-02 (dono): os conteúdos são assinados
 # pela equipa. Quem tinha o link vai para /sobre.
 /autor/*                                     /sobre                                 301
+
+# Página Antes e Depois removida (dono, 24 Nov)
+/antes-depois-limpeza                         /                                      301

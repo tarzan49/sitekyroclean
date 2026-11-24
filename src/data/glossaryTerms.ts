@@ -877,8 +877,8 @@ export const glossaryTerms: GlossaryTerm[] = [
     "term": "Antes e Depois",
     "definition": "Comparação fotográfica de uma peça antes e depois de uma intervenção. Deve identificar corretamente o trabalho e permitir uma comparação honesta. Imagens ilustrativas não devem ser apresentadas como resultados reais.",
     "serviceLink": {
-      "label": "Antes e Depois",
-      "to": "/antes-depois-limpeza"
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
     }
   },
   {

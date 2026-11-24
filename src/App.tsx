@@ -34,7 +34,6 @@ const Obrigado = lazy(() => import("./pages/Obrigado"));
 const ProblemPage = lazy(() => import("./pages/ProblemPage"));
 const EnServicePage = lazy(() => import("./pages/EnServicePage"));
 const EnGuidePage = lazy(() => import("./pages/EnGuidePage"));
-const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
@@ -92,7 +91,6 @@ const AppRoutes = () => {
                 <Route path="/limpeza-alcatifas" element={<LimpezaAlcatifas />} />
                 <Route path="/obrigado" element={<Obrigado />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
-                <Route path="/antes-depois-limpeza" element={<BeforeAfterPage />} />
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
                 {/* English tourist SEO pages — isolated /en/ namespace, no PT overlap */}

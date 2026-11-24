@@ -79,20 +79,6 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Consulte la Política de Privacidad de Kyro Clean Solutions.",
     },
   },
-  "/antes-depois-limpeza": {
-    pt: {
-      title: "Antes e Depois | Resultados Reais de Limpeza Profissional | Kyro Clean",
-      description: "Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Sem filtros, sem retoques.",
-    },
-    en: {
-      title: "Before & After | Real Professional Cleaning Results | Kyro Clean",
-      description: "See the real results of professional sofa, mattress, rug and chair cleaning. Before and after each service. No filters, no retouching.",
-    },
-    es: {
-      title: "Antes y Después | Resultados Reales de Limpieza Profesional | Kyro Clean",
-      description: "Vea los resultados reales de la limpieza profesional de sofás, colchones, alfombras y sillas.",
-    },
-  },
   "/areas-de-servico": {
     pt: {
       title: "Áreas de Serviço | Porto, Lisboa e Todo o País | Kyro Clean Solutions",

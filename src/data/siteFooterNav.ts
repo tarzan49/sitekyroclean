@@ -37,7 +37,6 @@ export const FOOTER_NAV: FooterNavGroup[] = [
       { href: '/limpeza-cadeiras', label: 'Higienização de Cadeiras' },
       { href: '/limpeza-alcatifas', label: 'Higienização de Alcatifas' },
       // Estava só na navegação do cabeçalho, que não existe no HTML estático.
-      { href: '/antes-depois-limpeza', label: 'Antes e Depois' },
     ],
   },
   {
