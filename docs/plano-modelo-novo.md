@@ -18,10 +18,12 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido FEITO (OK); pele: widget Renovado/Renovado + Pele FEITO, encaixe desligado (falta passo a passo sem vídeos de tecido) | tapetes 412 FEITO (24 Nov) |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
 | TreatmentPage (`/tratamento-anti-acaros-*`, `/desbacterizacao-*`) | 206 | — | — | FEITO (24 Nov): texto encurtado com o OK do dono |
-| CommercialPage | 32 | — | — | por fazer |
+| CommercialPage | 32 | — | — | FEITO (24 Nov, 169072e2); alargar a todas as cidades e por setor: sessão "Páginas comerciais por setor e em todo o país" |
 | Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); /limpeza-colchoes e /limpeza-cadeiras FEITO (24 Nov, packs-tratamento) |
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
-| Guias, /problemas, /en, blog | — | — | — | por fazer (blog no fim: só topo + widget) |
+| /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
+| Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo, blog | — | — | — | tratar como o blog (texto corrido, sem encaixe): só topo + widget no fim; por fazer |
+| /sobre, /areas-de-servico, /problemas, /en | — | — | — | por fazer (sobre: 'O que fazemos' 820 px; áreas: 659 px) |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
 
