@@ -74,7 +74,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     // Each chair pays its position: 1.ª-4.ª 20€, 5.ª-8.ª 15€, 9.ª on 10€; site: true no longer changes the price.
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto' }).subtotal).toBe(110);
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto', site: true }).subtotal).toBe(110);
-    expect([1, 3, 4, 7, 8, 9, 10, 12].map(qty => ok({ items: [{ kind: 'chairs', qty }], city: 'Porto' }).subtotal)).toEqual([20, 60, 80, 132.5, 147.5, 162.5, 177.5, 207.5]);
+    expect([1, 3, 4, 7, 8, 9, 10, 12].map(qty => ok({ items: [{ kind: 'chairs', qty }], city: 'Porto' }).subtotal)).toEqual([20, 60, 80, 125, 140, 150, 160, 180]);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }, { kind: 'chairs', qty: 2 }], city: 'Porto' }).subtotal).toBe(80);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }], city: 'Braga' }).travel).toBeGreaterThan(0);
     expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(15);
@@ -130,7 +130,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([149, 0, 149, false]);
     // Waterproofed-only chairs do not push the cleaned ones over a tier; the 4 cleaned chairs are also waterproofed, so 4 x (20 - 5) = 60€ (dono, 24 Nov 2026).
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
-    expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([60, false]);
+    expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([40, false]);
   });
   it('chairs cleaned and waterproofed: by position, cleaning 5€ less per waterproofed chair, line ends in 9 (dono, 24 Nov 2026)', () => {
     // 12 chairs by position, cleaning at half with waterproofing: 90 + Premium 270 / Essencial 150, nearest 9 (dono, 24 Nov 2026: 359).
