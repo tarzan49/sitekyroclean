@@ -2654,7 +2654,7 @@ function withBlackFridayPrices(input, r) {
   }
   const normal = rugsOnly ? q.rugEstimate.homePrice : q.total;
   if (typeof normal !== "number" || bf >= normal) return none;
-  const out = { ...r, total: bf, subtotal: bf, travel: 0, bigOrder: null, closeNow: null, antiMiteGift: null, mattressMiteOffer: null };
+  const out = { ...r, total: bf, subtotal: bf, travel: 0, bigOrder: null, closeNow: null, antiMiteGift: null, mattressMiteOffer: null, visitGifts: null };
   const rug = q.rugEstimate;
   if (rug?.ok && rugsOnly) out.rugEstimate = { ...rug, homePrice: bf, pickupPrice: rug.pickupPrice == null ? null : bf + (rug.pickupPrice - (rug.homePrice ?? 0)) };
   return { ...out, blackFriday: { normal, total: bf, until: "2026-11-30", rule: BLACK_FRIDAY_RULE } };
@@ -2666,21 +2666,48 @@ function botQuoteCore(input) {
     const u = uWaterproofingQuote(input);
     if (u) return withBigOrder(u);
   }
-  return withMattressMiteOffer(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
+  return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-function withMattressMiteOffer(input, r) {
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 20€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nunca chamar desconto; o total é o de tabela.';
+var innerPriced = (x) => botQuoteInner(x);
+var pricedTotal = (r) => {
+  if (!r.ok || r.handToOwner) return null;
+  if (typeof r.rugCombo?.comboPrice === "number") return r.rugCombo.comboPrice;
+  return !r.quote && typeof r.total === "number" ? r.total : null;
+};
+function withVisitGifts(input, r) {
+  const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r;
-  const raw = input?.items;
-  const isMattress = (i) => i?.kind === "mattress" && [void 0, "clean", "clean+anti-acaros"].includes(i.treatment);
-  if (!q.ok || q.quote || q.handToOwner || q.bigOrder || typeof q.total !== "number" || !Array.isArray(raw) || !raw.some(isMattress)) return { ...r, mattressMiteOffer: null };
-  const as = (t) => botQuoteInner({ ...input, items: raw.map((i) => isMattress(i) ? { ...i, treatment: t } : i) });
-  const clean = as("clean");
-  const mites = as("clean+anti-acaros");
-  if (!clean.ok || !mites.ok || clean.quote || mites.quote || typeof clean.total !== "number" || typeof mites.total !== "number") return { ...r, mattressMiteOffer: null };
-  const normal = cents(mites.total - clean.total);
-  if (clean.total < MATTRESS_MITE_OFFER_MIN || normal <= 0) return { ...r, mattressMiteOffer: null };
-  return { ...r, mattressMiteOffer: { normal, total: clean.total } };
+  const rawIn = input?.items;
+  if (q.bigOrder || pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  const rec = (i) => i ?? {};
+  const raw = rawIn.map((i) => rec(i).kind === "mattress" && rec(i).treatment === "clean+anti-acaros" ? { ...rec(i), treatment: "clean" } : i);
+  const total = pricedTotal(innerPriced({ ...input, items: raw }));
+  if (total === null) return none;
+  const cleanOnly = (i) => [void 0, "clean"].includes(rec(i).treatment);
+  const pieces = raw.length;
+  const steps = [
+    { piece: "mattress", treatment: "anti-acaros", min: 2, match: (i) => rec(i).kind === "mattress" && cleanOnly(i), apply: (i) => ({ ...rec(i), treatment: "clean+anti-acaros" }) },
+    { piece: "chairs", treatment: "anti-acaros", min: 3, match: (i) => rec(i).kind === "chairs" && cleanOnly(i) && !rec(i).seatOnly, apply: (i) => ({ ...rec(i), treatment: "clean+anti-acaros" }) },
+    { piece: "rug", treatment: "anti-odor", min: 4, match: (i) => rec(i).kind === "rug" && cleanOnly(i) && rec(i).odor !== true, apply: (i) => ({ ...rec(i), odor: true }) }
+  ];
+  const gifts = [];
+  let items = raw;
+  let usual = total;
+  for (const s of steps) {
+    const mattressAlone = s.piece === "mattress" && total >= MATTRESS_MITE_OFFER_MIN;
+    if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
+    const next = items.map((i) => s.match(i) ? s.apply(i) : i);
+    const priced2 = pricedTotal(innerPriced({ ...input, items: next }));
+    if (priced2 === null || priced2 <= usual) continue;
+    gifts.push({ piece: s.piece, treatment: s.treatment, normal: cents(priced2 - usual) });
+    items = next;
+    usual = priced2;
+  }
+  if (!gifts.length) return none;
+  const m = gifts.find((g) => g.piece === "mattress");
+  return { ...r, visitGifts: { gifts, usual, total, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {
