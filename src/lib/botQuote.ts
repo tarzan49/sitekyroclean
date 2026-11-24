@@ -173,7 +173,9 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   const chairBulk = (_tier: 'premium' | 'essencial') => 0;
   const travelAsked = isBlackFriday() || (severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX) ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   // A corner / 5+ seat sofa waterproofed alone already carries its 10€ of travel in the fixed price.
-  const travel = items.some(i => i.travelIncluded) ? Math.max(0, travelAsked - WATERPROOFING_TRAVEL_MAX) : travelAsked;
+  // A corner / 5+ seat sofa waterproofed alone: its fixed price (199, 219, 249) is the base plus 10€ of travel; alone it
+  // keeps that 10€, in a visit it pays the order's travel like any other size (owner, 25 Nov 2026: "igual em todos os tamanhos").
+  const travel = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),
@@ -273,6 +275,7 @@ export const SEAT5_WATERPROOFING_EXTRA = { premium: 190, essencial: 130 } as con
 export const SEAT6_WATERPROOFING_ALONE = { premium: 249, essencial: 189 } as const;
 /** A corner sofa waterproofed alone: 199€ / 139€ travel included (owner, 22 Nov 2026: "fica em 199 e 139 sofa de canto"; was 179/129 as a U). */
 export const CANTO_WATERPROOFING_ALONE = { premium: 199, essencial: 139 } as const;
+const lessTravel = (p: { premium: number; essencial: number }) => ({ premium: p.premium - WATERPROOFING_TRAVEL_MAX, essencial: p.essencial - WATERPROOFING_TRAVEL_MAX });
 
 function uWaterproofingQuote(input: Record<string, unknown>) {
   const raw = input.items;
@@ -955,7 +958,7 @@ function botQuoteInner(input: unknown) {
     // (sob orçamento in the quiz), so it takes the U rule up to 5 seats: with the cleaning, the canto's cleaning
     // (119€) plus 150€ Premium / 90€ Essencial; alone, 179€ / 129€.
     if (item.kind === 'sofa' && item.size === 'canto' && (item.extra === 'premium' || item.extra === 'essencial')) {
-      items.push(item.primary === 'waterproofing' ? { ...item, waterproofingFixed: CANTO_WATERPROOFING_ALONE, travelIncluded: true } : { ...item, waterproofingFixed: U_WATERPROOFING_EXTRA });
+      items.push(item.primary === 'waterproofing' ? { ...item, waterproofingFixed: lessTravel(CANTO_WATERPROOFING_ALONE), travelIncluded: true } : { ...item, waterproofingFixed: U_WATERPROOFING_EXTRA });
       rawOf.push(raw);
       continue;
     }
@@ -963,15 +966,15 @@ function botQuoteInner(input: unknown) {
     // travel included; priced here so the rest of the order, both options and the visit gifts read it too.
     const rawSeats = Number((raw as Record<string, unknown>)?.seats);
     if (item.kind === 'sofa' && item.size === '5-lugares' && item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial') && !(Number.isInteger(rawSeats) && rawSeats > 7)) {
-      items.push({ ...item, waterproofingFixed: Number.isInteger(rawSeats) && rawSeats >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE, travelIncluded: true });
+      items.push({ ...item, waterproofingFixed: lessTravel(Number.isInteger(rawSeats) && rawSeats >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE), travelIncluded: true });
       rawOf.push(raw);
       continue;
     }
-    // 5-seat sofa cleaned alone, nothing else in the order (dono, 22 Nov 2026, Rosângela): 119€ final with the
-    // 10€ travel included, so the base is 109€ (travel added as usual); in a bigger order it stays 119€.
-    if (rawItems.length === 1 && item.qty === 1 && (raw as Record<string, unknown>)?.size === '5-lugares' && item.kind === 'sofa' && item.size === '5-lugares' && !item.unitPrice && item.extra === 'none' && item.primary !== 'waterproofing') {
+    // 5-seat sofa cleaned (dono, 22 Nov 2026, Rosângela): 119€ final with the 10€ travel included, so the base is 109€
+    // (travel added as usual); in a visit the line is 109€ like the other sizes lose their travel (owner, 25 Nov 2026).
+    if ((raw as Record<string, unknown>)?.size === '5-lugares' && item.kind === 'sofa' && item.size === '5-lugares' && !item.unitPrice && item.extra === 'none' && item.primary !== 'waterproofing') {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ''];
-      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE, travelIncluded: true } : item);
       rawOf.push(raw);
       continue;
     }
@@ -986,7 +989,13 @@ function botQuoteInner(input: unknown) {
   }
   // Chairs: one table for site and bot (owner, 24 Nov 2026), chairPricing.chairCleanTotal via customPack.
   const city = resolveBotCity(rawCity);
-  const result = calculateCustomPack(items, city ?? '');
+  // 6 or 7 seat sofa cleaned (129/139/149€ with the travel, 10€ towns): base 10€ less, the travel back when it is alone.
+  if (locationPrices[city ?? ''] === WATERPROOFING_TRAVEL_MAX) items.forEach((it, n) => {
+    if (it.kind === 'sofa' && it.unitPrice && !it.travelIncluded && it.extra === 'none' && it.primary !== 'waterproofing') items[n] = { ...it, unitPrice: it.unitPrice - WATERPROOFING_TRAVEL_MAX, travelIncluded: true };
+  });
+  const resultRaw = calculateCustomPack(items, city ?? '');
+  const lonePiece = items.length === 1 && items[0].qty === 1 && items[0].kind === 'sofa' && items[0].travelIncluded && items[0].primary !== 'waterproofing';
+  const result = lonePiece && resultRaw.travel === 0 ? { ...resultRaw, travel: WATERPROOFING_TRAVEL_MAX, total: cents(resultRaw.total + WATERPROOFING_TRAVEL_MAX) } : resultRaw;
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? '') : null;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   // Far zone, on a day a booked team is already there (availability.sharedTrip): no travel fee,

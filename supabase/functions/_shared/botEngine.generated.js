@@ -2412,7 +2412,7 @@ function waterproofingTiers(items, city) {
   const severalPieces = pieces > 1 && items.some(isWaterproofing);
   const chairBulk = (_tier) => 0;
   const travelAsked = isBlackFriday() || severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
-  const travel = items.some((i) => i.travelIncluded) ? Math.max(0, travelAsked - WATERPROOFING_TRAVEL_MAX) : travelAsked;
+  const travel = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk("premium") + travel),
@@ -2473,6 +2473,7 @@ var SEAT5_WATERPROOFING_ALONE = { premium: 219, essencial: 159 };
 var SEAT5_WATERPROOFING_EXTRA = { premium: 190, essencial: 130 };
 var SEAT6_WATERPROOFING_ALONE = { premium: 249, essencial: 189 };
 var CANTO_WATERPROOFING_ALONE = { premium: 199, essencial: 139 };
+var lessTravel = (p) => ({ premium: p.premium - WATERPROOFING_TRAVEL_MAX, essencial: p.essencial - WATERPROOFING_TRAVEL_MAX });
 function uWaterproofingQuote(input) {
   const raw = input.items;
   if (!Array.isArray(raw)) return null;
@@ -3055,19 +3056,19 @@ function botQuoteInner(input) {
     const item = toItem(raw, i);
     if ("ok" in item) return item;
     if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
-      items.push(item.primary === "waterproofing" ? { ...item, waterproofingFixed: CANTO_WATERPROOFING_ALONE, travelIncluded: true } : { ...item, waterproofingFixed: U_WATERPROOFING_EXTRA });
+      items.push(item.primary === "waterproofing" ? { ...item, waterproofingFixed: lessTravel(CANTO_WATERPROOFING_ALONE), travelIncluded: true } : { ...item, waterproofingFixed: U_WATERPROOFING_EXTRA });
       rawOf.push(raw);
       continue;
     }
     const rawSeats = Number(raw?.seats);
     if (item.kind === "sofa" && item.size === "5-lugares" && item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && !(Number.isInteger(rawSeats) && rawSeats > 7)) {
-      items.push({ ...item, waterproofingFixed: Number.isInteger(rawSeats) && rawSeats >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE, travelIncluded: true });
+      items.push({ ...item, waterproofingFixed: lessTravel(Number.isInteger(rawSeats) && rawSeats >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE), travelIncluded: true });
       rawOf.push(raw);
       continue;
     }
-    if (rawItems.length === 1 && item.qty === 1 && raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
+    if (raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ""];
-      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE, travelIncluded: true } : item);
       rawOf.push(raw);
       continue;
     }
@@ -3080,7 +3081,12 @@ function botQuoteInner(input) {
     rawOf.push(raw);
   }
   const city = resolveBotCity(rawCity);
-  const result = calculateCustomPack(items, city ?? "");
+  if (locationPrices[city ?? ""] === WATERPROOFING_TRAVEL_MAX) items.forEach((it, n) => {
+    if (it.kind === "sofa" && it.unitPrice && !it.travelIncluded && it.extra === "none" && it.primary !== "waterproofing") items[n] = { ...it, unitPrice: it.unitPrice - WATERPROOFING_TRAVEL_MAX, travelIncluded: true };
+  });
+  const resultRaw = calculateCustomPack(items, city ?? "");
+  const lonePiece = items.length === 1 && items[0].qty === 1 && items[0].kind === "sofa" && items[0].travelIncluded && items[0].primary !== "waterproofing";
+  const result = lonePiece && resultRaw.travel === 0 ? { ...resultRaw, travel: WATERPROOFING_TRAVEL_MAX, total: cents(resultRaw.total + WATERPROOFING_TRAVEL_MAX) } : resultRaw;
   const tiers = items.some(isWaterproofing) ? waterproofingTiers(items, city ?? "") : null;
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   const sharedTrip = extendedTrip && rawShared === true && !result.quote;

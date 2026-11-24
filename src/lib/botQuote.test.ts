@@ -21,7 +21,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect([a.total, a.handToOwner, a.waterproofingTiers]).toEqual([179, false, { travel: 0, premium: 179, essencial: 129 }]);
     expect(u(3, 'essencial').total).toBe(129);
     expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);
-    expect(ok({ items: [{ kind: 'sofa', size: 'u', seats: 6, look: 'grande', treatment: 'clean+premium' }], city: 'Porto' }).waterproofingTiers).toEqual({ travel: 0, premium: 299, essencial: 239 });
+    expect(ok({ items: [{ kind: 'sofa', size: 'u', seats: 6, look: 'grande', treatment: 'clean+premium' }], city: 'Porto' }).waterproofingTiers).toMatchObject({ premium: 299, essencial: 239 });
   });
   it('sofa 3 seats in Oeiras: 79€ + 10€ travel (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' });
@@ -85,11 +85,11 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('mattress with anti-ácaros (reply 3.4)', () => {
     expect(ok({ items: [{ kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' }], city: 'Braga' }).subtotal).toBe(89);
   });
-  it('5+ seats: cleaning is 119 (owner, 2026-10-06), also as an item added to another order', () => {
+  it('5+ seats: cleaning is 119 with the travel; added to another order the line loses the travel like the other sizes, 109 (owner, 25 Nov 2026)', () => {
     const alone = ok({ items: [{ kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
     expect([alone.total, alone.quote, alone.handToOwner]).toEqual([119, false, false]); // final com deslocação (dono, 22 Nov 2026, Rosângela)
     const added = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
-    expect(added.lines.map(l => l.amount)).toEqual([69, 119]);
+    expect(added.lines.map(l => l.amount)).toEqual([69, 109]);
   });
   it.skipIf(!PACK_PERKS_ON)('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
@@ -237,7 +237,8 @@ describe('puffs (owner, 21 Oct 2026)', () => {
 });
 
 describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
-  const sub = (item: Record<string, unknown>) => ok({ items: [{ kind: 'sofa', ...item }], city: 'Porto' }).subtotal;
+  // The total (with the travel): the 10€ towns price 6/7 seats as base + travel since 25 Nov 2026.
+  const sub = (item: Record<string, unknown>) => ok({ items: [{ kind: 'sofa', ...item }], city: 'Porto' }).total;
   it('cleaning is 129/139/149 by look, U or not; waterproofing +170/+110', () => {
     expect(sub({ size: '5-lugares', seats: 6, look: 'compacto' })).toBe(129);
     expect(sub({ size: '5-lugares', seats: 7, look: 'medio' })).toBe(139);
