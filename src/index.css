@@ -888,3 +888,20 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 html.snap-sections main > section[data-en-hero] { min-height: 100svh; padding-top: 0 !important; padding-bottom: 0 !important; justify-content: flex-end; }
 [data-en-hero] [class*="grid"] svg { display: none; }
 [data-en-hero] > div:last-child .grid { padding-top: 6px; padding-bottom: 8px; }
+
+/* Encaixe no telemóvel (verificação do site todo, 25 Nov). (1) "Aproveite a mesma visita": o div já tem o espaço da
+   secção, por isso o de fora não soma outra vez (718 px em 667). (2) Página inicial, "O seu preço": a grelha dos
+   sofás passou a duas filas e a secção ficou com 719 px; aperta-se só aqui para caber num ecrã de 667. */
+@media (max-width: 767px) {
+  html.snap-sections main #mesma-visita { padding: 0 !important; }
+  html.snap-home main > section#preco { padding-top: 64px !important; }
+  html.snap-home #preco [aria-label="Sofás por tamanho"] > * { height: 42px; min-height: 42px !important; }
+  html.snap-home #preco [aria-label="Sofás por tamanho"] + p { margin-top: 2px; line-height: 1.2; }
+  html.snap-home #preco [role="radiogroup"] { gap: 6px; padding-top: 4px; }
+  html.snap-home #preco [role="radio"] { min-height: 52px; }
+  html.snap-home #preco select { height: 40px; min-height: 40px !important; }
+  html.snap-home #preco [role="radio"] > span:not(.absolute) { padding-top: 5px !important; padding-bottom: 5px !important; }
+  html.snap-home #preco [role="radio"]:first-child > span:not(.absolute) { padding-top: 9px !important; }
+  html.snap-home main > section#preco { padding-bottom: 8px !important; }
+  html.snap-home #preco a[href*="wa.me"] { margin-top: 6px; }
+}
