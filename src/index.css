@@ -837,3 +837,12 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
   html.snap-sections #localidades .relative.mb-5 { margin-bottom: 12px; }
   html.snap-sections #localidades .mb-8 { margin-bottom: 16px; }
 }
+
+/* Topo das cadeiras: fotografias verticais numa moldura vertical, sem barras escuras dos lados; à volta fica o
+   verde do topo (dono, 24 Nov). Sobrepõe-se ao 3:2 / 4:3 das galerias do topo. */
+@media (max-width: 767px) {
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, 180px); margin-inline: auto; }
+}
+@media (min-width: 768px) {
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 3 / 4)); margin-inline: auto; }
+}

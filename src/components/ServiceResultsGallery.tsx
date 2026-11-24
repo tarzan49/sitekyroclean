@@ -26,7 +26,10 @@ export default function ServiceResultsGallery({ category, light = false, interva
   const itemCategory = singleCategory ?? (item as { category?: BeforeAfterCategory }).category;
   // Moldura fixa em 4:3 quando a galeria mistura tipos ou é de vídeos verticais (impermeabilização):
   // o hero não muda de altura e as 3 características por baixo ficam no ecrã.
-  const fixedFrame = !singleCategory || singleCategory === "impermeabilizacao" || singleCategory === "cadeiras";
+  // Cadeiras só com pares (fotografias verticais): a moldura tem a forma da fotografia, sem barras escuras dos
+  // lados; à volta fica o fundo da secção (dono, 24 Nov: "cortar as black bars e o fundo estar direito").
+  const chairsOnlyPairs = singleCategory === "cadeiras" && pool.every(i => i.kind === "pair");
+  const fixedFrame = !singleCategory || singleCategory === "impermeabilizacao" || (singleCategory === "cadeiras" && !chairsOnlyPairs);
 
   useEffect(() => {
     const rail = thumbnailsRef.current;
@@ -62,7 +65,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       {/* Galeria com tipos misturados (ex.: sofá + impermeabilização): moldura fixa em 4:3,
           para o hero não mudar de altura quando passa um vídeo vertical. */}
-      <div className={`overflow-hidden ${fixedFrame ? "w-full aspect-[4/3] bg-black/40" : itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[3/4]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
+      <div data-vertical-frame={!fixedFrame && itemCategory === "cadeiras" ? "" : undefined} className={`overflow-hidden ${fixedFrame ? "w-full aspect-[4/3] bg-black/40" : itemCategory === "cadeiras" ? "mx-auto w-[min(100%,300px)] aspect-[3/4] border-t-2 border-[#D4AF37]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
         {item.kind === "pair" ? (
           // Cadeiras (fotografias verticais) numa moldura fixa: ao centro, em 3:4, com barras dos lados, como os vídeos (dono, 24 Nov).
           <div className={fixedFrame && itemCategory === "cadeiras" ? "mx-auto h-full aspect-[3/4]" : "h-full w-full"}>
