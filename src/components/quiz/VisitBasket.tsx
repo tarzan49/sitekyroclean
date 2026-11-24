@@ -807,12 +807,12 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         </div>}
         {materials && material === null && <>
           <p className="mb-3 mt-1 text-base font-semibold text-white/85">{materials.ask}</p>
-          {/* Sofá: 2 fotografias na horizontal, uma por linha; tapete: 2 na vertical (dono, 24 Nov). */}
-          <div className={`grid min-h-72 grow auto-rows-fr gap-3 ${item.kind === 'sofa' ? 'grid-cols-1' : 'grid-cols-2'}`}>
+          {/* Sofá: 2 fotografias na horizontal, uma por linha; tapete: 2 na vertical (dono, 24 Nov). Medida normal, nunca a encher o ecrã (dono, 25 Nov). */}
+          <div className={`grid gap-3 ${item.kind === 'sofa' ? 'grid-cols-1' : 'grid-cols-2'}`}>
             {materials.options.map(o => (
-              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`relative overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98] ${item.kind === 'sofa' ? 'h-[150px]' : 'h-44'}`}>
                 <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-black/65 px-4 py-3"><span className="text-lg font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-gradient-to-t from-black/75 to-transparent px-3 pb-2 pt-6"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
               </button>
             ))}
           </div>
