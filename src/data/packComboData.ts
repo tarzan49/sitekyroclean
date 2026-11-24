@@ -48,7 +48,7 @@ export const PACK_HOOK: Record<string, string> = {
   'sofa-impermeabilizacao': 'Limpeza e proteção contra nódoas na mesma visita, até 10 anos com a Premium.',
   'cadeiras-impermeabilizacao': 'Limpeza e proteção contra nódoas nas cadeiras, na mesma visita. Ideal para a mesa onde se come todos os dias.',
   'sala-completa': `Sofá, cadeiras e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
-  'quarto-completo': `Colchão e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, no tapete acrescentado: ${PACK_PERK_RUG_NOTE.toLowerCase()}.`,
+  'quarto-completo': `Colchão e tapete numa só visita, cada um ao preço de tabela e com uma só deslocação.`,
 };
 
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */

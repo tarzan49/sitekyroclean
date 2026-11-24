@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -108,7 +109,7 @@ it('blocks a partially measured second rug instead of silently omitting it', () 
 });
 
 
-it('applies the published mattress, chair and carpet offers to the saved request', () => {
+it.skipIf(!PACK_PERKS_ON)('applies the published mattress, chair and carpet offers to the saved request', () => {
   render(<Harness primaryService="sofa" />);
   click(/^Colchão/); increment(0); increment(2); confirm();
   expect(savedItems().filter(i => i.mattressSize).map(i => i.price)).toEqual([45, 55, 65]);
@@ -134,7 +135,7 @@ it('charges table price for an extra when the order stays under the pack minimum
   expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(69);
 });
 
-it('unlocks the pack price once the primary service already reaches the minimum', () => {
+it.skipIf(!PACK_PERKS_ON)('unlocks the pack price once the primary service already reaches the minimum', () => {
   render(<Harness primaryService="sofa" primaryTablePrice={100} />);
   click(/^Colchão/); confirm();
   expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(55);
@@ -147,14 +148,14 @@ it('unlocks the pack price once the primary service already reaches the minimum'
 describe('summary previews price the reference item as if it were added', () => {
   const card = (label: RegExp) => screen.getByRole('button', { name: label });
 
-  it('shows the pack price for a casal mattress added to a 69€ sofa', () => {
+  it.skipIf(!PACK_PERKS_ON)('shows the pack price for a casal mattress added to a 69€ sofa', () => {
     render(<Harness primaryService="sofa" primaryTablePrice={69} />);
     const mattress = card(/^Colchão/);
     expect(mattress.textContent).toContain('55€/un.');
     expect(mattress.querySelector('s')?.textContent).toBe('69€');
   });
 
-  it('shows the pack price for a 2-seat sofa added to a 69€ mattress', () => {
+  it.skipIf(!PACK_PERKS_ON)('shows the pack price for a 2-seat sofa added to a 69€ mattress', () => {
     render(<Harness primaryService="mattress" primaryTablePrice={69} />);
     const sofa = card(/^Sofá/);
     expect(sofa.textContent).toContain('55€/un.');
@@ -175,7 +176,7 @@ describe('summary previews price the reference item as if it were added', () => 
     expect(card(/^Cadeiras/).textContent).toContain(CHAIR_PRICE_LABEL);
   });
 
-  it('keeps the rug offer on the card when the pack applies', () => {
+  it.skipIf(!PACK_PERKS_ON)('keeps the rug offer on the card when the pack applies', () => {
     render(<Harness primaryService="sofa" primaryTablePrice={100} />);
     expect(card(/^Tapete/).textContent).toContain('Limpe 5 m², pague 4');
     expect(card(/^Cadeiras/).textContent).toContain('Limpe 4, pague 3');

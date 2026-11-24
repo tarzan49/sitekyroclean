@@ -1149,14 +1149,14 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/guia-de-packs',
         title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
-        desc: 'Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita, com preço de pack no artigo acrescentado. Orçamento grátis.',
+        desc: 'Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita e uma só deslocação. Orçamento grátis.',
         content: {
           // O mesmo que a página React mostra: os quatro packs, a regra do
           // preço de pack e o diretório completo. Antes só havia <h1> e
           // introdução, e o hub não ligava a nenhuma das 244 páginas de pack.
           breadcrumb: [{ label: 'Início', href: '/' }, { label: 'Guia de Packs' }],
           h1: 'Packs de Limpeza',
-          intro: 'Vários artigos na mesma visita: uma só deslocação e preço de pack em cada artigo que acrescentar. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
+          intro: 'Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
           problems: packs.map(pack => ({ title: pack.name, description: packIntro(pack, PACK_HOOK[pack.id] ?? pack.description) })),
           howItWorks: PACK_PERK_LIMIT,
           benefits: PACK_PERK_BULLETS,

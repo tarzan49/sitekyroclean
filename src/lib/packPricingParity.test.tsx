@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
@@ -86,7 +87,7 @@ describe('o quiz e o configurador cobram o mesmo pelo mesmo cesto', () => {
     expect(calculateCustomPack(configuratorItems(basket), 'Braga').subtotal).toBe(quizTotal(basket));
   });
 
-  it('fixes the known totals', () => {
+  it.skipIf(!PACK_PERKS_ON)('fixes the known totals', () => {
     expect(quizTotal(baskets[0])).toBe(148);
     expect(quizTotal(baskets[2])).toBe(134);
     expect(quizTotal(baskets[3])).toBe(124);

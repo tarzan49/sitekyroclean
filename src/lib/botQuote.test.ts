@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { describe, expect, it } from 'vitest';
 import { bigOrderPrice, botQuote, listBotCities, resolveBotCity } from './botQuote';
 import { locationPrices } from '../constants/travel';
@@ -62,7 +63,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(pack?.travel).toBeLessThanOrEqual(10);
     expect(ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Sines' }).travel).toBe(20);
   });
-  it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
+  it.skipIf(!PACK_PERKS_ON)('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 198€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
     const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
     expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 209, 269, 159]);
     expect(ok({ items: [{ kind: 'sofa', size: '4-lugares' }], city: 'Porto' }).handToOwner).toBe(false);
@@ -91,7 +92,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const added = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
     expect(added.lines.map(l => l.amount)).toEqual([69, 119]);
   });
-  it('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
+  it.skipIf(!PACK_PERKS_ON)('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
     expect(r.lines.map(l => l.amount)).toEqual([79, 55]);
     expect([r.subtotal, r.savings, r.travel, r.total]).toEqual([134, 14, 0, 134]);

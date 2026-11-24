@@ -76,7 +76,7 @@ const PacksSitemap = () => {
               Packs de Limpeza
             </h1>
             <p className="text-white/80 text-base max-w-xl mb-6">
-              Vários artigos na mesma visita: uma só deslocação e preço de pack em cada artigo que acrescentar. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.
+              Vários artigos na mesma visita: uma só deslocação e cada artigo ao preço de tabela. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.
             </p>
             <label htmlFor="pack-city" className="block text-sm font-semibold text-white mb-2">
               Onde fica a sua casa?
@@ -133,7 +133,7 @@ const PacksSitemap = () => {
         <section className="pb-10 md:pb-14 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-[#E8E4DE] bg-white p-5 md:p-6">
-              <h2 className="type-section-title font-playfair text-[#111111] mb-4">Como funciona o preço de pack</h2>
+              <h2 className="type-section-title font-playfair text-[#111111] mb-4">Como funciona um pack</h2>
               <ul className="space-y-3">
                 {PACK_PERK_BULLETS.map(bullet => (
                   <li key={bullet} className="flex gap-3 text-base text-[#333]">

@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { isBlackFriday } from './campaigns';
 import { calculateTravelFee } from './travel';
@@ -35,7 +36,7 @@ describe('o motor na Black Friday', () => {
     expect(calculateTravelFee(15, 79)).toBe(15);
   });
 
-  it('o preço de pack vale abaixo dos 100€', () => {
+  it.skipIf(!PACK_PERKS_ON)('o preço de pack vale abaixo dos 100€', () => {
     const lines = [
       { kind: 'sofa', sizeId: '1-lugar', qty: 1, tablePrice: 49 },
       { kind: 'mattress', qty: 1, tablePrice: 39 },
