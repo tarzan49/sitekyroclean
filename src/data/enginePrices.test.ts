@@ -87,13 +87,13 @@ describe('preços de partida lidos do motor', () => {
     expect(() => mattressCleaningPrice('beliche')).toThrow();
   });
 
-  it('lê os escalões das cadeiras do motor: 20€ de 1 a 4, 17,50€ de 5 a 7, 15€ a partir de 8, sem sob orçamento (dono, 24 Nov 2026)', () => {
+  it('lê os escalões das cadeiras do motor: 20€ da 1.ª à 4.ª, 15€ da 5.ª à 8.ª, 10€ a partir da 9.ª, sem sob orçamento (dono, 24 Nov 2026)', () => {
     const { tiers } = chairCleaningTiers();
-    expect(tiers.map(tier => tier.unit).slice(0, 3)).toEqual([20, 17.5, 15]);
-    expect(tiers.map(tier => [tier.first, tier.unit])).toEqual([[1, 20], [5, 17.5], [8, 15]]);
-    expect(chairTierRows().map(row => row.price)).toEqual(['20€/un', '17,50€/un', '15€/un']);
+    expect(tiers.map(tier => tier.unit).slice(0, 3)).toEqual([20, 15, 10]);
+    expect(tiers.map(tier => [tier.first, tier.unit])).toEqual([[1, 20], [5, 15], [9, 10]]);
+    expect(chairTierRows().map(row => row.price)).toEqual(['20€/un', '15€/un', '10€/un']);
     const sentence = chairTierSentence();
-    expect(sentence).toContain('17,50€');
+    expect(sentence).toContain('10€');
     expect(sentence).not.toMatch(/sob orçamento/i);
   });
 });
@@ -136,8 +136,8 @@ describe('texto que cita estes preços', () => {
 // cadeira ("Desde 12,50€"), como nos outros serviços.
 describe('cadeiras: "Desde" o preço mais baixo por cadeira', () => {
   it('o rótulo vem do escalão mais barato do motor', () => {
-    // Dono, 24 Nov 2026: o escalão mais barato é 15€ por cadeira, a partir da 8.ª.
-    expect(CHAIR_UNIT_MIN).toBe(15);
+    // Dono, 24 Nov 2026: o escalão mais barato é 10€ por cadeira, a partir da 9.ª.
+    expect(CHAIR_UNIT_MIN).toBe(10);
     expect(CHAIR_PRICE_LABEL).toBe(`Desde ${formatEuro(CHAIR_UNIT_MIN)}`);
     expect(startingPriceLabel('limpeza-cadeiras', formatEuro(CHAIR_CLEANING_FROM))).toBe(CHAIR_PRICE_LABEL);
     expect(startingPriceLabel('limpeza-cadeiras', formatEuro(CHAIR_CLEANING_FROM), 'mid')).toBe(`desde ${formatEuro(CHAIR_UNIT_MIN)}`);
