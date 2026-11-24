@@ -453,7 +453,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                   <span className="absolute inset-x-0 bottom-0 flex items-end gap-1 bg-black/45 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
                     <span className="min-w-0 flex-1">
                       <span className="block whitespace-nowrap text-sm font-bold leading-tight text-white drop-shadow">{e.label}</span>
-                      {promo && <span className="mt-0.5 block whitespace-nowrap text-[11.5px] font-bold leading-tight text-[#E8C964] drop-shadow">{promo.what}</span>}
+                      {/* Só "+ oferta" / "+ poupa", sem o tratamento nem o valor (dono, 25 Nov): o valor aparece depois de escolher. */}
+                      {promo && <span className="mt-0.5 block whitespace-nowrap text-xs font-bold leading-tight text-[#E8C964] drop-shadow">{promo.kind === 'save' ? '+ poupa' : '+ oferta'}</span>}
                     </span>
                   </span>
                 </button>
