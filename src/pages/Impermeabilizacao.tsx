@@ -133,7 +133,7 @@ const pillar = getPillarPage('/impermeabilizacao');
 const Impermeabilizacao = () => {
   // Modelo novo (dono, 24 Nov): secções de ecrã inteiro; o preço pede a localidade.
   useSnapSections(true);
-  const [city, setCity] = useState("Lisboa");
+  const [city, setCity] = useState('');
   return (
     <>
       <Header />
@@ -146,16 +146,16 @@ const Impermeabilizacao = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="mb-3 flex items-center justify-between gap-3 md:mb-6">
               <h2 className="type-section-title font-playfair text-[#111111]">O seu <em className="not-italic" style={{ color: "#D4AF37" }}>preço</em></h2>
-              <label className="flex items-center gap-1.5 text-xs text-[#555]"><span className="sr-only sm:not-sr-only">Localidade</span>
+              <label className={`${city ? "flex" : "hidden"} items-center gap-1.5 text-xs text-[#555]`}><span className="sr-only sm:not-sr-only">Localidade</span>
                 <select aria-label="Localidade" value={city} onChange={e => setCity(e.target.value)} className="h-9 max-w-[150px] rounded-lg border-2 border-[#D4AF37] bg-white px-2 text-sm font-semibold text-[#1A1A1A]">
-                  {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
+                  <option value="" disabled>Localidade</option>{cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
                 </select>
               </label>
             </div>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ImperPricePicker city={city} source="pillar_picker_impermeabilizacao" /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ImperPricePicker city={city} onCity={setCity} source="pillar_picker_impermeabilizacao" /></div>
           </div>
         </section>
-        <WaterproofTierCards city={city} />
+        <WaterproofTierCards city={city || "Lisboa"} />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">

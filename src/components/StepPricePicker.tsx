@@ -1,0 +1,265 @@
+// "O seu preço" nas páginas, com a mesma lógica do orçamento (dono, 25 Nov 2026: "deveria ser exatamente o mesmo que o
+// do orçamento [...] deveria seguir a mesma lógica"): localidade, material, tamanho e só depois as opções com preço.
+// Nada vem escolhido e o botão diz o passo que falta. Os números são os do cesto (funções do VisitBasket, que lêem o
+// motor do bot), carregadas só quando a pessoa começa a escolher.
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
+import { WHATSAPP_BASE } from '@/constants/business';
+import { formatEuro } from '@/data/enginePrices';
+import { cities, cityPrep } from '@/data/serviceCatalog';
+import SofaCounters, { sofaWhat, type SofaCounts } from '@/components/SofaCounters';
+import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
+import type { BasketItem, BasketPack } from '@/components/quiz/VisitBasket';
+import matTecido from '@/assets/quiz-materiais/sofa-tecido.webp';
+import matPele from '@/assets/quiz-materiais/sofa-pele.webp';
+import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
+import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
+import imperSofaPhoto from '@/assets/picker-premium-sofa.webp';
+import imperChairPhoto from '@/assets/picker-premium-cadeira.webp';
+
+const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
+
+export type StepKind = 'sofa' | 'chairs' | 'mattress' | 'rug' | 'carpet' | 'imper';
+type Material = 'tecido' | 'pele' | 'comum' | 'natural';
+interface Props { kind: StepKind; city: string; source: string; onCity?: (city: string) => void; material?: Material; piece?: 'sofa' | 'chairs' }
+
+// As funções de preço do cesto: um só cálculo no site (nunca uma cópia).
+type Calc = typeof import('@/components/quiz/VisitBasket');
+let calcModule: Calc | null = null;
+let calcPromise: Promise<Calc> | null = null;
+const loadCalc = () => (calcPromise ??= import('@/components/quiz/VisitBasket').then(m => (calcModule = m)).catch(e => { calcPromise = null; throw e; }));
+
+const PACKS: { pack: BasketPack; name: string; note: string; wa: string }[] = [
+  { pack: 'premium', name: 'Blindado', note: 'Limpeza + Premium, até 10 anos', wa: 'limpeza + impermeabilização Premium, proteção anti-manchas e anti-líquidos até 10 anos' },
+  { pack: 'essencial', name: 'Protegido', note: 'Limpeza + Essencial, 1 a 2 anos', wa: 'limpeza + impermeabilização Essencial, proteção anti-manchas e anti-líquidos de 1 a 2 anos' },
+  { pack: 'none', name: 'Renovado', note: 'Só limpeza', wa: 'só limpeza, sem impermeabilização' },
+];
+const IMPER: typeof PACKS = [
+  { pack: 'premium', name: 'Premium', note: 'À base de solvente, até 10 anos', wa: 'impermeabilização Premium' },
+  { pack: 'essencial', name: 'Essencial', note: 'À base de água, 1 a 2 anos', wa: 'impermeabilização Essencial' },
+];
+const MATERIALS: Partial<Record<StepKind, { ask: string; options: { id: Material; label: string; photo: string }[] }>> = {
+  sofa: { ask: 'O seu sofá é de que material?', options: [{ id: 'tecido', label: 'Tecido', photo: matTecido }, { id: 'pele', label: 'Pele / couro', photo: matPele }] },
+  rug: { ask: 'O seu tapete é de que material?', options: [{ id: 'comum', label: 'Sintético ou lã', photo: matComum }, { id: 'natural', label: 'Juta ou sisal', photo: matJuta }] },
+};
+const SEATS = [1, 2, 3, 4, 5, 6];
+const CHAIRS = [2, 4, 6, 8, 10, 12];
+const CHAIR_MAX = 100;
+const MATTRESS = [{ id: 'solteiro', label: 'Solteiro' }, { id: 'casal', label: 'Casal' }, { id: 'king', label: 'King / Queen' }];
+const SIZES = {
+  rug: [{ label: 'Pequeno', w: '1,2', l: '1,7' }, { label: 'Médio', w: '1,6', l: '2,3' }, { label: 'Grande', w: '2', l: '3' }, { label: 'Muito grande', w: '2,5', l: '3,5' }],
+  carpet: [{ label: 'Quarto', w: '3', l: '4' }, { label: 'Sala', w: '4', l: '6' }, { label: 'Escritório', w: '6', l: '8' }, { label: 'Espaço grande', w: '10', l: '10' }],
+};
+const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga'];
+const num = (v: string) => { const n = parseFloat(v.replace(',', '.')); return n > 0 ? n : 0; };
+const seatId = (n: number) => `${n}-${n === 1 ? 'lugar' : 'lugares'}`;
+
+function PriceTag({ shown, struck: raw }: { shown: number | null; struck: number | null }) {
+  if (shown === null) return <span className="text-xs font-semibold text-[#8B6914]">Sob orçamento</span>;
+  const struck = raw !== null && raw - shown >= 5 ? raw : null; // poupança de trocos não se mostra (dono, 25 Nov)
+  return <span className="flex shrink-0 flex-col items-end leading-tight">
+    <span className="flex items-baseline gap-1.5 whitespace-nowrap">{struck !== null && <span className="text-xs text-[#888] line-through">{formatEuro(struck)}</span>}<span className="text-lg font-bold text-[#1A1A1A]">{formatEuro(shown)}</span></span>
+    {struck !== null && <span className="whitespace-nowrap text-[11px] font-semibold text-[#8B6914]">Poupa {formatEuro(Math.round((struck - shown) * 100) / 100)}</span>}
+  </span>;
+}
+
+const tile = (on: boolean) => `rounded-2xl border-2 font-semibold transition-colors ${on ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#444] hover:border-[#D4AF37]/60'}`;
+
+/** Cartões com fotografia (material, peça): a primeira pergunta ocupa o espaço do widget. */
+function PhotoCards<T extends string>({ ask, options, onPick }: { ask: string; options: { id: T; label: string; photo: string }[]; onPick: (id: T) => void }) {
+  return <>
+    <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-3 md:text-lg">{ask}</p>
+    <div className="grid grid-cols-2 gap-3">
+      {options.map(o => <button key={o.id} type="button" onClick={() => onPick(o.id)} className="relative h-40 overflow-hidden rounded-2xl border-2 border-[#D4AF37]/60 text-left transition-transform active:scale-[0.98] md:h-48">
+        <img src={o.photo} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/50 px-3 py-2 backdrop-blur-md"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0 text-[#D4AF37]" strokeWidth={3} aria-hidden /></span>
+      </button>)}
+    </div>
+  </>;
+}
+/** Depois de escolher, os cartões encolhem para uma linha. */
+function Pills<T extends string>({ label, options, value, onPick }: { label: string; options: { id: T; label: string }[]; value: T; onPick: (id: T) => void }) {
+  return <div className="mb-2 grid grid-cols-2 gap-2 md:mb-3" role="group" aria-label={label}>
+    {options.map(o => <button key={o.id} type="button" aria-pressed={value === o.id} onClick={() => onPick(o.id)} className={`flex h-11 min-h-0 items-center justify-center gap-1.5 text-sm ${tile(value === o.id)}`}>{value === o.id && <Check className="h-4 w-4 shrink-0 text-[#D4AF37]" strokeWidth={3} aria-hidden />}{o.label}</button>)}
+  </div>;
+}
+
+export default function StepPricePicker({ kind, city, source, onCity, material: fixedMaterial, piece: fixedPiece }: Props) {
+  const [piece, setPiece] = useState<'sofa' | 'chairs' | null>(fixedPiece ?? null);
+  const [material, setMaterial] = useState<Material | null>(fixedMaterial ?? null);
+  const [counts, setCounts] = useState<SofaCounts>({});
+  const [mCounts, setMCounts] = useState<Record<string, number>>({});
+  const [qty, setQty] = useState(0);
+  const [ownQty, setOwnQty] = useState(false);
+  const [dims, setDims] = useState({ w: '', l: '' });
+  const [pack, setPack] = useState<BasketPack | null>(null);
+  const [extra, setExtra] = useState(false); // anti-ácaros (colchão) ou anti-odor (tapete, alcatifa)
+  const [basket, setBasket] = useState<BasketItem[] | null>(null);
+  const [calc, setCalc] = useState<Calc | null>(calcModule);
+  const uid = useRef(`p${Date.now()}`).current;
+
+  const what: 'sofa' | 'chairs' | 'mattress' | 'rug' | 'carpet' | null = kind === 'imper' ? piece : kind;
+  const imper = kind === 'imper';
+  const leather = material === 'pele';
+  const mat = MATERIALS[kind];
+  const isRug = what === 'rug' || what === 'carpet';
+
+  const group = (over: Partial<BasketItem> = {}): BasketItem[] => {
+    const base = { pack: 'none' as BasketPack, ...(leather ? { leather: true } : {}), ...(imper ? { imperOnly: true } : {}), ...over };
+    if (what === 'sofa') return SEATS.filter(n => (counts[seatId(n)] ?? 0) > 0).map(n => ({ id: `${uid}-${n}`, kind: 'sofa', size: n === 6 ? '5-lugares' : seatId(n), ...(n === 6 ? { seats: 6 } : {}), qty: counts[seatId(n)], ...base }));
+    if (what === 'mattress') return MATTRESS.filter(m => (mCounts[m.id] ?? 0) > 0).map(m => ({ id: `${uid}-${m.id}`, kind: 'mattress', size: m.id, qty: mCounts[m.id], ...base }));
+    if (what === 'chairs') return qty > 0 ? [{ id: uid, kind: 'chairs', qty, ...base }] : [];
+    if (isRug) return num(dims.w) && num(dims.l) ? [{ id: uid, kind: what, qty: 1, width: dims.w, length: dims.l, ...(kind === 'rug' ? { rugMaterial: material === 'natural' ? 'juta ou sisal' : 'sintético ou lã' } : {}), ...base }] : [];
+    return [];
+  };
+  const withExtra = (on: boolean): Partial<BasketItem> => (what === 'mattress' ? { pack: on ? 'premium' : 'none' } : isRug ? { odor: on } : {});
+
+  const pieceOk = what !== null;
+  const materialOk = !mat || material !== null;
+  const sized = pieceOk && materialOk && group().length > 0;
+  const needsPack = (what === 'sofa' || what === 'chairs') && !leather;
+  const ready = !!city && sized && (!needsPack || pack !== null);
+  const chosen: Partial<BasketItem> = needsPack ? { pack: pack ?? 'none' } : withExtra(extra);
+
+  // O cálculo carrega quando se começa a escolher, para já lá estar quando os preços aparecem.
+  const started = pieceOk && (materialOk || sized);
+  useEffect(() => { if (started && !calc) loadCalc().then(setCalc).catch(() => undefined); }, [started, calc]);
+  const warm = () => { if (!calcModule) loadCalc().catch(() => undefined); };
+
+  const price = (over: Partial<BasketItem>) => (calc && city && sized ? calc.optionPrice(city, [], group(over)) : { shown: null, struck: null });
+  const total = ready ? price(chosen).shown : null;
+  const add = () => { const on = price(withExtra(true)), off = price(withExtra(false)); const plus = on.shown !== null && off.shown !== null ? Math.max(0, Math.round((on.shown - off.shown) * 100) / 100) : null; const sum = (l: BasketItem[]) => l.reduce<number | null>((t, x) => { const v = calc!.struckOf(city, x); return t === null || v === null ? null : t + v; }, 0); const a = calc ? sum(group(withExtra(true))) : null, b = calc ? sum(group(withExtra(false))) : null; const was = a !== null && b !== null ? Math.round((a - b) * 100) / 100 : null; return { plus, was: was !== null && plus !== null && was - plus >= 5 ? was : null }; };
+  const gift = calc && ready ? calc.giftsUnlocked(city, [], group(chosen)) : null;
+
+  const pickMaterial = (m: Material) => { if (m === material) return; setMaterial(m); setPack(null); warm(); };
+  const options = imper ? IMPER : PACKS;
+  const option = options.find(o => o.pack === pack);
+
+  const describe = () => {
+    if (what === 'sofa') return leather ? sofaWhat(counts, 'sofá de pele', 'sofás de pele') : sofaWhat(counts);
+    if (what === 'chairs') return `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
+    if (what === 'mattress') return MATTRESS.filter(m => mCounts[m.id] > 0).map(m => `${mCounts[m.id]} ${mCounts[m.id] === 1 ? 'colchão' : 'colchões'} ${m.label.toLowerCase()}`).join(' e ');
+    return `${what === 'carpet' ? 'uma alcatifa' : `um tapete (${material === 'natural' ? 'juta ou sisal' : 'sintético ou lã'})`} de mais ou menos ${dims.w} x ${dims.l} m`;
+  };
+  const service = () => {
+    if (imper) return `da impermeabilização ${option?.name} para ${describe()}`;
+    if (leather) return `da limpeza e tratamento da pele (limpeza e hidratação) para ${describe()}`;
+    if (needsPack) return `do pack ${option?.name} (${option?.wa}) para ${describe()}`;
+    if (what === 'mattress') return `da limpeza${extra ? ' com anti-ácaros (produto Bactran)' : ''} para ${describe()}`;
+    return `da lavagem${extra ? ' com anti-odor' : ''} de ${describe()}`;
+  };
+  const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'fotografias';
+  const msg = ready ? `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}` : ''}. Envio ${photo}.` : 'Olá! Gostaria de saber o preço e a disponibilidade. Envio fotografias.';
+
+  const step = !city ? 'Escolha a localidade' : !pieceOk ? 'Escolha a peça' : !materialOk ? 'Escolha o material'
+    : !sized ? (isRug ? 'Escolha ou escreva a medida' : what === 'chairs' ? 'Escolha quantas cadeiras' : what === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : 'Escolha uma opção';
+
+  const title = (text: string, hint?: string) => <p className="mb-2 text-sm font-semibold text-[#1A1A1A] md:mb-3 md:text-base">{text}{hint && <span className="font-normal text-[#666]"> {hint}</span>}</p>;
+  const bumpMattress = (id: string, d: number) => setMCounts(c => ({ ...c, [id]: Math.max(0, Math.min(9, (c[id] ?? 0) + d)) }));
+
+  // ── Passos da esquerda ──
+  let questions: ReactNode;
+  if (!city) {
+    questions = <>
+      <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-3 md:text-lg">Onde é o serviço?</p>
+      <div className="grid grid-cols-2 gap-2">{FIRST_CITIES.map(c => <button key={c} type="button" onClick={() => { warm(); onCity?.(c); }} className={`min-h-12 px-2 text-sm ${tile(false)}`}>{c}</button>)}</div>
+      <select aria-label="Outra localidade" value="" onChange={e => onCity?.(e.target.value)} className="mt-2 h-12 w-full rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">
+        <option value="" disabled>Outra localidade</option>
+        {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
+      </select>
+    </>;
+  } else if (!pieceOk) {
+    questions = <PhotoCards ask="O que quer impermeabilizar?" options={[{ id: 'sofa' as const, label: 'Sofá', photo: imperSofaPhoto }, { id: 'chairs' as const, label: 'Cadeiras', photo: imperChairPhoto }]} onPick={p => { setPiece(p); warm(); }} />;
+  } else if (mat && material === null) {
+    questions = <PhotoCards ask={mat.ask} options={mat.options} onPick={pickMaterial} />;
+  } else {
+    questions = <>
+      {imper && <Pills label="Peça" options={[{ id: 'sofa' as const, label: 'Sofá' }, { id: 'chairs' as const, label: 'Cadeiras' }]} value={piece!} onPick={p => { setPiece(p); setPack(null); }} />}
+      {mat && !fixedMaterial && <Pills label={mat.ask} options={mat.options} value={material!} onPick={pickMaterial} />}
+      {what === 'sofa' && (sized
+        ? <SofaCounters counts={counts} onChange={setCounts} hideSummary />
+        : <>
+            {title('Quantos lugares?', 'Pode juntar vários')}
+            <div className="grid grid-cols-3 gap-2">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} className={`flex flex-col items-center gap-0.5 px-1 py-2 text-sm ${tile(false)}`}>
+              <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-9 w-12 sm:h-9 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}
+              <span className="flex items-center text-[11px] text-[#8B6914]"><Plus className="mr-0.5 h-3 w-3" strokeWidth={3} aria-hidden />Juntar</span>
+            </button>)}</div>
+            <p className="mt-2 text-xs leading-snug text-[#666]">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
+          </>)}
+      {what === 'mattress' && <>
+        {title('Que tamanho?', 'Pode juntar vários')}
+        <div className="grid grid-cols-3 gap-2">{MATTRESS.map(m => { const n = mCounts[m.id] ?? 0; return (
+          <div key={m.id} role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none flex-col items-center gap-0.5 px-1 py-2 text-center text-sm ${tile(n > 0)}`}>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-10 w-14 sm:h-10 sm:w-14" />{m.label}
+            {n > 0 ? <span className="mt-0.5 flex items-center gap-1">
+              <button type="button" aria-label={`Menos um colchão ${m.label}`} onClick={e => { e.stopPropagation(); bumpMattress(m.id, -1); }} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-full bg-[#F3F0E7]"><Minus className="h-3.5 w-3.5" /></button>
+              <span className="w-4 text-center text-base font-bold">{n}</span>
+              <button type="button" aria-label={`Mais um colchão ${m.label}`} onClick={e => { e.stopPropagation(); bumpMattress(m.id, 1); }} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-full bg-[#D4AF37] text-white"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
+            </span> : <span className="mt-0.5 flex h-8 items-center text-[11px] text-[#8B6914]"><Plus className="mr-0.5 h-3 w-3" strokeWidth={3} aria-hidden />Juntar</span>}
+          </div>); })}</div>
+      </>}
+      {what === 'chairs' && <>
+        {title('Quantas cadeiras?')}
+        <div className="grid grid-cols-3 gap-2">{CHAIRS.map(n => <button key={n} type="button" aria-pressed={!ownQty && qty === n} onClick={() => { setOwnQty(false); setQty(n); warm(); }} className={`${sized ? 'h-10 min-h-0 text-sm' : 'min-h-[56px] text-base'} ${tile(!ownQty && qty === n)}`}>{n} cadeiras</button>)}</div>
+        {!ownQty && !sized && <button type="button" onClick={() => { setOwnQty(true); setQty(0); warm(); }} className={`mt-2 h-11 w-full text-sm ${tile(false)}`}>Outro número</button>}
+        {ownQty && !sized && <label className="mt-2 flex items-center justify-between gap-3 rounded-2xl border-2 border-[#D4AF37]/60 bg-white px-3 py-1.5">
+          <span className="text-sm font-semibold text-[#1A1A1A]">Número de cadeiras</span>
+          <input autoFocus inputMode="numeric" enterKeyHint="done" maxLength={3} aria-label="Número de cadeiras" onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }} onBlur={e => { const n = Math.min(CHAIR_MAX, Number(e.target.value.replace(/\D/g, ''))); if (n > 0) setQty(n); else setOwnQty(false); }} className="h-11 w-24 rounded-xl border-2 border-[#E5E0D3] text-center text-lg font-bold outline-none focus:border-[#D4AF37]" />
+        </label>}
+        {sized && <div className="mt-2 flex items-center justify-between rounded-2xl border-2 border-[#E5E0D3] bg-white p-1">
+          <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-9 min-h-0 w-9 min-w-0 place-items-center rounded-xl bg-[#F3F0E7]"><Minus className="h-4 w-4" /></button>
+          <span className="text-base font-semibold text-[#1A1A1A]">{qty} {qty === 1 ? 'cadeira' : 'cadeiras'}</span>
+          <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-9 min-h-0 w-9 min-w-0 place-items-center rounded-xl bg-[#F3F0E7]"><Plus className="h-4 w-4" /></button>
+        </div>}
+      </>}
+      {isRug && <>
+        {title(what === 'carpet' ? 'Qual é o espaço?' : 'Que tamanho tem?')}
+        <div className="grid grid-cols-2 gap-2">{SIZES[what as 'rug' | 'carpet'].map(z => <button key={z.label} type="button" aria-pressed={dims.w === z.w && dims.l === z.l} onClick={() => { setDims({ w: z.w, l: z.l }); warm(); }} className={`flex flex-col items-start px-3 py-2 text-left text-sm leading-tight ${tile(dims.w === z.w && dims.l === z.l)}`}>{z.label}<span className="text-xs font-semibold text-[#666]">{z.w} × {z.l} m</span></button>)}</div>
+        <p className="mb-1 mt-2 text-xs font-semibold text-[#666]">Ou escreva a medida, em metros</p>
+        <div className="grid grid-cols-2 gap-2">
+          <input inputMode="decimal" aria-label="Largura em metros" placeholder="Largura (2,0)" value={dims.w} onChange={e => { setDims(d => ({ ...d, w: e.target.value })); warm(); }} className="h-11 rounded-xl border-2 border-[#E5E0D3] bg-white px-3 text-base outline-none focus:border-[#D4AF37]" />
+          <input inputMode="decimal" aria-label="Comprimento em metros" placeholder="Comprimento (3,0)" value={dims.l} onChange={e => { setDims(d => ({ ...d, l: e.target.value })); warm(); }} className="h-11 rounded-xl border-2 border-[#E5E0D3] bg-white px-3 text-base outline-none focus:border-[#D4AF37]" />
+        </div>
+      </>}
+    </>;
+  }
+
+  const row = (on: boolean) => `flex min-h-[54px] w-full items-center justify-between gap-2 px-3.5 py-1.5 text-left md:min-h-[72px] md:px-5 ${tile(on)}`;
+  const text = (name: string, note: string) => <span className="min-w-0"><span className="block text-base font-bold leading-tight text-[#1A1A1A] md:text-lg">{name}</span><span className="block text-xs font-normal leading-snug text-[#555] md:text-sm">{note}</span></span>;
+  const addOn = () => { const a = add(); return a.plus === null ? null : <span className="flex shrink-0 flex-col items-end leading-tight">{a.was !== null && <span className="text-[11px] text-[#888] line-through">+{formatEuro(a.was)}</span>}<span className="text-lg font-bold text-[#1A1A1A]">{a.plus > 0 ? `+${formatEuro(a.plus)}` : 'Oferecido'}</span></span>; };
+  const area = isRug ? (Math.round(num(dims.w) * num(dims.l) * 100) / 100).toLocaleString('pt-PT') : '';
+
+  return (
+    <div className="mx-auto grid w-full max-w-4xl gap-2.5 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-8" onPointerDown={warm}>
+      <div>{questions}</div>
+      <div className="flex flex-col">
+        {city && sized && <div className="flex flex-col gap-2">
+          {needsPack && options.map(o => <button key={o.pack} type="button" aria-pressed={pack === o.pack} onClick={() => setPack(o.pack)} className={row(pack === o.pack)}>
+            {text(o.name, o.note)}
+            <span className="flex items-center gap-2">{calc ? <PriceTag {...price({ pack: o.pack })} /> : <span className="h-5 w-14 animate-pulse rounded bg-[#EFEAE0]" aria-hidden />}<span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${pack === o.pack ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{pack === o.pack && <Check className="h-3 w-3" strokeWidth={3} />}</span></span>
+          </button>)}
+          {leather && <div className={row(true)}>{text('Limpeza + tratamento da pele', 'Limpeza e hidratação')}{calc && <PriceTag {...price({})} />}</div>}
+          {what === 'mattress' && <div className={row(!extra)}>{text('Limpeza', 'Extração a fundo, seca em 2 a 5 h')}{calc && <PriceTag {...price({})} />}</div>}
+          {isRug && <div className={row(!extra)}>{text(`${what === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa'}, ${area} m²`, 'Deslocação incluída, seca em 2 a 5 h')}{calc && <PriceTag {...price({})} />}</div>}
+          {(what === 'mattress' || isRug) && <button type="button" aria-pressed={extra} onClick={() => setExtra(v => !v)} className={row(extra)}>
+            {text(what === 'mattress' ? 'Com anti-ácaros' : 'Com anti-odor', what === 'mattress' ? 'Produto Bactran, desinfeta o colchão' : 'Para o cheiro de animais ou de urina')}
+            <span className="flex items-center gap-2">{calc && addOn()}<span className={`grid h-5 w-5 shrink-0 place-items-center rounded-md border-2 ${extra ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{extra && <Check className="h-3 w-3" strokeWidth={3} />}</span></span>
+          </button>}
+        </div>}
+        {!sized && <div className="hidden min-h-[180px] flex-1 items-center justify-center rounded-2xl border-2 border-dashed border-[#E5E0D3] px-6 text-center text-base text-[#666] md:flex">O preço aparece aqui assim que escolher {!city ? 'a localidade' : !pieceOk ? 'a peça' : !materialOk ? 'o material e o tamanho' : 'o tamanho'}.</div>}
+        {gift && <p className="mt-1.5 text-xs font-semibold text-[#8B6914]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
+        {ready && <button type="button" onClick={() => setBasket(group(chosen))} className="mt-2 flex h-10 min-h-0 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] hover:bg-[#D4AF37]/20 md:h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} aria-hidden />Juntar mais artigos à mesma visita</button>}
+        {ready
+          ? <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-center text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] md:min-h-14 md:text-base">
+              <MessageCircle className="h-5 w-5" aria-hidden />{total !== null ? `Pedir este orçamento · ${formatEuro(total)}` : 'Pedir este orçamento no WhatsApp'}
+            </a>
+          : <>
+              <div aria-live="polite" className="mt-2 flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#D4AF37]/35 px-3 text-center text-[15px] font-bold text-[#5b4a12] md:min-h-14">{step}</div>
+              <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={`${source}_direto`} className="mt-1 flex min-h-9 items-center justify-center gap-1.5 text-sm font-semibold text-[#128C4B] underline-offset-4 hover:underline"><MessageCircle className="h-4 w-4" aria-hidden />Ou peça o preço no WhatsApp</a>
+            </>}
+        {ready && <p className="mt-1 hidden text-center text-sm text-[#666] md:block">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
+      </div>
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
+    </div>
+  );
+}

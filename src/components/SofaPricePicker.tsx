@@ -1,16 +1,7 @@
-// Widget de preço dos sofás com o botão "+ Juntar mais artigos à mesma visita" a abrir o cesto da visita
-// (regra do dono, 24 Nov: em todas as páginas de serviço, por baixo dos lugares). Para as páginas fora do
-// LandingServiceSections (problemas, materiais, marcas, página principal).
-import { lazy, Suspense, useState } from 'react';
-import WaterproofPackPicker, { type PackChoice } from '@/components/WaterproofPackPicker';
-import { choiceToItems } from '@/components/quiz/basketChoice';
+// Widget de preço dos sofás para as páginas fora do LandingServiceSections (problemas, materiais, marcas, principal).
+// `material` quando a página já o diz (ex.: sofá de veludo): não se pergunta outra vez.
+import StepPricePicker from '@/components/StepPricePicker';
 
-const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
-
-export default function SofaPricePicker({ city, source }: { city: string; source: string }) {
-  const [basket, setBasket] = useState<PackChoice | null>(null);
-  return <>
-    <WaterproofPackPicker kind="sofa" city={city} source={source} onMore={c => setBasket(c)} />
-    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={choiceToItems(basket)} /></Suspense>}
-  </>;
+export default function SofaPricePicker({ city, source, onCity, material }: { city: string; source: string; onCity?: (city: string) => void; material?: 'tecido' }) {
+  return <StepPricePicker kind="sofa" city={city} source={source} onCity={onCity} material={material} />;
 }

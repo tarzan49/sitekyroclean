@@ -36,7 +36,7 @@ function summary(counts: SofaCounts): string {
   return `${total} sofás: ${parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts[0]}`;
 }
 
-export default function SofaCounters({ counts, onChange }: { counts: SofaCounts; onChange: (next: SofaCounts) => void }) {
+export default function SofaCounters({ counts, onChange, hideSummary = false }: { counts: SofaCounts; onChange: (next: SofaCounts) => void; hideSummary?: boolean }) {
   const bump = (id: string, d: number) => onChange({ ...counts, [id]: Math.max(0, Math.min(9, (counts[id] ?? 0) + d)) });
   return (
     <div>
@@ -52,16 +52,16 @@ export default function SofaCounters({ counts, onChange }: { counts: SofaCounts;
           ) : (
             <div key={id} className="flex h-11 flex-col items-center justify-center rounded-xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 md:h-12">
               <span className="whitespace-nowrap text-[11px] font-semibold leading-none text-[#555]">{seatsLabel(id)}</span>
-              <span className="mt-0.5 flex items-center gap-1">
-                <button type="button" onClick={() => bump(id, -1)} aria-label={`Tirar um sofá de ${seatsLabel(id)}`} className="grid h-6 min-h-0 w-6 min-w-0 place-items-center rounded-md bg-white/80 text-[#1A1A1A]"><Minus className="h-3 w-3" /></button>
+              <span className="flex items-center gap-1">
+                <button type="button" onClick={() => bump(id, -1)} aria-label={`Tirar um sofá de ${seatsLabel(id)}`} className="grid h-7 min-h-0 w-7 min-w-0 place-items-center rounded-md bg-white/80 text-[#1A1A1A]"><Minus className="h-3 w-3" /></button>
                 <span className="w-4 text-center text-sm font-bold leading-none text-[#1A1A1A]">{n}</span>
-                <button type="button" onClick={() => bump(id, 1)} aria-label={`Juntar mais um sofá de ${seatsLabel(id)}`} className="grid h-6 min-h-0 w-6 min-w-0 place-items-center rounded-md bg-white/80 text-[#1A1A1A]"><Plus className="h-3 w-3" /></button>
+                <button type="button" onClick={() => bump(id, 1)} aria-label={`Juntar mais um sofá de ${seatsLabel(id)}`} className="grid h-7 min-h-0 w-7 min-w-0 place-items-center rounded-md bg-white/80 text-[#1A1A1A]"><Plus className="h-3 w-3" /></button>
               </span>
             </div>
           );
         })}
       </div>
-      <p className="mt-1.5 text-xs text-[#666]" aria-live="polite">{summary(counts)}</p>
+      <p className={hideSummary ? 'sr-only' : 'mt-1.5 text-xs text-[#666]'} aria-live="polite">{summary(counts)}</p>
     </div>
   );
 }

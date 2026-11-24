@@ -9,6 +9,7 @@ import type { BasketItem } from '@/components/quiz/VisitBasket';
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 import { Check, Minus, Plus, MessageCircle } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
+import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
 import SofaCounters, { sofaItems, sofaWhat, sofaTotal, type SofaCounts } from '@/components/SofaCounters';
@@ -31,9 +32,14 @@ const ODOR: Option[] = [
 ];
 
 export interface TreatmentChoice { kind: TreatmentKind; size: string; width: number; length: number; treat: boolean; qty?: number }
-interface Props { kind: TreatmentKind; city: string; source: string; onMore?: (choice: TreatmentChoice) => void }
+interface Props { kind: TreatmentKind; city: string; source: string; onMore?: (choice: TreatmentChoice) => void; onCity?: (city: string) => void }
 
-export default function TreatmentPackPicker({ kind, city, source, onMore }: Props) {
+export default function TreatmentPackPicker(props: Props) {
+  // Colchões e tapetes: a lógica do orçamento (dono, 25 Nov). O sofá com anti-ácaros (packs) fica neste widget.
+  return props.kind === 'sofa' ? <SofaTreatmentPicker {...props} /> : <StepPricePicker kind={props.kind} city={props.city} source={props.source} onCity={props.onCity} />;
+}
+
+function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
   const OPTIONS = kind === 'rug' ? ODOR : MITES;
   const [size, setSize] = useState(kind === 'mattress' ? 'casal' : '3-lugares');
   const [rugW, setRugW] = useState(2);
