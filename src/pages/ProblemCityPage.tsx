@@ -31,6 +31,8 @@ import RugPricePicker from "@/components/RugPricePicker";
 import CarpetPricePicker from "@/components/CarpetPricePicker";
 import ServiceProcessStory from "@/components/ServiceProcessStory";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
+import ChairProcessStory from "@/components/ChairProcessStory";
+import ServicePricePicker, { type PickerService } from "@/components/ServicePricePicker";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
 import { pickReviewSubset } from "@/data/reviewsPool";
@@ -49,7 +51,9 @@ const ProblemCityPage = () => {
   const sofa = problem?.relatedServices[0] === 'limpeza-sofas';
   const rug = problem?.relatedServices[0] === 'limpeza-tapetes';
   const carpet = problem?.relatedServices[0] === 'limpeza-alcatifas';
-  const fresh = sofa || rug || carpet; // modelo novo: sofás e tapetes (dono, 24 Nov)
+  // Cadeiras e colchões também (packs-tratamento, dono 24 Nov): widget com o cesto e passo a passo real.
+  const mine = ['limpeza-cadeiras', 'limpeza-colchoes'].includes(problem?.relatedServices[0] ?? '');
+  const fresh = sofa || rug || carpet || mine; // modelo novo: sofás, tapetes, alcatifas, cadeiras e colchões (dono, 24 Nov)
   useSnapSections(fresh);
   const city = useMemo(() => routeData ? cities.find(c => c.slug === routeData.citySlug) : null, [routeData]);
 
@@ -129,7 +133,7 @@ const ProblemCityPage = () => {
         {fresh ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{carpet ? <CarpetPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : rug ? <RugPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : <SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} />}</div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{carpet ? <CarpetPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : rug ? <RugPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : mine ? <ServicePricePicker service={problem.relatedServices[0] as PickerService} city={city.name} source={`problem_picker_${problem.slug}`} /> : <SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />}
 
@@ -137,7 +141,7 @@ const ProblemCityPage = () => {
         {fresh ? <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
-            <CustomerReviews reviews={pickReviewSubset(carpet ? 'limpeza-alcatifas' : rug ? 'limpeza-tapetes' : 'limpeza-sofas', `${problem.slug}-${city.slug}`, 6)} />
+            <CustomerReviews reviews={pickReviewSubset(problem.relatedServices[0], `${problem.slug}-${city.slug}`, 6)} />
           </div>
         </section> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -152,6 +156,7 @@ const ProblemCityPage = () => {
           ? <ServiceProcessStory key={problem.slug} service={carpet ? 'limpeza-alcatifas' : 'limpeza-tapetes'} steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : sofa
           ? <SofaProcessGuide key={problem.slug} real steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+          : mine ? <ChairProcessStory key={problem.slug} service={problem.relatedServices[0] as 'limpeza-cadeiras' | 'limpeza-colchoes'} cityPrep={prep} steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : <ProblemTreatmentGuide key={problem.slug} guide={getProblemLayout(problem).processGuide} slug={problem.slug} />}
 
         {/* ═══ BENEFÍCIOS ═══ */}
