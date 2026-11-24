@@ -10,9 +10,9 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Molde (`src/pages/`) | Páginas | Sofás | Estado sofás | Outros serviços |
 |---|---|---|---|---|
 | LocationServicePage (cidade) | 612 | 102 | FEITO | cadeiras e colchões FEITO (24 Nov, packs-tratamento); resto por fazer |
-| FreguesiaServicePage | 4656 | 776 | FEITO (24 Nov) | cadeiras FEITO (24 Nov), falta OK; colchões por fazer |
-| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | cadeiras FEITO (24 Nov), falta OK; colchões por fazer |
-| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras (higienização, lavagem, limpeza) FEITO (24 Nov), falta OK; colchões por fazer |
+| FreguesiaServicePage | 4656 | 776 | FEITO (24 Nov) | cadeiras e colchões FEITO (24 Nov) |
+| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | cadeiras e colchões FEITO (24 Nov) |
+| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras e colchões (higienização, lavagem, limpeza) FEITO (24 Nov) |
 | PackComboPage | 510+ | — | FEITO (todos os packs) | — |
 | ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO, falta OK do dono | por fazer |
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | FEITO em tecido, falta OK; PELE por fazer (precisa de widget sem impermeabilização: limpeza + tratamento da pele) | tapetes 412 |
