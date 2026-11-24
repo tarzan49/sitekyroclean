@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, cityKnown, joinSaving, linePrice, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, joinSaving, linePrice, newItem, optionPrice, orderLines, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -133,4 +133,15 @@ describe('linhas do cesto: nunca somam menos do que o total (9€ dos totais em 
       expect(sum, `${g.map(x => `${x.qty}× ${x.kind} ${x.size ?? ''} ${x.pack}`).join(' + ')}: linhas ${sum}, total ${q.total}`).toBeGreaterThanOrEqual(q.total! - 9);
     }
   }, 60_000);
+});
+
+describe('linhas do pedido guardado', () => {
+  it('são as do cesto e nunca somam menos do que o total (um sofá e um colchão gravavam 79€ + 69€ = 169€)', () => {
+    for (const list of [[newItem('sofa', { pack: 'none' }), newItem('mattress')], [newItem('sofa'), newItem('mattress'), newItem('chairs')], [newItem('sofa', { leather: true, pack: 'premium' })]]) {
+      const sum = orderLines('Lisboa', list).reduce((t, l) => t + l.total!, 0);
+      expect(sum, JSON.stringify(list)).toBeGreaterThanOrEqual(quoteBasket('Lisboa', list).total! - 9);
+      expect(orderLines('Lisboa', list).map(l => l.total)).toEqual(list.map(i => linePrice('Lisboa', i)));
+    }
+    expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' }), newItem('mattress')]).map(l => l.total)).toEqual([89, 79]);
+  });
 });

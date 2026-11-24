@@ -1,6 +1,6 @@
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useEffect, lazy, Suspense } from "react";
-import { MessageCircle } from "lucide-react";
+import { Calculator, MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
 import HomeHeroTrust from "@/components/HomeHeroTrust";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -32,7 +32,7 @@ const Hero = () => {
             <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
             <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
           </picture>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 58%, rgba(5,28,23,.78) 68%, rgba(5,28,23,.92) 78%, rgba(5,28,23,.97) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 46%, rgba(5,28,23,.74) 59%, rgba(5,28,23,.92) 72%, rgba(5,28,23,.97) 100%)' }} />
         </div>
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
@@ -87,8 +87,8 @@ const Hero = () => {
           {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
           <div className="mx-auto flex w-full max-w-sm flex-col gap-2.5 md:mb-8 md:mt-0 md:w-[92%] md:max-w-[400px] md:self-end md:justify-self-center">
 
-              {/* Só o WhatsApp, com a mensagem genérica (dono, 24 Nov: sai o "Calcular o meu preço"). */}
-              {/* WhatsApp is the primary CTA on mobile and desktop. */}
+              {/* WhatsApp primeiro, com a mensagem genérica; o questionário volta por baixo, bem visível (dono, 25 Nov:
+                  "voltar a meter o CTA no Hero [...] torna o botao acessivel e obvio"). */}
               <div className="group relative order-1">
                 <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
                 <a
@@ -111,6 +111,20 @@ const Hero = () => {
                   <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                 </a>
               </div>
+              <button
+                type="button"
+                onClick={handleOpenQuiz}
+                aria-haspopup="dialog"
+                className={[
+                  'order-2 flex h-[56px] w-full items-center justify-center gap-2 px-4 text-[#0B2F2A] touch-manipulation md:h-[60px] md:px-8',
+                  'bg-gradient-to-r from-[#D4AF37] via-[#E8C964] to-[#D4AF37] shadow-[0_6px_22px_rgba(212,175,55,0.38),inset_0_1px_0_rgba(255,255,255,0.35)]',
+                  'hover:scale-[1.025] active:scale-[0.95] transition-all duration-150',
+                  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-white',
+                ].join(' ')}
+              >
+                <Calculator className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={2.25} aria-hidden="true" />
+                <span className="text-[13px] font-bold uppercase tracking-[0.14em]">Calcular o meu preço</span>
+              </button>
 
           </div>
         </div>

@@ -261,6 +261,9 @@ export function linePrice(city: string, it: BasketItem): number | null {
   if (it.qty > 1 && (it.kind === 'sofa' || it.kind === 'mattress')) { const one = aloneTotal(city, { ...it, qty: 1 }); return one === null ? null : Math.round(one * it.qty * 100) / 100; }
   return aloneTotal(city, it);
 }
+/** As linhas do pedido guardado são as que a pessoa viu no cesto (cada peça com a sua deslocação), não as da visita:
+ *  um sofá e um colchão gravavam 79€ + 69€ com o total 169€ (25 Nov 2026). */
+export const orderLines = (city: string, items: BasketItem[]) => items.map(it => ({ label: itemLabel(it), qty: it.qty, total: linePrice(city, it) }));
 /** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, o que o total sobe de verdade
  *  (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€). Só a diferença de
  *  1€ dos totais a acabar em 9 fica no preço da peça.
@@ -422,7 +425,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       carpetKind: items.some(i => i.kind === 'carpet') ? 'alcatifa' : 'tapete',
       basketOrder: {
         ...buildQuizOrder({ service: main.kind === 'rug' || main.kind === 'carpet' ? 'carpet' : main.kind, serviceType: 'both', waterproofingTier: 'premium', sofaItems: [], mattressItems: [], upsellItems: [], carpetItems: [], chairQuantity: '0', chairWaterproofQty: 0, chairAntiAcaros: false, finalLocation: city.trim(), totalPrice: quote.total ?? 0, hasSobOrcamento: quote.sob, hasUpsellSobItem: false, priceText, slotLabel: '' },
-          items.map((it, i) => ({ label: labels[i], qty: it.qty, total: quote.lines[i] ?? null }))),
+          orderLines(city, items)),
         quote: { items: items.map(toQuote).filter(Boolean) as QuoteItem[], exact: true },
         rugs: items.filter(i => isRug(i.kind) && num(i.width) && num(i.length)).map(i => ({ kind: i.kind as 'rug' | 'carpet', typed: `${i.width} × ${i.length}`, width: num(i.width), length: num(i.length), areaM2: Math.round(num(i.width) * num(i.length) * 100) / 100, fromCm: false, doubtful: false })),
         rugPickup: items.some(i => isRug(i.kind)) ? false : null,

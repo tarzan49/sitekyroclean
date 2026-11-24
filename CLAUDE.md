@@ -115,7 +115,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - O HTML estático (`scripts/prerender.ts`) é o que o Google e as IAs leem; tem de dizer o mesmo que a página React (regra anti-cloaking). Dados partilhados vivem em `src/data/*` e são lidos pelos dois lados.
 - Constantes duplicadas são a armadilha nº 1: uma mudança de preço/facto faz-se na fonte única e verifica-se no prerender.
 - Rota nova só no React precisa de entrada no `prerender.ts`, senão serve 404.
-- Hero das páginas de SEO: só botão de WhatsApp. Mensagens de WhatsApp pedem sempre "o preço e a disponibilidade".
+- Hero das páginas de SEO: só botão de WhatsApp. A página inicial tem também "Calcular o meu preço" (questionário), por baixo do WhatsApp (dono, 25 Nov). Mensagens de WhatsApp pedem sempre "o preço e a disponibilidade".
 - Google Ads otimiza para "Serviço fechado" (fechos reais, valor "para ti", via `ads-conversions-feed`: com código "ref." vai o gclid, e os fechos marcados Google Ads no CRM sem código vão pelo telefone cifrado, dono 24 Nov); o clique no WhatsApp é secundário (dono, 3 Nov).
 - Nomes dos packs nas escolhas de preço do site: **Blindado** = limpeza + Premium, **Protegido** = limpeza + Essencial, **Renovado** = só limpeza; "Premium"/"Essencial" ficam por baixo e a mensagem de WhatsApp leva os dois (`WaterproofPackPicker.tsx`; dono, 24 Nov).
 - Barra fixa do WhatsApp em todas as páginas: acompanha sempre e só se esconde quando a secção que está no ecrã tem um botão de WhatsApp (`MobileStickyBar.tsx`; dono, 24 Nov).
