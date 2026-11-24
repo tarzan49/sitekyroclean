@@ -62,6 +62,10 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   const [mattress, setMattress] = useState('casal');
   const [qty, setQty] = useState(6);
   const [rug, setRug] = useState(true);
+  const [rugW, setRugW] = useState('2');
+  const [rugL, setRugL] = useState('1.6');
+  const dim = (v: string) => { const n = Number(v.replace(',', '.')); return n > 0 && n <= 10 ? n : null; };
+  const rugItem = rug && pieces.includes('rug') && dim(rugW) && dim(rugL) ? { kind: 'rug', width: dim(rugW), length: dim(rugL), treatment: 'clean' } : null;
   const [t, setT] = useState<Record<string, string>>(DEFAULT_T);
   const setTreat = (k: string) => (v: string) => setT(prev => ({ ...prev, [k]: v }));
 
@@ -72,7 +76,15 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   }), [pieces, seats, mattress, qty, t]);
 
   const quote = (list: Record<string, unknown>[]) => { const r = botQuote({ city, items: list }) as { ok: boolean; quote?: boolean; total?: number | null }; return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null; };
-  const total = useMemo(() => { const v = quote(items.map(i => ({ ...i.base, treatment: i.treatment }))); return v === null ? null : up9(v); }, [items, city]);
+  // Tapete com o preço do bot (dono, 24 Nov): com outras peças = rugCombo.comboPrice (mesma visita, preço de tabela de cada peça).
+  const total = useMemo(() => {
+    const list = items.map(i => ({ ...i.base, treatment: i.treatment }));
+    if (rugItem) {
+      const r = botQuote({ city, items: [...list, rugItem] }) as { ok: boolean; rugCombo?: { ok: boolean; comboPrice?: number } | null };
+      return r.ok && r.rugCombo?.ok && typeof r.rugCombo.comboPrice === 'number' ? up9(r.rugCombo.comboPrice) : null;
+    }
+    const v = quote(list); return v === null ? null : up9(v);
+  }, [items, city, rugW, rugL, rug]);
   // Preço cortado = o mesmo pedido em separado (cada serviço com a sua deslocação): a única comparação permitida (dono, 19 Nov).
   const separate = useMemo(() => {
     const parts: (number | null)[] = [];
@@ -80,18 +92,19 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
       if (i.treatment === 'clean+essencial' || i.treatment === 'clean+premium') { parts.push(quote([{ ...i.base, treatment: 'clean' }]), quote([{ ...i.base, treatment: i.treatment.replace('clean+', '') }])); }
       else parts.push(quote([{ ...i.base, treatment: i.treatment }]));
     }
+    if (rugItem) { const r = botQuote({ city, items: [rugItem] }) as { rugEstimate?: { ok: boolean; homePrice?: number } | null }; parts.push(r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null); }
     return parts.every(v => v !== null) ? (parts as number[]).reduce((a, b) => a + b, 0) : null;
-  }, [items, city]);
+  }, [items, city, rugW, rugL, rug]);
   const crossed = total !== null && separate !== null && separate > total ? up9(separate) : null;
 
   const describe = (p: PieceKind) => {
     if (p === 'sofa') return `sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${TREATMENTS.sofa.find(x => x.id === t.sofa)!.wa})`;
     if (p === 'mattress') return `colchão ${MATTRESS.find(m => m.id === mattress)!.label.toLowerCase()} (${TREATMENTS.mattress.find(x => x.id === t.mattress)!.wa})`;
     if (p === 'chairs') return `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'} (${TREATMENTS.chairs.find(x => x.id === t.chairs)!.wa})`;
-    return 'um tapete (envio as medidas)';
+    return rugItem ? `tapete de ${rugW.replace('.', ',')} × ${rugL.replace('.', ',')} m` : 'um tapete (envio as medidas)';
   };
   const chosen = pieces.filter(p => p !== 'rug' || rug);
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} em ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${rug && pieces.includes('rug') ? ' mais o tapete' : ''}` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} em ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}` : ''}.`;
   const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
   const q = 'mb-1.5 text-base font-semibold text-[#1A1A1A]';
 
@@ -124,15 +137,21 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
             {!compact && <img src={pair('tapete')?.after} alt="" loading="lazy" decoding="async" className="h-14 w-16 shrink-0 object-cover" />}
             <span className={`flex-1 ${compact ? 'px-3 py-2' : 'py-1.5'}`}>
               <span className="block text-[14px] font-bold text-[#1A1A1A]">Juntar o tapete</span>
-              <span className="block text-[11px] leading-tight text-[#555]">Preço pelas medidas, no WhatsApp</span>
+              <span className="block text-[11px] leading-tight text-[#555]">Lavagem em casa, pelas medidas</span>
             </span>
             <span className={`mr-3 grid h-5 w-5 place-items-center rounded-full border-2 ${rug ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{rug && <Check className="h-3 w-3" strokeWidth={3} />}</span>
           </button>
+          {rug && <div className="mt-1.5 flex items-center gap-2 text-sm text-[#555]">
+            <span>Medidas (m):</span>
+            <input aria-label="Largura do tapete em metros" inputMode="decimal" value={rugW} onChange={e => setRugW(e.target.value)} className="h-9 w-16 rounded-lg border-2 border-[#E5E0D3] bg-white text-center font-semibold text-[#1A1A1A]" />
+            <span>×</span>
+            <input aria-label="Comprimento do tapete em metros" inputMode="decimal" value={rugL} onChange={e => setRugL(e.target.value)} className="h-9 w-16 rounded-lg border-2 border-[#E5E0D3] bg-white text-center font-semibold text-[#1A1A1A]" />
+          </div>}
         </>}
       </div>)}
       <div className={pieces.length > 2 ? 'md:col-span-3' : 'md:col-span-2'}>
         <div className="flex items-end justify-between border-t border-[#E5E0D3] pt-2">
-          <span className="text-sm text-[#555]">{rug && pieces.includes('rug') ? 'Total sem o tapete' : `Total em ${city}`}<br />
+          <span className="text-sm text-[#555]">{`Total em ${city}`}<br />
             {crossed !== null && total !== null ? <span className="mt-1 inline-flex items-center rounded-full border border-[#D4AF37]/60 bg-gradient-to-r from-[#F7E7B4] via-[#E9CD72] to-[#D4AF37] px-2.5 py-0.5 text-[12px] font-bold tracking-wide text-[#3A2E08] shadow-[0_4px_12px_-4px_rgba(212,175,55,0.7)]">Poupa {formatEuro(crossed - total)}</span> : <span className="text-xs">deslocação incluída</span>}
           </span>
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>
