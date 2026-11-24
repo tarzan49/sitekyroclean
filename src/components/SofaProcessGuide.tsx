@@ -22,8 +22,12 @@ function realStory(custom?: { label: string; description: string; alt?: string }
     { video: extractVideo, poster: extractPoster },
     { image: pair?.after },
   ];
-  const list = custom && custom.length === 5 ? custom : steps;
-  return list.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt ?? s.label, ...media[i] }));
+  const list = custom && custom.length ? custom : steps;
+  if (list.length === 5) return list.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt ?? s.label, ...media[i] }));
+  // Outro número de etapas (materiais): o vídeo certo pelo nome da etapa; sem vídeo próprio, repete o anterior.
+  const pick = (label: string, i: number) => /avalia|inspe/i.test(label) ? media[0] : /aplica|pulveri|trat|pré/i.test(label) ? media[1] : /escov/i.test(label) ? media[2] : /extra/i.test(label) ? media[3] : /seca|final|confer|resultado/i.test(label) ? media[4] : i === 0 ? media[0] : null;
+  let last = media[0];
+  return list.map((s, i) => { const m = pick(s.label, i) ?? last; last = m; return { label: s.label, text: s.description, alt: s.alt ?? s.label, ...m }; });
 }
 
 /** Novo modelo: história no telemóvel, cinco cartões reais no computador. */
