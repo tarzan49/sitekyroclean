@@ -747,3 +747,4 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #problemas figcaption { padding-top: 6px; }
   html.snap-sections #problemas .grid + p { margin-top: 8px; }
 }
+@keyframes kyro-reveal { 0%, 25% { clip-path: inset(0 100% 0 0); } 70%, 100% { clip-path: inset(0 0 0 0); } }

@@ -120,6 +120,7 @@ export default function PackComboPage() {
         city={city.name}
         price={priceFrom}
         exactPrice={Boolean(simpleKind)}
+        duo={combo}
         breadcrumbs={[{ label: 'Início', to: '/' }, { label: 'Packs', to: '/guia-de-packs' }, { label: heading }]}
         whatsappHref={waHref}
         source={`pack_hero_${pack.id}_${city.slug}`}
