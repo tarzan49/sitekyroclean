@@ -8,7 +8,7 @@ const g = (items: unknown[]) => (botQuote({ items, city: 'Lisboa' }) as any).vis
 
 describe('visitGifts (escada A)', () => {
   it('sofá + colchão: anti-ácaros no colchão, nunca abaixo das peças sozinhas, 89 + 79 = 168 -> 169', () => {
-    expect(g([S, M])).toMatchObject({ total: 169, usual: 208, gifts: [{ piece: 'mattress', normal: 40 }] });
+    expect(g([S, M])).toMatchObject({ total: 169, usual: 208, withoutGift: 149, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
   it('3 peças: + anti-ácaros nas cadeiras', () => {
     expect(g([S, M, C]).total % 10).toBe(9);

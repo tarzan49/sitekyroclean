@@ -612,7 +612,7 @@ function botQuoteCore(input: unknown): CoreQuote {
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -621,7 +621,7 @@ const pricedTotal = (r: Priced): number | null => {
   return !r.quote && typeof r.total === 'number' ? r.total : null;
 };
 type TierGift = { usual: number; total: number };
-function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
+function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; withoutGift: number | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r as unknown as Priced;
   const inp = (input ?? {}) as Record<string, unknown>;
@@ -678,6 +678,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
+  // `withoutGift`: the second option, the visit price without the gift, up to the 9 (149; owner, 24 Nov 2026).
   // Owner, 24 Nov 2026 (sofá 3L + colchão casal = 89 + 79 = 168 -> 169): with a gift the total never falls under
   // the pieces quoted each on its own (each with its travel); without the gift the visit price stays (149).
   const EXTRA_KEYS = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'];
@@ -706,7 +707,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
   const m = gifts.find(g => g.piece === 'mattress');
-  return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
 const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });
