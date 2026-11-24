@@ -1,23 +1,18 @@
-import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import BusinessConditions from './BusinessConditions';
 import { Phone, Mail, MapPin, ChevronRight, Instagram } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
 import kyroLogo from "@/assets/kyro-logo.webp";
-import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID, BUSINESS_LEGAL_NAME, INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/constants/business";
+import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID, BUSINESS_LEGAL_NAME, INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/constants/business";
 import { COVERAGE_PROMISE, RESPONSE_PROMISE, TRAVEL_FEE_MIN } from "@/constants/commercialPolicy";
 
 const Footer = () => {
   return (
     <footer className="bg-kyro-green text-white pt-6 md:pt-8 pb-24" style={{ paddingBottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }}>
-      {/* Fecho de todas as páginas (dono, 24 Nov: o fecho junta-se ao rodapé): WhatsApp e a linha discreta. */}
+      {/* Linha discreta no início do rodapé (dono, 24 Nov: sem botão de WhatsApp aqui; a barra fixa já o mostra). */}
       <div className="mx-auto mb-6 max-w-md px-5 text-center">
-        <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} target="_blank" rel="noopener noreferrer" data-tracking-source="footer_whatsapp"
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-base font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]">
-          Falar por WhatsApp
-        </a>
-        <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
+        <p className="whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
       </div>
       <div className="container mx-auto px-4">
         {/* Logo Section */}
