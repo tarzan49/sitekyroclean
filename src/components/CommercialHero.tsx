@@ -20,7 +20,7 @@ interface Props {
   // intercala as duas categorias em vez de mostrar só a do serviceSlug.
   secondaryServiceSlug?: string;
   /** Antes/depois das duas peças lado a lado, com um + (pack sofá + colchão). */
-  duo?: { left: DuoSide; right: DuoSide };
+  duo?: { left: DuoSide; right: DuoSide; third?: DuoSide };
   city?: string;
   municipality?: string;
   price?: string;
@@ -90,7 +90,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">
-          {duo ? <DuoBeforeAfter left={duo.left} right={duo.right} className="border-t-2 border-[#D4AF37]" /> : category && <HeroBeforeAfterPool category={category} className="border-t-2 border-[#D4AF37]" />}
+          {duo ? <DuoBeforeAfter left={duo.left} right={duo.right} third={duo.third} className="border-t-2 border-[#D4AF37]" /> : category && <HeroBeforeAfterPool category={category} className="border-t-2 border-[#D4AF37]" />}
         </div>
       </div>
     </div>

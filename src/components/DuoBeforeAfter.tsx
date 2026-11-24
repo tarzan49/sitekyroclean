@@ -24,7 +24,7 @@ function VideoHalf({ items }: { items: Video[] }) {
   </div>;
 }
 
-export default function DuoBeforeAfter({ left, right, className = '' }: { left: DuoSide; right: DuoSide; className?: string }) {
+export default function DuoBeforeAfter({ left, right, third, className = '' }: { left: DuoSide; right: DuoSide; third?: DuoSide; className?: string }) {
   const [run, setRun] = useState(0);
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -37,11 +37,13 @@ export default function DuoBeforeAfter({ left, right, className = '' }: { left: 
     const pairs = pool.filter(p => p.kind === 'pair') as unknown as Pair[];
     return pairs.length ? <PairHalf items={pairs} run={run} /> : null;
   };
-  const a = half(left), b = half(right);
-  if (!a || !b) return null;
-  return <div className={`relative grid grid-cols-2 gap-1 ${className}`}>
-    {a}{b}
-    <span aria-hidden="true" className="absolute left-1/2 top-1/2 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#D4AF37] text-2xl font-bold text-[#0c241a] shadow-lg">+</span>
+  // Duas ou três peças lado a lado (sala completa = sofá + cadeiras + tapete), um "+" em cada junção.
+  const halves = [left, right, ...(third ? [third] : [])].map(half);
+  if (halves.some(h => !h)) return null;
+  const n = halves.length;
+  return <div className={`relative grid gap-1 ${n === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${className}`}>
+    {halves.map((h, i) => <div key={i}>{h}</div>)}
+    {Array.from({ length: n - 1 }, (_, i) => <span key={i} aria-hidden="true" style={{ left: `${((i + 1) / n) * 100}%` }} className={`absolute top-1/2 grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#D4AF37] font-bold text-[#0c241a] shadow-lg ${n === 3 ? 'h-8 w-8 text-xl' : 'h-10 w-10 text-2xl'}`}>+</span>)}
     <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-white">Antes · Depois</span>
   </div>;
 }

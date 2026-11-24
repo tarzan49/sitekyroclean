@@ -43,11 +43,11 @@ const PACK_PIECES: Record<string, PieceKind[]> = {
   'quarto-completo': ['mattress', 'rug'],
 };
 
-const PACK_DUO: Record<string, { left: DuoSide; right: DuoSide }> = {
+const PACK_DUO: Record<string, { left: DuoSide; right: DuoSide; third?: DuoSide }> = {
   'sofa-colchao': { left: { category: 'sofa' }, right: { category: 'colchao' } },
   'sofa-impermeabilizacao': { left: { category: 'sofa' }, right: { category: 'impermeabilizacao', video: true } },
   'cadeiras-impermeabilizacao': { left: { category: 'cadeiras' }, right: { category: 'cadeiras', video: true } },
-  'sala-completa': { left: { category: 'sofa' }, right: { category: 'tapete' } },
+  'sala-completa': { left: { category: 'sofa' }, right: { category: 'cadeiras' }, third: { category: 'tapete' } },
   'quarto-completo': { left: { category: 'colchao' }, right: { category: 'tapete' } },
 };
 
