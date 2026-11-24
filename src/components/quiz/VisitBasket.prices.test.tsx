@@ -87,17 +87,21 @@ describe('janela da peça: o preço e o "Poupa" são os que o total mostra', () 
   const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
   const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
   const R = (rugMaterial: string) => newItem('rug', { width: '2', length: '3', rugMaterial });
-  const others: Record<string, BasketItem[]> = { 'vazio': [], 'colchão': [M()], 'sofá 3L': [S('3-lugares')], '6 cadeiras': [chairs(6, 'none')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], 'tapete': [R('sintético ou lã')], 'colchão + 6 cadeiras': [M(), chairs(6, 'none')] };
-  const adds: Record<string, BasketItem> = { '3L Renovado': S('3-lugares'), '3L Blindado': S('3-lugares', { pack: 'premium' }), '3L Protegido': S('3-lugares', { pack: 'essencial' }), '3L pele': S('3-lugares', { leather: true }), '3L só imper': S('3-lugares', { pack: 'premium', imperOnly: true }), '5L Renovado': S('5-lugares'), 'colchão': M(), '6 cadeiras': chairs(6, 'none'), '6 cadeiras Blindado': chairs(6, 'premium'), 'tapete juta': R('juta ou sisal') };
-  for (const [on, o] of Object.entries(others)) for (const [an, a] of Object.entries(adds)) for (const city of ['Lisboa', 'Porto']) it(`${city}: ${on} + ${an}`, () => {
-    const { shown, struck } = optionPrice(city, o, [a]);
-    const alone = aloneTotal(city, a)!, rise = quoteBasket(city, [...o, a]).total! - (o.length ? quoteBasket(city, o).total! : 0);
-    expect(shown).not.toBeNull();
-    // O preço é o da peça, ou menos só se a visita sobe mesmo menos.
-    expect(shown === alone || Math.abs(shown! - rise) < 0.01).toBe(true);
-    expect(shown!).toBeLessThanOrEqual(alone);
-    // Sem pack, o "Poupa" nunca passa o que a visita deixa de subir (1€ dos totais em 9).
-    const pack = a.pack !== 'none' && !a.imperOnly;
-    if (struck !== null && !pack) expect(struck - shown!).toBeLessThanOrEqual(Math.max(0, alone - rise) + 1);
-  });
+  const A = () => newItem('carpet', { width: '4', length: '5' });
+  const others: Record<string, BasketItem[]> = { 'vazio': [], 'colchão': [M()], 'sofá 1L': [S('1-lugar')], 'sofá 3L': [S('3-lugares')], '6 cadeiras': [chairs(6, 'none')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], 'tapete': [R('sintético ou lã')], 'alcatifa': [A()], 'colchão + 6 cadeiras': [M(), chairs(6, 'none')], 'sofá 3L + 2L': [S('3-lugares'), S('2-lugares')], 'sofá 3L + tapete': [S('3-lugares'), R('juta ou sisal')] };
+  const groups: Record<string, BasketItem[]> = { 'tapete juta': [R('juta ou sisal')], 'alcatifa': [A()], '2L + 3L': [S('2-lugares'), S('3-lugares')], '2×2L + 3L Blindado': [S('2-lugares', { qty: 2, pack: 'premium' }), S('3-lugares', { pack: 'premium' })], 'casal + solteiro': [M(), M({ size: 'solteiro' })] };
+  for (const qty of [1, 2, 3]) for (const size of ['1-lugar', '2-lugares', '3-lugares', '5-lugares']) for (const pack of ['none', 'essencial', 'premium'] as const) groups[`${qty}× ${size} ${pack}`] = [S(size, { qty, pack })];
+  for (const qty of [1, 2]) { groups[`${qty}× 3L pele`] = [S('3-lugares', { qty, leather: true })]; groups[`${qty}× 3L só imper`] = [S('3-lugares', { qty, pack: 'premium', imperOnly: true })]; for (const size of ['solteiro', 'casal', 'king']) for (const pack of ['none', 'premium'] as const) groups[`${qty}× ${size} ${pack}`] = [M({ size, qty, pack })]; }
+  for (const q of [1, 2, 6, 7, 12, 25]) for (const pack of ['none', 'essencial', 'premium'] as const) groups[`${q} cadeiras ${pack}`] = [chairs(q, pack)];
+  for (const city of ['Lisboa', 'Porto']) for (const [on, o] of Object.entries(others)) it(`${city}: ${on} + ${Object.keys(groups).length} grupos`, () => {
+    const before = o.length ? quoteBasket(city, o).total! : 0;
+    for (const [gn, g] of Object.entries(groups)) {
+      const { shown, struck } = optionPrice(city, o, g), rise = quoteBasket(city, [...o, ...g]).total! - before;
+      const where = `${city}: ${on} + ${gn}`;
+      expect(shown, where).not.toBeNull();
+      expect(Math.abs(shown! - Math.max(0, rise)), `${where}: mostra ${shown}, o total sobe ${rise}`).toBeLessThanOrEqual(1);
+      const sep = g.reduce((t, x) => t + struckOf(city, x)!, 0);
+      if (struck !== null) expect(struck - shown!, `${where}: poupa`).toBeLessThanOrEqual(sep - rise + 1);
+    }
+  }, 60_000);
 });

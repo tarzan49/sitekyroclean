@@ -240,8 +240,9 @@ export function struckOf(city: string, it: BasketItem): number | null {
   const sep = separateOf(city, it);
   return q.gifts.length ? Math.min(sep ?? sum, sum) : sep ?? sum;
 }
-/** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, só menos se a visita subir
- *  mesmo menos (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€).
+/** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, o que o total sobe de verdade
+ *  (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€). Só a diferença de
+ *  1€ dos totais a acabar em 9 fica no preço da peça.
  *  Riscado: as mesmas peças pedidas sozinhas, com os serviços em separado (`struckOf`). */
 export function optionPrice(city: string, others: BasketItem[], list: BasketItem[]): { shown: number | null; struck: number | null } {
   const totalOf = (l: BasketItem[]) => { const q = quoteBasket(city, l); return !l.length || q.total === null || q.sob ? null : q.total; };
@@ -249,7 +250,7 @@ export function optionPrice(city: string, others: BasketItem[], list: BasketItem
   if (alone === null) return { shown: null, struck: null };
   const before = others.length ? totalOf(others) : 0, after = others.length ? totalOf([...others, ...list]) : alone;
   const rise = before !== null && after !== null ? Math.round((after - before) * 100) / 100 : alone;
-  const shown = rise < alone - 1 ? Math.max(0, rise) : alone;
+  const shown = Math.abs(rise - alone) <= 1 ? alone : Math.max(0, rise);
   let sep: number | null = 0;
   for (const x of list) { const v = struckOf(city, x); sep = v === null || sep === null ? null : sep + v; }
   return { shown, struck: sep !== null && sep > shown ? Math.round(sep * 100) / 100 : null };
