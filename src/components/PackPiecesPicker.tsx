@@ -35,7 +35,7 @@ const TREATMENTS: Record<Exclude<PieceKind, 'rug'>, T[]> = {
   ],
   mattress: [
     { id: 'clean', label: 'Só limpeza', note: 'Limpo a fundo', img: pair('colchao')?.after, wa: 'só limpeza' },
-    { id: 'clean+anti-acaros', label: 'Anti-ácaros', note: 'Limpeza + desinfeção', img: pair('colchao')?.before, wa: 'limpeza + anti-ácaros' },
+    { id: 'clean+anti-acaros', label: 'Anti-ácaros', note: 'Limpeza + desinfeção', img: pair('colchao')?.before, wa: 'limpeza + anti-ácaros (produto Bactran)' },
   ],
 };
 const DEFAULT_T: Record<Exclude<PieceKind, 'rug'>, string> = { sofa: 'clean+premium', chairs: 'clean+premium', mattress: 'clean+anti-acaros' };
@@ -103,7 +103,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
     return rugItem ? `tapete de ${rugW.replace('.', ',')} × ${rugL.replace('.', ',')} m` : 'um tapete (envio as medidas)';
   };
   const chosen = pieces.filter(p => p !== 'rug' || rug);
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} oferecido)` : ''}` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} ${groupGifts(gifts).length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.`;
   const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
   const q = 'mb-1.5 text-base font-semibold text-[#1A1A1A]';
 

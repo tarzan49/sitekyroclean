@@ -93,7 +93,7 @@ const FreguesiaServicePage = () => {
   const h1Gold = h1Words.pop() ?? "";
   const h1Rest = h1Words.join(" ");
 
-  const waUrl = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`;
+  const waUrl = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name, data.h1.endsWith(` ${data.name}`) ? data.h1.slice(0, -data.name.length).trim().split(' ').pop() : undefined))}`;
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "2 a 5h", label: "Pronto a usar" };
   // Resposta em menos de 1 minuto: compromisso comum a todo o site.

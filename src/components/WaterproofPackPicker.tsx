@@ -94,7 +94,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     none: 'só limpeza, sem impermeabilização',
   };
   const piece = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares' : what;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${kind === 'sofa' && count === 1 ? 'um ' : ''}${piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? 'do sofá' : 'das cadeiras'}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${kind === 'sofa' && count === 1 ? 'um ' : ''}${byPhoto && count > 1 ? `${count} sofás (${piece})` : piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? (count > 1 ? 'dos sofás' : 'do sofá') : 'das cadeiras'}.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (
@@ -171,7 +171,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
           })}
         </div>
         <VisitGiftLine gift={gift} />
-        {!byPhoto && !compact && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final em {city}, deslocação incluída.</p>}
+        {!byPhoto && !compact && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full md:mt-5 md:min-h-14 items-center justify-center gap-2 rounded-2xl bg-[#25D366] whitespace-nowrap px-3 text-center text-[15px] font-bold text-white sm:text-base shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5">

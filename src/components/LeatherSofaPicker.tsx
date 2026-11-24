@@ -12,7 +12,7 @@ import { choiceToItem } from '@/components/quiz/basketChoice';
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 const SEATS = [1, 2, 3, 4, 5, 6];
 const OPTIONS = [
-  { id: 'pele', name: 'Renovado + Pele', note: 'Limpeza e hidratação da pele', leather: true, top: true, wa: 'limpeza + tratamento da pele (limpeza e hidratação)' },
+  { id: 'pele', name: 'Renovado + Pele', note: 'Limpeza e hidratação da pele', leather: true, top: true, wa: 'limpeza com tratamento e hidratação da pele' },
   { id: 'limpeza', name: 'Renovado', note: 'Só a limpeza', leather: false, top: false, wa: 'só limpeza' },
 ];
 

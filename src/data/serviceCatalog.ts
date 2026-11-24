@@ -30,6 +30,7 @@ export const services = [
 // (serviceCatalog.test.ts confere). As freguesias não passam por aqui.
 const ARTICLE_CITIES: Record<string, "o" | "a"> = {
   "Porto": "o",
+  "Funchal": "o",
   "Barreiro": "o",
   "Seixal": "o",
   "Montijo": "o",

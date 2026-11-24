@@ -4,7 +4,7 @@ import { cities, cityPrep, cityPrepCap, cityPrepDe, headingWithCity } from './se
 // Os concelhos servidos que levam artigo. Até 2026-09-29 faltavam a Maia, a
 // Trofa e as duas Póvoas, e o site dizia "Limpeza de Sofás em Maia".
 const WITH_ARTICLE: Record<string, 'o' | 'a'> = {
-  Porto: 'o', Barreiro: 'o', Seixal: 'o', Montijo: 'o',
+  Porto: 'o', Funchal: 'o', Barreiro: 'o', Seixal: 'o', Montijo: 'o',
   Amadora: 'a', Moita: 'a', 'Figueira da Foz': 'a', Batalha: 'a', 'Marinha Grande': 'a', 'Nazaré': 'a', 'Caniço': 'o',
   Maia: 'a', Trofa: 'a', 'Póvoa de Varzim': 'a', 'Póvoa de Lanhoso': 'a',
   'Lousã': 'a', 'Pampilhosa da Serra': 'a',

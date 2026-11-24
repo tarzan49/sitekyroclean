@@ -52,8 +52,9 @@ type ItemKind = keyof typeof ITEM_BLANKS;
  * "se já tiver a localidade diz só em Lisboa"); the bot confirms the exact
  * locality before the travel fee. Sent untouched, it still names what and where.
  */
-function buildItemWaMessage(request: string, kind: ItemKind, placeName?: string | null): string {
-  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+function buildItemWaMessage(request: string, kind: ItemKind, placeName?: string | null, prep?: string): string {
+  // Freguesias têm a preposição própria ("no Lumiar", "no Parque das Nações"), a mesma do H1 da página.
+  const loc = placeName ? ` ${prep ?? cityPrep(placeName)} ${placeName}` : '';
   const { blank, blankWithLocality } = ITEM_BLANKS[kind];
   return `Olá! Gostaria de saber o preço e a disponibilidade para ${request}${loc}.\n\n${placeName ? blank : blankWithLocality}`;
 }
@@ -68,10 +69,10 @@ const SERVICE_MESSAGES: Record<string, { request: string; kind: ItemKind }> = {
 };
 
 /** Shared by service, location, neighbourhood and price landing pages. */
-export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
+export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null, prep?: string): string {
   const service = SERVICE_MESSAGES[serviceSlug];
   if (!service) return buildGeneralWaMessage();
-  return buildItemWaMessage(service.request, service.kind, placeName);
+  return buildItemWaMessage(service.request, service.kind, placeName, prep);
 }
 
 /** Used on MaterialPage. */
@@ -216,7 +217,7 @@ export function buildSubmittedWaMessage(reference?: string | null, opts: { photo
   const safe = value && /^(?:[A-Z0-9]{6,12}|L-\d{8}-[a-z0-9]{8,12})$/.test(value) ? value : null;
   const ask = opts.photoQuote
     ? 'Envio já as fotografias para saber o preço e a disponibilidade.'
-    : 'Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.';
+    : 'Gostaria de confirmar o preço e a disponibilidade. Posso enviar fotografias dos artigos para avaliação.';
   return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. ${ask}`;
 }
 
