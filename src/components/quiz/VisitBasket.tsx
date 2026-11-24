@@ -162,11 +162,14 @@ export function packSaving(city: string, it: BasketItem): number | null {
   return typeof v === 'number' && v > 0 ? v : null;
 }
 /** O que cada cartão do "Juntar à mesma visita" mostra: a impermeabilização, a poupança do pack; as outras, a oferta que trazem. */
-function promoOf(city: string, items: BasketItem[], e: { key: string; kind: BasketKind; over?: Partial<BasketItem> }): { kind: 'save' | 'gift'; value: number } | null {
+function promoOf(city: string, items: BasketItem[], e: { key: string; kind: BasketKind; over?: Partial<BasketItem> }): { kind: 'save' | 'gift'; value: number; what: string } | null {
   const it = newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) });
-  if (e.key === 'imper') { const p = packSaving(city, it); if (p) return { kind: 'save', value: p }; }
+  if (e.key === 'imper') { const p = packSaving(city, it); if (p) return { kind: 'save', value: p, what: '+ com a limpeza' }; }
   const g = giftsUnlocked(city, items, it);
-  return g ? { kind: 'gift', value: g.value } : null;
+  if (!g) return null;
+  // O tratamento dito pelo nome (dono, 25 Nov: a oferta tem de ser o gancho do cartão).
+  const what = /pele/.test(g.text) ? '+ tratamento da pele' : /anti-odor/.test(g.text) ? '+ anti-odor' : '+ anti-ácaros';
+  return { kind: 'gift', value: g.value, what };
 }
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
@@ -386,10 +389,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               ))}
               {/* A oferta da escada A como linha própria (dono, 25 Nov: "só mais colchão e anti-ácaros está oferecido, isso é top"). */}
               {groupGifts(quote.gifts).map(g => (
-                <li key={g.key} className="flex min-h-[52px] items-center gap-2.5 bg-[#D4AF37]/10 px-3">
-                  <span className="flex h-9 w-12 shrink-0 items-center justify-center"><Gift className="h-5 w-5" style={{ color: GOLD }} /></span>
-                  <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-white">{capital(g.text)}</span>
-                  <span className="shrink-0 pr-1 text-right text-sm"><span className="mr-1.5 text-white/50 line-through">{formatEuro(g.normal)}</span><span className="font-bold text-[#E8C964]">Oferecido</span></span>
+                <li key={g.key} className="flex min-h-[60px] items-center gap-2.5 border-l-4 border-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/25 to-[#D4AF37]/5 px-2.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Gift className="h-5 w-5" strokeWidth={2.5} /></span>
+                  <span className="min-w-0 flex-1"><span className="block text-sm font-bold leading-snug text-white">{capital(g.text)}</span><span className="block text-xs font-semibold text-[#E8C964]">Por juntar na mesma visita</span></span>
+                  <span className="shrink-0 pr-1 text-right"><span className="block text-xs text-white/55 line-through">{formatEuro(g.normal)}</span><span className="mt-0.5 inline-block rounded-md bg-[#D4AF37] px-1.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">Oferecido</span></span>
                 </li>
               ))}
             </ul>
@@ -408,13 +411,20 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               {ENTRY.map(e => {
                 const promo = promoOf(city, items, e);
                 return (
-                <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className="group relative h-[100px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
+                <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className={`group relative h-[116px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
                   <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-                  <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A] shadow"><Plus className="h-4 w-4" strokeWidth={3} /></span>
-                  {/* Faixa escura e desfocada por baixo do texto (dono, 25 Nov: "mais premium, opacidade na parte das letras"). */}
-                  <span className="absolute inset-x-0 bottom-0 border-t border-[#D4AF37]/20 bg-[#071a12]/75 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
-                    <span className={`block whitespace-nowrap font-bold leading-tight text-white ${e.label.length > 12 ? 'text-[10.5px] tracking-tighter' : 'text-[13px]'}`}>{e.label}</span>
-                    {promo && <span className="mt-0.5 inline-block whitespace-nowrap rounded-full bg-gradient-to-r from-[#D4AF37] to-[#E8C964] px-1.5 py-px text-[10px] font-bold leading-tight text-[#0B2F2A]">{promo.kind === 'save' ? `poupa ${formatEuro(promo.value)}` : `+ oferta de ${formatEuro(promo.value)}`}</span>}
+                  {/* O gancho (dono, 25 Nov): a oferta em destaque, em cima, com o presente e o valor. */}
+                  {promo && <span className="absolute left-1.5 top-1.5 flex items-center gap-1 overflow-hidden rounded-lg bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-wide text-[#0B2F2A] shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]">
+                    <Gift className="h-3.5 w-3.5" strokeWidth={2.5} />{promo.kind === 'save' ? 'Poupa' : 'Oferta'} {formatEuro(promo.value)}
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/45 to-transparent motion-reduce:hidden" style={{ animation: 'shimmer 3.2s ease-in-out infinite' }} />
+                  </span>}
+                  {/* Vidro neutro só atrás do texto, com o vídeo a ver-se através (dono, 25 Nov: "não tornas verde"). */}
+                  <span className="absolute inset-x-0 bottom-0 flex items-end gap-1 bg-black/45 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
+                    <span className="min-w-0 flex-1">
+                      <span className={`block whitespace-nowrap font-bold leading-tight text-white drop-shadow ${e.label.length > 12 ? 'text-[10.5px] tracking-tighter' : 'text-[13px]'}`}>{e.label}</span>
+                      {promo && <span className="block whitespace-nowrap text-[10.5px] font-bold leading-tight text-[#D4AF37] drop-shadow">{promo.what}</span>}
+                    </span>
+                    {e.label.length <= 12 && <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/40"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></span>}
                   </span>
                 </button>
                 );
