@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, cityKnown, joinSaving, linePrice, newItem, optionPrice, orderLines, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, joinSaving, linePrice, mergeChairs, newItem, optionPrice, orderLines, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -151,5 +151,13 @@ describe('linhas do pedido guardado', () => {
       expect(orderLines('Lisboa', list).map(l => l.total)).toEqual(list.map(i => linePrice('Lisboa', i)));
     }
     expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' }), newItem('mattress')]).map(l => l.total)).toEqual([89, 79]);
+  });
+});
+
+describe('cadeiras do mesmo serviço são uma só linha', () => {
+  it('1 + 2 de limpeza = 3; Blindado e só impermeabilização ficam à parte', () => {
+    const m = mergeChairs([chairs(1, 'none'), newItem('sofa'), chairs(2, 'none'), chairs(6, 'premium'), chairs(6, 'premium', true)]);
+    expect(m.map(i => `${i.kind}${i.qty}${i.pack}${i.imperOnly ? '!' : ''}`)).toEqual(['chairs3none', 'sofa1premium', 'chairs6premium', 'chairs6premium!']);
+    expect(linePrice('Lisboa', m[0])).toBe(quoteBasket('Lisboa', [m[0]]).total);
   });
 });

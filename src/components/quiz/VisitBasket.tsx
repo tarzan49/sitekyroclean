@@ -280,6 +280,15 @@ export function linePrice(city: string, it: BasketItem): number | null {
   if (it.qty > 1 && (it.kind === 'sofa' || it.kind === 'mattress')) { const one = aloneTotal(city, { ...it, qty: 1 }); return one === null ? null : Math.round(one * it.qty * 100) / 100; }
   return aloneTotal(city, it);
 }
+/** Cadeiras com o mesmo serviço são uma só linha (dono, 24 Nov: "Sim, como 6"): 1 + 2 mostravam 30€ + 50€ com o total 70€. */
+export function mergeChairs(list: BasketItem[]): BasketItem[] {
+  const out: BasketItem[] = [];
+  for (const i of list) {
+    const at = i.kind === 'chairs' ? out.findIndex(o => o.kind === 'chairs' && o.pack === i.pack && !!o.imperOnly === !!i.imperOnly && !!o.leather === !!i.leather && o.qty + i.qty <= CHAIR_MAX) : -1;
+    if (at < 0) out.push(i); else out[at] = { ...out[at], qty: out[at].qty + i.qty };
+  }
+  return out;
+}
 /** As linhas do pedido guardado são as que a pessoa viu no cesto (cada peça com a sua deslocação), não as da visita:
  *  um sofá e um colchão gravavam 79€ + 69€ com o total 169€ (25 Nov 2026). */
 export const orderLines = (city: string, items: BasketItem[]) => items.map(it => ({ label: itemLabel(it), qty: it.qty, total: linePrice(city, it) }));
@@ -462,7 +471,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   // Uma janela pode juntar várias peças de uma vez (dono, 25 Nov: "2 sofás de 2 lugares e 1 de 3"): substituem a que se editava.
   const saveEditing = (group: BasketItem[]) => {
     if (!editing) return;
-    setItems(list => { const at = list.findIndex(i => i.id === editing.id); const rest = list.filter(i => i.id !== editing.id); return at < 0 ? [...rest, ...group] : [...rest.slice(0, at), ...group, ...rest.slice(at)]; });
+    setItems(list => { const at = list.findIndex(i => i.id === editing.id); const rest = list.filter(i => i.id !== editing.id); return mergeChairs(at < 0 ? [...rest, ...group] : [...rest.slice(0, at), ...group, ...rest.slice(at)]); });
     // Impermeabilização: volta a "O que vamos impermeabilizar?" para poder juntar a outra peça (dono, 25 Nov).
     if (editing.imperOnly) setImperPick(true);
     setEditing(null);
