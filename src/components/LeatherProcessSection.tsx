@@ -11,7 +11,7 @@ export default function LeatherProcessSection({ heading = 'Como cuidamos do seu 
     <div className="mx-auto grid max-w-6xl gap-3 px-4 sm:px-6 md:grid-cols-2 md:items-center md:gap-10">
       <div>
         <SectionHeader heading={heading} goldWord={gold} />
-        <img src={leatherAfter} alt="Sofá de pele creme limpo e hidratado pela nossa equipa" loading="lazy" decoding="async" className="h-[11svh] w-full rounded-2xl object-cover object-[50%_60%] md:aspect-[4/3] md:h-auto" />
+        <img src={leatherAfter} alt="Sofá de pele creme limpo e hidratado pela nossa equipa" loading="lazy" decoding="async" className="h-[11svh] w-full rounded-2xl object-cover object-[50%_60%] md:h-[40svh]" />
       </div>
       <ol className="space-y-1.5 md:space-y-2">
         {steps.map((s, i) => <li key={s.label} className="flex items-center gap-3 rounded-xl border border-[#E5E0D3] bg-white px-3 py-1.5 md:py-2">

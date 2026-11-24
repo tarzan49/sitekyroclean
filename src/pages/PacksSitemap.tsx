@@ -102,9 +102,9 @@ const PacksSitemap = () => {
         <section id="packs" className="py-10 md:py-14 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="type-section-title font-playfair text-[#111111] mb-4">Escolha o seu <em className="not-italic" style={{ color: "#D4AF37" }}>pack</em></h2>
-            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0">
+            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:gap-4 md:px-0">
               {packs.map(pack => (
-                <article key={pack.id} className="flex w-[86%] shrink-0 snap-start flex-col rounded-2xl border border-[#E8E4DE] bg-white p-5 md:w-auto md:p-6" style={{ borderTop: "3px solid #D4AF37" }}>
+                <article key={pack.id} className="flex w-[86%] shrink-0 snap-start flex-col rounded-2xl border border-[#E8E4DE] bg-white p-5 md:w-[calc(33.333%-11px)] md:p-6" style={{ borderTop: "3px solid #D4AF37" }}>
                   <ul className="flex flex-wrap gap-1.5 mb-3" aria-label="Inclui">
                     {packChips(pack.id).map(chip => (
                       <li key={chip} className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-sm font-semibold text-[#111111]">

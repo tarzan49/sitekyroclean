@@ -856,3 +856,29 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 @media (max-width: 767px) {
   html.snap-sections #beneficios .grid > div > span { font-size: 13px; line-height: 1.4; }
 }
+/* Computador de ecrã baixo (1280×620): cada secção cabe inteira (dono, 25 Nov). Menos espaço por cima,
+   widget de preço mais compacto. */
+@media (min-width: 768px) and (max-height: 820px) {
+  html.snap-sections main section:not([data-commercial-hero]):not(#orcamento) { padding-top: 20px; }
+  html.snap-sections main section > div > div.mb-8:first-child, html.snap-sections main section > div > div.md\:mb-10:first-child { margin-bottom: 16px; }
+  html.snap-sections #precos .md\:p-6 { padding: 14px; }
+  html.snap-sections #precos [role="radio"].md\:min-h-\[84px\], html.snap-sections #montar [role="radio"].md\:min-h-\[84px\] { min-height: 62px; }
+  html.snap-sections #precos .md\:min-h-14, html.snap-sections #montar .md\:min-h-14 { min-height: 48px; }
+  html.snap-sections #precos .md\:mt-5, html.snap-sections #montar .md\:mt-5 { margin-top: 10px; }
+  html.snap-sections #precos .md\:min-h-\[60px\], html.snap-sections #montar .md\:min-h-\[60px\] { min-height: 46px; }
+  html.snap-sections #precos .md\:mb-6 { margin-bottom: 10px; }
+  html.snap-sections main section#precos, html.snap-sections main section#montar { padding-bottom: 20px !important; }
+  html.snap-sections #montar .md\:p-6 { padding: 14px; }
+  html.snap-sections #montar .md\:mb-10 { margin-bottom: 14px; }
+  html.snap-sections #montar .md\:gap-8 { gap: 16px; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] > * { height: 270px; }
+  html.snap-sections #localidades button[aria-expanded] { padding-top: 10px; padding-bottom: 10px; }
+  html.snap-sections #localidades button[aria-expanded] span.mt-1 { display: none; }
+  html.snap-sections #processo .md\:grid video, html.snap-sections #processo .md\:grid img { max-height: 32svh; }
+  html.snap-sections [data-mobile-hero] > section { padding-top: 84px !important; padding-bottom: 24px !important; }
+  html.snap-sections #packs article { padding: 16px; }
+  html.snap-sections #packs article .mt-5 { margin-top: 12px; }
+  html.snap-sections #packs article .mt-3 { margin-top: 6px; }
+  html.snap-sections details.group\/directory > summary { min-height: 40px; padding-top: 6px; padding-bottom: 6px; }
+  html.snap-sections #processo .md\:grid figcaption { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+}
