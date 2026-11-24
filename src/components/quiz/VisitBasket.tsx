@@ -201,21 +201,6 @@ export function packSaving(city: string, it: BasketItem): number | null {
   const v = r.separatePrice?.saving;
   return typeof v === 'number' && v > 0 ? v : null;
 }
-/** O que cada cartão do "Juntar à mesma visita" mostra: a impermeabilização, a poupança do pack; as outras, a oferta que trazem. */
-function promoOf(city: string, items: BasketItem[], e: { key: string; kind: BasketKind; over?: Partial<BasketItem> }): { kind: 'save' | 'gift'; value: number; what: string } | null {
-  const it = newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) });
-  // Impermeabilização sozinha: a vantagem é a deslocação já paga pelas outras peças (dono, 25 Nov).
-  if (e.key === 'imper') {
-    if (!items.length) return null;
-    const alone = aloneTotal(city, it), { shown } = optionPrice(city, items, [it]);
-    return alone !== null && shown !== null && alone - shown >= 5 ? { kind: 'save', value: Math.round((alone - shown) * 100) / 100, what: '+ deslocação oferecida' } : null;
-  }
-  const g = giftsUnlocked(city, items, it);
-  if (!g) return null;
-  // O tratamento dito pelo nome (dono, 25 Nov: a oferta tem de ser o gancho do cartão).
-  const what = /pele/.test(g.text) ? '+ tratamento da pele oferecido' : /anti-odor/.test(g.text) ? '+ anti-odor oferecido' : '+ anti-ácaros oferecido';
-  return { kind: 'gift', value: g.value, what };
-}
 /** "Se juntar X, poupa Y": só o que se confirma no total para qualquer tamanho da peça (o mínimo), pelo motor. */
 const JOIN_PACKS = ['none', 'essencial', 'premium'] as const;
 const JOIN_VARIANTS: Record<BasketKind, Partial<BasketItem>[]> = {
@@ -242,7 +227,6 @@ export function joinSaving(city: string, items: BasketItem[], kind: BasketKind):
   }
   return Number.isFinite(min) ? Math.round(min * 100) / 100 : 0;
 }
-const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
 /** A peça pedida sozinha com cada serviço em separado (separatePrice.separate do motor). */
 function separateOf(city: string, it: BasketItem | BasketItem[]): number | null {
   const list = (Array.isArray(it) ? it : [it]).map(toQuote);
@@ -567,21 +551,18 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             </label>
             <p className="mb-1 text-base font-semibold text-white">Quanto mais junta, mais <span style={{ color: GOLD }}>poupa</span></p>
             {(() => {
-              // "Se juntar X, poupa Y" (dono, 25 Nov): a peça que mais dá, pelo motor; sem nenhuma, a frase geral.
-              return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{bestJoin ? <>Se juntar {JOIN_NAME[bestJoin.kind]}, poupa {formatEuro(bestJoin.value)}</> : 'Uma só visita para tudo'}</p>;
+              // Uma só frase, "Ao juntar um item, poupa até X" (dono, 25 Nov), com a peça que mais dá, pelo motor; nada nos cartões.
+              return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{bestJoin ? <>Ao juntar um item, poupa até {formatEuro(bestJoin.value)}</> : 'Uma só visita para tudo'}</p>;
             })()}
             <div className="grid grid-cols-2 gap-2">
               {ENTRY.map(e => {
-                const promo = promoOf(city, items, e);
                 return (
-                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[118px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
+                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[118px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] border-[#D4AF37]/50`}>
                   {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" style={e.kind === 'chairs' ? { objectPosition: '50% 85%' } : undefined} /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
                   {/* Vidro neutro só atrás do texto, com o vídeo a ver-se através (dono, 25 Nov: "não tornas verde"). */}
                   <span className="absolute inset-x-0 bottom-0 flex items-end gap-1 bg-black/45 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
                     <span className="min-w-0 flex-1">
                       <span className="block whitespace-nowrap text-sm font-bold leading-tight text-white drop-shadow">{e.label}</span>
-                      {/* Só "+ oferta" / "+ poupa", sem o tratamento nem o valor (dono, 25 Nov): o valor aparece depois de escolher. */}
-                      {promo && <span className="mt-0.5 block whitespace-nowrap text-xs font-bold leading-tight text-[#E8C964] drop-shadow">{promo.kind === 'save' ? '+ poupa' : '+ oferta'}</span>}
                     </span>
                   </span>
                 </button>
