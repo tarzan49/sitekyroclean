@@ -2646,14 +2646,24 @@ function rugWaterproofingQuote(input) {
     rugWaterproofing: { amount: amount2, sameVisit: false, travelExtra: travel ?? 0 }
   };
 }
+function expandPieces(inp) {
+  if (!Array.isArray(inp.items)) return inp;
+  const items = inp.items.flatMap((i) => {
+    const x = i ?? {};
+    const n = Number(x.qty);
+    return (x.kind === "sofa" || x.kind === "mattress") && Number.isInteger(n) && n > 1 && n <= 20 ? Array.from({ length: n }, () => ({ ...x, qty: 1 })) : [i];
+  });
+  return items.length === inp.items.length ? inp : { ...inp, items };
+}
 function withOneStruckPrice(input, r) {
   const x = r;
   const v = x?.visitGifts;
   if (!v) return r;
-  const inp = input ?? {};
+  const inp = expandPieces(input ?? {});
+  const expanded = inp !== input;
   const items = Array.isArray(inp.items) ? inp.items : [];
   const asked = (i) => ["mattress", "chairs"].includes(i?.kind) && i?.treatment === "clean+anti-acaros";
-  const sep = items.some(asked) ? botQuoteChain({ ...inp, items: items.map((i) => asked(i) ? { ...i, treatment: "clean" } : i) }).separatePrice : x.separatePrice;
+  const sep = items.some(asked) || expanded ? botQuoteChain({ ...inp, items: items.map((i) => asked(i) ? { ...i, treatment: "clean" } : i) }).separatePrice : x.separatePrice;
   const out = { ...x };
   const struck = sep && sep.separate > v.total ? sep.separate : v.usual;
   const tierStruck = (k) => v.tiers?.[k] ? { usual: sep?.tiers?.[k]?.separate > v.tiers[k].total ? sep.tiers[k].separate : v.tiers[k].usual, total: v.tiers[k].total } : null;
@@ -2779,7 +2789,7 @@ var pricedTotal = (r) => {
 function withVisitGifts(input, r) {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r;
-  const inp = input ?? {};
+  const inp = expandPieces(input ?? {});
   const rawIn = inp.items;
   if (pricedTotal({ ...q, total: q.bigOrder ? q.bigOrder.normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i) => i ?? {};

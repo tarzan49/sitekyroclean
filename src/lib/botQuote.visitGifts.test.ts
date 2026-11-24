@@ -89,3 +89,17 @@ describe('um só riscado por pedido (auditoria, 24 Nov 2026)', () => {
     }
   });
 });
+
+describe('o mesmo pedido dá o mesmo preço, com qty ou em itens (Ovar, 24 Nov 2026)', () => {
+  it('sofá 2L + 2 sofás 3L + 6 cadeiras', () => {
+    const a = botQuote({ city: 'Ovar', items: [{ kind: 'sofa', size: '2-lugares' }, S, S, C] }) as any;
+    const b = botQuote({ city: 'Ovar', items: [{ kind: 'sofa', size: '2-lugares' }, { ...S, qty: 2 }, C] }) as any;
+    expect([b.total, b.visitGifts.usual, b.visitGifts.withoutGift, b.separatePrice?.separate]).toEqual([a.total, a.visitGifts.usual, a.visitGifts.withoutGift, a.separatePrice?.separate]);
+  });
+  it('dois colchões em qty contam como duas peças', () => {
+    const a = botQuote({ city: 'Lisboa', items: [M, M] }) as any;
+    const b = botQuote({ city: 'Lisboa', items: [{ ...M, qty: 2 }] }) as any;
+    expect(b.total).toBe(a.total);
+    expect(b.visitGifts?.usual).toBe(a.visitGifts?.usual);
+  });
+});

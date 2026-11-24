@@ -473,6 +473,16 @@ function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fa
   } as RugWpResult;
 }
 
+/** Sofas and mattresses with qty > 1 as one item each (chairs stay one set): the same order always gives the same price. */
+function expandPieces(inp: Record<string, unknown>): Record<string, unknown> {
+  if (!Array.isArray(inp.items)) return inp;
+  const items = (inp.items as unknown[]).flatMap(i => {
+    const x = (i ?? {}) as Record<string, unknown>;
+    const n = Number(x.qty);
+    return (x.kind === 'sofa' || x.kind === 'mattress') && Number.isInteger(n) && n > 1 && n <= 20 ? Array.from({ length: n }, () => ({ ...x, qty: 1 })) : [i];
+  });
+  return items.length === (inp.items as unknown[]).length ? inp : { ...inp, items };
+}
 /**
  * One struck price per order (24 Nov 2026 audit: 229 / 208 / 209 on the same order): the order done
  * separately (separatePrice, which already adds the visit gifts), read on the order with the mattress or
@@ -483,10 +493,11 @@ function withOneStruckPrice<T>(input: unknown, r: T): T {
   const x = r as unknown as Record<string, any>;
   const v = x?.visitGifts;
   if (!v) return r;
-  const inp = (input ?? {}) as Record<string, unknown>;
+  const inp = expandPieces((input ?? {}) as Record<string, unknown>);
+  const expanded = inp !== input;
   const items = Array.isArray(inp.items) ? inp.items as Record<string, unknown>[] : [];
   const asked = (i: Record<string, unknown>) => ['mattress', 'chairs'].includes(i?.kind as string) && i?.treatment === 'clean+anti-acaros';
-  const sep = items.some(asked)
+  const sep = items.some(asked) || expanded
     ? (botQuoteChain({ ...inp, items: items.map(i => (asked(i) ? { ...i, treatment: 'clean' } : i)) }) as Record<string, any>).separatePrice
     : x.separatePrice;
   const out = { ...x };
@@ -655,7 +666,8 @@ type TierGift = { usual: number; total: number };
 function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; withoutGift: number | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r as unknown as Priced;
-  const inp = (input ?? {}) as Record<string, unknown>;
+  // A sofa or mattress with qty 2 is two pieces, as two items (24 Nov 2026, Ovar: 369 vs 399 for the same order).
+  const inp = expandPieces((input ?? {}) as Record<string, unknown>);
   const rawIn = inp.items;
   // Above 300€ the ladder replaces the big-order cut (owner, 24 Nov 2026: the total never goes down); with no gift the big order stays.
   if (pricedTotal({ ...q, total: q.bigOrder ? (q.bigOrder as { normal: number }).normal : q.total }) === null || !Array.isArray(rawIn)) return none;
