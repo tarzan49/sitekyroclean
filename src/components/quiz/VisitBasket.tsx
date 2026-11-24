@@ -74,9 +74,9 @@ export function itemLabel(it: BasketItem): string {
   return `${it.qty > 1 ? `${it.qty} × ` : ''}Sofá ${seats} ${seats === 1 ? 'lugar' : 'lugares'} · ${pack}`;
 }
 
-type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: number | null; lines?: { amount: number | null; quote: boolean }[]; visitGifts?: { gifts: { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number }[]; usual: number; total: number } | null };
+type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: number | null; lines?: { amount: number | null; quote: boolean }[]; visitGifts?: { gifts: { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number }[]; usual: number; total: number } | null };
 export type BasketGift = NonNullable<Quote['visitGifts']>['gifts'][number];
-const GIFT_LABEL: Record<string, string> = { 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'rug:anti-odor': 'o anti-odor no tapete' };
+const GIFT_LABEL: Record<string, string> = { 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'sofa:anti-acaros': 'o anti-ácaros no sofá', 'rug:anti-odor': 'o anti-odor no tapete', 'carpet:anti-odor': 'o anti-odor na alcatifa', 'rug:anti-acaros': 'o anti-ácaros no tapete', 'carpet:anti-acaros': 'o anti-ácaros na alcatifa', 'sofa:anti-odor': 'o anti-odor no sofá' };
 export const giftLabel = (g: BasketGift) => GIFT_LABEL[`${g.piece}:${g.treatment}`] ?? g.treatment;
 
 export function quoteBasket(city: string, items: BasketItem[]) {
@@ -267,7 +267,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       </div>
 
       <footer className="fixed inset-x-0 bottom-0 border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{quote.gifts.map(g => <li key={g.piece}>Oferecemos {giftLabel(g)}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
+        {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{quote.gifts.map((g, gi) => <li key={`${g.piece}${gi}`}>Oferecemos {giftLabel(g)}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <div className="mb-2 flex items-baseline justify-between">
           <span className="text-sm text-white/70">Total, deslocação incluída</span>
           <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">+ tapetes sob orçamento</span>}</span>
