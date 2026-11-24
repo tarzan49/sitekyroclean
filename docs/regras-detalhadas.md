@@ -1145,3 +1145,9 @@ Os 15 concelhos do distrito de Coimbra acrescentados a 23 Nov ao `botAvailabilit
 Saiu a nota "deslocação ainda por definir: não dês valor de deslocação" (`COIMBRA_DISTRICT_FEE_NOTE`); `COIMBRA_DISTRICT_NO_FEE` fica só para os nomes curtos (Condeixa, Poiares). Ao Vitor já se disse "sem deslocação": para ele mantém-se (preço já dado ganha). As páginas de SEO das 15 cidades passam a existir (+360 rotas).
 
 - **24 Nov 2026 (dono):** avaliações Google passam a "+210" em todo o lado (site `REVIEW_COUNT`, bot `REVIEW_COUNT` + ficheiro do bot + bot-contract, Google Ads, Instagram via selo do site). Anúncio de sofás: "Sofá como novo desde 49€, com deslocação incluída." em vez do 89€ do sofá de 3 lugares ("as pessoas fogem"). [RETIRADA 24/11] "+200 avaliações".
+
+## Barra fixa do WhatsApp (dono, 24 Nov 2026)
+
+- Regra para todas as páginas do site: a barra "Falar por WhatsApp" no fundo do ecrã acompanha sempre; só não aparece quando a secção que ocupa o ecrã já tem um botão de WhatsApp (mesmo que esse botão ainda esteja mais abaixo na secção).
+- Antes aparecia só depois de 400 px de scroll e escondia-se perto do fim; depois passou a esconder-se só com o botão à vista, e o dono apanhou-a por cima da escolha de preço das cadeiras ("já te tinha dito"). Hoje decide pela secção de primeiro nível com mais altura visível (`main section` que não está dentro de outra secção, mais o `footer`).
+- Código: `src/components/MobileStickyBar.tsx`.

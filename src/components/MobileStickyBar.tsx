@@ -15,14 +15,22 @@ const MobileStickyBar = () => {
     let frame = 0;
     const check = () => {
       frame = 0;
+      // A secção que está no ecrã = a que ocupa mais altura visível. Se ela tem um botão de
+      // WhatsApp (à vista ou ainda mais abaixo na mesma secção), a barra não aparece.
       const top = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
-      const bottom = window.innerHeight - 80;
-      const ownButtonInView = [...document.querySelectorAll<HTMLAnchorElement>('main a[href*="wa.me"], main a[href*="whatsapp"], footer a[href*="wa.me"], footer a[href*="whatsapp"]')]
-        .some(a => {
-          const r = a.getBoundingClientRect();
-          return r.width > 0 && r.height > 0 && r.bottom > top && r.top < bottom;
-        });
-      setVisible(!ownButtonInView);
+      const bottom = window.innerHeight;
+      const waSelector = 'a[href*="wa.me"], a[href*="whatsapp"]';
+      let current: Element | null = null;
+      let best = 0;
+      const sections = [...document.querySelectorAll('main section')].filter(s => !s.parentElement?.closest('main section'));
+      const footer = document.querySelector('footer');
+      for (const s of footer ? [...sections, footer] : sections) {
+        const r = s.getBoundingClientRect();
+        const visibleHeight = Math.min(r.bottom, bottom) - Math.max(r.top, top);
+        if (visibleHeight > best) { best = visibleHeight; current = s; }
+      }
+      const sectionHasButton = !!current && [...current.querySelectorAll<HTMLAnchorElement>(waSelector)].some(a => a.getClientRects().length > 0);
+      setVisible(!sectionHasButton);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
     schedule();

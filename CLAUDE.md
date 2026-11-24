@@ -116,6 +116,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Rota nova só no React precisa de entrada no `prerender.ts`, senão serve 404.
 - Hero das páginas de SEO: só botão de WhatsApp. Mensagens de WhatsApp pedem sempre "o preço e a disponibilidade".
 - Google Ads otimiza para "Serviço fechado" (fechos reais, valor "para ti", via `ads-conversions-feed`: com código "ref." vai o gclid, e os fechos marcados Google Ads no CRM sem código vão pelo telefone cifrado, dono 24 Nov); o clique no WhatsApp é secundário (dono, 3 Nov).
+- Barra fixa do WhatsApp em todas as páginas: acompanha sempre e só se esconde quando a secção que está no ecrã tem um botão de WhatsApp (`MobileStickyBar.tsx`; dono, 24 Nov).
 - Cliques de contacto medem-se só pelo delegado global (`data-tracking-source`), nunca `onClick` com tracking.
 - Plugins do Vite que escrevem no `dist` levam `apply: 'build'`.
 - Instagram e Facebook: 3 publicações por dia (dono, 19 Nov), hora de Lisboa: 12:30 antes e depois, 18:30 Reel do serviço mais recente (só serviços dos últimos 14 dias; sem nenhum, não sai Reel, nunca material antigo), 21:00 informação (carrossel) (`kyro-social`, `src/pick.ts`). Reel feito em lote só entra na fila depois de visto imagem a imagem: sem sanita, sem material de outras empresas. Detalhe em `docs/regras-detalhadas.md`.
