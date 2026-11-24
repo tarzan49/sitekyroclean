@@ -152,6 +152,15 @@ export function giftsUnlocked(city: string, items: BasketItem[], add: BasketItem
   const value = fresh.reduce((t, g) => t + g.normal - (before.get(g.key) ?? 0), 0);
   return fresh.length && value > 0 ? { text: fresh.map(g => g.text).join(' e '), value, normal: fresh.reduce((t, g) => t + g.normal, 0) } : null;
 }
+/** Impermeabilização: a vantagem é a poupança do pack, limpeza + impermeabilização contra os dois em separado
+ *  (dono, 25 Nov: "na imper a oferta é de poupança na limpeza"), pelo separatePrice do motor. */
+export function packSaving(city: string, it: BasketItem): number | null {
+  const q = toQuote(it);
+  if (!q) return null;
+  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { saving?: number } | null };
+  const v = r.separatePrice?.saving;
+  return typeof v === 'number' && v > 0 ? v : null;
+}
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -391,7 +400,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                   <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-4 w-4" strokeWidth={3} /></span>
                   <span className="absolute inset-x-1.5 bottom-1.5">
                     <span className={`block whitespace-nowrap font-bold leading-tight text-white ${e.label.length > 12 ? 'text-[10.5px] tracking-tighter' : 'text-[13px]'}`}>{e.label}</span>
-                    {(() => { const g = giftsUnlocked(city, items, newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) })); return g ? <span className="block whitespace-nowrap text-[11px] font-bold leading-tight text-[#E8C964]">+ oferta de {formatEuro(g.value)}</span> : null; })()}
+                    {(() => { if (e.key === 'imper') { const p = packSaving(city, newItem(e.kind, e.over)); return p ? <span className="block whitespace-nowrap text-[11px] font-bold leading-tight text-[#E8C964]">+ poupa {formatEuro(p)}</span> : null; } return null; })() ?? (() => { const g = giftsUnlocked(city, items, newItem(e.kind, { ...e.over, ...(e.kind === 'rug' ? { width: '2', length: '3' } : e.kind === 'carpet' ? { width: '4', length: '5' } : {}) })); return g ? <span className="block whitespace-nowrap text-[11px] font-bold leading-tight text-[#E8C964]">+ oferta de {formatEuro(g.value)}</span> : null; })()}
                   </span>
                 </button>
               ))}
