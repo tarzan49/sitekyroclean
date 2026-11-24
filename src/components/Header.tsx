@@ -85,11 +85,12 @@ const Header = () => {
           }}
           className="flex h-11 min-w-0 flex-1 items-center justify-start leading-none md:h-auto md:block md:flex-none md:text-left md:shrink-0"
         >
-          <span className="inline-flex h-11 items-center whitespace-nowrap font-playfair text-[15px] font-medium tracking-[-0.025em] text-[#5F6368] md:hidden">
-            Kyro Clean Solutions
+          {/* Marca com mais presença (dono, 24 Nov): nome inteiro numa linha, letra forte e escura, "Kyro" a dourado. */}
+          <span className="inline-flex h-11 items-center whitespace-nowrap font-playfair text-[17px] font-bold tracking-[-0.02em] text-[#111111] md:hidden">
+            <span className="text-[#D4AF37]">Kyro</span>&nbsp;Clean Solutions
           </span>
-          <span className="hidden font-playfair text-[17px] font-normal tracking-tight text-[#111111] md:inline">
-            Kyro Clean Solutions
+          <span className="hidden font-playfair text-[21px] font-bold tracking-[-0.02em] text-[#111111] md:inline">
+            <span className="text-[#D4AF37]">Kyro</span> Clean Solutions
           </span>
         </Link>
 
