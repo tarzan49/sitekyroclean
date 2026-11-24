@@ -2,21 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { botQuote } from './botQuote';
 
 describe('anti-ácaros oferecido num pedido grande (dono, 30/10/2026)', () => {
-  it('sofá 3L + 3 colchões com anti-ácaros: a condição especial é o anti-ácaros oferecido', () => {
+  it('sofá 3L + 3 colchões com anti-ácaros: desde 24/11 a escada A substitui o desconto (anti-ácaros oferecido, total acabado em 9)', () => {
     const q = botQuote({ city: 'Porto', items: [
       { kind: 'sofa', size: '3-lugares', treatment: 'clean+anti-acaros' },
       { kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' },
       { kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' },
       { kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' },
     ] }) as any;
-    const clean = botQuote({ city: 'Porto', items: [
-      { kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }, { kind: 'mattress', size: 'casal' }, { kind: 'mattress', size: 'casal' },
-    ] }) as any;
-    expect(q.bigOrder.normal).toBeGreaterThan(300);
-    // Com a escada A (24 Nov) o pedido só com limpeza pode subir ao 9 seguinte; a condição especial fica o preço de tabela.
-    expect(q.antiMiteGift).toBe(q.total - q.bigOrder.special);
-    expect(clean.total - q.bigOrder.special).toBeGreaterThanOrEqual(0);
-    expect(clean.total - q.bigOrder.special).toBeLessThan(10);
+    expect(q.bigOrder).toBeNull();
+    expect(q.antiMiteGift).toBeNull();
+    expect(q.visitGifts.gifts[0]).toMatchObject({ piece: 'mattress', treatment: 'anti-acaros' });
   });
   it('sem anti-ácaros fica a condição de sempre', () => {
     const q = botQuote({ city: 'Porto', items: Array(4).fill({ kind: 'sofa', size: '3-lugares' }) }) as any;

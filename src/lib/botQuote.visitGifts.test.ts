@@ -24,3 +24,28 @@ describe('visitGifts (escada A)', () => {
     expect(g([M])).toBeNull();
   });
 });
+
+describe('visitGifts: opções e pedidos acima de 300€ (dono, 24 Nov 2026)', () => {
+  it('sofá com impermeabilização + colchão: a oferta e o 9 também no Premium e no Essencial', () => {
+    const r = botQuote({ items: [{ ...S, treatment: 'clean+premium' }, M], city: 'Lisboa' }) as any;
+    const t = r.visitGifts.tiers;
+    for (const k of ['premium', 'essencial'] as const) {
+      if (!t[k]) continue;
+      expect(t[k].total % 10).toBe(9);
+      expect(t[k].usual).toBeGreaterThan(t[k].total);
+      expect(r.waterproofingTiers[k]).toBe(t[k].total);
+    }
+  });
+  it('acima de 300€ com colchões: a escada substitui o desconto, o total nunca desce', () => {
+    const items = [{ kind: "sofa", size: "5-lugares" }, M, M, M];
+    const r = botQuote({ items, city: 'Porto' }) as any;
+    expect(r.bigOrder).toBeNull();
+    expect(r.visitGifts.total % 10).toBe(9);
+    expect(r.visitGifts.total).toBeGreaterThan(300);
+  });
+  it('acima de 300€ sem nada para oferecer: fica a condição de sempre', () => {
+    const r = botQuote({ items: Array(4).fill(S), city: 'Porto' }) as any;
+    expect(r.visitGifts).toBeNull();
+    expect(r.bigOrder).not.toBeNull();
+  });
+});
