@@ -9,6 +9,8 @@ import { formatEuro } from '@/data/enginePrices';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 type Kind = 'sofa' | 'chairs';
+// Preço exposto acaba sempre em 9, arredondado para cima (dono, 24 Nov: "Sim, acaba em 9"; 155€ → 159€).
+const up9 = (n: number) => Math.ceil((n + 1) / 10) * 10 - 1;
 const OPTIONS = [
   { id: 'premium', name: 'Premium', note: 'Anti-manchas e anti-líquidos, até 10 anos', top: true },
   { id: 'essencial', name: 'Essencial', note: 'A mesma proteção, mais económica: 1 a 2 anos', top: false },
@@ -24,7 +26,7 @@ export default function ImperPricePicker({ city, source, initialKind = 'sofa' }:
     : seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment } : { kind: 'sofa', size: seats === 1 ? '1-lugar' : `${Math.min(seats, 5)}-lugares`, treatment };
   const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
     const r = botQuote({ city, items: [item(o.id)] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
+    return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? up9(r.total) : null];
   })) as Record<string, number | null>, [kind, seats, qty, city]);
   const total = totals[choice];
   const what = kind === 'chairs' ? `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}` : `um sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
