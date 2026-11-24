@@ -226,6 +226,7 @@ function calculateTravelFee(baseFee, servicesTotal) {
 }
 
 // src/components/quiz/QuizTypes.ts
+var SOFA_5_ALONE_CLEANING_BASE = 109;
 var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },
   { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 138, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
@@ -287,6 +288,10 @@ var endIn9Down = (total) => {
 function chairPackWas(qty, tier) {
   return qty * endIn9Down(chairCleanTotal(1, 1) + chairWaterproofTotal(1, tier));
 }
+var endIn9Up = (total) => {
+  const n = Math.ceil(total - 1e-9);
+  return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
+};
 
 // src/constants/antiAcarosPricing.ts
 var SOFA_ANTI_ACAROS_PRICE = {
@@ -421,6 +426,7 @@ function customPackLine(item, chairsBefore = 0) {
   const waterproofingOnly2 = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly2 && item.kind === "chairs") {
     amount2 = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial", true) : (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    if (amount2 !== null && !item.seatOnly) amount2 = endIn9Up(amount2);
   } else if (waterproofingOnly2 && item.waterproofingFixed) {
     amount2 = item.waterproofingFixed[item.extra === "premium" ? "premium" : "essencial"] * item.qty;
   } else if (waterproofingOnly2 && option2) {
@@ -480,6 +486,11 @@ function calculateCustomPack(items, city) {
       table[n] = { ...line, amount: amount2, ..."tablePrice" in line && typeof line.tablePrice === "number" ? { tablePrice: amount2 } : {} };
     });
     const wpRow = wpRows[0];
+    if (covered > 0) for (const n of wpRows) {
+      const it = items[n];
+      const exact = chairWaterproofTotal(it.qty, it.extra === "premium" ? "premium" : "essencial", !!it.seatOnly);
+      if (exact !== null && table[n].amount != null) table[n] = { ...table[n], amount: exact, ..."tablePrice" in table[n] && typeof table[n].tablePrice === "number" ? { tablePrice: exact } : {} };
+    }
     const sum2 = table.filter((_, n) => items[n].kind === "chairs").reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum2 - endIn9Down(sum2);
     if (covered > 0 && diff !== 0 && table[wpRow].amount != null) {
@@ -536,10 +547,10 @@ function carpetWashing(areaM2) {
 
 // src/constants/rugSitePrice.ts
 var RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
-var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, com a deslocação incluída; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
+var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, mais a deslocação; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
 var CARPET_PRICE_FROM = `Desde ${RUG_RATE_CARPET}€/m²`;
 var carpetTierText = CARPET_TIERS.slice(0, -1).map((t, i) => `até ${CARPET_TIERS[i + 1].from} m² ${t.rate}€/m²`).join(", ");
-var CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), com a deslocação incluída.`;
+var CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), mais a deslocação.`;
 
 // src/data/serviceCatalog.ts
 var cities = [
@@ -2947,7 +2958,7 @@ function botQuoteInner(input) {
     }
     if (rawItems.length === 1 && raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ""];
-      items.push(fee === 10 ? { ...item, unitPrice: 109 } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
       rawOf.push(raw);
       continue;
     }
@@ -3941,7 +3952,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
       handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
       askWeek: true,
-      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll("sextas-feiras", "quintas-feiras (só esta semana)").replaceAll("sexta-feira", "quinta-feira"),
+      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.split("sextas-feiras").join("quintas-feiras (só esta semana)").split("sexta-feira").join("quinta-feira"),
       fridayOnly: friday
     };
   }
