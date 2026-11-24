@@ -8,7 +8,7 @@ const g = (items: unknown[]) => (botQuote({ items, city: 'Lisboa' }) as any).vis
 
 describe('visitGifts (escada A)', () => {
   it('sofá + colchão: anti-ácaros no colchão, nunca abaixo das peças sozinhas, 89 + 79 = 168 -> 169', () => {
-    expect(g([S, M])).toMatchObject({ total: 169, usual: 208, withoutGift: 149, gifts: [{ piece: 'mattress', normal: 40 }] });
+    expect(g([S, M])).toMatchObject({ total: 169, usual: 209, withoutGift: 149, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
   it('3 peças: + anti-ácaros nas cadeiras', () => {
     expect(g([S, M, C]).total % 10).toBe(9);
@@ -67,5 +67,25 @@ describe('visitGifts: casos 3 a 6 (dono, 24 Nov 2026)', () => {
     const r = botQuote({ items: [S, { ...C, treatment: 'clean+anti-acaros' }], city: 'Lisboa' }) as any;
     expect(pieces(r)).toEqual(['chairs']);
     expect(r.visitGifts.total).toBe(botQuote({ items: [S, C], city: 'Lisboa' }).total);
+  });
+});
+
+describe('um só riscado por pedido (auditoria, 24 Nov 2026)', () => {
+  const Mm = { ...M, treatment: 'clean+anti-acaros' }, Sp = { ...S, treatment: 'clean+premium' };
+  it('sofá + colchão (com ou sem anti-ácaros pedido): 209 em todo o lado', () => {
+    for (const items of [[S, M], [S, Mm]]) {
+      const r = botQuote({ items, city: 'Lisboa' }) as any;
+      expect([r.total, r.visitGifts.usual, r.separatePrice.separate]).toEqual([169, 209, 209]);
+      if (r.mattressMitePack) expect(r.mattressMitePack.separate).toBe(209);
+    }
+  });
+  it('sofá Premium + colchão: a opção Premium bate com o total, o riscado é um só', () => {
+    for (const items of [[Sp, M], [Sp, Mm]]) {
+      const r = botQuote({ items, city: 'Lisboa' }) as any;
+      expect(r.visitGifts.tiers.premium.total).toBe(r.total);
+      expect(r.waterproofingTiers.premium).toBe(r.total);
+      expect(r.separatePrice.separate).toBe(r.visitGifts.usual);
+      expect(r.separatePrice.tiers.premium.separate).toBe(r.visitGifts.tiers.premium.usual);
+    }
   });
 });

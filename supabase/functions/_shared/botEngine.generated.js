@@ -2635,8 +2635,31 @@ function rugWaterproofingQuote(input) {
     rugWaterproofing: { amount: amount2, sameVisit: false, travelExtra: travel ?? 0 }
   };
 }
-function botQuote(input) {
+function withOneStruckPrice(input, r) {
+  const x = r;
+  const v = x?.visitGifts;
+  if (!v) return r;
+  const inp = input ?? {};
+  const items = Array.isArray(inp.items) ? inp.items : [];
+  const asked = (i) => ["mattress", "chairs"].includes(i?.kind) && i?.treatment === "clean+anti-acaros";
+  const sep = items.some(asked) ? botQuoteChain({ ...inp, items: items.map((i) => asked(i) ? { ...i, treatment: "clean" } : i) }).separatePrice : x.separatePrice;
+  const out = { ...x };
+  const struck = sep && sep.separate > v.total ? sep.separate : v.usual;
+  const tierStruck = (k) => v.tiers?.[k] ? { usual: sep?.tiers?.[k]?.separate > v.tiers[k].total ? sep.tiers[k].separate : v.tiers[k].usual, total: v.tiers[k].total } : null;
+  const vt = v.tiers ? { premium: tierStruck("premium"), essencial: tierStruck("essencial") } : null;
+  out.visitGifts = { ...v, usual: struck, tiers: vt };
+  if (x.separatePrice || sep) {
+    const tiers = vt ? Object.fromEntries(["premium", "essencial"].map((k) => [k, vt[k] ? { separate: vt[k].usual, total: vt[k].total, saving: cents(vt[k].usual - vt[k].total) } : null])) : null;
+    out.separatePrice = { ...x.separatePrice ?? sep, separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: v.withoutGift };
+  }
+  if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
+  return out;
+}
+function botQuoteChain(input) {
   return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
+}
+function botQuote(input) {
+  return withOneStruckPrice(input, botQuoteChain(input));
 }
 var MATTRESS_MITES_SEPARATE = 40;
 var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
@@ -2805,11 +2828,12 @@ function withVisitGifts(input, r) {
   const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
-  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
+  const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
+  const usual = up9(paid + giftSum);
   const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
@@ -2820,9 +2844,9 @@ function withVisitGifts(input, r) {
     const e = r[k];
     if (shift && e && typeof e.total === "number" && !(rc && typeof rc.comboPrice === "number")) out[k] = { ...e, total: cents(e.total + shift) };
   }
-  const giftSum = cents(usual - paid);
+  const asAsked = pricedTotal(q) ?? total;
   const t = r.waterproofingTiers;
-  const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;
+  const tier = (v) => typeof v === "number" ? { usual: up9(paid + (v - asAsked) + giftSum), total: up9(paid + (v - asAsked)) } : null;
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) {
