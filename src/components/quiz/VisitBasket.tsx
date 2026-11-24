@@ -38,6 +38,8 @@ import capaImper from '@/assets/quiz-videos-capas/imper.jpg';
 import capaImperCadeiras from '@/assets/quiz-videos-capas/imper-cadeiras.jpg';
 // Cartões de limpeza com o antes e depois que mais vende (dono, 25 Nov: "a melhor foto antes e depois que vendesse
 // instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
+// Sofá real já impermeabilizado, com a água em gotas (dono, 25 Nov).
+import sofaImpermeabilizado from '@/assets/quiz-materiais/sofa-impermeabilizado.webp';
 import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
 // Cartões do material (dono, 25 Nov: "assim como é no que vamos impermeabilizar"): fotografias reais de serviços.
 import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
@@ -636,9 +638,9 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               <h2 className="type-section-title font-playfair absolute bottom-2 left-4 right-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>impermeabilizar?</em></h2>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              {([{ kind: 'sofa', label: 'Sofá', photo: matTecido }, { kind: 'chairs', label: 'Cadeiras', photo: cadeirasInteiras }] as const).map(o => (
-                <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-[130px] overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
-                  <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              {([{ kind: 'sofa', label: 'Sofá', photo: sofaImpermeabilizado }, { kind: 'chairs', label: 'Cadeiras', photo: cadeirasInteiras }] as const).map(o => (
+                <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-[clamp(140px,27svh,205px)] overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+                  <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" style={o.kind === 'sofa' ? { objectPosition: '50% 72%' } : undefined} />
                   <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-gradient-to-t from-black/75 to-transparent px-3 pb-2 pt-6"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5" style={{ color: GOLD }} strokeWidth={3} /></span>
                 </button>
               ))}
@@ -772,7 +774,8 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // O vídeo é o da limpeza da peça; o da impermeabilização só em "O que vamos impermeabilizar?" (dono, 24 Nov: "porque é que em
   // limpeza de sofá o vídeo é impermeabilização? [...] não faz sentido o vídeo aparecer aqui se estamos a escolher o tipo").
   const [clip] = useState(() => (!item.imperOnly ? CLIP[item.kind] : item.kind === 'chairs' ? imperChairsClip : imperClip));
-  const pickingMaterial = !!materials && material === null;
+  // Tapete: o vídeo da máquina a passar no tapete fica também no passo do material (dono, 25 Nov: "esse vídeo estava perfeito").
+  const pickingMaterial = !!materials && material === null && item.kind !== 'rug';
   const tile = (on: boolean) => `flex flex-col items-center justify-center gap-1 rounded-2xl border-2 px-1 py-2 text-sm font-bold ${on ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label={KIND_LABEL[item.kind]}>

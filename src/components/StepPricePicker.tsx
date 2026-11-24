@@ -14,13 +14,15 @@ import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
 import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
 import baCadeiras from '@/assets/quiz-antes-depois/cadeiras.webp';
 import baTapete from '@/assets/quiz-antes-depois/tapete.webp';
-import carpetPoster from '@/assets/alcatifa-processo/extracao-poster.jpg';
-import imperPoster from '@/assets/before-after-pool/imper-agua-01-poster.webp';
+import carpetVideo from '@/assets/alcatifa-processo/extracao.mp4';
+import imperVideo from '@/assets/before-after-pool/imper-agua-01.mp4';
+import carpetPoster from '@/assets/quiz-videos-capas/alcatifa.jpg';
+import imperPoster from '@/assets/quiz-videos-capas/imper.jpg';
 import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
 import matPele from '@/assets/widget-materiais/sofa-pele.webp';
 import matComum from '@/assets/quiz-materiais/tapete-la-inteiro.webp';
 import matJuta from '@/assets/quiz-materiais/tapete-juta-inteiro.webp';
-import imperSofaPhoto from '@/assets/widget-materiais/sofa-tecido.webp';
+import imperSofaPhoto from '@/assets/quiz-materiais/sofa-impermeabilizado.webp'; // sofá real impermeabilizado, água em gotas (dono, 25 Nov)
 import imperChairPhoto from '@/assets/quiz-materiais/cadeiras-inteiras.webp';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
@@ -59,7 +61,8 @@ const SIZES = {
 const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga'];
 // Passo da localidade no telemóvel: a fotografia real do artigo em cima (as do antes e depois do orçamento), para o
 // ecrã encher com conteúdo e nunca com botões esticados (dono, 25 Nov: "achas que a disposição disto é assim?").
-const CITY_PHOTO: Record<StepKind, { src: string; pair: boolean }> = { sofa: { src: baSofa, pair: true }, mattress: { src: baColchao, pair: true }, chairs: { src: baCadeiras, pair: true }, rug: { src: baTapete, pair: true }, carpet: { src: carpetPoster, pair: false }, imper: { src: imperPoster, pair: false } };
+// Impermeabilização e alcatifa: o vídeo real do trabalho a passar (dono, 25 Nov: "isto deveria ser vídeo").
+const CITY_PHOTO: Record<StepKind, { src: string; pair: boolean; video?: string }> = { sofa: { src: baSofa, pair: true }, mattress: { src: baColchao, pair: true }, chairs: { src: baCadeiras, pair: true }, rug: { src: baTapete, pair: true }, carpet: { src: carpetPoster, pair: false, video: carpetVideo }, imper: { src: imperPoster, pair: false, video: imperVideo } };
 const num = (v: string) => { const n = parseFloat(v.replace(',', '.')); return n > 0 ? n : 0; };
 const seatId = (n: number) => `${n}-${n === 1 ? 'lugar' : 'lugares'}`;
 
@@ -173,7 +176,9 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   if (!city) {
     questions = <>
       <div className="relative mb-4 overflow-hidden rounded-2xl md:hidden">
-        <img src={CITY_PHOTO[kind].src} alt="" width={520} height={440} loading="lazy" decoding="async" className="h-[210px] w-full object-cover" />
+        {CITY_PHOTO[kind].video
+          ? <video key={CITY_PHOTO[kind].video} src={CITY_PHOTO[kind].video} poster={CITY_PHOTO[kind].src} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="h-[210px] w-full object-cover" style={kind === 'imper' ? { objectPosition: '50% 45%' } : undefined} />
+          : <img src={CITY_PHOTO[kind].src} alt="" width={520} height={440} loading="lazy" decoding="async" className="h-[210px] w-full object-cover" />}
         {CITY_PHOTO[kind].pair && <><span className="absolute left-2.5 top-2.5 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white">Antes</span>
         <span className="absolute right-2.5 top-2.5 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white">Depois</span></>}
       </div>
