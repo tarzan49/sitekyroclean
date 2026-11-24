@@ -2719,7 +2719,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2809,7 +2809,7 @@ function withVisitGifts(input, r) {
     out.antiMiteGift = null;
   }
   const m = gifts.find((g) => g.piece === "mattress");
-  return { ...out, visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  return { ...out, visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {
