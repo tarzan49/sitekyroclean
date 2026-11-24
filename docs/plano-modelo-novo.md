@@ -17,7 +17,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO (OK 24 Nov) | colchões, tapetes e alcatifas FEITO (24 Nov); outros (pelos-animais, cheiro-urina genéricos, imper 45) por fazer |
 | MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido FEITO (OK); pele: widget Renovado/Renovado + Pele FEITO, encaixe desligado (falta passo a passo sem vídeos de tecido) | tapetes 412 FEITO (24 Nov) |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
-| TreatmentPage (`/tratamento-anti-acaros-*`) | 206 | — | — | por fazer |
+| TreatmentPage (`/tratamento-anti-acaros-*`, `/desbacterizacao-*`) | 206 | — | — | FEITO (24 Nov): texto encurtado com o OK do dono |
 | CommercialPage | 32 | — | — | por fazer |
 | Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); colchões e cadeiras: packs-tratamento |
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
