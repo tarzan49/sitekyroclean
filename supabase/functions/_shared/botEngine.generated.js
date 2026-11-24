@@ -2978,7 +2978,7 @@ function botQuoteInner(input) {
   if (!leather) return { ...withOdor, leatherTreatment: null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
 }
-var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
 var up9Total = (x) => {
   const n = Math.ceil(x - 1e-9);
   return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
@@ -3033,7 +3033,9 @@ function withSeparatePrice(input, r) {
   const out = { ...r };
   if (main) out.total = main.total;
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
-  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, rule: SEPARATE_PRICE_RULE } };
+  const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
+  const withoutGift = plain === null ? null : up9Total(plain);
+  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } };
 }
 
 // src/constants/cityCoords.ts

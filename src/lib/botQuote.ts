@@ -921,7 +921,7 @@ function botQuoteInner(input: unknown) {
  * struck price both go up to the next price ending in 9; `saving` = the difference. Gifts of the visit (escada A)
  * are added to the separate price at their normal value. Also on the Premium / Essencial options (`tiers`).
  */
-export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
 const up9Total = (x: number) => { const n = Math.ceil(x - 1e-9); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
 type SepTier = { separate: number; total: number; saving: number };
 function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
@@ -969,5 +969,8 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
   if (main) out.total = main.total;
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
   // Typed as T (the result is read as JSON by the bot): a wider type here makes botQuote's type circular.
-  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, rule: SEPARATE_PRICE_RULE } } as T;
+  // With a gift of the visit (escada A), the price without it (owner, 24 Nov 2026: "se ele não quiser, faço por 149").
+  const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
+  const withoutGift = plain === null ? null : up9Total(plain);
+  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } } as T;
 }
