@@ -3187,7 +3187,7 @@ function withSeparatePrice(input, r) {
     if (tier && !asWp) return [i];
     return asWp ? [{ ...rec(i), treatment: "clean" }, asWp] : null;
   };
-  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + g.normal, 0);
+  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + (g.treatment === "tratamento-pele" ? 0 : g.normal), 0);
   const sepOf = (tier) => {
     const parts = [];
     for (const i of items) {

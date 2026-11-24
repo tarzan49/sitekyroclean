@@ -120,3 +120,13 @@ describe('Blindado 5L/6L acima de 300€ (dono, 25 Nov 2026: "Sim, também")', (
     }
   });
 });
+
+describe('sofás de pele: o riscado não conta o tratamento duas vezes (25 Nov 2026, 2×3L dava ~~299~~ 219)', () => {
+  const L = (size: string, qty = 1) => sofa(size, 'clean', { leather: true, qty });
+  it.each([['2-lugares', 2, 239], ['3-lugares', 2, 259], ['3-lugares', 3, 389], ['4-lugares', 3, 449], ['5-lugares', 2, 359], ['1-lugar', 3, 299]])('%s × %i: riscado = cada um sozinho, somado, a acabar em 9 (%i)', (size, n, usual) => {
+    for (const items of [[L(size, n)], Array.from({ length: n }, () => L(size))]) {
+      const r = q('Lisboa', items);
+      expect([r.visitGifts.usual, r.separatePrice.separate, r.separatePrice.saving]).toEqual([usual, usual, usual - r.total]);
+    }
+  });
+});
