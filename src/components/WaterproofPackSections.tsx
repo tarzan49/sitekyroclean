@@ -73,7 +73,8 @@ export function StoryPlayer({ story, light = false }: { story: StoryStep[]; ligh
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.5 });
+    // Só conta quando a história está quase toda à vista; ao entrar, o passo recomeça do zero.
+    const io = new IntersectionObserver(([e]) => { setInView(e.isIntersecting); if (e.isIntersecting) setRun(r => r + 1); }, { threshold: 0.85 });
     io.observe(el); return () => io.disconnect();
   }, []);
   const next = () => { setStep(i => (i + 1) % story.length); setRun(r => r + 1); };
