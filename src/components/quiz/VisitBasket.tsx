@@ -21,13 +21,20 @@ import imperPhoto from '@/assets/picker-premium-sofa.webp';
 // Primeiro ecrã: vídeos reais da equipa a limpar em vez de fotografias (dono, 24 Nov: "vídeos de fundo a fazer a
 // limpeza, com opacidade mais alta, na horizontal"). Os mesmos da página inicial; o tapete é a máquina de extração.
 import sofaClip from '@/assets/sofa-processo/extracao.mp4';
-import mattressClip from '@/assets/colchoes-processo/extracao.mp4';
+import mattressClip from '@/assets/colchoes-processo/extracao-espuma.mp4';
 import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
-import rugClip from '@/assets/tapete-processo/maquina.mp4';
+import rugClip from '@/assets/tapete-processo/limpeza-soalho.mp4';
 import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
 import imperClip from '@/assets/before-after-pool/imper-agua-01.mp4';
 // Impermeabilização das cadeiras: a prova do funil (água em gotas numa cadeira), não a escova da limpeza (dono, 25 Nov).
 import imperChairsClip from '@/assets/before-after-pool/imper-agua-cadeira-01.mp4';
+import capaSofa from '@/assets/quiz-videos-capas/sofa.jpg';
+import capaColchao from '@/assets/quiz-videos-capas/colchao.jpg';
+import capaCadeiras from '@/assets/quiz-videos-capas/cadeiras.jpg';
+import capaTapete from '@/assets/quiz-videos-capas/tapete.jpg';
+import capaAlcatifa from '@/assets/quiz-videos-capas/alcatifa.jpg';
+import capaImper from '@/assets/quiz-videos-capas/imper.jpg';
+import capaImperCadeiras from '@/assets/quiz-videos-capas/imper-cadeiras.jpg';
 // Cartões de limpeza com o antes e depois que mais vende (dono, 25 Nov: "a melhor foto antes e depois que vendesse
 // instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
 import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
@@ -321,6 +328,10 @@ const ENTRY: { key: string; kind: BasketKind; label: string; short?: string; pho
   { key: 'carpet', kind: 'carpet', label: 'Alcatifa', photo: PHOTO.carpet, clip: carpetClip, from: c => fromPrice(c, 'carpet') },
 ];
 const CLIP: Record<BasketKind, string> = { sofa: sofaClip, mattress: mattressClip, chairs: chairsClip, rug: rugClip, carpet: carpetClip };
+/** A imagem enquanto o vídeo carrega é um fotograma do próprio vídeo (dono, 25 Nov: "nos tapetes tem que ter um vídeo de
+ *  limpeza de tapetes": via-se uma fotografia de catálogo), e o ponto do vídeo que fica sempre à vista. */
+const CLIP_POSTER: Record<string, string> = { [sofaClip]: capaSofa, [mattressClip]: capaColchao, [chairsClip]: capaCadeiras, [rugClip]: capaTapete, [carpetClip]: capaAlcatifa, [imperClip]: capaImper, [imperChairsClip]: capaImperCadeiras };
+const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 50%', [mattressClip]: '50% 55%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
 function waterproofFrom(city: string): string {
   const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
   const v = r.ok ? r.lines?.[0]?.amount : null;
@@ -768,10 +779,12 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       <header className="flex items-center border-b border-white/10 px-2 py-2">
         <button type="button" onClick={onCancel} className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:bg-white/10"><ArrowLeft className="h-5 w-5" />Voltar</button>
       </header>
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className={`relative -mx-4 mb-4 overflow-hidden ${!asksMaterial ? 'h-32' : material === null ? 'h-28' : 'h-20'}`}>
-          <video src={clip} poster={PHOTO[item.kind]} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="h-full w-full object-cover" />
-          <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/20 to-transparent" />
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-4 [&>*]:shrink-0">
+        {/* O vídeo ocupa o espaço que sobra no ecrã (dono, 25 Nov: "os vídeos estão completamente cortados, uma cena gigante em
+            baixo sem nada"); quando as opções aparecem, encolhe até ao mínimo. */}
+        <div className={`relative -mx-4 mb-4 shrink-0 grow overflow-hidden ${!asksMaterial ? 'min-h-32' : material === null ? 'min-h-28' : 'min-h-20'}`}>
+          <video src={clip} poster={CLIP_POSTER[clip]} autoPlay muted loop playsInline preload="auto" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: CLIP_AT[clip] }} />
+          <span className="absolute inset-x-0 bottom-0 h-28 max-h-full bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/45 to-transparent" />
           <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{item.imperOnly ? <>Impermeabilização <span className="block text-lg" style={{ color: GOLD }}>{item.kind === 'chairs' ? 'das cadeiras' : 'do sofá'}</span></> : KIND_LABEL[item.kind]}</h3>
         </div>
 
@@ -785,7 +798,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
             {materials.options.map(o => (
               <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className="relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
                 <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/45 px-3 py-2 backdrop-blur-md"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-black/65 px-3 py-2"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
               </button>
             ))}
           </div>
