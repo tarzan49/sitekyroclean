@@ -1,3 +1,4 @@
+import { useSnapSections } from '@/hooks/useSnapSections';
 import CommercialHero from "@/components/CommercialHero";
 import { AdsLandingFooter, AdsLandingHeader, isAdsVisit } from "@/components/AdsLandingNavigation";
 import LandingServiceSections from '@/components/LazyLandingServiceSections';
@@ -109,6 +110,7 @@ const SofaVariantPage = () => {
   // 8.364 paginas: e a familia onde o catalogo pesava mais (66K comprimidos).
   const resolved = useLandingModel(location.pathname);
   const model = resolved.status === 'ready' && resolved.model.family === 'variante' ? resolved.model : null;
+  useSnapSections(model?.serviceSlug === 'limpeza-sofas'); // modelo novo em tudo o que é limpeza de sofás (dono, 24 Nov)
   const parsed = useMemo(() => (model && model.variantKey && model.serviceKey ? {
     variantKey: model.variantKey as VariantKey,
     serviceKey: model.serviceKey as ServiceKey,
