@@ -71,7 +71,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
               {item.to ? <Link to={item.to} className="inline-flex min-h-9 items-center hover:text-white">{item.label}</Link> : <span className="py-2">{item.label}</span>}
             </Fragment>)}
           </nav>
-          <h1 data-hero-part="title" className="font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
+          <h1 data-hero-part="title" data-long-title={`${words.join(' ')} ${gold}`.length > 60 ? '' : undefined} className={`font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white`} style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
           <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
           {/* Preço e avaliação lado a lado, por cima do botão (dono, 09/10/2026). */}
           <div data-hero-part="proof" className="mb-4 grid grid-cols-2 items-center">
