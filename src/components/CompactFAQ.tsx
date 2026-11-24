@@ -2,24 +2,34 @@
 // caixa única com as perguntas fechadas, uma abre de cada vez. Mobile-first, cabe num ecrã.
 import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
+import ServiceFAQSchema from './ServiceFAQSchema';
 
 interface Props {
   faqs: { question: string; answer: string }[];
+  heading?: string;
   subtitle?: string;
   id?: string;
   // Fundo verde quando a secção anterior é clara (as cores alternam na página).
   dark?: boolean;
 }
 
-export default function CompactFAQ({ faqs, subtitle, id = 'perguntas', dark = false }: Props) {
+export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id = 'perguntas', dark = false }: Props) {
   const [open, setOpen] = useState<number | null>(null);
+  const words = heading.trim().split(' ');
+  const gold = words.pop() ?? '';
+  const rest = words.join(' ');
   return (
     <section id={id} className={`scroll-mt-20 py-12 md:py-16 ${dark ? 'bg-kyro-green' : 'bg-[#FDFDF9]'}`}>
+      <ServiceFAQSchema faqs={faqs} />
       <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-12">
+        {/* Cabeçalho editorial igual ao do resto do site (linha dourada, texto por cima, título, subtítulo). */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Dúvidas</p>
-          <h2 className={`mt-2 text-2xl font-semibold leading-tight md:text-4xl ${dark ? 'text-white' : 'text-[#1A1A1A]'}`}>O que nos <span className="text-[#D4AF37]">perguntam</span></h2>
-          {subtitle && <p className={`mt-2 hidden md:block ${dark ? 'text-white/75' : 'text-[#555]'}`}>{subtitle}</p>}
+          <div className="mb-3 flex items-center gap-3 md:mb-4">
+            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+            <p className="text-sm font-bold uppercase tracking-[0.08em]" style={{ color: '#D4AF37', opacity: 0.85 }}>Dúvidas Frequentes</p>
+          </div>
+          <h2 className={`type-section-title font-playfair ${dark ? 'text-white' : 'text-[#111111]'}`}>{rest} <em className="not-italic" style={{ color: '#D4AF37' }}>{gold}</em></h2>
+          <p className={`mt-3 text-base leading-relaxed md:mt-4 ${dark ? 'text-white/80' : 'text-[#536259]'}`}>Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.</p>
         </div>
         <div className="divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white">
           {faqs.map((f, i) => {
