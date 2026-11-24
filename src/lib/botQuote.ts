@@ -600,13 +600,14 @@ function botQuoteCore(input: unknown) {
  * One gift per piece beyond the first: the mattress anti-mites first, then each time the cheapest
  * treatment left in the visit (anti-mites on chairs or a sofa, anti-odor on a rug or carpet). Armchairs,
  * puffs and headboards count as pieces. A mattress order of 150€ or more keeps its gift (19 Nov). A mattress
- * or chairs the client already asked with anti-mites can be the gift (the base is cleaning only).
+ * or chairs the client already asked with anti-mites can be the gift (the base is cleaning only). The mattress
+ * anti-mites shows its separate price, 40€ per mattress (owner, 24 Nov 2026: "sim, muda para 40€").
  * `usual` = price with the offered treatments (the struck price); `total` = what the client pays, up to the
  * next price ending in 9. Same gifts on the Premium / Essencial options (`tiers`). Above 300€ it replaces
  * the big-order cut. Works with a rug in the order (rugCombo).
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
-export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
+export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
 export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
@@ -619,46 +620,66 @@ type TierGift = { usual: number; total: number };
 function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r as unknown as Priced;
-  const rawIn = (input as { items?: unknown } | null)?.items;
+  const inp = (input ?? {}) as Record<string, unknown>;
+  const rawIn = inp.items;
   // Above 300€ the ladder replaces the big-order cut (owner, 24 Nov 2026: the total never goes down); with no gift the big order stays.
   if (pricedTotal({ ...q, total: q.bigOrder ? (q.bigOrder as { normal: number }).normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
-  // A mattress the client already asked with anti-mites gets it offered too (19 Nov): the base is cleaning only.
-  const raw = rawIn.map(i => (rec(i).kind === 'mattress' && rec(i).treatment === 'clean+anti-acaros' ? { ...rec(i), treatment: 'clean' } : i));
-  const total = pricedTotal(innerPriced({ ...(input as object), items: raw }));
-  if (total === null) return none;
-  const cleanOnly = (i: unknown) => [undefined, 'clean'].includes(rec(i).treatment as string | undefined);
-  const pieces = raw.length;
-  const steps: { piece: VisitGift['piece']; treatment: VisitGift['treatment']; min: number; match: (i: unknown) => boolean; apply: (i: unknown) => unknown }[] = [
-    { piece: 'mattress', treatment: 'anti-acaros', min: 2, match: i => rec(i).kind === 'mattress' && cleanOnly(i), apply: i => ({ ...rec(i), treatment: 'clean+anti-acaros' }) },
-    { piece: 'chairs', treatment: 'anti-acaros', min: 3, match: i => rec(i).kind === 'chairs' && cleanOnly(i) && !rec(i).seatOnly, apply: i => ({ ...rec(i), treatment: 'clean+anti-acaros' }) },
-    { piece: 'rug', treatment: 'anti-odor', min: 4, match: i => rec(i).kind === 'rug' && cleanOnly(i) && rec(i).odor !== true, apply: i => ({ ...rec(i), odor: true }) },
-  ];
-  const gifts: VisitGift[] = [];
-  let items = raw as unknown[];
-  let usual = total;
-  let real = total; // o preço de tabela com as ofertas até aqui (a base de cada diferença)
-  for (const s of steps) {
-    const mattressAlone = s.piece === 'mattress' && total >= MATTRESS_MITE_OFFER_MIN;
-    if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
-    const next = items.map(i => (s.match(i) ? s.apply(i) : i));
-    const priced = pricedTotal(innerPriced({ ...(input as object), items: next }));
-    if (priced === null || priced <= real) continue;
-    // Colchão: o anti-ácaros oferecido vale o preço à parte, 40€ por colchão (dono, 24 Nov 2026: "sim, muda para 40€").
-    const mattresses = s.piece === 'mattress' ? items.filter(s.match).reduce((n: number, i) => n + (Number(rec(i).qty) || 1), 0) : 0;
-    const normal = s.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - real);
-    gifts.push({ piece: s.piece, treatment: s.treatment, normal });
-    items = next;
-    real = priced;
-    usual = cents(usual + normal);
+  const price = (items: unknown[]) => pricedTotal(innerPriced({ ...inp, items }));
+  const treat = (i: unknown) => rec(i).treatment as string | undefined;
+  const clean = (i: unknown) => treat(i) === undefined || treat(i) === 'clean';
+  // A mattress or chairs already asked with anti-mites: candidates on a cleaning base; restored (paid) when not offered.
+  const asked = new Set<number>();
+  const base = rawIn.map((i, n) => (['mattress', 'chairs'].includes(rec(i).kind as string) && treat(i) === 'clean+anti-acaros' ? (asked.add(n), { ...rec(i), treatment: 'clean' }) : i));
+  const extras = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'].filter(k => typeof inp[k] === 'number' && (inp[k] as number) > 0).length;
+  const pieces = rawIn.length + extras;
+  const candidate = (i: unknown): { piece: VisitGift['piece']; treatment: VisitGift['treatment']; apply: unknown } | null => {
+    const x = rec(i);
+    if (!clean(i)) return null;
+    if (x.kind === 'mattress') return { piece: 'mattress', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if (x.kind === 'chairs' && !x.seatOnly) return { piece: 'chairs', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if (x.kind === 'sofa' && !x.leather) return { piece: 'sofa', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    if ((x.kind === 'rug' || x.kind === 'carpet') && x.odor !== true) return { piece: x.kind, treatment: 'anti-odor', apply: { ...x, odor: true } };
+    return null;
+  };
+  const baseTotal = price(base);
+  if (baseTotal === null) return none;
+  const giftsAllowed = Math.max(pieces - 1, baseTotal >= MATTRESS_MITE_OFFER_MIN && base.some(i => rec(i).kind === 'mattress') ? 1 : 0);
+  const gifted = new Map<number, VisitGift>();
+  let withGifts = base.slice();
+  let usualBase = baseTotal;
+  while (gifted.size < giftsAllowed) {
+    let best: { n: number; gift: VisitGift; items: unknown[]; priced: number } | null = null;
+    for (const [n, i] of withGifts.entries()) {
+      if (gifted.has(n)) continue;
+      const c = candidate(i);
+      if (!c) continue;
+      const items = withGifts.map((y, k) => (k === n ? c.apply : y));
+      const priced = price(items);
+      if (priced === null || priced <= usualBase) continue;
+      const mattresses = c.piece === 'mattress' ? Number(rec(i).qty) || 1 : 0;
+      const gift: VisitGift = { piece: c.piece, treatment: c.treatment, normal: c.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - usualBase) };
+      // The mattress goes first (owner's ladder), then the cheapest treatment left.
+      const better = !best || (c.piece === 'mattress') !== (best.gift.piece === 'mattress') ? !best || c.piece === 'mattress' : gift.normal < best.gift.normal;
+      if (better) best = { n, gift, items, priced };
+    }
+    if (!best) break;
+    gifted.set(best.n, best.gift);
+    withGifts = best.items;
+    usualBase = best.priced;
   }
-  if (!gifts.length) return none;
-  const m = gifts.find(g => g.piece === 'mattress');
+  if (!gifted.size) return none;
+  // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
+  const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
+  const total = price(restore(base));
+  if (total === null || price(restore(withGifts)) === null) return none;
+  const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
+  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
   // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
   const final = up9(total);
   const out = { ...r } as Record<string, unknown>;
-  const rc = (r as unknown as Priced).rugCombo;
+  const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
   // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
@@ -668,6 +689,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
+  const m = gifts.find(g => g.piece === 'mattress');
   return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */

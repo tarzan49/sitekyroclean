@@ -2728,45 +2728,64 @@ var pricedTotal = (r) => {
 function withVisitGifts(input, r) {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r;
-  const rawIn = input?.items;
+  const inp = input ?? {};
+  const rawIn = inp.items;
   if (pricedTotal({ ...q, total: q.bigOrder ? q.bigOrder.normal : q.total }) === null || !Array.isArray(rawIn)) return none;
   const rec = (i) => i ?? {};
-  const raw = rawIn.map((i) => rec(i).kind === "mattress" && rec(i).treatment === "clean+anti-acaros" ? { ...rec(i), treatment: "clean" } : i);
-  const total = pricedTotal(innerPriced({ ...input, items: raw }));
-  if (total === null) return none;
-  const cleanOnly = (i) => [void 0, "clean"].includes(rec(i).treatment);
-  const pieces = raw.length;
-  const steps = [
-    { piece: "mattress", treatment: "anti-acaros", min: 2, match: (i) => rec(i).kind === "mattress" && cleanOnly(i), apply: (i) => ({ ...rec(i), treatment: "clean+anti-acaros" }) },
-    { piece: "chairs", treatment: "anti-acaros", min: 3, match: (i) => rec(i).kind === "chairs" && cleanOnly(i) && !rec(i).seatOnly, apply: (i) => ({ ...rec(i), treatment: "clean+anti-acaros" }) },
-    { piece: "rug", treatment: "anti-odor", min: 4, match: (i) => rec(i).kind === "rug" && cleanOnly(i) && rec(i).odor !== true, apply: (i) => ({ ...rec(i), odor: true }) }
-  ];
-  const gifts = [];
-  let items = raw;
-  let usual = total;
-  let real = total;
-  for (const s of steps) {
-    const mattressAlone = s.piece === "mattress" && total >= MATTRESS_MITE_OFFER_MIN;
-    if (!(pieces >= s.min || mattressAlone) || !items.some(s.match)) continue;
-    const next = items.map((i) => s.match(i) ? s.apply(i) : i);
-    const priced2 = pricedTotal(innerPriced({ ...input, items: next }));
-    if (priced2 === null || priced2 <= real) continue;
-    const mattresses = s.piece === "mattress" ? items.filter(s.match).reduce((n, i) => n + (Number(rec(i).qty) || 1), 0) : 0;
-    const normal = s.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - real);
-    gifts.push({ piece: s.piece, treatment: s.treatment, normal });
-    items = next;
-    real = priced2;
-    usual = cents(usual + normal);
+  const price = (items) => pricedTotal(innerPriced({ ...inp, items }));
+  const treat = (i) => rec(i).treatment;
+  const clean = (i) => treat(i) === void 0 || treat(i) === "clean";
+  const asked = /* @__PURE__ */ new Set();
+  const base = rawIn.map((i, n) => ["mattress", "chairs"].includes(rec(i).kind) && treat(i) === "clean+anti-acaros" ? (asked.add(n), { ...rec(i), treatment: "clean" }) : i);
+  const extras = ["armchairs", "largeArmchairs", "puffs", "headboards"].filter((k) => typeof inp[k] === "number" && inp[k] > 0).length;
+  const pieces = rawIn.length + extras;
+  const candidate = (i) => {
+    const x = rec(i);
+    if (!clean(i)) return null;
+    if (x.kind === "mattress") return { piece: "mattress", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
+    if (x.kind === "chairs" && !x.seatOnly) return { piece: "chairs", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
+    if (x.kind === "sofa" && !x.leather) return { piece: "sofa", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
+    if ((x.kind === "rug" || x.kind === "carpet") && x.odor !== true) return { piece: x.kind, treatment: "anti-odor", apply: { ...x, odor: true } };
+    return null;
+  };
+  const baseTotal = price(base);
+  if (baseTotal === null) return none;
+  const giftsAllowed = Math.max(pieces - 1, baseTotal >= MATTRESS_MITE_OFFER_MIN && base.some((i) => rec(i).kind === "mattress") ? 1 : 0);
+  const gifted = /* @__PURE__ */ new Map();
+  let withGifts = base.slice();
+  let usualBase = baseTotal;
+  while (gifted.size < giftsAllowed) {
+    let best = null;
+    for (const [n, i] of withGifts.entries()) {
+      if (gifted.has(n)) continue;
+      const c = candidate(i);
+      if (!c) continue;
+      const items = withGifts.map((y, k) => k === n ? c.apply : y);
+      const priced2 = price(items);
+      if (priced2 === null || priced2 <= usualBase) continue;
+      const mattresses = c.piece === "mattress" ? Number(rec(i).qty) || 1 : 0;
+      const gift = { piece: c.piece, treatment: c.treatment, normal: c.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - usualBase) };
+      const better = !best || c.piece === "mattress" !== (best.gift.piece === "mattress") ? !best || c.piece === "mattress" : gift.normal < best.gift.normal;
+      if (better) best = { n, gift, items, priced: priced2 };
+    }
+    if (!best) break;
+    gifted.set(best.n, best.gift);
+    withGifts = best.items;
+    usualBase = best.priced;
   }
-  if (!gifts.length) return none;
-  const m = gifts.find((g) => g.piece === "mattress");
+  if (!gifted.size) return none;
+  const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
+  const total = price(restore(base));
+  if (total === null || price(restore(withGifts)) === null) return none;
+  const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
+  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
   const final = up9(total);
   const out = { ...r };
-  const rc = r.rugCombo;
+  const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
   const giftSum = cents(usual - total);
@@ -2778,6 +2797,7 @@ function withVisitGifts(input, r) {
     out.bigOrder = null;
     out.antiMiteGift = null;
   }
+  const m = gifts.find((g) => g.piece === "mattress");
   return { ...out, visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
