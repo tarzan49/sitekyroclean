@@ -1123,8 +1123,6 @@ Regra (vale para questionário, WhatsApp, anúncios e email, sem exceção):
 5. Só depois de o cliente escolher: "Temos disponibilidade [dia] às [hora] ou [hora]."
 Email do questionário: responde-se com a mensagem automática que já existia e, nela, este funil.
 
-**Provas em teste (dono, 24 Nov 2026).** As 5 publicações de antes e depois de 19/11 (kyro-social `antes-depois/nov-0[1-5]-*.json`, gerador `render.py`, que lê o número de avaliações do site) foram regeradas com o selo "210+". No bot (kyro-bot `src/bot/funnel23.ts` `APPROVED_PROOFS`, escolha estável pelo hash dos últimos 9 dígitos do telefone, `approvedFor`; o nome da prova enviada fica nos media do `bot_drafts`, que é o que se cruza com os fechos por variante): sofá A/B/C/D = `ad23-sofa-05`, `ad23-sofa-10`, `ad24-sofa-rosa` ("Riscos e manchas cor-de-rosa no tecido") e `ad24-sofa-cinza` ("Assentos acinzentados num sofá claro"); o `ad23-sofa-15` saiu para ficarem 4 variantes (05 e 10 foram os primeiros que ele nomeou). Colchão A/B = `ad23-colchao` (o de sempre) e `ad24-colchao-centro` ("Manchas amarelas no centro do colchão"). No site, os pares originais entraram nas galerias (`src/data/beforeAfterPool.ts`): sofá `sofa-16`/`sofa-17` logo a seguir ao sofá azul do hero; colchão `colchao-08`/`09`/`10` (as publicações 1, 4 e 5) logo a seguir ao primeiro.
-
 ### [RETIRADA 23/11] Provas no orçamento (dono, 7 Nov)
 "limpeza = vídeo do problema do cliente (anúncio aprovado com a 1.ª frase do problema, pontos no fim) + antes/depois" deixou de valer: a limpeza leva só o antes/depois do artigo.
 
