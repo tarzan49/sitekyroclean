@@ -507,7 +507,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           </>
         ) : (
           <>
-            <h2 className="type-section-title font-playfair mb-4 text-white">Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></h2>
+            <h2 className="type-section-title font-playfair mb-4 text-white">{cityKnown(city) ? <>Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></> : <>Para onde enviamos o <em className="not-italic" style={{ color: GOLD }}>preço?</em></>}</h2>
             <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
               {items.map(it => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : ''; })()}</span></li>)}
               {groupGifts(quote.gifts).map(g => <li key={g.key} className="flex justify-between gap-2 text-[#E8C964]"><span>{capital(g.text)}</span><span className="font-semibold"><span className="mr-1.5 text-white/45 line-through">{formatEuro(g.normal)}</span>Oferecido</span></li>)}
@@ -517,7 +517,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
             <label className="block"><span className="mb-1 block text-xs font-semibold text-white/70">Telemóvel (WhatsApp)</span>
               <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
-            <p className="mt-3 text-xs text-white/60">Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.</p>
+            <p className="mt-3 text-xs text-white/60">{cityKnown(city) ? 'Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.' : 'Confirmamos o preço com a deslocação e a disponibilidade no WhatsApp.'}</p>
             {failed && <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, quote.gifts))}`} data-tracking-source="basket_fallback" target="_blank" rel="noopener noreferrer" className="mt-3 block rounded-xl bg-[#25D366] p-3 text-center text-sm font-bold text-white">Não conseguimos enviar. Enviar pelo WhatsApp</a>}
           </>
         )}
@@ -530,7 +530,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         </div>
         {step === 'basket'
           ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Continuar</button>
-          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : 'Receber o preço e as horas no WhatsApp'}</button>}
+          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
       </footer>
 
       {askCity && !editing && (() => {
@@ -685,7 +685,8 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const choose = (p: Partial<BasketItem>) => { set(p); reveal(); };
   const bump = (k: string, d: number) => { setCounts(c => ({ ...c, [k]: Math.max(0, Math.min(9, (c[k] ?? 0) + d)) })); if (d > 0) reveal(); };
   const sized = !rug || (num(item.width) > 0 && num(item.length) > 0);
-  // Pele ou tecido pergunta-se logo no menu do sofá (dono, 25 Nov): pele avança para o preço, tecido escolhe o pack.
+  // O material pergunta-se primeiro (dono, 25 Nov): os lugares e os preços só aparecem por baixo depois de clicar; pele
+  // avança para o preço, tecido escolhe o pack.
   const asksMaterial = item.kind === 'sofa' && !item.imperOnly;
   const [material, setMaterial] = useState<'tecido' | 'pele' | null>(() => (!asksMaterial ? 'tecido' : fresh ? null : item.leather ? 'pele' : 'tecido'));
   const ok = multi ? group().length > 0 && material !== null : sized && (picked || rug);
@@ -718,15 +719,17 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
 
         {item.kind === 'sofa' && <>
           {asksMaterial && <>
-            <p className="mb-2 text-sm font-semibold text-white">É de pele ou couro?</p>
+            <p className="mb-2 text-sm font-semibold text-white">O seu sofá é de que material?</p>
             <div className="mb-4 grid grid-cols-2 gap-2">
-              {([['tecido', 'Não, é de tecido'], ['pele', 'Sim, pele ou couro']] as const).map(([m, label]) => <button key={m} type="button" aria-pressed={material === m} onClick={() => chooseMaterial(m)} className={`${tile(material === m)} min-h-12`}>{label}</button>)}
+              {([['tecido', 'Tecido'], ['pele', 'Pele / couro']] as const).map(([m, label]) => <button key={m} type="button" aria-pressed={material === m} onClick={() => chooseMaterial(m)} className={`${tile(material === m)} min-h-12`}>{label}</button>)}
             </div>
           </>}
+          {material !== null && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantos lugares? <span className="font-normal text-white/60">Pode juntar vários</span></p>
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(n => <CountTile key={n} count={counts[String(n)] ?? 0} onBump={d => bump(String(n), d)} cls={tile}>
             <QuizFurnitureImage service="sofa" sizeId={n >= 4 ? '4-lugares' : n === 1 ? '1-lugar' : `${n}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}</CountTile>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
+          </>}
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho? <span className="font-normal text-white/60">Pode juntar vários</span></p>
@@ -797,7 +800,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? (material === null ? 'Diga se é de pele ou tecido' : 'Escolha os lugares e quantos') : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? (material === null ? 'Escolha o material' : 'Escolha os lugares e quantos') : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
