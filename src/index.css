@@ -817,3 +817,7 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
   html.snap-sections #duvidas button[aria-expanded] { padding-top: 8px; padding-bottom: 8px; gap: 10px; }
   html.snap-sections #duvidas button[aria-expanded] > span:first-child { font-size: 14px; line-height: 1.35; }
 }
+@media (max-width: 767px) {
+  /* Títulos de secção mais juntos ao conteúdo em todas as páginas com encaixe (cada secção cabe num ecrã). */
+  html.snap-sections main section > div > div.mb-8:first-child { margin-bottom: 14px; }
+}

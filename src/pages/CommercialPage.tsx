@@ -6,6 +6,10 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
+import CompactFAQ from "@/components/CompactFAQ";
+import heroVideo from "@/assets/comercial/poltronas.mp4";
+import heroPoster from "@/assets/comercial/poltronas-poster.jpg";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { getCommercialPageData, COMMERCIAL_CITIES, SegmentKey } from "@/data/commercialSeoData";
 import { cityPrep } from "@/data/serviceCatalog";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
@@ -23,6 +27,7 @@ const CommercialPage = () => {
   const { pathname } = useLocation();
   const citySlug = pathname.replace(/^\/limpeza-comercial-/, "");
   const data = getCommercialPageData(citySlug);
+  useSnapSections(Boolean(data));
   const heroImg = getProblemHeroImage("limpeza-sofa-hotel");
 
   useEffect(() => {
@@ -85,177 +90,76 @@ const CommercialPage = () => {
       <main>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-        {/* ═══ HERO ═══ */}
-        <div data-mobile-hero="photo" className="relative overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" width={1280} height={720} />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
-
-          <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
-            <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-              <div className="max-w-2xl">
-                <PageBreadcrumb items={[
-                  { label: "Início", to: "/" },
-                  { label: data.h1 },
-                ]} />
-
-                <div className="inline-flex items-start mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      Restaurantes · Hotéis · Escritórios
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="type-page-title font-playfair      text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
-                  {data.h1}
-                </h1>
-
-                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro}
-                </p>
-
-                <div className="flex items-center gap-2 mb-6">
-                  <span className="text-white font-bold text-base">{REVIEW_RATING}★</span>
-                  <span className="text-white/80 text-sm">Google · {REVIEW_COUNT}+ avaliações</span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
-                  <div className="relative group flex-1">
-                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <a
-                      href={waHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
-                    >
-                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-base font-semibold tracking-[0.18em] uppercase">Pedir Proposta</span>
-                    </a>
-                  </div>
-                  <a
-                    href={`tel:${PHONE_TEL}`}
-                    className="flex-1 flex items-center justify-center gap-2 h-[58px] md:h-[52px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
-                  >
-                    <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                    <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
-                  </a>
-                </div>
-                <p className="text-white/80 text-sm mt-4">Orçamento personalizado · Visita de avaliação gratuita · Sem compromisso</p>
-              </div>
+        {/* Modelo novo (dono, 24 Nov: "as páginas comerciais são das piores coisas que temos"): secções de ecrã
+            inteiro, vídeo real de um trabalho em espaço comercial, pouco texto e um só pedido: a proposta. */}
+        <section data-commercial-hero className="relative flex min-h-[100svh] items-end overflow-hidden bg-[#071a12] text-white">
+          <video src={heroVideo} poster={heroPoster} autoPlay muted loop playsInline aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.35) 0%, rgba(7,26,18,0.55) 45%, rgba(7,26,18,0.95) 85%)" }} />
+          <div className="relative mx-auto w-full max-w-7xl px-5 pb-8 pt-20 sm:px-6 md:pb-16 md:pt-28 lg:px-8">
+            <div className="hidden md:block"><PageBreadcrumb items={[{ label: "Início", to: "/" }, { label: data.h1 }]} /></div>
+            <h1 className="font-playfair mb-3 max-w-2xl text-[28px] font-semibold leading-tight text-white md:text-5xl" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.6)" }}>{data.h1}</h1>
+            <p className="mb-5 max-w-lg text-[15px] leading-relaxed text-white/80 line-clamp-2">{data.intro}</p>
+            <p className="mb-5 flex items-center gap-2 text-sm text-white/85"><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> Google · {REVIEW_COUNT}+ avaliações · contratos com restaurantes, hotéis e escritórios</p>
+            <div className="flex max-w-md flex-col gap-2.5 sm:flex-row">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source={`commercial_hero_${citySlug}`} className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5" />Pedir proposta no WhatsApp</a>
+              <a href={`tel:${PHONE_TEL}`} data-tracking-source={`commercial_hero_${citySlug}`} className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg border border-white/30 px-4 text-base font-semibold text-white hover:bg-white/10"><Phone className="h-4 w-4" />{PHONE_DISPLAY}</a>
             </div>
-            <img src={heroImg} alt="Limpeza profissional de estofos" width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
-          </section>
-        </div>
+          </div>
+        </section>
 
-        {/* ═══ SEGMENTOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Para o seu negócio" heading="Feito para o seu tipo de" goldWord="espaço" light={true} />
-            <div className="grid md:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+        <section id="espacos" className="scroll-mt-20 bg-[#FDFDF9] py-14 md:py-20">
+          <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+            <SectionHeader heading="Feito para o seu" goldWord="espaço" />
+            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0">
               {data.segments.map(seg => {
                 const Icon = SEGMENT_ICONS[seg.key];
                 return (
-                  <div key={seg.key} className="relative overflow-hidden flex flex-col p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mb-4" style={{ backgroundColor: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.25)" }}>
-                      <Icon className="w-5 h-5" style={{ color: "#D4AF37" }} />
+                  <article key={seg.key} className="w-[90%] shrink-0 snap-start rounded-2xl border border-[#E5E0D3] bg-white p-4 md:w-auto md:p-5" style={{ borderTop: "3px solid #D4AF37" }}>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#D4AF37]/10"><Icon className="h-5 w-5 text-[#D4AF37]" /></span>
+                      <h3 className="font-playfair text-xl font-bold text-[#111111]">{seg.label}</h3>
                     </div>
-                    <p className="font-playfair text-lg font-bold mb-3 text-[#111111]">{seg.label}</p>
-                    <ul className="space-y-2 mb-4">
-                      {seg.painPoints.map((p, i) => (
-                        <li key={i} className="text-base text-[#505650] leading-relaxed flex items-start gap-2">
-                          <span className="w-1 h-1 rounded-full bg-[#D4AF37] flex-shrink-0 mt-2" />
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-base text-[#111111]/70 leading-relaxed pt-4" style={{ borderTop: "1px solid #E8E4DE" }}>{seg.solution}</p>
-                  </div>
+                    <ul className="mb-2.5 space-y-1">{seg.painPoints.map((pt, i) => <li key={i} className="flex gap-2 text-[13px] leading-snug text-[#505650]"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#D4AF37]" />{pt}</li>)}</ul>
+                    <p className="border-t border-[#E8E4DE] pt-2.5 text-[13px] font-medium leading-snug text-[#111111]">{seg.solution}</p>
+                  </article>
                 );
               })}
             </div>
           </div>
         </section>
 
-        {/* ═══ BENEFÍCIOS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Como Funciona" heading="O que muda com um" goldWord="contrato" light={false} />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {data.benefits.map((benefit, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3.5 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
-                    <CheckCircle2 className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                  </div>
-                  <span className="text-base text-white/75 leading-relaxed pt-1.5">{benefit}</span>
-                </div>
-              ))}
-            </div>
+        <section id="contrato" className="scroll-mt-20 bg-kyro-green py-14 text-white md:py-20">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-8">
+            <SectionHeader heading="O que muda com um" goldWord="contrato" light={false} />
+            <ul className="space-y-2">{data.benefits.map((benefit, idx) => <li key={idx} className="flex gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[14px] leading-snug text-white/90"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#D4AF37]" />{benefit}</li>)}</ul>
           </div>
         </section>
 
-        {/* ═══ TESTEMUNHO REAL ═══ */}
-        <section className="py-14 md:py-16 bg-[#FDFDF9]">
-          <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="relative p-8 md:p-10" style={{ background: "linear-gradient(160deg, rgba(212,175,55,0.06) 0%, rgba(212,175,55,0.02) 100%)", border: "1px solid rgba(212,175,55,0.18)", borderTop: "2px solid #D4AF37" }}>
-              <Quote className="w-10 h-10 mb-4" style={{ color: "rgba(212,175,55,0.35)" }} />
-              <p className="font-playfair text-lg md:text-xl text-[#111111]/85 leading-relaxed mb-5">
-                "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️"
-              </p>
-              <p className="text-base font-bold text-[#111111]">Lumiere Restaurante</p>
-              <p className="text-sm text-[#505650]">Avaliação Google verificada</p>
-            </div>
+        <section id="testemunho" className="scroll-mt-20 bg-[#FDFDF9] py-14 md:py-20">
+          <div className="mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
+            <SectionHeader heading="Quem já trabalha" goldWord="connosco" />
+            <figure className="rounded-2xl border border-[#D4AF37]/30 bg-white p-6 md:p-10">
+              <Quote className="mb-3 h-9 w-9 text-[#D4AF37]/50" />
+              <blockquote className="font-playfair text-lg leading-relaxed text-[#111111]/85 md:text-xl">"Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️"</blockquote>
+              <figcaption className="mt-4 text-sm"><span className="font-bold text-[#111111]">Lumiere Restaurante</span> · <span className="text-[#505650]">avaliação Google verificada</span></figcaption>
+            </figure>
           </div>
         </section>
 
-        {/* ═══ FAQ ═══ */}
-        <ServiceFAQ faqs={data.faqs} heading="Dúvidas sobre contratos comerciais" variant="dark" />
+        <CompactFAQ id="duvidas" dark faqs={data.faqs} heading="Dúvidas sobre contratos comerciais" />
 
-        {/* ═══ CTA FINAL ═══ */}
-        <section className="py-14 md:py-16 bg-[#FDFDF9] border-t border-[#111111]/8">
-          <div className="max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <h2 className="type-section-title font-playfair    text-[#111111] mb-3">
-              Peça uma proposta <span style={{ color: "#D4AF37" }}>sem compromisso</span>
-            </h2>
-            <p className="text-[#505650] text-base mb-8 max-w-lg mx-auto">
-              Fazemos uma visita de avaliação gratuita ao seu espaço {cityPrep(data.city.name)} {data.city.name} e enviamos uma proposta ajustada ao seu volume e frequência.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)]"
-              >
-                <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
-              </a>
-              <a
-                href={`tel:${PHONE_TEL}`}
-                className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold border border-[#111111]/20 text-[#111111] hover:bg-[#111111]/5 transition-colors"
-              >
-                <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
-              </a>
+        <section id="proposta" className="scroll-mt-20 bg-[#FDFDF9] py-14 md:py-20">
+          <div className="mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
+            <SectionHeader heading="Peça uma proposta" goldWord="sem compromisso" />
+            <p className="mb-5 text-base leading-relaxed text-[#505650]">Diga-nos o tipo de espaço, o número de peças e a frequência. Respondemos em menos de 1 minuto no WhatsApp com uma proposta à medida.</p>
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source={`commercial_cta_${citySlug}`} className="flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5" />Pedir proposta no WhatsApp</a>
+              <a href={`tel:${PHONE_TEL}`} data-tracking-source={`commercial_cta_${citySlug}`} className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg border border-[#111111]/20 px-4 text-base font-semibold text-[#111111]"><Phone className="h-4 w-4" />Ligar {PHONE_DISPLAY}</a>
             </div>
-          </div>
-        </section>
-
-        {/* As outras cidades com página B2B. Sem isto, estas 20 páginas não
-            tinham nenhuma ligação interna em lado nenhum do site: nunca houve
-            um hub para elas. O rodapé liga as quatro cabeças de região e este
-            bloco alcança as restantes. */}
-        <section className="container mx-auto px-4 pb-16">
-          <h2 className="type-section-title font-playfair text-[#111111] mb-5">Limpeza comercial noutras cidades</h2>
-          <div className="flex flex-wrap gap-3">
-            {COMMERCIAL_CITIES.filter(c => c.slug !== citySlug).map(c => (
-              <Link key={c.slug} to={`/limpeza-comercial-${c.slug}`} className="border border-[#111111]/15 rounded-lg px-4 py-3 text-base hover:bg-[#111111]/5 transition-colors">
-                {c.name}
-              </Link>
-            ))}
+            <details className="mt-6"><summary className="cursor-pointer text-base font-semibold text-[#111111]">Limpeza comercial noutras cidades</summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {COMMERCIAL_CITIES.filter(c => c.slug !== citySlug).map(c => <Link key={c.slug} to={`/limpeza-comercial-${c.slug}`} className="rounded-full border border-[#E5E0D3] bg-white px-3 py-1.5 text-sm text-[#1A1A1A] hover:border-[#D4AF37]">{c.name}</Link>)}
+            </div></details>
           </div>
         </section>
       </main>
