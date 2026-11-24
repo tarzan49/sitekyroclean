@@ -30,7 +30,7 @@ const SPILLS: Record<Kind, { img: string; title: string; text: string }[]> = {
 
 /** Faixa que desliza sozinha (só quando tem scroll para o lado, ou seja, no telemóvel);
  *  avança um cartão a cada 3,5 s, em scroll suave, e pára de vez quando a pessoa lhe toca. */
-function useAutoSlide<T extends HTMLElement>(intervalMs = 3500) {
+export function useAutoSlide<T extends HTMLElement>(intervalMs = 3500) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;

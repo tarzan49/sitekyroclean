@@ -16,6 +16,9 @@ export const packs: PackCombo[] = [
   { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Escolha os lugares do sofá, o tamanho do colchão e o tratamento de cada um. O total já vem com a deslocação.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
   { id: 'sofa-impermeabilizacao', name: 'Limpeza e Impermeabilização de Sofá', slug: 'pack-sofa-impermeabilizacao', tagline: 'O seu sofá já não é novo, mas gostava que voltasse a parecer?', description: 'Tiramos a sujidade das fibras com uma limpeza profunda e protegemo-lo a seguir: vinho, café ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'impermeabilizacao' },
   { id: 'cadeiras-impermeabilizacao', name: 'Limpeza e Impermeabilização de Cadeiras', slug: 'pack-cadeiras-impermeabilizacao', tagline: 'As cadeiras da mesa são as primeiras a sofrer com cada refeição?', description: 'Limpamos o tecido a fundo e protegemo-lo a seguir: molho, vinho ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, e o preço por cadeira desce com a quantidade.', service1Slug: 'limpeza-cadeiras', service2Slug: 'impermeabilizacao' },
+  { id: 'colchao-anti-acaros', name: 'Limpeza de Colchão com Anti-ácaros', slug: 'pack-colchao-anti-acaros', tagline: 'Dorme todas as noites num colchão que nunca foi limpo a fundo?', description: 'Tiramos o pó, o suor e os ácaros das fibras com uma limpeza profunda e aplicamos a seguir o anti-ácaros e anti-bacteriano (produto Bactran), que elimina bactérias, bolores e odores. Tudo na mesma visita.', service1Slug: 'limpeza-colchoes', service2Slug: 'limpeza-colchoes' },
+  { id: 'sofa-anti-acaros', name: 'Limpeza de Sofá com Anti-ácaros', slug: 'pack-sofa-anti-acaros', tagline: 'O sofá onde a família se senta todos os dias está mesmo limpo?', description: 'Tiramos o pó, a sujidade e os ácaros das fibras com uma limpeza profunda e aplicamos a seguir o anti-ácaros (produto Bactran), que elimina bactérias, bolores e odores. Tudo na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-sofas' },
+  { id: 'tapete-anti-odor', name: 'Limpeza de Tapete com Anti-odor', slug: 'pack-tapete-anti-odor', tagline: 'O tapete ficou com cheiro dos animais ou de um acidente?', description: 'Lavamos o tapete a fundo em sua casa e aplicamos a seguir o tratamento anti-odor, que trata o cheiro que fica nas fibras. Indique as medidas e veja o preço final.', service1Slug: 'limpeza-tapetes', service2Slug: 'limpeza-tapetes' },
   { id: 'sala-completa', name: 'Limpeza de Sofá, Cadeiras e Tapete', slug: 'pack-sala-completa', tagline: 'Sofá, cadeiras e tapetes à sua medida', description: 'Escolha os artigos da sala. Os tapetes ficam sempre sob orçamento: indique largura e comprimento de cada peça.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-tapetes' },
   { id: 'quarto-completo', name: 'Limpeza de Colchão e Tapete', slug: 'pack-quarto-completo', tagline: 'Personalize os cuidados do quarto', description: 'Combine colchões e tapetes e acrescente, se pretender, o tratamento anti-ácaros. Tapetes sempre sob orçamento, mediante medidas.', service1Slug: 'limpeza-colchoes', service2Slug: 'limpeza-tapetes' },
 ];
@@ -33,6 +36,9 @@ export const PACK_KINDS: Record<string, PackKind[]> = {
   'sofa-colchao': ['sofa', 'mattress'],
   'sofa-impermeabilizacao': ['sofa'],
   'cadeiras-impermeabilizacao': ['chairs'],
+  'colchao-anti-acaros': ['mattress'],
+  'sofa-anti-acaros': ['sofa'],
+  'tapete-anti-odor': ['rug'],
   'sala-completa': ['sofa', 'chairs', 'rug'],
   'quarto-completo': ['mattress', 'rug'],
 };
@@ -47,6 +53,9 @@ export const PACK_HOOK: Record<string, string> = {
   'sofa-colchao': `A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o colchão acrescentado fica ${PACK_PERK_MATTRESS_OFF}€ mais barato. Uma só deslocação.`,
   'sofa-impermeabilizacao': 'Limpeza e proteção contra nódoas na mesma visita, até 10 anos com a Premium.',
   'cadeiras-impermeabilizacao': 'Limpeza e proteção contra nódoas nas cadeiras, na mesma visita. Ideal para a mesa onde se come todos os dias.',
+  'colchao-anti-acaros': 'Limpeza a fundo e anti-ácaros (produto Bactran) no colchão, na mesma visita.',
+  'sofa-anti-acaros': 'Limpeza a fundo e anti-ácaros (produto Bactran) no sofá, na mesma visita.',
+  'tapete-anti-odor': 'Lavagem a fundo e anti-odor no tapete, na mesma visita.',
   'sala-completa': `Sofá, cadeiras e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
   'quarto-completo': `Colchão e tapete numa só visita, cada um ao preço de tabela e com uma só deslocação.`,
 };
@@ -62,6 +71,16 @@ export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
     const travel = pack.id === 'cadeiras-impermeabilizacao' ? (r.travel ?? 0) : 0;
     if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total - travel);
   }
+  // Tapete com anti-odor: o preço em casa do bot, 1,6 x 2,3 m com anti-odor (dono, 24 Nov: o site volta a mostrar os tapetes).
+  if (pack.id === 'tapete-anti-odor') {
+    const v = rugHome(cityName, 1.6, 2.3, true);
+    if (v !== null) return formatEuro(v);
+  }
+  // Packs de limpeza + anti-ácaros: o total mais baixo do bot (colchão de solteiro, sofá de 1 lugar).
+  if (MITES_PACKS[pack.id]) {
+    const r = botQuote({ city: cityName, items: [{ ...MITES_PACKS[pack.id].smallest, treatment: 'clean+anti-acaros' }] }) as { ok: boolean; quote?: boolean; total?: number | null };
+    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total);
+  }
   const amounts = [pack.service1Slug, pack.service2Slug]
     .map(slug => services.find(s => s.slug === slug)?.priceFrom ?? '')
     .map(value => Number(value.replace('€', '').trim()))
@@ -74,6 +93,8 @@ export function packFaqs(pack: PackCombo, cityName: string): { question: string;
   const fee = locationPrices[cityName];
   const travel = fee === undefined ? 'a deslocação é confirmada pela morada, a partir de 10€' : `a deslocação é de ${fee}€`;
   // Packs de limpeza + impermeabilização: só as 5 perguntas próprias (dono, 24 Nov: as genéricas ninguém lê).
+  if (pack.id === 'tapete-anti-odor') return rugOdorFaqs(cityName);
+  if (MITES_PACKS[pack.id]) return mitesFaqs(pack.id, cityName);
   if (WATERPROOF_PACK_FAQS[pack.id]) return [waterproofPriceFaq(pack.id, cityName), ...WATERPROOF_COMMON];
   return [
     {
@@ -152,6 +173,58 @@ const WATERPROOF_PACK_FAQS: Record<string, { question: string; answer: string }[
     ...WATERPROOF_COMMON,
   ],
 };
+
+/** Packs de limpeza + anti-ácaros (produto Bactran). Os ácaros saem com a extração; o Bactran só faz o que a ficha diz. */
+export const MITES_PACKS: Record<string, { kind: 'mattress' | 'sofa'; smallest: Record<string, unknown>; example: Record<string, unknown>; exampleLabel: string; smallestLabel: string }> = {
+  'colchao-anti-acaros': { kind: 'mattress', smallest: { kind: 'mattress', size: 'solteiro' }, example: { kind: 'mattress', size: 'casal' }, exampleLabel: 'um colchão de casal', smallestLabel: 'num colchão de solteiro' },
+  'sofa-anti-acaros': { kind: 'sofa', smallest: { kind: 'sofa', size: '1-lugar' }, example: { kind: 'sofa', size: '3-lugares' }, exampleLabel: 'um sofá de 3 lugares', smallestLabel: 'num sofá de 1 lugar' },
+};
+function mitesFaqs(packId: string, cityName: string) {
+  const m = MITES_PACKS[packId];
+  const t = (item: Record<string, unknown>) => {
+    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
+    return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
+  };
+  const what = m.kind === 'mattress' ? 'colchão' : 'sofá';
+  return [
+    {
+      question: `Quanto custa limpar um ${what} com anti-ácaros?`,
+      answer: `${cityPrep(cityName)} ${cityName}, com a deslocação incluída: ${m.exampleLabel} fica em ${t({ ...m.example, treatment: 'clean+anti-acaros' })} com o anti-ácaros (só a limpeza, ${t({ ...m.example, treatment: 'clean' })}). A partir de ${t({ ...m.smallest, treatment: 'clean+anti-acaros' })} ${m.smallestLabel}. Escolha o tamanho no início da página para ver o seu valor.`.replace(/^./, c => c.toUpperCase()),
+    },
+    {
+      question: 'O que faz o tratamento anti-ácaros?',
+      answer: `Primeiro a limpeza: a extração com água retira das fibras o pó, a pele morta e os ácaros. Depois aplicamos o Bactran, que segundo a ficha técnica elimina 99,9% das bactérias, bolores e odores.${m.kind === 'mattress' ? ' É o mesmo tratamento anti-bacteriano.' : ''}`,
+    },
+    {
+      question: 'O produto é seguro para crianças e animais?',
+      answer: 'Aplicamos o Bactran como indica a ficha técnica, que enviamos a quem a pedir no WhatsApp. Depois de seco, o estofo volta ao uso normal.',
+    },
+    {
+      question: `Quando posso voltar a usar o ${what}?`,
+      answer: 'A limpeza seca em 2 a 5 horas, conforme o tecido e a ventilação.',
+    },
+    {
+      question: 'Posso juntar outras peças na mesma visita?',
+      answer: 'Pode. Cada peça entra ao preço de tabela, somado, e a deslocação é uma só. Diga-nos no WhatsApp o que quer juntar e enviamos o total.',
+    },
+  ];
+}
+
+/** Tapete com anti-odor: tapetes nunca mostram preço no site (dono, 24 Nov): pede-se as medidas no WhatsApp. */
+function rugHome(cityName: string, w: number, l: number, odor: boolean): number | null {
+  const r = botQuote({ city: cityName, items: [{ kind: 'rug', width: w, length: l, treatment: 'clean', odor }] }) as { ok: boolean; rugEstimate?: { ok: boolean; homePrice?: number } };
+  return r.ok && r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null;
+}
+function rugOdorFaqs(cityName: string) {
+  const f = (w: number, l: number, o: boolean) => { const v = rugHome(cityName, w, l, o); return v === null ? 'sob orçamento' : formatEuro(v); };
+  return [
+    { question: 'Quanto custa lavar um tapete com anti-odor?', answer: `${cityPrep(cityName)} ${cityName}, em sua casa e com a deslocação incluída: um tapete de 2 x 3 m fica em ${f(2, 3, true)} com o anti-odor (só a lavagem, ${f(2, 3, false)}). O anti-odor é 5€ por m². Indique as medidas no início da página para ver o seu valor.`.replace(/^./, c => c.toUpperCase()) },
+    { question: 'O anti-odor pode ser feito sem a lavagem?', answer: 'Não. O anti-odor é sempre aplicado depois da lavagem a fundo, na mesma visita: primeiro sai a sujidade, depois tratamos o cheiro.' },
+    { question: 'Serve para cheiro de cão, gato ou urina?', answer: 'Sim, é para isso que existe: cheiro de animais, urina ou humidade que ficou nas fibras do tapete.' },
+    { question: 'Levam o tapete ou é lavado em casa?', answer: 'Lavamos o tapete em sua casa, com o mesmo resultado e sem esperar pela entrega.' },
+    { question: 'Quando posso voltar a usar o tapete?', answer: 'A lavagem seca em 2 a 5 horas, conforme o tapete e a ventilação.' },
+  ];
+}
 
 /** Junta a frase de abertura e a descrição sem pôr ponto depois de uma pergunta. */
 export function packIntro(pack: PackCombo, text = pack.description): string {
