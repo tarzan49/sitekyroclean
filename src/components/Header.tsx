@@ -15,6 +15,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import QuizForm from "./QuizFormLazy";
+import BasketButton from "./BasketButton";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -86,7 +87,7 @@ const Header = () => {
           className="flex h-11 min-w-0 flex-1 items-center justify-start leading-none md:h-auto md:block md:flex-none md:text-left md:shrink-0"
         >
           {/* Marca com mais presença (dono, 24 Nov): nome inteiro numa linha, letra forte e escura, "Kyro" a dourado. */}
-          <span className="inline-flex h-11 items-center whitespace-nowrap font-playfair text-[17px] font-bold tracking-[-0.02em] text-[#111111] md:hidden">
+          <span className="inline-flex h-11 items-center whitespace-nowrap font-playfair text-[15px] min-[400px]:text-[17px] font-bold tracking-[-0.03em] text-[#111111] md:hidden">
             <span className="text-[#D4AF37]">KYRO</span>&nbsp;Clean Solutions
           </span>
           <span className="hidden font-playfair text-[21px] font-bold tracking-[-0.02em] text-[#111111] md:inline">
@@ -149,6 +150,7 @@ const Header = () => {
 
         {/* ── RIGHT: three solid buttons (desktop) ── */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
+          <BasketButton onOpen={openQuiz} className="h-10 w-10" />
           <a
             href={`tel:${PHONE_TEL}`}
             data-tracking-source="header_desktop"
@@ -176,12 +178,13 @@ const Header = () => {
         </div>
 
         {/* ── MOBILE: call, WhatsApp and menu controls on the right ── */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden shrink-0">
+        <div className="flex items-center gap-1 min-[400px]:gap-1.5 sm:gap-2 md:hidden shrink-0">
+          <BasketButton onOpen={openQuiz} className="w-10 min-[400px]:w-11" />
           {/* Call icon only */}
           <a
             href={`tel:${PHONE_TEL}`}
             data-tracking-source="header_mobile"
-            className="w-11 h-11 border border-[#D1D5DB] bg-[#E5E7EB] flex items-center justify-center touch-manipulation transition-colors active:bg-[#DDE0E4]"
+            className="w-10 min-[400px]:w-11 h-11 border border-[#D1D5DB] bg-[#E5E7EB] flex items-center justify-center touch-manipulation transition-colors active:bg-[#DDE0E4]"
             aria-label="Ligar"
           >
             <Phone className="w-4 h-4 text-[#555555]" strokeWidth={2} />
@@ -193,7 +196,7 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             data-tracking-source="header_mobile"
-            className="w-11 h-11 border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20BD5A]"
+            className="w-10 min-[400px]:w-11 h-11 border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20BD5A]"
             aria-label="WhatsApp"
           >
             <MessageCircle className="w-4 h-4 text-white" strokeWidth={2} />
