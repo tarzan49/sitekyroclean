@@ -80,6 +80,14 @@ import sofa17Antes from "@/assets/before-after-pool/sofa-17-antes.webp";
 import sofa17Depois from "@/assets/before-after-pool/sofa-17-depois.webp";
 import sofa18Antes from "@/assets/before-after-pool/sofa-18-antes.webp";
 import sofa18Depois from "@/assets/before-after-pool/sofa-18-depois.webp";
+import imperCadeira01 from "@/assets/before-after-pool/imper-agua-cadeira-01.mp4";
+import imperCadeira01Poster from "@/assets/before-after-pool/imper-agua-cadeira-01-poster.webp";
+import imperCadeira02 from "@/assets/before-after-pool/imper-agua-cadeira-02.mp4";
+import imperCadeira02Poster from "@/assets/before-after-pool/imper-agua-cadeira-02-poster.webp";
+import imperCadeira03 from "@/assets/before-after-pool/imper-agua-cadeira-03.mp4";
+import imperCadeira03Poster from "@/assets/before-after-pool/imper-agua-cadeira-03-poster.webp";
+import imperCadeira04 from "@/assets/before-after-pool/imper-agua-cadeira-04.mp4";
+import imperCadeira04Poster from "@/assets/before-after-pool/imper-agua-cadeira-04-poster.webp";
 import imperAgua01 from "@/assets/before-after-pool/imper-agua-01.mp4";
 import imperAgua01Poster from "@/assets/before-after-pool/imper-agua-01-poster.webp";
 import imperAgua02 from "@/assets/before-after-pool/imper-agua-02.mp4";
@@ -219,10 +227,15 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: colchao03Antes, after: colchao03Depois },
   ],
   cadeiras: [
+    // Vídeos reais de impermeabilização de cadeiras (teste da água) intercalados com os pares (dono, 24 Nov).
     { kind: "pair", before: cadeiras05Antes, after: cadeiras05Depois },
+    { kind: "video", src: imperCadeira01, poster: imperCadeira01Poster, alt: "Vídeo real: água numa cadeira impermeabilizada escorre sem entrar no tecido" },
     { kind: "pair", before: cadeiras01Antes, after: cadeiras01Depois },
+    { kind: "video", src: imperCadeira02, poster: imperCadeira02Poster, alt: "Vídeo real: água numa cadeira impermeabilizada escorre sem entrar no tecido" },
     { kind: "pair", before: cadeiras02Antes, after: cadeiras02Depois },
+    { kind: "video", src: imperCadeira03, poster: imperCadeira03Poster, alt: "Vídeo real: água numa cadeira impermeabilizada escorre sem entrar no tecido" },
     { kind: "pair", before: cadeiras07Antes, after: cadeiras07Depois },
+    { kind: "video", src: imperCadeira04, poster: imperCadeira04Poster, alt: "Vídeo real: água numa cadeira impermeabilizada escorre sem entrar no tecido" },
     { kind: "pair", before: cadeiras03Antes, after: cadeiras03Depois },
     { kind: "pair", before: cadeiras08Antes, after: cadeiras08Depois },
     { kind: "pair", before: cadeiras06Antes, after: cadeiras06Depois },

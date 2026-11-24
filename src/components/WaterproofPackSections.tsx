@@ -63,12 +63,52 @@ function storyFor(kind: Kind) {
   ];
 }
 
+type StoryStep = ReturnType<typeof storyFor>[number];
+
+/** Os passos da visita no telemóvel, um de cada vez: 6 s por fotografia, o vídeo até acabar; toque avança. */
+function StoryPlayer({ story }: { story: StoryStep[] }) {
+  const [step, setStep] = useState(0);
+  const [run, setRun] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.5 });
+    io.observe(el); return () => io.disconnect();
+  }, []);
+  const next = () => { setStep(i => (i + 1) % story.length); setRun(r => r + 1); };
+  const current = story[step];
+  useEffect(() => {
+    if (!inView || current.video) return;
+    const t = window.setTimeout(next, 6000);
+    return () => window.clearTimeout(t);
+  }, [inView, step, run]);
+  return (
+    <div ref={ref} className="mt-5 md:hidden">
+      <button type="button" onClick={next} aria-label="Passo seguinte" className="relative block w-full overflow-hidden rounded-2xl border border-white/15 bg-black/30 text-left">
+        <div className="absolute inset-x-3 top-3 z-10 flex gap-1.5">
+          {story.map((p, i) => (
+            <span key={p.label} className="h-1 flex-1 overflow-hidden rounded-full bg-white/25">
+              <span key={`${i}-${run}`} className="block h-full bg-[#D4AF37]"
+                style={{ width: i < step ? '100%' : '0%', animation: i === step && inView && !current.video ? 'kyro-story 6s linear forwards' : undefined, ...(i === step && current.video ? { width: '100%' } : {}) }} />
+            </span>
+          ))}
+        </div>
+        <span className="absolute left-3 top-7 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#D4AF37]">{step + 1} · {current.label}</span>
+        {current.video
+          ? <video key={`v-${run}`} src={current.video} poster={current.poster} autoPlay muted playsInline onEnded={next} className="aspect-[4/5] max-h-[48svh] w-full object-cover" />
+          : <img key={`i-${step}`} src={current.image} alt={current.alt} decoding="async" className="aspect-[4/5] max-h-[48svh] w-full object-cover" />}
+      </button>
+      <p className="mt-3 min-h-[2.75rem] text-sm leading-relaxed text-white/80">{current.text}</p>
+    </div>
+  );
+}
+
 export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind: Kind; cityLabel: string; faqs: { question: string; answer: string }[] }) {
   const [open, setOpen] = useState<number | null>(null);
   const item = kind === 'sofa' ? 'os sofás' : 'as cadeiras';
   const story = storyFor(kind);
   const spillsRef = useAutoSlide<HTMLDivElement>();
-  const storyRef = useAutoSlide<HTMLDivElement>(6000);
   return <>
     {/* 1. O que a proteção evita */}
     <section id="protecao" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
@@ -96,13 +136,16 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Na mesma visita</p>
         <h2 className="mt-2 text-2xl font-semibold leading-tight md:text-4xl">Assim ficam {item}, <span className={gold}>do antes à proteção</span></h2>
-        <div ref={storyRef} className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:mt-7 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0">
+        {/* Telemóvel: um passo de cada vez, como uma história, com barras de progresso; toque = passo seguinte. */}
+        <StoryPlayer story={story} />
+        {/* Computador: os 3 passos lado a lado. */}
+        <div className="mt-7 hidden gap-5 md:grid md:grid-cols-3">
           {story.map((p, i) => (
-            <figure key={p.label} className="w-[78%] shrink-0 snap-start md:w-auto">
+            <figure key={p.label}>
               <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/30">
                 {p.video
-                  ? <video src={p.video} poster={p.poster} autoPlay muted loop playsInline preload="metadata" className="aspect-[4/5] max-h-[46svh] w-full object-cover md:aspect-square" />
-                  : <img src={p.image} alt={p.alt} loading="lazy" decoding="async" className="aspect-[4/5] max-h-[46svh] w-full object-cover md:aspect-square" />}
+                  ? <video src={p.video} poster={p.poster} autoPlay muted loop playsInline preload="metadata" className="aspect-square max-h-[46svh] w-full object-cover" />
+                  : <img src={p.image} alt={p.alt} loading="lazy" decoding="async" className="aspect-square max-h-[46svh] w-full object-cover" />}
                 <span className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#D4AF37]">{i + 1} · {p.label}</span>
               </div>
               <figcaption className="mt-3 text-sm leading-relaxed text-white/80">{p.text}</figcaption>

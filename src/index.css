@@ -729,3 +729,4 @@ html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin
 html.snap-sections main > section > * { width: 100%; }
 /* Telemóvel: o menu esconde-se ao descer, por isso a secção encaixa no topo do ecrã. */
 @media (max-width: 767px) { html.snap-sections { scroll-padding-top: 0; } html.snap-sections main > section { min-height: 100svh; } }
+@keyframes kyro-story { from { width: 0%; } to { width: 100%; } }

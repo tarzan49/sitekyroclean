@@ -113,7 +113,7 @@ export default function PackComboPage() {
         title={heading}
         subtitle={packIntro(pack)}
         serviceSlug={pack.service1Slug}
-        secondaryServiceSlug={pack.service2Slug}
+        secondaryServiceSlug={simpleKind === 'chairs' ? undefined : pack.service2Slug}
         city={city.name}
         price={priceFrom}
         exactPrice={Boolean(simpleKind)}
