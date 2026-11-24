@@ -519,21 +519,23 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
 // Riscado + "Poupa X€" em todas as opções (dono, 25 Nov: "isto é que é o desconto que a pessoa está à procura";
 // "vale para todos os upsells"). Valores só do motor.
-function PriceTag({ shown, struck, small }: { shown: number | null; struck: number | null; small?: boolean }) {
+function PriceTag({ shown, struck, note }: { shown: number | null; struck: number | null; note?: string }) {
   if (shown === null) return null;
-  if (small) return <span className="block whitespace-nowrap text-xs font-bold leading-tight">{struck !== null && <span className="mr-1 font-semibold text-white/50 line-through decoration-[#D4AF37]">{formatEuro(struck)}</span>}<span className="text-white">{formatEuro(shown)}</span>{struck !== null && <span className="block text-[10.5px] font-extrabold uppercase text-[#E8C964]">Poupa {formatEuro(struck - shown)}</span>}</span>;
-  return <span className="flex shrink-0 flex-col items-end gap-1 leading-none">
-    <span className="whitespace-nowrap">{struck !== null && <span className="mr-1.5 text-sm font-semibold text-white/55 line-through decoration-[#D4AF37] decoration-2">{formatEuro(struck)}</span>}<span className="text-lg font-extrabold text-white">{formatEuro(shown)}</span></span>
-    {struck !== null && <span className="whitespace-nowrap rounded-md bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">Poupa {formatEuro(struck - shown)}</span>}
+  // O mesmo riscado do resto do site (dono, 25 Nov: "os preços riscados não estão como no site inteiro"): pequeno e
+  // neutro por cima do preço, o preço em branco forte e a poupança em texto fino dourado, nunca num selo.
+  return <span className="flex shrink-0 flex-col items-end leading-tight">
+    {struck !== null && <span className="text-[11px] text-white/45 line-through">{formatEuro(struck)}</span>}
+    <span className="whitespace-nowrap text-lg font-bold text-white">{formatEuro(shown)}</span>
+    {struck !== null && <span className="whitespace-nowrap text-[11px] font-medium text-[#E8C964]">Poupa {formatEuro(struck - shown)}{note ? ` ${note}` : ''}</span>}
   </span>;
 }
-/** Um extra (anti-ácaros, anti-odor, pele): quanto acrescenta, riscado o que custaria em separado, ou "Oferecido". */
+/** Um extra (anti-ácaros, anti-odor): quanto acrescenta, riscado o que custaria em separado, ou "Oferecido". */
 function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null }) {
   if (plus === null) return null;
   const was = normal !== null && normal > plus ? normal : null;
-  return <span className="flex shrink-0 flex-col items-end gap-1 leading-none">
-    <span className="whitespace-nowrap">{was !== null && <span className="mr-1.5 text-sm font-semibold text-white/55 line-through decoration-[#D4AF37] decoration-2">+{formatEuro(was)}</span>}{plus > 0 && <span className="text-lg font-extrabold text-white">+{formatEuro(plus)}</span>}</span>
-    {was !== null && <span className="whitespace-nowrap rounded-md bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">{plus > 0 ? `Poupa ${formatEuro(was - plus)}` : 'Oferecido'}</span>}
+  return <span className="flex shrink-0 flex-col items-end leading-tight">
+    {was !== null && <span className="text-[11px] text-white/45 line-through">+{formatEuro(was)}</span>}
+    {plus > 0 ? <span className="whitespace-nowrap text-lg font-bold text-white">+{formatEuro(plus)}</span> : <span className="whitespace-nowrap text-base font-bold text-[#E8C964]">Oferecido</span>}
   </span>;
 }
 
@@ -543,12 +545,12 @@ function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d
     <div role="button" tabIndex={0} aria-pressed={count > 0} onClick={() => { if (!count) onBump(1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !count) { e.preventDefault(); onBump(1); } }} className={`${cls(count > 0)} cursor-pointer select-none`}>
       {children}
       {count > 0
-        ? <span className="mt-0.5 flex items-center gap-1.5">
-            <button type="button" aria-label="Menos" onClick={e => { e.stopPropagation(); onBump(-1); }} className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white"><Minus className="h-3.5 w-3.5" /></button>
+        ? <span className="mt-0.5 flex items-center gap-1">
+            <button type="button" aria-label="Menos" onClick={e => { e.stopPropagation(); onBump(-1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-white/10 text-white"><Minus className="h-3.5 w-3.5" /></button>
             <span className="w-4 text-center text-base font-extrabold text-[#E8C964]">{count}</span>
-            <button type="button" aria-label="Mais" onClick={e => { e.stopPropagation(); onBump(1); }} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
+            <button type="button" aria-label="Mais" onClick={e => { e.stopPropagation(); onBump(1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
           </span>
-        : <span className="mt-0.5 flex h-7 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
+        : <span className="mt-0.5 flex h-8 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
     </div>
   );
 }
@@ -583,7 +585,13 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
   // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
   const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const one = { ...x, qty: 1 }; const v = separateOf(city, one) ?? aloneTotal(city, one); if (v === null) return null; t += v * x.qty; } return g.length ? Math.round(t * 100) / 100 : null; };
-  const packPrice = (p: Partial<BasketItem>) => {
+  const packPrice = (p: Partial<BasketItem>): { shown: number | null; struck: number | null } => {
+    // Pele: o motor põe o tratamento numa linha à parte, por isso soma-se à linha da limpeza na visita.
+    if (p.leather && others.length) {
+      const clean = packPrice({ ...p, leather: false, pack: 'none' }).shown, a = totalOf(group(p)), b = totalOf(group({ ...p, leather: false, pack: 'none' }));
+      const shown = clean !== null && a !== null && b !== null ? Math.round((clean + a - b) * 100) / 100 : null;
+      return { shown, struck: a !== null && shown !== null && a > shown ? a : null };
+    }
     const g = group(p);
     const alone = totalOf(g);
     const shown = !others.length ? alone : (() => { const q = quoteBasket(city, [...others, ...g]); if (q.sob) return null; const ls = q.lines.slice(others.length); return ls.length && ls.every(v => v != null) ? Math.round(ls.reduce<number>((t, v) => t + (v as number), 0) * 100) / 100 : null; })();
@@ -666,10 +674,6 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         })()}
 
         {ok && <div ref={optionsRef} className="scroll-mt-2">
-          {item.kind === 'sofa' && !item.imperOnly && <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
-            <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
-            <AddOnTag {...addOn({ leather: true }, { leather: false, pack: 'none' })} />
-          </button>}
           {item.kind === 'mattress' && <button type="button" className={`${chip(item.pack === 'premium')} mb-3 flex w-full items-center justify-between gap-2 py-2 text-left`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>
             <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
             <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
@@ -678,11 +682,19 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
             <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
             <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
           </div>}
-          {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => (
-            <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
+          {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
+            const on = item.pack === p.pack && !item.leather;
+            return <button key={p.pack} type="button" onClick={() => set({ pack: p.pack, leather: false })} className={`${chip(on)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
               <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack })} />{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
-            </button>))}</div>}
+              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} note={item.imperOnly || p.pack === 'none' ? 'na deslocação' : 'na limpeza'} />{on ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+            </button>;
+          })}
+          {/* Pele (dono, 25 Nov): a última opção da mesma lista, com o preço total; nunca leva impermeabilização. */}
+          {item.kind === 'sofa' && !item.imperOnly && <button type="button" onClick={() => set({ leather: true, pack: 'none' })} className={`${chip(!!item.leather)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
+            <span><span className="block">Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
+            <span className="flex items-center gap-2"><PriceTag {...packPrice({ leather: true, pack: 'none' })} note="na deslocação" />{item.leather ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+          </button>}
+          </div>}
           {rug && <>
             <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
