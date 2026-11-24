@@ -15,7 +15,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras, colchões, tapetes, alcatifas e `impermeabilizacao-sofa/cadeiras-*` FEITO (24 Nov) |
 | PackComboPage | 510+ | — | FEITO (todos os packs) | — |
 | ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO (OK 24 Nov) | colchões, tapetes e alcatifas FEITO (24 Nov); outros (pelos-animais, cheiro-urina genéricos, imper 45) por fazer |
-| MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido FEITO (OK); pele: widget Renovado/Renovado + Pele FEITO, encaixe desligado (falta passo a passo sem vídeos de tecido) | tapetes 412 FEITO (24 Nov) |
+| MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido e pele FEITO (25 Nov): pele com passo a passo próprio (fotografia real de sofá de pele, 5 etapas), encaixe ligado | tapetes 412 FEITO (24 Nov) |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
 | TreatmentPage (`/tratamento-anti-acaros-*`, `/desbacterizacao-*`) | 206 | — | — | FEITO (24 Nov): texto encurtado com o OK do dono |
 | CommercialPage | 106 (102 cidades + 4 setores) | — | — | FEITO, falta OK do dono (24 Nov): setores hotéis, alojamento local, restaurantes e cafés, escritórios; regra legal lida: Portaria 327/2008 n.º 80A (colchões de 3 em 3 anos) |

@@ -1,3 +1,4 @@
+import LeatherProcessSection from '@/components/LeatherProcessSection';
 import CommercialHero from "@/components/CommercialHero";
 import MaterialExamplesGallery from "@/components/MaterialExamplesGallery";
 import DirectoryGroup from "@/components/DirectoryGroup";
@@ -79,7 +80,7 @@ const MaterialPage = () => {
   const rugNew = data?.serviceSlug === 'limpeza-tapetes' && !!cityName; // tapetes por cidade (dono, 24 Nov)
   const sofaNew = (data?.serviceSlug === 'limpeza-sofas' && !!cityName) || rugNew;
   const fabric = sofaNew && !rugNew && data?.slug !== 'limpeza-sofa-pele';
-  useSnapSections(fabric || rugNew); // pele: falta um widget próprio (limpeza + tratamento da pele, sem impermeabilização)
+  useSnapSections(sofaNew); // tecido, pele (widget e passo a passo próprios) e tapetes (dono, 25 Nov)
 
   useEffect(() => {
     if (data) {
@@ -162,6 +163,8 @@ const MaterialPage = () => {
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
         {rugNew ? (
           <ServiceProcessStory key={data.slug} service="limpeza-tapetes" steps={processGuide?.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como lavamos o seu', gold: data.name.toLowerCase() }} />
+        ) : sofaNew && data.slug === 'limpeza-sofa-pele' ? (
+          <LeatherProcessSection />
         ) : fabric && processGuide ? (
           <SofaProcessGuide key={data.slug} real steps={processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como limpamos o seu', gold: data.name.toLowerCase() }} />
         ) : processGuide ? (

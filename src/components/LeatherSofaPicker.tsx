@@ -16,18 +16,20 @@ const OPTIONS = [
   { id: 'limpeza', name: 'Renovado', note: 'Só a limpeza', leather: false, top: false, wa: 'só limpeza' },
 ];
 
-export default function LeatherSofaPicker({ city, source }: { city: string; source: string }) {
+export default function LeatherSofaPicker({ city, source, syntheticOnly = false }: { city: string; source: string; syntheticOnly?: boolean }) {
+  // Pele sintética/PU: só a limpeza (sem tratamento da pele nem impermeabilização).
+  const options = syntheticOnly ? OPTIONS.filter(o => !o.leather) : OPTIONS;
   const [seats, setSeats] = useState(3);
   const [count, setCount] = useState(1); // quantos sofás iguais (dono, 25 Nov)
-  const [choice, setChoice] = useState('pele');
+  const [choice, setChoice] = useState(syntheticOnly ? 'limpeza' : 'pele');
   const [basket, setBasket] = useState(false);
   const size = seats === 1 ? '1-lugar' : seats >= 5 ? '5-lugares' : `${seats}-lugares`;
-  const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
+  const totals = useMemo(() => Object.fromEntries(options.map(o => {
     const item = seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', leather: o.leather, qty: count } : { kind: 'sofa', size, treatment: 'clean', leather: o.leather, qty: count };
     const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
     return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
   })) as Record<string, number | null>, [seats, size, count, city]);
-  const chosen = OPTIONS.find(o => o.id === choice)!;
+  const chosen = options.find(o => o.id === choice)!;
   const total = totals[choice];
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade para ${count > 1 ? `${count} sofás` : 'um sofá'} de pele de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
 
@@ -50,7 +52,7 @@ export default function LeatherSofaPicker({ city, source }: { city: string; sour
       </div>
       <div>
         <div className="flex flex-col gap-2.5 pt-1.5 md:gap-3" role="radiogroup" aria-label="Opção">
-          {OPTIONS.map(o => {
+          {options.map(o => {
             const active = choice === o.id;
             const value = totals[o.id];
             return <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setChoice(o.id)}
@@ -67,7 +69,7 @@ export default function LeatherSofaPicker({ city, source }: { city: string; sour
             </button>;
           })}
         </div>
-        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final com a deslocação incluída. Na pele não fazemos impermeabilização.</p>
+        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final com a deslocação incluída. {syntheticOnly ? 'Pele sintética: só limpeza.' : 'Na pele não fazemos impermeabilização.'}</p>
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] md:mt-5 md:min-h-14 sm:text-base">
           <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp

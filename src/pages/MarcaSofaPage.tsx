@@ -1,3 +1,4 @@
+import LeatherProcessSection from '@/components/LeatherProcessSection';
 import { buildMarcaWaMessage } from "@/lib/whatsappMessages";
 import CommercialHero from "@/components/CommercialHero";
 import DirectoryGroup from "@/components/DirectoryGroup";
@@ -69,8 +70,12 @@ const MarcaSofaPage = () => {
   }, [pathname]);
 
   // Modelo novo nas marcas de sofá em tecido (dono, 24 Nov); pele nunca leva impermeabilização.
-  const fabric = !!data && !/pele|couro/i.test(data.marca.material);
-  useSnapSections(fabric);
+  // Tecido (com tecido no material, mesmo que também haja couro) = widget de tecido; pele genuína = Renovado/+ Pele;
+  // pele sintética/PU = só limpeza (CLAUDE.md: nunca impermeabilização em pele, PU, napa…; sintético só limpeza).
+  const mat = data?.marca.material ?? '';
+  const synthetic = /sint[ée]tic|\bPU\b|napa|curvim/i.test(mat);
+  const fabric = !!data && !synthetic && (/tecido/i.test(mat) || !/pele|couro/i.test(mat));
+  useSnapSections(Boolean(data)); // tecido e pele (dono, 25 Nov)
   const pageUrl = `${SITE_URL}${pathname}`;
   // Título, descrição, <h1>, migalha e preço: os mesmos que o scripts/prerender.ts
   // escreve no HTML estático (marcaPageCopy em marcaCities.ts).
@@ -151,7 +156,7 @@ const MarcaSofaPage = () => {
         {data ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{fabric ? <SofaPricePicker city={city.name} source={`marca_picker_${marca.slug}`} /> : <LeatherSofaPicker city={city.name} source={`marca_picker_${marca.slug}`} />}</div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{fabric ? <SofaPricePicker city={city.name} source={`marca_picker_${marca.slug}`} /> : <LeatherSofaPicker syntheticOnly={synthetic} city={city.name} source={`marca_picker_${marca.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />}
 
@@ -186,7 +191,7 @@ const MarcaSofaPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
-        {fabric ? <SofaProcessGuide real steps={PROCESS_STEPS.map(st => ({ label: st.title, description: st.desc }))} heading={{ text: 'Como limpamos o', gold: marca.name }} /> : <>
+        {fabric || synthetic ? <SofaProcessGuide real steps={PROCESS_STEPS.map(st => ({ label: st.title, description: st.desc }))} heading={{ text: 'Como limpamos o', gold: marca.name }} /> : true ? <LeatherProcessSection heading="Como cuidamos do" gold={marca.name} /> : <>
         {/* ═══ PROCESSO ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -231,7 +236,7 @@ const MarcaSofaPage = () => {
         />
 
         {/* ═══ FAQ ═══ */}
-        {fabric ? <CompactFAQ id="duvidas" dark faqs={marca.faqs} heading={`Perguntas sobre sofás ${marca.name}`} /> : <ServiceFAQ
+        {data ? <CompactFAQ id="duvidas" dark faqs={marca.faqs} heading={`Perguntas sobre sofás ${marca.name}`} /> : <ServiceFAQ
           faqs={marca.faqs}
           heading={`Perguntas sobre sofás ${marca.name}`}
           variant="dark"
