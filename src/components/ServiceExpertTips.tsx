@@ -44,7 +44,7 @@ const ServiceExpertTips = ({ tips, variant = "dark" }: ServiceExpertTipsProps) =
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="type-card-title font-sans   ">{tip.title}</h3>
-                  <p className={`hidden md:line-clamp-2 mt-2 text-base leading-relaxed ${light ? "text-[#505650]" : "text-white/80"}`}>
+                  <p className={`expert-tip-text hidden md:block mt-2 text-base leading-relaxed ${light ? "text-[#505650]" : "text-white/80"}`}>
                     {tip.summary}
                   </p>
                   {tip.url && (
