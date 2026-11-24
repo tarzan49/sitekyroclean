@@ -1249,3 +1249,9 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 
 Dois ou mais sofás no pedido (a quantidade conta), limpos ou impermeabilizados: total, opções Premium/Essencial e valores da condição acima de 300€ acabam em 9, para cima (616 -> 619, 446 -> 449). `withEndIn9` em `src/lib/botQuote.ts`, teste `botQuote.sofas9.test.ts`; vale no site e no bot.
 - **"Famalicão" sozinho é Vila Nova de Famalicão (24 Nov 2026).** `resolveBotCity` lia a freguesia de Famalicão da Nazaré e dava a equipa Lisboa 1 sem horas (Daniela). Só com Nazaré, Leiria ou 2450 ao lado é a da Nazaré.
+
+## Widget "O seu preço" das páginas = lógica do orçamento (dono, 25 Nov 2026)
+
+- "O sentido disto deveria ser exatamente o mesmo que o do orçamento, ou seja, deveria seguir a mesma lógica": `StepPricePicker.tsx` (sofá, pele, cadeiras, colchão, tapete, alcatifa, impermeabilização), usado em todas as páginas; aprovado ("Sim, publica").
+- Passos: localidade, material, tamanho e só depois as opções; nada vem escolhido; o botão diz o passo que falta. Preço, riscado e "Poupa" vêm das funções exportadas por `VisitBasket.tsx` (`optionPrice`, `giftsUnlocked`, `struckOf`), em import dinâmico, nunca uma cópia.
+- [RETIRADA 25/11] Blindado pré-escolhido e os três "Escolha o tamanho"; a oferta dentro do preço da limpeza (c9c5d1f0, "Sim, como o bot"), substituída por "149€, extra à parte".

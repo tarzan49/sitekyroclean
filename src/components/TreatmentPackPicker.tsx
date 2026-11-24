@@ -3,7 +3,6 @@
 // as opções com o total final do bot (botQuote), um botão. Sem símbolos nas opções (dono, 24 Nov).
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { treatmentToItem } from '@/components/quiz/basketChoice';
-import { giftText, visitGiftFor } from '@/lib/visitGift';
 import type { BasketItem } from '@/components/quiz/VisitBasket';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
@@ -64,12 +63,11 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
     }
     const treatment = treat ? 'clean+anti-acaros' : 'clean';
     const items = kind === 'mattress' ? mItems(treatment) : sofaItems(counts, treatment);
-    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null };
-    // Como o bot (dono, 25 Nov): com várias peças o total já inclui a oferta, dita na própria opção.
-    const plain = r.total;
+    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
+    // Só limpeza = o preço sem a oferta; o extra é à parte (dono, 25 Nov: "149€, extra à parte").
+    const plain = !treat && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     return [o.id, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
   })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, counts, mCounts, city]);
-  const gift = useMemo(() => kind === 'rug' ? null : visitGiftFor(city, kind === 'mattress' ? mItems('clean') : sofaItems(counts, 'clean')), [kind, size, counts, mCounts, city]);
   // Preço riscado do bot: limpeza + anti-ácaros feito à parte (40€ por colchão; dono, 24 Nov).
   const struck = useMemo(() => {
     if (kind !== 'mattress') return null;
@@ -81,7 +79,7 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
   const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => `${mCounts[x.id]} ${mCounts[x.id] === 1 ? 'colchão' : 'colchões'} ${x.label.toLowerCase()}`).join(' e ') : `${sofaWhat(counts)}`;
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${choice === 'clean' && gift ? 'limpeza' : chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}${choice === 'clean' && gift ? `, com ${giftText(gift)} de oferta` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
   const box = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 transition-all md:min-h-[60px] ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`;
 
   return (
@@ -140,12 +138,11 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
                 className={`relative flex min-h-[58px] items-center rounded-2xl border-2 px-4 py-2.5 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
                 {o.top && <span className="absolute -top-3 left-4 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
                 <span className="flex min-w-0 flex-1 flex-col justify-center">
-                  <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.id === 'clean' && gift ? 'Limpeza com oferta' : o.title}</span>
-                  <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.id === 'clean' && gift ? `Inclui ${giftText(gift)} de oferta (normalmente ${formatEuro(gift.normal)})` : o.note}</span>
+                  <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.title}</span>
+                  <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
                 </span>
                 <span className="flex items-center gap-2 pl-2">
                   <span className="flex flex-col items-end leading-tight">
-                  {o.id === 'clean' && gift?.usual && value !== null && gift.usual > value && <span className="mb-0.5 text-[12px] text-[#888] line-through">{formatEuro(gift.usual)}</span>}
                   {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="mb-0.5 text-[12px] text-[#888] line-through">{formatEuro(struck)}</span>}
                   <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">{kind === 'sofa' && !sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                   </span>
