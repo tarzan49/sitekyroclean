@@ -3,7 +3,7 @@
 // total final já com deslocação, um botão. Preços pelo mesmo motor do
 // bot (botQuote), nunca escritos à mão.
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { choiceToItem } from '@/components/quiz/basketChoice';
+import { choiceToItems } from '@/components/quiz/basketChoice';
 import VisitGiftLine, { visitGiftFor } from '@/components/VisitGiftLine';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
@@ -41,14 +41,20 @@ const PHOTO: Record<'sofa' | 'chairs', Record<string, string>> = {
   chairs: { premium: premiumChair, essencial: essencialChair, none: afterOf('cadeiras') },
 };
 
-export interface PackChoice { kind: Kind; size: string; qty: number; extra: PackExtra }
+export interface PackChoice { kind: Kind; size: string; qty: number; extra: PackExtra; sofas?: { size: string; qty: number }[] }
 interface Props { kind: Kind; city: string; source: string; onMore?: (choice: PackChoice) => void; compact?: boolean }
 
 export default function WaterproofPackPicker({ kind, city, source, onMore, compact = false }: Props) {
-  const [size, setSize] = useState('3-lugares');
+  // Um contador por tamanho, como nos colchões (dono, 24 Nov): combina-se à vontade, começa em 1 sofá de 3 lugares.
+  const [sofaCounts, setSofaCounts] = useState<Record<string, number>>({ '3-lugares': 1 });
+  const bumpSofa = (id: string, d: number) => setSofaCounts(c => { const next = { ...c, [id]: Math.max(0, Math.min(9, (c[id] ?? 0) + d)) }; return Object.values(next).some(v => v > 0) ? next : c; });
+  const sofas = SOFA_SIZES.filter(id => (sofaCounts[id] ?? 0) > 0).map(id => ({ size: id, qty: sofaCounts[id] }));
+  const sofaKey = sofas.map(x => `${x.size}:${x.qty}`).join(',');
+  const size = sofas[0]?.size ?? '3-lugares';
+  const count = sofas.reduce((n, x) => n + x.qty, 0);
+  // O pedido inteiro numa só chamada ao motor: uma linha por tamanho (6 lugares = 5 com seats 6, como o bot).
+  const sofaItems = (treatment: string) => sofas.map(x => x.size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: x.qty } : { kind: 'sofa', size: x.size, treatment, qty: x.qty });
   const [qty, setQty] = useState(6);
-  // Quantos sofás iguais (dono, 25 Nov: "tem que conseguir adicionar quantidades").
-  const [count, setCount] = useState(1);
   // Sem cesto da página, o widget abre o seu (dono, 25 Nov: "em todas no site").
   const [basket, setBasket] = useState<PackChoice | null>(null);
   const more = (c: PackChoice) => onMore ? onMore(c) : setBasket(c);
@@ -59,12 +65,12 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
   const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
     if (kind === 'sofa' && size === PHOTO_SIZE) return [o.extra, null];
     const treatment = o.extra === 'premium' ? 'clean+premium' : o.extra === 'essencial' ? 'clean+essencial' : 'clean';
-    const item = kind === 'sofa' ? (size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: count } : { kind: 'sofa', size, treatment, qty: count }) : { kind: 'chairs', qty, treatment };
-    const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
+    const items = kind === 'sofa' ? sofaItems(treatment) : [{ kind: 'chairs', qty, treatment }];
+    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
     // "Renovado" é só a limpeza: sem a oferta que o motor junta com várias peças (dono, 25 Nov).
     const plain = o.extra === 'none' && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     return [o.extra, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
-  })) as Record<PackExtra, number | null>, [kind, size, qty, count, city]);
+  })) as Record<PackExtra, number | null>, [kind, sofaKey, qty, city]);
 
   // "Em vez de": a limpeza e a impermeabilização pedidas em separado (cada uma com a sua deslocação), pelo bot.
   // É a única comparação permitida (pack contra separado; regra do dono, 19 Nov).
@@ -74,16 +80,16 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
     // Sofás: o separatePrice do motor, o MESMO valor que o bot diz no WhatsApp (dono, 24 Nov 2026).
     const pick = (t: string) => {
-      const item = size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: t, qty: count } : { kind: 'sofa', size, treatment: t, qty: count };
-      const r = botQuote({ city, items: [item] }) as { separatePrice?: { separate: number } | null };
+      const r = botQuote({ city, items: sofaItems(t) }) as { separatePrice?: { separate: number } | null };
       return r.separatePrice?.separate ?? null;
     };
     return { premium: pick('clean+premium'), essencial: pick('clean+essencial') } as Record<string, number | null>;
-  }, [kind, size, qty, count, city]);
+  }, [kind, sofaKey, qty, city]);
 
-  const gift = useMemo(() => kind !== 'sofa' || size === 'foto' ? null : visitGiftFor(city, [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', qty: count } : { kind: 'sofa', size, treatment: 'clean', qty: count }]), [kind, size, count, city]);
-  const seats = Number(size.split('-')[0]);
-  const what = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares (envio fotografia)' : kind === 'sofa' ? `${count > 1 ? `${count} sofás` : 'sofá'} de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}` : `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
+  const gift = useMemo(() => kind !== 'sofa' || size === 'foto' ? null : visitGiftFor(city, sofaItems('clean')), [kind, sofaKey, city]);
+  const seatLabel = (id: string) => { const n = Number(id.split('-')[0]); return `${n} ${n === 1 ? 'lugar' : 'lugares'}`; };
+  const sofaList = sofas.map(x => `${x.qty === 1 ? 'um sofá' : `${x.qty} sofás`} de ${seatLabel(x.size)}`);
+  const what = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares (envio fotografia)' : kind === 'sofa' ? (sofaList.length > 1 ? `${sofaList.slice(0, -1).join(', ')} e ${sofaList[sofaList.length - 1]}` : sofaList[0]) : `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
   const chosen = OPTIONS.find(o => o.extra === extra)!;
   const total = totals[extra];
   // Mensagem pronta no WhatsApp com a escolha completa (dono, 24 Nov): o nome do pack, o que inclui, a peça,
@@ -94,40 +100,30 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     none: 'só limpeza, sem impermeabilização',
   };
   const piece = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares' : what;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${kind === 'sofa' && count === 1 ? 'um ' : ''}${byPhoto && count > 1 ? `${count} sofás (${piece})` : piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? (count > 1 ? 'dos sofás' : 'do sofá') : 'das cadeiras'}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? (count > 1 ? 'dos sofás' : 'do sofá') : 'das cadeiras'}.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (
-    <div className="mx-auto grid w-full max-w-4xl gap-4 md:gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">
+    <div className="mx-auto grid w-full max-w-4xl gap-3 md:gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">
       {/* 1. Uma só pergunta */}
       <div>
         <p className="hidden text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37] md:block">Passo 1</p>
         <div className={`${compact && kind !== 'sofa' ? 'hidden md:flex ' : 'flex '}mb-2 items-center justify-between gap-2 md:mb-4 md:mt-1`}>
-          <p className={`${compact ? 'hidden md:block ' : ''}text-base font-semibold text-[#1A1A1A] md:text-lg`}>{kind === 'sofa' ? 'Quantos lugares tem o sofá?' : 'Quantas cadeiras?'}</p>
-          {kind === 'sofa' && <div className="ml-auto flex items-center gap-1.5" aria-label="Quantos sofás">
-            <button type="button" aria-label="Menos um sofá" onClick={() => setCount(c => Math.max(1, c - 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
-            <span className="min-w-[3.2rem] text-center text-sm font-semibold text-[#1A1A1A]">{count} {count === 1 ? 'sofá' : 'sofás'}</span>
-            <button type="button" aria-label="Mais um sofá" onClick={() => setCount(c => Math.min(5, c + 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
-          </div>}
+          <p className={`${compact ? 'hidden md:block ' : ''}text-base font-semibold text-[#1A1A1A] md:text-lg`}>{kind === 'sofa' ? 'Quantos sofás de cada tamanho?' : 'Quantas cadeiras?'}</p>
         </div>
         {kind === 'sofa' ? (
-          <div className="grid grid-cols-6 gap-1.5 md:grid-cols-3 md:gap-2" role="radiogroup" aria-label="Lugares">
+          <div className="grid grid-cols-3 gap-1.5 md:grid-cols-2 md:gap-2" aria-label="Sofás por tamanho">
             {SOFA_SIZES.map(id => {
-              const active = size === id;
-              // Canto, U ou 7+: no telemóvel uma linha por baixo dos números (para a secção caber num ecrã).
-              if (id === PHOTO_SIZE) return (
-                <button key={id} type="button" role="radio" aria-checked={active} onClick={() => setSize(id)}
-                  className={`col-span-6 flex items-center justify-center gap-1.5 rounded-xl py-1.5 text-sm font-semibold transition-all md:col-span-2 md:min-h-[60px] md:flex-col md:rounded-2xl md:border-2 ${active ? 'text-[#1A1A1A] md:border-[#D4AF37] md:bg-[#D4AF37]/10' : 'text-[#555] underline decoration-[#D4AF37] underline-offset-4 md:border-[#E5E0D3] md:bg-white md:no-underline'}`}>
-                  <Camera className={`h-4 w-4 md:h-5 md:w-5 ${active ? 'text-[#D4AF37]' : 'text-[#B5AD99]'}`} />
-                  <span>Canto, U ou 7+ lugares</span>
-                </button>
-              );
+              const n = sofaCounts[id] ?? 0;
               return (
-                <button key={id} type="button" role="radio" aria-checked={active} onClick={() => setSize(id)}
-                  className={`flex min-h-[44px] flex-col md:min-h-[60px] items-center justify-center gap-1 rounded-2xl border-2 transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
-                  <ItemIcon className={`hidden h-5 w-5 md:block ${active ? 'text-[#D4AF37]' : 'text-[#B5AD99]'}`} />
-                  <span className={`text-xl font-semibold leading-none ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{id.split('-')[0]}</span>
-                </button>
+                <div key={id} className={`flex flex-col items-center gap-0.5 rounded-xl border-2 px-1 pb-0.5 pt-1.5 transition-all md:min-h-[48px] md:py-1 md:flex-row md:justify-between md:gap-1 md:pl-2.5 ${n > 0 ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#E5E0D3] bg-white'}`}>
+                  <span className={`whitespace-nowrap text-[13px] font-semibold leading-none md:text-sm md:leading-tight ${n > 0 ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{seatLabel(id)}</span>
+                  <div className="flex items-center gap-0.5">
+                    <button type="button" aria-label={`Menos um sofá de ${seatLabel(id)}`} onClick={() => bumpSofa(id, -1)} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
+                    <span className="w-5 text-center text-base font-bold text-[#1A1A1A]">{n}</span>
+                    <button type="button" aria-label={`Mais um sofá de ${seatLabel(id)}`} onClick={() => bumpSofa(id, 1)} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -138,8 +134,8 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
             <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] md:h-12 md:w-12 text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-5 w-5" /></button>
           </div>
         )}
-        <button type="button" onClick={() => more({ kind, size, qty: kind === 'sofa' ? count : qty, extra })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
-        <p className="mt-1 text-center text-[11px] leading-snug text-[#666] md:text-sm">Junte outra peça à mesma visita e oferecemos-lhe um tratamento: anti-ácaros, anti-odor e outros.</p>
+        <button type="button" onClick={() => more({ kind, size, qty: kind === 'sofa' ? count : qty, extra, sofas: kind === 'sofa' ? sofas : undefined })} className="mt-1.5 flex min-h-9 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
+        <p className={`${kind === 'sofa' ? 'hidden md:block ' : ''}mt-1 text-center text-[11px] leading-snug text-[#666] md:text-sm`}>Junte outra peça à mesma visita e oferecemos-lhe um tratamento: anti-ácaros, anti-odor e outros.</p>
         <p className={`${byPhoto ? '' : 'hidden'} mt-2 text-xs leading-relaxed text-[#666] md:mt-3 md:text-sm`}>{kind === 'sofa' ? (byPhoto ? 'Envie-nos uma fotografia do sofá e dizemos-lhe o preço em menos de 1 minuto.' : 'Sofá de canto, em U ou com mais de 6 lugares: o preço é dado pela fotografia.') : `Mais de ${CHAIR_MAX} cadeiras: peça o preço no WhatsApp.`}</p>
       </div>
 
@@ -171,7 +167,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
           })}
         </div>
         <VisitGiftLine gift={gift} />
-        {!byPhoto && !compact && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
+        {!byPhoto && !compact && <p className={`${gift ? 'hidden md:block ' : ''}mt-2 text-xs text-[#666] md:mt-3 md:text-sm`}>Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full md:mt-5 md:min-h-14 items-center justify-center gap-2 rounded-2xl bg-[#25D366] whitespace-nowrap px-3 text-center text-[15px] font-bold text-white sm:text-base shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5">
@@ -179,7 +175,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
         </a>
         <p className="hidden">Resposta em menos de 1 minuto</p>
       </div>
-      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={[choiceToItem(basket)]} /></Suspense>}
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={choiceToItems(basket)} /></Suspense>}
     </div>
   );
 }

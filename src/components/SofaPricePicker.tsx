@@ -3,7 +3,7 @@
 // LandingServiceSections (problemas, materiais, marcas, página principal).
 import { lazy, Suspense, useState } from 'react';
 import WaterproofPackPicker, { type PackChoice } from '@/components/WaterproofPackPicker';
-import { choiceToItem } from '@/components/quiz/basketChoice';
+import { choiceToItems } from '@/components/quiz/basketChoice';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 
@@ -11,6 +11,6 @@ export default function SofaPricePicker({ city, source }: { city: string; source
   const [basket, setBasket] = useState<PackChoice | null>(null);
   return <>
     <WaterproofPackPicker kind="sofa" city={city} source={source} onMore={c => setBasket(c)} />
-    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={[choiceToItem(basket)]} /></Suspense>}
+    {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={choiceToItems(basket)} /></Suspense>}
   </>;
 }

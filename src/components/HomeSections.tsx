@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import WaterproofPackPicker from './WaterproofPackPicker';
 import CompactFAQ from './CompactFAQ';
-import { choiceToItem } from './quiz/basketChoice';
+import { choiceToItems } from './quiz/basketChoice';
 import type { BasketItem } from './quiz/VisitBasket';
 const VisitBasketLazy = lazy(() => import('./quiz/VisitBasket'));
 import { StoryPlayer, storyFor } from './WaterproofPackSections';
@@ -29,7 +29,7 @@ export function HomePriceSection() {
   const [city, setCity] = useState('Lisboa');
   // "Juntar mais artigos" leva a escolha feita para o cesto, como nas páginas de serviço (24 Nov:
   // na inicial o cesto abria vazio, sem o sofá ou as cadeiras que a pessoa tinha acabado de escolher).
-  const [basket, setBasket] = useState<BasketItem | null>(null);
+  const [basket, setBasket] = useState<BasketItem[] | null>(null);
   const navigate = useNavigate();
   return (
     <section id="preco" className="scroll-mt-20 bg-kyro-green py-12 md:py-16">
@@ -47,10 +47,10 @@ export function HomePriceSection() {
           </select>
         </div>
         <div className="rounded-2xl bg-white p-3 md:p-6">
-          <WaterproofPackPicker key={kind} kind={kind} city={city} source="home_picker" onMore={c => setBasket(choiceToItem(c))} compact />
+          <WaterproofPackPicker key={kind} kind={kind} city={city} source="home_picker" onMore={c => setBasket(choiceToItems(c))} compact />
         </div>
       </div>
-      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={[basket]} /></Suspense>}
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
     </section>
   );
 }
