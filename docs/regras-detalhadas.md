@@ -1172,3 +1172,8 @@ Dono: "O preço máximo de limpeza de uma cadeira é 20 euros. entre 1-4 cadeira
 - "Caga nos 2 títulos, vais remover o cabeçalho, vais colocar só um título em cada coisa e o título tem que ter o mesmo formato em todas as páginas": sem overline (linha dourada + texto pequeno em maiúsculas) e sem subtítulo por baixo do título.
 - Formato único: `type-section-title font-playfair`, #111111 em fundo claro, branco em fundo verde, a última palavra a dourado #D4AF37. Fonte única em `src/components/SectionHeader.tsx` (overline e subtitle ainda aceites como props, mas não se mostram); os 15 componentes com cabeçalho próprio foram alinhados no mesmo dia.
 - A mensagem de WhatsApp do widget de preço diz a escolha completa: "Olá! Escolhi o pack Blindado: limpeza + impermeabilização Premium (até 10 anos), para um sofá de 3 lugares, em Lisboa, por 219€. Gostaria de confirmar o preço e a disponibilidade." O bot ainda não tem regra própria para "Escolhi o pack X" (fica para o kyro-bot, com OK do dono).
+
+
+## Anti-odor em tapete: sempre 5€/m² (dono, 24 Nov 2026)
+
+"anti odor sera sempre 5 euros m2". Sai o mínimo de 15€ de 12 Nov `[RETIRADA 24/11]` ("15€ ou 5€/m², o que der mais"). `RUG_ODOR` em `botQuote.ts` fica `{ min: 0, perM2: 5 }`: 5€ × m², arredondado para baixo.

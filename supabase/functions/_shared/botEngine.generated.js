@@ -2496,7 +2496,7 @@ function addToPrices(r, amount2, lines, tierAmounts) {
     headboard: extra(q.headboard)
   };
 }
-var RUG_ODOR = { min: 15, perM2: 5 };
+var RUG_ODOR = { min: 0, perM2: 5 };
 var RUG_ODOR_RULE = "Já está somado ao preço (total, ou homePrice/pickupPrice/comboPrice nos tapetes): não somes outra vez. Diz o anti-odor numa linha à parte.";
 var rugOdorUnit = (w, l) => Math.max(RUG_ODOR.min, Math.floor(w * l * RUG_ODOR.perM2 + 1e-9));
 function rugOdorFor(items, rawOf) {

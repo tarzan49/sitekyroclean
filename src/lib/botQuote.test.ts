@@ -253,15 +253,15 @@ describe('sofa of 6 or 7 seats judged on the photo (owner, 9 Nov 2026)', () => {
   });
 });
 
-describe('anti-odor em tapetes (dono, 12 Nov 2026: +15€, 5€ o m²)', () => {
-  it('máx(15€, 5€ × m², para baixo), numa linha própria, somado ao preço do tapete', () => {
+describe('anti-odor em tapetes (dono, 24 Nov 2026: sempre 5€ o m²)', () => {
+  it('5€ × m², para baixo, sem mínimo, numa linha própria, somado ao preço do tapete', () => {
     const plain = ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
     const smelly = ok({ items: [{ kind: 'rug', width: 2, length: 3, odor: true }], city: 'Lisboa' });
-    expect(smelly.rugOdor).toMatchObject({ amount: 30, min: 15, perM2: 5 });
+    expect(smelly.rugOdor).toMatchObject({ amount: 30, min: 0, perM2: 5 });
     expect(smelly.lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor tapete 2 x 3 m', amount: 30 });
     expect(smelly.rugEstimate?.ok && plain.rugEstimate?.ok && smelly.rugEstimate.homePrice - plain.rugEstimate.homePrice).toBe(30);
-    // A small rug pays the 15€ floor; 1,55 x 2,35 = 3,64 m² → 18€.
-    expect(ok({ items: [{ kind: 'rug', width: 1.2, length: 1.7, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(15);
+    // No floor since 24 Nov: 1,2 x 1,7 = 2,04 m² → 10€; 1,55 x 2,35 = 3,64 m² → 18€.
+    expect(ok({ items: [{ kind: 'rug', width: 1.2, length: 1.7, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(10);
     expect(ok({ items: [{ kind: 'rug', width: 1.55, length: 2.35, odor: true }], city: 'Lisboa' }).rugOdor?.amount).toBe(18);
     // With a sofa in the same visit: on the combo price.
     const combo = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
