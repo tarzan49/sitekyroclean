@@ -519,20 +519,22 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
 // Riscado + "Poupa X€" em todas as opções (dono, 25 Nov: "isto é que é o desconto que a pessoa está à procura";
 // "vale para todos os upsells"). Valores só do motor.
-function PriceTag({ shown, struck, note }: { shown: number | null; struck: number | null; note?: string }) {
+function PriceTag({ shown, struck: rawStruck }: { shown: number | null; struck: number | null; note?: string }) {
   if (shown === null) return null;
+  // Poupança de trocos não se mostra (dono, 25 Nov: "poupa 1€ na deslocação [...] isso é demais"): só a partir de 5€.
+  const struck = rawStruck !== null && rawStruck - shown >= 5 ? rawStruck : null;
   // O mesmo riscado do resto do site (dono, 25 Nov: "os preços riscados não estão como no site inteiro"): pequeno e
   // neutro por cima do preço, o preço em branco forte e a poupança em texto fino dourado, nunca num selo.
   return <span className="flex shrink-0 flex-col items-end leading-tight">
     {struck !== null && <span className="text-[11px] text-white/45 line-through">{formatEuro(struck)}</span>}
     <span className="whitespace-nowrap text-lg font-bold text-white">{formatEuro(shown)}</span>
-    {struck !== null && <span className="whitespace-nowrap text-[11px] font-medium text-[#E8C964]">Poupa {formatEuro(struck - shown)}{note ? ` ${note}` : ''}</span>}
+    {struck !== null && <span className="whitespace-nowrap text-[11px] font-medium text-[#E8C964]">Poupa {formatEuro(Math.round((struck - shown) * 100) / 100)}</span>}
   </span>;
 }
 /** Um extra (anti-ácaros, anti-odor): quanto acrescenta, riscado o que custaria em separado, ou "Oferecido". */
 function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null }) {
   if (plus === null) return null;
-  const was = normal !== null && normal > plus ? normal : null;
+  const was = normal !== null && normal - plus >= 5 ? normal : null;
   return <span className="flex shrink-0 flex-col items-end leading-tight">
     {was !== null && <span className="text-[11px] text-white/45 line-through">+{formatEuro(was)}</span>}
     {plus > 0 ? <span className="whitespace-nowrap text-lg font-bold text-white">+{formatEuro(plus)}</span> : <span className="whitespace-nowrap text-base font-bold text-[#E8C964]">Oferecido</span>}
