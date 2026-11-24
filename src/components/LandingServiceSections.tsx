@@ -49,7 +49,7 @@ export default function LandingServiceSections() {
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
   // Novo modelo em teste (limpeza de sofás por cidade): escolha de preço simples com os totais do bot.
-  const newModel = model.serviceSlug === 'limpeza-sofas' && model.family === 'localidade';
+  const newModel = model.serviceSlug === 'limpeza-sofas'; // todas as famílias de sofás (dono, 24 Nov)
   const sections = {
     precos: newModel ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
