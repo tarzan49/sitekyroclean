@@ -2,6 +2,7 @@ import ServiceResultsGallery from "@/components/ServiceResultsGallery";
 import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
 
 interface Props {
+  noVideos?: boolean;
   category: BeforeAfterCategory | BeforeAfterCategory[];
   className?: string;
   intervalMs?: number;
@@ -13,11 +14,11 @@ interface Props {
 // devagar até "Depois" antes de trocar para o par seguinte. `category` pode
 // ser uma lista (páginas de pack, que combinam dois serviços): os pares saem
 // intercalados, ver `interleavePools`.
-export default function HeroBeforeAfterPool({ category, className, intervalMs = 4000 }: Props) {
+export default function HeroBeforeAfterPool({ category, className, intervalMs = 4000, noVideos = false }: Props) {
   const key = Array.isArray(category) ? category.join('+') : category;
   return (
     <div className={className}>
-      <ServiceResultsGallery autoplay priority key={key} category={category} intervalMs={intervalMs} />
+      <ServiceResultsGallery autoplay priority noVideos={noVideos} key={key} category={category} intervalMs={intervalMs} />
     </div>
   );
 }
