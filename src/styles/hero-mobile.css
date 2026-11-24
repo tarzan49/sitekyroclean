@@ -99,3 +99,14 @@
 html.snap-sections:has([data-paid-landing]) { --header-h: 0px !important; scroll-padding-top: 0; }
 html.snap-sections:has([data-paid-landing]) header { scroll-snap-align: start; }
 html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scroll-snap-align: none; }
+
+/* Letra das secções no tamanho normal (dono, 25 Nov: "está tudo compactado"); só os ecrãs úteis abaixo de 640 px
+   (que já não são iPhones nem Androids atuais) ficam com a letra apertada do index.css. */
+@media (max-width: 767px) and (min-height: 640px) {
+  html.snap-sections #duvidas button[aria-expanded] > span:first-child, html.snap-sections #perguntas button[aria-expanded] > span:first-child { font-size: 16px; line-height: 1.35; }
+  html.snap-sections #dicas .grid h3 { font-size: 16.5px; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 18.5px; line-height: 1.5; -webkit-line-clamp: 7; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { font-size: 14px; }
+  html.snap-sections #beneficios .grid > div > span { font-size: 15px; line-height: 1.45; }
+  html.snap-sections #marca-tecido .grid > div span { font-size: 15px; }
+}
