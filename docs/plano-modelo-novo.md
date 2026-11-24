@@ -9,21 +9,23 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 
 | Molde (`src/pages/`) | Páginas | Sofás | Estado sofás | Outros serviços |
 |---|---|---|---|---|
-| LocationServicePage (cidade) | 612 | 102 | FEITO | cadeiras e colchões FEITO (24 Nov, packs-tratamento); resto por fazer |
-| FreguesiaServicePage | 4656 | 776 | FEITO (24 Nov) | cadeiras e colchões FEITO (24 Nov) |
-| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | cadeiras e colchões FEITO (24 Nov) |
-| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras e colchões (higienização, lavagem, limpeza) FEITO (24 Nov) |
+| LocationServicePage (cidade) | 612 | 102 | FEITO | cadeiras, colchões, tapetes, alcatifas, impermeabilização FEITO (24 Nov) |
+| FreguesiaServicePage | 4656 | 776 | FEITO (24 Nov) | todos os serviços FEITO (24 Nov) |
+| PricePage (`/preco-limpeza-*`) | 612 | 102 | FEITO (OK 24 Nov) | todos os serviços FEITO (24 Nov) |
+| SofaVariantPage (`/higienizacao-sofa-*`, `/lavagem-sofa-*`…) | 10541 | 2634 | FEITO nas variantes de limpeza de sofás (OK 24 Nov); `impermeabilizacao-sofa-*` é do serviço impermeabilização | cadeiras, colchões, tapetes, alcatifas e `impermeabilizacao-sofa/cadeiras-*` FEITO (24 Nov) |
 | PackComboPage | 510+ | — | FEITO (todos os packs) | — |
-| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO, falta OK do dono | colchões FEITO (24 Nov; ácaros, alergias, cheiro, manchas, urina, preço); não há problemas de cadeiras |
-| MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | FEITO em tecido, falta OK; PELE por fazer (precisa de widget sem impermeabilização: limpeza + tratamento da pele) | tapetes 412 |
+| ProblemCityPage (`/manchas-cafe-sofa-*`, `/preco-limpeza-sofa-*`, `/acaros-sofa-*`) | 2434 | 1218 | FEITO (OK 24 Nov) | colchões, tapetes e alcatifas FEITO (24 Nov); outros (pelos-animais, cheiro-urina genéricos, imper 45) por fazer |
+| MaterialPage (`/limpeza-sofa-veludo-*`) | 1133 | 721 | tecido FEITO (OK); pele: widget Renovado/Renovado + Pele FEITO, encaixe desligado (falta passo a passo sem vídeos de tecido) | tapetes 412 FEITO (24 Nov) |
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
 | TreatmentPage (`/tratamento-anti-acaros-*`) | 206 | — | — | por fazer |
 | CommercialPage | 32 | — | — | por fazer |
-| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO, falta OK | por fazer |
-| Página inicial, preços, guias, blog, /problemas, /en | — | — | — | por fazer (blog no fim) |
+| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); colchões e cadeiras: packs-tratamento |
+| Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
+| Guias, /problemas, /en, blog | — | — | — | por fazer (blog no fim: só topo + widget) |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
 
 Divisão (24 Nov): packs-tratamento = colchões e cadeiras em tudo; novo-modelo-seccoes = tapetes, alcatifas e impermeabilização.
 Coordenação: sessão packs-tratamento (cadeiras por cidade, packs de tratamento), sessão do questionário (cesto da visita).
-Regra das cadeiras combinada: `newModel = serviceSlug === 'limpeza-sofas' || (serviceSlug === 'limpeza-cadeiras' && family === 'localidade')`.
+Regra única: `isNewModel(model)` em src/lib/newModel.ts (listas de serviços); mudar só aí.
+Alcatifas: preço do motor (7€/m², 96775466); o dono disse a 24 Nov à noite "diria desde 5€ o metro quadrado": por decidir com ele (pedido à sessão dos tapetes).
