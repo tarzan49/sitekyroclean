@@ -35,6 +35,10 @@ interface Props {
   paid?: boolean;
   // O `price` já é o valor final a mostrar (ex.: total de um pack); não passa pela regra do preço por cadeira.
   exactPrice?: boolean;
+  /** Páginas comerciais (dono, 24 Nov): sem valores no topo; só a avaliação e este texto no botão do contacto direto. */
+  directContactLabel?: string;
+  /** Vídeo real vertical em vez do antes/depois (páginas comerciais, dono 24 Nov): no telemóvel é o fundo do topo, no computador fica ao lado do texto. */
+  video?: { src: string; poster: string };
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
@@ -48,7 +52,7 @@ export function splitHeroSubtitle(text: string): [string, string] {
   return [lead.trim(), parts.slice(k).join('').trim()];
 }
 
-export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false, duo }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false, duo, directContactLabel, video }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
@@ -67,13 +71,13 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
   const statIcons = { rating: GoogleG, duration: Hourglass, response: Clock, drying: Timer };
   const stats = commercialHeroStats(serviceSlug).map(stat => ({ ...stat, icon: statIcons[stat.key] }));
   const [lead, rest] = splitHeroSubtitle(subtitle ?? commercialHeroSubtitle(serviceSlug, municipality));
-  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[100svh] lg:flex-col">
+  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className={`relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[100svh] lg:flex-col${video ? ' max-lg:flex max-lg:min-h-[100svh] max-lg:flex-col' : ''}`}>
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
       <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" width={1280} height={720} />
     </picture>
     <div className="absolute inset-0 -z-10" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,.48) 0%, rgba(0,0,0,.54) 55%, rgba(0,0,0,.68) 100%)' }} />
-    <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8 pb-4 sm:pb-8 lg:flex lg:w-full lg:flex-1 lg:flex-col lg:justify-center">
+    <div className={`mx-auto max-w-6xl px-5 sm:px-6 lg:px-8 pb-4 sm:pb-8 lg:flex lg:w-full lg:flex-1 lg:flex-col lg:justify-center${video ? ' max-lg:mt-auto max-lg:w-full' : ''}`}>
       <div className="grid items-center gap-4 lg:grid-cols-2 lg:gap-12">
         <div className="min-w-0">
           <nav data-hero-part="breadcrumb" aria-label="Breadcrumb" className="mb-2 flex flex-wrap items-center gap-x-2 text-[11px] leading-relaxed text-white/85" style={{ fontFamily: 'var(--font-kyro)' }}>
@@ -85,24 +89,27 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           <h1 data-hero-part="title" data-long-title={`${words.join(' ')} ${gold}`.length > 90 ? 'xl' : `${words.join(' ')} ${gold}`.length > 52 ? '' : undefined} className={`font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white`} style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
           <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{lead}{rest && <span className="max-md:hidden"> {rest}</span>}</p>
           {/* Preço e avaliação lado a lado, por cima do botão (dono, 09/10/2026). */}
-          <div data-hero-part="proof" className="mb-4 grid grid-cols-2 items-center">
-            <a href={pricesHref} className="flex min-h-[56px] flex-col items-center justify-center border-r border-white/15 px-2 text-center">
+          <div data-hero-part="proof" className={`mb-4 grid items-center ${directContactLabel ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            {!directContactLabel && <a href={pricesHref} className="flex min-h-[56px] flex-col items-center justify-center border-r border-white/15 px-2 text-center">
               {priceValue !== startingPrice && <span className="text-[11px] uppercase tracking-[0.12em] text-white/70">Desde</span>}
               <span className={`font-playfair font-semibold leading-tight text-[#D4AF37] ${priceValue === startingPrice ? 'text-[17px]' : 'text-[22px]'}`}>{priceValue}</span>
-            </a>
+            </a>}
             <div className="flex min-h-[56px] flex-col items-center justify-center px-2 text-center">
               <span className="flex items-center gap-1.5"><GoogleG className="h-4 w-4 shrink-0" /><span className="sr-only">{`${REVIEW_RATING} em 5 estrelas no Google`}</span><span className="flex" aria-hidden="true">{[0, 1, 2, 3, 4].map(i => <Star key={i} className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}</span><span aria-hidden="true" className="text-[15px] font-semibold text-white">{REVIEW_RATING}</span></span>
               <span className="mt-0.5 text-[11px] text-white/75">+{REVIEW_COUNT} avaliações Google</span>
             </div>
           </div>
-          <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
-          <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 items-center justify-center text-center">
+          <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />{directContactLabel ?? 'Pedir orçamento por WhatsApp'}</a>
+          {!directContactLabel && <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 items-center justify-center text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
-          </a>
+          </a>}
         </div>
-        <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">
+        {video ? <div data-hero-part="video" className="absolute inset-0 -z-10 overflow-hidden lg:relative lg:inset-auto lg:z-auto lg:mx-auto lg:aspect-[9/16] lg:h-[min(62svh,600px)] lg:rounded-2xl">
+          <video src={video.src} poster={video.poster} autoPlay muted loop playsInline aria-hidden="true" className="h-full w-full object-cover" />
+          <div aria-hidden="true" className="absolute inset-0 lg:hidden" style={{ background: 'linear-gradient(to bottom, rgba(7,26,18,.2) 0%, rgba(7,26,18,.35) 25%, rgba(7,26,18,.88) 58%, rgba(7,26,18,.96) 100%)' }} />
+        </div> : <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">
           {duo ? <DuoBeforeAfter left={duo.left} right={duo.right} third={duo.third} className="border-t-2 border-[#D4AF37]" /> : category && <HeroBeforeAfterPool noVideos={serviceSlug.startsWith('limpeza-') && !secondaryServiceSlug} category={category} className={category === 'cadeiras' ? undefined : "border-t-2 border-[#D4AF37]"} />}
-        </div>
+        </div>}
       </div>
     </div>
     <div data-hero-part="stats"><ServiceSnapshotStats stats={stats} /></div>

@@ -1,5 +1,5 @@
-import { locationPrices } from '../constants/travel';
 import { cities, cityPrep } from './serviceCatalog';
+import { pickReviewSubset, type PoolReview } from './reviewsPool';
 // Páginas comerciais (B2B). Dono, 24 Nov: "aumenta para o país todo [...] já trabalhamos com hotéis,
 // restaurantes, cafés, com tudo [...] layout como as outras, só que específicas, com mais profissionalismo".
 // Duas famílias, no mesmo molde (CommercialPage):
@@ -160,14 +160,14 @@ export const SECTORS: SectorData[] = [
     items: [
       { item: 'Cadeiras de trabalho', detail: 'Assento e encosto, onde se acumula o suor e o pó do dia a dia.' },
       { item: 'Sofás e poltronas de receção', detail: 'A primeira coisa que um cliente vê.' },
-      { item: 'Alcatifas', detail: 'Extração por área, com preço por escalões de metros quadrados.' },
+      { item: 'Alcatifas', detail: 'Extração por área, com proposta à medida.' },
       { item: 'Salas de reunião', detail: 'Cadeiras e alcatifa na mesma visita.' },
     ],
     rules: [],
     rulesNote: '',
     faqs: [
       { question: 'Podem vir ao fim de semana?', answer: 'Sim. Ao fim de semana ou ao fim do dia: na segunda de manhã está tudo seco.' },
-      { question: 'Fazem muitas cadeiras de uma vez?', answer: 'Sim. O preço por cadeira desce a partir da 5.ª e da 9.ª cadeira.' },
+      { question: 'Fazem muitas cadeiras de uma vez?', answer: 'Sim. Diga-nos quantas são e fazemos a proposta à medida.' },
       IVA_FAQ,
       PRICE_FAQ,
     ],
@@ -192,16 +192,13 @@ export function getCommercialPageData(citySlug: string): CommercialPageData | nu
   const city = COMMERCIAL_CITIES.find(c => c.slug === citySlug);
   if (!city) return null;
   const prep = cityPrep(city.name);
-  const fee = locationPrices[city.name];
   return {
     city,
     title: `Limpeza Comercial de Estofos ${prep} ${city.name} | Hotéis, Restaurantes e Escritórios | Kyro Clean`,
     metaDescription: `Limpeza de colchões, cadeiras, sofás e alcatifas para hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name}. Fatura com IVA, fora de horas, proposta no WhatsApp.`,
     h1: `Limpeza comercial de estofos ${prep} ${city.name}`,
     intro: `Hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name}: colchões, cadeiras, sofás e alcatifas limpos fora de horas, com fatura com IVA.`,
-    coverage: fee === undefined
-      ? `Servimos ${prep} ${city.name} e arredores; a deslocação vem na proposta.`
-      : `Servimos ${prep} ${city.name} e arredores; deslocação de ${fee}€ por visita, já na proposta.`,
+    coverage: `Servimos ${prep} ${city.name} e arredores; a deslocação vem na proposta.`,
     faqs: [
       { question: `Trabalham com empresas ${prep} ${city.name}?`, answer: `Sim. Hotéis, alojamento local, restaurantes, cafés e escritórios ${prep} ${city.name} e arredores, com a mesma equipa que faz os serviços da zona.` },
       HOURS_FAQ,
@@ -217,3 +214,24 @@ export function getAllCommercialRoutes(): { path: string; citySlug: string }[] {
     ...COMMERCIAL_CITIES.map(c => ({ path: `/limpeza-comercial-${c.slug}`, citySlug: c.slug })),
   ];
 }
+
+// Peça principal de cada setor (páginas comerciais): dá os exemplos, as avaliações e o passo a passo. Partilhado pelo React (CommercialPage) e pelo prerender.
+export const COMMERCIAL_HERO_SERVICE: Record<SegmentKey | 'cidade', 'limpeza-colchoes' | 'limpeza-cadeiras'> = {
+  hoteis: 'limpeza-colchoes',
+  'alojamento-local': 'limpeza-colchoes',
+  restaurantes: 'limpeza-cadeiras',
+  escritorios: 'limpeza-cadeiras',
+  cidade: 'limpeza-cadeiras',
+};
+
+/** Avaliações reais da página, sem a da Lumière (dono, 24 Nov: retirada). */
+export function commercialReviews(path: string, service: 'limpeza-colchoes' | 'limpeza-cadeiras'): PoolReview[] {
+  return pickReviewSubset(service, `${path}:comercial`, 7).filter(r => r.name !== 'Lumiere Restaurante').slice(0, 6);
+}
+
+// Contacto direto (dono, 24 Nov: nas páginas comerciais não há valores, as empresas falam diretamente connosco).
+export const COMMERCIAL_CONTACT_TEXT = 'Para saber o preço para a sua empresa, o contacto é feito diretamente connosco.';
+export const COMMERCIAL_CONTACT_HINT = 'Envie o tipo de espaço, a localidade e as peças, de preferência com fotografias.';
+
+/** Empresas com quem já trabalhámos, confirmadas pelo dono a 24 Nov. Nunca acrescentar contactos comerciais da folha. */
+export const COMMERCIAL_CLIENTS = ['Real Indiana', 'Arcádia', 'Mikado', 'Palácio da Bolsa', 'RC Restaurante', 'Duello', 'Menina Colina', 'Garden Balthazar', 'Lumière', 'Praia da Luz', 'Churrasqueira Premium', 'Al Mare', 'Genki', 'Mövenpick'];

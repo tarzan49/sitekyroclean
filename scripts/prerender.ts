@@ -2,6 +2,7 @@ import { EN_GUIDE_DESCRIPTION, EN_GUIDE_SECTIONS, EN_GUIDE_FAQS, EN_GUIDE_TAKEAW
 import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
+import { getLandingProblems } from '../src/data/landingServiceCopy';
 import { commercialHeroSubtitle, commercialHeroPriceLine, commercialHeroFacts, type HeroStat } from '../src/data/commercialHeroCopy';
 import { PILLAR_PAGES, type PillarSlug } from '../src/data/pillarPages';
 import { SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM } from '../src/data/enginePrices';
@@ -65,7 +66,7 @@ import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { BLOG_THEMES } from '../src/data/blogThemes';
 import { glossaryTerms } from '../src/data/glossaryTerms';
-import { getAllCommercialRoutes, getCommercialPageData, getSector, COMMERCIAL_CITIES, SECTORS, CONTRACT_POINTS } from '../src/data/commercialSeoData';
+import { getAllCommercialRoutes, getCommercialPageData, getSector, COMMERCIAL_CITIES, SECTORS, CONTRACT_POINTS, COMMERCIAL_HERO_SERVICE, COMMERCIAL_CLIENTS, COMMERCIAL_CONTACT_TEXT, COMMERCIAL_CONTACT_HINT, commercialReviews } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildHowToNode, buildServicePageSchema, offerForPriceLabel } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
@@ -1506,6 +1507,10 @@ export function prerenderRoutes(outDir: string): number {
       ];
       const cityLinks = COMMERCIAL_CITIES.filter(city => city.slug !== route.citySlug).map(city => ({ href: `/limpeza-comercial-${city.slug}`, label: `Limpeza comercial ${cityPrep(city.name)} ${city.name}` }));
       const sectorLinks = SECTORS.filter(s => s.key !== route.citySlug).map(s => ({ href: `/limpeza-comercial-${s.key}`, label: `${s.label}: ${s.short}` }));
+      // As mesmas secções do React: contacto direto, avaliações reais (Lumiere primeiro), exemplos da peça principal.
+      const heroService = COMMERCIAL_HERO_SERVICE[sector?.key ?? 'cidade'];
+      const examples = getLandingProblems(heroService).map(p => ({ title: p.title, description: p.description }));
+      const items = sector ? sector.items.map(it => ({ title: it.item, description: it.detail })) : SECTORS.map(s => ({ title: s.label, description: s.short }));
       emit(
         route.path,
         page.title,
@@ -1514,8 +1519,10 @@ export function prerenderRoutes(outDir: string): number {
           h1: page.h1,
           intro: page.intro,
           localSection: sector ? (sector.rules.map(r => `${r.text} (${r.source})`).join(' ') + (sector.rulesNote ? ` ${sector.rulesNote}` : '')) || undefined : data!.coverage,
-          problems: sector ? sector.items.map(it => ({ title: it.item, description: it.detail })) : SECTORS.map(s => ({ title: s.label, description: s.short })),
-          benefits: [...CONTRACT_POINTS, 'Lumiere Restaurante (avaliação Google): "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️"'],
+          heroFacts: { priceLine: `Fale diretamente connosco. ${COMMERCIAL_CONTACT_TEXT} ${COMMERCIAL_CONTACT_HINT} WhatsApp e telefone: ${PHONE_DISPLAY}. Email: ${BUSINESS_EMAIL}.`, stats: commercialHeroFacts(heroService) },
+          problems: [...examples, ...items],
+          benefits: [...CONTRACT_POINTS, `Quem confia em nós: ${COMMERCIAL_CLIENTS.join(', ')}`],
+          reviews: commercialReviews(route.path, heroService).map(r => ({ name: r.name, text: r.text })),
           faqs: page.faqs,
           links: [...sectorLinks, ...cityLinks],
           linksHeading: 'Limpeza comercial por setor e por cidade',

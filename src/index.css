@@ -905,3 +905,17 @@ html.snap-sections main > section[data-en-hero] { min-height: 100svh; padding-to
   html.snap-home main > section#preco { padding-bottom: 8px !important; }
   html.snap-home #preco a[href*="wa.me"] { margin-top: 6px; }
 }
+
+/* Botão único de WhatsApp em todo o site: o do topo (dono, 24 Nov 2026). Apanha todos os botões verdes que abrem
+   o WhatsApp, sejam quais forem as classes; ligações de texto não levam. O tamanho é o de cada sítio. */
+a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]),[data-hero-part="whatsapp"] {
+  background: linear-gradient(135deg, #188344, #13753b) !important;
+  border: 1px solid #ffffff12 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 5px 16px #061b1324 !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+}
+a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]):hover,[data-hero-part="whatsapp"]:hover { background: linear-gradient(135deg, #156f3a, #0f6431) !important; }
+a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) :is(span, svg) { color: #fff !important; letter-spacing: normal !important; text-transform: none !important; }

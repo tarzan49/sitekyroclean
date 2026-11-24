@@ -1255,3 +1255,6 @@ Dois ou mais sofás no pedido (a quantidade conta), limpos ou impermeabilizados:
 - "O sentido disto deveria ser exatamente o mesmo que o do orçamento, ou seja, deveria seguir a mesma lógica": `StepPricePicker.tsx` (sofá, pele, cadeiras, colchão, tapete, alcatifa, impermeabilização), usado em todas as páginas; aprovado ("Sim, publica").
 - Passos: localidade, material, tamanho e só depois as opções; nada vem escolhido; o botão diz o passo que falta. Preço, riscado e "Poupa" vêm das funções exportadas por `VisitBasket.tsx` (`optionPrice`, `giftsUnlocked`, `struckOf`), em import dinâmico, nunca uma cópia.
 - [RETIRADA 25/11] Blindado pré-escolhido e os três "Escolha o tamanho"; a oferta dentro do preço da limpeza (c9c5d1f0, "Sim, como o bot"), substituída por "149€, extra à parte".
+## Páginas comerciais (dono, 24 Nov 2026)
+
+O dono: "o comercial não faz muito sentido o valor estar lá [...] o contacto tem que ser diretamente connosco". O widget de preços chegou a ser feito e saiu no mesmo dia. Contactos: WhatsApp, telefone e email (`BUSINESS_EMAIL`). Faixa "Quem confia em nós": só clientes ditos pelo dono (`COMMERCIAL_CLIENTS`), nunca os contactos comerciais da folha "Base de dados CS"; a avaliação da Lumière saiu. Botão de WhatsApp: "um botão universal de whatsapp no site, esse botão tem que ser o botão do hero".
