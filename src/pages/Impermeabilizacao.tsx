@@ -1,6 +1,8 @@
 import { CHAIR_WATERPROOF_BIG_ESSENTIAL, CHAIR_WATERPROOF_BIG_PREMIUM } from '../constants/chairPricing';
 import { sofaPrices } from '@/components/quiz/QuizTypes';
 import { formatEuro } from '@/data/enginePrices';
+import { botQuote } from '@/lib/botQuote';
+import { cityPrep as cityPrepOf } from '@/data/serviceCatalog';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { Check, Droplet, FlaskConical } from "lucide-react";
 import Header from "@/components/Header";
@@ -125,36 +127,44 @@ const waterproofingTiers: WaterproofingTier[] = [
   },
 ];
 
-// "Essencial ou Premium?" num ecrã (dono, 24 Nov: cada secção cabe inteira): comparação lado a lado, sem cartões compridos.
-const WaterproofingTierComparison = () => {
+// "Essencial ou Premium?" num ecrã (dono, 24 Nov): dois cartões lado a lado que mostram a diferença num olhar
+// (anos de proteção em grande, lavagens em pontos) e os preços do bot para o sofá e para as cadeiras.
+const sofaImperPrice = (city: string, treatment: 'premium' | 'essencial') => {
+  const r = botQuote({ city, items: [{ kind: 'sofa', size: '3-lugares', treatment }] }) as { ok: boolean; quote?: boolean; total?: number | null };
+  return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
+};
+
+const WaterproofingTierComparison = ({ city }: { city: string }) => {
   const [p, e] = waterproofingTiers;
-  // Versão curta dos mesmos factos de waterproofingTiers, para caber num ecrã.
-  const rows: [string, string, string][] = [
-    ['Base', 'Solvente', 'Água'],
-    ['Duração', 'Até 10 anos', '1 a 2 anos'],
-    ['Lavagens', 'Até 5', 'Até 2'],
-    ['Ideal para', 'Crianças, animais, uso intenso', 'Uso moderado, 1.ª proteção'],
-    ['Cadeiras', p.chairPrice, e.chairPrice],
+  const cards = [
+    { tier: p, top: true, years: '10', yearsLabel: 'anos de proteção', washes: 5, base: 'Base solvente', ideal: 'Crianças, animais, uso intenso', sofa: sofaImperPrice(city, 'premium') },
+    { tier: e, top: false, years: '1-2', yearsLabel: 'anos de proteção', washes: 2, base: 'Base água', ideal: 'Uso moderado, 1.ª proteção', sofa: sofaImperPrice(city, 'essencial') },
   ];
   return (
     <section id="versoes" className="py-14 md:py-20 bg-white">
       <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
         <SectionHeader heading="Essencial ou" goldWord="Premium?" />
-        <div className="overflow-hidden rounded-2xl border border-[#E5E0D3]">
-          <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)] bg-[#0c241a] text-white">
-            <span className="p-3" />
-            <span className="relative flex flex-wrap items-center gap-1.5 p-3 text-base font-bold">{p.name}<span className="block w-fit rounded-full bg-[#D4AF37] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#0c241a]">{p.badge}</span></span>
-            <span className="p-3 text-base font-bold">{e.name}</span>
-          </div>
-          {rows.map(([label, a, b], i) => (
-            <div key={label} className={`grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)] text-[13px] leading-snug md:text-sm ${i % 2 ? 'bg-[#FDFDF9]' : 'bg-white'}`}>
-              <span className="p-3 font-semibold text-[#555]">{label}</span>
-              <span className="p-3 font-medium text-[#1A1A1A]">{a}</span>
-              <span className="p-3 text-[#1A1A1A]">{b}</span>
+        <div className="grid grid-cols-2 gap-2.5 md:gap-5">
+          {cards.map(c => (
+            <div key={c.tier.name} className={`relative flex flex-col rounded-2xl p-3 md:p-6 ${c.top ? 'border-2 border-[#D4AF37] bg-[#0c241a] text-white shadow-[0_16px_40px_-18px_rgba(212,175,55,0.7)]' : 'border border-[#E5E0D3] bg-[#FDFDF9] text-[#1A1A1A]'}`}>
+              {c.top && <span className="absolute -top-2.5 left-3 rounded-full bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0c241a]">Mais escolhido</span>}
+              <p className="text-lg font-bold leading-tight md:text-2xl">{c.tier.name}</p>
+              <p className={`text-[11px] md:text-sm ${c.top ? 'text-white/60' : 'text-[#777]'}`}>{c.base}</p>
+              <p className={`mt-3 font-playfair text-4xl font-bold leading-none md:text-6xl ${c.top ? 'text-[#D4AF37]' : 'text-[#1A1A1A]'}`}>{c.years}</p>
+              <p className={`text-[11px] md:text-sm ${c.top ? 'text-white/70' : 'text-[#555]'}`}>{c.yearsLabel}</p>
+              <div className="mt-3 flex gap-1" aria-label={`Aguenta até ${c.washes} lavagens`}>
+                {[0, 1, 2, 3, 4].map(n => <span key={n} className={`h-2 flex-1 rounded-full ${n < c.washes ? 'bg-[#D4AF37]' : c.top ? 'bg-white/15' : 'bg-[#E5E0D3]'}`} />)}
+              </div>
+              <p className={`mt-1 text-[11px] md:text-sm ${c.top ? 'text-white/70' : 'text-[#555]'}`}>Até {c.washes} lavagens</p>
+              <p className={`mt-3 text-[12px] leading-snug md:text-sm ${c.top ? 'text-white/85' : 'text-[#444]'}`}>{c.ideal}</p>
+              <div className={`mt-auto pt-3 text-[12px] md:text-sm ${c.top ? 'border-white/15' : 'border-[#E5E0D3]'} border-t mt-3`}>
+                <p className="flex items-baseline justify-between gap-1"><span className={c.top ? 'text-white/70' : 'text-[#666]'}>Sofá 3 lug.</span><span className="text-base font-bold md:text-lg">{c.sofa}</span></p>
+                <p className="flex items-baseline justify-between gap-1"><span className={c.top ? 'text-white/70' : 'text-[#666]'}>Cadeira</span><span className="font-semibold">{c.tier.chairPrice}</span></p>
+              </div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-[#666]">Preços de sofá no seu preço, acima, pela localidade. Só em tecido: na pele não fazemos impermeabilização.</p>
+        <p className="mt-3 text-xs text-[#666]">Nas duas, os líquidos ficam à superfície e saem com um pano. Preços {cityPrepOf(city)} {city}, com a deslocação incluída. Só em tecido: na pele não fazemos impermeabilização.</p>
       </div>
     </section>
   );
@@ -189,7 +199,7 @@ const Impermeabilizacao = () => {
             <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ImperPricePicker city={city} source="pillar_picker_impermeabilizacao" /></div>
           </div>
         </section>
-        <WaterproofingTierComparison />
+        <WaterproofingTierComparison city={city} />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
