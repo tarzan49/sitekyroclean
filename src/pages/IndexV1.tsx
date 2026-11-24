@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import Header from "@/components/Header";
 import HeroV1 from "@/components/HeroV1";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
@@ -19,6 +19,12 @@ const SectionLoader = () => (
 );
 
 const IndexV1 = () => {
+  // Secções de ecrã inteiro com encaixe no scroll, como nas páginas de serviço (dono, 24 Nov).
+  useEffect(() => {
+    document.documentElement.classList.add('snap-sections');
+    return () => document.documentElement.classList.remove('snap-sections');
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Header />

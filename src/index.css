@@ -788,3 +788,6 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #processo .md\:hidden video, html.snap-sections #processo .md\:hidden img { max-height: 44svh; }
   html.snap-sections #processo > div > div:first-child { margin-bottom: 14px; }
 }
+
+/* Página inicial: o topo (HeroV1, #orcamento) mantém a sua disposição própria dentro do encaixe. */
+html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-bottom: 28px; }
