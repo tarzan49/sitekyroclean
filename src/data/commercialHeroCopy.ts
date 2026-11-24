@@ -57,8 +57,8 @@ export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `$
 export const commercialHeroPriceLine = (serviceSlug: string, municipality?: string, price?: string): string => {
   // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
   // Tapetes e alcatifas com valor do motor desde 24 Nov 2026 (dono).
-  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}, com a deslocação incluída.`;
-  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}, com a deslocação incluída.`;
+  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}, mais a deslocação.`;
+  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}, mais a deslocação.`;
   if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;

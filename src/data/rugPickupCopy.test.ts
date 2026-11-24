@@ -95,7 +95,7 @@ describe('recolha dos tapetes', () => {
 
   it('em tapetes e alcatifas a deslocação vem incluída no preço por m² (dono, 24 Nov 2026)', () => {
     for (const slug of ['limpeza-tapetes', 'limpeza-alcatifas'] as const) {
-      expect(commercialHeroPriceLine(slug, 'Porto')).toMatch(/€\/m², com a deslocação incluída/);
+      expect(commercialHeroPriceLine(slug, 'Porto')).toMatch(/€\/m², mais a deslocação/);
       const travelFaq = getLandingFaqs({ serviceSlug: slug, pageKey: 'teste', municipality: 'Porto', family: 'localidade' })
         .concat(getLandingFaqs({ serviceSlug: slug, pageKey: 'outra', municipality: 'Porto', family: 'preco' }))
         .find(f => /deslocação está incluída/.test(f.question));

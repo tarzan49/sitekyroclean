@@ -1,7 +1,7 @@
 import { CHAIR_WATERPROOF_BIG_ESSENTIAL } from '../constants/chairPricing';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '../constants/antiAcarosPricing';
 // "18€ por cadeira": o hero das cadeiras nunca diz "desde" (ver `startingPriceLabel`).
-import { perChairPrice, formatEuro, CHAIR_CLEANING_FROM } from './enginePrices';
+import { perChairPrice, formatEuro, CHAIR_CLEANING_FROM, SOFA_CLEANING_FROM, SOFA_WATERPROOF_ESSENCIAL_FROM } from './enginePrices';
 // Central engine for keyword variant pages:
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
@@ -75,7 +75,7 @@ function pick<T>(arr: readonly T[], seed: number): T {
 const SERVICE_META: Record<ServiceKey, {
   label: string; labelPlural: string; canonicalBase: string; priceFrom: string; waterproofPriceFrom?: string;
 }> = {
-  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
+  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: formatEuro(SOFA_CLEANING_FROM),     waterproofPriceFrom: formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM) },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: RUG_PRICE_FROM                              },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: formatEuro(CHAIR_CLEANING_FROM),     waterproofPriceFrom: formatEuro(CHAIR_WATERPROOF_BIG_ESSENTIAL) },
@@ -247,7 +247,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       `Para casas e espaços de uso partilhado em ${loc}, a Kyro Clean Solutions limpa cadeiras estofadas ao domicílio. Pode acrescentar o tratamento anti-ácaros (desbacterização), opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`,
     ] as const, seed),
     whatIs: `A higienização de cadeiras em ${loc} remove sujidade e resíduos das fibras. O tratamento anti-ácaros, que é o mesmo que a desbacterização, é opcional e custa ${CHAIR_ANTI_ACAROS_UNIT_LABEL} Confirmamos o produto e a compatibilidade com o tecido antes da marcação.`,
-    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', `Anti-ácaros opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, `Desbacterização: é o mesmo tratamento anti-ácaros, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 2 a 5 horas, conforme ventilação'],
+    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', `Anti-ácaros opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, `Desbacterização: é o mesmo tratamento anti-ácaros, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, 'Preço por cadeira, mais baixo a partir da 5.ª e da 9.ª, para qualquer quantidade', 'Secagem média de 2 a 5 horas, conforme ventilação'],
     processSteps: [
       { step: 1, title: 'Avaliação do material', description: `Inspeção do tecido, das manchas e das costuras em ${loc}.` },
       { step: 2, title: 'Pré-tratamento', description: 'Aplicação de solução de limpeza adequada à sujidade e ao tecido.' },
@@ -707,7 +707,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
         'Essencial: até 2 lavagens. Premium: até 5 lavagens, mais resistente ao desgaste',
         'Ideal para restaurantes, hotéis e escritórios de uso intenso (recomendamos a Premium)',
         `Aplicação ao domicílio em ${loc}, sem transporte`,
-        'Preço fixo por cadeira; lotes grandes sob orçamento',
+        'Preço por cadeira, mais baixo a partir da 5.ª e da 9.ª, para qualquer quantidade',
       ],
       [
         `Derramamentos, café e gordura repelidos pelo tecido em ${loc}`,

@@ -187,6 +187,7 @@ describe('total dito ganha à tabela (Altieres, 19 Nov)', () => {
     const ev2 = { id: 'e', start: '2026-12-01T16:00:00Z', end: '2026-12-01T17:00:00Z', summary: 'Serviço 100€ (199€) Impermeabilização Premium de sofá - 919789999 - A - Rua', description: 'Artigos: x\nTotal: 249€' };
     const r = planBookingUpdate(ev2 as never, '919789999', { requote: { total: 279, what: 'sofá + 4 cadeiras' }, saidTotal: 249 }, new Date('2026-11-19T09:00:00Z'));
     expect(r.ok).toBe(true);
+    if (!r.ok) throw new Error('plano recusado');
     expect(r.title).toContain('(249€)');
     expect(r.added?.value).toBe(50);
   });

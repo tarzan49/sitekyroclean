@@ -13,7 +13,7 @@
  * is out of date.
  */
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
-import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
+import { sofaPrices, mattressPrices, SOFA_5_ALONE_CLEANING_BASE } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee, isSmallOrderFarPlace, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE, SMALL_ORDER_FAR_RULE } from '../constants/travel';
 import { isBlackFriday, blackFridayPricesActive, BLACK_FRIDAY_PRICES } from '../constants/campaigns';
 import { rugPickupFee, rugPickupOffered, NO_RUG_PICKUP_RULE, RUG_PICKUP_ASKED_RULE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
@@ -861,7 +861,7 @@ function botQuoteInner(input: unknown) {
     // 10€ travel included, so the base is 109€ (travel added as usual); in a bigger order it stays 119€.
     if (rawItems.length === 1 && (raw as Record<string, unknown>)?.size === '5-lugares' && item.kind === 'sofa' && item.size === '5-lugares' && !item.unitPrice && item.extra === 'none' && item.primary !== 'waterproofing') {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ''];
-      items.push(fee === 10 ? { ...item, unitPrice: 109 } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
       rawOf.push(raw);
       continue;
     }
