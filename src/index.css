@@ -779,3 +779,7 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #localidades button[aria-expanded] span.mt-1 { display: none; }
   html.snap-sections #localidades > div > div:first-child { margin-bottom: 14px; }
 }
+@media (max-width: 767px) {
+  /* A secção do preço tem o botão de WhatsApp: a barra fixa esconde-se, não precisa do espaço de baixo. */
+  html.snap-sections section#precos { padding-bottom: 16px !important; }
+}

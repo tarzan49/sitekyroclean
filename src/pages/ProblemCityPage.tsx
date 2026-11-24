@@ -26,7 +26,7 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { getAllProblemCityRoutes, problemCityBenefits, problemCityMeta, problemCityName, problemCityNeighbours } from "@/data/problemCitySeoData";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
-import WaterproofPackPicker from "@/components/WaterproofPackPicker";
+import SofaPricePicker from "@/components/SofaPricePicker";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
@@ -123,7 +123,7 @@ const ProblemCityPage = () => {
         {sofa ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><WaterproofPackPicker kind="sofa" city={city.name} source={`problem_picker_${problem.slug}`} /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /></div>
           </div>
         </section> : <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />}
 

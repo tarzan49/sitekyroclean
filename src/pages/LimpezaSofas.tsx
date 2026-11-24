@@ -16,7 +16,7 @@ import SofaProcessGuide from "@/components/SofaProcessGuide";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import { useState } from "react";
-import WaterproofPackPicker from "@/components/WaterproofPackPicker";
+import SofaPricePicker from "@/components/SofaPricePicker";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
 import { pickReviewSubset } from "@/data/reviewsPool";
@@ -94,7 +94,7 @@ const LimpezaSofas = () => {
                 </select>
               </label>
             </div>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><WaterproofPackPicker kind="sofa" city={city} source="pillar_picker_limpeza-sofas" /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={city} source="pillar_picker_limpeza-sofas" /></div>
           </div>
         </section>
 

@@ -53,7 +53,7 @@ const MARCA_HERO: Record<string, string> = {
 const PROCESS_ICONS = [Search, Droplets, ShieldCheck, Wind];
 const PROCESS_STEPS = MARCA_PROCESS_STEPS.sofa.map((step, index) => ({ ...step, icon: PROCESS_ICONS[index] ?? Search, label: String(index + 1).padStart(2, "0") }));
 
-import WaterproofPackPicker from "@/components/WaterproofPackPicker";
+import SofaPricePicker from "@/components/SofaPricePicker";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import CompactFAQ from "@/components/CompactFAQ";
 import { useSnapSections } from "@/hooks/useSnapSections";
@@ -150,7 +150,7 @@ const MarcaSofaPage = () => {
         {fabric ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><WaterproofPackPicker kind="sofa" city={city.name} source={`marca_picker_${marca.slug}`} /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={city.name} source={`marca_picker_${marca.slug}`} /></div>
           </div>
         </section> : <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />}
 
