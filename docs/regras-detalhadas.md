@@ -1214,3 +1214,7 @@ Corrigido em `botQuote.ts`/`customPack.ts`/`rugMeasure.ts` (teste `src/lib/botQu
 ## Poupa do pack limpeza + impermeabilização (dono, 25 Nov 2026)
 
 - "Só se for um pack de limpeza mais impermeabilização em que baixamos é na limpeza": a impermeabilização nunca leva desconto; a poupança do pack (3L Blindado 219€ contra 249€ em separado) sai toda da limpeza (60€ em vez de 89€). Os preços da tabela de 22 Nov ficam; o limite 10/15/20€ por tamanho proposto no mesmo dia não entra no motor. A imper sozinha numa visita desce só a deslocação (3L 159€ → 149€).
+
+## Questionário: "Poupa" só a partir de 5€ (dono, 25 Nov 2026)
+
+O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da visita, o preço riscado e o "Poupa X€" só aparecem quando a poupança é de 5€ ou mais (`PriceTag` em `src/components/quiz/VisitBasket.tsx`). O texto é só "Poupa X€", sem "na limpeza" nem "na deslocação".
