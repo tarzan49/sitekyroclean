@@ -273,7 +273,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
     intro: pick([
       `A higienização de alcatifas em ${loc} é crítica para hotéis, clínicas, escolas e espaços comerciais onde a saúde coletiva está em causa. A Kyro Clean Solutions aplica protocolos de sanitização certificados para grandes superfícies em ${loc}, ${ctx}, garantindo qualidade do ar interior e conformidade com normas de higiene.`,
       `Precisa de higienizar alcatifas em ${loc}? Hotéis, clínicas, escolas e espaços comerciais dependem desta manutenção para a saúde coletiva de quem os frequenta. A Kyro Clean Solutions aplica sanitização certificada para grandes superfícies em ${loc}, ${ctx}.`,
-      `Alcatifas de espaços comerciais em ${loc} — hotéis, clínicas, escolas — acumulam pó e alergénios que afetam a qualidade do ar de toda a gente que ali passa. A Kyro Clean Solutions aplica protocolos de sanitização certificados para grandes superfícies em ${loc}, ${ctx}.`,
+      `Alcatifas de espaços comerciais em ${loc} (hotéis, clínicas, escolas) acumulam pó e alergénios que afetam a qualidade do ar de toda a gente que ali passa. A Kyro Clean Solutions aplica protocolos de sanitização certificados para grandes superfícies em ${loc}, ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
       `As alcatifas de espaços comerciais acumulam nas fibras densas grandes quantidades de pó, bactérias e alergénios que pioram a qualidade do ar. Este tratamento elimina-os com produtos aprovados para espaços públicos, melhorando o ar do espaço e facilitando auditorias de higiene em ${loc}.`,
@@ -398,7 +398,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
     whatIs: pick([
       `Com o uso diário, o colchão absorve suor, líquidos e manchas nas suas camadas profundas, e o arejamento não chega para os remover. Este tratamento extrai essas impurezas de dentro do colchão, devolve o aspeto original e elimina os odores na raiz, tudo ao domicílio em ${loc}.`,
       `Todos os dias o colchão absorve suor e líquidos que se instalam nas suas camadas internas, onde nenhum arejamento consegue chegar. Este tratamento extrai essas impurezas de dentro do colchão, devolvendo o aspeto original e eliminando os odores na raiz, ao domicílio em ${loc}.`,
-      `Arejar o colchão limpa apenas a superfície — o suor e os líquidos absorvidos ao longo do tempo ficam retidos nas camadas mais internas. Este tratamento extrai essas impurezas de dentro do colchão, devolvendo o aspeto original e eliminando os odores na raiz, ao domicílio em ${loc}.`,
+      `Arejar o colchão limpa apenas a superfície: o suor e os líquidos absorvidos ao longo do tempo ficam retidos nas camadas mais internas. Este tratamento extrai essas impurezas de dentro do colchão, devolvendo o aspeto original e eliminando os odores na raiz, ao domicílio em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
@@ -577,7 +577,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
     ] as const, seed),
     whatIs: pick([
       `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 5 horas em ${loc}.`,
-      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa — manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 2 a 5 horas em ${loc}.`,
+      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa: manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 2 a 5 horas em ${loc}.`,
       `As manchas de passagem, derramamentos e sujidade que se acumulam numa alcatifa ao longo dos anos ficam presas nas fibras mais densas, fora do alcance da aspiração normal. A lavagem profissional remove-as, com resultado visível no mesmo dia e secagem em 2 a 5 horas em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
@@ -637,7 +637,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
     ] as const, seed),
     whatIs: pick([
       `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
-      `Depois deste tratamento, café, vinho ou sumo entornado no sofá fica à superfície em vez de se infiltrar no tecido — limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
+      `Depois deste tratamento, café, vinho ou sumo entornado no sofá fica à superfície em vez de se infiltrar no tecido: limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
       `Um derrame de café, vinho ou sumo deixa de ser motivo de stress depois deste tratamento: o líquido fica à superfície do tecido e limpa-se com um pano, sem mancha. O toque e o aspeto do sofá mantêm-se exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos; a Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
     ] as const, seed2),
     benefits: pick([

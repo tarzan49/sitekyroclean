@@ -1,7 +1,7 @@
 import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, DEPOSIT_RULE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
 import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
-import { CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
+import { CARPET_PRICE_NOTE, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 
 /** Shared by React and prerender. Do not import assets, React or locationSeoData here. */
 export const LANDING_FAQ_COUNT = 4;
@@ -79,7 +79,7 @@ const initialByService: Record<LandingService, readonly FaqEntry[]> = {
     { id: 'colchao-protetor', topic: 'cuidados', question: 'Como manter o colchão depois da limpeza?', answer: 'Use roupa de cama limpa, mantenha a ventilação e siga as instruções do fabricante sobre rotação e manutenção. Se usar um protetor, coloque-o apenas depois de o colchão secar completamente.' },
   ],
   'limpeza-tapetes': [
-    { id: 'tapete-preco', topic: 'orcamento', question: 'Existe um preço fixo por metro quadrado de tapete?', answer: 'Não. Os tapetes são sempre sob orçamento. Indique largura, comprimento, quantidade e tipo de fibra, se o conhecer, e envie fotografias para avaliarmos cada peça.' },
+    { id: 'tapete-preco', topic: 'orcamento', question: 'Existe um preço fixo por metro quadrado de tapete?', answer: `Sim: ${RUG_PRICE_NOTE} Indique a largura e o comprimento de cada tapete e o preço final sai logo, com a lavagem feita em sua casa.` },
     { id: 'tapete-varios', topic: 'orcamento', question: 'Como peço orçamento para vários tapetes?', answer: 'Meça cada tapete separadamente e adicione as respetivas dimensões no simulador. Identifique nas fotografias qual corresponde a cada medida, sobretudo se tiverem fibras ou estados diferentes.' },
     { id: 'tapete-redondo', topic: 'orcamento', question: 'Como indico as medidas de um tapete redondo ou irregular?', answer: 'Indique que a forma é redonda ou irregular e envie uma fotografia com as maiores medidas. Num tapete redondo, informe o diâmetro. Confirmamos a forma e as dimensões para preparar o orçamento.' },
     { id: 'tapete-moveis', topic: 'preparacao', question: 'Devo retirar os móveis que estão sobre o tapete?', answer: 'Informe quais os móveis sobre o tapete e combine o acesso com a equipa. Retire objetos pequenos e frágeis. Não mova sozinho peças pesadas nem arraste móveis que possam danificar o tapete ou o chão.' },

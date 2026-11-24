@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { isNewModel } from '../lib/newModel';
 import { getLandingFaqRoutes } from '../../scripts/landing-faq-routes';
 import { renderLandingPageHtml, escapeLandingHtml } from '../../scripts/landing-page-html';
 import { getLandingPageModel } from './landingPageModel';
@@ -27,7 +28,8 @@ describe('final landing SEO regression coverage', () => {
       expect(model.faqs).toHaveLength(4);
       expect(model.trustPoints).toHaveLength(3);
       for (const point of model.trustPoints) {
-        expect(html).toContain(escapeLandingHtml(point.desc));
+        // O modelo novo não mostra os pontos de confiança antigos, e o HTML estático diz o mesmo que a página (dono, 24 Nov).
+        if (!isNewModel(model)) expect(html).toContain(escapeLandingHtml(point.desc));
         expect(JSON.stringify(point)).not.toMatch(/70%|90%|85%|30 segundos|18 meses|2 kg|kg\/m²|[0-9]×|nunca mais temer|aplica-se a tudo|desconto de pack incluído|como novos|recuperam.*tonalidade|do cadeira|seu cadeira/);
       }
       if (model.municipalityName === 'Aveiro') expect(model.editorialIntro).toContain('Disponibilidade sob consulta.');

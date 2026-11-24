@@ -295,7 +295,7 @@ const ALCATIFA_PROBLEMA_POOL: TrustPoint[] = [
   {
     "titleGold": "Escadas e recortes",
     "titleRest": " medidos separadamente",
-    "desc": "Indique degraus, corredores e áreas irregulares para preparar uma proposta adequada, sempre sob orçamento."
+    "desc": "Indique degraus, corredores e áreas irregulares para calcularmos a área certa."
   }
 ];
 

@@ -190,7 +190,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                     <div className="flex items-center justify-between px-1">
                       <span className="text-base text-white/80">Área total</span>
                       <span className={cn("text-sm font-bold tabular-nums", qty > 0 ? "text-gold" : "text-white/80")}>
-                        {qty > 0 ? `${Math.round(qty * 100) / 100} m²` : '—'}
+                        {qty > 0 ? `${Math.round(qty * 100) / 100} m²` : ''}
                       </span>
                     </div>
                   )}

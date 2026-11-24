@@ -37,6 +37,7 @@ import path from 'path';
 import { getLandingPageModel } from '../src/data/landingPageModel';
 import { landingBreadcrumb } from '../src/data/breadcrumb';
 import { renderLandingPageHtml, ENTITY_FOOTER_HTML, SERVICE_CONDITIONS_HTML } from './landing-page-html';
+import { newModelPriceRows } from '../src/lib/newModelPriceRows';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep, headingWithCity } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
@@ -981,7 +982,10 @@ export function prerenderRoutes(outDir: string): number {
           breadcrumb: crumbs.map(crumb => ({ label: crumb.name, href: crumb.url.replace(BASE_URL, '') })),
           h1: heading,
           intro: packIntro(data.pack),
-          howItWorks: data.pack.id === 'tapete-anti-odor' ? 'Indique as medidas aproximadas do tapete e escolha a lavagem com anti-odor ou só a lavagem: o preço final aparece logo, com a deslocação incluída. O anti-odor é 5€ por m² e só existe com a lavagem, na mesma visita.' : MITES_PACKS[data.pack.id] ? 'Escolha o tamanho no início da página e veja o total com a deslocação incluída: limpeza com anti-ácaros (produto Bactran) ou só a limpeza. A extração retira o pó e os ácaros das fibras; o Bactran elimina bactérias, bolores e odores.' : `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e o preço de tapetes e alcatifas sai pelas medidas.`,
+          howItWorks: ['sofa-impermeabilizacao', 'cadeiras-impermeabilizacao'].includes(data.pack.id)
+            // O que o widget mostra (dono, 24 Nov): os três packs com os totais do bot para a cidade.
+            ? `Escolha o pack: Blindado (limpeza + impermeabilização Premium, até 10 anos), Protegido (limpeza + Essencial, 1 a 2 anos) ou Renovado (só a limpeza). Preços ${prep} ${data.city.name}, com a deslocação incluída: ${newModelPriceRows(data.pack.id === 'cadeiras-impermeabilizacao' ? 'limpeza-cadeiras' : 'limpeza-sofas', undefined, data.city.name).map(row => `${row.item}: ${row.price}`).join('; ')}.`
+            : data.pack.id === 'tapete-anti-odor' ? 'Indique as medidas aproximadas do tapete e escolha a lavagem com anti-odor ou só a lavagem: o preço final aparece logo, com a deslocação incluída. O anti-odor é 5€ por m² e só existe com a lavagem, na mesma visita.' : MITES_PACKS[data.pack.id] ? 'Escolha o tamanho no início da página e veja o total com a deslocação incluída: limpeza com anti-ácaros (produto Bactran) ou só a limpeza. A extração retira o pó e os ácaros das fibras; o Bactran elimina bactérias, bolores e odores.' : `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e o preço de tapetes e alcatifas sai pelas medidas.`,
           faqs,
           links,
           linksHeading: `Serviços e packs ${prep} ${data.city.name}`,
@@ -1525,9 +1529,14 @@ export function prerenderRoutes(outDir: string): number {
   // substitua ao montar, como em todas as outras páginas. O WebSite continua no
   // template: é o mesmo nó em todas as páginas.
   {
+    const HOME_FAQS = RESOURCE_FAQS.filter(f => f.id !== 'garantia-e-manchas').map(f => ({ question: f.question, answer: f.answer }));
     const homeBody = generatePageBody({
       h1: 'Os seus estofos como novos, ainda hoje.',
-      intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
+      // O que a página inicial mostra (dono, 24 Nov): a linha discreta do topo, o preço do bot (sofá em
+      // Lisboa, como o widget abre) e as perguntas (sem a da garantia, como no React).
+      intro: 'Todo Portugal | Resposta em menos de 1 minuto',
+      priceTable: newModelPriceRows('limpeza-sofas', undefined, 'Lisboa'),
+      faqs: HOME_FAQS,
       links: [
         ...services.map(service => ({ href: service.baseRoute, label: service.name })),
         { href: '/areas-de-servico', label: 'Áreas de Serviço' },
@@ -1539,6 +1548,7 @@ export function prerenderRoutes(outDir: string): number {
     });
     let homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
     homeHtml = injectJsonLd(homeHtml, { '@context': 'https://schema.org', ...buildHomepageBusinessNode() });
+    homeHtml = injectJsonLd(homeHtml, buildFaqSchema(HOME_FAQS));
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');
     console.log('  Homepage h1/intro:       injected');
   }
