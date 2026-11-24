@@ -60,3 +60,14 @@ describe('localidade: só com preço fechado do motor se diz "deslocação inclu
   for (const c of ['Lisboa', ' lisboa ', 'Carnaxide', 'Vila Nova de Gaia', 'Faro', 'Funchal']) it(`${c} tem preço`, () => expect(cityKnown(c)).toBe(true));
   for (const c of ['', 'L', 'Li', 'Xpto', 'Évora', 'Ponta Delgada']) it(`"${c}" não tem`, () => expect(cityKnown(c)).toBe(false));
 });
+
+describe('tapetes: o material escolhido chega ao motor', () => {
+  for (const [material, rate] of [['juta ou sisal', 'sisal'], ['sintético ou lã', 'lã']] as const) for (const [w, l] of [[1.2, 1.7], [2, 3], [2.5, 3.5]]) it(`${material} ${w} × ${l}`, () => {
+    const m = botQuote({ city: 'Lisboa', items: [{ kind: 'rug', qty: 1, treatment: 'clean', width: w, length: l, material: rate }] }) as unknown as { rugEstimate: { homePrice: number } };
+    expect(aloneTotal('Lisboa', newItem('rug', { width: String(w).replace('.', ','), length: String(l).replace('.', ','), rugMaterial: material }))).toBe(m.rugEstimate.homePrice);
+  });
+  it('juta ou sisal nunca sai ao preço do tapete comum num tapete grande', () => {
+    const of = (rugMaterial: string) => aloneTotal('Lisboa', newItem('rug', { width: '2', length: '3', rugMaterial }))!;
+    expect(of('juta ou sisal')).toBeGreaterThan(of('sintético ou lã'));
+  });
+});

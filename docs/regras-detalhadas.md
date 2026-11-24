@@ -1218,3 +1218,12 @@ Corrigido em `botQuote.ts`/`customPack.ts`/`rugMeasure.ts` (teste `src/lib/botQu
 ## Questionário: "Poupa" só a partir de 5€ (dono, 25 Nov 2026)
 
 O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da visita, o preço riscado e o "Poupa X€" só aparecem quando a poupança é de 5€ ou mais (`PriceTag` em `src/components/quiz/VisitBasket.tsx`). O texto é só "Poupa X€", sem "na limpeza" nem "na deslocação".
+
+## Questionário: localidade e material primeiro, nada já escolhido (dono, 25 Nov 2026)
+
+- **Localidade antes da peça** (`VisitBasket.tsx`, ecrã "Onde é o serviço?"): sem ela as opções ficavam sem preço ("a pessoa escolhe e não sabe o preço"). Numa localidade sem preço fechado no motor (`cityKnown`) diz "Subtotal, sem a deslocação" e não promete horas.
+- **Nenhuma opção vem escolhida**; o riscado e o "Poupa" só aparecem depois de escolher.
+- **Material primeiro**, em cartões com fotografia real ("assim como é no que vamos impermeabilizar"): sofá "Tecido" ou "Pele / couro" (pele = um só preço, limpeza + tratamento da pele; tecido = Blindado, Protegido, Renovado); tapete "Sintético ou lã" ou "Juta ou sisal" (`rugMaterial`, vai ao motor em `material`: 10 ou 12€/m²). Só duas opções: o dono recusou a da pele sintética. Alcatifa e impermeabilização não perguntam.
+- [RETIRADA 25/11] "O questionário nunca pergunta o material" (dono, 11 Out, "não compliques o questionário"; ainda citada no comentário de `botRugEstimate.ts`).
+- **Cadeiras**: 2, 4, 6, 8, 10, 12 ou "Outro número" (até 100, o máximo do motor).
+- O menu de cada peça cabe inteiro em 375×667, sem textos cortados.

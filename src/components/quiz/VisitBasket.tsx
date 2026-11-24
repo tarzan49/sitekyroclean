@@ -31,6 +31,11 @@ import imperChairsClip from '@/assets/before-after-pool/imper-agua-cadeira-01.mp
 // Cartões de limpeza com o antes e depois que mais vende (dono, 25 Nov: "a melhor foto antes e depois que vendesse
 // instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
 import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
+// Cartões do material (dono, 25 Nov: "assim como é no que vamos impermeabilizar"): fotografias reais de serviços.
+import matTecido from '@/assets/quiz-materiais/sofa-tecido.webp';
+import matPele from '@/assets/quiz-materiais/sofa-pele.webp';
+import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
+import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
 import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
 import baCadeiras from '@/assets/quiz-antes-depois/cadeiras.webp';
 import baTapete from '@/assets/quiz-antes-depois/tapete.webp';
@@ -50,6 +55,7 @@ export interface BasketItem {
   leather?: boolean;      // sofá de pele: só limpeza + tratamento da pele
   width?: string;         // tapete/alcatifa, em metros
   length?: string;
+  rugMaterial?: string;   // tapete: 'juta ou sisal' (12€/m²) ou 'sintético ou lã' (10€/m²), lido pelo motor
   odor?: boolean;         // tapete/alcatifa: anti-odor (5€/m², só com a limpeza)
   imperOnly?: boolean;    // sofá/cadeiras: só a impermeabilização, sem limpeza (dono, 25 Nov)
 }
@@ -66,6 +72,13 @@ const PACKS: { pack: BasketPack; name: string; note: string }[] = [
 ];
 const SOFA_SEATS = [1, 2, 3, 4, 5, 6];
 const CHAIR_QTY = [2, 4, 6, 8, 10, 12];
+const CHAIR_MAX = 100; // o máximo que o motor aceita
+type Material = 'tecido' | 'pele' | 'comum' | 'natural';
+const RUG_MATERIAL: Partial<Record<Material, string>> = { natural: 'juta ou sisal', comum: 'sintético ou lã' };
+const MATERIALS: Record<'sofa' | 'rug', { ask: string; options: { m: Material; label: string; photo: string }[] }> = {
+  sofa: { ask: 'O seu sofá é de que material?', options: [{ m: 'tecido', label: 'Tecido', photo: matTecido }, { m: 'pele', label: 'Pele / couro', photo: matPele }] },
+  rug: { ask: 'O seu tapete é de que material?', options: [{ m: 'comum', label: 'Sintético ou lã', photo: matComum }, { m: 'natural', label: 'Juta ou sisal', photo: matJuta }] },
+};
 // Tamanhos de um toque (dono, 25 Nov: a janela do tapete "tá muito fraca"): os tapetes mais comuns e divisões
 // típicas para a alcatifa; o preço de cada um é o do motor. "Outra medida" abre os campos.
 const RUG_SIZES: { label: string; w: string; l: string }[] = [
@@ -92,7 +105,7 @@ export const newItem = (kind: BasketKind, over: Partial<BasketItem> = {}): Baske
 function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
   if (isRug(it.kind)) {
     const w = num(it.width), l = num(it.length);
-    return w && l ? { kind: it.kind, qty: 1, treatment: 'clean', width: w, length: l, ...(it.odor ? { odor: true } : {}) } : null;
+    return w && l ? { kind: it.kind, qty: 1, treatment: 'clean', width: w, length: l, ...(it.kind === 'rug' && it.rugMaterial ? { material: it.rugMaterial } : {}), ...(it.odor ? { odor: true } : {}) } : null;
   }
   if (it.kind === 'mattress') return { kind: 'mattress', size: it.size, qty: it.qty, treatment: it.pack === 'premium' ? 'clean+anti-acaros' : 'clean' };
   const treatment = it.imperOnly && !it.leather && it.pack !== 'none' ? it.pack : it.leather || it.pack === 'none' ? 'clean' : it.pack === 'premium' ? 'clean+premium' : 'clean+essencial';
@@ -102,7 +115,7 @@ function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
 }
 
 export function itemLabel(it: BasketItem): string {
-  if (isRug(it.kind)) return `${KIND_LABEL[it.kind]}${num(it.width) && num(it.length) ? ` ${it.width} × ${it.length} m` : ''}${it.odor ? ' + anti-odor' : ''}`;
+  if (isRug(it.kind)) return `${KIND_LABEL[it.kind]}${num(it.width) && num(it.length) ? ` ${it.width} × ${it.length} m` : ''}${it.rugMaterial ? ` (${it.rugMaterial})` : ''}${it.odor ? ' + anti-odor' : ''}`;
   if (it.kind === 'mattress') return `${it.qty > 1 ? `${it.qty} × ` : ''}Colchão ${MATTRESS.find(m => m.id === it.size)?.label ?? ''}${it.pack === 'premium' ? ' + anti-ácaros' : ''}`;
   const pack = it.leather ? 'pele: limpeza + tratamento da pele' : it.imperOnly ? `só impermeabilização ${IMPER_ONLY.find(p => p.pack === it.pack)?.name ?? ''}` : PACKS.find(p => p.pack === it.pack)!.name;
   if (it.kind === 'chairs') return `${it.qty} cadeiras · ${pack}`;
@@ -614,7 +627,7 @@ function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null
 /** Quadrado com imagem e contador próprio: toca para juntar 1, depois − e + (vários tamanhos na mesma janela). */
 function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d: number) => void; cls: (on: boolean) => string; children: React.ReactNode }) {
   return (
-    <div role="button" tabIndex={0} aria-pressed={count > 0} onClick={() => { if (!count) onBump(1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !count) { e.preventDefault(); onBump(1); } }} className={`${cls(count > 0)} cursor-pointer select-none`}>
+    <div role="button" tabIndex={0} aria-pressed={count > 0} onClick={() => { if (!count) onBump(1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !count) { e.preventDefault(); onBump(1); } }} className={`${cls(count > 0)} cursor-pointer select-none !gap-0.5 !py-1.5`}>
       {children}
       {count > 0
         ? <span className="mt-0.5 flex items-center gap-1">
@@ -680,6 +693,9 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // Primeiro só a escolha (lugares, tamanho, quantidade), sem preços; as opções com o riscado e o "Poupa" aparecem
   // depois de escolher e a folha desce até elas (dono, 25 Nov: "o poupa aparece quando a pessoa clica").
   const [picked, setPicked] = useState(!fresh);
+  // Cadeiras: um número que não está na lista (dono, 25 Nov).
+  const [ownQty, setOwnQty] = useState(() => !fresh && item.kind === 'chairs' && !CHAIR_QTY.includes(item.qty));
+  const [ownText, setOwnText] = useState(() => (!fresh && item.kind === 'chairs' ? String(item.qty) : ''));
   const optionsRef = useRef<HTMLDivElement>(null);
   const reveal = () => { if (!picked && rug) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); setPicked(true); };
   const choose = (p: Partial<BasketItem>) => { set(p); reveal(); };
@@ -687,17 +703,18 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const sized = !rug || (num(item.width) > 0 && num(item.length) > 0);
   // O material pergunta-se primeiro (dono, 25 Nov): os lugares e os preços só aparecem por baixo depois de clicar; pele
   // avança para o preço, tecido escolhe o pack.
-  const asksMaterial = item.kind === 'sofa' && !item.imperOnly;
-  const [material, setMaterial] = useState<'tecido' | 'pele' | null>(() => (!asksMaterial ? 'tecido' : fresh ? null : item.leather ? 'pele' : 'tecido'));
-  const ok = multi ? group().length > 0 && material !== null : sized && (picked || rug);
+  const materials = item.kind === 'sofa' && !item.imperOnly ? MATERIALS.sofa : item.kind === 'rug' ? MATERIALS.rug : null;
+  const asksMaterial = materials !== null;
+  const [material, setMaterial] = useState<Material | null>(() => (!materials ? 'tecido' : fresh ? null : item.kind === 'rug' ? (item.rugMaterial ? (item.rugMaterial === RUG_MATERIAL.natural ? 'natural' : 'comum') : null) : item.leather ? 'pele' : 'tecido'));
+  const ok = material !== null && (multi ? group().length > 0 : sized && (picked || rug));
   // Nenhuma opção vem escolhida (dono, 25 Nov): a pessoa escolhe Blindado, Protegido, Renovado ou pele.
   const needsPack = item.kind === 'sofa' || item.kind === 'chairs';
   const [packPicked, setPackPicked] = useState(!fresh);
   const ready = ok && (!needsPack || packPicked || material === 'pele');
-  const chooseMaterial = (m: 'tecido' | 'pele') => { if (m === material) return; setMaterial(m); setPackPicked(false); set({ leather: m === 'pele', ...(m === 'pele' ? { pack: 'none' as const } : {}) }); };
+  const chooseMaterial = (m: Material) => { if (m === material) return; setMaterial(m); if (rug) return set({ rugMaterial: RUG_MATERIAL[m] }); setPackPicked(false); set({ leather: m === 'pele', ...(m === 'pele' ? { pack: 'none' as const } : {}) }); };
   // Desce até ao preço quando a escolha fica completa (nos tapetes só ao tocar num tamanho, nunca a meio de escrever).
   const wasOk = useRef(ok);
-  useEffect(() => { if (ok && !wasOk.current && !rug) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); wasOk.current = ok; }, [ok, rug]);
+  useEffect(() => { if (ok && !wasOk.current && !rug && !ownQty) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); wasOk.current = ok; }, [ok, rug, ownQty]);
   useEffect(() => { if (material && ok && asksMaterial && fresh) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [material]);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
@@ -711,54 +728,66 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         <button type="button" onClick={onCancel} className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:bg-white/10"><ArrowLeft className="h-5 w-5" />Voltar</button>
       </header>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className={`relative -mx-4 mb-4 overflow-hidden ${asksMaterial ? 'h-28' : 'h-40'}`}>
+        <div className={`relative -mx-4 mb-4 overflow-hidden ${!asksMaterial ? 'h-32' : material === null ? 'h-28' : 'h-20'}`}>
           <video src={clip} poster={PHOTO[item.kind]} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="h-full w-full object-cover" />
           <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/20 to-transparent" />
           <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{item.imperOnly ? <>Impermeabilização <span className="block text-lg" style={{ color: GOLD }}>{item.kind === 'chairs' ? 'das cadeiras' : 'do sofá'}</span></> : KIND_LABEL[item.kind]}</h3>
         </div>
 
+        {/* Depois de escolher, os cartões encolhem para uma linha: o resto cabe no ecrã sem cortar (dono, 25 Nov). */}
+        {materials && material !== null && <div className="mb-3 grid grid-cols-2 gap-2" role="group" aria-label={materials.ask}>
+          {materials.options.map(o => <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl border-2 px-2 text-sm font-bold ${material === o.m ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/70'}`}>{material === o.m && <Check className="h-4 w-4 shrink-0" style={{ color: GOLD }} strokeWidth={3} />}{o.label}</button>)}
+        </div>}
+        {materials && material === null && <>
+          <p className="mb-2 text-sm font-semibold text-white">{materials.ask}</p>
+          <div className="mb-4 grid grid-cols-2 gap-3">
+            {materials.options.map(o => (
+              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className="relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+                <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/45 px-3 py-2 backdrop-blur-md"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
+              </button>
+            ))}
+          </div>
+        </>}
         {item.kind === 'sofa' && <>
-          {asksMaterial && <>
-            <p className="mb-2 text-sm font-semibold text-white">O seu sofá é de que material?</p>
-            <div className="mb-4 grid grid-cols-2 gap-2">
-              {([['tecido', 'Tecido'], ['pele', 'Pele / couro']] as const).map(([m, label]) => <button key={m} type="button" aria-pressed={material === m} onClick={() => chooseMaterial(m)} className={`${tile(material === m)} min-h-12`}>{label}</button>)}
-            </div>
-          </>}
           {material !== null && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantos lugares? <span className="font-normal text-white/60">Pode juntar vários</span></p>
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(n => <CountTile key={n} count={counts[String(n)] ?? 0} onBump={d => bump(String(n), d)} cls={tile}>
-            <QuizFurnitureImage service="sofa" sizeId={n >= 4 ? '4-lugares' : n === 1 ? '1-lugar' : `${n}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}</CountTile>)}</div>
-          <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
+            <QuizFurnitureImage service="sofa" sizeId={n >= 4 ? '4-lugares' : n === 1 ? '1-lugar' : `${n}-lugares`} className="h-9 w-12 sm:h-9 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}</CountTile>)}</div>
+          <p className="mb-2 text-xs leading-snug text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
           </>}
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho? <span className="font-normal text-white/60">Pode juntar vários</span></p>
           <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <CountTile key={m.id} count={counts[m.id] ?? 0} onBump={d => bump(m.id, d)} cls={tile}>
-            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}</CountTile>)}</div>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-10 w-14 sm:h-10 sm:w-14" />{m.label}</CountTile>)}</div>
         </>}
         {item.kind === 'chairs' && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantas cadeiras?</p>
-          <div className="mb-3 grid grid-cols-3 gap-2">{CHAIR_QTY.map(n => <button key={n} type="button" className={`${tile(picked && item.qty === n)} min-h-[56px] text-base`} onClick={() => choose({ qty: n })}>{n} cadeiras</button>)}</div>
+          <div className="mb-3 grid grid-cols-3 gap-2">{CHAIR_QTY.map(n => <button key={n} type="button" className={`${tile(picked && !ownQty && item.qty === n)} min-h-[56px] text-base`} onClick={() => { setOwnQty(false); choose({ qty: n }); }}>{n} cadeiras</button>)}
+            <button type="button" aria-pressed={ownQty} className={`${tile(ownQty)} col-span-3 min-h-[48px]`} onClick={() => setOwnQty(true)}>Outro número</button></div>
+          {ownQty && <label className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-[#D4AF37]/40 bg-white/[0.04] px-3 py-2">
+            <span className="text-sm font-semibold text-white">Número de cadeiras</span>
+            <input autoFocus inputMode="numeric" enterKeyHint="done" maxLength={3} onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }} onBlur={() => { if (Number(ownText) > 0) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} aria-label="Número de cadeiras" value={ownText} onChange={e => { const t = e.target.value.replace(/\D/g, ''); const n = Math.min(CHAIR_MAX, Number(t)); setOwnText(t ? String(n) : ''); if (n > 0) { set({ qty: n }); setPicked(true); } else setPicked(false); }} className="h-12 w-24 rounded-xl border border-white/15 bg-white/[0.06] text-center text-lg font-bold text-white outline-none focus:border-[#D4AF37]" />
+          </label>}
         </>}
-        {rug && (() => {
+        {rug && material !== null && (() => {
           const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
           const preset = sizes.find(z => z.w === item.width && z.l === item.length);
           return <>
-            <ul className="mb-4 flex flex-wrap gap-1.5 text-xs font-semibold text-white/85">
-              {[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', 'Deslocação incluída', 'Seca em 2 a 5 h'].map(t => <li key={t} className="flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-2.5 py-1"><Check className="h-3.5 w-3.5" style={{ color: GOLD }} />{t}</li>)}
-            </ul>
+            <p className="mb-3 text-center text-[11px] font-semibold text-[#E8C964]">{[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', ...(cityKnown(city) ? ['Deslocação incluída'] : []), 'Seca em 2 a 5 h'].join(' · ')}</p>
             <p className="mb-2 text-sm font-semibold text-white">{item.kind === 'carpet' ? 'Qual é o espaço?' : 'Que tamanho tem?'}</p>
             <div className="mb-2 grid grid-cols-2 gap-2">
               {sizes.map(z => {
                 const w = num(z.w), l = num(z.l), max = Math.max(...sizes.map(x => num(x.l)));
-                return <button key={z.label} type="button" onClick={() => choose({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start gap-2 !px-2.5 text-left`}>
-                  <span className="flex h-12 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(14, (l / max) * 64)}px`, height: `${Math.max(10, (w / max) * 44)}px` }} /></span>
+                return <button key={z.label} type="button" onClick={() => choose({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start !gap-1 !px-2.5 !py-1.5 text-left`}>
+                  <span className="flex h-8 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(12, (l / max) * 46)}px`, height: `${Math.max(8, (w / max) * 32)}px` }} /></span>
                   <span className="block leading-tight">{z.label}</span>
                   <span className="block text-xs font-semibold text-white/60">{z.w} × {z.l} m</span>
                 </button>;
               })}
             </div>
-            <p className="mb-1 mt-3 text-xs font-semibold text-white/70">{preset ? 'Ou escreva a medida certa, em metros' : 'Medida em metros (de uma ponta à outra)'}</p>
+            <p className="mb-1 mt-2 text-xs font-semibold text-white/70">{preset ? 'Ou escreva a medida certa, em metros' : 'Medida em metros (de uma ponta à outra)'}</p>
             <div className="mb-3 grid grid-cols-2 gap-2">
               <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
               <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
@@ -772,9 +801,9 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
             <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
             <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
           </button>}
-          {item.kind === 'chairs' && <div className="mb-3 flex items-center justify-between">
+          {item.kind === 'chairs' && !ownQty && <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
-            <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
+            <Stepper value={item.qty} min={1} max={CHAIR_MAX} onChange={qty => { set({ qty }); setOwnText(String(qty)); if (!CHAIR_QTY.includes(qty)) setOwnQty(true); }} />
           </div>}
           {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(material === 'pele' ? [] : item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
             const on = packPicked && item.pack === p.pack && !item.leather;
@@ -790,7 +819,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           </div>}
           </div>}
           {rug && <>
-            <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>
+            <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m²{cityKnown(city) ? ', deslocação incluída' : ''}</span><PriceTag {...packPrice({})} /></p>
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
               <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60">Para o cheiro de animais ou de urina</span></span>
               <AddOnTag {...addOn({ odor: true }, { odor: false })} />
@@ -800,7 +829,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? (material === null ? 'Escolha o material' : 'Escolha os lugares e quantos') : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (material === null ? 'Escolha o material' : rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
