@@ -103,3 +103,13 @@ describe('o mesmo pedido dá o mesmo preço, com qty ou em itens (Ovar, 24 Nov 2
     expect(b.visitGifts?.usual).toBe(a.visitGifts?.usual);
   });
 });
+
+describe('colchão com anti-ácaros e tapete com anti-odor acabam em 9 (dono, 24 Nov 2026)', () => {
+  it('colchões e tapetes', () => {
+    const t = (items: unknown[]) => botQuote({ items, city: 'Lisboa' }) as any;
+    expect(t([{ ...M, treatment: 'clean+anti-acaros' }]).total).toBe(99);
+    expect(t([{ kind: 'mattress', size: 'solteiro', treatment: 'clean+anti-acaros' }]).total % 10).toBe(9);
+    expect(t([{ kind: 'rug', width: 2.5, length: 3, odor: true }]).rugEstimate.homePrice % 10).toBe(9);
+    expect(t([{ kind: 'rug', width: 1.6, length: 2.3, odor: true }]).rugEstimate.homePrice % 10).toBe(9);
+  });
+});

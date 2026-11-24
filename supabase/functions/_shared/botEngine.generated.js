@@ -2679,8 +2679,29 @@ function withOneStruckPrice(input, r) {
 function botQuoteChain(input) {
   return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
 }
+function withEndIn9(input, r) {
+  const items = (input ?? {}).items;
+  const hit = Array.isArray(items) && items.some((i) => {
+    const x2 = i ?? {};
+    return x2.kind === "mattress" && x2.treatment === "clean+anti-acaros" || (x2.kind === "rug" || x2.kind === "carpet") && x2.odor === true;
+  });
+  const x = r;
+  if (!hit || !x?.ok || x.blackFriday) return r;
+  const up9 = (v) => {
+    if (typeof v !== "number") return v;
+    const n = Math.ceil(v);
+    return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
+  };
+  const out = { ...x, total: x.quote ? x.total : up9(x.total) };
+  if (x.rugEstimate) out.rugEstimate = { ...x.rugEstimate, homePrice: up9(x.rugEstimate.homePrice), pickupPrice: up9(x.rugEstimate.pickupPrice) };
+  if (x.rugCombo) out.rugCombo = { ...x.rugCombo, comboPrice: up9(x.rugCombo.comboPrice), usualPrice: up9(x.rugCombo.usualPrice) };
+  if (x.waterproofingTiers) out.waterproofingTiers = { ...x.waterproofingTiers, premium: up9(x.waterproofingTiers.premium), essencial: up9(x.waterproofingTiers.essencial) };
+  if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, total: up9(x.mattressMitePack.total), separate: up9(x.mattressMitePack.separate) };
+  if (x.separatePrice) out.separatePrice = { ...x.separatePrice, total: up9(x.separatePrice.total), separate: up9(x.separatePrice.separate), saving: up9(x.separatePrice.separate) - up9(x.separatePrice.total) };
+  return out;
+}
 function botQuote(input) {
-  return withOneStruckPrice(input, botQuoteChain(input));
+  return withOneStruckPrice(input, withEndIn9(input, botQuoteChain(input)));
 }
 var MATTRESS_MITES_SEPARATE = 40;
 var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
