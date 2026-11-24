@@ -9,20 +9,24 @@ import { getLandingPageModel } from '../data/landingPageModel';
 
 vi.mock('./CustomerReviews', () => ({ default: () => <div>Avaliações</div> }));
 vi.mock('./PriceWidget', () => ({ default: (props: object) => <div data-testid="widget">{JSON.stringify(props)}</div> }));
+// Modelo novo (dono, 24 Nov): o preço sai dos widgets do bot; o teste só confirma qual e para que cidade.
+const pickerMock = vi.hoisted(() => (name: string) => ({ default: (props: { city?: string; kind?: string; initialKind?: string }) => <div data-testid="widget">{JSON.stringify({ name, city: props.city, kind: props.kind ?? props.initialKind })}</div> }));
+vi.mock('./WaterproofPackPicker', () => pickerMock('pack'));
+vi.mock('./ImperPricePicker', () => pickerMock('imper'));
+vi.mock('./CarpetPricePicker', () => pickerMock('carpet'));
+vi.mock('./TreatmentPackPicker', () => pickerMock('treatment'));
 vi.mock('./SofaProcessGuide', () => ({ default: () => <div>Processo sofá</div> }));
 vi.mock('./ServiceProcessGuide', () => ({ default: () => <div>Processo serviço</div> }));
 vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boolean; [key: string]: unknown }) => isOpen ? <div data-testid="quiz">{JSON.stringify(props)}</div> : null }));
 afterEach(() => { cleanup(); clearLandingModel(); });
 
 describe('landing section integration', () => {
-  it('shows the same trust descriptions as initial HTML', () => {
+  it('mostra as 4 perguntas da página (o modelo novo já não tem os pontos de confiança antigos)', () => {
     for (const route of ['/limpeza-sofas-lisboa', '/limpeza-sofas-porto-paranhos', '/preco-limpeza-sofas-lisboa', '/higienizacao-sofa-coimbra-santa-clara']) {
       const model = getLandingPageModel(route)!;
       installLandingModel(route);
-      const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      fireEvent.click(screen.getByRole('button', { name: 'Porquê escolher a Kyro Clean?' }));
-      for (const point of model.trustPoints) expect(screen.getAllByText(point.desc)).toHaveLength(2);
-      expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
+      render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
+      for (const faq of model.faqs) expect(screen.getAllByText(faq.question).length).toBeGreaterThan(0);
       cleanup();
     }
   });
@@ -94,14 +98,14 @@ describe('landing section integration', () => {
   });
   it('passes the municipality and correct service to the widget and problem enquiry', () => {
     const cases = [
-      { route: '/impermeabilizacao-cadeiras-porto-paranhos', serviceSlug: 'impermeabilizacao', initialService: 'chairs', initialServiceType: 'waterproofing', initialCarpetKind: 'tapete' },
-      { route: '/limpeza-alcatifas-porto-paranhos', serviceSlug: 'limpeza-alcatifas', initialService: 'carpet', initialServiceType: 'cleaning', initialCarpetKind: 'alcatifa' },
-      { route: '/higienizacao-sofa-porto-paranhos', serviceSlug: 'limpeza-sofas', initialService: 'sofa', initialServiceType: 'cleaning', initialCarpetKind: 'tapete' },
+      { route: '/impermeabilizacao-cadeiras-porto-paranhos', widget: { name: 'imper', city: 'Porto', kind: 'chairs' }, initialService: 'chairs', initialServiceType: 'waterproofing', initialCarpetKind: 'tapete' },
+      { route: '/limpeza-alcatifas-porto-paranhos', widget: { name: 'carpet', city: 'Porto' }, initialService: 'carpet', initialServiceType: 'cleaning', initialCarpetKind: 'alcatifa' },
+      { route: '/higienizacao-sofa-porto-paranhos', widget: { name: 'pack', city: 'Porto', kind: 'sofa' }, initialService: 'sofa', initialServiceType: 'cleaning', initialCarpetKind: 'tapete' },
     ];
-    for (const { route, serviceSlug, ...expected } of cases) {
+    for (const { route, widget, ...expected } of cases) {
       installLandingModel(route);
       render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      expect(JSON.parse(screen.getByTestId('widget').textContent!)).toEqual({ initialLocation: 'Porto', serviceSlug });
+      expect(JSON.parse(screen.getByTestId('widget').textContent!)).toEqual(widget);
       fireEvent.click(screen.getAllByRole('button', { name: /^Ampliar imagem:/ })[0]);
       fireEvent.click(screen.getByRole('button', { name: /^Pedir avaliação:/ }));
       expect(JSON.parse(screen.getByTestId('quiz').textContent!)).toMatchObject({ initialLocation: 'Porto', ...expected });
@@ -117,7 +121,7 @@ describe('landing section integration', () => {
     clearLandingModel();
     const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
     expect(container.querySelector('#precos')).toBeNull();
-    await screen.findByText(model.priceHeading.replace(`${model.prep} ${model.locationName}`, '').trim(), { exact: false });
+    await screen.findByText('O seu preço', { exact: false });
     expect(container.querySelector('#precos')).not.toBeNull();
     expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
     expect([...container.querySelectorAll('[data-problem-id] img')]).toHaveLength(4);

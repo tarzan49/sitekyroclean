@@ -2,6 +2,7 @@
 // quantas), Premium / Essencial com o total do bot (botQuote, deslocação incluída), e a sugestão de juntar a
 // limpeza (o pack). Só tecido: nunca pele. Mesmo desenho do WaterproofPackPicker.
 import { lazy, Suspense, useMemo, useState } from 'react';
+import { cityPrep } from '@/data/serviceCatalog';
 import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -30,7 +31,7 @@ export default function ImperPricePicker({ city, source, initialKind = 'sofa' }:
   })) as Record<string, number | null>, [kind, seats, qty, city]);
   const total = totals[choice];
   const what = kind === 'chairs' ? `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}` : `um sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da impermeabilização ${choice === 'premium' ? 'Premium' : 'Essencial'} para ${what}, em ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da impermeabilização ${choice === 'premium' ? 'Premium' : 'Essencial'} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia.`;
   const chip = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
 
   return (

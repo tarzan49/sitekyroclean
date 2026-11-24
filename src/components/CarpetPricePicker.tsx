@@ -1,6 +1,7 @@
 // Alcatifas: preço do motor do bot pelas medidas (homePrice, deslocação incluída; taxa em rugRates.ts). Uma pergunta
 // (as medidas), o total, o botão de WhatsApp com as medidas e o "+ Juntar mais artigos" a abrir o cesto da visita. Mesmo desenho dos outros widgets.
 import { lazy, Suspense, useMemo, useState } from 'react';
+import { cityPrep } from '@/data/serviceCatalog';
 import { botQuote } from '@/lib/botQuote';
 import { formatEuro } from '@/data/enginePrices';
 import { Minus, Plus, MessageCircle } from 'lucide-react';
@@ -16,7 +17,7 @@ export default function CarpetPricePicker({ city, source }: { city: string; sour
   const [basket, setBasket] = useState(false);
   const area = Math.round(w * l * 10) / 10;
   const price = useMemo(() => { const r = botQuote({ city, items: [{ kind: 'carpet', width: w, length: l, treatment: 'clean' }] }) as { rugEstimate?: { ok: boolean; homePrice?: number } | null }; return r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null; }, [w, l, city]);
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da limpeza de uma alcatifa de mais ou menos ${m(w)} x ${m(l)} m (${m(area)} m²), em ${city}${price ? `, por ${formatEuro(price)}` : ''}. Envio fotografias.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da limpeza de uma alcatifa de mais ou menos ${m(w)} x ${m(l)} m (${m(area)} m²), ${cityPrep(city)} ${city}${price ? `, por ${formatEuro(price)}` : ''}. Envio fotografias.`;
   const item: BasketItem = { id: `c${Date.now()}`, kind: 'carpet', qty: 1, pack: 'none', width: String(w), length: String(l) } as BasketItem;
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-2 md:gap-10">
@@ -40,7 +41,7 @@ export default function CarpetPricePicker({ city, source }: { city: string; sour
             <p className="text-lg font-bold text-[#1A1A1A]">Limpeza no local, {m(area)} m²</p>
             {price !== null && <span className="text-2xl font-bold text-[#1A1A1A]">{formatEuro(price)}</span>}
           </div>
-          <p className="text-[13px] leading-snug text-[#555]">{price !== null ? `Preço final em ${city}, deslocação incluída.` : 'Envie as medidas e uma fotografia e dizemos-lhe o valor em menos de 1 minuto.'}</p>
+          <p className="text-[13px] leading-snug text-[#555]">{price !== null ? `Preço final ${cityPrep(city)} ${city}, deslocação incluída.` : 'Envie as medidas e uma fotografia e dizemos-lhe o valor em menos de 1 minuto.'}</p>
         </div>
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] sm:text-base">

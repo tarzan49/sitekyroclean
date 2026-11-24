@@ -6,6 +6,7 @@ import { Check, Minus, Plus, MessageCircle } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
+import { cityPrep } from '@/data/serviceCatalog';
 
 export type TreatmentKind = 'sofa' | 'mattress' | 'rug';
 const SOFA_SIZES = ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares', '6-lugares'];
@@ -57,7 +58,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
   const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? `um colchão ${MATTRESS_SIZES.find(x => x.id === size)?.label.toLowerCase()}` : `um sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, em ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
   const box = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 transition-all md:min-h-[60px] ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`;
 
   return (
@@ -121,7 +122,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
             );
           })}
         </div>
-        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">{kind === 'rug' ? `Preço final em ${city}, lavagem em sua casa, deslocação incluída. Juta, sisal, seda ou persa: o valor é ajustado.` : `Preço final em ${city}, deslocação incluída.`}</p>
+        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">{kind === 'rug' ? `Preço final ${cityPrep(city)} ${city}, lavagem em sua casa, deslocação incluída. Juta, sisal, seda ou persa: o valor é ajustado.` : `Preço final ${cityPrep(city)} ${city}, deslocação incluída.`}</p>
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-center text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5 sm:text-base md:mt-5 md:min-h-14">

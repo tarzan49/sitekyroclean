@@ -3,6 +3,7 @@
 // total final já com deslocação, um botão. Preços pelo mesmo motor do
 // bot (botQuote), nunca escritos à mão.
 import { useMemo, useState } from 'react';
+import { cityPrep } from '@/data/serviceCatalog';
 import { Check, Minus, Plus, MessageCircle, Sofa, Armchair, Camera } from 'lucide-react';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 import premiumSofa from '@/assets/picker-premium-sofa.webp';
@@ -81,7 +82,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     none: 'só limpeza, sem impermeabilização',
   };
   const piece = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares' : what;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${kind === 'sofa' ? 'um ' : ''}${piece}, em ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? 'do sofá' : 'das cadeiras'}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${kind === 'sofa' ? 'um ' : ''}${piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? 'do sofá' : 'das cadeiras'}.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (

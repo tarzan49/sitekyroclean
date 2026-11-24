@@ -2,6 +2,7 @@
 // incluída): "Renovado" = só limpeza; "Renovado + Pele" = limpeza + tratamento da pele (limpeza e hidratação,
 // +40€, +60€ em 5 e 6 lugares, `leather: true`). Mesmo desenho do WaterproofPackPicker.
 import { lazy, Suspense, useMemo, useState } from 'react';
+import { cityPrep } from '@/data/serviceCatalog';
 import { Check, MessageCircle, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -27,7 +28,7 @@ export default function LeatherSofaPicker({ city, source }: { city: string; sour
   })) as Record<string, number | null>, [seats, size, city]);
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para um sofá de pele de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${chosen.wa}), em ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para um sofá de pele de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">

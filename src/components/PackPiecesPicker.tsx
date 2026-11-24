@@ -2,6 +2,7 @@
 // um só total do bot (botQuote, deslocação incluída), preço cortado = o mesmo pedido em separado,
 // ambos a acabar em 9 para cima. Tapetes nunca mostram preço no site: pedem as medidas no WhatsApp.
 import { useMemo, useState } from 'react';
+import { cityPrep } from '@/data/serviceCatalog';
 import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 import premiumSofa from '@/assets/picker-premium-sofa.webp';
@@ -100,7 +101,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
     return rugItem ? `tapete de ${rugW.replace('.', ',')} × ${rugL.replace('.', ',')} m` : 'um tapete (envio as medidas)';
   };
   const chosen = pieces.filter(p => p !== 'rug' || rug);
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} em ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} oferecido)` : ''}` : ''}${withoutGift !== null ? `; ou ${formatEuro(withoutGift)} sem o tratamento oferecido` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} oferecido)` : ''}` : ''}${withoutGift !== null ? `; ou ${formatEuro(withoutGift)} sem o tratamento oferecido` : ''}.`;
   const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
   const q = 'mb-1.5 text-base font-semibold text-[#1A1A1A]';
 
@@ -147,7 +148,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
       </div>)}
       <div className={pieces.length > 2 ? 'md:col-span-3' : 'md:col-span-2'}>
         <div className="flex items-end justify-between border-t border-[#E5E0D3] pt-2">
-          <span className="text-sm text-[#555]">{`Total em ${city}`}<br />
+          <span className="text-sm text-[#555]">{`Total ${cityPrep(city)} ${city}`}<br />
             {crossed !== null && total !== null ? <span className="mt-1 inline-flex items-center rounded-full border border-[#D4AF37]/60 bg-gradient-to-r from-[#F7E7B4] via-[#E9CD72] to-[#D4AF37] px-2.5 py-0.5 text-[12px] font-bold tracking-wide text-[#3A2E08] shadow-[0_4px_12px_-4px_rgba(212,175,55,0.7)]">Poupa {formatEuro(crossed - total)}</span> : <span className="text-xs">deslocação incluída</span>}
           </span>
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>

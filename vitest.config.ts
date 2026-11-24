@@ -15,6 +15,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
     environment: "jsdom",
+    setupFiles: ["src/test/setup.ts"],
     globals: true,
     // As campanhas com data (src/constants/campaigns.ts) ficam desligadas nos
     // testes; o teste da campanha passa a data.
