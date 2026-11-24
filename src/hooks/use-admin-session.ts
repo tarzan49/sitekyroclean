@@ -43,6 +43,8 @@ export function useAdminSession() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  // A verificação falhou (rede ou Supabase): não é o mesmo que não ter acesso.
+  const [adminError, setAdminError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -67,11 +69,13 @@ export function useAdminSession() {
       return;
     }
     setCheckingAdmin(true);
+    setAdminError(null);
     callIsAdmin('is_admin').then(({ data, error }) => {
       setIsAdmin(!error && data === true);
+      setAdminError(error ? error.message : null);
       setCheckingAdmin(false);
     });
   }, [userId]);
 
-  return { session, loading, isAuthed: !!session, isAdmin, checkingAdmin };
+  return { session, loading, isAuthed: !!session, isAdmin, checkingAdmin, adminError };
 }

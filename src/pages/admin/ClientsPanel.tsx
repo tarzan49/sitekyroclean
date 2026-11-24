@@ -120,7 +120,7 @@ const ClientsPanel = () => {
       setTouches(t.error ? [] : t.data ?? []);
       setLastDigest(d.error ? null : d.data?.[0] ?? null);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Erro ao carregar os clientes.");
+      setError((e as { message?: string } | null)?.message || "Erro ao carregar os clientes.");
     } finally {
       setLoading(false);
     }

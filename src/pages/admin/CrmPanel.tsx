@@ -219,7 +219,7 @@ const CrmPanel = () => {
       setRecords((data ?? []).filter((r: ServiceRequest) => !r.calendar_missing_since));
       return data ?? [];
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Erro ao carregar pedidos. Cria a tabela service_requests no Supabase primeiro.");
+      setError((e as { message?: string } | null)?.message || "O Supabase não respondeu");
       return null;
     } finally {
       setLoading(false);
@@ -763,7 +763,7 @@ const CrmPanel = () => {
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
-          Erro ao carregar pedidos: {error}. Confirma que a tabela <code className="bg-red-100 px-1 rounded">service_requests</code> existe no Supabase (migration <code className="bg-red-100 px-1 rounded">20260911000000_add_service_requests.sql</code>).
+          Erro ao carregar pedidos: {error}. <button type="button" onClick={runSync} className="underline font-semibold">Tentar de novo</button>
         </div>
       )}
 

@@ -27,7 +27,7 @@ const TabFallback = () => (
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const AdminPanel = () => {
-  const { isAuthed, loading: authLoading, isAdmin, checkingAdmin } = useAdminSession();
+  const { isAuthed, loading: authLoading, isAdmin, checkingAdmin, adminError } = useAdminSession();
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -57,6 +57,23 @@ const AdminPanel = () => {
     return (
       <div className="min-h-screen bg-[#12121e] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthed && adminError) {
+    return (
+      <div className="min-h-screen bg-[#12121e] flex items-center justify-center p-4">
+        <div className="bg-[#13132B] border border-red-500/30 rounded-2xl p-8 w-full max-w-sm shadow-2xl text-center">
+          <h1 className="font-playfair text-white font-bold mb-2">Não foi possível ligar ao Supabase</h1>
+          <p className="text-sm text-white/50 mb-6 break-words">{adminError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-white/5 border border-white/10 text-white/70 font-medium py-3 rounded-xl hover:bg-white/10 transition-colors text-sm"
+          >
+            Tentar de novo
+          </button>
+        </div>
       </div>
     );
   }
