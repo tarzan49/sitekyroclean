@@ -6,12 +6,11 @@
  * O Google Ads vai buscar este endereço todos os dias (importação agendada por
  * HTTPS, com utilizador e palavra-passe: ADS_FEED_USER / ADS_FEED_PASSWORD).
  *
- * Só vão fechos de quem veio de um anúncio com código "ref." (dono, 2026-11-04,
- * depois da pesquisa ao RGPD): telefone → whatsapp_conversations.ad_ref →
- * ad_clicks. Orgânicos e clientes anteriores ao código ficam de fora: não têm
- * finalidade de medição e quase não ensinam o Google.
- * Vai o gclid; o telefone só quando o clique não tem gclid (gbraid/wbraid no
- * iPhone), sempre cifrado em SHA-256 e só até 63 dias, o limite da Google.
+ * Vão os fechos de quem veio de um anúncio com código "ref." (telefone →
+ * whatsapp_conversations.ad_ref → ad_clicks) e, desde 24/11 (dono), também os
+ * que o CRM marca "Google Ads" sem código, só pelo telefone. Orgânicos ficam de fora.
+ * Vai o gclid; o telefone (E.164, SHA-256) quando não há gclid, só até 63 dias,
+ * o limite da Google.
  * O Google ignora linhas repetidas (mesmo clique, nome e hora), por isso reenviar
  * todos os dias não duplica nada.
  *
@@ -20,6 +19,7 @@
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+export const GOOGLE_ADS_SOURCE = "Google Ads";
 export const CONVERSION_NAME = "Serviço fechado";
 const DAYS = 90;
 const PHONE_DAYS = 63;
@@ -56,7 +56,7 @@ export async function sha256(text: string): Promise<string> {
 const money = (v: unknown) => Math.round((Number(v) || 0) * 100) / 100;
 const csvCell = (v: string) => (/[",\n]/.test(v) ? `"${v.replaceAll('"', '""')}"` : v);
 
-export async function buildConversionsCsv({ services, extras, conversations, clicks, now }: FeedInput): Promise<{ csv: string; rows: number; withClick: number }> {
+export async function buildConversionsCsv({ services, extras, conversations, clicks, now }: FeedInput): Promise<{ csv: string; rows: number; withClick: number; byPhone: number }> {
   const since = now.getTime() - DAYS * 86_400_000;
   const clickByRef = new Map(clicks.map(c => [String(c.ref), c]));
   const refByPhone = new Map<string, string>();
@@ -65,24 +65,26 @@ export async function buildConversionsCsv({ services, extras, conversations, cli
   for (const x of extras) extrasByEvent.set(String(x.calendar_event_id), [...(extrasByEvent.get(String(x.calendar_event_id)) ?? []), x]);
 
   const lines: string[] = [];
-  let withClick = 0;
-  const push = async (id: string, phone: string, at: string, cut: number, billed: number) => {
+  let withClick = 0, byPhone = 0;
+  const push = async (id: string, phone: string, at: string, cut: number, billed: number, fromCrm: boolean) => {
     const t = Date.parse(at);
     if (!(t >= since) || t > now.getTime()) return;
     const value = cut > 0 ? cut : money(billed / 2);
     if (value <= 0) return;
     const ref = refByPhone.get(key9(phone));
     const click = ref ? clickByRef.get(ref) : undefined;
-    // Sem código de anúncio não vai; o clique tem de ser anterior ao fecho.
-    if (!click || Date.parse(String(click.created_at)) > t) return;
-    const gclid = click.gclid ? String(click.gclid) : "";
+    // Com código: o clique tem de ser anterior ao fecho. Sem código só vai o marcado Google Ads no CRM.
+    const clicked = click && Date.parse(String(click.created_at)) <= t;
+    if (!clicked && !fromCrm) return;
+    const gclid = clicked && click.gclid ? String(click.gclid) : "";
     if (!gclid && now.getTime() - t > PHONE_DAYS * 86_400_000) return;
-    if (gclid) withClick++;
+    if (gclid) withClick++; else byPhone++;
     lines.push([gclid, gclid ? "" : await sha256(phone), CONVERSION_NAME, utcTime(at), value.toFixed(2), "EUR", id].map(csvCell).join(","));
   };
 
   for (const s of services) {
     if (s.calendar_missing_since || !s.booked_at) continue;
+    const fromCrm = s.source === GOOGLE_ADS_SOURCE;
     const phone = e164(s.phone);
     if (!phone) continue;
     let billed = money(s.billed_value) + money(s.upsell_value);
@@ -94,13 +96,13 @@ export async function buildConversionsCsv({ services, extras, conversations, cli
     if (mine.length && money(s.billed_value) > extraValue) {
       billed = money(billed - extraValue);
       cut = money(cut - mine.reduce((a, x) => a + money(x.my_cut), 0));
-      for (const x of mine) await push(String(x.id), phone, String(x.added_at), money(x.my_cut), money(x.value));
+      for (const x of mine) await push(String(x.id), phone, String(x.added_at), money(x.my_cut), money(x.value), fromCrm);
     }
-    await push(String(s.id), phone, String(s.booked_at), cut, billed);
+    await push(String(s.id), phone, String(s.booked_at), cut, billed, fromCrm);
   }
 
   const header = ["Google Click ID,Phone Number,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID"];
-  return { csv: [...header, ...lines].join("\n") + "\n", rows: lines.length, withClick };
+  return { csv: [...header, ...lines].join("\n") + "\n", rows: lines.length, withClick, byPhone };
 }
 
 function authorized(req: Request): boolean {
@@ -115,7 +117,7 @@ if (import.meta.main) {
     if (!authorized(req)) return new Response("Unauthorized", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="ads"' } });
     const from = new Date(Date.now() - (DAYS + 30) * 86_400_000).toISOString();
     const [s, x, c, k] = await Promise.all([
-      client.from("service_requests").select("id, phone, booked_at, billed_value, upsell_value, my_cut, calendar_event_id, calendar_missing_since").gte("booked_at", from),
+      client.from("service_requests").select("id, phone, booked_at, billed_value, upsell_value, my_cut, calendar_event_id, calendar_missing_since, source").gte("booked_at", from),
       client.from("service_extras").select("id, calendar_event_id, added_at, value, my_cut").gte("added_at", from),
       client.from("whatsapp_conversations").select("contact_key, ad_ref").not("ad_ref", "is", null),
       client.from("ad_clicks").select("ref, gclid, created_at").gte("created_at", from),
@@ -123,7 +125,7 @@ if (import.meta.main) {
     const error = s.error ?? x.error ?? c.error ?? k.error;
     if (error) { console.error(error.message); return new Response("error", { status: 500 }); }
     const out = await buildConversionsCsv({ services: s.data ?? [], extras: x.data ?? [], conversations: c.data ?? [], clicks: k.data ?? [], now: new Date() });
-    console.log(`feed: ${out.rows} fechos, ${out.withClick} com clique`);
+    console.log(`feed: ${out.rows} fechos, ${out.withClick} com clique, ${out.byPhone} pelo telefone`);
     return new Response(out.csv, { headers: { "Content-Type": "text/csv; charset=utf-8" } });
   });
 }

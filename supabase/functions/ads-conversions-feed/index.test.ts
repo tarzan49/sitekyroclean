@@ -60,3 +60,19 @@ Deno.test("clique depois do fecho não conta", async () => {
   });
   assertEquals(rows, 0);
 });
+
+Deno.test("marcado Google Ads no CRM sem código vai pelo telefone cifrado; desmarcado e orgânico não", async () => {
+  const hash = await sha256("+351912345678");
+  const out = await buildConversionsCsv({
+    now, extras: [], conversations: [], clicks: [],
+    services: [
+      { id: "s1", phone: "912345678", booked_at: "2026-11-02T10:00:00Z", billed_value: 89, my_cut: 45, source: "Google Ads" },
+      { id: "s2", phone: "912345679", booked_at: "2026-11-02T10:00:00Z", billed_value: 89, my_cut: 45, source: "WhatsApp" },
+      { id: "s3", phone: "912345670", booked_at: "2026-11-02T10:00:00Z", billed_value: 89, my_cut: 45, source: "Google Ads", calendar_missing_since: "2026-11-03" },
+      { id: "s4", phone: "912345671", booked_at: "2026-08-01T10:00:00Z", billed_value: 89, my_cut: 45, source: "Google Ads" },
+    ],
+  });
+  assertEquals(out.rows, 1);
+  assertEquals(out.byPhone, 1);
+  assertEquals(out.csv.trim().split("\n")[1], `,${hash},Serviço fechado,2026-11-02 10:00:00+00:00,45.00,EUR,s1`);
+});

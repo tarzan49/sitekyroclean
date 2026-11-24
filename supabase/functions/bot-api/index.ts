@@ -1082,6 +1082,9 @@ function supabaseConversations(): BotEnv["conversations"] {
     const keys = rows.map(r => String(r.contact_key));
     const { data: existing, error: readError } = await client.from("whatsapp_conversations").select("*").in("contact_key", keys);
     if (readError) return { error: readError.message };
+    // Um código "ref." já gravado nunca se apaga (o bot só procura nos últimos 30 dias; dono, 24 Nov).
+    const savedRef = new Map(((existing ?? []) as Row[]).filter(e => e.ad_ref).map(e => [String(e.contact_key), e.ad_ref]));
+    rows = rows.map(r => (r.ad_ref || !savedRef.has(String(r.contact_key)) ? r : { ...r, ad_ref: savedRef.get(String(r.contact_key)) }));
     const changed = changedRows(rows, (existing ?? []) as Row[], ["contact_key"]);
     if (!changed.length) return {};
     const { error } = await client.from("whatsapp_conversations").upsert(changed, { onConflict: "contact_key" });

@@ -400,6 +400,7 @@ Google Ads, todos os dias, só os fechos de quem veio com código "ref." (desde
 sem gclid, o telefone em SHA-256, e o valor "para ti", na conversão
 "Serviço fechado", que passa a principal; o clique no WhatsApp passa a
 secundário (substitui a exceção de 24/09). Linha na política de privacidade.
+24 Nov (dono): o feed envia ao Google todos os fechos marcados Google Ads, os sem código pelo telefone cifrado; a regra de 04/11 'só fechos com código' [RETIRADA 24/11]
 **Desde 28/09/2026 os anúncios da Meta também marcam** ("Vi o vosso anúncio no
 Facebook" / "…no Instagram", pelo `utm_source` = `{{site_source_name}}`), no
 mesmo ficheiro (`adsWhatsAppMark`). Só com os parâmetros de URL da campanha
