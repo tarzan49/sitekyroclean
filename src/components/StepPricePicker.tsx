@@ -12,10 +12,10 @@ import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import type { BasketItem, BasketPack } from '@/components/quiz/VisitBasket';
 import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
 import matPele from '@/assets/widget-materiais/sofa-pele.webp';
-import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
-import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
-import imperSofaPhoto from '@/assets/picker-premium-sofa.webp';
-import imperChairPhoto from '@/assets/picker-premium-cadeira.webp';
+import matComum from '@/assets/quiz-materiais/tapete-la-inteiro.webp';
+import matJuta from '@/assets/quiz-materiais/tapete-juta-inteiro.webp';
+import imperSofaPhoto from '@/assets/widget-materiais/sofa-tecido.webp';
+import imperChairPhoto from '@/assets/quiz-materiais/cadeiras-inteiras.webp';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 
