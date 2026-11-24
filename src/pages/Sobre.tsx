@@ -1,3 +1,4 @@
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, MapPin, Phone, Mail, Building2 } from "lucide-react";
@@ -43,6 +44,7 @@ const PAGE_URL = `${SITE_URL}/sobre`;
  * mudar na fonte.
  */
 const Sobre = () => {
+  useSnapSections(true);
   const travelFees = Object.values(locationPrices);
   const travelMin = Math.min(...travelFees);
   const travelMax = Math.max(...travelFees);
@@ -54,54 +56,49 @@ const Sobre = () => {
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", PAGE_URL);
   }, []);
 
+  // Modelo novo (dono, 24 Nov): secções de ecrã inteiro com encaixe, um título por secção, o mesmo texto de antes.
+  const gold = (t: string, w: string) => <>{t} <em className="not-italic" style={{ color: "#D4AF37" }}>{w}</em></>;
+  const stats = [
+    [REVIEW_RATING, `Média de ${REVIEW_COUNT} avaliações no Google`],
+    [CLIENTS_SERVED_LABEL, "Clientes servidos"],
+    [SERVICES_COMPLETED_LABEL, "Serviços realizados"],
+    [String(cities.length), "Cidades atendidas"],
+  ];
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildAboutPageSchema()) }} />
-
-      <div className="min-h-screen bg-[#f4f5f7]">
-        <Header />
-
-        <div data-mobile-hero="text" className="pt-24 pb-10 bg-checker-dark">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6" aria-label="Breadcrumb">
-              <Link to="/" className="hover:text-gold transition-colors">Início</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white/80">Sobre</span>
+      <Header />
+      <main>
+        <section data-commercial-hero className="flex min-h-[100svh] items-end bg-kyro-green text-white">
+          <div className="mx-auto w-full max-w-4xl px-5 pb-10 pt-24 sm:px-6">
+            <nav className="mb-4 hidden items-center gap-1.5 text-sm text-white/70 md:flex" aria-label="Breadcrumb">
+              <Link to="/" className="hover:text-[#D4AF37]">Início</Link><ChevronRight className="h-3 w-3" /><span>Sobre</span>
             </nav>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-gold" />
-              </div>
-              <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase">KYRO CLEAN SOLUTIONS</p>
-            </div>
-
-            <h1 className="type-page-title font-playfair text-white mb-4">
-              Sobre a Kyro Clean Solutions
-            </h1>
-            <p className="text-white/80 text-base leading-relaxed max-w-2xl">
+            <h1 className="font-playfair mb-3 text-[28px] font-semibold leading-tight text-white md:text-5xl">Sobre a Kyro Clean <em className="not-italic text-[#D4AF37]">Solutions</em></h1>
+            <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-white/80 md:text-lg">
               Somos uma empresa portuguesa de limpeza e higienização de estofos ao domicílio.
               Levamos o equipamento a casa do cliente e tratamos sofás, colchões, tapetes,
               cadeiras e alcatifas no local, em {cities.length} cidades.
             </p>
+            <ul className="mb-3 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 md:grid-cols-4">
+              {stats.map(([n, label]) => <li key={label} className="bg-[#0c241a] p-3.5"><span className="block text-2xl font-semibold text-[#D4AF37]">{n}</span><span className="text-xs leading-snug text-white/70">{label}</span></li>)}
+            </ul>
+            <p className="text-xs text-white/60">{WEEKLY_REQUESTS}</p>
           </div>
-        </div>
+        </section>
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">O que fazemos</h2>
-            <p className="text-neutral-700 leading-relaxed mb-5">
+        <section id="servicos" className="bg-[#FDFDF9] py-14">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6">
+            <div className="mb-8"><h2 className="type-section-title font-playfair text-[#111111]">{gold("O que", "fazemos")}</h2></div>
+            <p className="mb-3 text-[13px] leading-snug text-[#505650]">
               Seis serviços, todos ao domicílio. Os preços indicados são de partida, por artigo,
               e a deslocação é cobrada à parte, entre {travelMin}€ e {travelMax}€ conforme a cidade.
             </p>
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <ul className="grid grid-cols-2 gap-2">
               {services.map(service => (
-                <li key={service.slug} className="bg-white border border-neutral-200 rounded-xl p-4">
-                  <Link to={service.baseRoute} className="font-semibold hover:text-gold transition-colors">
-                    {service.name}
-                  </Link>
-                  <p className="text-sm text-neutral-600 mt-1">
+                <li key={service.slug} className="rounded-xl border border-[#E5E0D3] bg-white px-3 py-2.5">
+                  <Link to={service.baseRoute} className="text-[15px] font-semibold text-[#111111] hover:text-[#D4AF37]">{service.name}</Link>
+                  <p className="mt-0.5 text-xs leading-snug text-[#505650]">
                     {/\/m²/.test(service.priceFrom)
                       ? `${service.priceFrom}, com a deslocação incluída`
                       : isPricedPerChair(service.slug)
@@ -111,90 +108,52 @@ const Sobre = () => {
                 </li>
               ))}
             </ul>
-            <p className="text-sm text-neutral-600 mt-4">{TREATMENT_EXTRAS}</p>
-          </section>
+            <p className="mt-3 text-xs text-[#505650]">{TREATMENT_EXTRAS}</p>
+          </div>
+        </section>
 
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Onde trabalhamos</h2>
-            <p className="text-neutral-700 leading-relaxed mb-3">{COVERAGE_PROMISE}</p>
-            <p className="text-neutral-700 leading-relaxed">
-              Ao todo são {cities.length} cidades com página própria por serviço.
-              A lista completa, incluindo freguesias, está em{" "}
-              <Link to="/areas-de-servico" className="underline underline-offset-4 hover:text-gold">
-                áreas de serviço
-              </Link>.
-            </p>
-          </section>
+        <section id="como" className="bg-kyro-green py-14 text-white">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6">
+            <div className="mb-8"><h2 className="type-section-title font-playfair text-white">{gold("Onde e como", "trabalhamos")}</h2></div>
+            <div className="space-y-2.5 text-[14px] leading-snug text-white/85">
+              <p>{COVERAGE_PROMISE}</p>
+              <p>Ao todo são {cities.length} cidades com página própria por serviço. A lista completa, incluindo freguesias, está em <Link to="/areas-de-servico" className="underline underline-offset-4 hover:text-[#D4AF37]">áreas de serviço</Link>.</p>
+              <p>O orçamento é pedido por WhatsApp, telefone ou pelo simulador do site. {RESPONSE_PROMISE}.</p>
+              <p>{AVAILABILITY_PROMISE}</p>
+              <p>{DRYING_PROMISE}</p>
+            </div>
+          </div>
+        </section>
 
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Como trabalhamos</h2>
-            <p className="text-neutral-700 leading-relaxed mb-3">
-              O orçamento é pedido por WhatsApp, telefone ou pelo simulador do site. {RESPONSE_PROMISE}.
-            </p>
-            <p className="text-neutral-700 leading-relaxed mb-3">{AVAILABILITY_PROMISE}</p>
-            <p className="text-neutral-700 leading-relaxed">{DRYING_PROMISE}</p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Os nossos compromissos</h2>
-            <dl className="space-y-4">
-              <div className="bg-white border border-neutral-200 rounded-xl p-4">
-                <dt className="font-semibold mb-1">Preço confirmado antes da marcação</dt>
-                <dd className="text-sm text-neutral-700 leading-relaxed">{PRICE_PROMISE}</dd>
+        <section id="compromissos" className="bg-[#FDFDF9] py-14">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6">
+            <div className="mb-8"><h2 className="type-section-title font-playfair text-[#111111]">{gold("Os nossos", "compromissos")}</h2></div>
+            <dl className="space-y-3">
+              <div className="rounded-xl border border-[#E5E0D3] bg-white p-4" style={{ borderTop: "3px solid #D4AF37" }}>
+                <dt className="mb-1 font-semibold">Preço confirmado antes da marcação</dt>
+                <dd className="text-sm leading-relaxed text-[#505650]">{PRICE_PROMISE}</dd>
               </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-4">
-                <dt className="font-semibold mb-1">Repetição sem custos em 48 horas</dt>
-                <dd className="text-sm text-neutral-700 leading-relaxed">{SATISFACTION_PROMISE}</dd>
+              <div className="rounded-xl border border-[#E5E0D3] bg-white p-4" style={{ borderTop: "3px solid #D4AF37" }}>
+                <dt className="mb-1 font-semibold">Repetição sem custos em 48 horas</dt>
+                <dd className="text-sm leading-relaxed text-[#505650]">{SATISFACTION_PROMISE}</dd>
               </div>
             </dl>
-          </section>
+          </div>
+        </section>
 
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Em números</h2>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              <li className="bg-white border border-neutral-200 rounded-xl p-4">
-                <span className="block text-2xl font-semibold text-gold">{REVIEW_RATING}</span>
-                <span className="text-sm text-neutral-600">Média de {REVIEW_COUNT} avaliações no Google</span>
-              </li>
-              <li className="bg-white border border-neutral-200 rounded-xl p-4">
-                <span className="block text-2xl font-semibold text-gold">{CLIENTS_SERVED_LABEL}</span>
-                <span className="text-sm text-neutral-600">Clientes servidos</span>
-              </li>
-              <li className="bg-white border border-neutral-200 rounded-xl p-4">
-                <span className="block text-2xl font-semibold text-gold">{SERVICES_COMPLETED_LABEL}</span>
-                <span className="text-sm text-neutral-600">Serviços realizados</span>
-              </li>
-              <li className="bg-white border border-neutral-200 rounded-xl p-4">
-                <span className="block text-2xl font-semibold text-gold">{cities.length}</span>
-                <span className="text-sm text-neutral-600">Cidades atendidas</span>
-              </li>
+        <section id="contactos" className="bg-kyro-green py-14 text-white">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6">
+            <div className="mb-8"><h2 className="type-section-title font-playfair text-white">{gold("Fale", "connosco")}</h2></div>
+            <ul className="mb-6 space-y-3 text-[15px] text-white/85">
+              <li className="flex items-start gap-3"><MapPin className="mt-1 h-4 w-4 shrink-0 text-[#D4AF37]" /><span>Rua de Ferreira Cardoso 174, 4300-197 Porto</span></li>
+              <li className="flex items-start gap-3"><Phone className="mt-1 h-4 w-4 shrink-0 text-[#D4AF37]" /><a href={`tel:${PHONE_TEL}`} className="hover:text-[#D4AF37]">{PHONE_DISPLAY}</a></li>
+              <li className="flex items-start gap-3"><Mail className="mt-1 h-4 w-4 shrink-0 text-[#D4AF37]" /><a href={BUSINESS_EMAIL_HREF} className="hover:text-[#D4AF37]">{BUSINESS_EMAIL}</a></li>
             </ul>
-            <p className="text-sm text-neutral-600 mt-4">{WEEKLY_REQUESTS}</p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="font-playfair text-2xl sm:text-3xl mb-4">Contactos</h2>
-            <ul className="space-y-3 text-neutral-700">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-1 shrink-0 text-gold" />
-                <span>Rua de Ferreira Cardoso 174, 4300-197 Porto</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className="w-4 h-4 mt-1 shrink-0 text-gold" />
-                <a href={`tel:${PHONE_TEL}`} className="hover:text-gold transition-colors">{PHONE_DISPLAY}</a>
-              </li>
-              <li className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-1 shrink-0 text-gold" />
-                <a href={BUSINESS_EMAIL_HREF} className="hover:text-gold transition-colors">{BUSINESS_EMAIL}</a>
-              </li>
-            </ul>
-          </section>
-
-          <QuizButton ctaLabel="Pedir orçamento" />
-        </main>
-
-        <Footer />
-      </div>
+            <QuizButton ctaLabel="Pedir orçamento" />
+          </div>
+        </section>
+      </main>
+      <Footer />
     </>
   );
 };

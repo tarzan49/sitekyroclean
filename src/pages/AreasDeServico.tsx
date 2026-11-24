@@ -1,3 +1,4 @@
+import { useSnapSections } from "@/hooks/useSnapSections";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -36,7 +37,7 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
   if (!areaCities.length) return null;
   return (
     <details open={search ? true : undefined} className="group/region border-b border-[#E8E4DE]">
-      <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
         <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#D4AF37]" />
         <span className="flex-1 font-semibold text-[#111111]">{heading} {goldWord}</span>
         <span className="text-sm text-[#666]">{areaCities.length}</span>
@@ -67,6 +68,7 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
 };
 
 const AreasDeServico = () => {
+  useSnapSections(true); // modelo novo (dono, 24 Nov)
   const [query, setQuery] = useState("");
   const search = normalize(query);
   const hasResults = cities.some(city => normalize(city.name).includes(search) || municipiosComFreguesias.find(m => m.slug === city.slug)?.freguesias.some(f => normalize(f.name).includes(search)));
@@ -77,21 +79,21 @@ const AreasDeServico = () => {
       <Header />
       <main>
         {/* Hero */}
-        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <h1 className="type-page-title font-playfair text-[#111111]">
+        <section data-commercial-hero className="flex min-h-[100svh] items-end bg-kyro-green pt-24 pb-10 text-white md:pt-28 md:pb-14">
+          <div className="container mx-auto px-5 max-w-4xl">
+            <h1 className="font-playfair text-[28px] font-semibold leading-tight text-white md:text-5xl">
               Áreas de{" "}
               <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
             </h1>
-            <p className="mt-4 text-base md:text-lg text-[#505650] leading-relaxed max-w-2xl">
+            <p className="mt-3 text-[15px] md:text-lg text-white/80 leading-relaxed max-w-2xl">
               A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {cities.length} municípios e {stats.freguesias} freguesias, de Viana do Castelo ao Algarve, com equipas em Braga, Porto, Coimbra, Lisboa e Algarve.
             </p>
-            <p className="text-base text-[#505650] mt-2 mb-6">
+            <p className="text-sm text-white/70 mt-2 mb-6">
               Aveiro, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.
             </p>
             <div className="flex flex-wrap gap-3">
               <QuizButton />
-              <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-base px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
+              <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold text-base px-5 py-2.5 rounded-full hover:bg-white/10 transition-colors">
                 <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
               </a>
             </div>
@@ -100,8 +102,8 @@ const AreasDeServico = () => {
 
         <section className="bg-[#FDFDF9] py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-8">
-            <p className="mb-5 text-base leading-relaxed text-[#666]">Escolha a região, depois o concelho e o serviço. Também pode pesquisar diretamente uma localidade ou freguesia.</p>
-            <div className="relative mb-6">
+            <h2 className="mb-4 type-section-title font-playfair text-[#111111]">Escolha a sua <em className="not-italic" style={{ color: "#D4AF37" }}>zona</em></h2>
+            <div className="relative mb-3">
               <label htmlFor="area-search" className="sr-only">Pesquisar localidade ou freguesia</label>
               <Search aria-hidden="true" className="absolute left-4 top-4 h-4 w-4 text-[#857443]" />
               <input id="area-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Pesquisar localidade ou freguesia…" className="min-h-12 w-full rounded-lg border border-[#E8E4DE] bg-white py-3 pl-11 pr-12 text-base text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/60 [&::-webkit-search-cancel-button]:appearance-none" />
@@ -117,13 +119,7 @@ const AreasDeServico = () => {
         {/* CTA */}
         <section className="py-10 md:py-14 bg-kyro-green">
           <div className="container mx-auto px-4 max-w-4xl">
-            <SectionHeader
-              overline="Comece já"
-              heading="Precisa de limpeza profissional na sua"
-              goldWord="cidade?"
-              subtitle="Peça o seu orçamento gratuito: resposta em menos de 1 minuto."
-              light={false}
-            />
+            <SectionHeader heading="Precisa de limpeza profissional na sua" goldWord="cidade?" light={false} />
             <QuizButton />
           </div>
         </section>

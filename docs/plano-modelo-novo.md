@@ -23,8 +23,9 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
 | Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo | — | — | — | FEITO (24 Nov): topo novo (ResourceHubHero, também no índice do blog) + widget de preço no fim (ResourcePriceSection), texto corrido sem encaixe |
-| Artigos do blog | — | — | — | por fazer: topo + ResourcePriceSection no fim |
-| /sobre, /areas-de-servico, /problemas, /en | — | — | — | por fazer (sobre: 'O que fazemos' 820 px; áreas: 659 px) |
+| Artigos do blog | — | — | — | FEITO (24 Nov): topo (CommercialHero) + ResourcePriceSection do serviço do artigo no fim |
+| /sobre, /areas-de-servico | — | — | — | FEITO (24 Nov): secções de ecrã inteiro com encaixe |
+| /problemas, /en | — | — | — | por fazer |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
 
