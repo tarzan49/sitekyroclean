@@ -26,6 +26,21 @@ Regras de desenho que o dono deu:
 9. Faixas de cartões no telemóvel deslizam sozinhas (3,5 s, suave) e param quando a pessoa toca (`useAutoSlide`).
 10. Vídeos verticais nunca esticam a secção: moldura fixa (`fixedFrame` em `ServiceResultsGallery.tsx`).
 
+## Âmbito e ritmo
+
+O site TODO (dono, 24 Nov), com calma: uma fase de cada vez, um modelo de cada vez, e o dono vê cada modelo antes de avançar.
+
+## Fase 0: peças base (antes de mexer em qualquer página)
+
+Transformar o que foi feito nos packs em peças partilhadas, com testes:
+1. Secções de ecrã inteiro com encaixe: um hook (ex. `useSnapSections()`) que cada modelo liga quando estiver compactado; o CSS de `html.snap-sections` sai das regras só de packs e passa a genérico.
+2. Topo compacto: opção do `CommercialHero` (prop), em vez de CSS por `data-hero-part` só para packs. Números das 3 informações a dourado (já em todo o site, `ServiceSnapshotStats.tsx`).
+3. Widget de preço universal (a partir de `WaterproofPackPicker.tsx`): uma pergunta + opções com o total do `botQuote`, configurado por serviço. Sofá: lugares 1-6 + canto/U/7+ (pela fotografia); limpeza, Premium, Essencial, anti-ácaros. Colchão: tamanho; limpeza, anti-ácaros. Cadeiras: quantidade; limpeza, Premium, Essencial ("desde" sem a deslocação). Tapete e alcatifa: sem preço, pede medidas no WhatsApp.
+4. Blocos de explicação simples (a partir de `WaterproofPackSections.tsx`): "o que resolve" (cartões reais a deslizar), "na mesma visita" (antes/depois/vídeo real; história no telemóvel com `StoryPlayer`), perguntas (máx. 5, compactas). Vídeos de impermeabilização sempre do próprio artigo (cadeiras = vídeos de cadeiras).
+5. Script de medição (`scripts/`): abre cada modelo em 375×667 e 1280×620 e falha se uma secção não couber, se houver scroll para o lado ou se o HTML do prerender disser coisa diferente da página.
+
+A barra fixa do WhatsApp já segue a regra do site todo (`MobileStickyBar.tsx`): acompanha sempre, esconde-se só quando a secção no ecrã tem botão de WhatsApp.
+
 ## Ordem (um modelo de cada vez)
 
 1. Páginas de serviço (`/limpeza-sofas`, `/limpeza-colchoes`, `/limpeza-cadeiras`, `/limpeza-tapetes`, `/limpeza-alcatifas`, `/impermeabilizacao` e afins): são o molde das páginas por cidade e por freguesia, onde está quase todo o tráfego.
@@ -34,7 +49,7 @@ Regras de desenho que o dono deu:
 4. Problemas e materiais.
 5. Marcas e variantes de sofá.
 6. Os outros packs.
-7. O blog fica de fora (texto corrido, não secções).
+7. Blog no fim: os artigos são texto corrido; adaptar o topo, os blocos de explicação e o widget de preço ao fim do artigo, sem encaixe por secções no texto.
 
 ## Como trabalhar cada modelo
 
