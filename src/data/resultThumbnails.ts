@@ -61,8 +61,6 @@ import photo30 from '@/assets/before-after-pool/tapete-04-depois.webp';
 import thumb30 from '@/assets/before-after-pool/tapete-04-depois-thumb.webp';
 import photo31 from '@/assets/before-after-pool/tapete-05-unico-sem-par.webp';
 import thumb31 from '@/assets/before-after-pool/tapete-05-unico-sem-par-thumb.webp';
-import photo32 from '@/assets/before-after-pool/tapete-06-depois.webp';
-import thumb32 from '@/assets/before-after-pool/tapete-06-depois-thumb.webp';
 const thumbnails: Record<string, string> = {
   [photo0]: thumb0,
   [photo1]: thumb1,
@@ -95,6 +93,5 @@ const thumbnails: Record<string, string> = {
   [photo29]: thumb29,
   [photo30]: thumb30,
   [photo31]: thumb31,
-  [photo32]: thumb32,
 };
 export const resultThumbnail = (image: string) => thumbnails[image] ?? image;
