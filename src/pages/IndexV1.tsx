@@ -57,9 +57,6 @@ const IndexV1 = () => {
           <HomeFaqSection />
         </Suspense>
 
-        <Suspense fallback={<SectionLoader />}>
-          <HomeClosingSection />
-        </Suspense>
       </main>
 
       <Suspense fallback={null}>
