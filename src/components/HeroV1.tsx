@@ -32,7 +32,7 @@ const Hero = () => {
             <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
             <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
           </picture>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 58%, rgba(5,28,23,.78) 68%, rgba(5,28,23,.92) 78%, rgba(5,28,23,.97) 100%)' }} />
         </div>
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
@@ -79,7 +79,7 @@ const Hero = () => {
           {/* Keep the cleaning line visible while bringing trust and both CTAs into the first mobile viewport. */}
           <div className="-mx-5 min-h-[clamp(9rem,40vw,11rem)] flex-1 md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
           {/* Linha subtil por cima da prova (dono, 24 Nov). */}
-          <p className="whitespace-nowrap text-center text-[10.5px] tracking-wide text-white/75 md:hidden" style={{ textShadow: "0 1px 6px rgba(0,0,0,.7)" }}>Trabalhamos em todo Portugal · Resposta em menos de 1 minuto</p>
+          <p className="whitespace-nowrap text-center text-[11px] font-semibold tracking-normal text-white/95 md:hidden" style={{ textShadow: "0 1px 6px rgba(0,0,0,.7)" }}>Trabalhamos em todo Portugal · Resposta em menos de 1 minuto</p>
           <div className="py-3 md:hidden">
             <HomeHeroTrust />
           </div>
