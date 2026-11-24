@@ -3169,7 +3169,8 @@ function withSeparatePrice(input, r) {
   const q = r;
   const inp = expandPieces(input ?? {});
   const items = inp.items;
-  if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder || q.rugCombo) return none;
+  const onePack = Array.isArray(items) && items.length === 1 && items[0]?.kind === "sofa" && /^clean\+(premium|essencial)$/.test(String(items[0]?.treatment));
+  if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder && !onePack || q.rugCombo) return none;
   if (["armchairs", "largeArmchairs", "puffs", "headboards"].some((k) => typeof inp[k] === "number" && inp[k] > 0)) return none;
   if (items.every((i) => i?.kind === "chairs")) return none;
   const total = pricedTotal(q);
@@ -3213,6 +3214,10 @@ function withSeparatePrice(input, r) {
   const tiers = wt ? { premium: make(sepOf("premium"), wt.premium), essencial: make(sepOf("essencial"), wt.essencial) } : null;
   if (!main && !(tiers && (tiers.premium || tiers.essencial))) return none;
   const out = { ...r };
+  if (onePack && q.bigOrder) {
+    out.bigOrder = null;
+    out.antiMiteGift = null;
+  }
   const up9n = (v) => typeof v === "number" ? up9Total(v) : v;
   if (main) out.total = main.total;
   else if (wt) out.total = up9Total(total);

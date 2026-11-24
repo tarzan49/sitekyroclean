@@ -110,3 +110,13 @@ describe('auditoria, 2.ª passagem (24 Nov 2026)', () => {
     if (v) expect(v.usual).toBeGreaterThan(v.total);
   });
 });
+
+describe('Blindado 5L/6L acima de 300€ (dono, 25 Nov 2026: "Sim, também")', () => {
+  it('leva o riscado do separado, sem a condição dos 300€', () => {
+    for (const it of [sofa('5-lugares', 'clean+premium'), sofa('5-lugares', 'clean+premium', { seats: 6, look: 'compacto' })]) {
+      const r = q('Lisboa', [it]);
+      expect(r.separatePrice?.separate).toBeGreaterThan(r.total);
+      expect(r.bigOrder).toBeNull();
+    }
+  });
+});

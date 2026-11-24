@@ -1103,7 +1103,10 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
   // qty 2 = two lines (24 Nov 2026 audit: 2 sofás de 1 lugar 158 in one line, 159 in two).
   const inp = expandPieces((input ?? {}) as Record<string, unknown>);
   const items = inp.items;
-  if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder || q.rugCombo) return none;
+  // One sofa pack (limpeza + impermeabilização) above 300€ keeps its struck price too, instead of the big-order cut
+  // (owner, 25 Nov 2026, 5L/6L Blindado 309/349€: "Sim, também").
+  const onePack = Array.isArray(items) && items.length === 1 && (items[0] as Record<string, unknown>)?.kind === 'sofa' && /^clean\+(premium|essencial)$/.test(String((items[0] as Record<string, unknown>)?.treatment));
+  if (!Array.isArray(items) || !items.length || q.blackFriday || (q.bigOrder && !onePack) || q.rugCombo) return none;
   if (['armchairs', 'largeArmchairs', 'puffs', 'headboards'].some(k => typeof inp[k] === 'number' && (inp[k] as number) > 0)) return none;
   // Chairs alone: their struck price is chairsWas (1 chair × quantity; owner, 24 Nov 2026), never this one.
   if (items.every(i => (i as Record<string, unknown>)?.kind === 'chairs')) return none;
@@ -1142,6 +1145,7 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
   const tiers = wt ? { premium: make(sepOf('premium'), wt.premium), essencial: make(sepOf('essencial'), wt.essencial) } : null;
   if (!main && !(tiers && (tiers.premium || tiers.essencial))) return none;
   const out = { ...r } as Record<string, unknown>;
+  if (onePack && q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
   const up9n = (v: number | null) => (typeof v === 'number' ? up9Total(v) : v);
   // Both options end in 9, also the one without a Poupa (24 Nov 2026 audit: 188, 298, 318), and the total with them.
   if (main) out.total = main.total;
