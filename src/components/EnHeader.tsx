@@ -1,6 +1,7 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { Link } from "react-router-dom";
-import { MessageCircle, Phone } from "lucide-react";
+import { Phone } from 'lucide-react';
 import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 /** Minimal English-only header for the /en/ tourist pages. Deliberately no
@@ -22,10 +23,7 @@ const EnHeader = () => {
             <Phone className="h-[18px] w-[18px] shrink-0 text-[#0B2F2A] md:h-4 md:w-4 md:text-[#D4AF37]" strokeWidth={2.2} />
             <span className="hidden md:inline">{PHONE_DISPLAY}</span>
           </a>
-          <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="en_header" className="flex h-10 min-h-0 touch-manipulation items-center gap-2 whitespace-nowrap rounded-xl bg-[#25D366] px-4 text-[14px] font-bold text-white transition-colors hover:bg-[#20BD5A]">
-            <MessageCircle className="h-4 w-4" strokeWidth={2.2} />
-            WhatsApp
-          </a>
+          <WhatsAppCta href={waHref} source="en_header" en small />
         </div>
       </div>
     </header>

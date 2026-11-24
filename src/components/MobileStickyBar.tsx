@@ -1,7 +1,8 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+
 import { useFillSections } from '@/hooks/useFillSections';
 import { WHATSAPP_BASE } from '@/constants/business';
 
@@ -55,16 +56,7 @@ const MobileStickyBar = () => {
     >
       <div className="bg-[#071a12]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
         <div className="max-w-2xl mx-auto px-3 pt-2.5 pb-3">
-          <a
-            href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(isEn))}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-tracking-source="sticky_bar"
-            className="flex items-center justify-center gap-2.5 w-full min-h-14 py-3 bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all touch-manipulation"
-          >
-            <MessageCircle className="w-4 h-4 text-[#071a12] flex-shrink-0" strokeWidth={2} />
-            <span className="text-[#071a12] text-base font-semibold tracking-[0.04em] uppercase">{isEn ? "Message on WhatsApp" : "Falar por WhatsApp"}</span>
-          </a>
+          <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(isEn))}`} source="sticky_bar" en={isEn} />
         </div>
       </div>
     </div>

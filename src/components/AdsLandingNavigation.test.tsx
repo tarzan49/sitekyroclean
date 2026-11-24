@@ -28,6 +28,6 @@ describe('ads landing entry and sofa information', () => {
     const { container } = render(<AdsLandingHeader whatsappHref={href} />);
     const link = container.querySelector('a[data-tracking-source="header_ads"]')!;
     expect(link.getAttribute('href')).toBe(href);
-    expect(link.getAttribute('aria-label')).toBe('Pedir orçamento por WhatsApp');
+    expect(link.getAttribute('aria-label')).toBe('Falar por WhatsApp');
   });
 });

@@ -1,9 +1,10 @@
+import { WhatsAppCta } from '@/components/Cta';
 import CompactFAQ from "@/components/CompactFAQ";
 import { useSnapSections } from "@/hooks/useSnapSections";
 import { EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE, EN_DRYING_PROMISE } from '@/constants/commercialPolicy';
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Star, MessageCircle, Phone, Clock, Languages, Camera, Users, CheckCircle2 } from "lucide-react";
+import { Star, Phone, Clock, Languages, Camera, Users, CheckCircle2 } from 'lucide-react';
 import EnHeader from "@/components/EnHeader";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import EnFooter from "@/components/EnFooter";
@@ -123,7 +124,7 @@ const EnServicePage = () => {
             <p className="mb-3 max-w-2xl text-[13px] leading-snug text-white/85 md:text-[15px]">{page.intro}</p>
             <p className="mb-3 flex flex-wrap gap-x-3 text-[13px] text-white/85"><span><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> Google</span><span>{REVIEW_COUNT}+ reviews</span><span>{CLIENTS_SERVED_LABEL} clients</span></p>
             <div className="flex max-w-xl gap-2">
-              <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="en_hero" className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Message on WhatsApp</a>
+              <WhatsAppCta href={waHref} source="en_hero" en className="flex-1" />
               <a href={`tel:${PHONE_TEL}`} data-tracking-source="en_hero" aria-label={`Call ${PHONE_DISPLAY}`} className="flex min-h-[48px] min-w-[48px] items-center justify-center gap-2 rounded-lg border border-white/30 px-3 text-base font-semibold text-white hover:bg-white/10"><Phone className="h-4 w-4 shrink-0" /><span className="hidden sm:inline">{PHONE_DISPLAY}</span></a>
             </div>
             <p className="mt-2 text-[12px] leading-snug text-white/75">{EN_AVAILABILITY_PROMISE} {EN_DRYING_PROMISE} Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
@@ -185,22 +186,8 @@ const EnServicePage = () => {
               Message us on WhatsApp with a photo of the problem, or call us directly. {EN_RESPONSE_PROMISE}.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)]"
-              >
-                <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
-              </a>
-              <a
-                href={`tel:${PHONE_TEL}`}
-                className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
-              >
-                <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
-              </a>
+              <WhatsAppCta href={waHref} source="en_closing" en className="flex-1" />
+              <a href={`tel:${PHONE_TEL}`} data-tracking-source="en_closing" className="flex min-h-12 flex-1 items-center justify-center gap-2 text-base font-semibold text-white"><Phone className="h-4 w-4 shrink-0 text-[#D4AF37]" strokeWidth={2} />{PHONE_DISPLAY}</a>
             </div>
           </div>
         </section>

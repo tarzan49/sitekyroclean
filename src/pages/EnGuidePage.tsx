@@ -1,7 +1,8 @@
+import { WhatsAppCta } from '@/components/Cta';
 import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Phone, CheckCircle2, Camera, Clock, Euro } from "lucide-react";
+import { Phone, CheckCircle2, Camera, Clock, Euro } from 'lucide-react';
 import EnHeader from "@/components/EnHeader";
 import EnFooter from "@/components/EnFooter";
 import SectionHeader from "@/components/SectionHeader";
@@ -80,7 +81,7 @@ const EnGuidePage = () => {
             <p className="mb-3 max-w-2xl text-[14px] leading-snug text-white/85 md:text-base">A practical guide for hosts: turnover timelines, what to document when a guest causes damage, and realistic costs, based on what we see cleaning rental properties across Porto, Lisbon and the Algarve.</p>
             <p className="mb-3 flex flex-wrap gap-x-3 text-[13px] text-white/85"><span><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> Google</span><span>{REVIEW_COUNT}+ reviews</span><span>{CLIENTS_SERVED_LABEL} clients</span></p>
             <div className="flex max-w-xl flex-col gap-2 sm:flex-row">
-              <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="en_hero" className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Message on WhatsApp</a>
+              <WhatsAppCta href={waHref} source="en_hero" en className="flex-1" />
               <a href={`tel:${PHONE_TEL}`} data-tracking-source="en_hero" className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-white/30 px-4 text-base font-semibold text-white hover:bg-white/10"><Phone className="h-4 w-4 shrink-0" />{PHONE_DISPLAY}</a>
             </div>
           </div>

@@ -1,6 +1,7 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Hourglass, MessageCircle, Star, Timer } from 'lucide-react';
+import { Clock, Hourglass, Star, Timer } from 'lucide-react';
 import { GoogleG } from './icons/GoogleG';
 import HeroBeforeAfterPool from './HeroBeforeAfterPool';
 import DuoBeforeAfter, { type DuoSide } from './DuoBeforeAfter';
@@ -99,7 +100,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
               <span className="mt-0.5 text-[11px] text-white/75">+{REVIEW_COUNT} avaliações Google</span>
             </div>
           </div>
-          <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />{directContactLabel ?? 'Pedir orçamento por WhatsApp'}</a>
+          <WhatsAppCta href={whatsappHref} source={source} heroPart="whatsapp" />
           {!directContactLabel && <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 items-center justify-center text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
           </a>}

@@ -24,7 +24,7 @@ describe('Obrigado session integration', () => {
     show();
     expect(screen.getByText('Limpeza de sofá de 3 lugares')).toBeTruthy();
     expect(screen.getByText('89,00 €', { exact: false })).toBeTruthy();
-    const url = new URL(screen.getByRole('link', { name: 'Confirmar pelo WhatsApp' }).getAttribute('href')!);
+    const url = new URL(screen.getByRole('link', { name: 'Falar por WhatsApp' }).getAttribute('href')!);
     expect(url.origin + url.pathname).toBe(WHATSAPP_BASE);
     expect(url.searchParams.get('text')).toContain('ABC123');
     cleanup();
@@ -36,7 +36,7 @@ describe('Obrigado session integration', () => {
     sessionStorage.setItem('kyro_receipt', '{invalid');
     show();
     expect(screen.getByText(/Os detalhes do pedido não estão disponíveis/)).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Confirmar pelo WhatsApp' }).getAttribute('href')).toContain(WHATSAPP_BASE);
+    expect(screen.getByRole('link', { name: 'Falar por WhatsApp' }).getAttribute('href')).toContain(WHATSAPP_BASE);
     expect(screen.queryByText('Pedido recebido')).toBeNull();
   });
 

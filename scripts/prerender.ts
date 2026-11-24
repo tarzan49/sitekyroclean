@@ -312,7 +312,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   }
 
   if (c.hero) {
-    html += `<p>${escHtml(c.hero.eyebrow)}</p><p>${escHtml(c.hero.priceLabel)} + ${escHtml(c.hero.travelLabel)}</p><a href="${escHtml(c.hero.waHref)}">Pedir orçamento por WhatsApp</a><p>${escHtml(c.hero.response)} · Sem compromisso</p><a href="#precos">${escHtml(c.hero.priceLinkLabel)}</a><div id="precos"><a href="${escHtml(c.hero.service.baseRoute)}#precos">Orçamento de ${escHtml(c.hero.service.name.toLowerCase())}</a></div>\n`;
+    html += `<p>${escHtml(c.hero.eyebrow)}</p><p>${escHtml(c.hero.priceLabel)} + ${escHtml(c.hero.travelLabel)}</p><a href="${escHtml(c.hero.waHref)}">Falar por WhatsApp</a><p>${escHtml(c.hero.response)} · Sem compromisso</p><a href="#precos">${escHtml(c.hero.priceLinkLabel)}</a><div id="precos"><a href="${escHtml(c.hero.service.baseRoute)}#precos">Orçamento de ${escHtml(c.hero.service.name.toLowerCase())}</a></div>\n`;
   }
 
   if (c.serviceExamples) {

@@ -18,7 +18,7 @@ export const NOT_FOUND_LINKS: readonly { href: string; label: string }[] = [
 export const QUOTE_EMPTY_H1 = ['O próximo passo é simples.', 'Falamos no WhatsApp?'] as const;
 export const QUOTE_EMPTY_TEXT = 'Os detalhes do pedido não estão disponíveis nesta sessão. Fale connosco para o localizar.';
 export const QUOTE_SUMMARY_TITLE = 'Resumo do pedido';
-export const QUOTE_CONFIRM_LABEL = 'Confirmar pelo WhatsApp';
+export const QUOTE_CONFIRM_LABEL = 'Falar por WhatsApp';
 
 /** `/obrigado-pelo-servico` sem nome, peça nem cidade no endereço. */
 /** Título do separador e da pré-visualização no WhatsApp. */

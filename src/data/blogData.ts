@@ -595,7 +595,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       }
     ],
     "relatedService": {
-      "label": "Agendar limpeza profissional de sofá",
+      "label": "Limpeza profissional de sofá",
       "href": "/limpeza-sofas"
     },
     "relatedPosts": [

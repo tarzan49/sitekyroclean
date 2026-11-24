@@ -1,5 +1,6 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Plus, Trash2, MessageCircle, BadgePercent, Check, Minus } from 'lucide-react';
+import { Plus, Trash2, BadgePercent, Check, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { cities, cityPrep } from '@/data/serviceCatalog';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
@@ -342,10 +343,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
             <span className="text-2xl font-bold tabular-nums text-[#D4AF37]">{money(prices.total)}</span>
           </p>
           {prices.valid
-            ? <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-                className="mt-3 flex min-h-[52px] items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] px-3 py-3 text-[15px] font-semibold uppercase tracking-[0.02em] text-[#071a12] lg:gap-1.5 lg:px-2 lg:text-sm lg:tracking-normal shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] transition-all active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
-                <MessageCircle className="h-5 w-5 shrink-0" />Confirmar o meu orçamento
-              </a>
+            ? <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3" />
             : <p role="status" className="mt-3 rounded-[10px] bg-white/[0.06] p-3 text-xs text-white/75">Escolha a localidade e complete quantidades e medidas válidas para pedir a confirmação.</p>}
           <p className="mt-1.5 text-center text-[11px] leading-snug text-white/60">Resposta em menos de 1 minuto · Uma só deslocação</p>
         </div>

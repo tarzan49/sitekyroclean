@@ -102,7 +102,7 @@ const CookieBanner = () => {
             </button>
             <button
               onClick={accept}
-              className="h-10 sm:h-11 px-5 text-sm font-bold rounded-full bg-[#D4AF37] hover:bg-[#f0dc8a] text-[#0B2F2A] transition-colors touch-manipulation shadow-md"
+              className="cta cta-gold cta-sm"
             >
               {isEn ? "Accept" : "Aceitar"}
             </button>

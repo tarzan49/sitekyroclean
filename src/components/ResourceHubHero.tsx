@@ -1,7 +1,8 @@
+import { WhatsAppCta } from '@/components/Cta';
 import type { ReactNode } from 'react';
 import HeroPhoto from '@/components/HeroPhoto';
 import { Link, NavLink } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+
 import { getResourceWhatsapp } from '@/data/resourceContent';
 import { RESPONSE_PROMISE } from '@/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
@@ -28,7 +29,7 @@ export default function ResourceHubHero({ title, description, image, video, post
           <p className="mt-3 text-[15px] text-white/85 md:text-sm md:text-white/80"><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> no Google · +{REVIEW_COUNT} avaliações</p>
         </div>
         <div>
-          <a href={getResourceWhatsapp()} target="_blank" rel="noopener noreferrer" data-tracking-source="resource-hub" className="flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold hover:bg-[#116b32] md:min-h-[52px]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
+          <WhatsAppCta href={getResourceWhatsapp()} source="resource-hub" />
           <p className="mt-2 text-center text-sm text-white/75">{RESPONSE_PROMISE}</p>
         </div>
       </div>

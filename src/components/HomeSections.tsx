@@ -1,6 +1,7 @@
 // Secções novas da página inicial (dono, 24 Nov: "o resto é para refazer tudo, está super default").
 // Mesmas peças aprovadas nas páginas de serviço: widget de preço dos packs, história antes/depois/proteção
 // com material real, perguntas compactas. Cada secção cabe num ecrã do telemóvel.
+import { WhatsAppCta } from '@/components/Cta';
 import { useState } from 'react';
 import SectionHeader from './SectionHeader';
 import StepPricePicker, { type StepKind } from './StepPricePicker';
@@ -8,7 +9,7 @@ import CompactFAQ from './CompactFAQ';
 import { StoryPlayer, storyFor } from './WaterproofPackSections';
 import { cities } from '@/data/serviceCatalog';
 import { RESOURCE_FAQS } from '@/data/resourceContent';
-import { MessageCircle, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from '@/constants/business';
 import { buildGeneralWaMessage } from '@/lib/whatsappMessages';
 
@@ -84,10 +85,7 @@ export function HomeClosingSection() {
     <section id="fecho" className="scroll-mt-20 bg-kyro-green py-12 text-center text-white md:py-16">
       <div className="mx-auto max-w-xl px-5">
         <SectionHeader heading="Os seus estofos como novos," goldWord="ainda hoje." light={false} className="!mb-6" />
-        <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} target="_blank" rel="noopener noreferrer" data-tracking-source="home_closing"
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-base font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]">
-          <MessageCircle className="h-5 w-5" /> Falar por WhatsApp
-        </a>
+        <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} source="home_closing" />
         <a href={`tel:${PHONE_TEL}`} data-tracking-source="home_closing_phone" className="mt-4 inline-flex items-center gap-2 text-white/80">
           <Phone className="h-4 w-4" /> {PHONE_DISPLAY}
         </a>

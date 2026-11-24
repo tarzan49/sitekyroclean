@@ -1,11 +1,12 @@
 // Packs de várias peças (dono, 24 Nov): o cliente escolhe peça a peça (tamanho/quantidade + tratamento),
 // um só total do bot (botQuote, deslocação incluída), preço cortado = o mesmo pedido em separado,
 // ambos a acabar em 9 para cima. Tapetes nunca mostram preço no site: pedem as medidas no WhatsApp.
+import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 import { cityPrep } from '@/data/serviceCatalog';
-import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
+import { Check, Minus, Plus } from 'lucide-react';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 import premiumSofa from '@/assets/picker-premium-sofa.webp';
 import essencialSofa from '@/assets/picker-essencial-sofa.webp';
@@ -156,11 +157,8 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>
         </div>
         {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#D4AF37]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
-        <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-          className="mt-1.5 flex min-h-[46px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
-          <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp
-        </a>
-        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-1.5 hidden h-10 min-h-0 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white text-sm md:flex font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={total !== null ? formatEuro(total) : undefined} className="mt-1.5" />
+        <PriceCta className="mt-1.5 max-md:hidden" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => onMore ? onMore() : setBasket(true)}>Juntar mais artigos</PriceCta>
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} /></Suspense>}
     </div>

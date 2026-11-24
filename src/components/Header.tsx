@@ -1,3 +1,4 @@
+import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ChevronDown, MessageCircle, Phone } from "lucide-react";
@@ -150,13 +151,8 @@ const Header = () => {
             {PHONE_DISPLAY}
           </a>
           <BasketButton onOpen={openQuiz} />
-          <button type="button" onClick={openQuiz} className="flex h-10 min-h-0 items-center whitespace-nowrap rounded-xl bg-[#D4AF37] px-4 text-[14px] font-bold text-[#0B2F2A] transition-colors hover:bg-[#E0BE4C]">
-            Agendar limpeza
-          </button>
-          <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="header_desktop" className="flex h-10 min-h-0 items-center gap-2 whitespace-nowrap rounded-xl bg-[#25D366] px-4 text-[14px] font-bold text-white transition-colors hover:bg-[#20BD5A]">
-            <MessageCircle className="h-4 w-4" strokeWidth={2.2} />
-            WhatsApp
-          </a>
+          <PriceCta onClick={openQuiz} small />
+          <WhatsAppCta href={waHref} source="header_desktop" small />
         </div>
 
         {/* Telemóvel: telefone e cesto leves, WhatsApp em destaque, menu */}
@@ -203,15 +199,8 @@ const Header = () => {
               </nav>
 
               <div className="space-y-2 border-t border-white/10 px-5 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">
-                <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="header_mobile_menu"
-                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]">
-                  <MessageCircle className="h-4 w-4" strokeWidth={2.2} />
-                  Pedir preço no WhatsApp
-                </a>
-                <button type="button" onClick={() => { closeMenu(); openQuiz(); }}
-                  className="flex min-h-12 w-full items-center justify-center rounded-xl bg-[#D4AF37] text-[15px] font-bold text-[#0B2F2A]">
-                  Agendar limpeza
-                </button>
+                <WhatsAppCta href={waHref} source="header_mobile_menu" />
+                <PriceCta onClick={() => { closeMenu(); openQuiz(); }} />
                 <a href={`tel:${PHONE_TEL}`} data-tracking-source="header_mobile_menu" onClick={closeMenu}
                   className="flex min-h-11 w-full items-center justify-center gap-2 text-sm text-white/80">
                   <Phone className="h-4 w-4 text-[#D4AF37]" strokeWidth={2} />

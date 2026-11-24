@@ -1,6 +1,7 @@
+import { WhatsAppCta } from '@/components/Cta';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+
 import { GoogleG } from '@/components/icons/GoogleG';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 
@@ -24,7 +25,7 @@ export default function ArticleHero({ title, subtitle, category, byline, image, 
           <a href="#precos" className="flex items-center justify-center px-2 font-playfair text-lg font-semibold leading-tight text-[#D4AF37]">{priceLine.replace(/\.$/, '')}</a>
           <p className="flex flex-col items-center px-2 leading-tight"><span className="flex items-center gap-1.5 text-lg font-semibold text-white"><GoogleG className="h-4 w-4" />{REVIEW_RATING}★</span><span className="text-xs text-white/75">+{REVIEW_COUNT} avaliações Google</span></p>
         </div>
-        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
+        <WhatsAppCta href={whatsappHref} source={source} />
       </div>
     </div>
   </section>;

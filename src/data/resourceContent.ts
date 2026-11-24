@@ -32,7 +32,7 @@ export const RESOURCE_FAQS = [
 
 export function getResourceOffer(post?: BlogPost) {
   const href = post?.relatedService.href ?? '/#servicos';
-  const base = { href, title: 'Vamos avaliar o seu caso?', detail: 'Envie fotografias, medidas e localidade. Confirmamos o serviço adequado e o preço antes de marcar.', action: 'Pedir orçamento por WhatsApp', link: 'Ver serviços e preços' };
+  const base = { href, title: 'Vamos avaliar o seu caso?', detail: 'Envie fotografias, medidas e localidade. Confirmamos o serviço adequado e o preço antes de marcar.', action: 'Falar por WhatsApp', link: 'Ver serviços e preços' };
   if (href === '/limpeza-tapetes') return { ...base, title: `Tapetes ${RUG_PRICE_FROM.toLowerCase()}`, detail: 'Envie largura × comprimento e localidade: o preço sai das medidas, com a deslocação incluída.', link: 'Ver limpeza de tapetes' };
   if (href === '/limpeza-alcatifas') return { ...base, title: `Alcatifas ${CARPET_PRICE_FROM.toLowerCase()}`, detail: 'Envie largura × comprimento e localidade: o preço sai das medidas, com a deslocação incluída.', link: 'Ver limpeza de alcatifas' };
   if (href === '/limpeza-sofas') return { ...base, title: `Limpeza de sofás desde ${sofaPrices[0].cleaningPrice}€`, detail: 'Valor de partida para 1 lugar. Envie uma fotografia do sofá e indique a sua localidade.', link: 'Ver preços de sofás' };

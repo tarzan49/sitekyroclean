@@ -1,4 +1,5 @@
-import { ArrowUpRight, CalendarDays, Check, Clock, MapPin, MessageCircle, Star } from 'lucide-react';
+import { WhatsAppCta } from '@/components/Cta';
+import { CalendarDays, Check, Clock, MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GoogleG } from '@/components/icons/GoogleG';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
@@ -98,9 +99,7 @@ export default function QuoteConfirmation({ receipt, waUrl }: { receipt: Confirm
         </section>
 
         <div className="mt-4 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:max-w-sm">
-          <a href={waUrl} target="_blank" rel="noopener noreferrer" data-tracking-source="quote_confirmation" className="flex min-h-14 items-center justify-center gap-2.5 rounded-xl border border-white/15 bg-gradient-to-b from-[#39de78] to-[#25D366] px-3 text-[15px] lg:min-h-16 lg:text-base font-bold text-[#071a12] shadow-[0_6px_24px_#25d36620] transition-colors hover:from-[#59e890] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37]">
-            <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{photoQuote ? 'Enviar fotografias no WhatsApp' : QUOTE_CONFIRM_LABEL}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-          </a>
+          <WhatsAppCta href={waUrl} source="quote_confirmation" />
           <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-white/75"><Clock className="h-3 w-3 text-[#D4AF37]" />{RESPONSE_PROMISE}</p>
         </div>
 

@@ -19,7 +19,7 @@ describe('Quote confirmation', () => {
   });
   it('uses the supplied WhatsApp link for the single primary action', () => {
     show(mixed);
-    const links = screen.getAllByRole('link', { name: 'Confirmar pelo WhatsApp' });
+    const links = screen.getAllByRole('link', { name: 'Falar por WhatsApp' });
     expect(links).toHaveLength(1);
     links.forEach(link => expect(link.getAttribute('href')).toBe('https://wa.me/351925530647?text=pedido'));
   });
@@ -30,7 +30,7 @@ describe('Quote confirmation', () => {
     show(receipt);
     expect(screen.queryByText('Subtotal conhecido')).toBeNull();
     expect(screen.getByText('O preço é dado por fotografia')).toBeTruthy();
-    expect(screen.getAllByRole('link', { name: 'Enviar fotografias no WhatsApp' })).toHaveLength(1);
+    expect(screen.getAllByRole('link', { name: 'Falar por WhatsApp' })).toHaveLength(1);
   });
   it('does not invent a successful submission or a total without session data', () => {
     show(null);

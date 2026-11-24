@@ -1,7 +1,8 @@
-﻿import { logError } from '@/lib/errorTracking';
+import { WhatsAppCta } from '@/components/Cta';
+import { logError } from '@/lib/errorTracking';
 import { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { RefreshCw, Home, MessageCircle } from 'lucide-react';
+import { RefreshCw, Home } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
 
 interface Props {
@@ -45,16 +46,7 @@ class ErrorBoundary extends Component<Props, State> {
               Fale connosco pelo WhatsApp e dizemos-lhe o preço e a próxima hora livre em menos de 1 minuto.
             </p>
 
-            <a
-              href={WHATSAPP_BASE}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-tracking-source="error_page"
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-base font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]"
-            >
-              <MessageCircle className="h-5 w-5" />
-              Falar por WhatsApp
-            </a>
+            <WhatsAppCta href={WHATSAPP_BASE} source="error_page" />
 
             <div className="mt-3 grid grid-cols-2 gap-3">
               <button

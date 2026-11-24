@@ -4,6 +4,7 @@
 //    deslocação incluída), nunca escrito à mão. Tapetes e alcatifas com o preço do bot (24 Nov 2026).
 // 2) Contacto: nome e telemóvel. O pedido vai pelo mesmo envio (submit-lead + quiz_order), por isso a
 //    mensagem automática e o funil do bot no WhatsApp continuam iguais.
+import { WhatsAppCta } from '@/components/Cta';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Gift, Minus, Plus, Trash2, X } from 'lucide-react';
@@ -482,7 +483,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <li><b>Itens para o bot:</b> {testOrder.quote.items.length}{testOrder.rugs.length ? ` (${testOrder.rugs.length} tapete/alcatifa com medidas)` : ''}</li>
         </ul>
         <p className="mb-4 text-xs text-white/60">Em produção, este pedido vai para o CRM e o cliente recebe no WhatsApp a mensagem automática do questionário.</p>
-        <button type="button" onClick={() => setTestOrder(null)} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">Voltar ao cesto</button>
+        <button type="button" onClick={() => setTestOrder(null)} className="cta cta-gold">Voltar ao cesto</button>
       </div>
     );
   }
@@ -589,7 +590,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             <label className="block"><span className="mb-1 block text-xs font-semibold text-white/70">Telemóvel (WhatsApp)</span>
               <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
             <p className="mt-3 text-xs text-white/60">{cityKnown(city) ? 'Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.' : 'Confirmamos o preço com a deslocação e a disponibilidade no WhatsApp.'}</p>
-            {failed && <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, quote.gifts))}`} data-tracking-source="basket_fallback" target="_blank" rel="noopener noreferrer" className="mt-3 block rounded-xl bg-[#25D366] p-3 text-center text-sm font-bold text-white">Não conseguimos enviar. Enviar pelo WhatsApp</a>}
+            {failed && <div className="mt-3"><p className="mb-2 text-sm text-white/80">Não conseguimos enviar o pedido.</p><WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, quote.gifts))}`} source="basket_fallback" /></div>}
           </>
         )}
       </div>
@@ -601,8 +602,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!city.trim() ? 'falta a localidade' : !cityKnown(city) ? 'deslocação a confirmar no WhatsApp' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="block text-xs font-bold text-[#E8C964]">Poupa {formatEuro(quote.usual - quote.total)}</span>}</span>
         </div>
         {step === 'basket'
-          ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">Continuar</button> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
-          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
+          ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="cta cta-gold">Continuar</button> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
+          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="cta cta-gold disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
       </footer>}
 
       {askCity && !editing && (() => {
@@ -620,7 +621,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               {!known && q.length > 1 && !options.length && <p className="mt-3 text-sm text-white/70">Nesta localidade a deslocação é confirmada no WhatsApp.</p>}
             </div>
             <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-              <button type="submit" disabled={city.trim().length < 2} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{known || options.length === 1 || city.trim().length < 2 ? 'Ver os preços' : `Continuar com ${city.trim()}`}</button>
+              <button type="submit" disabled={city.trim().length < 2} className="cta cta-gold disabled:cursor-not-allowed">{known || options.length === 1 || city.trim().length < 2 ? 'Ver os preços' : `Continuar com ${city.trim()}`}</button>
             </footer>
           </form>
         </div>;
@@ -652,7 +653,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               return <div className="mt-4 rounded-2xl border border-[#D4AF37]/30 bg-white/[0.04] p-3">
                 <ul className="mb-2 space-y-1">{done.map(i => <li key={i.id} className="flex items-center gap-2 text-sm font-semibold text-white"><Check className="h-4 w-4 shrink-0" style={{ color: GOLD }} />{itemLabel(i)}</li>)}</ul>
                 <p className="mb-3 text-sm text-[#E8C964]">{has('sofa') && has('chairs') ? 'Sofá e cadeiras impermeabilizados na mesma visita.' : has('chairs') ? 'Junte também o sofá e deixe tudo impermeabilizado.' : 'Junte também as cadeiras e deixe tudo impermeabilizado.'}</p>
-                <button type="button" onClick={() => setImperPick(false)} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A]">Seguir para o cesto</button>
+                <button type="button" onClick={() => setImperPick(false)} className="cta cta-gold">Seguir para o cesto</button>
               </div>;
             })()}
           </div>
@@ -890,7 +891,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       {/* O botão só aparece quando há algo para confirmar (dono, 24 Nov, sobre o "Escolha o material" parado no widget). */}
       {ok && <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        {!ready ? <p className="flex min-h-12 items-center justify-center text-sm font-semibold text-[#D4AF37]">Escolha uma opção</p> : <button type="button" onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">{(() => { const v = others.length ? totalWith({}) : totalOf(group()); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button>}</footer>}
+        {!ready ? <p className="flex min-h-12 items-center justify-center text-sm font-semibold text-[#D4AF37]">Escolha uma opção</p> : <button type="button" onClick={() => onSave(group())} className="cta cta-gold">{(() => { const v = others.length ? totalWith({}) : totalOf(group()); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button>}</footer>}
     </div>
   );
 }

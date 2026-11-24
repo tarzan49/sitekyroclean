@@ -1,6 +1,7 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MessageCircle, Mail, Phone, FileText, ChevronRight } from "lucide-react";
+import { Mail, Phone, FileText, ChevronRight } from 'lucide-react';
 import Header from "@/components/Header";
 import CommercialHero from "@/components/CommercialHero";
 import { cityPrep } from "@/data/serviceCatalog";
@@ -125,7 +126,7 @@ const CommercialPage = () => {
           breadcrumbs={[{ label: "Início", to: "/" }, { label: h1 }]}
           whatsappHref={waHref}
           source={`${track}_hero`}
-          directContactLabel="Falar diretamente connosco"
+          directContactLabel="Falar por WhatsApp"
         />
 
         <section id="clientes" className="scroll-mt-20 bg-white py-14 md:py-20">
@@ -209,7 +210,7 @@ const CommercialPage = () => {
           <div className="mx-auto w-full max-w-2xl px-5 py-5 text-center md:py-14 sm:px-6">
             <SectionHeader heading="Fale diretamente" goldWord="connosco" light={false} />
             <p className="mx-auto mb-7 max-w-md text-base leading-relaxed text-white/90">{COMMERCIAL_CONTACT_TEXT}</p>
-            <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source={`${track}_contacto`} className="mx-auto flex min-h-[58px] w-full max-w-md items-center justify-center gap-2 bg-[#16833e] px-5 text-[17px]"><MessageCircle className="h-5 w-5 shrink-0" />Falar diretamente connosco</a>
+            <WhatsAppCta href={waHref} source={`${track}_contacto`} className="mx-auto max-w-md" />
             <div className="mx-auto mt-7 grid max-w-md grid-cols-1 divide-y divide-white/15 border-y border-white/15">
               <a href={`tel:${PHONE_TEL}`} data-tracking-source={`${track}_contacto`} className="flex min-h-[60px] items-center justify-between gap-3 text-white hover:text-[#D4AF37]"><Phone className="h-5 w-5 shrink-0 text-[#D4AF37]" /><span className="text-lg font-semibold">{PHONE_DISPLAY}</span></a>
               <a href={mailHref} data-tracking-source={`${track}_contacto`} className="flex min-h-[60px] items-center justify-between gap-3 text-white hover:text-[#D4AF37]"><Mail className="h-5 w-5 shrink-0 text-[#D4AF37]" /><span className="text-[15px] font-semibold">{BUSINESS_EMAIL}</span></a>

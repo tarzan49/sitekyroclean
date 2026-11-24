@@ -1,9 +1,10 @@
 // Sofás de pele (dono, 24 Nov): nunca impermeabilização. Duas opções com o total do bot (botQuote, deslocação
 // incluída): "Renovado" = só limpeza; "Renovado + Pele" = limpeza + tratamento da pele (limpeza e hidratação,
 // +40€, +60€ em 5 e 6 lugares, `leather: true`). Mesmo desenho do WaterproofPackPicker.
+import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
-import { Check, MessageCircle, Plus } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -43,7 +44,6 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
       <div>
         <p className="mb-2 text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
         <SofaCounters counts={counts} onChange={setCounts} />
-        <button type="button" onClick={() => setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-bold text-[#1A1A1A] hover:bg-[#FFFDF5] md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
       </div>
       <div>
         <div className="flex flex-col gap-2.5 pt-1.5 md:gap-3" role="radiogroup" aria-label="Opção">
@@ -65,10 +65,8 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
           })}
         </div>
         <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final com a deslocação incluída. {syntheticOnly ? 'Pele sintética: só limpeza.' : 'Na pele não fazemos impermeabilização.'}</p>
-        <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] md:mt-5 md:min-h-14 sm:text-base">
-          <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp
-        </a>
+        <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3 md:mt-5" />
+        <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => setBasket(true)}>Juntar mais artigos</PriceCta>
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} initialItems={choiceToItems({ kind: 'sofa', size: '3-lugares', qty: 1, extra: 'none', sofas: Object.entries(counts).filter(([, n]) => n > 0).map(([size, qty]) => ({ size, qty })) })} /></Suspense>}
     </div>

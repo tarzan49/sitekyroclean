@@ -24,7 +24,7 @@ describe('StepPricePicker', () => {
     const want = optionPrice('Lisboa', [], [newItem('sofa', { size: '3-lugares', qty: 1, pack: 'premium' })]);
     expect(await screen.findByText(euros(want.shown!))).toBeTruthy();
     fireEvent.click(screen.getByText('Blindado'));
-    const a = await screen.findByText(/Pedir este orçamento/);
+    const a = await screen.findByText(/Falar por WhatsApp ·/);
     const href = decodeURIComponent(a.closest('a')!.getAttribute('href')!);
     expect(href).toContain('do pack Blindado (limpeza + impermeabilização Premium');
     expect(href).toContain(`em Lisboa, por ${want.shown}`);

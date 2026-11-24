@@ -2,8 +2,9 @@
 // do orçamento [...] deveria seguir a mesma lógica"): localidade, material, tamanho e só depois as opções com preço.
 // Nada vem escolhido e o botão diz o passo que falta. Os números são os do cesto (funções do VisitBasket, que lêem o
 // motor do bot), carregadas só quando a pessoa começa a escolher.
+import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Check, ChevronRight, MessageCircle, Minus, Plus } from 'lucide-react';
+import { Check, ChevronRight, Minus, Plus } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
 import { cities, cityPrep } from '@/data/serviceCatalog';
@@ -268,10 +269,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </button>}
         </div>
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
-        {ready && <button type="button" onClick={() => setBasket(group(chosen))} className="mt-2 flex h-10 min-h-0 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-bold text-[#1A1A1A] hover:bg-[#FFFDF5] md:h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} aria-hidden />Juntar mais artigos à mesma visita</button>}
-        {ready && <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-center text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] md:min-h-14 md:text-base">
-              <MessageCircle className="h-5 w-5" aria-hidden />{total !== null ? `Pedir este orçamento · ${formatEuro(total)}` : 'Pedir este orçamento no WhatsApp'}
-            </a>}
+        {ready && <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={total !== null ? formatEuro(total) : undefined} className="mt-2" />}
+        {ready && <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
         {ready && <p className="mt-1 hidden text-center text-sm text-[#666] md:block">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
       </div>}
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}

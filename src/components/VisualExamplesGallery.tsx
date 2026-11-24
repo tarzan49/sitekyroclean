@@ -1,3 +1,4 @@
+import { PriceCta } from '@/components/Cta';
 import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '@/lib/responsiveImages';
 import "@/styles/visual-examples.css";
 import { useRef, useState } from "react";
@@ -61,7 +62,7 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
               <Dialog.Title className="pr-10 pb-4 text-lg">{examples[selected].label}</Dialog.Title>
               {photo(selected, "eager")}
               <Dialog.Description className="pt-3 text-sm text-white/65">{examples[selected].description ?? imageDescription ?? "Imagem ilustrativa."}</Dialog.Description>
-              {onEnquire && <button type="button" onClick={() => { setSelected(null); onEnquire(); }} aria-label={`Pedir avaliação: ${examples[selected].label}`} className="mt-4 min-h-12 w-full bg-[#D4AF37] px-4 py-3 text-sm font-semibold text-[#071a12]">Pedir avaliação</button>}
+              {onEnquire && <PriceCta className="mt-4" onClick={() => { setSelected(null); onEnquire(); }} />}
             </>}
             <Dialog.Close asChild><button type="button" aria-label="Fechar imagem" className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center text-white focus-visible:outline focus-visible:outline-[#D4AF37]"><X className="h-5 w-5" /></button></Dialog.Close>
           </Dialog.Content>

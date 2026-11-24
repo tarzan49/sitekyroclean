@@ -1,6 +1,7 @@
+import { WhatsAppCta } from '@/components/Cta';
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Home, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, Home, Phone } from 'lucide-react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
@@ -29,7 +30,7 @@ const NotFound = () => {
         <h1 className="font-playfair text-[28px] font-semibold leading-tight text-white md:text-5xl">{h1.slice(0, -1).join(" ")} <em className="not-italic text-[#D4AF37]">{h1.slice(-1)}</em></h1>
         <p className="mt-3 max-w-xl text-base leading-relaxed text-white/80 md:text-lg">{NOT_FOUND_TEXT}</p>
         <div className="mt-8 max-w-md">
-          <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} target="_blank" rel="noopener noreferrer" data-tracking-source="not_found_page" className="flex min-h-14 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Falar por WhatsApp</a>
+          <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} source="not_found_page" />
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Link to="/" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/25 px-2 text-sm font-semibold text-white"><Home className="h-4 w-4 shrink-0 text-[#D4AF37]" />Página inicial</Link>
             <a href={`tel:${PHONE_TEL}`} data-tracking-source="not_found_page" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/25 px-2 text-sm font-semibold text-white"><Phone className="h-4 w-4 shrink-0 text-[#D4AF37]" />{PHONE_DISPLAY}</a>

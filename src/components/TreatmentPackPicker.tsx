@@ -1,12 +1,13 @@
 // Escolha simples para os packs de limpeza + tratamento (anti-ácaros no colchão e no sofá,
 // anti-odor no tapete). O mesmo formato do WaterproofPackPicker: passo 1 o tamanho, passo 2
 // as opções com o total final do bot (botQuote), um botão. Sem símbolos nas opções (dono, 24 Nov).
+import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { treatmentToItem } from '@/components/quiz/basketChoice';
 import type { BasketItem } from '@/components/quiz/VisitBasket';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
-import { Check, Minus, Plus, MessageCircle } from 'lucide-react';
+import { Check, Minus, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -122,7 +123,6 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
             }) : null}
           </div>
         )}
-        <button type="button" onClick={() => more({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#FFFDF5] md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
       </div>
 
       {/* 2. Opções com o total final, 3. um botão */}
@@ -154,10 +154,8 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
         </div>
         <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">{kind === 'rug' ? `Preço final ${cityPrep(city)} ${city}, lavagem em sua casa, deslocação incluída. Juta, sisal, seda ou persa: o valor é ajustado.` : `Preço final ${cityPrep(city)} ${city}, deslocação incluída.`}</p>
 
-        <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-center text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5 sm:text-base md:mt-5 md:min-h-14">
-          <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp
-        </a>
+        <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3 md:mt-5" />
+        <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => more({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })}>Juntar mais artigos</PriceCta>
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={[basket]} /></Suspense>}
     </div>
