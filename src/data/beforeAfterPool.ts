@@ -68,6 +68,16 @@ import colchao04Antes from "@/assets/before-after-pool/colchao-04-antes.webp";
 import colchao04Depois from "@/assets/before-after-pool/colchao-04-depois.webp";
 import colchao05Antes from "@/assets/before-after-pool/colchao-05-antes.webp";
 import colchao05Depois from "@/assets/before-after-pool/colchao-05-depois.webp";
+import colchao08Antes from "@/assets/before-after-pool/colchao-08-antes.webp";
+import colchao08Depois from "@/assets/before-after-pool/colchao-08-depois.webp";
+import colchao09Antes from "@/assets/before-after-pool/colchao-09-antes.webp";
+import colchao09Depois from "@/assets/before-after-pool/colchao-09-depois.webp";
+import colchao10Antes from "@/assets/before-after-pool/colchao-10-antes.webp";
+import colchao10Depois from "@/assets/before-after-pool/colchao-10-depois.webp";
+import sofa16Antes from "@/assets/before-after-pool/sofa-16-antes.webp";
+import sofa16Depois from "@/assets/before-after-pool/sofa-16-depois.webp";
+import sofa17Antes from "@/assets/before-after-pool/sofa-17-antes.webp";
+import sofa17Depois from "@/assets/before-after-pool/sofa-17-depois.webp";
 import impermeabilizacaoVideo from "@/assets/before-after-pool/impermeabilizacao-video.mp4";
 import impermeabilizacaoVideoPoster from "@/assets/before-after-pool/impermeabilizacao-video-poster.webp";
 import impermeabilizacaoVideoPepsi from "@/assets/before-after-pool/impermeabilizacao-video-pepsi.mp4";
@@ -155,6 +165,9 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
+    // 24/11/2026 (dono): os 2 sofás das publicações de antes e depois de 19/11 (riscos cor-de-rosa; assentos acinzentados).
+    { kind: "pair", before: sofa16Antes, after: sofa16Depois },
+    { kind: "pair", before: sofa17Antes, after: sofa17Depois },
     // 15/11/2026 (dono): sofá da Lisboa 1 (Rodolfo) em 2.º; 4.º e 5.º trocados; sofa-02 para o fim.
     { kind: "pair", before: sofa15Antes, after: sofa15Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
@@ -170,6 +183,10 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   colchao: [
     { kind: "pair", before: colchao06Antes, after: colchao06Depois },
+    // 24/11/2026 (dono): os 3 colchões das publicações de antes e depois de 19/11 (manchas amarelas; centro; manchas escuras).
+    { kind: "pair", before: colchao08Antes, after: colchao08Depois },
+    { kind: "pair", before: colchao09Antes, after: colchao09Depois },
+    { kind: "pair", before: colchao10Antes, after: colchao10Depois },
     { kind: "pair", before: colchao07Antes, after: colchao07Depois },
     { kind: "pair", before: colchao04Antes, after: colchao04Depois },
     { kind: "pair", before: colchao02Antes, after: colchao02Depois },
