@@ -115,7 +115,11 @@ export function detailLines(details: string | undefined): string[] {
 const pickupOf = (details: string | undefined) => /Recolha(?:, entrega e deslocação| e entrega)/.test(details ?? "");
 
 /** Preço do motor (botQuote) para um pedido com preço de tabela; null quando é sob orçamento. */
-export interface QuotedPrice { lines: { label: string; amount: number }[]; travel: number; total: number }
+export interface QuotedPrice {
+  lines: { label: string; amount: number }[]; travel: number; total: number;
+  /** Ofertas da visita (escada A) e o mesmo pedido em separado; só do motor. */
+  gifts?: { label: string; normal: number }[]; usual?: number | null;
+}
 
 const euro = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".", ",")}€`;
 
@@ -127,9 +131,10 @@ function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedP
   return [
     `Olá ${firstName(lead.name)}, tudo bem?`,
     `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${loc}. O seu orçamento:`,
-    [...price.lines.map(l => `• ${l.label.replace(/ · 1 un\./, "").replace(/ · (\d+) (?:un\.|unidades)/, " · $1").replace("Só limpeza", "limpeza")}: ${euro(l.amount)}`),
+    [...price.lines.map(l => `• ${l.label}: ${euro(l.amount)}`),
+      ...(price.gifts ?? []).map(g => `• ${g.label}: oferecido (normalmente ${euro(g.normal)})`),
       price.travel > 0 ? `• Deslocação: ${euro(price.travel)}` : "• Deslocação incluída"].join("\n"),
-    `Total: ${euro(price.total)}`,
+    `Total: ${euro(price.total)}${price.usual ? ` (em vez de ${euro(price.usual)})` : ""}`,
     "Já lhe envio de seguida as horas que temos livres.",
   ].join("\n\n");
 }
