@@ -44,9 +44,28 @@ describe('visitGifts: opções e pedidos acima de 300€ (dono, 24 Nov 2026)', (
     expect(r.visitGifts.total % 10).toBe(9);
     expect(r.visitGifts.total).toBeGreaterThan(300);
   });
-  it('acima de 300€ sem nada para oferecer: fica a condição de sempre', () => {
-    const r = botQuote({ items: Array(4).fill(S), city: 'Porto' }) as any;
+  it('acima de 300€ numa peça só (sem nada para oferecer): fica a condição de sempre', () => {
+    const r = botQuote({ items: [{ kind: 'chairs', qty: 30 }], city: 'Porto' }) as any;
     expect(r.visitGifts).toBeNull();
     expect(r.bigOrder).not.toBeNull();
+  });
+});
+
+describe('visitGifts: casos 3 a 6 (dono, 24 Nov 2026)', () => {
+  const pieces = (r: any) => r.visitGifts.gifts.map((x: any) => x.piece);
+  it('3.ª peça sem cadeiras: o tratamento mais barato que houver', () => {
+    expect(pieces(botQuote({ items: [S, M, R], city: 'Lisboa' }))).toEqual(['mattress', 'rug']);
+  });
+  it('sem colchão: o tratamento mais barato (sofá + cadeiras = cadeiras; dois sofás = um sofá)', () => {
+    expect(pieces(botQuote({ items: [S, C], city: 'Lisboa' }))).toEqual(['chairs']);
+    expect(pieces(botQuote({ items: [S, S], city: 'Lisboa' }))).toEqual(['sofa']);
+  });
+  it('poltronas contam como peça', () => {
+    expect(pieces(botQuote({ items: [S], armchairs: 1, city: 'Lisboa' }))).toEqual(['sofa']);
+  });
+  it('cadeiras já pedidas com anti-ácaros podem ser a oferta', () => {
+    const r = botQuote({ items: [S, { ...C, treatment: 'clean+anti-acaros' }], city: 'Lisboa' }) as any;
+    expect(pieces(r)).toEqual(['chairs']);
+    expect(r.visitGifts.total).toBe(botQuote({ items: [S, C], city: 'Lisboa' }).total);
   });
 });

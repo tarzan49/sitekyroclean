@@ -130,9 +130,12 @@ describe('custom pack commercial rules', () => {
     expect('chaise' in makePackItem('sofa', 's')).toBe(false);
     expect(customPackLine(makePackItem('sofa', 's')).label).not.toMatch(/chaise/i);
   });
-  it('keeps ten chairs under quote even when split across rows', () => {
-    const result = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 5 }, { ...makePackItem('chairs','b'), qty: 5 }], 'Braga');
-    expect(result.lines.every(line => line.amount === null)).toBe(true);
-    expect(result.quote).toBe(true);
+  it('prices ten chairs by position across rows, no more sob orçamento (dono, 24 Nov 2026)', () => {
+    const result = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 10 }], 'Braga');
+    expect(result.lines.map(line => line.amount)).toEqual([177.5]);
+    expect(result.quote).toBe(false);
+    const split = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 5 }, { ...makePackItem('chairs','b'), qty: 5 }], 'Braga');
+    expect(split.quote).toBe(false);
+    expect(split.lines.every(line => line.amount !== null)).toBe(true);
   });
 });

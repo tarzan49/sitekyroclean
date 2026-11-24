@@ -12,6 +12,7 @@ import essencialChair from '@/assets/picker-essencial-cadeira.webp';
 import { type PackExtra } from '@/lib/customPack';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
+import { chairPackWas } from '@/constants/chairPricing';
 import { formatEuro } from '@/data/enginePrices';
 
 type Kind = 'sofa' | 'chairs';
@@ -62,6 +63,8 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
       const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
       return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null;
     };
+    // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026: "em vez de 39 × 12, paga 359").
+    if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
     const clean = one('clean');
     const pick = (t: string) => { const w = one(t); return clean !== null && w !== null ? clean + w : null; };
     return { premium: pick('premium'), essencial: pick('essencial') } as Record<string, number | null>;

@@ -12,15 +12,16 @@ describe('calcChairBracket', () => {
     expect(calcChairBracket(0, false)).toBe(0);
     expect(calcChairBracket(-1, false)).toBe(0);
   });
-  it('keeps cleaning under quotation at 10+ but prices protection per unit', () => {
-    expect(calcChairBracket(10, false)).toBeNull();
-    expect(calcChairBracket(10, true)).toBe(150); // 15€ each from 9 (owner, 19 Nov 2026)
+  it('prices cleaning and protection at 10+, no more sob orçamento (dono, 24 Nov 2026)', () => {
+    expect(calcChairBracket(10, false)).toBe(177.5); // 4 x 20 + 3 x 17,50 + 3 x 15
+    expect(calcChairBracket(10, true)).toBe(127.5); // Essencial 4 x 15 + 3 x 12,50 + 3 x 10
   });
   it('uses the same Essential and Premium chair prices as the quiz', () => {
-    expect(calcChairBracket(4, true, 'essencial')).toBe(92); // 23€ por cadeira até 4 (dono, 2026-10-09)
-    expect(calcChairBracket(9, true, 'essencial')).toBe(144); // never below 8 chairs (owner, 19 Nov 2026)
-    expect(calcChairBracket(4, true, 'premium')).toBe(120); // 30€ por cadeira até 4
-    expect(calcChairBracket(9, true, 'premium')).toBe(202.5); // 22,50€ each from 9 (owner, 19 Nov 2026)
+    // By position (dono, 24 Nov 2026): Premium 25/22,50/20€, Essencial 15/12,50/10€.
+    expect(calcChairBracket(4, true, 'essencial')).toBe(60);
+    expect(calcChairBracket(9, true, 'essencial')).toBe(117.5);
+    expect(calcChairBracket(4, true, 'premium')).toBe(100);
+    expect(calcChairBracket(9, true, 'premium')).toBe(207.5);
   });
 });
 
@@ -114,7 +115,7 @@ describe('waterproof widget handoff', () => {
     const total = calcWidgetTotal('impermeabilizacao', quantities, tier);
     const config = buildWidgetQuizConfig('impermeabilizacao', quantities, tier)!;
     const sofaUnit = tier === 'premium' ? 119 : 69;
-    const chairs = tier === 'premium' ? 120 : 92; // 4 cadeiras: 30€ / 23€ cada
+    const chairs = tier === 'premium' ? 100 : 60; // 4 cadeiras: 25€ / 15€ cada (dono, 24 Nov 2026)
     expect(total).toBe(sofaUnit * 2 + chairs);
     expect(config.waterproofingTier).toBe(tier);
     expect(config.sofaItems?.[0].qty).toBe(2);
@@ -122,7 +123,7 @@ describe('waterproof widget handoff', () => {
   });
   it('prices ten protected chairs in a mixed selection', () => {
     const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 6: 10 })!;
-    expect(config.initialUpsellItems?.[0].price).toBe(150); // 10 chairs x 15€ Essencial from 9 (owner, 19 Nov 2026)
+    expect(config.initialUpsellItems?.[0].price).toBe(127.5); // 10 chairs Essencial by position: 4 x 15 + 3 x 12,50 + 3 x 10 (dono, 24 Nov 2026)
   });
 });
 

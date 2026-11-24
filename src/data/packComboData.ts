@@ -1,10 +1,11 @@
+import { CHAIR_WATERPROOF_PREMIUM as CHAIR_WATERPROOF_MID_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL as CHAIR_WATERPROOF_MID_ESSENTIAL } from '../constants/chairPricing';
 import { cities, services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { PACK_PERK_MATTRESS_OFF, PACK_PERK_CHAIRS_SET, PACK_PERK_LIMIT, PACK_PERK_RULE, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE } from '../constants/packPerks';
 import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import type { PackKind, PackExtra } from '../lib/customPack';
 import { botQuote } from '../lib/botQuote';
-import { formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, CHAIR_CLEANING_FROM, CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT, CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT, CHAIR_WATERPROOF_ESSENCIAL_UNIT } from './enginePrices';
+import { chairTierSentence, formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, CHAIR_CLEANING_FROM, CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT, CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT, CHAIR_WATERPROOF_ESSENCIAL_UNIT } from './enginePrices';
 // These are editable starting combinations, not separate price lists.
 // Live amounts come from the same article tables used by the quote form.
 // `name` é o título da página e começa sempre por "Limpeza": é o que as
@@ -67,7 +68,7 @@ export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
   if (pack.id === 'sofa-impermeabilizacao' || pack.id === 'cadeiras-impermeabilizacao') {
     const item = pack.id === 'sofa-impermeabilizacao' ? { kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' } : { kind: 'chairs', qty: 1, treatment: 'clean+essencial' };
     const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; travel?: number | null };
-    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 24 Nov: 25 + 23 = 48€).
+    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 24 Nov: limpeza a metade 10€ + Essencial 15€, no 9 mais perto = 29€).
     const travel = pack.id === 'cadeiras-impermeabilizacao' ? (r.travel ?? 0) : 0;
     if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total - travel);
   }
@@ -168,7 +169,7 @@ const WATERPROOF_PACK_FAQS: Record<string, { question: string; answer: string }[
   'cadeiras-impermeabilizacao': [
     {
       question: 'Quanto custa limpar e impermeabilizar cadeiras?',
-      answer: `A limpeza é desde ${formatEuro(CHAIR_CLEANING_FROM)} por cadeira. A impermeabilização custa ${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} (Premium) ou ${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} (Essencial) por cadeira até 4 cadeiras, e desce para ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} ou ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} a partir da 5.ª.`,
+      answer: `Cada cadeira paga o preço da sua posição. ${chairTierSentence()} Com a impermeabilização, a limpeza fica a metade. A impermeabilização custa ${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} (Premium) ou ${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} (Essencial) por cadeira nas primeiras 4, ${formatEuro(CHAIR_WATERPROOF_MID_PREMIUM)} ou ${formatEuro(CHAIR_WATERPROOF_MID_ESSENTIAL)} da 5.ª à 8.ª, e ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} ou ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} a partir da 9.ª.`,
     },
     ...WATERPROOF_COMMON,
   ],

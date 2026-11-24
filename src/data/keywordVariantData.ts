@@ -1,4 +1,4 @@
-import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
+import { CHAIR_WATERPROOF_BIG_ESSENTIAL } from '../constants/chairPricing';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '../constants/antiAcarosPricing';
 // "18€ por cadeira": o hero das cadeiras nunca diz "desde" (ver `startingPriceLabel`).
 import { perChairPrice, formatEuro, CHAIR_CLEANING_FROM } from './enginePrices';
@@ -78,7 +78,7 @@ const SERVICE_META: Record<ServiceKey, {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: RUG_PRICE_FROM                              },
-  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: formatEuro(CHAIR_CLEANING_FROM),     waterproofPriceFrom: formatEuro(CHAIR_WATERPROOF_ESSENTIAL) },
+  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: formatEuro(CHAIR_CLEANING_FROM),     waterproofPriceFrom: formatEuro(CHAIR_WATERPROOF_BIG_ESSENTIAL) },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: CARPET_PRICE_FROM                             },
 };
 
