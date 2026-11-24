@@ -7,6 +7,7 @@ import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/
 import { SERVICE_CONDITIONS, SERVICE_CONDITIONS_LINKS } from '../src/constants/commercialPolicy';
 import { INSTAGRAM_URL, INSTAGRAM_HANDLE, BUSINESS_LEGAL_NAME, BUSINESS_TAX_ID, BUSINESS_ADDRESS } from '../src/constants/business';
 import { formatReviewDate } from '../src/data/reviewsPool';
+import { waterproofTiersHtml } from '../src/data/waterproofTiers';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -103,6 +104,8 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
   // secagem já estavam todos no hero para quem visita o site. O que faltava era
   // chegarem aqui: "Desde 49€" e "deslocação 10€" não apareciam uma única vez
   // no HTML estático, que é o único que um crawler sem JavaScript lê.
+  // Impermeabilização: os cartões "Essencial ou Premium?" da página, com os mesmos factos e preços (dono, 24 Nov).
+  const versoes = model.serviceSlug === 'impermeabilizacao' ? waterproofTiersHtml(model.municipalityName, model.prep, e) : '';
   const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroFacts(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
   // A mesma migalha que o CommercialHero desenha para quem vê a página:
   // Início, o serviço (ligado ao seu hub), nas freguesias o município, e a
@@ -121,5 +124,5 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
       : `<li>${e(step.name)}</li>`).join('')
     + `</ol></nav>`;
 
-  return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}${SERVICE_CONDITIONS_HTML}${ENTITY_FOOTER_HTML}</main>`;
+  return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>${section === 'precos' && versoes ? `\n<section id="versoes" data-landing-section="versoes">${versoes}</section>` : ''}`).join('\n')}${SERVICE_CONDITIONS_HTML}${ENTITY_FOOTER_HTML}</main>`;
 }

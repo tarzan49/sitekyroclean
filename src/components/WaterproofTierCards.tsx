@@ -1,25 +1,13 @@
 // Cartões "Essencial ou Premium?" (dono, 24 Nov: "está top assim"): a diferença num olhar e os preços do bot.
 // Usado em /impermeabilizacao; pode entrar nas outras páginas de impermeabilização.
 import SectionHeader from '@/components/SectionHeader';
-import { botQuote } from '@/lib/botQuote';
-import { formatEuro } from '@/data/enginePrices';
+import { waterproofTierCards } from '@/data/waterproofTiers';
 import { cityPrep as cityPrepOf } from '@/data/serviceCatalog';
-import { CHAIR_WATERPROOF_BIG_ESSENTIAL, CHAIR_WATERPROOF_BIG_PREMIUM } from '@/constants/chairPricing';
 
 // "Essencial ou Premium?" num ecrã (dono, 24 Nov): dois cartões lado a lado que mostram a diferença num olhar
 // (anos de proteção em grande, lavagens em pontos) e os preços do bot para o sofá e para as cadeiras.
-const sofaImperPrice = (city: string, treatment: 'premium' | 'essencial') => {
-  const r = botQuote({ city, items: [{ kind: 'sofa', size: '3-lugares', treatment }] }) as { ok: boolean; quote?: boolean; total?: number | null };
-  return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
-};
-
 export default function WaterproofTierCards({ city }: { city: string }) {
-  const p = { name: 'Premium', chairPrice: `desde ${formatEuro(CHAIR_WATERPROOF_BIG_PREMIUM)}/un` };
-  const e = { name: 'Essencial', chairPrice: `desde ${formatEuro(CHAIR_WATERPROOF_BIG_ESSENTIAL)}/un` };
-  const cards = [
-    { tier: p, top: true, years: '10', yearsLabel: 'anos de proteção', washes: 5, base: 'Base solvente', ideal: 'Crianças, animais, uso intenso', sofa: sofaImperPrice(city, 'premium') },
-    { tier: e, top: false, years: '1-2', yearsLabel: 'anos de proteção', washes: 2, base: 'Base água', ideal: 'Uso moderado, 1.ª proteção', sofa: sofaImperPrice(city, 'essencial') },
-  ];
+  const cards = waterproofTierCards(city).map(c => ({ ...c, tier: { name: c.name, chairPrice: c.chair } }));
   return (
     <section id="versoes" className="py-14 md:py-20 bg-white">
       <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
