@@ -10,9 +10,11 @@ import { BEFORE_AFTER_POOL, interleavePools, type BeforeAfterCategory } from "@/
 // a pessoa carregar em reproduzir. `category` aceita mais do que uma
 // categoria (páginas de pack, que combinam dois serviços): os pares saem
 // intercalados, sempre com o próprio antes/depois de cada item.
-export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false, autoplay = false }: { priority?: boolean; category: BeforeAfterCategory | BeforeAfterCategory[]; light?: boolean; intervalMs?: number; autoplay?: boolean }) {
+export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false, autoplay = false, noVideos = false }: { noVideos?: boolean; priority?: boolean; category: BeforeAfterCategory | BeforeAfterCategory[]; light?: boolean; intervalMs?: number; autoplay?: boolean }) {
   const categories = Array.isArray(category) ? category : [category];
-  const pool = categories.length > 1 ? interleavePools(categories) : BEFORE_AFTER_POOL[categories[0]];
+  const fullPool = categories.length > 1 ? interleavePools(categories) : BEFORE_AFTER_POOL[categories[0]];
+  // Páginas de limpeza: sem os vídeos de impermeabilização que a galeria das cadeiras tem para o pack (dono, 24 Nov).
+  const pool = noVideos ? fullPool.filter(i => i.kind !== 'video') : fullPool;
   const singleCategory = categories.length === 1 ? categories[0] : undefined;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(autoplay);

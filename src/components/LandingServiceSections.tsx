@@ -10,6 +10,7 @@ import SectionHeader from './SectionHeader';
 import PriceWidget from './PriceWidget';
 import WaterproofPackPicker from './WaterproofPackPicker';
 import CompactFAQ from './CompactFAQ';
+import ChairProcessStory from './ChairProcessStory';
 import PriceFactors from './PriceFactors';
 import { ServiceTrustDesktop, ServiceTrustMobile } from './ServiceTrustBlock';
 import CustomerReviews from './CustomerReviews';
@@ -49,13 +50,14 @@ export default function LandingServiceSections() {
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
   // Novo modelo em teste (limpeza de sofás por cidade): escolha de preço simples com os totais do bot.
-  const newModel = model.serviceSlug === 'limpeza-sofas'; // todas as famílias de sofás (dono, 24 Nov)
+  const newModel = model.serviceSlug === 'limpeza-sofas' || (model.serviceSlug === 'limpeza-cadeiras' && model.family === 'localidade'); // sofás: todas as famílias; cadeiras: por cidade (dono, 24 Nov)
+  const pickerKind = model.serviceSlug === 'limpeza-cadeiras' ? 'chairs' as const : 'sofa' as const;
   const sections = {
     precos: newModel ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
         <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{model.prep} {model.locationName}</em></h2>
         <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">
-          <WaterproofPackPicker kind="sofa" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(c)} />
+          <WaterproofPackPicker kind={pickerKind} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(c)} />
         </div>
       </div>
     </section> : <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
@@ -89,7 +91,7 @@ export default function LandingServiceSections() {
       alt: card.image?.alt ?? card.title,
     }))} />,
     duvidas: newModel ? <CompactFAQ key={model.path} id="duvidas" dark faqs={model.faqs} heading={model.faqHeading} /> : <div id="duvidas" className="scroll-mt-20"><ServiceFAQ key={model.path} faqs={model.faqs} heading={model.faqHeading} /></div>,
-    processo: model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
+    processo: newModel && model.serviceSlug === 'limpeza-cadeiras' ? <ChairProcessStory key={model.path} city={model.locationName} cityPrep={model.prep} /> : model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
     'mesma-visita': <div id="mesma-visita" className="scroll-mt-20"><ServicePackBanner packSlugs={model.packSlugs} city={model.municipalitySlug} variant="dark" /></div>,
     zonas: <section id="zonas" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
