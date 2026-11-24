@@ -759,3 +759,9 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 @media (max-width: 767px) {
   html.snap-sections #exemplos > div > div:first-child, html.snap-sections #processo > div > div:first-child { margin-bottom: 14px; }
 }
+@media (max-width: 767px) {
+  html.snap-sections #material .grid { gap: 8px; }
+  html.snap-sections #material figcaption { padding-top: 6px; }
+  html.snap-sections #material .grid + p { margin-top: 8px; }
+  html.snap-sections #material > div > div:first-child { margin-bottom: 14px; }
+}
