@@ -433,7 +433,7 @@ function customPackLine(item, chairsBefore = 0) {
       if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
-      if (item.extra === "premium" || item.extra === "essencial") amount2 = endIn9Down(amount2);
+      if ((item.extra === "premium" || item.extra === "essencial") && item.primary !== "waterproofing") amount2 = endIn9Down(amount2);
     }
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
     const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
@@ -466,7 +466,7 @@ function calculateCustomPack(items, city) {
   const wpRows = items.map((i, n) => i.kind === "chairs" && i.primary === "waterproofing" && (i.extra === "premium" || i.extra === "essencial") ? n : -1).filter((n) => n >= 0);
   let wpLeft = wpRows.reduce((sum2, n) => sum2 + items[n].qty, 0);
   if (wpLeft > 0) {
-    let seen = 0;
+    let seen = 0, covered = 0;
     items.forEach((item, n) => {
       const line = table[n];
       if (item.kind !== "chairs" || item.primary === "waterproofing") return;
@@ -475,13 +475,14 @@ function calculateCustomPack(items, city) {
       if (wpLeft <= 0 || item.extra === "premium" || item.extra === "essencial" || line.amount == null) return;
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
+      covered += off;
       const amount2 = chairCleanTotal(item.qty, off, before);
       table[n] = { ...line, amount: amount2, ..."tablePrice" in line && typeof line.tablePrice === "number" ? { tablePrice: amount2 } : {} };
     });
     const wpRow = wpRows[0];
     const sum2 = table.filter((_, n) => items[n].kind === "chairs").reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum2 - endIn9Down(sum2);
-    if (diff !== 0 && table[wpRow].amount != null) {
+    if (covered > 0 && diff !== 0 && table[wpRow].amount != null) {
       const wpLine = table[wpRow];
       table[wpRow] = { ...wpLine, amount: wpLine.amount - diff, ..."tablePrice" in wpLine && typeof wpLine.tablePrice === "number" ? { tablePrice: wpLine.tablePrice - diff } : {} };
     }
