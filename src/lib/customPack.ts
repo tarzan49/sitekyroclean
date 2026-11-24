@@ -97,7 +97,8 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
   // Chair positions are counted waterproofed rows first, then the rest, each in the order given: the same chairs
   // in another order give the same price (24 Nov 2026 audit).
   const chairOrder = items.map((it, n) => n).filter(n => items[n].kind === 'chairs' && items[n].primary !== 'waterproofing')
-    .sort((a, b) => Number(!(items[a].extra === 'premium' || items[a].extra === 'essencial')) - Number(!(items[b].extra === 'premium' || items[b].extra === 'essencial')) || a - b);
+    .sort((a, b) => Number(!(items[a].extra === 'premium' || items[a].extra === 'essencial')) - Number(!(items[b].extra === 'premium' || items[b].extra === 'essencial'))
+      || items[a].extra.localeCompare(items[b].extra) || items[b].qty - items[a].qty || a - b);
   const chairsBeforeOf = new Map<number, number>();
   chairOrder.reduce((seen, n) => (chairsBeforeOf.set(n, seen), seen + items[n].qty), 0);
   const table = items.map((item, n) => {

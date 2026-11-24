@@ -672,15 +672,23 @@ function botQuoteCore(input: unknown): CoreQuote {
  * 299€ with the anti-odor; Lisboa, tapete + sofá 2L com anti-ácaros 149€, and 139€ with it). The same order without
  * the anti-odor often offers it as the visit gift: then that quote is the answer (the gift is the anti-odor he asked).
  */
+// Also a cleaning + waterproofing of chairs (24 Nov 2026 audit: Funchal, 4 cadeiras limpeza + 6 Essencial 229€, and
+// 209€ with the 10 in Essencial; Faro, 4 cadeiras + tapete 219€, 218€ in Essencial): never under the same chairs cleaned only.
 function withOdorFloor<T>(input: unknown, r: T): T {
   const inp = expandPieces((input ?? {}) as Record<string, unknown>);
   const items = inp.items;
   const isOdor = (i: unknown) => { const x = (i ?? {}) as Record<string, unknown>; return (x.kind === 'rug' || x.kind === 'carpet') && x.odor === true; };
-  if (!Array.isArray(items) || items.length < 2 || !items.some(isOdor)) return r;
+  // Only with another piece: one chair alone keeps its table (Protegido under Renovado in 15/20/25€ towns, owner's call).
+  const isChairWp = (i: unknown) => { const x = (i ?? {}) as Record<string, unknown>; return (x.kind === 'chairs' || x.kind === 'sofa') && !x.seatOnly && (x.treatment === 'clean+premium' || x.treatment === 'clean+essencial'); };
+  const isWpOnlyChairs = (i: unknown) => { const x = (i ?? {}) as Record<string, unknown>; return x.kind === 'chairs' && (x.treatment === 'premium' || x.treatment === 'essencial'); };
+  if (!Array.isArray(items) || items.length < 2 || !items.some(i => isChairWp(i) || isOdor(i) || isWpOnlyChairs(i))) return r;
   const own = pricedTotal(r as unknown as Priced);
   if (own === null) return r;
-  // Each anti-odor taken out in turn (each of those floored the same way), so one more anti-odor never lowers it.
-  const alts = items.flatMap((i, n) => (isOdor(i) ? [pricedTotal(botQuoteCore({ ...inp, items: items.map((y, k) => (k === n ? { ...(y as object), odor: false } : y)) }) as Priced)] : []))
+  // Each anti-odor / chairs waterproofing taken out in turn (each of those floored the same way), so one more never lowers it.
+  const without = (i: unknown) => (isOdor(i) ? { ...(i as object), odor: false } : { ...(i as object), treatment: 'clean' });
+  const finalOf = (its: unknown[]) => { const x = { ...inp, items: its }; return pricedTotal(withEndIn9(x, withSeparatePrice(x, botQuoteCore(x))) as Priced); };
+  const alts = items.flatMap((i, n) => (isChairWp(i) || isOdor(i) ? [finalOf(items.map((y, k) => (k === n ? without(y) : y)))]
+    : isWpOnlyChairs(i) && !items.every(y => ((y ?? {}) as Record<string, unknown>).kind === 'chairs') ? [finalOf(items.filter((_, k) => k !== n))] : []))
     .filter((v): v is number => v !== null);
   const altTotal = alts.length ? Math.max(...alts) : null;
   if (altTotal === null || altTotal <= own) return r;
@@ -820,7 +828,8 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
   // The struck price ends in 9 too (89 + 79 + 40 = 208 -> 209): the one struck price of the order, also in separatePrice.
   const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
-  const usual = up9(paid + giftSum);
+  // A struck price always above the total (24 Nov 2026 audit: Coimbra, 1 + 12 cadeiras, ~~279~~ 279).
+  const usual = Math.max(up9(paid + giftSum), up9(paid) + 10);
   const final = up9(paid);
   const out = { ...r } as Record<string, unknown>;
   const rc = q.rugCombo;
@@ -836,7 +845,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   // Each option keeps its distance to the order as asked (the asked one equals the total).
   const asAsked = pricedTotal(q) ?? total;
   const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
-  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: up9(paid + (v - asAsked) + giftSum), total: up9(paid + (v - asAsked)) } : null);
+  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: Math.max(up9(paid + (v - asAsked) + giftSum), up9(paid + (v - asAsked)) + 10), total: up9(paid + (v - asAsked)) } : null);
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }

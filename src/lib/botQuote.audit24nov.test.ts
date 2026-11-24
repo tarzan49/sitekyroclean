@@ -91,3 +91,14 @@ describe('escada A, dono 25 Nov 2026', () => {
     expect(q('Lisboa', [sofa('3-lugares', 'clean'), mattress('casal')]).visitGifts).toMatchObject({ total: 169, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
 });
+
+describe('auditoria, 2.ª passagem (24 Nov 2026)', () => {
+  it('imper nas cadeiras com outra peça nunca baixa o total', () => {
+    expect(paid(q('Funchal', [chairs(4, 'clean+essencial'), chairs(6, 'clean+essencial')]))).toBeGreaterThanOrEqual(paid(q('Funchal', [chairs(4, 'clean'), chairs(6, 'clean+essencial')])));
+    expect(paid(q('Faro', [chairs(4, 'clean+essencial'), rug(3, 4)]))).toBeGreaterThanOrEqual(paid(q('Faro', [chairs(4, 'clean'), rug(3, 4)])));
+  });
+  it('o riscado da oferta fica sempre acima do total', () => {
+    const v = q('Coimbra', [chairs(1, 'clean+anti-acaros'), chairs(12, 'clean+anti-acaros')]).visitGifts;
+    if (v) expect(v.usual).toBeGreaterThan(v.total);
+  });
+});
