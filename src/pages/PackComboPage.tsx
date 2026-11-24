@@ -9,6 +9,7 @@ import PackConfigurator from '@/components/PackConfigurator';
 import WaterproofPackPicker from '@/components/WaterproofPackPicker';
 import WaterproofPackSections from '@/components/WaterproofPackSections';
 import SofaMattressPicker from '@/components/SofaMattressPicker';
+import type { DuoSide } from '@/components/DuoBeforeAfter';
 import CompactFAQ from '@/components/CompactFAQ';
 import CustomerReviews from '@/components/CustomerReviews';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
@@ -35,6 +36,15 @@ const container = 'max-w-7xl mx-auto px-5 sm:px-6 lg:px-8';
  * PackConfigurator (partilhado, ver o próprio ficheiro) e as regalias são as
  * mesmas do upsell do quiz.
  */
+// Antes/depois duplo com "+" no topo de cada pack (dono, 24 Nov); impermeabilização = vídeo do próprio artigo.
+const PACK_DUO: Record<string, { left: DuoSide; right: DuoSide }> = {
+  'sofa-colchao': { left: { category: 'sofa' }, right: { category: 'colchao' } },
+  'sofa-impermeabilizacao': { left: { category: 'sofa' }, right: { category: 'impermeabilizacao', video: true } },
+  'cadeiras-impermeabilizacao': { left: { category: 'cadeiras' }, right: { category: 'cadeiras', video: true } },
+  'sala-completa': { left: { category: 'sofa' }, right: { category: 'tapete' } },
+  'quarto-completo': { left: { category: 'colchao' }, right: { category: 'tapete' } },
+};
+
 export default function PackComboPage() {
   const { pathname } = useLocation();
   const route = getAllPackComboRoutes().find(r => r.path === pathname);
@@ -120,7 +130,7 @@ export default function PackComboPage() {
         city={city.name}
         price={priceFrom}
         exactPrice={Boolean(simpleKind)}
-        duo={combo}
+        duo={PACK_DUO[pack.id]}
         breadcrumbs={[{ label: 'Início', to: '/' }, { label: 'Packs', to: '/guia-de-packs' }, { label: heading }]}
         whatsappHref={waHref}
         source={`pack_hero_${pack.id}_${city.slug}`}

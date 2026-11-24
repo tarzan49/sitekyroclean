@@ -92,13 +92,13 @@ export default function SofaMattressPicker({ city, source, onMore }: { city: str
       <div className="md:col-span-2">
         <div className="flex items-end justify-between border-t border-[#E5E0D3] pt-2">
           <span className="text-sm text-[#555]">Total em {city}<br />
-            {crossed !== null ? <span className="mt-0.5 inline-block rounded-full bg-[#D4AF37] px-2 py-0.5 text-[11px] font-bold text-white">Poupa {formatEuro(crossed - total!)}</span> : <span className="text-xs">deslocação incluída</span>}
+            {crossed !== null ? <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-[#D4AF37]/60 bg-gradient-to-r from-[#F7E7B4] via-[#E9CD72] to-[#D4AF37] px-2.5 py-0.5 text-[12px] font-bold tracking-wide text-[#3A2E08] shadow-[0_4px_12px_-4px_rgba(212,175,55,0.7)]">Poupa {formatEuro(crossed - total!)}</span> : <span className="text-xs">deslocação incluída</span>}
           </span>
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>
         </div>
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
-          className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] md:min-h-14 sm:text-base">
-          <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp
+          className="mt-2 flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
+          <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp
         </a>
         {onMore && <button type="button" onClick={onMore} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
       </div>
