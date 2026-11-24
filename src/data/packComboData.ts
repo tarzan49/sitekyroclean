@@ -57,8 +57,10 @@ export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
   // limpeza + Essencial de 1 lugar ou de 1 cadeira, com a deslocação da cidade.
   if (pack.id === 'sofa-impermeabilizacao' || pack.id === 'cadeiras-impermeabilizacao') {
     const item = pack.id === 'sofa-impermeabilizacao' ? { kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' } : { kind: 'chairs', qty: 1, treatment: 'clean+essencial' };
-    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total);
+    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; travel?: number | null };
+    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 24 Nov: 25 + 23 = 48€).
+    const travel = pack.id === 'cadeiras-impermeabilizacao' ? (r.travel ?? 0) : 0;
+    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total - travel);
   }
   const amounts = [pack.service1Slug, pack.service2Slug]
     .map(slug => services.find(s => s.slug === slug)?.priceFrom ?? '')
@@ -111,7 +113,7 @@ function waterproofPriceFaq(packId: string, cityName: string) {
   const c = (q: number, tr: string) => t({ kind: 'chairs', qty: q, treatment: tr });
   return {
     question: 'Quanto custa limpar e impermeabilizar cadeiras?',
-    answer: `${where}, com a deslocação incluída: 6 cadeiras ficam em ${c(6, 'clean+premium')} com a Premium ou ${c(6, 'clean+essencial')} com a Essencial (só a limpeza, ${c(6, 'clean')}). Uma cadeira, desde ${c(1, 'clean+essencial')}. Escolha o número de cadeiras no início da página para ver o seu valor.`,
+    answer: `${where}, com a deslocação incluída: 6 cadeiras ficam em ${c(6, 'clean+premium')} com a Premium ou ${c(6, 'clean+essencial')} com a Essencial (só a limpeza, ${c(6, 'clean')}). Uma cadeira com a Essencial, desde ${packPriceFrom(packs.find(p => p.id === 'cadeiras-impermeabilizacao')!, cityName)} mais a deslocação. Escolha o número de cadeiras no início da página para ver o seu valor.`,
   };
 }
 

@@ -6,6 +6,8 @@ import { Plus, Minus } from 'lucide-react';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 import imperVideo from '@/assets/before-after-pool/imper-agua-01.mp4';
 import imperPoster from '@/assets/before-after-pool/imper-agua-01-poster.webp';
+import chairVideo from '@/assets/before-after-pool/imper-agua-cadeira-01.mp4';
+import chairPoster from '@/assets/before-after-pool/imper-agua-cadeira-01-poster.webp';
 
 type Kind = 'sofa' | 'chairs';
 const gold = 'text-[#D4AF37]';
@@ -28,7 +30,7 @@ const SPILLS: Record<Kind, { img: string; title: string; text: string }[]> = {
 
 /** Faixa que desliza sozinha (só quando tem scroll para o lado, ou seja, no telemóvel);
  *  avança um cartão a cada 3,5 s, em scroll suave, e pára de vez quando a pessoa lhe toca. */
-function useAutoSlide<T extends HTMLElement>() {
+function useAutoSlide<T extends HTMLElement>(intervalMs = 3500) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;
@@ -45,9 +47,9 @@ function useAutoSlide<T extends HTMLElement>() {
       const step = (card?.offsetWidth ?? el.clientWidth) + 12;
       const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
       el.scrollTo({ left: atEnd ? 0 : el.scrollLeft + step, behavior: 'smooth' });
-    }, 3500);
+    }, intervalMs);
     return () => { window.clearInterval(timer); el.removeEventListener('pointerdown', stop); el.removeEventListener('touchstart', stop); };
-  }, []);
+  }, [intervalMs]);
   return ref;
 }
 
@@ -57,7 +59,7 @@ function storyFor(kind: Kind) {
   return [
     { label: 'Antes', image: pair?.before, alt: `${what} antes da limpeza`, text: 'Como o encontrámos: nódoas e sujidade acumulada nas fibras.' },
     { label: 'Depois da limpeza', image: pair?.after, alt: `${what} depois da limpeza`, text: 'Pré-tratamento, escovagem e extração com água. A cor volta.' },
-    { label: 'Com proteção', video: imperVideo, poster: imperPoster, text: 'O líquido fica à superfície e sai com um pano. 24 h e está pronto.' },
+    { label: 'Com proteção', video: kind === 'chairs' ? chairVideo : imperVideo, poster: kind === 'chairs' ? chairPoster : imperPoster, text: 'O líquido fica à superfície e sai com um pano. 24 h e está pronto.' },
   ];
 }
 
@@ -66,7 +68,7 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
   const item = kind === 'sofa' ? 'os sofás' : 'as cadeiras';
   const story = storyFor(kind);
   const spillsRef = useAutoSlide<HTMLDivElement>();
-  const storyRef = useAutoSlide<HTMLDivElement>();
+  const storyRef = useAutoSlide<HTMLDivElement>(6000);
   return <>
     {/* 1. O que a proteção evita */}
     <section id="protecao" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
