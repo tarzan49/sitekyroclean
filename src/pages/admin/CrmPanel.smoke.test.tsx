@@ -75,7 +75,7 @@ describe('CrmPanel, filtros e fatura (dono, 27/10)', () => {
   });
 
   it('Por pagar mostra todos os meses e os clientes que me devem, mesmo com a equipa acertada', async () => {
-    rows.push({ ...base, id: 'r6', request_date: '2026-09-20', description: 'Cliente paga-me a mim', client_name: 'Rui Teste', billed_value: 150, my_cut: 75, paid: true, invoiced: false, paid_to_owner: true } as typeof rows[number]);
+    rows.push({ ...base, id: 'r6', request_date: '2026-10-20', description: 'Cliente paga-me a mim', client_name: 'Rui Teste', billed_value: 150, my_cut: 75, paid: true, invoiced: false, paid_to_owner: true } as typeof rows[number]);
     try {
       render(<CrmPanel />);
       await waitFor(() => expect(shown()).toHaveLength(4));

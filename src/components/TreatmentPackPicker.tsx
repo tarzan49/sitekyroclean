@@ -72,7 +72,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
 
   const m = (v: number) => String(v).replace('.', ',');
   const seats = Number(size.split('-')[0]);
-  const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => `${mCounts[x.id]} ${mCounts[x.id] === 1 ? 'colchão' : 'colchões'} ${x.label.toLowerCase()}`).join(' e ') : `um sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
+  const what = kind === 'rug' ? `um tapete de mais ou menos ${m(rugW)} x ${m(rugL)} m` : kind === 'mattress' ? MATTRESS_SIZES.filter(x => mCounts[x.id] > 0).map(x => `${mCounts[x.id]} ${mCounts[x.id] === 1 ? 'colchão' : 'colchões'} ${x.label.toLowerCase()}`).join(' e ') : `${count > 1 ? `${count} sofás` : 'um sofá'} de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
@@ -122,7 +122,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
               const active = size === o.id;
               return (
                 <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setSize(o.id)} className={box(active)}>
-                  <span className={`${kind === 'mattress' ? 'text-base' : 'text-xl'} font-semibold leading-none ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{o.label}</span>
+                  <span className={`text-xl font-semibold leading-none ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{o.label}</span>
                 </button>
               );
             })}

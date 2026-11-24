@@ -82,7 +82,7 @@ export default function ImperPricePicker({ city, source, initialKind = 'sofa' }:
             </button>;
           })}
         </div>
-        <p className="mt-2 text-xs text-[#666]">Preço final em {city}, deslocação incluída. Só em tecido: na pele não fazemos impermeabilização.</p>
+        <p className="mt-2 text-xs text-[#666]">Preço final {cityPrep(city)} {city}, deslocação incluída. Só em tecido: na pele não fazemos impermeabilização.</p>
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]">
           <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp

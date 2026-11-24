@@ -40,7 +40,7 @@ describe('WhatsApp enquiry context and privacy', () => {
     expect(buildGeneralWaMessage()).toBe('Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.');
   });
   it.each([undefined, null, '', '{referência}', 'Nome 900000000', 'audit@example.invalid'])('omits missing or unsafe reference %s', reference => {
-    expect(buildSubmittedWaMessage(reference)).toBe('Olá! Acabei de enviar o pedido. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.');
+    expect(buildSubmittedWaMessage(reference)).toBe('Olá! Acabei de enviar o pedido. Gostaria de confirmar o preço e a disponibilidade. Posso enviar fotografias dos artigos para avaliação.');
   });
   it('uses only the opaque reference after submission', () => {
     expect(buildSubmittedWaMessage('ANPNQP3Z')).toContain('pedido #ANPNQP3Z.');
