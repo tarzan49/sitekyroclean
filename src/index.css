@@ -748,3 +748,14 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #problemas .grid + p { margin-top: 8px; }
 }
 @keyframes kyro-reveal { 0%, 25% { clip-path: inset(0 100% 0 0); } 70%, 100% { clip-path: inset(0 0 0 0); } }
+@media (max-width: 767px) {
+  html.snap-sections #exemplos .grid { gap: 8px; }
+  html.snap-sections #exemplos figcaption { padding-top: 6px; }
+  html.snap-sections #exemplos .grid + p { margin-top: 8px; }
+  html.snap-sections #processo h2 { margin-bottom: 12px; }
+  html.snap-sections #beneficios .grid > div { padding: 12px 14px; }
+  html.snap-sections #beneficios .grid > div > span:first-child { display: none; }
+}
+@media (max-width: 767px) {
+  html.snap-sections #exemplos > div > div:first-child, html.snap-sections #processo > div > div:first-child { margin-bottom: 14px; }
+}

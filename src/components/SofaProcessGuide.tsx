@@ -13,7 +13,7 @@ import extractPoster from '@/assets/sofa-processo/extracao-poster.jpg';
 
 /** As cinco etapas com material real da equipa: fotografia antes, vídeos de pulverização,
  *  escovação e extração, fotografia depois. Os textos são os mesmos do prerender. */
-function realStory(): StoryStep[] {
+function realStory(custom?: { label: string; description: string; alt?: string }[]): StoryStep[] {
   const pair = BEFORE_AFTER_POOL.sofa.find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
   const media = [
     { image: pair?.before },
@@ -22,15 +22,16 @@ function realStory(): StoryStep[] {
     { video: extractVideo, poster: extractPoster },
     { image: pair?.after },
   ];
-  return steps.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt, ...media[i] }));
+  const list = custom && custom.length === 5 ? custom : steps;
+  return list.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt ?? s.label, ...media[i] }));
 }
 
 /** Novo modelo: história no telemóvel, cinco cartões reais no computador. */
-function SofaProcessStory({ city, cityPrep }: { city?: string; cityPrep: string }) {
-  const story = realStory();
+function SofaProcessStory({ city, cityPrep, custom, heading }: { city?: string; cityPrep: string; custom?: { label: string; description: string }[]; heading?: { text: string; gold: string } }) {
+  const story = realStory(custom);
   return <section id="processo" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
-      <SectionHeader heading={`A limpeza do seu sofá${city ? ` ${cityPrep}` : ''}`} goldWord={city || 'passo a passo'} light />
+      <SectionHeader heading={heading ? heading.text : `A limpeza do seu sofá${city ? ` ${cityPrep}` : ''}`} goldWord={heading ? heading.gold : city || 'passo a passo'} light />
       <StoryPlayer story={story} light />
       <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
         {story.map((p, i) => <figure key={p.label} className="min-w-0">
@@ -48,8 +49,8 @@ function SofaProcessStory({ city, cityPrep }: { city?: string; cityPrep: string 
 }
 
 
-export default function SofaProcessGuide({ real = false, ...props }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode; real?: boolean }) {
-  return real ? <SofaProcessStory city={props.city} cityPrep={props.cityPrep ?? 'em'} /> : <SofaProcessTabs {...props} />;
+export default function SofaProcessGuide({ real = false, steps: custom, heading, ...props }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode; real?: boolean; steps?: { label: string; description: string }[]; heading?: { text: string; gold: string } }) {
+  return real ? <SofaProcessStory city={props.city} cityPrep={props.cityPrep ?? 'em'} custom={custom} heading={heading} /> : <SofaProcessTabs {...props} />;
 }
 
 function SofaProcessTabs({ city, cityPrep = 'em', dark = false, switcher }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode }) {
