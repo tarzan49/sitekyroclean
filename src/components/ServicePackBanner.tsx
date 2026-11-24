@@ -22,7 +22,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
   }));
 
   return (
-    <section className={`py-14 md:py-20 ${light ? 'bg-[#FDFDF9] text-[#111111]' : 'bg-[#071a12] text-white'}`}>
+    <section data-pack-banner className={`py-14 md:py-20 ${light ? 'bg-[#FDFDF9] text-[#111111]' : 'bg-[#071a12] text-white'}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <SectionHeader
           overline="O pack à sua medida"

@@ -23,6 +23,13 @@ import { getProblemCities } from "@/data/problemCitySeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
+import ResourcePriceSection from "@/components/ResourcePriceSection";
+import SofaProcessGuide from "@/components/SofaProcessGuide";
+import ServiceProcessStory from "@/components/ServiceProcessStory";
+import CustomerReviews from "@/components/CustomerReviews";
+import CompactFAQ from "@/components/CompactFAQ";
+import { pickReviewSubset } from "@/data/reviewsPool";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import {
   buildLocalBusinessNode,
   buildWebPageNode,
@@ -36,6 +43,10 @@ import {
 const ProblemPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const data = useMemo(() => (slug ? getProblemBySlug(slug) : null), [slug]);
+  // Modelo novo nas páginas de problema nacionais de sofás, tapetes e alcatifas (dono, 24 Nov).
+  const svc = data?.relatedServices[0];
+  const fresh = svc === 'limpeza-sofas' || svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas';
+  useSnapSections(fresh);
   const relatedService = useMemo(
     () => (data ? services.find(s => s.slug === data.relatedServices[0]) : undefined),
     [data]
@@ -94,23 +105,27 @@ const ProblemPage = () => {
       <main>
 
         <ProblemHero problem={data} breadcrumb={breadcrumb} />
-        <ServicePriceSection serviceSlug={data.relatedServices[0]} />
+        {fresh ? <ResourcePriceSection service={svc} source={`problem_hub_${data.slug}`} /> : <ServicePriceSection serviceSlug={data.relatedServices[0]} />}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug={data.relatedServices[0]} seed={data.slug} heading="" />
+            <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            {fresh ? <CustomerReviews reviews={pickReviewSubset(svc!, data.slug, 6)} /> : <ServiceReviewsGrid serviceSlug={data.relatedServices[0]} seed={data.slug} heading="" />}
           </div>
         </section>
 
         <ProblemExamplesGallery key={`examples-${slug}`} problem={data} />
 
-        <ProblemTreatmentGuide key={`process-${slug}`} guide={layout.processGuide} slug={data.slug} />
+        {svc === 'limpeza-sofas'
+          ? <SofaProcessGuide key={`process-${slug}`} real steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+          : svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas'
+          ? <ServiceProcessStory key={`process-${slug}`} service={svc} steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+          : <ProblemTreatmentGuide key={`process-${slug}`} guide={layout.processGuide} slug={data.slug} />}
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={layout.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="light" />
+          fresh ? <CompactFAQ id="duvidas" faqs={layout.faqs.slice(0, 6)} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} /> : <ServiceFAQ faqs={layout.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="light" />
         )}
 
         <ServicePackBanner

@@ -713,6 +713,8 @@ export function prerenderRoutes(outDir: string): number {
     const prev = count;
     for (const p of getAllProblems()) {
       const layout = getProblemLayout(p);
+      // Modelo novo (dono, 24 Nov): sofás, tapetes e alcatifas mostram 6 perguntas; o HTML diz o mesmo.
+      const hubFaqs = ['limpeza-sofas', 'limpeza-tapetes', 'limpeza-alcatifas'].includes(p.relatedServices[0]) ? layout.faqs.slice(0, 6) : layout.faqs;
       const hero = getProblemHero(p);
       emit(
         `/problemas/${p.slug}`,
@@ -728,7 +730,7 @@ export function prerenderRoutes(outDir: string): number {
           links: getProblemCities(p.slug).map(city => ({ href: `/${p.slug}-${city.slug}`, label: city.name })),
           problems: layout.examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })),
           processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })),
-          faqs: layout.faqs,
+          faqs: hubFaqs,
         },
         // Migalha igual à da página React (Início › serviço › problema): a
         // mesma `problemBreadcrumb` que o hero e o JSON-LD do React usam. Estas
@@ -738,7 +740,7 @@ export function prerenderRoutes(outDir: string): number {
         // duas de uma só vez, sem poderem discordar.
         [
           buildBreadcrumbSchema(problemBreadcrumb(p).map(step => ({ name: step.name, url: `${BASE_URL}${step.path}` }))),
-          buildFaqSchema(layout.faqs),
+          buildFaqSchema(hubFaqs),
         ],
       );
     }

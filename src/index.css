@@ -794,8 +794,8 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 /* Página inicial: o topo (HeroV1, #orcamento) mantém a sua disposição própria dentro do encaixe. */
 @media (max-width: 767px) {
   /* "Aproveite a mesma visita": cartões fortes a deslizar no telemóvel (cabe num ecrã). */
-  html.snap-sections #mesma-visita .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
-  html.snap-sections #mesma-visita .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
+  html.snap-sections #mesma-visita .grid, html.snap-sections [data-pack-banner] .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
+  html.snap-sections #mesma-visita .grid > *, html.snap-sections [data-pack-banner] .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
 }
 html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-top: 76px !important; padding-bottom: 28px !important; }
 @media (min-width: 768px) { html.snap-sections main > section#orcamento { padding-top: 100px; padding-bottom: 100px; } }
