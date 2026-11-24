@@ -31,18 +31,7 @@ const subtitles: Record<string, string> = {
   // nunca leva "desde" (pedido do dono, 26/09/2026).
   [CHAIR_WATERPROOF_SUBTITLE_KEY]: `Proteção Premium desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)}: até 10 anos e até 5 lavagens. Essencial desde ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)}.`,
 };
-/**
- * Lisboa e Porto: o topo da limpeza de sofás diz o mesmo que o anúncio Google
- * (dono, 24 Nov: "Sofá como novo desde 49€, com deslocação incluída."). O preço
- * vem do catálogo; React e HTML estático leem estas mesmas funções.
- */
-export const SOFA_AD_MATCH_CITIES = new Set(['Lisboa', 'Porto']);
-const SOFA_FROM = services.find(item => item.slug === 'limpeza-sofas')?.priceFrom ?? '';
-const isSofaAdMatch = (serviceSlug: string, city?: string) => serviceSlug === 'limpeza-sofas' && !!city && SOFA_AD_MATCH_CITIES.has(city) && !!SOFA_FROM;
-export const SOFA_AD_MATCH_SUBTITLE = `Sofá como novo desde ${SOFA_FROM}, com deslocação incluída.`;
-export const SOFA_AD_MATCH_PRICE_LINE = `Desde ${SOFA_FROM}, deslocação incluída.`;
-
-export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => isSofaAdMatch(serviceSlug, city) ? SOFA_AD_MATCH_SUBTITLE : `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city && EXTENDED_TRIP_CITIES.has(city) ? ' Disponibilidade sob consulta.' : ''}`;
+export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city && EXTENDED_TRIP_CITIES.has(city) ? ' Disponibilidade sob consulta.' : ''}`;
 
 /**
  * Os factos que o hero mostra: a linha de preço e os três indicadores.
@@ -65,7 +54,6 @@ export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => is
 export const commercialHeroPriceLine = (serviceSlug: string, municipality?: string, price?: string): string => {
   // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
   if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
-  if (isSofaAdMatch(serviceSlug, municipality) && !price?.match(/orçamento/i)) return SOFA_AD_MATCH_PRICE_LINE;
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
