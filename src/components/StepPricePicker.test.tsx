@@ -11,15 +11,15 @@ describe('StepPricePicker', () => {
   it('sofá: pede localidade, material, lugares e opção, sem nada escolhido; o preço é o do cesto', async () => {
     const onCity = vi.fn();
     const { rerender } = render(<StepPricePicker kind="sofa" city="" onCity={onCity} source="t" />);
-    expect(screen.getByText('Escolha a localidade')).toBeTruthy();
+    expect(screen.getByText('Onde é o serviço?')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Lisboa' }));
     expect(onCity).toHaveBeenCalledWith('Lisboa');
     rerender(<StepPricePicker kind="sofa" city="Lisboa" onCity={onCity} source="t" />);
-    expect(screen.getByText('Escolha o material')).toBeTruthy();
+    expect(screen.getByText('O seu sofá é de que material?')).toBeTruthy();
+    expect(document.querySelector('a[href*="wa.me"]')).toBeNull(); // só há botão quando há preço
     fireEvent.click(screen.getByText('Tecido'));
-    expect(screen.getByText('Escolha os lugares e quantos')).toBeTruthy();
+    expect(screen.getByText('Quantos lugares?')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Juntar um sofá de 3 lugares'));
-    expect(screen.getByText('Escolha uma opção')).toBeTruthy();
     for (const name of ['Blindado', 'Protegido', 'Renovado']) expect(screen.getByText(name).closest('button')!.getAttribute('aria-pressed')).toBe('false');
     const want = optionPrice('Lisboa', [], [newItem('sofa', { size: '3-lugares', qty: 1, pack: 'premium' })]);
     expect(await screen.findByText(euros(want.shown!))).toBeTruthy();
@@ -39,7 +39,7 @@ describe('StepPricePicker', () => {
   });
   it('cadeiras: nenhuma quantidade nem opção escolhida à partida', () => {
     render(<StepPricePicker kind="chairs" city="Porto" source="t" />);
-    expect(screen.getByText('Escolha quantas cadeiras')).toBeTruthy();
+    expect(screen.getByText('Quantas cadeiras?')).toBeTruthy();
     expect(screen.queryByText('Blindado')).toBeNull();
   });
 });

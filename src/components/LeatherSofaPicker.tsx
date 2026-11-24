@@ -5,6 +5,7 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
 import { Check, MessageCircle, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
+import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
 import SofaCounters, { sofaItems, sofaWhat, sofaTotal, type SofaCounts } from '@/components/SofaCounters';
@@ -16,7 +17,12 @@ const OPTIONS = [
   { id: 'limpeza', name: 'Renovado', note: 'Só a limpeza', leather: false, top: false, wa: 'só limpeza' },
 ];
 
-export default function LeatherSofaPicker({ city, source, syntheticOnly = false }: { city: string; source: string; syntheticOnly?: boolean }) {
+export default function LeatherSofaPicker(props: { city: string; source: string; syntheticOnly?: boolean; onCity?: (city: string) => void }) {
+  // Pele verdadeira: a lógica do orçamento, com o material já escolhido. Pele sintética: só a limpeza.
+  return props.syntheticOnly ? <SyntheticSofaPicker {...props} /> : <StepPricePicker kind="sofa" material="pele" city={props.city} source={props.source} onCity={props.onCity} />;
+}
+
+function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: string; source: string; syntheticOnly?: boolean }) {
   // Pele sintética/PU: só a limpeza (sem tratamento da pele nem impermeabilização).
   const options = syntheticOnly ? OPTIONS.filter(o => !o.leather) : OPTIONS;
   // Sofás por tamanho, combináveis, com o total em pequeno (dono, 25 Nov).
@@ -37,7 +43,7 @@ export default function LeatherSofaPicker({ city, source, syntheticOnly = false 
       <div>
         <p className="mb-2 text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
         <SofaCounters counts={counts} onChange={setCounts} />
-        <button type="button" onClick={() => setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
+        <button type="button" onClick={() => setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-bold text-[#1A1A1A] hover:bg-[#FFFDF5] md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
       </div>
       <div>
         <div className="flex flex-col gap-2.5 pt-1.5 md:gap-3" role="radiogroup" aria-label="Opção">
@@ -45,7 +51,7 @@ export default function LeatherSofaPicker({ city, source, syntheticOnly = false 
             const active = choice === o.id;
             const value = totals[o.id];
             return <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setChoice(o.id)}
-              className={`relative flex min-h-[58px] items-stretch rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white'}`}>
+              className={`relative flex min-h-[58px] items-stretch rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
               {o.top && <span className="absolute -top-3 left-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
               <span className="flex min-w-0 flex-1 flex-col justify-center px-4 py-2.5 text-left">
                 <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>
@@ -53,7 +59,7 @@ export default function LeatherSofaPicker({ city, source, syntheticOnly = false 
               </span>
               <span className="flex items-center gap-2 pr-3">
                 <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">{!sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
-                <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
+                <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
               </span>
             </button>;
           })}

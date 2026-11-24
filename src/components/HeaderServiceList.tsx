@@ -44,7 +44,7 @@ export default function HeaderServiceList({ dark = false, onNavigate }: { dark?:
                 <img src={s.img} alt="" width={56} height={56} decoding="async" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
                 <span className="min-w-0">
                   <span className="block text-[15px] font-semibold leading-tight text-[#111111]">{s.label}</span>
-                  <span className="mt-0.5 block text-xs font-semibold text-[#8B6914]">{s.price}</span>
+                  <span className="mt-0.5 block text-xs font-semibold text-[#D4AF37]">{s.price}</span>
                 </span>
               </Link>
             )}

@@ -47,13 +47,13 @@ function Choice({ items, value, onChange, label, compact }: { items: T[]; value:
     {items.map(t => {
       const active = value === t.id;
       return <button key={t.id} type="button" role="radio" aria-checked={active} onClick={() => onChange(t.id)}
-        className={`relative flex flex-col overflow-hidden rounded-xl border-2 text-left transition-all ${active ? 'border-[#D4AF37] bg-[#FFFBEF] shadow-[0_6px_18px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white'}`}>
+        className={`relative flex flex-col overflow-hidden rounded-xl border-2 text-left transition-all ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
         {!compact && <img src={t.img} alt="" loading="lazy" decoding="async" className="h-[52px] w-full object-cover" />}
         <span className="px-2 py-1.5">
           <span className="block text-[13px] font-bold leading-tight text-[#1A1A1A]">{t.label}</span>
-          <span className="block text-[11px] leading-tight text-[#555]">{t.note}</span>
+          <span className="block text-[11px] leading-tight text-[#1A1A1A]/75">{t.note}</span>
         </span>
-        {active && <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-[#D4AF37] text-white"><Check className="h-3 w-3" strokeWidth={3} /></span>}
+        {active && <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-[#0B2F2A] text-[#D4AF37]"><Check className="h-3 w-3" strokeWidth={3} /></span>}
       </button>;
     })}
   </div>;
@@ -104,7 +104,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   };
   const chosen = pieces.filter(p => p !== 'rug' || rug);
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} ${groupGifts(gifts).length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.`;
-  const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
+  const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-[#0B2F2A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
   const q = 'mb-1.5 text-base font-semibold text-[#1A1A1A]';
 
   return (
@@ -124,21 +124,21 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
           <div className="mb-1.5 flex items-center justify-between">
             <p className="text-base font-semibold text-[#1A1A1A]">As cadeiras: quantas?</p>
             <div className="flex items-center gap-2">
-              <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(n => Math.max(1, n - 1))} className="grid h-9 w-9 place-items-center rounded-lg bg-[#F3F0E7]"><Minus className="h-4 w-4" /></button>
+              <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(n => Math.max(1, n - 1))} className="grid h-9 w-9 place-items-center rounded-lg bg-[#EEF1EE]"><Minus className="h-4 w-4" /></button>
               <span className="w-6 text-center text-lg font-semibold">{qty}</span>
-              <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(n => Math.min(20, n + 1))} className="grid h-9 w-9 place-items-center rounded-lg bg-[#F3F0E7]"><Plus className="h-4 w-4" /></button>
+              <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(n => Math.min(20, n + 1))} className="grid h-9 w-9 place-items-center rounded-lg bg-[#EEF1EE]"><Plus className="h-4 w-4" /></button>
             </div>
           </div>
           <Choice compact={compact} items={TREATMENTS.chairs} value={t.chairs} onChange={setTreat('chairs')} label="Tratamento das cadeiras" />
         </>}
         {p === 'rug' && <>
-          <button type="button" role="switch" aria-checked={rug} onClick={() => setRug(r => !r)} className={`flex w-full items-center gap-3 overflow-hidden rounded-xl border-2 text-left ${rug ? 'border-[#D4AF37] bg-[#FFFBEF]' : 'border-[#E5E0D3] bg-white'}`}>
+          <button type="button" role="switch" aria-checked={rug} onClick={() => setRug(r => !r)} className={`flex w-full items-center gap-3 overflow-hidden rounded-xl border-2 text-left ${rug ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
             {!compact && <img src={pair('tapete')?.after} alt="" loading="lazy" decoding="async" className="h-14 w-16 shrink-0 object-cover" />}
             <span className={`flex-1 ${compact ? 'px-3 py-2' : 'py-1.5'}`}>
               <span className="block text-[14px] font-bold text-[#1A1A1A]">Juntar o tapete</span>
-              <span className="block text-[11px] leading-tight text-[#555]">Lavagem em casa, pelas medidas</span>
+              <span className="block text-[11px] leading-tight text-[#1A1A1A]/75">Lavagem em casa, pelas medidas</span>
             </span>
-            <span className={`mr-3 grid h-5 w-5 place-items-center rounded-full border-2 ${rug ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{rug && <Check className="h-3 w-3" strokeWidth={3} />}</span>
+            <span className={`mr-3 grid h-5 w-5 place-items-center rounded-full border-2 ${rug ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{rug && <Check className="h-3 w-3" strokeWidth={3} />}</span>
           </button>
           {rug && <div className="mt-1.5 flex items-center gap-2 text-sm text-[#555]">
             <span>Medidas (m):</span>
@@ -155,12 +155,12 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
           </span>
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>
         </div>
-        {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#8B6914]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
+        {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#D4AF37]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-2 flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
           <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp
         </a>
-        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} /></Suspense>}
     </div>

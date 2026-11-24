@@ -80,7 +80,7 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()}${kind !== 'rug' && choice === 'treat' ? ' (produto Bactran)' : ''} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}.`;
-  const box = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 transition-all md:min-h-[60px] ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`;
+  const box = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 transition-all md:min-h-[60px] ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`;
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">
@@ -96,9 +96,9 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
               <div key={label} className="rounded-2xl border-2 border-[#E5E0D3] bg-white p-2">
                 <p className="text-center text-xs font-semibold text-[#666]">{label}</p>
                 <div className="mt-1 flex items-center justify-between">
-                  <button type="button" aria-label={`Menos ${label.toLowerCase()}`} onClick={() => set(x => Math.max(0.5, x - 0.5))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Minus className="h-4 w-4" /></button>
+                  <button type="button" aria-label={`Menos ${label.toLowerCase()}`} onClick={() => set(x => Math.max(0.5, x - 0.5))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#EEF1EE] text-[#1A1A1A] hover:bg-[#E1E6E2]"><Minus className="h-4 w-4" /></button>
                   <span className="text-lg font-semibold text-[#1A1A1A]">{m(v)} m</span>
-                  <button type="button" aria-label={`Mais ${label.toLowerCase()}`} onClick={() => set(x => Math.min(10, x + 0.5))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-4 w-4" /></button>
+                  <button type="button" aria-label={`Mais ${label.toLowerCase()}`} onClick={() => set(x => Math.min(10, x + 0.5))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#EEF1EE] text-[#1A1A1A] hover:bg-[#E1E6E2]"><Plus className="h-4 w-4" /></button>
                 </div>
               </div>
             ))}
@@ -110,19 +110,19 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
             {kind === 'mattress' ? MATTRESS_SIZES.map(o => {
               const n = mCounts[o.id] ?? 0;
               return (
-                <div key={o.id} className={`flex flex-col items-center gap-1 rounded-2xl border-2 px-1 py-2 transition-all ${n > 0 ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#E5E0D3] bg-white'}`}>
+                <div key={o.id} className={`flex flex-col items-center gap-1 rounded-2xl border-2 px-1 py-2 transition-all ${n > 0 ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white'}`}>
                   <span className={`text-base font-semibold leading-none ${n > 0 ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{o.label}</span>
                   <div className="flex items-center gap-1">
-                    <button type="button" aria-label={`Menos um colchão ${o.label}`} onClick={() => bump(o.id, -1)} className="grid h-7 w-7 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Menos um colchão ${o.label}`} onClick={() => bump(o.id, -1)} className="grid h-7 w-7 place-items-center rounded-lg bg-[#EEF1EE] text-[#1A1A1A]"><Minus className="h-3.5 w-3.5" /></button>
                     <span className="w-5 text-center text-base font-bold text-[#1A1A1A]">{n}</span>
-                    <button type="button" aria-label={`Mais um colchão ${o.label}`} onClick={() => bump(o.id, 1)} className="grid h-7 w-7 place-items-center rounded-lg bg-[#F3F0E7] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Mais um colchão ${o.label}`} onClick={() => bump(o.id, 1)} className="grid h-7 w-7 place-items-center rounded-lg bg-[#EEF1EE] text-[#1A1A1A]"><Plus className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
               );
             }) : null}
           </div>
         )}
-        <button type="button" onClick={() => more({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
+        <button type="button" onClick={() => more({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#FFFDF5] md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>
       </div>
 
       {/* 2. Opções com o total final, 3. um botão */}
@@ -135,7 +135,7 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
             const value = totals[o.id];
             return (
               <button key={o.id} type="button" role="radio" aria-checked={active} onClick={() => setChoice(o.id)}
-                className={`relative flex min-h-[58px] items-center rounded-2xl border-2 px-4 py-2.5 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                className={`relative flex min-h-[58px] items-center rounded-2xl border-2 px-4 py-2.5 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
                 {o.top && <span className="absolute -top-3 left-4 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
                 <span className="flex min-w-0 flex-1 flex-col justify-center">
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.title}</span>
@@ -146,7 +146,7 @@ function SofaTreatmentPicker({ kind, city, source, onMore }: Props) {
                   {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="mb-0.5 text-[12px] text-[#888] line-through">{formatEuro(struck)}</span>}
                   <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">{kind === 'sofa' && !sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                   </span>
-                  <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
+                  <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
                 </span>
               </button>
             );
