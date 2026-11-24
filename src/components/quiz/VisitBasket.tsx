@@ -12,6 +12,8 @@ import { formatEuro } from '@/data/enginePrices';
 import { buildQuizOrder, type QuoteItem } from '@/lib/quizOrder';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { buildWaUrl, type QuizLeadPayload } from '@/services/submissionService';
+import { IS_PRODUCTION } from '@/lib/quizTracking';
+import type { QuizOrder } from '@/lib/quizOrder';
 
 export type BasketPack = 'premium' | 'essencial' | 'none';
 export type BasketKind = 'sofa' | 'mattress' | 'chairs' | 'rug' | 'carpet';
@@ -95,11 +97,13 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [failed, setFailed] = useState(false);
+  // Fora de produção nada é enviado: mostra-se o pedido tal como o bot o vai ler, para testar.
+  const [testOrder, setTestOrder] = useState<QuizOrder | null>(null);
 
   // Cada abertura a partir do widget traz a escolha dessa altura.
   useEffect(() => {
     if (!isOpen) return;
-    setCity(initialCity); setItems(initialItems); setStep('basket'); setFailed(false);
+    setCity(initialCity); setItems(initialItems); setStep('basket'); setFailed(false); setTestOrder(null);
     if (!initialItems.length) setEditing(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -138,6 +142,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         rugPickup: items.some(i => isRug(i.kind)) ? false : null,
       },
     };
+    if (!IS_PRODUCTION) { setTestOrder(payload.basketOrder ?? null); return; }
     const r = await submit(payload);
     if (!r.success) setFailed(true);
   };
@@ -147,6 +152,29 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
     setItems(list => (list.some(i => i.id === editing.id) ? list.map(i => (i.id === editing.id ? editing : i)) : [...list, editing]));
     setEditing(null);
   };
+
+  if (testOrder) {
+    // O mesmo cálculo que o bot faz quando recebe o pedido (botQuote dos itens do quiz_order).
+    const bot = botQuote({ city: testOrder.city, items: testOrder.quote.items }) as Quote;
+    const botTotal = bot.ok && !bot.quote && typeof bot.total === 'number' ? bot.total : null;
+    const same = testOrder.total === null ? botTotal === null || testOrder.sobOrcamento : botTotal === testOrder.total;
+    return (
+      <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#FAF8F3] p-4" role="dialog" aria-modal="true" aria-label="Teste do pedido">
+        <p className="mb-2 text-xs font-bold uppercase text-[#1A1A1A]/60">Teste (não foi enviado)</p>
+        <h3 className={`mb-3 text-2xl font-bold ${same ? 'text-[#1E7F4F]' : 'text-[#B42318]'}`}>{same ? 'Pedido aceite' : 'Pedido com diferença'}</h3>
+        <ul className="mb-3 space-y-1 rounded-2xl border border-black/10 bg-white p-3 text-sm">
+          <li><b>Nome:</b> {name} · <b>Telemóvel:</b> {phone}</li>
+          <li><b>Localidade:</b> {testOrder.city}</li>
+          {testOrder.lines.map((l, i) => <li key={i}>{l.label}: {l.price === null ? 'sob orçamento' : formatEuro(l.price)}</li>)}
+          <li><b>Total no site:</b> {testOrder.priceText}</li>
+          <li><b>Total que o bot calcula:</b> {botTotal === null ? 'sob orçamento' : formatEuro(botTotal)}</li>
+          <li><b>Itens para o bot:</b> {testOrder.quote.items.length}{testOrder.rugs.length ? ` (${testOrder.rugs.length} tapete/alcatifa com medidas)` : ''}</li>
+        </ul>
+        <p className="mb-4 text-xs text-[#1A1A1A]/60">Em produção, este pedido vai para o CRM e o cliente recebe no WhatsApp a mensagem automática do questionário.</p>
+        <button type="button" onClick={() => setTestOrder(null)} className="min-h-12 w-full rounded-2xl bg-[#D4AF37] font-bold text-[#111]">Voltar ao cesto</button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-[#FAF8F3]" role="dialog" aria-modal="true" aria-label="Orçamento da visita">
