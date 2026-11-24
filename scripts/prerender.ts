@@ -12,7 +12,7 @@ import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialEx
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments, treatmentContentSections, treatmentArticles } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL, WHATSAPP_BASE } from '../src/constants/business';
-import { GOOGLE_REVIEW_URL } from '../src/constants/google';
+import { reviewLinkForCity } from '../src/data/reviewLink';
 import { buildSubmittedWaMessage } from '../src/lib/whatsappMessages';
 import { locationPrices } from '../src/constants/travel';
 import { buildAboutPageSchema, buildStudySchemas } from '../src/lib/seoSchema';
@@ -47,7 +47,7 @@ import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '.
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { LEGAL_PAGES } from '../src/data/legalPages';
 import { renderLegalHtml } from '../src/data/legalContent';
-import { NOT_FOUND_H1, NOT_FOUND_LINKS, NOT_FOUND_LINKS_HEADING, NOT_FOUND_TEXT, QUOTE_CONFIRM_LABEL, QUOTE_EMPTY_H1, QUOTE_EMPTY_TEXT, QUOTE_SUMMARY_TITLE, REVIEW_ASK, REVIEW_BUTTON, REVIEW_H1, REVIEW_WHATSAPP } from '../src/data/supportPages';
+import { NOT_FOUND_H1, NOT_FOUND_LINKS, NOT_FOUND_LINKS_HEADING, NOT_FOUND_TEXT, QUOTE_CONFIRM_LABEL, QUOTE_EMPTY_H1, QUOTE_EMPTY_TEXT, QUOTE_SUMMARY_TITLE, REVIEW_ASK, REVIEW_BUTTON, REVIEW_H1, REVIEW_PAGE_TITLE, REVIEW_WHATSAPP } from '../src/data/supportPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero, problemBreadcrumb } from '../src/data/problemHero';
@@ -63,6 +63,7 @@ import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug, marcasColchao }
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug, marcasCadeiras } from '../src/data/marcaCadeirasData';
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
+import { BLOG_THEMES } from '../src/data/blogThemes';
 import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData, getSector, COMMERCIAL_CITIES, SECTORS, CONTRACT_POINTS } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildHowToNode, buildServicePageSchema, offerForPriceLabel } from '../src/lib/seoSchema';
@@ -196,7 +197,7 @@ interface PageContent {
   // a lista de artigos era desenhada só pelo React: o HTML que os crawlers
   // leem não tinha uma única ligação para nenhum dos 26 artigos, e todos eles
   // ficavam órfãos. Mesma falha do glossário na fase 2 e da migalha na fase 8.
-  postList?: { href: string; title: string; category?: string; date?: string; readingTime?: number }[];
+  postList?: { heading: string; posts: { href: string; title: string; date?: string; readingTime?: number }[] }[];
   serviceExamples?: ReturnType<typeof getServiceExamples>;
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
@@ -286,9 +287,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
 
   if (c.resourceCommercial) {
     const commercial = c.resourceCommercial;
-    html += `<p>${escHtml(commercial.priceLine)}</p><ul>${commercial.stats.map(stat => `<li>${escHtml(stat.value)} · ${escHtml(stat.label)}</li>`).join('')}</ul>`;
-    html += `<section id="precos"><h2>Preços e orçamento</h2><table><caption>Valores do serviço, deslocação à parte</caption><thead><tr><th>Artigo</th><th>Preço</th></tr></thead><tbody>${commercial.priceRows.map(row => `<tr><th>${escHtml(row.item)}</th><td>${escHtml(row.price)}</td></tr>`).join('')}</tbody></table><p>${escHtml(PRICE_PROMISE)}</p>${commercial.trustPoints.map(point => `<p>${escHtml([point.stat, point.titleGold, point.titleRest, point.desc].filter(Boolean).join(' '))}</p>`).join('')}</section>`;
-    html += `<section><h2>Nas palavras dos nossos clientes</h2>${commercial.reviews.map(review => `<blockquote><p>${escHtml(review.text)}</p><footer>${escHtml(review.name)}${review.city ? ` · ${escHtml(review.city)}` : ''}</footer></blockquote>`).join('')}</section>`;
+    html += `<p>${escHtml(commercial.priceLine)}</p><p>${REVIEW_RATING}★ · +${REVIEW_COUNT} avaliações Google</p>`;
   }
 
   if (c.links?.length) {
@@ -299,15 +298,16 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   }
 
   if (c.postList?.length) {
-    html += `<section><ul>\n`;
-    for (const post of c.postList) {
-      const meta: string[] = [];
-      if (post.category) meta.push(escHtml(post.category));
-      if (post.date) meta.push(`<time datetime="${escHtml(post.date)}">${formatDatePt(post.date)}</time>`);
-      if (post.readingTime) meta.push(`${post.readingTime} min de leitura`);
-      html += `<li><a href="${escHtml(post.href)}">${escHtml(post.title)}</a>${meta.length ? ` · ${meta.join(' · ')}` : ''}</li>\n`;
+    for (const theme of c.postList) {
+      html += `<section><h2>${escHtml(theme.heading)}</h2><ul>\n`;
+      for (const post of theme.posts) {
+        const meta: string[] = [];
+        if (post.date) meta.push(`<time datetime="${escHtml(post.date)}">${formatDatePt(post.date)}</time>`);
+        if (post.readingTime) meta.push(`${post.readingTime} min de leitura`);
+        html += `<li><a href="${escHtml(post.href)}">${escHtml(post.title)}</a>${meta.length ? ` · ${meta.join(' · ')}` : ''}</li>\n`;
+      }
+      html += `</ul></section>\n`;
     }
-    html += `</ul></section>\n`;
   }
 
   if (c.hero) {
@@ -434,6 +434,13 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `</ol></section>\n`;
   }
 
+  // Artigos: as avaliações e o preço vêm depois do texto, como na página (BlogPost.tsx).
+  if (c.resourceCommercial) {
+    const commercial = c.resourceCommercial;
+    html += `<section><h2>Nas palavras dos nossos clientes</h2>${commercial.reviews.map(review => `<blockquote><p>${escHtml(review.text)}</p><footer>${escHtml(review.name)}${review.city ? ` · ${escHtml(review.city)}` : ''}</footer></blockquote>`).join('')}</section>`;
+    html += `<section id="precos"><h2>Preços e orçamento</h2><table><caption>Valores do serviço, deslocação à parte</caption><thead><tr><th>Artigo</th><th>Preço</th></tr></thead><tbody>${commercial.priceRows.map(row => `<tr><th>${escHtml(row.item)}</th><td>${escHtml(row.price)}</td></tr>`).join('')}</tbody></table><p>${escHtml(PRICE_PROMISE)}</p>${commercial.trustPoints.map(point => `<p>${escHtml([point.stat, point.titleGold, point.titleRest, point.desc].filter(Boolean).join(' '))}</p>`).join('')}</section>`;
+  }
+
   // O mesmo bloco que o rodapé React desenha (BusinessConditions.tsx), a partir
   // da mesma lista (SERVICE_CONDITIONS em commercialPolicy.ts).
   if (lang === 'pt') html += SERVICE_CONDITIONS_HTML + ENTITY_FOOTER_HTML;
@@ -492,7 +499,8 @@ export function prerenderRoutes(outDir: string): number {
   const assetNames = fs.readdirSync(path.join(outDir, 'assets'));
   const heroServices = new Map<string, string>();
   const heroPages = new Map<string, string>();
-  for (const post of getAllPosts()) { heroServices.set(`/blog/${post.slug}`, post.relatedService.href.slice(1)); heroPages.set(`/blog/${post.slug}`, 'BlogPost'); }
+  // Os artigos têm topo próprio (fotografia do guia), sem o antes e depois do serviço para pré-carregar.
+  for (const post of getAllPosts()) heroPages.set(`/blog/${post.slug}`, 'BlogPost');
   for (const material of getAllMaterials()) {
     heroServices.set(`/${material.slug}`, material.serviceSlug);
     heroPages.set(`/${material.slug}`, 'MaterialPage');
@@ -1197,12 +1205,14 @@ export function prerenderRoutes(outDir: string): number {
           // A mesma lista que a página React desenha, pela mesma ordem e com os
           // mesmos campos que ela mostra em cada cartão. Sem isto o índice do
           // blog era um hub que não ligava a nenhum dos seus artigos.
-          postList: getAllPosts().map(post => ({
-            href: `/blog/${post.slug}`,
-            title: post.title,
-            category: post.category,
-            date: post.updatedDate || post.publishDate,
-            readingTime: post.readingTime,
+          postList: BLOG_THEMES.map(theme => ({
+            heading: `${theme.heading} ${theme.goldWord}`,
+            posts: theme.slugs.map(slug => getAllPosts().find(post => post.slug === slug)!).map(post => ({
+              href: `/blog/${post.slug}`,
+              title: post.title,
+              date: post.updatedDate || post.publishDate,
+              readingTime: post.readingTime,
+            })),
           })),
         },
       },
@@ -1629,10 +1639,12 @@ export function prerenderRoutes(outDir: string): number {
     // As duas de agradecimento levam o que a página mostra sem pedido na sessão.
     const bodies: Record<string, string> = {
       '/obrigado': `<main><h1>${escHtml(QUOTE_EMPTY_H1.join(' '))}</h1><section><h2>${escHtml(QUOTE_SUMMARY_TITLE)}</h2><p>${escHtml(QUOTE_EMPTY_TEXT)}</p></section><a href="${escHtml(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage())}`)}">${escHtml(QUOTE_CONFIRM_LABEL)}</a><p>${escHtml(RESPONSE_PROMISE)}</p></main>`,
-      '/obrigado-pelo-servico': `<main><h1>${escHtml(REVIEW_H1)}</h1><p>${escHtml(REVIEW_ASK)}</p><a href="${escHtml(GOOGLE_REVIEW_URL)}">${escHtml(REVIEW_BUTTON)}</a><a href="${WHATSAPP_BASE}">${escHtml(REVIEW_WHATSAPP)}</a></main>`,
+      '/obrigado-pelo-servico': `<main><h1>${escHtml(REVIEW_H1)}</h1><p>${escHtml(REVIEW_ASK)}</p><a href="${escHtml(reviewLinkForCity())}">${escHtml(REVIEW_BUTTON)}</a><a href="${WHATSAPP_BASE}">${escHtml(REVIEW_WHATSAPP)}</a></main>`,
     };
     for (const routePath of CLIENT_ONLY_ROUTES) {
       let html = template.replace('</head>', '  <meta name="robots" content="noindex, follow">\n</head>');
+      // Título e descrição próprios: é o que a pré-visualização do link mostra no WhatsApp.
+      if (routePath === '/obrigado-pelo-servico') html = injectMeta(html, REVIEW_PAGE_TITLE, REVIEW_ASK, `${BASE_URL}${routePath}`);
       if (bodies[routePath]) html = injectContent(html, bodies[routePath]);
       html = injectJsonLd(html, LOCAL_BIZ);
       writeRoute(outDir, routePath, html);

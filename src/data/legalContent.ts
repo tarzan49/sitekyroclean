@@ -2,12 +2,13 @@
 // estático (scripts/prerender.ts) desenham estes mesmos blocos. Até 25/11/2026 o
 // texto vivia nos componentes e o HTML estático levava só um resumo.
 //
-// Conteúdo jurídico: não se muda uma palavra sem o OK do dono.
+// Conteúdo jurídico: não se muda uma palavra sem o OK do dono (última: 24/11/2026, sinal, fatura, NIPC,
+// equipas parceiras, WhatsApp, assistente com IA, Vendus e conservação das faturas).
 //
 // Sem imports com alias `@/` (lido em Node puro pelo prerender). Fica fora de
 // `legalPages.ts` porque esse está no pacote inicial de todas as páginas (PageHead).
 import { DEPOSIT_RULE, SATISFACTION_PROMISE, SATISFACTION_PHOTOS, PRICE_PROMISE } from '../constants/commercialPolicy';
-import { BUSINESS_ADDRESS, BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_DISPLAY, PHONE_E164, PHONE_TEL, WHATSAPP_BASE } from '../constants/business';
+import { BUSINESS_ADDRESS, BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, BUSINESS_LEGAL_NAME, BUSINESS_TAX_ID, PHONE_DISPLAY, PHONE_E164, PHONE_TEL, WHATSAPP_BASE } from '../constants/business';
 
 export interface LegalSection {
   title: string;
@@ -25,7 +26,7 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
     {
       title: '1. Quem somos',
       body: [
-        `<p>A <strong>Kyro Clean Solutions</strong> é uma empresa de limpeza e higienização de estofos ao domicílio, sediada em ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.postalCode} ${BUSINESS_ADDRESS.addressLocality}, Portugal.</p>`,
+        `<p>A <strong>Kyro Clean Solutions</strong> é uma empresa de limpeza, higienização e impermeabilização de estofos ao domicílio, com a firma ${BUSINESS_LEGAL_NAME} e o NIPC ${BUSINESS_TAX_ID}, sediada em ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.postalCode} ${BUSINESS_ADDRESS.addressLocality}, Portugal.</p>`,
         `<p>Para efeitos do Regulamento Geral de Proteção de Dados (RGPD, Regulamento UE 2016/679), somos o <strong>responsável pelo tratamento</strong> dos dados pessoais recolhidos através deste website.</p>`,
       ],
     },
@@ -36,6 +37,8 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
         '<ul>',
         `<li><strong>Dados de contacto:</strong> nome, número de telemóvel e endereço de e-mail, fornecidos voluntariamente no formulário de orçamento.</li>`,
         `<li><strong>Dados do pedido:</strong> tipo de serviço, localização e detalhes sobre os artigos a limpar, incluindo fotografias opcionais enviadas pelo utilizador.</li>`,
+        `<li><strong>Conversas:</strong> mensagens, fotografias, vídeos e notas de voz que nos envie por WhatsApp ou e-mail.</li>`,
+        `<li><strong>Dados do serviço e de faturação:</strong> morada e data do serviço, valor e, quando pede fatura, nome e número de contribuinte.</li>`,
         `<li><strong>Dados de navegação:</strong> endereço IP, tipo de browser, páginas visitadas, duração da visita e comportamento de navegação, recolhidos através do Google Analytics (GA4) e do Pixel da Meta mediante consentimento. Sem consentimento, a Google recebe apenas os sinais sem cookies descritos na secção 4.</li>`,
         `<li><strong>Cookies:</strong> ficheiros de pequena dimensão guardados no seu dispositivo para garantir o funcionamento do site e, com o seu consentimento, para fins analíticos e publicitários.</li>`,
         '</ul>',
@@ -49,6 +52,7 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
         `<li>Responder ao seu pedido de orçamento e agendar a prestação do serviço;</li>`,
         `<li>Enviar confirmações e comunicações relacionadas com o serviço contratado;</li>`,
         `<li>Melhorar a experiência de utilização do website através de dados analíticos agregados (GA4);</li>`,
+        `<li>Enviar mensagens de seguimento do orçamento que pediu e, depois do serviço, o pedido de avaliação. Pode pedir para não as receber a qualquer momento;</li>`,
         `<li>Cumprir obrigações legais ou regulatórias aplicáveis.</li>`,
         '</ul>',
       ],
@@ -70,7 +74,8 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
         '<ul>',
         `<li><strong>Execução de contrato</strong> (Art. 6.º, n.º 1, al. b) do RGPD): para processar o seu pedido de orçamento e prestar o serviço.</li>`,
         `<li><strong>Consentimento</strong> (Art. 6.º, n.º 1, al. a) do RGPD): para cookies analíticos e comunicações de marketing.</li>`,
-        `<li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD): para melhorar o website, prevenir fraudes e medir de forma agregada, sem cookies, os resultados das campanhas publicitárias (secção 4).</li>`,
+        `<li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD): para melhorar o website, prevenir fraudes e medir de forma agregada, sem cookies, os resultados das campanhas publicitárias (secção 4); responder às mensagens, enviar o seguimento do orçamento pedido e o pedido de avaliação.</li>`,
+        `<li><strong>Obrigação legal</strong> (Art. 6.º, n.º 1, al. c) do RGPD): para emitir e conservar as faturas.</li>`,
         '</ul>',
       ],
     },
@@ -82,6 +87,13 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
         `<li><strong>Google LLC</strong>: através do GA4 e do Google Ads, com o seu consentimento, para análise de tráfego e medição de campanhas; sem consentimento, apenas os sinais sem cookies descritos na secção 4;</li>`,
         `<li><strong>Google LLC, medição de serviços contratados (Google Ads)</strong>: se chegou ao site por um anúncio do Google, a mensagem de WhatsApp leva uma referência curta (por exemplo "ref. K7F2Q"), que guardamos no nosso servidor com o identificador do clique no anúncio, sem gravar nada no seu dispositivo. Se contratar um serviço, enviamos à Google esse identificador ou o seu número de telefone em formato cifrado (hash), com a data e o valor do serviço, para medir quais os anúncios que trazem clientes. A Google só usa estes dados para essa medição. Base legal: interesse legítimo em medir a eficácia da publicidade. Pode opor-se a qualquer momento através do contacto indicado nesta política;</li>`,
         `<li><strong>Meta Platforms Ireland Limited</strong>: através do Pixel da Meta, mediante consentimento, para medição de visitas e campanhas;</li>`,
+        `<li><strong>Meta Platforms Ireland Limited, medição de contactos e de serviços contratados</strong>: se nos contactou através de um anúncio da Meta ou contratou um serviço, podemos enviar à Meta o seu número de telefone em formato cifrado (hash), com a data e o valor do serviço, para medir quais os anúncios que trazem clientes. Base legal: interesse legítimo em medir a eficácia da publicidade. Pode opor-se a qualquer momento através do contacto indicado nesta política;</li>`,
+        `<li><strong>Equipas parceiras</strong>: as equipas que realizam o serviço em cada zona recebem apenas o necessário para o fazer (nome, contacto, morada, data, fotografias, descrição e valor do serviço);</li>`,
+        `<li><strong>WhatsApp (Meta Platforms Ireland Limited) e 360dialog</strong>: fornecedores do canal por onde trocamos mensagens consigo;</li>`,
+        `<li><strong>Anthropic</strong>: fornecedor do assistente de inteligência artificial que lê e responde a mensagens de WhatsApp e e-mail, com acompanhamento da nossa equipa. As notas de voz são transcritas no nosso próprio servidor;</li>`,
+        `<li><strong>Hostinger</strong>: servidor onde funciona o assistente e onde ficam guardadas as conversas;</li>`,
+        `<li><strong>Google (Gmail e Google Calendar)</strong>: e-mail e agenda das marcações;</li>`,
+        `<li><strong>Vendus</strong>: emissão das faturas, com o nome, o número de contribuinte e os dados do serviço;</li>`,
         `<li><strong>Google reCAPTCHA</strong> (Google LLC): só no momento em que envia um pedido de orçamento, para distinguir pedidos reais de envios automáticos (spam). O reCAPTCHA recolhe informação técnica do browser e da interação com a página, tratada pela Google segundo a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de Privacidade</a> e os <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Termos de Serviço</a> da Google. Base legal: interesse legítimo na segurança do formulário. Um resultado duvidoso nunca impede o pedido de nos chegar;</li>`,
         `<li><strong>Resend</strong>: plataforma utilizada para o envio de emails com os pedidos de orçamento de forma segura;</li>`,
         `<li><strong>Localização opcional (BigDataCloud)</strong>: ao permitir a localização no navegador, as coordenadas atuais são enviadas diretamente ao BigDataCloud para sugerir a localidade do serviço. O fornecedor recebe também o endereço IP e usa estes sinais para melhorar os seus dados de geolocalização. Não guardamos as coordenadas no pedido, apenas a localidade confirmada. Pode recusar a localização e pesquisar manualmente. Consulte a <a href="https://www.bigdatacloud.com/privacy-policy" target="_blank" rel="noopener noreferrer">política do fornecedor</a>.</li>`,
@@ -94,6 +106,7 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
       title: '7. Retenção de dados',
       body: [
         `<p>Os dados de contacto associados a pedidos de orçamento são conservados durante <strong>12 meses</strong> após a última interação, findo o qual são eliminados. Dados analíticos recolhidos pelo GA4 são conservados durante 14 meses, de acordo com as definições padrão da Google.</p>`,
+        `<p>Os dados que constam das faturas são conservados durante <strong>10 anos</strong>, como exige a lei fiscal.</p>`,
       ],
     },
     {
@@ -147,7 +160,8 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
     {
       title: '1. Identificação',
       body: [
-        `<p><strong>Kyro Clean Solutions</strong>: serviço de limpeza e higienização profissional de estofos ao domicílio.</p>`,
+        `<p><strong>Kyro Clean Solutions</strong>: serviço de limpeza, higienização e impermeabilização profissional de estofos ao domicílio.</p>`,
+        `<p>${BUSINESS_LEGAL_NAME}, NIPC ${BUSINESS_TAX_ID}.</p>`,
         `<p>Morada: ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.postalCode} ${BUSINESS_ADDRESS.addressLocality}, Portugal.<br>Email: <a href="${BUSINESS_EMAIL_HREF}">${BUSINESS_EMAIL}</a><br>Telefone / WhatsApp: <a href="tel:${PHONE_E164}">+351 ${PHONE_DISPLAY}</a></p>`,
       ],
     },
@@ -162,6 +176,7 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
       body: [
         `<p>Os orçamentos são gratuitos e sem compromisso, fornecidos via formulário no website, WhatsApp ou telefone. A confirmação do serviço é feita por escrito e só se considera vinculativa após confirmação expressa de ambas as partes.</p>`,
         `<p>${PRICE_PROMISE}</p>`,
+        `<p>${DEPOSIT_RULE}</p>`,
       ],
     },
     {
@@ -180,13 +195,15 @@ export const LEGAL_CONTENT: Record<string, LegalSection[]> = {
     {
       title: '6. Pagamento',
       body: [
-        `<p>O pagamento é efetuado no final da prestação do serviço, salvo acordo prévio em contrário. Aceitamos transferência bancária, MB Way e numerário.</p>`,
+        `<p>O pagamento é efetuado no final da prestação do serviço, salvo acordo prévio em contrário e o sinal referido na secção 3. Aceitamos transferência bancária, MB Way e numerário.</p>`,
+        `<p>Nos serviços com fatura, o pagamento é sempre feito por transferência bancária para a conta da empresa, com o IBAN que enviamos ao cliente.</p>`,
       ],
     },
     {
       title: '7. Cancelamentos',
       body: [
         `<p>O cancelamento deve ser comunicado com pelo menos 24 horas de antecedência. Cancelamentos com menos de 24 horas ou ausências no local poderão implicar uma taxa de deslocação.</p>`,
+        `<p>Nas reservas com sinal aplica-se também a secção 3.</p>`,
       ],
     },
     {

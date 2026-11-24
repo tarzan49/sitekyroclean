@@ -43,7 +43,7 @@ export const LEGAL_PAGES: LegalPage[] = [
     title: 'Termos e Condições | Kyro Clean Solutions',
     description: 'Termos e condições dos serviços de limpeza de estofos ao domicílio da Kyro Clean Solutions: orçamentos, prestação do serviço, pagamento, cancelamentos e reclamações.',
     h1: 'Termos e Condições',
-    updated: 'setembro de 2026',
+    updated: 'novembro de 2026',
   },
   {
     path: '/politica-de-devolucoes',
@@ -51,6 +51,6 @@ export const LEGAL_PAGES: LegalPage[] = [
     title: 'Política de Devoluções | Kyro Clean Solutions',
     description: 'Política de devoluções da Kyro Clean Solutions: direito de livre resolução, reclamações, limitações do material e cancelamentos num serviço prestado ao domicílio.',
     h1: 'Política de Devoluções',
-    updated: 'setembro de 2026',
+    updated: 'novembro de 2026',
   },
 ];

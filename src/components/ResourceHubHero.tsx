@@ -1,3 +1,4 @@
+import HeroPhoto from '@/components/HeroPhoto';
 import { Link } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { getResourceWhatsapp } from '@/data/resourceContent';
@@ -6,9 +7,10 @@ import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
 
 // Topo dos recursos (perguntas, glossário, blog) no estilo novo (dono, 24 Nov): verde, título em Playfair com a
 // última palavra a dourado, prova social e um só botão, o WhatsApp com a cor do topo das páginas de serviço.
-export default function ResourceHubHero({ title, description }: { title: string; description: string }) {
+export default function ResourceHubHero({ title, description, image }: { title: string; description: string; image?: string }) {
   const words = title.split(' '); const gold = words.pop();
-  return <section data-mobile-hero="text" className="bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
+  return <section data-mobile-hero="text" className="relative isolate overflow-hidden bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
+    {image && <HeroPhoto src={image} />}
     <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-2 text-sm text-white/70"><Link to="/">Início</Link><span>/</span><Link to="/blog">Recursos</Link></nav>
       <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">

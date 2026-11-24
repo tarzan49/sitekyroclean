@@ -23,6 +23,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
 | Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo | — | — | — | FEITO (24 Nov): topo novo (ResourceHubHero, também no índice do blog) + widget de preço no fim (ResourcePriceSection), texto corrido sem encaixe |
+| /blog e artigos (renovação visual) | — | — | — | FEITO (25 Nov): índice por tema (src/data/blogThemes.ts), cartões a deslizar no telemóvel, fotografia real própria de cada guia (src/assets/blog, nada gerado por IA); artigo com topo próprio (ArticleHero), índice ao lado, linha de leitura, antes e depois a meio, avaliações e preço depois do texto |
 | Artigos do blog, /blog, glossário, estudo, perguntas | — | — | — | FEITO (25 Nov): cada página na sua lógica (texto corrido, sem encaixe), títulos no formato único, introdução do artigo visível, preço do bot no fim |
 | /sobre, /areas-de-servico | — | — | — | FEITO (24 Nov): secções de ecrã inteiro com encaixe |
 | /problemas/* (nacionais) e por cidade | — | — | — | todos os serviços FEITO (25 Nov): sofás, tapetes, alcatifas, colchões, cadeiras, impermeabilização |

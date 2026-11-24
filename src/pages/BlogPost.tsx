@@ -2,13 +2,16 @@ import ResourcePriceSection from '@/components/ResourcePriceSection';
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ResourceLeadCard from "@/components/ResourceLeadCard";
 import ResourceNav from "@/components/ResourceNav";
-import CommercialHero from '@/components/CommercialHero';
+import ArticleHero from '@/components/ArticleHero';
+import ArticleProof from '@/components/ArticleProof';
+import ReadingToc, { ReadingProgress } from '@/components/ReadingGuide';
+import { commercialHeroPaidPriceLine } from '@/data/commercialHeroCopy';
 import ServiceReviewsGrid from '@/components/ServiceReviewsGrid';
 import ServicePackBanner from '@/components/ServicePackBanner';
 import SectionHeader from '@/components/SectionHeader';
 import { QuizServiceProvider } from '@/context/QuizLocationContext';
 import { getResourceWhatsapp, resourceQuizService, resourceHeroSubtitle } from '@/data/resourceContent';
-import { useMemo, useEffect } from "react";
+import { Fragment, useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { ArrowRight, Lightbulb } from "lucide-react";
 import Header from "@/components/Header";
@@ -21,7 +24,7 @@ import { getBlogSources } from "@/data/blogSources";
 import { DEFAULT_AUTHOR } from "@/data/authors";
 import { clearPrerenderedFaqSchema } from "@/lib/seoSchema";
 
-import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
+import { BLOG_IMAGES, BLOG_IMAGE_ALTS, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
 const BlogPost = () => {
   const location = useLocation();
@@ -37,6 +40,8 @@ const BlogPost = () => {
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", post.metaDescription);
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", `${SITE_URL}/blog/${post.slug}`);
   }, [post]);
+
+  const toc = useMemo(() => post?.sections.map((section, i) => ({ id: `passo-${i + 1}`, label: section.heading })) ?? [], [post]);
 
   if (!post) {
     return (
@@ -116,10 +121,81 @@ const BlogPost = () => {
       <Header />
 
       <main className="min-h-screen bg-[#FDFDF9]">
+        <ReadingProgress targetId="guia" />
 
-        <CommercialHero title={post.title} subtitle={resourceHeroSubtitle(post)} serviceSlug={serviceSlug}
-          breadcrumbs={[{label:'Início',to:'/'},{label:'Guias',to:'/blog'},{label:post.category}]}
-          whatsappHref={getResourceWhatsapp(post)} source={`blog-${post.slug}`} />
+        <ArticleHero title={post.title} subtitle={resourceHeroSubtitle(post)} category={post.category}
+          byline={<>Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={DEFAULT_AUTHOR.href} className="underline">{post.author}</Link></>}
+          image={heroImg} imageAlt={BLOG_IMAGE_ALTS[post.slug] ?? post.heroAlt}
+          priceLine={commercialHeroPaidPriceLine(serviceSlug)} whatsappHref={getResourceWhatsapp(post)} source={`blog-${post.slug}`} />
+
+        {/* ── Conteúdo: o texto vem logo a seguir ao topo, com o índice ao lado ── */}
+        <div className="mx-auto grid max-w-6xl gap-x-14 px-5 sm:px-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-8">
+          <aside className="min-w-0"><ReadingToc title="Neste guia" items={toc} /></aside>
+          <article id="guia" className="min-w-0 max-w-[46rem] scroll-mt-20 py-8 lg:py-12">
+            <SectionHeader heading="O que precisa de" goldWord="saber" className="!mb-4" />
+            {/* A introdução é texto do artigo, não subtítulo: está no HTML estático e tem de se ler na página. */}
+            <p className="text-xl leading-[1.6] text-[#26352c]">{post.intro}</p>
+            {post.sections.map((section, i) => {
+              const words = section.heading.split(' ');
+              return <Fragment key={section.heading}>
+                <section id={`passo-${i+1}`} className="scroll-mt-24 pt-10">
+                  <SectionHeader heading={words.slice(0, -1).join(' ')} goldWord={words.slice(-1)[0]} className="!mb-4" />
+                  <div
+                    className="blog-body type-reading text-[#3d443e] space-y-4"
+                    dangerouslySetInnerHTML={{ __html: renderBlogBody(section.body) }}
+                  />
+                  {section.tip && (
+                    <p className="mt-6 rounded-xl bg-[#f6f3e9] px-5 py-4 text-base leading-relaxed text-[#26352c]">
+                      <span className="mb-1 flex items-center gap-2 font-semibold text-[#111111]"><Lightbulb className="h-5 w-5 text-[#D4AF37]" strokeWidth={1.75} />Dica:</span>{" "}
+                      {section.tip}
+                    </p>
+                  )}
+                </section>
+                {i === 1 && <ArticleProof serviceSlug={serviceSlug} seed={post.slug} />}
+              </Fragment>;
+            })}
+
+            {sources.length > 0 && (
+              <section className="mt-12 border-t border-[#dfe5df] pt-8">
+                <h2 className="type-section-title font-playfair mb-3 text-[#111111]"><em className="not-italic" style={{ color: '#D4AF37' }}>Fontes</em></h2>
+                <p className="text-sm text-[#505650] mb-4">
+                  Referências para os cuidados descritos neste guia.
+                </p>
+                <ol className="space-y-2 text-sm text-[#505650] list-decimal pl-5">
+                  {sources.map(source => (
+                    <li key={source.id}>
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="underline underline-offset-2 hover:text-gold transition-colors"
+                      >
+                        {source.label}
+                      </a>
+                      <span className="text-[#505650]/80">, {source.publisher}. Verificada a {source.checkedOn}.</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+
+            <section className="mt-12"><ResourceLeadCard post={post} /></section>
+
+            {/* Link serviço relacionado */}
+            <Link
+              to={post.relatedService.href}
+              className="group mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#dfe5df] bg-white px-5 py-4"
+            >
+              <span className="font-semibold text-[#111111]">{post.relatedService.label}</span>
+              <ArrowRight className="w-5 h-5 shrink-0 text-gold group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </article>
+        </div>
+
+        {post.faq.length > 0 && (
+          <ServiceFAQ faqs={post.faq.map(item => ({ question: item.q, answer: item.a }))} includeSchema={false} variant="light" />
+        )}
+
         <section className="py-12 md:py-16 bg-kyro-green" aria-label="Avaliações de clientes">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader heading="Nas palavras dos nossos" goldWord="clientes" light={false} />
@@ -127,99 +203,27 @@ const BlogPost = () => {
           </div>
         </section>
 
-        {/* ── Conteúdo ── */}
-        <article id="guia" className="container mx-auto px-5 max-w-4xl py-12 sm:py-16 scroll-mt-20">
-          <SectionHeader heading="O que precisa de" goldWord="saber" />
-          {/* A introdução é texto do artigo, não subtítulo: está no HTML estático e tem de se ler na página. */}
-          <p className="type-reading mb-6 text-[#505650]">{post.intro}</p>
-          <p className="text-sm text-[#505650] mb-7">Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={DEFAULT_AUTHOR.href} className="underline">{post.author}</Link></p>
-          <nav aria-label="Neste guia" className="mb-8 border-b border-[#dfe5df] pb-6">
-            <h2 className="text-base font-semibold text-[#173e2b] mb-3">Neste guia</h2>
-            <ol className="grid sm:grid-cols-2 gap-x-6 gap-y-1">{post.sections.map((section,i)=><li key={section.heading}><a href={`#passo-${i+1}`} className="flex gap-3 py-2 min-h-11 text-base text-[#435449] underline underline-offset-4"><span className="text-[#49664d]">{i+1}.</span>{section.heading}</a></li>)}</ol>
-          </nav>
-          <div className="space-y-9">
-            {post.sections.map((section, i) => (
-              <section key={i} id={`passo-${i+1}`} className="scroll-mt-24">
-                <h2 className="type-article-title font-playfair    text-[#111111] mb-4">
-                  {section.heading}
-                </h2>
-                <div
-                  className="blog-body type-reading text-[#505650] space-y-3"
-                  dangerouslySetInnerHTML={{ __html: renderBlogBody(section.body) }}
-                />
-                {section.tip && (
-                  <div className="mt-4 bg-gold/8 border-l-4 border-gold rounded-r-xl px-4 py-3">
-                    <p className="text-base text-[#111111]/80 leading-relaxed">
-                      <span className="inline-flex items-center gap-1 font-bold text-[#111111]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica:</span>{" "}
-                      {section.tip}
-                    </p>
-                  </div>
-                )}
-              </section>
-            ))}
-          </div>
-
-          {sources.length > 0 && (
-            <section className="mt-12 border-t border-neutral-200 pt-6">
-              <h2 className="font-playfair text-xl text-[#111111] mb-3">Fontes</h2>
-              <p className="text-sm text-[#505650] mb-4">
-                Referências para os cuidados descritos neste guia.
-              </p>
-              <ol className="space-y-2 text-sm text-[#505650] list-decimal pl-5">
-                {sources.map(source => (
-                  <li key={source.id}>
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                      className="underline underline-offset-2 hover:text-gold transition-colors"
-                    >
-                      {source.label}
-                    </a>
-                    <span className="text-[#505650]/80">, {source.publisher}. Verificada a {source.checkedOn}.</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          <div className="my-10"><ResourceLeadCard post={post} /></div>
-
-          {/* FAQ */}
-          {post.faq.length > 0 && (
-            <ServiceFAQ faqs={post.faq.map(item => ({ question: item.q, answer: item.a }))} includeSchema={false} variant="light" />
-          )}
-
-          {/* Link serviço relacionado */}
-          <div className="mt-10">
-            <Link
-              to={post.relatedService.href}
-              className="flex items-center justify-between bg-gold/10 border border-gold/20 rounded-2xl px-6 py-4 hover:bg-gold/15 transition-colors group"
-            >
-              <span className="font-semibold text-[#111111]">{post.relatedService.label}</span>
-              <ArrowRight className="w-5 h-5 text-gold group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </article>
-
         {/* Blog no modelo novo (dono, 24 Nov): o texto corrido e, no fim do artigo, o preço do serviço do artigo. */}
         <ResourcePriceSection service={serviceSlug} source={`blog_price_${post.slug}`} />
         <ServicePackBanner packSlugs={[]} variant="dark" />
-        <ResourceNav afterHero />
 
-        {/* Related reading follows the same collapsed navigation pattern. */}
         {related.length > 0 && (
-          <section className="bg-[#F5F4F0] border-t border-[#E8E4DE] py-12">
-            <div className="container mx-auto px-4 max-w-3xl">
-              <h2 className="type-section-title font-playfair mb-4 text-[#111111]">Continue a <em className="not-italic" style={{ color: '#D4AF37' }}>ler</em></h2><div className="grid gap-3">
-                {related.map(p => <Link key={p.slug} to={`/blog/${p.slug}`} className="flex items-center justify-between gap-4 py-3 border-b border-[#dfe5df] text-[#173e2b]">{p.title}<ArrowRight className="w-4 h-4" /></Link>)}
-              </div>
+          <section className="border-t border-[#E8E4DE] bg-[#F5F4F0] py-10 md:py-14">
+            <div className="mx-auto max-w-6xl sm:px-6 lg:px-8">
+              <SectionHeader heading="Continue a" goldWord="ler" className="!mb-5 px-5 sm:px-0" />
+              <ul className="flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
+                {related.map(p => <li key={p.slug} className="w-[74vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none"><Link to={`/blog/${p.slug}`} className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#dfe5df] bg-white">
+                  <img src={BLOG_IMAGES[p.slug] ?? DEFAULT_BLOG_IMAGE} alt={BLOG_IMAGE_ALTS[p.slug] ?? p.heroAlt} width={800} height={600} loading="lazy" decoding="async" className="h-40 w-full object-cover" />
+                  <span className="flex flex-1 items-start justify-between gap-3 p-4 text-lg font-semibold leading-snug text-[#111111]">{p.title}<ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#D4AF37]" /></span>
+                </Link></li>)}
+              </ul>
             </div>
           </section>
         )}
 
-        <div className="py-8 text-center border-t border-[#E8E4DE]">
-          <Link to="/blog" className="text-base text-[#1A4E30] hover:underline font-medium">
+        <ResourceNav afterHero />
+        <div className="py-6 text-center">
+          <Link to="/blog" className="inline-flex min-h-11 items-center text-base font-medium text-[#173e2b] underline underline-offset-4">
             ← Ver todos os artigos do blog
           </Link>
         </div>

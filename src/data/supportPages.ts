@@ -21,6 +21,8 @@ export const QUOTE_SUMMARY_TITLE = 'Resumo do pedido';
 export const QUOTE_CONFIRM_LABEL = 'Confirmar pelo WhatsApp';
 
 /** `/obrigado-pelo-servico` sem nome, peça nem cidade no endereço. */
+/** Título do separador e da pré-visualização no WhatsApp. */
+export const REVIEW_PAGE_TITLE = 'Obrigado | Kyro Clean Solutions';
 export const REVIEW_H1 = 'Obrigado pela confiança';
 export const REVIEW_ASK = 'Se puder deixar a sua opinião no Google, demora 10 segundos e ajuda-nos muito.';
 export const REVIEW_BUTTON = 'Deixar avaliação no Google';

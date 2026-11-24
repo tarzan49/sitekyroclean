@@ -1232,3 +1232,9 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 
 - "Sim, limita": o riscado do pack de cadeiras (1 cadeira × quantidade, 24 Nov) nunca passa a limpeza sozinha + a impermeabilização sozinha dessas cadeiras, cada uma com a sua deslocação (`chairPackStruck` em `src/lib/botQuote.ts`, usado por `chairsWas` e pelo `WaterproofPackPicker`). Lisboa, Blindado: 12 cadeiras 468 → 459€; 100 cadeiras 3900 → 3099€. Os preços não mudam.
 - Duas linhas de cadeiras (1 + 1): quando a oferta se perde no arredondamento ao 9, `usual` = `total` e não há riscado (antes um +10€ inventado pelo código: ~~79~~ 69). O bot não mostra riscado se `usual` for igual ao total.
+
+## Páginas legais, blog e página de avaliação (dono, 24 e 25 Nov 2026)
+
+- **Texto legal numa fonte só:** `src/data/legalContent.ts` (página e HTML estático). Aprovado pelo dono a 24 Nov ("podes falar disso", "podes meter isso também", "altera"): sinal de 15% e fatura por transferência nos termos, firma e NIPC, impermeabilização, datas de novembro, e na privacidade as equipas parceiras, WhatsApp/360dialog, assistente com IA (Anthropic), Hostinger, Gmail e Calendar, Vendus, medição da Meta por telefone cifrado, seguimentos e faturas conservadas 10 anos. O IBAN nunca vai para o site: segue com a fatura.
+- **`/obrigado-pelo-servico`:** `?nome=&cidade=&servico=` (sofa, colchao, tapete, cadeiras, alcatifa, impermeabilizacao) e `&zona=lisboa` para localidades fora da lista. A ficha do Google sai da cidade (`src/data/reviewLink.ts`): zona de Lisboa = ficha de Lisboa, o resto = Porto.
+- **Blog:** uma fotografia real por guia em `src/assets/blog/<slug>.webp` e a legenda em `blogImages.ts`; nada gerado por IA. O par `sofa-13` fica fora dos artigos: o "antes" tem a marca do Gemini.
