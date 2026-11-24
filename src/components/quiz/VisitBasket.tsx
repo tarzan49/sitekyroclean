@@ -544,7 +544,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               ))}
               {/* A oferta da escada A como linha própria (dono, 25 Nov: "só mais colchão e anti-ácaros está oferecido, isso é top"). */}
               {groupGifts(quote.gifts).map(g => (
-                <li key={g.key} className="flex min-h-[60px] items-center gap-2.5 border-l-4 border-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/25 to-[#D4AF37]/5 px-2.5">
+                <li key={g.key} className="flex min-h-[60px] items-center gap-2.5 border-l-4 border-[#D4AF37] bg-white/[0.06] px-2.5">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Gift className="h-5 w-5" strokeWidth={2.5} /></span>
                   <span className="min-w-0 flex-1"><span className="block text-sm font-bold leading-snug text-white">{capital(g.text)}</span><span className="block text-xs font-semibold text-[#E8C964]">Por juntar na mesma visita</span></span>
                   <span className="shrink-0 pr-1 text-right"><span className="block text-xs text-white/55 line-through">{formatEuro(g.normal)}</span><span className="mt-0.5 inline-block rounded-md bg-[#D4AF37] px-1.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">Oferecido</span></span>
@@ -607,8 +607,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!city.trim() ? 'falta a localidade' : !cityKnown(city) ? 'deslocação a confirmar no WhatsApp' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="block text-xs font-bold text-[#E8C964]">Poupa {formatEuro(quote.usual - quote.total)}</span>}</span>
         </div>
         {step === 'basket'
-          ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Continuar</button>
-          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
+          ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">Continuar</button>
+          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
       </footer>
 
       {askCity && !editing && (() => {
@@ -626,7 +626,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               {!known && q.length > 1 && !options.length && <p className="mt-3 text-sm text-white/70">Nesta localidade a deslocação é confirmada no WhatsApp.</p>}
             </div>
             <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-              <button type="submit" disabled={city.trim().length < 2} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{known || options.length === 1 || city.trim().length < 2 ? 'Ver os preços' : `Continuar com ${city.trim()}`}</button>
+              <button type="submit" disabled={city.trim().length < 2} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{known || options.length === 1 || city.trim().length < 2 ? 'Ver os preços' : `Continuar com ${city.trim()}`}</button>
             </footer>
           </form>
         </div>;
@@ -674,9 +674,9 @@ function PriceTag({ shown, struck: rawStruck }: { shown: number | null; struck: 
   // O mesmo riscado do resto do site (dono, 25 Nov: "os preços riscados não estão como no site inteiro"): pequeno e
   // neutro por cima do preço, o preço em branco forte e a poupança em texto fino dourado, nunca num selo.
   return <span className="flex shrink-0 flex-col items-end leading-tight">
-    {struck !== null && <span className="text-[11px] text-white/45 line-through">{formatEuro(struck)}</span>}
-    <span className="whitespace-nowrap text-lg font-bold text-white">{formatEuro(shown)}</span>
-    {struck !== null && <span className="whitespace-nowrap text-[11px] font-medium text-[#E8C964]">Poupa {formatEuro(Math.round((struck - shown) * 100) / 100)}</span>}
+    {struck !== null && <span className="text-[11px] text-white/45 line-through group-[.is-on]:text-[#0B2F2A]/70">{formatEuro(struck)}</span>}
+    <span className="whitespace-nowrap text-lg font-bold text-white group-[.is-on]:text-[#0B2F2A]">{formatEuro(shown)}</span>
+    {struck !== null && <span className="whitespace-nowrap text-[11px] font-semibold text-[#D4AF37] group-[.is-on]:text-[#0B2F2A]">Poupa {formatEuro(Math.round((struck - shown) * 100) / 100)}</span>}
   </span>;
 }
 /** Um extra (anti-ácaros, anti-odor): quanto acrescenta, riscado o que custaria em separado, ou "Oferecido". */
@@ -684,8 +684,8 @@ function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null
   if (plus === null) return null;
   const was = normal !== null && normal - plus >= 5 ? normal : null;
   return <span className="flex shrink-0 flex-col items-end leading-tight">
-    {was !== null && <span className="text-[11px] text-white/45 line-through">+{formatEuro(was)}</span>}
-    {plus > 0 ? <span className="whitespace-nowrap text-lg font-bold text-white">+{formatEuro(plus)}</span> : <span className="whitespace-nowrap text-base font-bold text-[#E8C964]">Oferecido</span>}
+    {was !== null && <span className="text-[11px] text-white/45 line-through group-[.is-on]:text-[#0B2F2A]/70">+{formatEuro(was)}</span>}
+    {plus > 0 ? <span className="whitespace-nowrap text-lg font-bold text-white group-[.is-on]:text-[#0B2F2A]">+{formatEuro(plus)}</span> : <span className="whitespace-nowrap text-base font-bold text-[#D4AF37] group-[.is-on]:text-[#0B2F2A]">Oferecido</span>}
   </span>;
 }
 
@@ -696,9 +696,9 @@ function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d
       {children}
       {count > 0
         ? <span className="mt-0.5 flex items-center gap-1">
-            <button type="button" aria-label="Menos" onClick={e => { e.stopPropagation(); onBump(-1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-white/10 text-white"><Minus className="h-3.5 w-3.5" /></button>
-            <span className="w-4 text-center text-base font-extrabold text-[#E8C964]">{count}</span>
-            <button type="button" aria-label="Mais" onClick={e => { e.stopPropagation(); onBump(1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
+            <button type="button" aria-label="Menos" onClick={e => { e.stopPropagation(); onBump(-1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-[#0B2F2A] text-white"><Minus className="h-3.5 w-3.5" /></button>
+            <span className="w-4 text-center text-base font-extrabold text-[#0B2F2A]">{count}</span>
+            <button type="button" aria-label="Mais" onClick={e => { e.stopPropagation(); onBump(1); }} className="flex h-8 w-8 !min-h-0 !min-w-0 items-center justify-center rounded-full bg-[#0B2F2A] text-white"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
           </span>
         : <span className="mt-0.5 flex h-8 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
     </div>
@@ -769,12 +769,12 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const wasOk = useRef(ok);
   useEffect(() => { if (ok && !wasOk.current && !rug && !ownQty) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); wasOk.current = ok; }, [ok, rug, ownQty]);
   useEffect(() => { if (material && ok && asksMaterial && fresh) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [material]);
-  const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
+  const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
   // O vídeo fica o da escolha com que se abriu (a impermeabilização mostra a água), sem trocar a cada toque.
   const [clip] = useState(() => (item.imperOnly && item.kind === 'chairs' ? imperChairsClip : item.kind === 'sofa' && item.pack !== 'none' ? imperClip : CLIP[item.kind]));
-  const tile = (on: boolean) => `flex flex-col items-center justify-center gap-1 rounded-2xl border-2 px-1 py-2 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
+  const tile = (on: boolean) => `flex flex-col items-center justify-center gap-1 rounded-2xl border-2 px-1 py-2 text-sm font-bold ${on ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label={KIND_LABEL[item.kind]}>
       <header className="flex items-center border-b border-white/10 px-2 py-2">
@@ -791,7 +791,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
 
         {/* Depois de escolher, os cartões encolhem para uma linha: o resto cabe no ecrã sem cortar (dono, 25 Nov). */}
         {materials && material !== null && <div className="mb-3 grid grid-cols-2 gap-2" role="group" aria-label={materials.ask}>
-          {materials.options.map(o => <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl border-2 px-2 text-sm font-bold ${material === o.m ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/70'}`}>{material === o.m && <Check className="h-4 w-4 shrink-0" style={{ color: GOLD }} strokeWidth={3} />}{o.label}</button>)}
+          {materials.options.map(o => <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl border-2 px-2 text-sm font-bold ${material === o.m ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/70'}`}>{material === o.m && <Check className="h-4 w-4 shrink-0" strokeWidth={3} />}{o.label}</button>)}
         </div>}
         {materials && material === null && <>
           <p className="mb-2 text-sm font-semibold text-white">{materials.ask}</p>
@@ -836,9 +836,9 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
               {sizes.map(z => {
                 const w = num(z.w), l = num(z.l), max = Math.max(...sizes.map(x => num(x.l)));
                 return <button key={z.label} type="button" onClick={() => choose({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start !gap-1 !px-2.5 !py-1.5 text-left`}>
-                  <span className="flex h-8 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(12, (l / max) * 46)}px`, height: `${Math.max(8, (w / max) * 32)}px` }} /></span>
+                  <span className="flex h-8 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)] group-[.is-on]:border-[#0B2F2A]" style={{ width: `${Math.max(12, (l / max) * 46)}px`, height: `${Math.max(8, (w / max) * 32)}px` }} /></span>
                   <span className="block leading-tight">{z.label}</span>
-                  <span className="block text-xs font-semibold text-white/60">{z.w} × {z.l} m</span>
+                  <span className="block text-xs font-semibold text-white/60 group-[.is-on]:text-[#0B2F2A]/80">{z.w} × {z.l} m</span>
                 </button>;
               })}
             </div>
@@ -855,7 +855,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         {ok && <div ref={optionsRef} className="scroll-mt-2">
           {!cityKnown(city) && <p className="mb-3 rounded-xl border border-[#D4AF37]/30 bg-white/[0.04] px-3 py-2 text-sm text-white/80">Em {city.trim() || 'sua casa'} confirmamos o preço com a deslocação no WhatsApp.</p>}
           {item.kind === 'mattress' && <button type="button" className={`${chip(item.pack === 'premium')} mb-3 flex w-full items-center justify-between gap-2 py-2 text-left`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>
-            <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
+            <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">Produto Bactran, desinfeta o colchão</span></span>
             <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
           </button>}
           {item.kind === 'chairs' && !ownQty && <div className="mb-3 flex items-center justify-between">
@@ -865,20 +865,20 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(material === 'pele' ? [] : item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
             const on = packPicked && item.pack === p.pack && !item.leather;
             return <button key={p.pack} type="button" onClick={() => { set({ pack: p.pack, leather: false }); setPackPicked(true); }} className={`${chip(on)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
-              <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} note={item.imperOnly || p.pack === 'none' ? 'na deslocação' : 'na limpeza'} />{on ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+              <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">{p.note}</span></span>
+              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} note={item.imperOnly || p.pack === 'none' ? 'na deslocação' : 'na limpeza'} />{on ? <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0B2F2A] text-white"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span> : <span className="h-5 w-5 rounded-full border-2 border-white/25" />}</span>
             </button>;
           })}
           {/* Pele: um só preço, limpeza + tratamento da pele; nunca leva impermeabilização. */}
           {material === 'pele' && <div className={`${chip(true)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
-            <span><span className="block">Limpeza + tratamento da pele</span><span className="block text-xs font-normal text-white/60">Limpeza e hidratação</span></span>
+            <span><span className="block">Limpeza + tratamento da pele</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">Limpeza e hidratação</span></span>
             <PriceTag {...packPrice({ leather: true, pack: 'none' })} />
           </div>}
           </div>}
           {rug && <>
-            <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m²{cityKnown(city) ? ', deslocação incluída' : ''}</span><PriceTag {...packPrice({})} /></p>
+            <p className="mb-3 flex items-center justify-between rounded-xl border border-[#D4AF37]/40 bg-white/[0.05] px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m²{cityKnown(city) ? ', deslocação incluída' : ''}</span><PriceTag {...packPrice({})} /></p>
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
-              <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60">Para o cheiro de animais ou de urina</span></span>
+              <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">Para o cheiro de animais ou de urina</span></span>
               <AddOnTag {...addOn({ odor: true }, { odor: false })} />
             </button>
           </>}
@@ -886,7 +886,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (material === null ? 'Escolha o material' : rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (material === null ? 'Escolha o material' : rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
