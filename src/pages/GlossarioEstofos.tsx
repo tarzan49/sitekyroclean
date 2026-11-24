@@ -2,12 +2,15 @@ import ResourcePriceSection from '@/components/ResourcePriceSection';
 import { RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro } from '@/data/resourceContent';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight, Plus } from 'lucide-react';
+import SectionHeader from '@/components/SectionHeader';
+import { useSnapSections } from '@/hooks/useSnapSections';
+import heroVideo from '@/assets/tapetes-processo/extracao.mp4';
+import heroPoster from '@/assets/quiz-videos-capas/tapete.jpg';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ResourceHubHero from '@/components/ResourceHubHero';
 import ResourceNav from '@/components/ResourceNav';
-import ResourceLeadCard from '@/components/ResourceLeadCard';
 import { SITE_URL } from '@/constants/business';
 import { glossaryTerms } from '@/data/glossaryTerms';
 
@@ -16,6 +19,7 @@ const title = RESOURCE_GLOSSARY_TITLE;
 const description = resourceGlossaryIntro(glossaryTerms.length);
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 export default function GlossarioEstofos() {
+  useSnapSections(true);
   const [query, setQuery] = useState('');
   const visible = glossaryTerms.filter(t=>normalize(`${t.term} ${t.definition}`).includes(normalize(query)));
   useEffect(()=>{
@@ -30,26 +34,29 @@ export default function GlossarioEstofos() {
     reveal(); window.addEventListener('hashchange',reveal); return ()=>window.removeEventListener('hashchange',reveal);
   },[]);
   const schema = {'@context':'https://schema.org','@type':'DefinedTermSet',name:title,description,url:PAGE_URL,hasDefinedTerm:glossaryTerms.map(t=>({'@type':'DefinedTerm',name:t.term,description:t.definition,url:`${PAGE_URL}#${t.id}`,inDefinedTermSet:PAGE_URL}))};
+  const search = <label className="relative block max-w-2xl text-[#111111]"><span className="sr-only">Que termo procura?</span><Search className="absolute left-3 top-3.5 h-5 w-5 text-[#505650]" /><input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex.: extração, veludo, secagem" className="min-h-12 w-full rounded-xl border border-[#b7c5b7] bg-white pl-10 pr-3 text-base" /></label>;
   return <><Header /><main className="bg-[#FDFDF9] min-h-screen">
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}} />
-    <ResourceHubHero title={title} description={description} />
-    <ResourceNav afterHero />
-    <div className="max-w-6xl mx-auto px-5 pt-8">
-      <label className="block max-w-2xl text-sm text-[#505650]">Que termo procura?<div className="relative mt-2"><Search className="absolute left-3 top-3.5 w-5 h-5" /><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ex.: extração, veludo, secagem" className="w-full min-h-12 border border-[#b7c5b7] rounded-sm bg-white pl-10 pr-3 text-base" /></div></label>
-    </div>
-    <div className="max-w-6xl mx-auto px-5 py-8 grid lg:grid-cols-[minmax(0,1fr)_320px] gap-8 items-start">
-      <section aria-label="Termos do glossário" className="min-w-0"><p role="status" className="text-sm text-[#505650] mb-5">{visible.length} de {glossaryTerms.length} termos</p>
-        <div className="divide-y divide-[#dfe5df]">{visible.map(term=><article key={term.id} id={term.id} className="py-6 first:pt-0 scroll-mt-24">
-          <h2 className="type-card-title text-[#111111] mb-3"><a href={`#${term.id}`} className="hover:underline">{term.term}</a></h2>
-          <p className="type-reading text-[#505650]">{term.definition}</p>
-          {term.example && <p className="mt-3 text-base text-[#505650]">Exemplo ilustrativo: {term.example}</p>}
-          {term.source && <p className="mt-3 text-sm text-[#505650]"><a href={term.source.url} target="_blank" rel="noopener noreferrer" className="underline">{term.source.label}</a></p>}
-          {term.serviceLink && <Link to={term.serviceLink.to} className="inline-flex items-center gap-2 text-[#111111] font-semibold text-base py-3 mt-1 min-h-11">{term.serviceLink.label}<ArrowRight className="w-4 h-4 shrink-0" /></Link>}
-        </article>)}</div>
-        {!visible.length && <div className="py-8"><p>Não encontrámos esse termo. Experimente outra palavra.</p><button onClick={()=>setQuery('')} className="underline py-3 min-h-11">Ver os {glossaryTerms.length} termos</button></div>}
-      </section>
-      <div className="lg:sticky lg:top-20"><ResourceLeadCard compact /></div>
-    </div>
+    <ResourceHubHero title={title} description={description} video={heroVideo} poster={heroPoster}>
+      {search}
+    </ResourceHubHero>
+    <div className="hidden md:block"><ResourceNav afterHero /><div className="mx-auto max-w-6xl px-5 pt-8">{search}</div></div>
+    <section id="termos" aria-label="Termos do glossário" className="scroll-mt-20 bg-[#FDFDF9] py-8">
+      <div className="mx-auto w-full max-w-6xl px-5 lg:px-8">
+        <SectionHeader heading="Os termos" goldWord="explicados" light />
+        <p role="status" className="mb-3 text-sm text-[#505650]">{visible.length} de {glossaryTerms.length} termos</p>
+        <div className="grid items-start gap-2 md:grid-cols-2 md:gap-3">{visible.map(term => <details key={term.id} id={term.id} className="group/termo scroll-mt-24 rounded-xl border border-[#E5E0D3] bg-white">
+          <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-base font-semibold text-[#1A1A1A] [&::-webkit-details-marker]:hidden"><h2 className="text-base font-semibold">{term.term}</h2><Plus className="h-5 w-5 shrink-0 text-[#D4AF37] transition-transform group-open/termo:rotate-45" aria-hidden="true" /></summary>
+          <div className="px-4 pb-4">
+            <p className="text-[15px] leading-relaxed text-[#505650]">{term.definition}</p>
+            {term.example && <p className="mt-3 text-[15px] text-[#505650]">Exemplo ilustrativo: {term.example}</p>}
+            {term.source && <p className="mt-3 text-sm text-[#505650]"><a href={term.source.url} target="_blank" rel="noopener noreferrer" className="underline">{term.source.label}</a></p>}
+            {term.serviceLink && <Link to={term.serviceLink.to} className="mt-1 inline-flex min-h-11 items-center gap-2 py-3 text-base font-semibold text-[#111111]">{term.serviceLink.label}<ArrowRight className="h-4 w-4 shrink-0" /></Link>}
+          </div>
+        </details>)}</div>
+        {!visible.length && <div className="py-8"><p>Não encontrámos esse termo. Experimente outra palavra.</p><button onClick={() => setQuery('')} className="min-h-11 py-3 underline">Ver os {glossaryTerms.length} termos</button></div>}
+      </div>
+    </section>
     <ResourcePriceSection source="resource_price_glossario" />
   </main><Footer /></>;
 }

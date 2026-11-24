@@ -6,6 +6,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ResourceNav from '@/components/ResourceNav';
 import ResourceHubHero from '@/components/ResourceHubHero';
+import { useSnapSections } from '@/hooks/useSnapSections';
+import heroVideo from '@/assets/sofa-processo/extracao.mp4';
+import heroPoster from '@/assets/quiz-videos-capas/sofa.jpg';
 import SectionHeader from '@/components/SectionHeader';
 import { getAllPosts, getPostBySlug, type BlogPost } from '@/data/blogData';
 import { BLOG_THEMES } from '@/data/blogThemes';
@@ -30,7 +33,23 @@ function GuideCard({ post, dark }: { post: BlogPost; dark: boolean }) {
   </Link>;
 }
 
+function MobileGuides({ posts: list, dark }: { posts: BlogPost[]; dark: boolean }) {
+  const [first, ...rest] = list;
+  return <>
+    <Link to={`/blog/${first.slug}`} className="relative block overflow-hidden rounded-2xl">
+      <img src={BLOG_IMAGES[first.slug] ?? DEFAULT_BLOG_IMAGE} alt={BLOG_IMAGE_ALTS[first.slug] ?? first.heroAlt} width={800} height={600} loading="lazy" decoding="async" className="h-[190px] w-full object-cover" />
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-4 pb-3 pt-12"><span className="block text-lg font-semibold leading-snug text-white">{first.title}</span><span className="mt-0.5 block text-sm text-[#E8C964]">{first.readingTime} min de leitura</span></span>
+    </Link>
+    <ul className="mt-2">{rest.map(post => <li key={post.slug}><Link to={`/blog/${post.slug}`} className={`flex items-center gap-3 border-b py-2 ${dark ? 'border-white/12' : 'border-[#dfe5df]'}`}>
+      <img src={BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE} alt="" width={96} height={72} loading="lazy" decoding="async" data-no-fill className="h-[54px] w-[72px] shrink-0 rounded-lg object-cover" />
+      <span className="min-w-0 flex-1"><span className={`block text-[15px] font-semibold leading-snug ${dark ? 'text-white' : 'text-[#111111]'}`}>{post.title}</span></span>
+      <ArrowRight className="h-4 w-4 shrink-0 text-[#D4AF37]" />
+    </Link></li>)}</ul>
+  </>;
+}
+
 export default function Blog() {
+  useSnapSections(true);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(BLOG_THEMES[0].id);
   const chips = useRef<HTMLUListElement>(null);
@@ -56,18 +75,18 @@ export default function Blog() {
     if (rail && chip) rail.scrollTo({ left: chip.offsetLeft - 20, behavior: 'smooth' });
   }, [active]);
   const schema = { '@context': 'https://schema.org', '@type': 'Blog', name: RESOURCE_BLOG_TITLE, url: `${SITE_URL}/blog`, blogPost: posts.map(p => ({ '@type': 'BlogPosting', headline: p.title, url: `${SITE_URL}/blog/${p.slug}`, datePublished: p.publishDate, dateModified: p.updatedDate })) };
+  const search = (extra: string) => <label className={`relative block max-w-2xl ${extra}`}><span className="sr-only">Procurar um assunto</span><Search className="absolute left-3 top-3.5 h-5 w-5 text-[#505650]" /><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ex.: manchas, colchão, alcatifa" className="min-h-12 w-full rounded-lg border border-[#b7c5b7] bg-white pl-10 pr-3 text-base" /></label>;
   return <><Header /><main className="bg-[#FDFDF9] min-h-screen">
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}} />
-    <ResourceHubHero title={RESOURCE_BLOG_TITLE} description={RESOURCE_BLOG_INTRO} image={DEFAULT_BLOG_IMAGE} />
-    <ResourceNav afterHero />
-
-    <div className="border-b border-[#dfe5df] bg-white">
-      <div className="mx-auto max-w-6xl px-5 pb-1 pt-4 sm:px-6 lg:px-8">
-        <label className="relative block max-w-2xl"><span className="sr-only">Procurar um assunto</span><Search className="absolute left-3 top-3.5 h-5 w-5 text-[#505650]" /><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ex.: manchas, colchão, alcatifa" className="min-h-12 w-full rounded-lg border border-[#b7c5b7] bg-white pl-10 pr-3 text-base" /></label>
-      </div>
+    <ResourceHubHero title={RESOURCE_BLOG_TITLE} description={RESOURCE_BLOG_INTRO} image={DEFAULT_BLOG_IMAGE} video={heroVideo} poster={heroPoster}>
+      {search('text-[#111111]')}
+    </ResourceHubHero>
+    <div className="hidden md:block">
+      <ResourceNav afterHero />
+      <div className="border-b border-[#dfe5df] bg-white"><div className="mx-auto max-w-6xl px-5 pb-1 pt-4 sm:px-6 lg:px-8">{search('')}</div></div>
     </div>
 
-    {searching ? <section aria-label="Resultados" className="mx-auto min-h-[60svh] max-w-3xl px-5 py-8">
+    {searching ? <section id="resultados-guias" aria-label="Resultados" className="mx-auto min-h-[60svh] max-w-3xl px-5 py-8">
       <p role="status" className="mb-3 text-sm text-[#505650]">{found.length} de {posts.length} guias</p>
       <ul className="border-t border-[#dfe5df]">{found.map(post => <li key={post.slug}><Link to={`/blog/${post.slug}`} className="flex items-center gap-4 border-b border-[#dfe5df] py-3">
         <img src={BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE} alt="" width={96} height={72} loading="lazy" className="h-[72px] w-24 shrink-0 rounded-lg object-cover" />
@@ -76,7 +95,7 @@ export default function Blog() {
       {!found.length && <p className="py-6">Nenhum guia encontrado. Experimente outro assunto.</p>}
       <button type="button" onClick={()=>setQuery('')} className="min-h-11 py-3 underline">Ver todos os guias</button>
     </section> : <>
-      <nav aria-label="Temas" className="sticky z-20 border-b border-[#dfe5df] bg-white" style={{ top: 'var(--header-h, 57px)' }}>
+      <nav aria-label="Temas" className="sticky z-20 hidden border-b md:block border-[#dfe5df] bg-white" style={{ top: 'var(--header-h, 57px)' }}>
         <ul ref={chips} className="relative mx-auto flex max-w-6xl gap-2 overflow-x-auto px-5 py-2.5 [scrollbar-width:none] sm:px-6 lg:px-8 [&::-webkit-scrollbar]:hidden">
           {themes.map(theme => <li key={theme.id} className="shrink-0"><a href={`#tema-${theme.id}`} aria-current={active === theme.id ? 'true' : undefined} className={`flex min-h-11 items-center whitespace-nowrap rounded-full border px-4 text-sm ${active === theme.id ? 'border-[#173e2b] bg-[#173e2b] font-semibold text-white' : 'border-[#dfe5df] text-[#505650]'}`}>{theme.heading} {theme.goldWord}</a></li>)}
         </ul>
@@ -86,9 +105,12 @@ export default function Blog() {
         return <section key={theme.id} id={`tema-${theme.id}`} className={`scroll-mt-[calc(var(--header-h,57px)+60px)] py-9 md:py-14 ${dark ? 'bg-kyro-green' : 'bg-[#FDFDF9]'}`}>
           <div className="mx-auto max-w-6xl sm:px-6 lg:px-8">
             <SectionHeader heading={theme.heading} goldWord={theme.goldWord} light={!dark} className="!mb-5 px-5 sm:px-0" />
-            {/* Telemóvel: desliza para o lado, com o cartão seguinte à vista. Computador: grelha. */}
-            <ul className="flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-12 [&::-webkit-scrollbar]:hidden">
-              {theme.posts.map((post, i) => <li key={post.slug} className={`w-[74vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none ${span(theme.posts.length, i)}`}><GuideCard post={post} dark={dark} /></li>)}
+            {/* Telemóvel: o primeiro guia em grande e os outros em linhas, tudo num ecrã e nada cortado. Computador: grelha. */}
+            <div className="px-5 sm:hidden">
+              <MobileGuides posts={theme.posts} dark={dark} />
+            </div>
+            <ul className="hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-12">
+              {theme.posts.map((post, i) => <li key={post.slug} className={span(theme.posts.length, i)}><GuideCard post={post} dark={dark} /></li>)}
             </ul>
           </div>
         </section>;

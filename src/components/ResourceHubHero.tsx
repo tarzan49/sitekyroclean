@@ -1,29 +1,41 @@
+import type { ReactNode } from 'react';
 import HeroPhoto from '@/components/HeroPhoto';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { getResourceWhatsapp } from '@/data/resourceContent';
 import { RESPONSE_PROMISE } from '@/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
 
-// Topo dos recursos (perguntas, glossário, blog) no estilo novo (dono, 24 Nov): verde, título em Playfair com a
-// última palavra a dourado, prova social e um só botão, o WhatsApp com a cor do topo das páginas de serviço.
-export default function ResourceHubHero({ title, description, image }: { title: string; description: string; image?: string }) {
+const TABS = [['/blog', 'Guias'], ['/perguntas-frequentes-limpeza-estofos', 'Perguntas'], ['/glossario-limpeza-estofos', 'Glossário']];
+
+// Topo dos recursos (guias, perguntas, glossário). No telemóvel ocupa o ecrã todo, com um vídeo real da equipa em cima
+// e, em baixo, o título, a avaliação, o WhatsApp, os separadores e o que a página precisar (pesquisa) (dono, 25 Nov:
+// "esta secção não levou com as devidas alterações"). No computador fica como estava.
+export default function ResourceHubHero({ title, description, image, video, poster, children }: { title: string; description: string; image?: string; video?: string; poster?: string; children?: ReactNode }) {
   const words = title.split(' '); const gold = words.pop();
-  return <section data-mobile-hero="text" className="relative isolate overflow-hidden bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
-    {image && <HeroPhoto src={image} />}
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-      <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-2 text-sm text-white/70"><Link to="/">Início</Link><span>/</span><Link to="/blog">Recursos</Link></nav>
-      <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+  return <section data-mobile-hero="text" data-resource-hero className="relative isolate overflow-hidden bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
+    {image && <div className="hidden md:block"><HeroPhoto src={image} /></div>}
+    {video && <div aria-hidden="true" className="absolute inset-0 -z-10 md:hidden">
+      <video src={video} poster={poster} autoPlay muted loop playsInline preload="metadata" className="h-[62%] w-full object-cover" />
+      <span className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(7,26,18,.12) 0%, rgba(7,26,18,.25) 26%, #0B2F2A 60%, #071a12 100%)' }} />
+    </div>}
+    <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+      <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-2 text-sm text-white/85 md:mb-4 md:text-white/70"><Link to="/">Início</Link><span>/</span><Link to="/blog">Recursos</Link></nav>
+      <div className="grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
         <div>
-          <h1 className="font-playfair mb-3 text-[28px] font-semibold leading-tight text-white md:text-5xl">{words.join(' ')} <em className="not-italic text-[#D4AF37]">{gold}</em></h1>
-          <p className="max-w-2xl text-[15px] leading-relaxed text-white/80 md:text-lg">{description}</p>
-          <p className="mt-3 text-sm text-white/80"><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> no Google · +{REVIEW_COUNT} avaliações</p>
+          <h1 className="font-playfair mb-2 text-[30px] font-semibold leading-[1.13] text-white md:mb-3 md:text-5xl">{words.join(' ')} <em className="not-italic text-[#D4AF37]">{gold}</em></h1>
+          <p className="max-w-2xl text-base leading-relaxed text-white/85 md:text-lg md:text-white/80">{description}</p>
+          <p className="mt-3 text-[15px] text-white/85 md:text-sm md:text-white/80"><span className="font-bold text-[#D4AF37]">{REVIEW_RATING}★</span> no Google · +{REVIEW_COUNT} avaliações</p>
         </div>
         <div>
-          <a href={getResourceWhatsapp()} target="_blank" rel="noopener noreferrer" data-tracking-source="resource-hub" className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
-          <p className="mt-2 text-center text-sm text-white/70">{RESPONSE_PROMISE}</p>
+          <a href={getResourceWhatsapp()} target="_blank" rel="noopener noreferrer" data-tracking-source="resource-hub" className="flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold hover:bg-[#116b32] md:min-h-[52px]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
+          <p className="mt-2 text-center text-sm text-white/75">{RESPONSE_PROMISE}</p>
         </div>
       </div>
+      <nav aria-label="Recursos" className="mt-4 grid grid-cols-3 gap-2 md:hidden">
+        {TABS.map(([to, label]) => <NavLink key={to} to={to} end className={({ isActive }) => `flex min-h-12 items-center justify-center rounded-xl border-2 text-[15px] font-semibold ${isActive ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-[#0B2F2A]' : 'border-white/20 bg-white/[0.06] text-white'}`}>{label}</NavLink>)}
+      </nav>
+      {children && <div className="mt-3 md:hidden">{children}</div>}
     </div>
   </section>;
 }

@@ -117,3 +117,11 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
   /* Sem cantos verdes por cima da secção do preço: a secção enche o ecrã de lado a lado. */
   html.snap-sections [data-landing-section="precos"] > section { border-radius: 0; }
 }
+
+/* Guias, perguntas e glossário: topo de ecrã inteiro no telemóvel, com o texto em baixo (dono, 25 Nov). */
+@media (max-width: 767px) {
+  html.snap-sections main > section[data-resource-hero] { min-height: var(--app-h, 100svh); justify-content: flex-end; padding-top: calc(var(--header-h, 57px) + 12px) !important; padding-bottom: 18px !important; }
+  html.snap-sections main > section[data-resource-hero] nav a { min-height: 32px; }
+  html.snap-sections main > section[data-resource-hero] nav[aria-label="Recursos"] a { min-height: 48px; }
+  html.snap-sections main > section#termos { justify-content: flex-start; }
+}
