@@ -1292,3 +1292,7 @@ Corrigido no caminho: o riscado da opção Premium contava a impermeabilização
 ## Nunca pôr o preço em dúvida; askTeam sem semana nem dia (dono, 24 Nov 2026, Câmara de Lobos)
 
 Dono: "quando é que eu te ensinei que tu dizes a alguém se o valor fizer sentido?". O modelo inventou a frase (não estava em nenhuma regra). `dropIfPriceOk` (kyro-bot `agent.ts`) corta-a antes de sair. A mesma conversa pediu a semana e o dia porque a regra de 12/11 (Funchal e Coimbra = askWeek) ficou no contrato e na S59 depois da de 19/11 (askTeam) [RETIRADA 24/11]; `tavira0211Issues` trava a pergunta quando a ferramenta devolve askTeam. Câmara de Lobos é Madeira: sem horas do motor, a hora é a da equipa do Funchal.
+
+## Equipa Funchal em pausa (dono, 25 Nov 2026)
+
+Dono: "para já enquanto eles me devem dinheiro". `teamPaused` em kyro-bot `vianaAsk.ts`; retoma-se esvaziando `team_paused:Funchal` na tabela de estado do VPS, sem deploy. Avaliar com o dono quando pagarem.
