@@ -32,7 +32,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
   const restLabel = words.join(" ");
 
   return (
-    <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
+    <section id="localidades" className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Editorial header */}

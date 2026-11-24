@@ -19,7 +19,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312, MarcaCadeiras 312 |
 | TreatmentPage (`/tratamento-anti-acaros-*`) | 206 | — | — | por fazer |
 | CommercialPage | 32 | — | — | por fazer |
-| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | POR FAZER | por fazer |
+| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO, falta OK | por fazer |
 | Página inicial, preços, guias, blog, /problemas, /en | — | — | — | por fazer (blog no fim) |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).

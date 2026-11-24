@@ -18,7 +18,7 @@ const ServiceExpertTips = ({ tips, variant = "dark" }: ServiceExpertTipsProps) =
   if (!tips.length) return null;
 
   return (
-    <section className={`py-9 md:py-14 ${light ? "bg-[#FDFDF9] text-[#111111]" : "bg-[#071a12] text-white"}`}>
+    <section id="dicas" className={`py-9 md:py-14 ${light ? "bg-[#FDFDF9] text-[#111111]" : "bg-[#071a12] text-white"}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="mb-8 md:mb-10 md:flex md:items-end md:justify-between md:gap-8">
           <div>
