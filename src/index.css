@@ -846,3 +846,10 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 @media (min-width: 768px) {
   html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 3 / 4)); margin-inline: auto; }
 }
+
+/* Portáteis de ecrã baixo (até ~820 px de altura): a barra fixa do WhatsApp (~80 px) tapava o fim do texto das
+   secções. Reserva-se o espaço em baixo só nesses ecrãs, como no telemóvel (24 Nov). */
+@media (min-width: 768px) and (max-height: 820px) {
+  html.snap-sections main > section:not([data-commercial-hero]):not(#orcamento) { padding-bottom: 88px; }
+  html.snap-sections main #mesma-visita > section { padding-bottom: 88px; }
+}
