@@ -143,7 +143,7 @@ const MaterialPage = () => {
 
         {sofaNew ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(priceCity)} {priceCity}</em></h2>
+            <h2 data-long-title={`${cityPrep(priceCity)} ${priceCity}`.length >= 23 ? '' : undefined} className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(priceCity)} {priceCity}</em></h2>
             {!cityName && <select value={pickCity} onChange={e => setPickCity(e.target.value)} aria-label="Localidade" className="mb-3 h-11 w-full max-w-xs rounded-xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">{cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}</select>}
             <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{rugNew ? <RugPricePicker city={priceCity} source={`material_picker_${data.slug}`} /> : fabric ? <SofaPricePicker city={priceCity} source={`material_picker_${data.slug}`} /> : <LeatherSofaPicker city={priceCity} source={`material_picker_${data.slug}`} />}</div>
           </div>

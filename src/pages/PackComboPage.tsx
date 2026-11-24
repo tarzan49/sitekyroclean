@@ -153,7 +153,7 @@ export default function PackComboPage() {
       <section id="montar" className="scroll-mt-20 py-14 md:py-20 lg:py-10 bg-[#FDFDF9]">
         <div className={container}>
           {simpleKind || combo
-            ? <h2 data-long-title={`${cityPrep(city.name)} ${city.name}`.length >= 23 ? '' : undefined} className={`${combo ? 'mb-4' : 'mb-8'} md:mb-10 type-section-title font-playfair text-[#111111]`}>O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(city.name)} {city.name}</em></h2>
+            ? <h2 data-long-title={`${cityPrep(city.name)} ${city.name}`.length >= (combo ? 11 : 23) ? '' : undefined} className={`${combo ? 'mb-4' : 'mb-8'} md:mb-10 type-section-title font-playfair text-[#111111]`}>O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(city.name)} {city.name}</em></h2>
             : <SectionHeader
               overline={pack.name}
               heading="Monte o seu pack"
