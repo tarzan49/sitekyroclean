@@ -176,8 +176,10 @@ const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermea
 function separateOf(city: string, it: BasketItem): number | null {
   const q = toQuote(it);
   if (!q) return null;
-  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { separate?: number } | null };
-  return typeof r.separatePrice?.separate === 'number' ? r.separatePrice.separate : null;
+  // Colchão com anti-ácaros: o motor dá o riscado em mattressMitePack (limpeza + anti-ácaros à parte, 40€).
+  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
+  const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate;
+  return typeof v === 'number' ? v : null;
 }
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
@@ -474,6 +476,26 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   );
 }
 
+// Riscado + "Poupa X€" em todas as opções (dono, 25 Nov: "isto é que é o desconto que a pessoa está à procura";
+// "vale para todos os upsells"). Valores só do motor.
+function PriceTag({ shown, struck, small }: { shown: number | null; struck: number | null; small?: boolean }) {
+  if (shown === null) return null;
+  if (small) return <span className="block whitespace-nowrap text-xs font-bold leading-tight">{struck !== null && <span className="mr-1 font-semibold text-white/50 line-through decoration-[#D4AF37]">{formatEuro(struck)}</span>}<span className="text-white">{formatEuro(shown)}</span>{struck !== null && <span className="block text-[10.5px] font-extrabold uppercase text-[#E8C964]">Poupa {formatEuro(struck - shown)}</span>}</span>;
+  return <span className="flex shrink-0 flex-col items-end gap-1 leading-none">
+    <span className="whitespace-nowrap">{struck !== null && <span className="mr-1.5 text-sm font-semibold text-white/55 line-through decoration-[#D4AF37] decoration-2">{formatEuro(struck)}</span>}<span className="text-lg font-extrabold text-white">{formatEuro(shown)}</span></span>
+    {struck !== null && <span className="whitespace-nowrap rounded-md bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">Poupa {formatEuro(struck - shown)}</span>}
+  </span>;
+}
+/** Um extra (anti-ácaros, anti-odor, pele): quanto acrescenta, riscado o que custaria em separado, ou "Oferecido". */
+function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null }) {
+  if (plus === null) return null;
+  const was = normal !== null && normal > plus ? normal : null;
+  return <span className="flex shrink-0 flex-col items-end gap-1 leading-none">
+    <span className="whitespace-nowrap">{was !== null && <span className="mr-1.5 text-sm font-semibold text-white/55 line-through decoration-[#D4AF37] decoration-2">+{formatEuro(was)}</span>}{plus > 0 && <span className="text-lg font-extrabold text-white">+{formatEuro(plus)}</span>}</span>
+    {was !== null && <span className="whitespace-nowrap rounded-md bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#0B2F2A]">{plus > 0 ? `Poupa ${formatEuro(was - plus)}` : 'Oferecido'}</span>}
+  </span>;
+}
+
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
     <div className="flex items-center gap-3">
@@ -504,6 +526,13 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
     const sep = separateOf(city, it) ?? alone;
     return { shown, struck: sep !== null && shown !== null && sep > shown ? sep : null };
   };
+  const addOn = (on: Partial<BasketItem>, off: Partial<BasketItem>) => {
+    // O que a visita sobe de facto com o extra (com a escada A pode ser 0: "Oferecido").
+    const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : aloneTotal(city, { ...item, ...p }));
+    const a = tot(on), b = tot(off);
+    const withAlone = separateOf(city, { ...item, ...on }) ?? aloneTotal(city, { ...item, ...on }), offAlone = aloneTotal(city, { ...item, ...off });
+    return { plus: a !== null && b !== null ? Math.max(0, a - b) : null, normal: withAlone !== null && offAlone !== null ? withAlone - offAlone : null };
+  };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
@@ -527,18 +556,21 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
         {item.kind === 'sofa' && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantos lugares?</p>
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(seats === s)} onClick={() => set(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
-            <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}</button>)}</div>
+            <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}<PriceTag small {...packPrice(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })} /></button>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
           <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
             <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
-            {item.leather && (() => { const a = priceWith({ leather: true }), b = priceWith({ leather: false, pack: 'none' }); return a !== null && b !== null ? <span className="text-base font-bold text-white">{a - b > 0 ? `+${formatEuro(a - b)}` : 'oferecido'}</span> : null; })()}
+            <AddOnTag {...addOn({ leather: true }, { leather: false, pack: 'none' })} />
           </button>
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho?</p>
           <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <button key={m.id} type="button" className={tile(item.size === m.id)} onClick={() => set({ size: m.id })}>
-            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}</button>)}</div>
-          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran){(() => { const a = priceWith({ pack: 'premium' }), b = priceWith({ pack: 'none' }); return a !== null && b !== null ? (a - b > 0 ? ` · +${formatEuro(a - b)}` : ' · oferecido') : ''; })()}</button>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}<PriceTag small {...packPrice({ size: m.id })} /></button>)}</div>
+          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 flex w-full items-center justify-between gap-2 py-2 text-left`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>
+            <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
+            <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
+          </button>
         </>}
         {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
@@ -547,14 +579,12 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
         {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{PACKS.map(p => (
           <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
             <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-            <span className="flex items-center gap-2">{(() => { const { shown, struck } = packPrice({ pack: p.pack }); return shown === null ? null : <span className="text-right leading-tight">{struck !== null && <span className="mr-1.5 text-xs font-normal text-white/50 line-through">{formatEuro(struck)}</span>}<span className="text-base font-bold text-white">{formatEuro(shown)}</span>{struck !== null && <span className="block text-[11px] font-bold text-[#E8C964]">Poupa {formatEuro(struck - shown)}</span>}</span>; })()}{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+            <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack })} />{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
           </button>))}</div>}
         {rug && (() => {
           const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
           const preset = sizes.find(z => z.w === item.width && z.l === item.length);
           const area = Math.round(num(item.width) * num(item.length) * 100) / 100;
-          const price = ok ? aloneTotal(city, item) : null;
-          const odorPlus = ok ? (() => { const a = aloneTotal(city, { ...item, odor: true }), b = aloneTotal(city, { ...item, odor: false }); return a !== null && b !== null ? a - b : null; })() : null;
           return <>
             <ul className="mb-4 flex flex-wrap gap-1.5 text-xs font-semibold text-white/85">
               {[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', 'Deslocação incluída', 'Seca em 2 a 5 h'].map(t => <li key={t} className="flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-2.5 py-1"><Check className="h-3.5 w-3.5" style={{ color: GOLD }} />{t}</li>)}
@@ -563,11 +593,11 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
             <div className="mb-2 grid grid-cols-2 gap-2">
               {sizes.map(z => {
                 const w = num(z.w), l = num(z.l), max = Math.max(...sizes.map(x => num(x.l)));
-                const v = aloneTotal(city, { ...item, width: z.w, length: z.l });
+                const v = packPrice({ width: z.w, length: z.l });
                 return <button key={z.label} type="button" onClick={() => set({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start gap-2 !px-2.5 text-left`}>
                   <span className="flex h-12 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(14, (l / max) * 64)}px`, height: `${Math.max(10, (w / max) * 44)}px` }} /></span>
                   <span className="block leading-tight">{z.label}</span>
-                  <span className="flex items-baseline justify-between gap-1 text-xs font-semibold"><span className="text-white/60">{z.w} × {z.l} m</span>{v !== null && <span className="text-sm font-bold text-white">{formatEuro(v)}</span>}</span>
+                  <span className="flex items-baseline justify-between gap-1 text-xs font-semibold"><span className="text-white/60">{z.w} × {z.l} m</span><PriceTag small {...v} /></span>
                 </button>;
               })}
             </div>
@@ -576,10 +606,10 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
               <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
               <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
             </div>
-            {ok && <p className="mb-3 flex items-baseline justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{area.toLocaleString('pt-PT')} m², deslocação incluída</span>{price !== null && <span className="text-lg font-bold">{formatEuro(price)}</span>}</p>}
+            {ok && <p className="mb-3 flex items-baseline justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{area.toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>}
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
               <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60">Para o cheiro de animais ou de urina</span></span>
-              {odorPlus !== null && <span className="text-base font-bold text-white">{odorPlus > 0 ? `+${formatEuro(odorPlus)}` : 'oferecido'}</span>}
+              <AddOnTag {...addOn({ odor: true }, { odor: false })} />
             </button>
           </>;
         })()}
