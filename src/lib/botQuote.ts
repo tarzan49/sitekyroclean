@@ -919,10 +919,9 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   }
   // The 20% cap left the order with no gift: the total still never falls under the pieces alone, as with the gift
   // (owner, 24 Nov 2026, "Preço cheio + oferta", with 3L + 3L = 179 in front of him, not 159). Orders with nothing to
-  // offer keep their price; so do the ones with a rug, still to be decided by him, and the ones with waterproofing (the
-  // table he saw was cleaning only).
-  const cleaningOnly = rawIn.every(i => ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean'));
-  if (!gifted.size && !(capped && cleaningOnly && !q.rugCombo)) return none;
+  // offer keep their price; so does anything but sofas only, cleaned only: that is the table he saw.
+  const cleanedSofas = rawIn.every(i => rec(i).kind === 'sofa' && ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean'));
+  if (!gifted.size && !(capped && cleanedSofas && !extras)) return none;
   // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
   const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
   const total = price(restore(base));

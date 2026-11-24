@@ -3028,8 +3028,8 @@ function withVisitGifts(input, r) {
     withGifts = best.items;
     usualBase = best.priced;
   }
-  const cleaningOnly = rawIn.every((i) => ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
-  if (!gifted.size && !(capped && cleaningOnly && !q.rugCombo)) return none;
+  const cleanedSofas = rawIn.every((i) => rec(i).kind === "sofa" && ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
+  if (!gifted.size && !(capped && cleanedSofas && !extras)) return none;
   const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;

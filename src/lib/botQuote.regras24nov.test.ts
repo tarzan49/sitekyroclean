@@ -83,6 +83,8 @@ describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medi
     expect(q([S('2-lugares', 'clean+essencial'), S('2-lugares')]).total).toBe(199);
     expect(q([S('3-lugares', 'premium'), S()]).total).toBe(229);
     expect(q([S(), S()]).total).toBe(179);
+    // Sofa + a few chairs is not a pair of sofas.
+    expect([q([S(), C(2)]).total, q([S(), C(2, 'clean+essencial')]).total]).toEqual([129, 129]);
   });
   it('o anti-ácaros de umas poucas cadeiras nunca é a oferta', () => {
     const r = q([C(1), S('3-lugares', 'clean', { leather: true }), C(6, 'clean+premium')]);
