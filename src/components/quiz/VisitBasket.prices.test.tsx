@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, cityKnown, newItem, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -81,4 +81,23 @@ describe('total do cesto: o riscado é o do motor, nunca um valor do site', () =
     expect(quoteBasket('Lisboa', g).usual).toBe(want !== null && want - m.total >= 5 ? want : null);
   });
   it('sofá limpo sozinho não tem riscado', () => expect(quoteBasket('Lisboa', [S('3-lugares')]).usual).toBeNull());
+});
+
+describe('janela da peça: o preço e o "Poupa" são os que o total mostra', () => {
+  const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
+  const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
+  const R = (rugMaterial: string) => newItem('rug', { width: '2', length: '3', rugMaterial });
+  const others: Record<string, BasketItem[]> = { 'vazio': [], 'colchão': [M()], 'sofá 3L': [S('3-lugares')], '6 cadeiras': [chairs(6, 'none')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], 'tapete': [R('sintético ou lã')], 'colchão + 6 cadeiras': [M(), chairs(6, 'none')] };
+  const adds: Record<string, BasketItem> = { '3L Renovado': S('3-lugares'), '3L Blindado': S('3-lugares', { pack: 'premium' }), '3L Protegido': S('3-lugares', { pack: 'essencial' }), '3L pele': S('3-lugares', { leather: true }), '3L só imper': S('3-lugares', { pack: 'premium', imperOnly: true }), '5L Renovado': S('5-lugares'), 'colchão': M(), '6 cadeiras': chairs(6, 'none'), '6 cadeiras Blindado': chairs(6, 'premium'), 'tapete juta': R('juta ou sisal') };
+  for (const [on, o] of Object.entries(others)) for (const [an, a] of Object.entries(adds)) for (const city of ['Lisboa', 'Porto']) it(`${city}: ${on} + ${an}`, () => {
+    const { shown, struck } = optionPrice(city, o, [a]);
+    const alone = aloneTotal(city, a)!, rise = quoteBasket(city, [...o, a]).total! - (o.length ? quoteBasket(city, o).total! : 0);
+    expect(shown).not.toBeNull();
+    // O preço é o da peça, ou menos só se a visita sobe mesmo menos.
+    expect(shown === alone || Math.abs(shown! - rise) < 0.01).toBe(true);
+    expect(shown!).toBeLessThanOrEqual(alone);
+    // Sem pack, o "Poupa" nunca passa o que a visita deixa de subir (1€ dos totais em 9).
+    const pack = a.pack !== 'none' && !a.imperOnly;
+    if (struck !== null && !pack) expect(struck - shown!).toBeLessThanOrEqual(Math.max(0, alone - rise) + 1);
+  });
 });

@@ -199,8 +199,8 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
   // Impermeabilização sozinha: a vantagem é a deslocação já paga pelas outras peças (dono, 25 Nov).
   if (e.key === 'imper') {
     if (!items.length) return null;
-    const alone = aloneTotal(city, it), q = quoteBasket(city, [...items, it]), line = q.sob ? null : q.lines[items.length] ?? null;
-    return alone !== null && line !== null && alone > line ? { kind: 'save', value: Math.round((alone - line) * 100) / 100, what: '+ deslocação oferecida' } : null;
+    const alone = aloneTotal(city, it), { shown } = optionPrice(city, items, [it]);
+    return alone !== null && shown !== null && alone - shown >= 5 ? { kind: 'save', value: Math.round((alone - shown) * 100) / 100, what: '+ deslocação oferecida' } : null;
   }
   const g = giftsUnlocked(city, items, it);
   if (!g) return null;
@@ -239,6 +239,20 @@ export function struckOf(city: string, it: BasketItem): number | null {
   // valor já conta a oferta (que o cesto mostra numa linha própria), por isso nunca passa de cada uma sozinha.
   const sep = separateOf(city, it);
   return q.gifts.length ? Math.min(sep ?? sum, sum) : sep ?? sum;
+}
+/** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, só menos se a visita subir
+ *  mesmo menos (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€).
+ *  Riscado: as mesmas peças pedidas sozinhas, com os serviços em separado (`struckOf`). */
+export function optionPrice(city: string, others: BasketItem[], list: BasketItem[]): { shown: number | null; struck: number | null } {
+  const totalOf = (l: BasketItem[]) => { const q = quoteBasket(city, l); return !l.length || q.total === null || q.sob ? null : q.total; };
+  const alone = totalOf(list);
+  if (alone === null) return { shown: null, struck: null };
+  const before = others.length ? totalOf(others) : 0, after = others.length ? totalOf([...others, ...list]) : alone;
+  const rise = before !== null && after !== null ? Math.round((after - before) * 100) / 100 : alone;
+  const shown = rise < alone - 1 ? Math.max(0, rise) : alone;
+  let sep: number | null = 0;
+  for (const x of list) { const v = struckOf(city, x); sep = v === null || sep === null ? null : sep + v; }
+  return { shown, struck: sep !== null && sep > shown ? Math.round(sep * 100) / 100 : null };
 }
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
@@ -673,19 +687,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
   // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
   const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const v = struckOf(city, x); if (v === null) return null; t += v; } return g.length ? Math.round(t * 100) / 100 : null; };
-  const packPrice = (p: Partial<BasketItem>): { shown: number | null; struck: number | null } => {
-    // Pele: o motor põe o tratamento numa linha à parte, por isso soma-se à linha da limpeza na visita.
-    if (p.leather && others.length) {
-      const clean = packPrice({ ...p, leather: false, pack: 'none' }).shown, a = totalOf(group(p)), b = totalOf(group({ ...p, leather: false, pack: 'none' }));
-      const shown = clean !== null && a !== null && b !== null ? Math.round((clean + a - b) * 100) / 100 : null;
-      return { shown, struck: a !== null && shown !== null && a > shown ? a : null };
-    }
-    const g = group(p);
-    const alone = totalOf(g);
-    const shown = !others.length ? alone : (() => { const q = quoteBasket(city, [...others, ...g]); if (q.sob) return null; const ls = q.lines.slice(others.length); return ls.length && ls.every(v => v != null) ? Math.round(ls.reduce<number>((t, v) => t + (v as number), 0) * 100) / 100 : null; })();
-    const sep = sepUnits(g);
-    return { shown, struck: sep !== null && shown !== null && sep > shown ? sep : null };
-  };
+  const packPrice = (p: Partial<BasketItem>) => optionPrice(city, others, group(p));
   const addOn = (on: Partial<BasketItem>, off: Partial<BasketItem>) => {
     // O que a visita sobe de facto com o extra (com a escada A pode ser 0: "Oferecido").
     const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : totalOf(group(p)));
