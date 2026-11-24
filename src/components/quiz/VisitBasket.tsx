@@ -41,7 +41,7 @@ const SOFA_SEATS = [1, 2, 3, 4, 5, 6];
 const MATTRESS = [{ id: 'solteiro', label: 'Solteiro' }, { id: 'casal', label: 'Casal' }, { id: 'king', label: 'King / Queen' }];
 const KIND_LABEL: Record<BasketKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 const GOLD = '#D4AF37';
-const imgOf = (it: Pick<BasketItem, 'kind' | 'size'>) => <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind === 'chairs' ? 'chairs' : it.kind} sizeId={it.size} className="h-14 w-14 rounded-xl bg-white/90 sm:h-14 sm:w-14" />;
+const imgOf = (it: Pick<BasketItem, 'kind' | 'size'>) => <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind === 'chairs' ? 'chairs' : it.kind} sizeId={it.size} className="h-14 w-14 sm:h-14 sm:w-14" />;
 
 const num = (v?: string) => { const n = parseFloat(String(v ?? '').replace(',', '.')); return n > 0 ? n : 0; };
 const isRug = (k: BasketKind) => k === 'rug' || k === 'carpet';
@@ -90,6 +90,11 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   return { total: sob ? (known && known > 0 ? known : null) : (typeof r.total === 'number' ? r.total : null), travel: r.travel ?? null, sob, lines };
 }
 
+const SAVE_KEY = 'kyro_visit_basket';
+function readSaved(): { city: string; items: BasketItem[] } | null {
+  try { const v = JSON.parse(sessionStorage.getItem(SAVE_KEY) ?? 'null'); return v && Array.isArray(v.items) ? v : null; } catch { return null; }
+}
+
 interface Props { isOpen: boolean; onClose: () => void; initialCity?: string; initialItems?: BasketItem[] }
 
 export default function VisitBasket({ isOpen, onClose, initialCity = '', initialItems = [] }: Props) {
@@ -107,10 +112,14 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   // Cada abertura a partir do widget traz a escolha dessa altura.
   useEffect(() => {
     if (!isOpen) return;
-    setCity(initialCity); setItems(initialItems); setStep('basket'); setFailed(false); setTestOrder(null);
+    // O cesto guardado na sessão volta se a página se refizer (recarregar, voltar atrás): nunca se perde um artigo.
+    const saved = readSaved();
+    const same = saved && initialItems[0] && saved.items[0] && ['kind', 'size', 'seats', 'pack', 'qty'].every(k => (saved.items[0] as unknown as Record<string, unknown>)[k] === (initialItems[0] as unknown as Record<string, unknown>)[k]);
+    setCity(same ? saved.city : initialCity); setItems(same ? saved.items : initialItems); setStep('basket'); setFailed(false); setTestOrder(null);
     if (!initialItems.length) setEditing(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
+  useEffect(() => { if (isOpen && items !== initialItems) try { sessionStorage.setItem(SAVE_KEY, JSON.stringify({ city, items })); } catch { /* sem armazenamento */ } }, [isOpen, city, items]);
   useEffect(() => { document.body.style.overflow = isOpen ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [isOpen]);
 
   const cityNames = useMemo(() => listBotCities().map(c => c.name), []);
@@ -248,7 +257,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : 'Receber o preço e as horas no WhatsApp'}</button>}
       </footer>
 
-      {editing && <ItemSheet item={editing} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
+      {editing && <ItemSheet item={editing} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
     </div>
   );
 }
@@ -263,9 +272,11 @@ function Stepper({ value, min, max, onChange }: { value: number; min: number; ma
   );
 }
 
-function ItemSheet({ item, onChange, onSave, onCancel }: { item: BasketItem; onChange: (i: BasketItem) => void; onSave: () => void; onCancel: () => void }) {
+function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: BasketItem; city: string; others: BasketItem[]; onChange: (i: BasketItem) => void; onSave: () => void; onCancel: () => void }) {
   const set = (p: Partial<BasketItem>) => onChange({ ...item, ...p });
   const rug = isRug(item.kind);
+  // O preço deste artigo em cada opção, pelo motor do bot, com o resto do cesto (o mesmo que o total vai mostrar).
+  const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.lines[others.length] ?? null; };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
@@ -283,7 +294,7 @@ function ItemSheet({ item, onChange, onSave, onCancel }: { item: BasketItem; onC
         {item.kind === 'mattress' && <>
           <p className="mb-1 text-xs font-semibold text-white/70">Tamanho</p>
           <div className="mb-3 grid grid-cols-3 gap-1.5">{MATTRESS.map(m => <button key={m.id} type="button" className={chip(item.size === m.id)} onClick={() => set({ size: m.id })}>{m.label}</button>)}</div>
-          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran)</button>
+          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran){(() => { const a = priceWith({ pack: 'premium' }), b = priceWith({ pack: 'none' }); return a !== null && b !== null ? ` · +${formatEuro(a - b)}` : ''; })()}</button>
         </>}
         {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
@@ -292,7 +303,7 @@ function ItemSheet({ item, onChange, onSave, onCancel }: { item: BasketItem; onC
         {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{PACKS.map(p => (
           <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
             <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-            {item.pack === p.pack && <Check className="h-4 w-4" style={{ color: GOLD }} />}
+            <span className="flex items-center gap-2">{(() => { const v = priceWith({ pack: p.pack }); return v === null ? null : <span className="text-base font-bold text-white">{formatEuro(v)}</span>; })()}{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
           </button>))}</div>}
         {rug && <>
           <p className="mb-1 text-xs font-semibold text-white/70">Medidas em metros</p>
@@ -302,7 +313,7 @@ function ItemSheet({ item, onChange, onSave, onCancel }: { item: BasketItem; onC
           </div>
           <p className="mb-3 text-xs text-white/60">Sob orçamento: enviamos o preço no WhatsApp, conforme as medidas.</p>
         </>}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Juntar à visita</button>
+        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : priceWith({}); return v === null ? 'Juntar à visita' : `Juntar à visita · ${formatEuro(v)}`; })()}</button>
       </div>
     </div>
   );
