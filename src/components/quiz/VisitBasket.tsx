@@ -57,6 +57,7 @@ const PACKS: { pack: BasketPack; name: string; note: string }[] = [
   { pack: 'none', name: 'Renovado', note: 'Só limpeza' },
 ];
 const SOFA_SEATS = [1, 2, 3, 4, 5, 6];
+const CHAIR_QTY = [2, 4, 6, 8, 10, 12];
 // Tamanhos de um toque (dono, 25 Nov: a janela do tapete "tá muito fraca"): os tapetes mais comuns e divisões
 // típicas para a alcatifa; o preço de cada um é o do motor. "Outra medida" abre os campos.
 const RUG_SIZES: { label: string; w: string; l: string }[] = [
@@ -508,7 +509,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           </div>
         </div>
       )}
-      {editing && <ItemSheet item={editing} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
+      {editing && <ItemSheet item={editing} fresh={!items.some(i => i.id === editing.id)} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
     </div>
     </div>
   );
@@ -544,7 +545,7 @@ function Stepper({ value, min, max, onChange }: { value: number; min: number; ma
   );
 }
 
-function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: BasketItem; city: string; others: BasketItem[]; onChange: (i: BasketItem) => void; onSave: () => void; onCancel: () => void }) {
+function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { item: BasketItem; fresh: boolean; city: string; others: BasketItem[]; onChange: (i: BasketItem) => void; onSave: () => void; onCancel: () => void }) {
   const set = (p: Partial<BasketItem>) => onChange({ ...item, ...p });
   const rug = isRug(item.kind);
   // O preço deste artigo em cada opção, pelo motor do bot, com o resto do cesto (o mesmo que o total vai mostrar).
@@ -572,7 +573,13 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
     return { plus: a !== null && b !== null ? Math.max(0, a - b) : null, normal: withAlone !== null && offAlone !== null ? withAlone - offAlone : null };
   };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
-  const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
+  // Primeiro só a escolha (lugares, tamanho, quantidade), sem preços; as opções com o riscado e o "Poupa" aparecem
+  // depois de escolher e a folha desce até elas (dono, 25 Nov: "o poupa aparece quando a pessoa clica").
+  const [picked, setPicked] = useState(!fresh);
+  const optionsRef = useRef<HTMLDivElement>(null);
+  const choose = (p: Partial<BasketItem>) => { set(p); setPicked(true); window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); };
+  const sized = !rug || (num(item.width) > 0 && num(item.length) > 0);
+  const ok = sized && (picked || rug);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
@@ -593,36 +600,22 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
 
         {item.kind === 'sofa' && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantos lugares?</p>
-          <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(seats === s)} onClick={() => set(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
-            <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}<PriceTag small {...packPrice(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })} /></button>)}</div>
+          <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(picked && seats === s)} onClick={() => choose(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
+            <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}</button>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
-          {!item.imperOnly && <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
-            <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
-            <AddOnTag {...addOn({ leather: true }, { leather: false, pack: 'none' })} />
-          </button>}
         </>}
         {item.kind === 'mattress' && <>
           <p className="mb-2 text-sm font-semibold text-white">Que tamanho?</p>
-          <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <button key={m.id} type="button" className={tile(item.size === m.id)} onClick={() => set({ size: m.id })}>
-            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}<PriceTag small {...packPrice({ size: m.id })} /></button>)}</div>
-          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 flex w-full items-center justify-between gap-2 py-2 text-left`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>
-            <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
-            <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
-          </button>
+          <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <button key={m.id} type="button" className={tile(picked && item.size === m.id)} onClick={() => choose({ size: m.id })}>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}</button>)}</div>
         </>}
-        {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
-          <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
-          <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
-        </div>}
-        {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => (
-          <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
-            <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
-            <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack })} />{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
-          </button>))}</div>}
+        {item.kind === 'chairs' && <>
+          <p className="mb-2 text-sm font-semibold text-white">Quantas cadeiras?</p>
+          <div className="mb-3 grid grid-cols-3 gap-2">{CHAIR_QTY.map(n => <button key={n} type="button" className={`${tile(picked && item.qty === n)} min-h-[56px] text-base`} onClick={() => choose({ qty: n })}>{n} cadeiras</button>)}</div>
+        </>}
         {rug && (() => {
           const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
           const preset = sizes.find(z => z.w === item.width && z.l === item.length);
-          const area = Math.round(num(item.width) * num(item.length) * 100) / 100;
           return <>
             <ul className="mb-4 flex flex-wrap gap-1.5 text-xs font-semibold text-white/85">
               {[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', 'Deslocação incluída', 'Seca em 2 a 5 h'].map(t => <li key={t} className="flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-2.5 py-1"><Check className="h-3.5 w-3.5" style={{ color: GOLD }} />{t}</li>)}
@@ -631,30 +624,51 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
             <div className="mb-2 grid grid-cols-2 gap-2">
               {sizes.map(z => {
                 const w = num(z.w), l = num(z.l), max = Math.max(...sizes.map(x => num(x.l)));
-                const v = packPrice({ width: z.w, length: z.l });
-                return <button key={z.label} type="button" onClick={() => set({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start gap-2 !px-2.5 text-left`}>
+                return <button key={z.label} type="button" onClick={() => choose({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start gap-2 !px-2.5 text-left`}>
                   <span className="flex h-12 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(14, (l / max) * 64)}px`, height: `${Math.max(10, (w / max) * 44)}px` }} /></span>
                   <span className="block leading-tight">{z.label}</span>
-                  <span className="flex items-baseline justify-between gap-1 text-xs font-semibold"><span className="text-white/60">{z.w} × {z.l} m</span><PriceTag small {...v} /></span>
+                  <span className="block text-xs font-semibold text-white/60">{z.w} × {z.l} m</span>
                 </button>;
               })}
             </div>
             <p className="mb-1 mt-3 text-xs font-semibold text-white/70">{preset ? 'Ou escreva a medida certa, em metros' : 'Medida em metros (de uma ponta à outra)'}</p>
-            <div className="mb-2 grid grid-cols-2 gap-2">
+            <div className="mb-3 grid grid-cols-2 gap-2">
               <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
               <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
             </div>
-            {ok && <p className="mb-3 flex items-baseline justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{area.toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>}
+          </>;
+        })()}
+
+        {ok && <div ref={optionsRef} className="scroll-mt-2">
+          {item.kind === 'sofa' && !item.imperOnly && <button type="button" className={`${chip(!!item.leather)} mb-3 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ leather: !item.leather })}>
+            <span><span className="block">{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
+            <AddOnTag {...addOn({ leather: true }, { leather: false, pack: 'none' })} />
+          </button>}
+          {item.kind === 'mattress' && <button type="button" className={`${chip(item.pack === 'premium')} mb-3 flex w-full items-center justify-between gap-2 py-2 text-left`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>
+            <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
+            <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
+          </button>}
+          {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
+            <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
+            <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
+          </div>}
+          {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => (
+            <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
+              <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
+              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack })} />{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
+            </button>))}</div>}
+          {rug && <>
+            <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
               <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60">Para o cheiro de animais ou de urina</span></span>
               <AddOnTag {...addOn({ odor: true }, { odor: false })} />
             </button>
-          </>;
-        })()}
+          </>}
+        </div>}
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        {(() => { const g = others.some(o => o.id === item.id) ? null : giftsUnlocked(city, others, item); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : priceWith({}); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        {ok && (() => { const g = giftsUnlocked(city, others, item); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
+        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : priceWith({}); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares' : 'Escolha o tamanho') : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
