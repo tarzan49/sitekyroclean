@@ -22,7 +22,7 @@ describe('shared landing composition', () => {
       expect(model!.problems).toHaveLength(4);
       expect(model!.problems.map(problem => problem.imageIndex)).toEqual([0, 1, 2, 3]);
       expect(model!.problems.every(problem => PROBLEM_IMAGES[model!.serviceSlug][problem.imageIndex])).toBe(true);
-      expect(model!.processSteps).toHaveLength(5);
+      expect(model!.processSteps).toHaveLength(model!.serviceSlug === 'limpeza-tapetes' ? 4 : 5);
       expect(model!.reviews.length).toBeGreaterThan(0);
       expect(model!.directory.length).toBeGreaterThan(0);
       expect(model!.packLinks.length).toBeGreaterThan(0);
@@ -37,7 +37,8 @@ describe('shared landing composition', () => {
     for (const route of ['/limpeza-sofas-lisboa', '/limpeza-alcatifas-porto-paranhos', '/preco-limpeza-tapetes-lisboa', '/impermeabilizacao-cadeiras-porto']) {
       const model = getLandingPageModel(route)!;
       const html = renderLandingPageHtml(model);
-      expect([...html.matchAll(/data-landing-section="([^"]+)"/g)].map(match => match[1])).toEqual(LANDING_SECTION_ORDER);
+      // A impermeabilização tem a secção extra 'Essencial ou Premium?' (versoes, 24 Nov); a ordem das outras mantém-se.
+      expect([...html.matchAll(/data-landing-section="([^"]+)"/g)].map(match => match[1]).filter(id => id !== 'versoes')).toEqual(LANDING_SECTION_ORDER);
       for (const item of [...model.problems, ...model.processSteps]) expect(html).toContain(escapeLandingHtml(item.description));
       for (const faq of model.faqs) expect(html).toContain(escapeLandingHtml(faq.answer));
     }

@@ -23,7 +23,8 @@ describe('process guide image containment', () => {
     it(`constrains the image to its own grid column through all steps: ${name}`, () => {
       render(component);
       const tabs = screen.getAllByRole('tab');
-      expect(tabs).toHaveLength(5);
+      // Tapetes: 4 etapas desde 24 Nov (sai a aspiração); os outros serviços continuam com 5.
+      expect(tabs).toHaveLength(name === 'limpeza-tapetes' ? 4 : 5);
       for (const tab of tabs) {
         fireEvent.click(tab);
         const panel = screen.getByRole('tabpanel');

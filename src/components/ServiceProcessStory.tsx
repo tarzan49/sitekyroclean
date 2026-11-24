@@ -9,8 +9,10 @@ import rugSpray from '@/assets/tapete-processo/pulverizacao.mp4';
 import rugSprayPoster from '@/assets/tapete-processo/pulverizacao-poster.jpg';
 import rugBrush from '@/assets/tapete-processo/escovacao.mp4';
 import rugBrushPoster from '@/assets/tapete-processo/escovacao-poster.jpg';
-import rugExtract from '@/assets/tapete-processo/extracao.mp4';
-import rugExtractPoster from '@/assets/tapete-processo/extracao-poster.jpg';
+// Extração do tapete = o vídeo da máquina de extração a passar no tapete (dono, 24 Nov: "coloca aquele vídeo da
+// pessoa a limpar com a máquina de tapetes"; sai o passo da aspiração, que repetia a fotografia da avaliação).
+import rugExtract from '@/assets/tapete-processo/maquina.mp4';
+import rugExtractPoster from '@/assets/tapete-processo/maquina-poster.jpg';
 import carpetExtract from '@/assets/alcatifa-processo/extracao.mp4';
 import carpetExtractPoster from '@/assets/alcatifa-processo/extracao-poster.jpg';
 import carpetBefore from '@/assets/alcatifa-processo/antes.jpg';
@@ -49,7 +51,7 @@ export default function ServiceProcessStory({ service, city, cityPrep = 'em', st
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       <SectionHeader heading={heading ? heading.text : `${MEDIA[service].heading}${city ? ` ${cityPrep}` : ''}`} goldWord={heading ? heading.gold : city || 'passo a passo'} light />
       <StoryPlayer story={steps} light />
-      <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
+      <div className="mt-6 hidden gap-4 md:grid" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>
         {steps.map((p, i) => <figure key={p.label + i} className="min-w-0">
           <div className="relative overflow-hidden rounded-xl bg-[#efeee7]">
             {p.video
