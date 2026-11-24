@@ -71,3 +71,14 @@ describe('tapetes: o material escolhido chega ao motor', () => {
     expect(of('juta ou sisal')).toBeGreaterThan(of('sintético ou lã'));
   });
 });
+
+describe('total do cesto: o riscado é o do motor, nunca um valor do site', () => {
+  const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
+  const q = (x: BasketItem) => ({ kind: x.kind, size: x.size, qty: x.qty, treatment: x.leather ? 'clean' : T[x.pack], ...(x.leather ? { leather: true } : {}) });
+  for (const [name, g] of Object.entries({ '3L + 2L': [S('3-lugares'), S('2-lugares')], '3L pele + 2L': [S('3-lugares', { leather: true }), S('2-lugares')], '3L Blindado sozinho': [S('3-lugares', { pack: 'premium' })], '3L + 1L': [S('3-lugares'), S('1-lugar')] })) it(name, () => {
+    const m = botQuote({ city: 'Lisboa', items: g.map(q) } as never) as unknown as { total: number; separatePrice: { separate: number } | null; visitGifts: { usual: number } | null };
+    const want = m.visitGifts?.usual ?? m.separatePrice?.separate ?? null;
+    expect(quoteBasket('Lisboa', g).usual).toBe(want !== null && want - m.total >= 5 ? want : null);
+  });
+  it('sofá limpo sozinho não tem riscado', () => expect(quoteBasket('Lisboa', [S('3-lugares')]).usual).toBeNull());
+});

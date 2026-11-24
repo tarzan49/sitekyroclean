@@ -143,6 +143,9 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   const valid = q.filter(Boolean) as QuoteItem[];
   if (!valid.length) return { total: null as number | null, travel: null as number | null, sob: items.some(i => isRug(i.kind)), lines: [] as (number | null)[], gifts: [] as BasketGift[], usual: null as number | null, withoutGift: null as number | null };
   const r = botQuote({ city, items: valid }) as Quote;
+  // Riscado do total: com oferta, o usual da escada; sem ela, o separatePrice do motor (ou o pack do colchão). Só do motor.
+  const px = r as Quote & { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
+  const usualOf = (total: number | null) => { const u = r.visitGifts?.usual ?? px.separatePrice?.separate ?? px.mattressMitePack?.separate ?? null; return u !== null && total !== null && u - total >= 5 ? u : null; };
   if (!r.ok) return { total: null, travel: null, sob: true, lines: [], gifts: [], usual: null, withoutGift: null };
   // Linhas do motor pela mesma ordem dos itens válidos. Tapetes com valor do bot desde 24 Nov 2026 (dono):
   // só tapetes = rugEstimate.homePrice (deslocação incluída); com outras peças = rugCombo.comboPrice.
@@ -160,13 +163,13 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   const missingRug = items.some(i => isRug(i.kind)) && rugAlone === null && !rugCombo;
   if (!missingRug && (rugAlone !== null || rugCombo)) {
     const othersSob = (r.lines ?? []).some((l, j) => l.quote && valid[j]?.kind !== 'rug' && valid[j]?.kind !== 'carpet');
-    if (!othersSob) return { total: rugAlone ?? rugCombo!.comboPrice!, travel: rugAlone !== null ? null : 0, sob: false, lines, gifts: r.visitGifts?.gifts ?? [], usual: r.visitGifts?.usual ?? null, withoutGift: r.visitGifts?.withoutGift ?? null };
+    if (!othersSob) return { total: rugAlone ?? rugCombo!.comboPrice!, travel: rugAlone !== null ? null : 0, sob: false, lines, gifts: r.visitGifts?.gifts ?? [], usual: usualOf(rugAlone ?? rugCombo!.comboPrice!), withoutGift: r.visitGifts?.withoutGift ?? null };
   }
   const sob = missingRug || !!r.quote;
   const known = sob ? lines.reduce<number>((s, v) => s + (v ?? 0), 0) + (r.travel ?? 0) : null;
   return { total: sob ? (known && known > 0 ? known : null) : (typeof r.total === 'number' ? r.total : null), travel: r.travel ?? null, sob, lines,
     // Escada A (dono, 24 Nov): várias peças = o total nunca desce, oferece-se um tratamento com o preço riscado.
-    gifts: !sob && r.visitGifts ? r.visitGifts.gifts : [], usual: !sob && r.visitGifts ? r.visitGifts.usual : null, withoutGift: !sob && r.visitGifts ? r.visitGifts.withoutGift ?? null : null };
+    gifts: !sob && r.visitGifts ? r.visitGifts.gifts : [], usual: !sob ? usualOf(typeof r.total === 'number' ? r.total : null) : null, withoutGift: !sob && r.visitGifts ? r.visitGifts.withoutGift ?? null : null };
 }
 
 /** Cada peça pedida sozinha, com a sua deslocação (o motor): é o que cada linha do cesto mostra, por isso as
