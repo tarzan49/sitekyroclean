@@ -17,11 +17,11 @@ const MEDIA: Record<Service, { pool: 'tapete'; heading: string; videos: [string,
   'limpeza-tapetes': { pool: 'tapete', heading: 'A lavagem do seu tapete', videos: [[rugSpray, rugSprayPoster], [rugBrush, rugBrushPoster], [rugExtract, rugExtractPoster]] },
 };
 
-function story(service: Service): StoryStep[] {
+function story(service: Service, custom?: { label: string; description: string; alt?: string }[]): StoryStep[] {
   const m = MEDIA[service];
   const pair = BEFORE_AFTER_POOL[m.pool].find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
   const media: Partial<StoryStep>[] = [{ image: pair?.before }, ...m.videos.map(([video, poster]) => ({ video, poster })), { image: pair?.after }];
-  const steps = SERVICE_PROCESS_GUIDES[service].steps;
+  const steps = custom && custom.length ? custom : SERVICE_PROCESS_GUIDES[service].steps;
   // O vídeo pelo nome da etapa; sem vídeo próprio, fica o anterior.
   const pick = (label: string, i: number) => /avalia|inspe/i.test(label) ? media[0] : /aplica|pulveri|trat|pré/i.test(label) ? media[1] : /escov/i.test(label) ? media[2] : /extra|lava/i.test(label) ? media[3] : /seca|final|confer|entrega/i.test(label) ? media[4] : i === 0 ? media[0] : null;
   let last = media[0];
@@ -30,11 +30,11 @@ function story(service: Service): StoryStep[] {
 
 export function hasProcessStory(service: string): service is Service { return service in MEDIA; }
 
-export default function ServiceProcessStory({ service, city, cityPrep = 'em' }: { service: Service; city?: string; cityPrep?: string }) {
-  const steps = story(service);
+export default function ServiceProcessStory({ service, city, cityPrep = 'em', steps: custom, heading }: { service: Service; city?: string; cityPrep?: string; steps?: { label: string; description: string }[]; heading?: { text: string; gold: string } }) {
+  const steps = story(service, custom);
   return <section id="processo" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
-      <SectionHeader heading={`${MEDIA[service].heading}${city ? ` ${cityPrep}` : ''}`} goldWord={city || 'passo a passo'} light />
+      <SectionHeader heading={heading ? heading.text : `${MEDIA[service].heading}${city ? ` ${cityPrep}` : ''}`} goldWord={heading ? heading.gold : city || 'passo a passo'} light />
       <StoryPlayer story={steps} light />
       <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
         {steps.map((p, i) => <figure key={p.label + i} className="min-w-0">

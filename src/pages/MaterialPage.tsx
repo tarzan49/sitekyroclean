@@ -18,6 +18,8 @@ import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import SofaPricePicker from "@/components/SofaPricePicker";
 import LeatherSofaPicker from "@/components/LeatherSofaPicker";
+import RugPricePicker from "@/components/RugPricePicker";
+import ServiceProcessStory from "@/components/ServiceProcessStory";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
@@ -74,9 +76,10 @@ const MaterialPage = () => {
     return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? "Sob orçamento";
   }, [data]);
   // Sofás de tecido por cidade: modelo novo (dono, 24 Nov). Pele fica com o guia próprio (os vídeos são de tecido).
-  const sofaNew = data?.serviceSlug === 'limpeza-sofas' && !!cityName;
-  const fabric = sofaNew && data?.slug !== 'limpeza-sofa-pele';
-  useSnapSections(fabric); // pele: falta um widget próprio (limpeza + tratamento da pele, sem impermeabilização)
+  const rugNew = data?.serviceSlug === 'limpeza-tapetes' && !!cityName; // tapetes por cidade (dono, 24 Nov)
+  const sofaNew = (data?.serviceSlug === 'limpeza-sofas' && !!cityName) || rugNew;
+  const fabric = sofaNew && !rugNew && data?.slug !== 'limpeza-sofa-pele';
+  useSnapSections(fabric || rugNew); // pele: falta um widget próprio (limpeza + tratamento da pele, sem impermeabilização)
 
   useEffect(() => {
     if (data) {
@@ -136,7 +139,7 @@ const MaterialPage = () => {
         {sofaNew ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(cityName!)} {cityName}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{fabric ? <SofaPricePicker city={cityName!} source={`material_picker_${data.slug}`} /> : <LeatherSofaPicker city={cityName!} source={`material_picker_${data.slug}`} />}</div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{rugNew ? <RugPricePicker city={cityName!} source={`material_picker_${data.slug}`} /> : fabric ? <SofaPricePicker city={cityName!} source={`material_picker_${data.slug}`} /> : <LeatherSofaPicker city={cityName!} source={`material_picker_${data.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />}
 
@@ -144,7 +147,7 @@ const MaterialPage = () => {
         {sofaNew ? <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
-            <CustomerReviews reviews={pickReviewSubset('limpeza-sofas', `${data.slug}-${citySlug}`, 6)} />
+            <CustomerReviews reviews={pickReviewSubset(rugNew ? 'limpeza-tapetes' : 'limpeza-sofas', `${data.slug}-${citySlug}`, 6)} />
           </div>
         </section> : <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -157,7 +160,9 @@ const MaterialPage = () => {
         <MaterialExamplesGallery key={data.slug} materialSlug={data.slug} />
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
-        {fabric && processGuide ? (
+        {rugNew ? (
+          <ServiceProcessStory key={data.slug} service="limpeza-tapetes" steps={processGuide?.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como lavamos o seu', gold: data.name.toLowerCase() }} />
+        ) : fabric && processGuide ? (
           <SofaProcessGuide key={data.slug} real steps={processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como limpamos o seu', gold: data.name.toLowerCase() }} />
         ) : processGuide ? (
           <IllustratedProcessGuide dark key={data.slug} guide={processGuide} heading="Como limpamos o seu" goldWord={data.name.toLowerCase()} downloadName={data.slug} />

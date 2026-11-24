@@ -27,6 +27,8 @@ import { getAllProblemCityRoutes, problemCityBenefits, problemCityMeta, problemC
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import SofaPricePicker from "@/components/SofaPricePicker";
+import RugPricePicker from "@/components/RugPricePicker";
+import ServiceProcessStory from "@/components/ServiceProcessStory";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import CustomerReviews from "@/components/CustomerReviews";
 import CompactFAQ from "@/components/CompactFAQ";
@@ -44,7 +46,9 @@ const ProblemCityPage = () => {
   const problem = useMemo(() => routeData ? getProblemBySlug(routeData.problemSlug) : null, [routeData]);
   // Sofás: modelo novo (ecrã inteiro, widget do bot, passo a passo real; dono, 24 Nov).
   const sofa = problem?.relatedServices[0] === 'limpeza-sofas';
-  useSnapSections(sofa);
+  const rug = problem?.relatedServices[0] === 'limpeza-tapetes';
+  const fresh = sofa || rug; // modelo novo: sofás e tapetes (dono, 24 Nov)
+  useSnapSections(fresh);
   const city = useMemo(() => routeData ? cities.find(c => c.slug === routeData.citySlug) : null, [routeData]);
 
   useEffect(() => {
@@ -120,18 +124,18 @@ const ProblemCityPage = () => {
       <main>
 
         <ProblemHero problem={problem} city={city.name} breadcrumb={breadcrumb} />
-        {sofa ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+        {fresh ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /></div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{rug ? <RugPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : <SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />}
 
         {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}
-        {sofa ? <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
+        {fresh ? <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
-            <CustomerReviews reviews={pickReviewSubset('limpeza-sofas', `${problem.slug}-${city.slug}`, 6)} />
+            <CustomerReviews reviews={pickReviewSubset(rug ? 'limpeza-tapetes' : 'limpeza-sofas', `${problem.slug}-${city.slug}`, 6)} />
           </div>
         </section> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -142,7 +146,9 @@ const ProblemCityPage = () => {
 
         <ProblemExamplesGallery key={`examples-${problem.slug}`} problem={problem} />
 
-        {sofa
+        {rug
+          ? <ServiceProcessStory key={problem.slug} service="limpeza-tapetes" steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+          : sofa
           ? <SofaProcessGuide key={problem.slug} real steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : <ProblemTreatmentGuide key={problem.slug} guide={getProblemLayout(problem).processGuide} slug={problem.slug} />}
 
@@ -204,7 +210,7 @@ const ProblemCityPage = () => {
         )}
 
         {/* ═══ FAQ ═══ */}
-        {localFaqs.length > 0 && (sofa
+        {localFaqs.length > 0 && (fresh
           ? <CompactFAQ id="duvidas" dark faqs={localFaqs} heading="Perguntas Frequentes" />
           : <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="dark" />)}
 
