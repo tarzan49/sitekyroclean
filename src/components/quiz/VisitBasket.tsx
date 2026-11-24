@@ -512,7 +512,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         <button type="button" onClick={onClose} aria-label="Fechar" className="flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/10"><X className="h-5 w-5" /></button>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
+      <div className={`flex-1 overflow-y-auto px-4 pt-4 ${items.length === 0 && step === 'basket' ? 'flex flex-col pb-4 [&>*]:shrink-0' : 'pb-32'}`}>
         {step === 'basket' ? (
           <>
             {items.length === 0 ? (
@@ -524,9 +524,9 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Onde é o serviço?" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grow auto-rows-fr grid-cols-2 gap-2">
                   {ENTRY.map(e => (
-                    <button key={e.key} type="button" onClick={() => pick(e)} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
+                    <button key={e.key} type="button" onClick={() => pick(e)} className="group relative min-h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
                       {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" style={e.kind === 'chairs' ? { objectPosition: '50% 85%' } : undefined} /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
                       <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
@@ -610,15 +610,16 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         )}
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 md:absolute border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+      {/* Cesto vazio: sem total "-" nem botão parado; a escolha faz-se nas fotografias. */}
+      {(items.length > 0 || step === 'contact') && <footer className="fixed inset-x-0 bottom-0 md:absolute border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         <div className="mb-2 flex items-baseline justify-between">
           <span className="text-sm text-white/70">{items.length > 0 && !cityKnown(city) ? 'Subtotal, sem a deslocação' : 'Total, deslocação incluída'}</span>
           <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!city.trim() ? 'falta a localidade' : !cityKnown(city) ? 'deslocação a confirmar no WhatsApp' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="block text-xs font-bold text-[#E8C964]">Poupa {formatEuro(quote.usual - quote.total)}</span>}</span>
         </div>
         {step === 'basket'
-          ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">Continuar</button>
+          ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">Continuar</button> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
           : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
-      </footer>
+      </footer>}
 
       {askCity && !editing && (() => {
         const q = plain(city), known = cityKnown(city);
@@ -781,8 +782,10 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
-  // O vídeo fica o da escolha com que se abriu (a impermeabilização mostra a água), sem trocar a cada toque.
-  const [clip] = useState(() => (item.imperOnly && item.kind === 'chairs' ? imperChairsClip : item.kind === 'sofa' && item.pack !== 'none' ? imperClip : CLIP[item.kind]));
+  // O vídeo é o da limpeza da peça; o da impermeabilização só em "O que vamos impermeabilizar?" (dono, 24 Nov: "porque é que em
+  // limpeza de sofá o vídeo é impermeabilização? [...] não faz sentido o vídeo aparecer aqui se estamos a escolher o tipo").
+  const [clip] = useState(() => (!item.imperOnly ? CLIP[item.kind] : item.kind === 'chairs' ? imperChairsClip : imperClip));
+  const pickingMaterial = !!materials && material === null;
   const tile = (on: boolean) => `flex flex-col items-center justify-center gap-1 rounded-2xl border-2 px-1 py-2 text-sm font-bold ${on ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label={KIND_LABEL[item.kind]}>
@@ -792,24 +795,24 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-4 [&>*]:shrink-0">
         {/* O vídeo ocupa o espaço que sobra no ecrã (dono, 25 Nov: "os vídeos estão completamente cortados, uma cena gigante em
             baixo sem nada"); quando as opções aparecem, encolhe até ao mínimo. */}
-        <div className={`relative -mx-4 mb-4 shrink-0 grow overflow-hidden ${!asksMaterial ? 'min-h-32' : material === null ? 'min-h-28' : 'min-h-20'}`}>
+        {pickingMaterial ? <h3 className="pt-4 font-playfair text-3xl font-semibold text-white">{KIND_LABEL[item.kind]}</h3> : <div className={`relative -mx-4 mb-4 shrink-0 grow overflow-hidden ${!asksMaterial ? 'min-h-32' : 'min-h-20'}`}>
           <video src={clip} poster={CLIP_POSTER[clip]} autoPlay muted loop playsInline preload="auto" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: CLIP_AT[clip] }} />
           <span className="absolute inset-x-0 bottom-0 h-28 max-h-full bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/45 to-transparent" />
           <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{item.imperOnly ? <>Impermeabilização <span className="block text-lg" style={{ color: GOLD }}>{item.kind === 'chairs' ? 'das cadeiras' : 'do sofá'}</span></> : KIND_LABEL[item.kind]}</h3>
-        </div>
+        </div>}
 
         {/* Depois de escolher, os cartões encolhem para uma linha: o resto cabe no ecrã sem cortar (dono, 25 Nov). */}
         {materials && material !== null && <div className="mb-3 grid grid-cols-2 gap-2" role="group" aria-label={materials.ask}>
           {materials.options.map(o => <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl border-2 px-2 text-sm font-bold ${material === o.m ? 'group is-on border-[#D4AF37] bg-[#D4AF37] text-[#0B2F2A]' : 'border-white/10 bg-white/[0.04] text-white/70'}`}>{material === o.m && <Check className="h-4 w-4 shrink-0" strokeWidth={3} />}{o.label}</button>)}
         </div>}
         {materials && material === null && <>
-          <p className="mb-2 text-sm font-semibold text-white">{materials.ask}</p>
+          <p className="mb-3 mt-1 text-base font-semibold text-white/85">{materials.ask}</p>
           {/* Sofá: 2 fotografias na horizontal, uma por linha; tapete: 2 na vertical (dono, 24 Nov). */}
-          <div className={`mb-4 grid gap-3 ${item.kind === 'sofa' ? 'grid-cols-1' : 'grid-cols-2'}`}>
+          <div className={`grid min-h-72 grow auto-rows-fr gap-3 ${item.kind === 'sofa' ? 'grid-cols-1' : 'grid-cols-2'}`}>
             {materials.options.map(o => (
-              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`relative overflow-hidden ${item.kind === 'sofa' ? 'h-36' : 'h-40'} rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]`}>
+              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
                 <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-black/65 px-3 py-2"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-black/65 px-4 py-3"><span className="text-lg font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
               </button>
             ))}
           </div>
@@ -894,9 +897,10 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           </>}
         </div>}
       </div>
-      <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+      {/* O botão só aparece quando há algo para confirmar (dono, 24 Nov, sobre o "Escolha o material" parado no widget). */}
+      {ok && <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:cursor-not-allowed">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (material === null ? 'Escolha o material' : rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        {!ready ? <p className="flex min-h-12 items-center justify-center text-sm font-semibold text-[#D4AF37]">Escolha uma opção</p> : <button type="button" onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">{(() => { const v = others.length ? totalWith({}) : totalOf(group()); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button>}</footer>}
     </div>
   );
 }
