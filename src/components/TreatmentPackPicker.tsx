@@ -23,9 +23,10 @@ const ODOR: Option[] = [
   { id: 'clean', title: 'Só lavagem', note: 'Lavagem a fundo em sua casa' },
 ];
 
-interface Props { kind: TreatmentKind; city: string; source: string }
+export interface TreatmentChoice { kind: TreatmentKind; size: string; width: number; length: number; treat: boolean }
+interface Props { kind: TreatmentKind; city: string; source: string; onMore?: (choice: TreatmentChoice) => void }
 
-export default function TreatmentPackPicker({ kind, city, source }: Props) {
+export default function TreatmentPackPicker({ kind, city, source, onMore }: Props) {
   const OPTIONS = kind === 'rug' ? ODOR : MITES;
   const [size, setSize] = useState(kind === 'mattress' ? 'casal' : '3-lugares');
   const [rugW, setRugW] = useState(2);
@@ -90,6 +91,7 @@ export default function TreatmentPackPicker({ kind, city, source }: Props) {
             })}
           </div>
         )}
+        {onMore && <button type="button" onClick={() => onMore({ kind, size, width: rugW, length: rugL, treat: choice === 'treat' })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
       </div>
 
       {/* 2. Opções com o total final, 3. um botão */}
