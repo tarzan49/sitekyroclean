@@ -13,6 +13,9 @@ import { buildQuizOrder, type QuoteItem } from '@/lib/quizOrder';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { buildWaUrl, type QuizLeadPayload } from '@/services/submissionService';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
+import QuizFurnitureImage from './QuizFurnitureImage';
+import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
+import { Star } from 'lucide-react';
 import type { QuizOrder } from '@/lib/quizOrder';
 
 export type BasketPack = 'premium' | 'essencial' | 'none';
@@ -38,6 +41,7 @@ const SOFA_SEATS = [1, 2, 3, 4, 5, 6];
 const MATTRESS = [{ id: 'solteiro', label: 'Solteiro' }, { id: 'casal', label: 'Casal' }, { id: 'king', label: 'King / Queen' }];
 const KIND_LABEL: Record<BasketKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 const GOLD = '#D4AF37';
+const imgOf = (it: Pick<BasketItem, 'kind' | 'size'>) => <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind === 'chairs' ? 'chairs' : it.kind} sizeId={it.size} className="h-14 w-14 rounded-xl bg-white/90 sm:h-14 sm:w-14" />;
 
 const num = (v?: string) => { const n = parseFloat(String(v ?? '').replace(',', '.')); return n > 0 ? n : 0; };
 const isRug = (k: BasketKind) => k === 'rug' || k === 'carpet';
@@ -159,10 +163,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
     const botTotal = bot.ok && !bot.quote && typeof bot.total === 'number' ? bot.total : null;
     const same = testOrder.total === null ? botTotal === null || testOrder.sobOrcamento : botTotal === testOrder.total;
     return (
-      <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#FAF8F3] p-4" role="dialog" aria-modal="true" aria-label="Teste do pedido">
-        <p className="mb-2 text-xs font-bold uppercase text-[#1A1A1A]/60">Teste (não foi enviado)</p>
-        <h3 className={`mb-3 text-2xl font-bold ${same ? 'text-[#1E7F4F]' : 'text-[#B42318]'}`}>{same ? 'Pedido aceite' : 'Pedido com diferença'}</h3>
-        <ul className="mb-3 space-y-1 rounded-2xl border border-black/10 bg-white p-3 text-sm">
+      <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white p-4" role="dialog" aria-modal="true" aria-label="Teste do pedido">
+        <p className="mb-2 text-xs font-bold uppercase text-white/60">Teste (não foi enviado)</p>
+        <h3 className={`mb-3 text-2xl font-bold ${same ? 'text-[#7BD8A6]' : 'text-[#FF8A80]'}`}>{same ? 'Pedido aceite' : 'Pedido com diferença'}</h3>
+        <ul className="mb-3 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm">
           <li><b>Nome:</b> {name} · <b>Telemóvel:</b> {phone}</li>
           <li><b>Localidade:</b> {testOrder.city}</li>
           {testOrder.lines.map((l, i) => <li key={i}>{l.label}: {l.price === null ? 'sob orçamento' : formatEuro(l.price)}</li>)}
@@ -170,77 +174,78 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <li><b>Total que o bot calcula:</b> {botTotal === null ? 'sob orçamento' : formatEuro(botTotal)}</li>
           <li><b>Itens para o bot:</b> {testOrder.quote.items.length}{testOrder.rugs.length ? ` (${testOrder.rugs.length} tapete/alcatifa com medidas)` : ''}</li>
         </ul>
-        <p className="mb-4 text-xs text-[#1A1A1A]/60">Em produção, este pedido vai para o CRM e o cliente recebe no WhatsApp a mensagem automática do questionário.</p>
-        <button type="button" onClick={() => setTestOrder(null)} className="min-h-12 w-full rounded-2xl bg-[#D4AF37] font-bold text-[#111]">Voltar ao cesto</button>
+        <p className="mb-4 text-xs text-white/60">Em produção, este pedido vai para o CRM e o cliente recebe no WhatsApp a mensagem automática do questionário.</p>
+        <button type="button" onClick={() => setTestOrder(null)} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)]">Voltar ao cesto</button>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-[#FAF8F3]" role="dialog" aria-modal="true" aria-label="Orçamento da visita">
-      <header className="flex items-center justify-between border-b border-black/10 bg-white px-4 py-3">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label="Orçamento da visita">
+      <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         {step === 'contact'
-          ? <button type="button" onClick={() => setStep('basket')} className="flex min-h-11 items-center gap-1 text-sm font-semibold text-[#1A1A1A]"><ArrowLeft className="h-4 w-4" />Voltar</button>
-          : <span className="font-playfair text-lg font-bold text-[#111]">A sua <span style={{ color: GOLD }}>visita</span></span>}
-        <button type="button" onClick={onClose} aria-label="Fechar" className="flex h-11 w-11 items-center justify-center rounded-full text-[#1A1A1A] hover:bg-black/5"><X className="h-5 w-5" /></button>
+          ? <button type="button" onClick={() => setStep('basket')} className="flex min-h-11 items-center gap-1 text-sm font-semibold text-white"><ArrowLeft className="h-4 w-4" />Voltar</button>
+          : <span className="flex flex-col"><span className="font-playfair text-xl font-semibold text-white">A sua <span style={{ color: GOLD }}>visita</span></span><span className="flex items-center gap-1 text-[11px] text-white/60"><Star className="h-3 w-3 fill-[#D4AF37] text-[#D4AF37]" />{REVIEW_RATING} em {REVIEW_COUNT}+ avaliações Google</span></span>}
+        <button type="button" onClick={onClose} aria-label="Fechar" className="flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/10"><X className="h-5 w-5" /></button>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
         {step === 'basket' ? (
           <>
             <label className="mb-4 block">
-              <span className="mb-1 block text-xs font-semibold text-[#1A1A1A]/70">Localidade</span>
-              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Ex.: Lisboa" className="min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 text-base text-[#111] outline-none focus:border-[#D4AF37]" />
+              <span className="mb-1 block text-xs font-semibold text-white/70">Localidade</span>
+              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Ex.: Lisboa" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base text-white outline-none focus:border-[#D4AF37]" />
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
 
             <ul className="space-y-2">
               {items.map((it, i) => (
-                <li key={it.id} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white p-3">
+                <li key={it.id} className="flex items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3">
+                  {imgOf(it)}
                   <button type="button" onClick={() => setEditing(it)} className="min-w-0 flex-1 text-left">
-                    <span className="block text-sm font-bold text-[#111]">{itemLabel(it)}</span>
-                    <span className="text-xs text-[#1A1A1A]/60">{isRug(it.kind) ? 'Sob orçamento, conforme as medidas' : 'Tocar para alterar'}</span>
+                    <span className="block text-sm font-bold text-white">{itemLabel(it)}</span>
+                    <span className="text-xs text-white/60">{isRug(it.kind) ? 'Sob orçamento, conforme as medidas' : 'Tocar para alterar'}</span>
                   </button>
-                  {!isRug(it.kind) && quote.lines[i] != null && <span className="text-sm font-bold text-[#111]">{formatEuro(quote.lines[i] as number)}</span>}
-                  <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-11 items-center justify-center rounded-full text-[#1A1A1A]/50 hover:bg-black/5"><Trash2 className="h-4 w-4" /></button>
+                  {!isRug(it.kind) && quote.lines[i] != null && <span className="text-sm font-bold text-white">{formatEuro(quote.lines[i] as number)}</span>}
+                  <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-11 items-center justify-center rounded-full text-white/50 hover:bg-white/10"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
             </ul>
 
-            <h3 className="mb-2 mt-6 font-playfair text-xl font-bold text-[#111]">Juntar à mesma <span style={{ color: GOLD }}>visita</span></h3>
+            <h3 className="mb-2 mt-6 font-playfair text-xl font-bold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></h3>
             <div className="grid grid-cols-2 gap-2">
               {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(k => (
-                <button key={k} type="button" onClick={() => setEditing(newItem(k))} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37]/60 bg-white px-3 text-sm font-bold text-[#111] hover:bg-[#D4AF37]/10">
-                  <Plus className="h-4 w-4" style={{ color: GOLD }} strokeWidth={3} />{KIND_LABEL[k]}
+                <button key={k} type="button" onClick={() => setEditing(newItem(k))} className="flex min-h-16 items-center gap-2 rounded-2xl border-2 border-[#D4AF37]/45 bg-white/[0.04] px-3 text-sm font-bold text-white hover:bg-[#D4AF37]/10">
+                  {imgOf({ kind: k, size: k === 'sofa' ? '3-lugares' : k === 'mattress' ? 'casal' : undefined })}<span className="flex-1 text-left">{KIND_LABEL[k]}</span><Plus className="h-4 w-4 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
                 </button>
               ))}
             </div>
           </>
         ) : (
           <>
-            <h3 className="mb-3 font-playfair text-2xl font-bold text-[#111]">Para onde enviamos as <span style={{ color: GOLD }}>horas</span>?</h3>
-            <ul className="mb-4 space-y-1 rounded-2xl border border-black/10 bg-white p-3 text-sm text-[#111]">
+            <h3 className="mb-3 font-playfair text-2xl font-bold text-white">Para onde enviamos as <span style={{ color: GOLD }}>horas</span>?</h3>
+            <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
               {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{isRug(it.kind) ? 'sob orçamento' : quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : ''}</span></li>)}
-              <li className="border-t border-black/10 pt-1 text-xs text-[#1A1A1A]/60">{city}, deslocação incluída no total</li>
+              <li className="border-t border-white/10 pt-1 text-xs text-white/60">{city}, deslocação incluída no total</li>
             </ul>
-            <label className="mb-3 block"><span className="mb-1 block text-xs font-semibold text-[#1A1A1A]/70">Nome</span>
-              <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" className="min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 text-base outline-none focus:border-[#D4AF37]" /></label>
-            <label className="block"><span className="mb-1 block text-xs font-semibold text-[#1A1A1A]/70">Telemóvel (WhatsApp)</span>
-              <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 text-base outline-none focus:border-[#D4AF37]" /></label>
-            <p className="mt-3 text-xs text-[#1A1A1A]/60">Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.</p>
+            <label className="mb-3 block"><span className="mb-1 block text-xs font-semibold text-white/70">Nome</span>
+              <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
+            <label className="block"><span className="mb-1 block text-xs font-semibold text-white/70">Telemóvel (WhatsApp)</span>
+              <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
+            <p className="mt-3 text-xs text-white/60">Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.</p>
             {failed && <a href={buildWaUrl({ hasSobOrcamento: quote.sob, hasUpsellSobItem: false }, 'SITE')} className="mt-3 block rounded-xl bg-[#25D366] p-3 text-center text-sm font-bold text-white">Não conseguimos enviar. Enviar pelo WhatsApp</a>}
           </>
         )}
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 border-t border-black/10 bg-white px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+      <footer className="fixed inset-x-0 bottom-0 border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-sm text-[#1A1A1A]/70">Total, deslocação incluída</span>
-          <span className="text-right"><span className="block text-xl font-bold text-[#111]">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-[#1A1A1A]/60">+ tapetes sob orçamento</span>}</span>
+          <span className="text-sm text-white/70">Total, deslocação incluída</span>
+          <span className="text-right"><span className="block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">+ tapetes sob orçamento</span>}</span>
         </div>
         {step === 'basket'
-          ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-[#D4AF37] text-base font-bold text-[#111] disabled:opacity-40">Continuar</button>
-          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-[#D4AF37] text-base font-bold text-[#111] disabled:opacity-40">{isSubmitting ? 'A enviar…' : 'Receber o preço e as horas no WhatsApp'}</button>}
+          ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Continuar</button>
+          : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{isSubmitting ? 'A enviar…' : 'Receber o preço e as horas no WhatsApp'}</button>}
       </footer>
 
       {editing && <ItemSheet item={editing} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
@@ -251,9 +256,9 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
     <div className="flex items-center gap-3">
-      <button type="button" aria-label="Menos" onClick={() => onChange(Math.max(min, value - 1))} className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15"><Minus className="h-4 w-4" /></button>
+      <button type="button" aria-label="Menos" onClick={() => onChange(Math.max(min, value - 1))} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white"><Minus className="h-4 w-4" /></button>
       <span className="w-8 text-center text-lg font-bold">{value}</span>
-      <button type="button" aria-label="Mais" onClick={() => onChange(Math.min(max, value + 1))} className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15"><Plus className="h-4 w-4" /></button>
+      <button type="button" aria-label="Mais" onClick={() => onChange(Math.min(max, value + 1))} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white"><Plus className="h-4 w-4" /></button>
     </div>
   );
 }
@@ -263,41 +268,41 @@ function ItemSheet({ item, onChange, onSave, onCancel }: { item: BasketItem; onC
   const rug = isRug(item.kind);
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
-  const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-[#111]' : 'border-black/10 bg-white text-[#1A1A1A]/80'}`;
+  const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
     <div className="fixed inset-0 z-[110] flex items-end bg-black/40" onClick={onCancel}>
-      <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
-        <h3 className="mb-3 font-playfair text-xl font-bold text-[#111]">{KIND_LABEL[item.kind]}</h3>
+      <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl border-t border-[#D4AF37]/40 bg-[#0B2F2A] text-white p-4 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
+        <h3 className="mb-3 font-playfair text-xl font-bold text-white">{KIND_LABEL[item.kind]}</h3>
 
         {item.kind === 'sofa' && <>
-          <p className="mb-1 text-xs font-semibold text-[#1A1A1A]/70">Lugares</p>
+          <p className="mb-1 text-xs font-semibold text-white/70">Lugares</p>
           <div className="mb-3 grid grid-cols-6 gap-1.5">{SOFA_SEATS.map(s => <button key={s} type="button" className={chip(seats === s)} onClick={() => set(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>{s}</button>)}</div>
-          <p className="mb-3 text-xs text-[#1A1A1A]/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
+          <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
           <button type="button" className={`${chip(!!item.leather)} mb-3 w-full`} onClick={() => set({ leather: !item.leather })}>{item.leather ? <Check className="mr-1 inline h-4 w-4" /> : null}Sofá de pele</button>
         </>}
         {item.kind === 'mattress' && <>
-          <p className="mb-1 text-xs font-semibold text-[#1A1A1A]/70">Tamanho</p>
+          <p className="mb-1 text-xs font-semibold text-white/70">Tamanho</p>
           <div className="mb-3 grid grid-cols-3 gap-1.5">{MATTRESS.map(m => <button key={m.id} type="button" className={chip(item.size === m.id)} onClick={() => set({ size: m.id })}>{m.label}</button>)}</div>
           <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran)</button>
         </>}
         {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#111]">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
+          <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
           <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
         </div>}
         {(item.kind === 'sofa' && !item.leather || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{PACKS.map(p => (
           <button key={p.pack} type="button" onClick={() => set({ pack: p.pack })} className={`${chip(item.pack === p.pack)} flex w-full items-center justify-between py-2 text-left`}>
-            <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-[#1A1A1A]/60">{p.note}</span></span>
+            <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
             {item.pack === p.pack && <Check className="h-4 w-4" style={{ color: GOLD }} />}
           </button>))}</div>}
         {rug && <>
-          <p className="mb-1 text-xs font-semibold text-[#1A1A1A]/70">Medidas em metros</p>
+          <p className="mb-1 text-xs font-semibold text-white/70">Medidas em metros</p>
           <div className="mb-2 grid grid-cols-2 gap-2">
-            <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-black/15 px-3 text-base outline-none focus:border-[#D4AF37]" />
-            <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-black/15 px-3 text-base outline-none focus:border-[#D4AF37]" />
+            <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
+            <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
           </div>
-          <p className="mb-3 text-xs text-[#1A1A1A]/60">Sob orçamento: enviamos o preço no WhatsApp, conforme as medidas.</p>
+          <p className="mb-3 text-xs text-white/60">Sob orçamento: enviamos o preço no WhatsApp, conforme as medidas.</p>
         </>}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-[#D4AF37] text-base font-bold text-[#111] disabled:opacity-40">Juntar à visita</button>
+        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Juntar à visita</button>
       </div>
     </div>
   );
