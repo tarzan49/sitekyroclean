@@ -158,7 +158,7 @@ export function quoteBasket(city: string, items: BasketItem[]) {
 
 /** Cada peça pedida sozinha, com a sua deslocação (o motor): é o que cada linha do cesto mostra, por isso as
  *  linhas somadas com as ofertas dão o riscado ("o mesmo pedido em separado", dono 24 Nov). */
-const aloneTotal = (city: string, it: BasketItem) => { const q = quoteBasket(city, [it]); return q.total === null || q.sob ? null : q.total; };
+export const aloneTotal = (city: string, it: BasketItem) => { const q = quoteBasket(city, [it]); return q.total === null || q.sob ? null : q.total; };
 /** O que uma peça a mais faz aparecer na escada A (dono, 25 Nov: "em cada [cartão] estar uma promoção"): as ofertas
  *  novas e quanto valem, pelo motor. */
 export function giftsUnlocked(city: string, items: BasketItem[], add: BasketItem | BasketItem[]): { text: string; value: number; normal: number } | null {
@@ -207,6 +207,20 @@ function separateOf(city: string, it: BasketItem | BasketItem[]): number | null 
 function fallbackMessage(city: string, items: BasketItem[], priceText: string, gifts: BasketGift[]): string {
   const offer = groupGifts(gifts).map(g => `oferecem ${g.text}`).join('; ');
   return `Olá! Gostaria de saber o preço e a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}. No site deu ${priceText}, com a deslocação incluída${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`;
+}
+/** Riscado de uma linha (a quantidade real, nunca 1 unidade × quantidade: as cadeiras têm escalões e a deslocação é
+ *  uma só): as mesmas peças pedidas sozinhas, sem contar a oferta, mais o que o motor diz que cada unidade pouparia em
+ *  separado (limpeza e impermeabilização, anti-ácaros). Cadeiras: o chairsWas do motor. */
+export function struckOf(city: string, it: BasketItem): number | null {
+  const q = quoteBasket(city, [it]);
+  if (q.total === null || q.sob) return null;
+  if (it.kind === 'chairs') return separateOf(city, it) ?? q.total;
+  const base = q.gifts.length && q.withoutGift != null ? q.withoutGift : q.total;
+  const one = { ...it, qty: 1 }, sepOne = separateOf(city, one), aloneOne = aloneTotal(city, one);
+  const save = !q.gifts.length && sepOne !== null && aloneOne !== null ? Math.max(0, sepOne - aloneOne) : 0;
+  // Nunca acima de cada unidade pedida sozinha (o total a acabar em 9 pode subir 1€ com a quantidade).
+  const cap = (sepOne ?? aloneOne ?? Infinity) * it.qty;
+  return Math.round(Math.min(base + save * it.qty, Math.max(cap, 0)) * 100) / 100;
 }
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
@@ -424,7 +438,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                     <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-12 w-12 sm:h-12 sm:w-12" />
                     <span className="min-w-0"><span className="block text-sm font-semibold leading-snug text-white">{itemLabel(it)}</span><span className="block text-xs font-semibold text-[#D4AF37]">Alterar</span></span>
                   </button>
-                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const n = it.kind === 'chairs' ? 1 : it.qty; const one = aloneTotal(city, it.kind === 'chairs' ? it : { ...it, qty: 1 }); return one != null ? formatEuro(Math.round(one * n * 100) / 100) : null; })()}</span>
+                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : null; })()}</span>
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
@@ -474,7 +488,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <>
             <h2 className="type-section-title font-playfair mb-4 text-white">Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></h2>
             <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
-              {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : ''}</span></li>)}
+              {items.map(it => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : ''; })()}</span></li>)}
+              {groupGifts(quote.gifts).map(g => <li key={g.key} className="flex justify-between gap-2 text-[#E8C964]"><span>{capital(g.text)}</span><span className="font-semibold"><span className="mr-1.5 text-white/45 line-through">{formatEuro(g.normal)}</span>Oferecido</span></li>)}
               <li className="border-t border-white/10 pt-1 text-xs text-white/60">{city}, deslocação incluída no total</li>
             </ul>
             <label className="mb-3 block"><span className="mb-1 block text-xs font-semibold text-white/70">Nome</span>
@@ -600,11 +615,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // a deslocação já está paga, por isso mostra-se a linha destas peças na visita (sem a 2.ª deslocação); riscado =
   // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
   // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
-  const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) {
-    // As cadeiras têm escalões e uma só deslocação: a peça é o conjunto, nunca 1 cadeira × quantidade.
-    const n = x.kind === 'chairs' ? 1 : x.qty, one = x.kind === 'chairs' ? x : { ...x, qty: 1 };
-    const v = separateOf(city, one) ?? aloneTotal(city, one); if (v === null) return null; t += v * n;
-  } return g.length ? Math.round(t * 100) / 100 : null; };
+  const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const v = struckOf(city, x); if (v === null) return null; t += v; } return g.length ? Math.round(t * 100) / 100 : null; };
   const packPrice = (p: Partial<BasketItem>): { shown: number | null; struck: number | null } => {
     // Pele: o motor põe o tratamento numa linha à parte, por isso soma-se à linha da limpeza na visita.
     if (p.leather && others.length) {
