@@ -20,7 +20,7 @@ describe('landing editorial descriptions', () => {
       // Coimbra tem trabalhador local desde 2026-09-28.
       if (model.municipalityName === 'Coimbra') expect(`${model.intro} ${model.metaDescription}`).not.toContain('sob consulta');
       if (model.family === 'freguesia') expect(model.metaDescription).toContain(model.municipalityName);
-      if (model.serviceSlug === 'limpeza-alcatifas') expect(model.metaDescription).toContain('7€/m²');
+      if (model.serviceSlug === 'limpeza-alcatifas') expect(model.metaDescription).toContain('5€/m²');
       // Tapetes com valor do motor desde 24 Nov 2026 (dono).
       if (model.serviceSlug === 'limpeza-tapetes') expect(model.metaDescription).toContain('10€/m²');
     }

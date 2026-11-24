@@ -518,13 +518,28 @@ function calculateCustomPack(items, city) {
 // src/constants/rugRates.ts
 var RUG_RATE_COMMON = 10;
 var RUG_RATE_NATURAL = 12;
-var RUG_RATE_CARPET = 7;
+var CARPET_TIERS = [
+  { from: 0, rate: 8 },
+  { from: 30, rate: 7 },
+  { from: 60, rate: 6 },
+  { from: 100, rate: 5 }
+];
+var RUG_RATE_CARPET = CARPET_TIERS[CARPET_TIERS.length - 1].rate;
+function carpetWashing(areaM2) {
+  if (!(areaM2 > 0)) return 0;
+  let tier = 0;
+  for (let i = 0; i < CARPET_TIERS.length; i++) if (areaM2 >= CARPET_TIERS[i].from) tier = i;
+  const own = areaM2 * CARPET_TIERS[tier].rate;
+  const floor = tier > 0 ? CARPET_TIERS[tier].from * CARPET_TIERS[tier - 1].rate : 0;
+  return Math.max(own, floor);
+}
 
 // src/constants/rugSitePrice.ts
 var RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
 var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, com a deslocação incluída; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
 var CARPET_PRICE_FROM = `Desde ${RUG_RATE_CARPET}€/m²`;
-var CARPET_PRICE_NOTE = `${RUG_RATE_CARPET}€/m² de alcatifa, com a deslocação incluída.`;
+var carpetTierText = CARPET_TIERS.slice(0, -1).map((t, i) => `até ${CARPET_TIERS[i + 1].from} m² ${t.rate}€/m²`).join(", ");
+var CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), com a deslocação incluída.`;
 
 // src/data/serviceCatalog.ts
 var cities = [
@@ -801,14 +816,15 @@ function rugEstimate(rugs, city) {
   const classes = rugs.map((r) => rugMaterialClass(r.material));
   if (classes.includes("delicate")) return { ok: false, reason: "tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço" };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
-  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * rateOf(classes[i]), 0);
+  const carpetArea = rugs.reduce((s, r, i) => s + (classes[i] === "carpet" ? r.qty * r.width * r.length : 0), 0);
+  const washing = rugs.reduce((s, r, i) => s + (classes[i] === "carpet" ? 0 : r.qty * r.width * r.length * rateOf(classes[i])), 0) + carpetWashing(carpetArea);
   const travelFee = locationPrices[city];
   const homePrice = roundToNine(washing + travelFee);
   const pickupFee = classes.includes("carpet") ? null : rugPickupFee(areaM2, city);
   return {
     ok: true,
     areaM2,
-    ratePerM2: [...new Set(classes.map(rateOf))],
+    ratePerM2: [...new Set(classes.map((c) => c === "carpet" && carpetArea > 0 ? Math.round(carpetWashing(carpetArea) / carpetArea * 100) / 100 : rateOf(c)))],
     travelFee,
     homePrice,
     pickupFee,
@@ -2719,7 +2735,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2785,7 +2801,7 @@ function withVisitGifts(input, r) {
     const one = innerPriced({ ...noExtras, ...x });
     return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === "number" ? one.rugEstimate.homePrice : null);
   };
-  const parts = [...restore(base).map((i) => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter((k) => typeof inp[k] === "number" && inp[k] > 0 || Array.isArray(inp[k]) && inp[k].length > 0).map((k) => aloneOf({ items: [], [k]: inp[k] }))];
+  const parts = restore(base).map((i) => aloneOf({ items: [i] }));
   const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
@@ -2799,6 +2815,11 @@ function withVisitGifts(input, r) {
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
+  const shift = cents(final - (typeof q.total === "number" ? q.total : final));
+  for (const k of ["puff", "armchair", "headboard"]) {
+    const e = r[k];
+    if (shift && e && typeof e.total === "number" && !(rc && typeof rc.comboPrice === "number")) out[k] = { ...e, total: cents(e.total + shift) };
+  }
   const giftSum = cents(usual - paid);
   const t = r.waterproofingTiers;
   const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;
@@ -2809,7 +2830,7 @@ function withVisitGifts(input, r) {
     out.antiMiteGift = null;
   }
   const m = gifts.find((g) => g.piece === "mattress");
-  return { ...out, visitGifts: { gifts, usual, total: final, tiers, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
+  return { ...out, visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {
@@ -2978,7 +2999,7 @@ function botQuoteInner(input) {
   if (!leather) return { ...withOdor, leatherTreatment: null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
 }
-var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
 var up9Total = (x) => {
   const n = Math.ceil(x - 1e-9);
   return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
@@ -3033,7 +3054,9 @@ function withSeparatePrice(input, r) {
   const out = { ...r };
   if (main) out.total = main.total;
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
-  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, rule: SEPARATE_PRICE_RULE } };
+  const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
+  const withoutGift = plain === null ? null : up9Total(plain);
+  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } };
 }
 
 // src/constants/cityCoords.ts

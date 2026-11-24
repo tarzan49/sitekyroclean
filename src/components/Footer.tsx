@@ -10,6 +10,10 @@ import { COVERAGE_PROMISE, RESPONSE_PROMISE, TRAVEL_FEE_MIN } from "@/constants/
 const Footer = () => {
   return (
     <footer className="bg-kyro-green text-white pt-6 md:pt-8 pb-24" style={{ paddingBottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }}>
+      {/* Linha discreta no início do rodapé (dono, 24 Nov: sem botão de WhatsApp aqui; a barra fixa já o mostra). */}
+      <div className="mx-auto mb-6 max-w-md px-5 text-center">
+        <p className="whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
+      </div>
       <div className="container mx-auto px-4">
         {/* Logo Section */}
         <div className="text-center mb-4 md:mb-5">

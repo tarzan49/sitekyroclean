@@ -11,36 +11,36 @@ import { sofaPrices, mattressPrices, initialFormData } from './QuizTypes';
 // em silêncio para 0€) — os testes fixam os limiares exatos dos comentários
 // no código-fonte, para uma alteração futura a um dos três não desalinhar
 // silenciosamente os outros dois.
-// Dono, 24 Nov 2026: cada cadeira paga o preço da sua posição (não é cumulativo, sem regra do mínimo).
-describe('calcChairClean (dono, 24 Nov 2026: 1.ª a 4.ª 20€, 5.ª a 7.ª 17,50€, 8.ª em diante 15€; -5€ por cadeira impermeabilizada)', () => {
+// Dono, 24 Nov 2026 (regra final): cada cadeira paga o preço da sua posição, escalões 1.ª-4.ª / 5.ª-8.ª / 9.ª+.
+describe('calcChairClean (dono, 24 Nov 2026: 20 / 15 / 10€ por posição; a metade na cadeira que também é impermeabilizada)', () => {
   it('is null for 0 or negative', () => {
     expect(calcChairClean(0)).toBeNull();
     expect(calcChairClean(-1)).toBeNull();
   });
   it('prices any quantity, no more "sob orçamento" at 10+', () => {
-    expect(calcChairClean(10)).toBeCloseTo(177.5);
-    expect(calcChairClean(12)).toBeCloseTo(207.5);
-    expect(calcChairClean(40)).toBeCloseTo(80 + 52.5 + 33 * 15);
+    expect(calcChairClean(10)).toBeCloseTo(160);
+    expect(calcChairClean(12)).toBeCloseTo(180);
+    expect(calcChairClean(40)).toBeCloseTo(80 + 60 + 32 * 10);
   });
   it.each([
-    [1, 20], [4, 80], [5, 97.5], [6, 115], [7, 132.5], [8, 147.5], [9, 162.5],
+    [1, 20], [4, 80], [5, 95], [6, 110], [7, 125], [8, 140], [9, 150],
   ])('qty=%i -> %s€', (qty, expected) => {
     expect(calcChairClean(qty)).toBeCloseTo(expected);
   });
   it('one more chair never costs less', () => {
     for (let q = 1; q < 30; q++) expect(calcChairClean(q + 1)!).toBeGreaterThan(calcChairClean(q)!);
   });
-  it('each waterproofed chair costs 5€ less to clean', () => {
-    expect(calcChairClean(4, 4)).toBeCloseTo(60);
-    expect(calcChairClean(12, 12)).toBeCloseTo(147.5);
+  it('a waterproofed chair cleans at half price', () => {
+    expect(calcChairClean(4, 4)).toBeCloseTo(40);
+    expect(calcChairClean(12, 12)).toBeCloseTo(90);
   });
 });
 
-describe('chair protection per chair by position (dono, 24 Nov 2026: Premium 25/22,50/20€, Essencial 15/12,50/10€)', () => {
+describe('chair protection per chair by position (dono, 24 Nov 2026: Premium 25/22,50/20€, Essencial 15/12,50/10€, escalões 1-4 / 5-8 / 9+)', () => {
   it.each([
     [1, 25, 15], [2, 50, 30], [4, 100, 60],
-    [5, 122.5, 72.5], [6, 145, 85], [8, 187.5, 107.5],
-    [9, 207.5, 117.5], [10, 227.5, 127.5], [12, 267.5, 147.5], [100, 2027.5, 1027.5],
+    [5, 122.5, 72.5], [6, 145, 85], [8, 190, 110],
+    [9, 210, 120], [10, 230, 130], [12, 270, 150], [100, 2030, 1030],
   ])('%i chairs: Premium %s€, Essencial %s€', (qty, premium, essencial) => {
     expect(calcChairWaterproofPremium(qty)).toBe(premium);
     expect(calcChairWaterproof(qty)).toBe(essencial);

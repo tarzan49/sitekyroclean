@@ -1,7 +1,7 @@
 ﻿import { logError } from '@/lib/errorTracking';
 import { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { RefreshCw, Home, MessageCircle, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Home, MessageCircle } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
 
 interface Props {
@@ -34,76 +34,50 @@ class ErrorBoundary extends Component<Props, State> {
         <div
           className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden bg-checker-dark"
         >
-          {/* Ambient glows */}
-          <div
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(ellipse, rgba(212,175,55,0.10) 0%, transparent 70%)" }}
-          />
-          <div
-            className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(ellipse, rgba(26,78,48,0.25) 0%, transparent 70%)" }}
-          />
+          <div className="relative z-10 w-full max-w-md mx-auto text-center">
 
-          <div className="relative z-10 w-full max-w-lg mx-auto text-center">
-
-            {/* Icon */}
-            <div
-              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-gold/20"
-              style={{ background: "rgba(212,175,55,0.08)" }}
-            >
-              <AlertTriangle className="w-9 h-9" style={{ color: "#D4AF37" }} strokeWidth={1.5} />
-            </div>
-
-            {/* Label */}
-            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-3" style={{ color: "#D4AF37" }}>
-              Algo correu mal
-            </p>
-
-            {/* Heading */}
-            <h1 className="type-page-title font-playfair    text-white  mb-4">
-              Não foi possível carregar esta página
+            {/* Página de erro (dono, 24 Nov: "está horrível"): um só título, sem ícone nem texto por cima,
+                e o WhatsApp à frente, para quem chega aqui não se perder. */}
+            <h1 className="type-section-title font-playfair text-white">
+              A página não abriu, <em className="not-italic" style={{ color: '#D4AF37' }}>mas estamos aqui.</em>
             </h1>
-
-            <p className="text-white/80 text-base max-w-sm mx-auto mb-10 leading-relaxed">
-              Ocorreu um erro inesperado. Pedimos desculpa pelo incómodo, pode tentar recarregar ou voltar ao início.
+            <p className="mx-auto mt-3 mb-8 max-w-sm text-base leading-relaxed text-white/75">
+              Fale connosco pelo WhatsApp e dizemos-lhe o preço e a próxima hora livre em menos de 1 minuto.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+            <a
+              href={WHATSAPP_BASE}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-tracking-source="error_page"
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-base font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)]"
+            >
+              <MessageCircle className="h-5 w-5" />
+              Falar por WhatsApp
+            </a>
+
+            <div className="mt-3 grid grid-cols-2 gap-3">
               <button
                 onClick={() => {
                   this.setState({ hasError: false, error: undefined });
                   window.location.reload();
                 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-base px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97] w-full sm:w-auto justify-center"
+                className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/20 text-sm font-semibold text-white"
               >
-                <RefreshCw className="w-4 h-4" strokeWidth={2.5} />
-                Tentar novamente
+                <RefreshCw className="h-4 w-4" />
+                Tentar outra vez
               </button>
-
               <Link
                 to="/"
                 onClick={() => this.setState({ hasError: false, error: undefined })}
-                className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/15 text-white font-semibold text-base px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm w-full sm:w-auto justify-center"
+                className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/20 text-sm font-semibold text-white"
               >
-                <Home className="w-4 h-4 text-gold" />
+                <Home className="h-4 w-4 text-[#D4AF37]" />
                 Página inicial
               </Link>
             </div>
 
-            {/* Support nudge */}
-            <p className="text-white/80 text-sm">
-              Continua a ter problemas?{' '}
-              <a
-                href={WHATSAPP_BASE}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[#25D366] hover:underline font-medium"
-              >
-                <MessageCircle className="w-3 h-3" />
-                Fale connosco
-              </a>
-            </p>
+            <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
 
             {/* Dev error trace */}
             {import.meta.env.DEV && this.state.error && (

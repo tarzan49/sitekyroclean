@@ -770,6 +770,8 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #marca-tecido p.mb-5 { margin-bottom: 10px; }
   html.snap-sections #marca-tecido .grid { gap: 8px; }
   html.snap-sections #marca-tecido .grid > div { padding: 12px 14px; }
+  /* Marcas de colchão: o texto do material é mais longo; mais compacto para caber num ecrã (packs-tratamento, 24 Nov). */
+  html.snap-sections #marca-tecido .grid > div span { font-size: 13px; line-height: 1.45; }
 }
 /* Página principal de serviço (dono, 24 Nov): blocos longos em cartões a deslizar no telemóvel. */
 @media (max-width: 767px) {
@@ -790,4 +792,28 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 }
 
 /* Página inicial: o topo (HeroV1, #orcamento) mantém a sua disposição própria dentro do encaixe. */
-html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-bottom: 28px; }
+@media (max-width: 767px) {
+  /* "Aproveite a mesma visita": cartões fortes a deslizar no telemóvel (cabe num ecrã). */
+  html.snap-sections #mesma-visita .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
+  html.snap-sections #mesma-visita .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
+}
+html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-top: 76px !important; padding-bottom: 28px !important; }
+@media (min-width: 768px) { html.snap-sections main > section#orcamento { padding-top: 100px; padding-bottom: 100px; } }
+html.snap-sections main > div#testemunhos { scroll-snap-align: start; }
+html.snap-sections #resultado video, html.snap-sections #resultado img { max-height: 42svh; }
+/* Página inicial: cada secção ocupa o ecrã inteiro a partir do topo e o conteúdo começa abaixo do menu fixo
+   (o topo da página já fica por trás do menu, por isso o encaixe alinha a 0 e não abaixo do menu). */
+html.snap-home { scroll-padding-top: 0; }
+html.snap-home main > section, html.snap-home main > div#testemunhos { min-height: 100svh; }
+html.snap-home main > section:not(#orcamento), html.snap-home main > div#testemunhos > section { padding-top: calc(var(--header-h, 57px) + 16px); }
+html.snap-home main > div#testemunhos { display: flex; flex-direction: column; }
+html.snap-home main > div#testemunhos > section { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+html.snap-home main > section#preco { padding-bottom: 16px !important; }
+html.snap-home main > div#testemunhos > section > * { width: 100%; }
+@media (max-width: 767px) { html.snap-home #avaliacoes [aria-roledescription="testemunho"] > * { height: 300px; } }
+@media (max-width: 767px) { html.snap-home #avaliacoes [aria-roledescription="testemunho"] p { -webkit-line-clamp: 3; } }
+/* Perguntas com muitas linhas (ex.: /limpeza-cadeiras, 8 perguntas): mais compactas no telemóvel para caber num ecrã (packs-tratamento, 24 Nov). */
+@media (max-width: 767px) {
+  html.snap-sections #duvidas button[aria-expanded] { padding-top: 8px; padding-bottom: 8px; gap: 10px; }
+  html.snap-sections #duvidas button[aria-expanded] > span:first-child { font-size: 14px; line-height: 1.35; }
+}

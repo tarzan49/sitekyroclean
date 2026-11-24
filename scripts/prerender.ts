@@ -935,8 +935,9 @@ export function prerenderRoutes(outDir: string): number {
       route.path,
       page.title,
       page.metaDescription,
-      { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, articleSections: treatment ? treatmentContentSections(treatment) : undefined, problems: treatment ? treatmentArticles.map(a => ({ title: a.title, description: a.body, image: { src: a.image, alt: a.alt } })) : undefined, faqs: page.faqs, links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
-      [buildFaqSchema(page.faqs), buildBreadcrumbSchema(crumbs)],
+      // Modelo novo (dono, 24 Nov): a página mostra o subtítulo do topo, 4 benefícios e 5 perguntas; o HTML diz o mesmo.
+      { h1: page.h1, intro: treatment?.heroSubtitle, benefits: page.benefits.slice(0, 4), faqs: page.faqs.slice(0, 5), links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
+      [buildFaqSchema(page.faqs.slice(0, 5)), buildBreadcrumbSchema(crumbs)],
     );
   }
 

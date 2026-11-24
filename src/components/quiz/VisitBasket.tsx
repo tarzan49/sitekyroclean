@@ -98,7 +98,7 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   if (!r.ok) return { total: null, travel: null, sob: true, lines: [], gifts: [], usual: null };
   // Linhas do motor pela mesma ordem dos itens válidos. Tapetes com valor do bot desde 24 Nov 2026 (dono):
   // só tapetes = rugEstimate.homePrice (deslocação incluída); com outras peças = rugCombo.comboPrice.
-  // Alcatifas também, 7€/m² (dono, 24 Nov 2026).
+  // Alcatifas também, por escalões da área (dono, 24 Nov 2026).
   const rx = r as Quote & { rugEstimate?: { ok: boolean; homePrice?: number } | null; rugCombo?: { ok: boolean; rugsWashing?: number; comboPrice?: number } | null };
   const rugValid = valid.filter(v => v.kind === 'rug' || v.kind === 'carpet');
   const othersValid = valid.length - rugValid.length;

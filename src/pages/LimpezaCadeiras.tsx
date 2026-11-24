@@ -1,17 +1,21 @@
-import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
+import { useState } from "react";
+import ServicePricePicker from "@/components/ServicePricePicker";
+import ChairProcessStory from "@/components/ChairProcessStory";
+import CustomerReviews from "@/components/CustomerReviews";
+import CompactFAQ from "@/components/CompactFAQ";
+import { pickReviewSubset } from "@/data/reviewsPool";
+import { cities } from "@/data/serviceCatalog";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
-import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServicePriceSection from "@/components/ServicePriceSection";
-import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
@@ -66,6 +70,9 @@ const expertTips: ExpertTip[] = [
 const pillar = getPillarPage('/limpeza-cadeiras');
 
 const LimpezaCadeiras = () => {
+  // Modelo novo (dono, 24 Nov): secções de ecrã inteiro; o preço pede a localidade.
+  useSnapSections(true);
+  const [city, setCity] = useState("Lisboa");
   return (
     <QuizServiceProvider value="chairs">
     <>
@@ -75,24 +82,36 @@ const LimpezaCadeiras = () => {
           title={pillar.h1}
           serviceSlug="limpeza-cadeiras"
         />
-        <ServicePriceSection serviceSlug="limpeza-cadeiras" />
+        <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="mb-3 flex items-center justify-between gap-3 md:mb-6">
+              <h2 className="type-section-title font-playfair text-[#111111]">O seu <em className="not-italic" style={{ color: "#D4AF37" }}>preço</em></h2>
+              <label className="flex items-center gap-1.5 text-xs text-[#555]"><span className="sr-only sm:not-sr-only">Localidade</span>
+                <select aria-label="Localidade" value={city} onChange={e => setCity(e.target.value)} className="h-9 max-w-[150px] rounded-lg border-2 border-[#D4AF37] bg-white px-2 text-sm font-semibold text-[#1A1A1A]">
+                  {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><ServicePricePicker service="limpeza-cadeiras" city={city} source="pillar_picker_limpeza-cadeiras" /></div>
+          </div>
+        </section>
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug="limpeza-cadeiras" seed="limpeza-cadeiras" heading="" />
+            <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <CustomerReviews reviews={pickReviewSubset("limpeza-cadeiras", "limpeza-cadeiras", 6)} />
           </div>
         </section>
 
         <ServiceExamplesGallery serviceSlug="limpeza-cadeiras" />
-        <ServiceProcessGuide serviceSlug="limpeza-cadeiras" />
+        <ChairProcessStory service="limpeza-cadeiras" cityPrep="" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de cadeiras"
           items={cadeirasGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
+        <CompactFAQ id="duvidas" faqs={pillar.faqs} heading="Perguntas Frequentes" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-cadeiras" serviceLabel={pillar.serviceName} />
         <ServiceSchema

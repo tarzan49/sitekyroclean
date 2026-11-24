@@ -6,6 +6,10 @@ import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 const HomepageBlogSection  = lazy(() => import("@/components/HomepageBlogSection"));
 const Services             = lazy(() => import("@/components/Services"));
 const HomeServiceVideos    = lazy(() => import("@/components/HomeServiceVideos"));
+const HomePriceSection     = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomePriceSection })));
+const HomeStorySection     = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeStorySection })));
+const HomeFaqSection       = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeFaqSection })));
+const HomeClosingSection   = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeClosingSection })));
 const PainPointsSolutionsV1 = lazy(() => import("@/components/PainPointsSolutionsV1"));
 const HowItWorksV1         = lazy(() => import("@/components/HowItWorksV1"));
 const TestimonialsV1       = lazy(() => import("@/components/TestimonialsV1"));
@@ -21,8 +25,8 @@ const SectionLoader = () => (
 const IndexV1 = () => {
   // Secções de ecrã inteiro com encaixe no scroll, como nas páginas de serviço (dono, 24 Nov).
   useEffect(() => {
-    document.documentElement.classList.add('snap-sections');
-    return () => document.documentElement.classList.remove('snap-sections');
+    document.documentElement.classList.add('snap-sections', 'snap-home');
+    return () => document.documentElement.classList.remove('snap-sections', 'snap-home');
   }, []);
 
   return (
@@ -35,6 +39,10 @@ const IndexV1 = () => {
           <HomeServiceVideos />
         </Suspense>
 
+        <Suspense fallback={<SectionLoader />}>
+          <HomePriceSection />
+        </Suspense>
+
         <div id="testemunhos" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <TestimonialsV1 />
@@ -42,22 +50,13 @@ const IndexV1 = () => {
         </div>
 
         <Suspense fallback={<SectionLoader />}>
-          <PainPointsSolutionsV1 />
-        </Suspense>
-
-        <div id="como-funciona" className="scroll-mt-16">
-          <Suspense fallback={<SectionLoader />}>
-            <HowItWorksV1 />
-          </Suspense>
-        </div>
-
-        <Suspense fallback={<SectionLoader />}>
-          <HomepageBlogSection />
+          <HomeStorySection />
         </Suspense>
 
         <Suspense fallback={<SectionLoader />}>
-          <FinalCTAV1 />
+          <HomeFaqSection />
         </Suspense>
+
       </main>
 
       <Suspense fallback={null}>
