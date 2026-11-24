@@ -79,7 +79,7 @@ const NotFound = () => {
       <p className="text-sm font-bold tracking-[0.08em] uppercase text-white/80 mb-5">
         Páginas populares
       </p>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {popularPages.map(({ to, icon: Icon, label, desc }) => (
           <Link key={to} to={to}
             className="group flex items-start gap-3 text-left p-4 rounded-2xl border border-white/8 hover:border-gold/30 transition-all"
@@ -87,7 +87,7 @@ const NotFound = () => {
             <span className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gold/20 transition-colors">
               <Icon className="w-4 h-4 text-gold" />
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-semibold text-white text-base leading-snug mb-0.5 group-hover:text-gold transition-colors">{label}</p>
               <p className="text-white/80 text-sm leading-snug">{desc}</p>
             </div>
