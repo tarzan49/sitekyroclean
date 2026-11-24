@@ -79,7 +79,7 @@ const Hero = () => {
           {/* Keep the cleaning line visible while bringing trust and both CTAs into the first mobile viewport. */}
           <div className="-mx-5 min-h-[clamp(9rem,40vw,11rem)] flex-1 md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
           {/* Linha subtil por cima da prova (dono, 24 Nov). */}
-          <p className="whitespace-nowrap text-center text-[11px] font-semibold tracking-normal text-white/95 md:hidden" style={{ textShadow: "0 1px 6px rgba(0,0,0,.7)" }}>Trabalhamos em todo Portugal · Resposta em menos de 1 minuto</p>
+          <p className="whitespace-nowrap text-center text-[10px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85 md:hidden">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
           <div className="py-3 md:hidden">
             <HomeHeroTrust />
           </div>
