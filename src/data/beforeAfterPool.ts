@@ -143,6 +143,16 @@ import sofa15Antes from "@/assets/before-after-pool/sofa-15-antes.webp";
 import sofa15Depois from "@/assets/before-after-pool/sofa-15-depois.webp";
 import sofa14Antes from "@/assets/before-after-pool/sofa-14-antes.webp";
 import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
+import tapete07Antes from "@/assets/before-after-pool/tapete-07-antes.webp";
+import tapete07Depois from "@/assets/before-after-pool/tapete-07-depois.webp";
+import tapete08Antes from "@/assets/before-after-pool/tapete-08-antes.webp";
+import tapete08Depois from "@/assets/before-after-pool/tapete-08-depois.webp";
+import tapete09Antes from "@/assets/before-after-pool/tapete-09-antes.webp";
+import tapete09Depois from "@/assets/before-after-pool/tapete-09-depois.webp";
+import tapete10Antes from "@/assets/before-after-pool/tapete-10-antes.webp";
+import tapete10Depois from "@/assets/before-after-pool/tapete-10-depois.webp";
+import tapete11Antes from "@/assets/before-after-pool/tapete-11-antes.webp";
+import tapete11Depois from "@/assets/before-after-pool/tapete-11-depois.webp";
 
 export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "alcatifa" | "impermeabilizacao";
 
@@ -219,8 +229,14 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: cadeiras04Antes, after: cadeiras04Depois },
   ],
   tapete: [
+    // 24/11/2026 (dono): do melhor para o pior; 07 Porto bege, 08 Vila do Conde, 09 sisal, 10 Guimarães, 11 Furadouro (Leça, Dany e bolinhas ficaram de fora: sem diferença).
     { kind: "pair", before: tapete04Antes, after: tapete04Depois },
+    { kind: "pair", before: tapete07Antes, after: tapete07Depois },
     { kind: "pair", before: tapete03Antes, after: tapete03Depois },
+    { kind: "pair", before: tapete08Antes, after: tapete08Depois },
+    { kind: "pair", before: tapete09Antes, after: tapete09Depois },
+    { kind: "pair", before: tapete10Antes, after: tapete10Depois },
+    { kind: "pair", before: tapete11Antes, after: tapete11Depois },
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
   ],
