@@ -22,7 +22,8 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); /limpeza-colchoes e /limpeza-cadeiras FEITO (24 Nov, packs-tratamento) |
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | /guia-de-packs | 1 | — | — | FEITO (24 Nov, af14e74a) |
-| Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo, blog | — | — | — | tratar como o blog (texto corrido, sem encaixe): só topo + widget no fim; por fazer |
+| Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo | — | — | — | FEITO (24 Nov): topo novo (ResourceHubHero, também no índice do blog) + widget de preço no fim (ResourcePriceSection), texto corrido sem encaixe |
+| Artigos do blog | — | — | — | por fazer: topo + ResourcePriceSection no fim |
 | /sobre, /areas-de-servico, /problemas, /en | — | — | — | por fazer (sobre: 'O que fazemos' 820 px; áreas: 659 px) |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).

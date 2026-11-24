@@ -1,3 +1,4 @@
+import ResourcePriceSection from '@/components/ResourcePriceSection';
 import { RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro } from '@/data/resourceContent';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -49,5 +50,6 @@ export default function GlossarioEstofos() {
       </section>
       <div className="lg:sticky lg:top-20"><ResourceLeadCard compact /></div>
     </div>
+    <ResourcePriceSection source="resource_price_glossario" />
   </main><Footer /></>;
 }
