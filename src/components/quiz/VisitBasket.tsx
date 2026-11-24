@@ -26,6 +26,12 @@ import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
 import rugClip from '@/assets/tapete-processo/maquina.mp4';
 import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
 import imperClip from '@/assets/before-after-pool/imper-agua-01.mp4';
+// Cartões de limpeza com o antes e depois que mais vende (dono, 25 Nov: "a melhor foto antes e depois que vendesse
+// instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
+import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
+import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
+import baCadeiras from '@/assets/quiz-antes-depois/cadeiras.webp';
+import baTapete from '@/assets/quiz-antes-depois/tapete.webp';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 import { Star } from 'lucide-react';
 import type { QuizOrder } from '@/lib/quizOrder';
@@ -221,12 +227,12 @@ function fromPrice(city: string, k: BasketKind): string {
 
 // Entrada do cesto (dono, 24 Nov: o questionário inteiro no formato novo): seis escolhas, cada uma com o "desde"
 // do motor, o mesmo dos heróis. Impermeabilização = sofá com a proteção (Protegido; o pack escolhe-se na folha).
-const ENTRY: { key: string; kind: BasketKind; label: string; short?: string; photo: string; clip: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
-  { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, clip: sofaClip, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
+const ENTRY: { key: string; kind: BasketKind; label: string; short?: string; photo: string; clip: string; ba?: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
+  { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, clip: sofaClip, ba: baSofa, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
   { key: 'imper', kind: 'sofa', label: 'Impermeabilização', short: 'Impermea\u00ADbilização', photo: imperPhoto, clip: imperClip, over: { pack: 'premium', imperOnly: true }, from: c => waterproofFrom(c) },
-  { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, clip: mattressClip, from: c => fromPrice(c, 'mattress') },
-  { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, clip: chairsClip, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
-  { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, clip: rugClip, from: c => fromPrice(c, 'rug') },
+  { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, clip: mattressClip, ba: baColchao, from: c => fromPrice(c, 'mattress') },
+  { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, clip: chairsClip, ba: baCadeiras, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
+  { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, clip: rugClip, ba: baTapete, from: c => fromPrice(c, 'rug') },
   { key: 'carpet', kind: 'carpet', label: 'Alcatifa', photo: PHOTO.carpet, clip: carpetClip, from: c => fromPrice(c, 'carpet') },
 ];
 const CLIP: Record<BasketKind, string> = { sofa: sofaClip, mattress: mattressClip, chairs: chairsClip, rug: rugClip, carpet: carpetClip };
@@ -393,7 +399,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <div className="grid grid-cols-2 gap-2">
                   {ENTRY.map(e => (
                     <button key={e.key} type="button" onClick={() => pick(e)} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
-                      <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /><BaLabels /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
                       <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
                         <span className="block text-[15px] font-bold leading-tight text-white">{e.label}</span>
@@ -441,8 +447,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               {ENTRY.map(e => {
                 const promo = promoOf(city, items, e);
                 return (
-                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[116px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
-                  <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[140px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
+                  {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /><BaLabels low /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
                   {/* O gancho (dono, 25 Nov): a oferta em destaque, em cima, com o presente e o valor. */}
                   {promo && <span className={`absolute left-1.5 top-1.5 flex max-w-[calc(100%-12px)] items-center overflow-hidden whitespace-nowrap rounded-lg bg-[#D4AF37] px-1.5 py-1 font-extrabold uppercase leading-none text-[#0B2F2A] ${promo.value >= 100 ? 'gap-0.5 text-[9.5px] tracking-tight' : 'gap-1 text-[11px] tracking-wide'} shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]`}>
                     <Gift className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} />{promo.kind === 'save' ? 'Poupa' : 'Oferta'} {formatEuro(promo.value)}
@@ -550,6 +556,15 @@ function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d
         : <span className="mt-0.5 flex h-7 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
     </div>
   );
+}
+
+/** "Antes" e "Depois" por cima de cada metade da fotografia. */
+function BaLabels({ low }: { low?: boolean }) {
+  const pos = low ? 'bottom-[46px]' : 'top-1.5';
+  return <>
+    <span className={`absolute left-1.5 ${pos} rounded bg-black/55 px-1 py-px text-[9px] font-bold uppercase tracking-wide text-white`}>Antes</span>
+    <span className={`absolute right-1.5 ${pos} rounded bg-[#D4AF37] px-1 py-px text-[9px] font-bold uppercase tracking-wide text-[#0B2F2A]`}>Depois</span>
+  </>;
 }
 
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
