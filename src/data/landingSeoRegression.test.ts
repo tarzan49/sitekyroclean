@@ -47,7 +47,7 @@ describe('final landing SEO regression coverage', () => {
       for (const problem of model.problems) usage.set(problem.image!.id, (usage.get(problem.image!.id) ?? 0) + 1);
       expect(getLandingPageModel(route.path + '?utm_medium=cpc#problemas')!.problems).toEqual(model.problems);
     }
-    expect(usage.size).toBe(176);
+    expect(usage.size).toBe(168);
     // Statistical regression guard (inventory grew with Leiria and Madeira on 17 Nov), not a ranking target.
     // Cadeiras e colchões: fotografias reais da equipa, 3 a 5 por problema (dono, 24 Nov), por isso cada uma aparece mais vezes.
     for (const [id, count] of usage) { expect(count, id).toBeGreaterThan(140); if (!/^(cadeira|colchao|sofa)-/.test(id)) expect(count, id).toBeLessThan(330); }

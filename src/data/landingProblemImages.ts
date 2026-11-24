@@ -45,46 +45,10 @@ export const SOFA_PROBLEM_IMAGES = [
     "alt": "Sofá-cama cinzento com migalhas, embalagens e manchas nos assentos"
   },
   {
-    "id": "sofa-residuos-02",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-02.webp",
-    "alt": "Sofá azul-escuro com pelos e pó acumulados nos assentos"
-  },
-  {
-    "id": "sofa-residuos-03",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-03.webp",
-    "alt": "Assentos e encostos de sofá azul com pelos e cotão"
-  },
-  {
-    "id": "sofa-residuos-04",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-04.webp",
-    "alt": "Chaise longue cinzento-escura com marcas de pó nos assentos"
-  },
-  {
-    "id": "sofa-residuos-05",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-05.webp",
-    "alt": "Sofá-chaise bege com borboto e pequenas marcas no braço e no assento"
-  },
-  {
     "id": "sofa-odores-01",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-01.webp",
     "alt": "Sofá de microfibra bege com marcas de gordura nas costas e nos braços"
-  },
-  {
-    "id": "sofa-odores-02",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-02.webp",
-    "alt": "Sofá camel com o braço encardido pelo uso"
-  },
-  {
-    "id": "sofa-odores-03",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-03.webp",
-    "alt": "Braço de sofá camel com o pelo baço e marcas de contacto"
   },
   {
     "id": "sofa-odores-04",
@@ -115,18 +79,6 @@ export const SOFA_PROBLEM_IMAGES = [
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-03.webp",
     "alt": "Assento de sofá bege com a frente amarelada pelo uso"
-  },
-  {
-    "id": "sofa-desgaste-04",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-04.webp",
-    "alt": "Chaise longue bege com o tecido acinzentado e manchas de uso"
-  },
-  {
-    "id": "sofa-desgaste-05",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-05.webp",
-    "alt": "Sofá-cama bege aberto com os assentos encardidos"
   }
 ] as const;
 
