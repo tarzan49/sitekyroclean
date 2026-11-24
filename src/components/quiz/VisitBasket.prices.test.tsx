@@ -38,8 +38,15 @@ describe('sofás e colchões com quantidade: linha = motor com a quantidade real
   for (const it_ of pieces) it(`${it_.qty} × ${it_.kind} ${it_.size} ${it_.pack}`, () => {
     const q = quoteBasket('Lisboa', [it_]);
     expect(aloneTotal('Lisboa', it_)).toBe(q.total);
-    const one = { ...it_, qty: 1 }, oneStruck = struckOf('Lisboa', one)!;
-    expect(struckOf('Lisboa', it_)!).toBeLessThanOrEqual(oneStruck * it_.qty + 0.001);
+    const treatment = it_.kind === 'mattress' ? (it_.pack === 'premium' ? 'clean+anti-acaros' : 'clean') : T[it_.pack];
+    const m = motor([{ kind: it_.kind, size: it_.size, qty: it_.qty, treatment }]);
+    const each = struckOf('Lisboa', { ...it_, qty: 1 })! * it_.qty, struck = struckOf('Lisboa', it_)!;
+    // Sem oferta e com separatePrice: é exatamente o do motor.
+    if (!q.gifts.length && m.separatePrice) expect(struck).toBe(m.separatePrice.separate);
+    // Com oferta: nunca acima de cada uma sozinha, nem acima do que o motor diz.
+    if (q.gifts.length) { expect(struck).toBeLessThanOrEqual(each + 0.001); if (m.separatePrice) expect(struck).toBeLessThanOrEqual(m.separatePrice.separate); }
+    // Sem oferta, nunca abaixo do preço (um riscado abaixo do preço esconde a poupança). Tolerância de 1€ dos totais em 9.
+    if (!q.gifts.length) expect(struck).toBeGreaterThanOrEqual(q.total! - 1);
   });
   it('uma peça só: o riscado do pack é o separatePrice do motor', () => {
     for (const size of ['2-lugares', '3-lugares', '4-lugares', '5-lugares']) for (const pack of ['premium', 'essencial'] as const) {

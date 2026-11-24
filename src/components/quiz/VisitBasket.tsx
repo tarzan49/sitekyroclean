@@ -215,12 +215,14 @@ export function struckOf(city: string, it: BasketItem): number | null {
   const q = quoteBasket(city, [it]);
   if (q.total === null || q.sob) return null;
   if (it.kind === 'chairs') return separateOf(city, it) ?? q.total;
-  const base = q.gifts.length && q.withoutGift != null ? q.withoutGift : q.total;
-  const one = { ...it, qty: 1 }, sepOne = separateOf(city, one), aloneOne = aloneTotal(city, one);
-  const save = !q.gifts.length && sepOne !== null && aloneOne !== null ? Math.max(0, sepOne - aloneOne) : 0;
-  // Nunca acima de cada unidade pedida sozinha (o total a acabar em 9 pode subir 1€ com a quantidade).
-  const cap = (sepOne ?? aloneOne ?? Infinity) * it.qty;
-  return Math.round(Math.min(base + save * it.qty, Math.max(cap, 0)) * 100) / 100;
+  const one = { ...it, qty: 1 }, oneAlone = separateOf(city, one) ?? aloneTotal(city, one);
+  if (oneAlone === null) return q.total;
+  const sum = Math.round(oneAlone * it.qty * 100) / 100;
+  if (it.qty === 1) return sum;
+  // Com quantidade: o valor em separado que o motor dá para o conjunto. Se a quantidade desbloqueia uma oferta, esse
+  // valor já conta a oferta (que o cesto mostra numa linha própria), por isso nunca passa de cada uma sozinha.
+  const sep = separateOf(city, it);
+  return q.gifts.length ? Math.min(sep ?? sum, sum) : sep ?? sum;
 }
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
@@ -300,8 +302,9 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
     const h = hist.current;
     if (h.timer) { clearTimeout(h.timer); h.timer = 0; }
     const onPop = () => {
-      h.depth = Math.max(0, h.depth - 1);
+      // Um passo que nós mesmos recuámos (Voltar do ecrã, fechar): a conta já foi acertada, não se desconta outra vez.
       if (h.skip > 0) { h.skip -= 1; return; }
+      h.depth = Math.max(0, h.depth - 1);
       const s = live.current;
       if (s.level <= h.depth) return;
       if (s.editing) { if (s.editing.imperOnly) setImperPick(true); setEditing(null); } else if (s.imperPick) setImperPick(false); else if (s.step === 'contact') setStep('basket'); else s.onClose();
