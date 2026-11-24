@@ -24,12 +24,15 @@ export interface RugSide {
   doubtful: boolean;
 }
 
-export function rugSide(raw: string | number | null | undefined): RugSide | null {
+/** A wall-to-wall carpet side goes up to 50 m (the site's CarpetPricePicker goes that far): 25 is 25 m, never 25 cm. */
+export const CARPET_SIDE_MAX_METERS = 50;
+
+export function rugSide(raw: string | number | null | undefined, maxMeters = RUG_SIDE_MAX_METERS): RugSide | null {
   const n = typeof raw === 'number' ? raw : Number(String(raw ?? '').trim().replace(',', '.'));
   if (!Number.isFinite(n) || n <= 0) return null;
-  if (n > RUG_SIDE_MAX_METERS) {
+  if (n > maxMeters) {
     const meters = Math.round(n) / 100;
-    return meters > RUG_SIDE_MAX_METERS ? null : { meters, fromCm: true, doubtful: false };
+    return meters > maxMeters ? null : { meters, fromCm: true, doubtful: false };
   }
   return { meters: n, fromCm: false, doubtful: n >= RUG_SIDE_DOUBTFUL_METERS };
 }

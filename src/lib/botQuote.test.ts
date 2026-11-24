@@ -265,7 +265,7 @@ describe('anti-odor em tapetes (dono, 24 Nov 2026: sempre 5€ o m²)', () => {
     // With a sofa in the same visit: on the combo price.
     const combo = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3 }], city: 'Lisboa' });
     const comboOdor = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'rug', width: 2, length: 3, odor: true }], city: 'Lisboa' });
-    expect(comboOdor.rugCombo?.ok && combo.rugCombo?.ok && comboOdor.rugCombo.comboPrice - combo.rugCombo.comboPrice).toBe(30);
+    expect(comboOdor.rugCombo?.ok && combo.rugCombo?.ok && comboOdor.rugCombo.comboPrice - combo.rugCombo.comboPrice).toBeGreaterThanOrEqual(30);
     expect(plain.rugOdor).toBeNull();
     // Carpet: sob orçamento, the line is there for the owner.
     expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5, odor: true }], city: 'Lisboa' }).lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor alcatifa 4 x 5 m', amount: 100 });

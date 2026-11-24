@@ -1200,3 +1200,13 @@ Dono, 23 Nov 2026 (Joana Duarte): 2 ou mais peças na mesma visita = cada peça 
 - [RETIRADA 24/11] "o 'em vez de' é só o pack contra o separado" e "tapete na mesma visita sem 'em vez de'" e "sem 'em vez de' sobre a soma": substituídas pelo `separatePrice`.
 - Pack do site: "Gostaria de saber o preço e a disponibilidade do pack Blindado / Protegido / Renovado…" = opção escolhida (Blindado = limpeza + Premium, Protegido = limpeza + Essencial, Renovado = só limpeza); o bot não repete opções nem upsell dessa peça, confirma o total e dá logo as duas horas (kyro-bot `sitePackChoice` em `funnel23.ts`, travão em `agent.ts`).
 - Impermeabilização sozinha de cadeiras (dono, 24 Nov, madrugada: "Sim, acaba em 9 [...] Não é só no site, mano, é na vida real"): acaba em 9 para cima, no motor (bot e site); 6 cadeiras em Lisboa 159/99€. [RETIRADA 24/11] imper sozinha ao preço exato (2f1157a1).
+
+## Escada A: teto de 20% e tratamento da pele (dono, 25 Nov 2026)
+
+- "Não podemos oferecer um tratamento de 60€ num pedido de 150": a soma dos valores normais das ofertas de uma visita nunca passa de 20% do total do pedido como foi pedido (150€ → 30€). A oferta que não cabe dá lugar a outro tratamento da visita mais barato que caiba; se nenhum couber, não há oferta. O anti-ácaros do colchão (40€) fica fora do teto (dono, 25 Nov: "colchão fora do teto") (`VISIT_GIFTS_MAX_SHARE` em `withVisitGifts`, `src/lib/botQuote.ts`).
+- "Aqui oferecemos o tratamento de pele": num sofá de pele a mais (`leather: true`) a oferta é o tratamento da pele, `treatment: 'tratamento-pele'`, normal 40€ (60€ em 5–6 lugares); o cliente paga a limpeza. Caso: sofá 3L Blindado + sofá 3L de pele (429€ sem oferta).
+
+
+## Auditoria do motor de preços (24 Nov 2026, 12 136 pedidos)
+
+Corrigido em `botQuote.ts`/`customPack.ts`/`rugMeasure.ts` (teste `src/lib/botQuote.audit24nov.test.ts`): a ordem das peças não muda o total (desempate estável das ofertas, U com o nível de cada peça, posições das cadeiras com imper primeiro); `qty: 2` = duas linhas (5L sozinho só com 1 unidade, imper de várias peças pela quantidade, tapetes/alcatifas na escada e no Poupa); canto/5L/6L em imper sozinha passam pelo motor normal com o preço fixo 199/139, 219/159, 249/189 (deslocação incluída), por isso têm preço com outras peças e tapetes, ofertas e fim em 9; opções com imper sozinha riscam o próprio nível e acabam em 9; `separate` 0 fica 0; o mínimo "peças sozinhas" usa o preço final de cada peça; pedir anti-odor nunca baixa o total (`withOdorFloor`); cadeiras com imper em várias linhas seguem os escalões e acabam em 9 uma vez; alcatifa até 50 m por lado (`CARPET_SIDE_MAX_METERS`).

@@ -12,7 +12,7 @@ export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros';
  * cleaning (sofas and chairs, with `extra` premium or essencial). The
  * configurator never sets it; the WhatsApp bot's quote uses it
  * (`src/lib/botQuote.ts`), so both price through this one engine. */
-export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; seatOnly?: boolean; waterproofingFixed?: { premium: number; essencial: number }; }
+export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; unitPrice?: number; seatOnly?: boolean; waterproofingFixed?: { premium: number; essencial: number }; travelIncluded?: boolean; }
 export const PACK_KIND_LABEL: Record<PackKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 export const EXTRA_LABEL: Record<PackExtra, string> = { none: 'Só limpeza', premium: 'Limpeza + impermeabilização Premium (até 10 anos)', essencial: 'Limpeza + impermeabilização Essencial (1 a 2 anos)', 'anti-acaros': 'Limpeza + tratamento anti-ácaros' };
 export function makePackItem(kind: PackKind, id: string): CustomPackItem {
@@ -94,23 +94,26 @@ export function customPackLine(item: CustomPackItem, chairsBefore = 0) {
 // um segundo sofá, e o mesmo pedido custava menos aqui do que no quiz.
 export function calculateCustomPack(items: CustomPackItem[], city: string) {
   // Cadeiras: qualquer quantidade tem preço (tabela única do dono, 24 Nov 2026; 8+ a 15€ cada).
-  let chairsSeen = 0;
-  const table = items.map(item => {
+  // Chair positions are counted waterproofed rows first, then the rest, each in the order given: the same chairs
+  // in another order give the same price (24 Nov 2026 audit).
+  const chairOrder = items.map((it, n) => n).filter(n => items[n].kind === 'chairs' && items[n].primary !== 'waterproofing')
+    .sort((a, b) => Number(!(items[a].extra === 'premium' || items[a].extra === 'essencial')) - Number(!(items[b].extra === 'premium' || items[b].extra === 'essencial')) || a - b);
+  const chairsBeforeOf = new Map<number, number>();
+  chairOrder.reduce((seen, n) => (chairsBeforeOf.set(n, seen), seen + items[n].qty), 0);
+  const table = items.map((item, n) => {
     if (item.kind !== 'chairs' || item.primary === 'waterproofing') return customPackLine(item);
-    const line = customPackLine(item, chairsSeen);
-    chairsSeen += item.qty;
-    return line;
+    return customPackLine(item, chairsBeforeOf.get(n) ?? 0);
   });
   // Waterproofing sent as its own chairs row (the quiz does this): the cleaned chairs it covers clean at half,
   // and cleaning + waterproofing ends in 9 like a combined row (owner, 24 Nov 2026).
   const wpRows = items.map((i, n) => i.kind === 'chairs' && i.primary === 'waterproofing' && (i.extra === 'premium' || i.extra === 'essencial') ? n : -1).filter(n => n >= 0);
   let wpLeft = wpRows.reduce((sum, n) => sum + items[n].qty, 0);
   if (wpLeft > 0) {
-    let seen = 0, covered = 0;
-    items.forEach((item, n) => {
+    let covered = 0;
+    chairOrder.forEach(n => {
+      const item = items[n];
       const line = table[n];
-      if (item.kind !== 'chairs' || item.primary === 'waterproofing') return;
-      const before = seen; seen += item.qty;
+      const before = chairsBeforeOf.get(n) ?? 0;
       if (wpLeft <= 0 || item.extra === 'premium' || item.extra === 'essencial' || line.amount == null) return;
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
@@ -133,6 +136,29 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
       // tablePrice too: priceWithPackPerks below rebuilds each line's amount from its tablePrice.
       const wpLine = table[wpRow];
       table[wpRow] = { ...wpLine, amount: wpLine.amount! - diff, ...('tablePrice' in wpLine && typeof wpLine.tablePrice === 'number' ? { tablePrice: wpLine.tablePrice - diff } : {}) };
+    }
+  }
+  // Chairs cleaned + waterproofed in several rows: the waterproofing keeps counting positions across the rows and
+  // the chairs end in 9 once, like one row (24 Nov 2026 audit: 4 + 2 Premium = 208€, one row of 6 = 199€).
+  const wpCleanRows = items.map((i, n) => (i.kind === 'chairs' && i.primary !== 'waterproofing' && !i.seatOnly && (i.extra === 'premium' || i.extra === 'essencial') && table[n].amount != null ? n : -1)).filter(n => n >= 0);
+  if (wpCleanRows.length > 1 && wpRows.length === 0) {
+    const wpBefore = { premium: 0, essencial: 0 };
+    const exact = new Map<number, number>();
+    chairOrder.forEach(n => {
+      const it = items[n];
+      const before = chairsBeforeOf.get(n) ?? 0;
+      if (!wpCleanRows.includes(n)) return;
+      const t = it.extra === 'premium' ? 'premium' : 'essencial';
+      const wp = chairWaterproofTotal(wpBefore[t] + it.qty, t)! - (wpBefore[t] ? chairWaterproofTotal(wpBefore[t], t)! : 0);
+      wpBefore[t] += it.qty;
+      exact.set(n, chairCleanTotal(it.qty, it.qty, before)! + wp);
+    });
+    const sum = [...exact.values()].reduce((a, v) => a + v, 0);
+    const diff = Math.round((sum - endIn9Down(sum)) * 100) / 100;
+    const last = [...exact.keys()].pop()!;
+    for (const [n, v] of exact) {
+      const amount = Math.round((v - (n === last ? diff : 0)) * 100) / 100;
+      table[n] = { ...table[n], amount, ...('tablePrice' in table[n] && typeof table[n].tablePrice === 'number' ? { tablePrice: amount } : {}) };
     }
   }
   const mainKind = items[0]?.kind;
