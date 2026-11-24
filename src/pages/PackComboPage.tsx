@@ -8,7 +8,7 @@ import SectionHeader from '@/components/SectionHeader';
 import PackConfigurator from '@/components/PackConfigurator';
 import WaterproofPackPicker from '@/components/WaterproofPackPicker';
 import WaterproofPackSections from '@/components/WaterproofPackSections';
-import SofaMattressPicker from '@/components/SofaMattressPicker';
+import PackPiecesPicker, { type PieceKind } from '@/components/PackPiecesPicker';
 import type { DuoSide } from '@/components/DuoBeforeAfter';
 import CompactFAQ from '@/components/CompactFAQ';
 import CustomerReviews from '@/components/CustomerReviews';
@@ -21,7 +21,7 @@ import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, pac
 import { services, cityPrep } from '@/data/serviceCatalog';
 import { pickReviewSubset } from '@/data/reviewsPool';
 import { locationPrices } from '@/constants/travel';
-import { PACK_PERK_MIN_ORDER, PACK_PERK_PRICES, PACK_PERK_SUMMARY } from '@/constants/packPerks';
+import { PACK_PERK_PRICES, PACK_PERK_SUMMARY } from '@/constants/packPerks';
 import { PRICE_PROMISE, AVAILABILITY_PROMISE, SATISFACTION_PROMISE } from '@/constants/commercialPolicy';
 import { SITE_URL, WHATSAPP_BASE } from '@/constants/business';
 import { buildPackWaMessage } from '@/lib/whatsappMessages';
@@ -37,6 +37,12 @@ const container = 'max-w-7xl mx-auto px-5 sm:px-6 lg:px-8';
  * mesmas do upsell do quiz.
  */
 // Antes/depois duplo com "+" no topo de cada pack (dono, 24 Nov); impermeabilização = vídeo do próprio artigo.
+const PACK_PIECES: Record<string, PieceKind[]> = {
+  'sofa-colchao': ['sofa', 'mattress'],
+  'sala-completa': ['sofa', 'chairs', 'rug'],
+  'quarto-completo': ['mattress', 'rug'],
+};
+
 const PACK_DUO: Record<string, { left: DuoSide; right: DuoSide }> = {
   'sofa-colchao': { left: { category: 'sofa' }, right: { category: 'colchao' } },
   'sofa-impermeabilizacao': { left: { category: 'sofa' }, right: { category: 'impermeabilizacao', video: true } },
@@ -69,7 +75,7 @@ export default function PackComboPage() {
   useEffect(() => setOpenNext(null), [pathname]);
 
   // Secções de ecrã inteiro com encaixe no scroll (index.css): só nas páginas já compactadas.
-  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao' || data?.pack.id === 'sofa-colchao';
+  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao' || Boolean(data && PACK_PIECES[data.pack.id]);
   useEffect(() => {
     if (!snapPage) return;
     document.documentElement.classList.add('snap-sections');
@@ -82,7 +88,8 @@ export default function PackComboPage() {
   const { pack, city } = data;
   const priceFrom = packPriceFrom(pack, city.name);
   const simpleKind = pack.id === 'sofa-impermeabilizacao' ? 'sofa' as const : pack.id === 'cadeiras-impermeabilizacao' ? 'chairs' as const : null;
-  const combo = pack.id === 'sofa-colchao'; // novo formato (dono, 24 Nov)
+  const pieces = PACK_PIECES[pack.id]; // formato peça a peça (dono, 24 Nov)
+  const combo = Boolean(pieces);
   const travelFee = locationPrices[city.name];
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.id, city.name))}`;
   const packServices = [pack.service1Slug, pack.service2Slug].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
@@ -91,7 +98,7 @@ export default function PackComboPage() {
 
   const perks = [
     {
-      title: 'Preço de pack no que acrescentar',
+      title: 'Uma só deslocação',
       text: PACK_PERK_PRICES,
       image: '/images/pack-perks/pack-artigos-800.webp',
       alt: 'Colchão, sofá, cadeira e tapete: os artigos que pode juntar no mesmo pack',
@@ -146,11 +153,11 @@ export default function PackComboPage() {
               overline={pack.name}
               heading="Monte o seu pack"
               goldWord={`${cityPrep(city.name)} ${city.name}`}
-              subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal.`}
+              subtitle="Cada artigo ao preço de tabela, com uma só deslocação."
               className="lg:!mb-5"
             />}
           <div className={simpleKind || combo ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
-            {combo ? <SofaMattressPicker city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
+            {combo ? <PackPiecesPicker pieces={pieces!} packName={pack.name} compact={pieces!.length > 2} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
               initialKinds={PACK_KINDS[pack.id]}
               initialExtra={PACK_INITIAL_EXTRA[pack.id]}
               initialCity={city.name}
@@ -233,7 +240,7 @@ export default function PackComboPage() {
         const rows = [
           { key: 'servicos', Icon: MapPin, label: `Serviços deste pack ${where}`, hint: 'Peça cada serviço em separado', count: `${packServices.length}`, unit: packServices.length === 1 ? 'serviço' : 'serviços',
             body: <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">{packServices.map(service => <Link key={service!.slug} className={linkClass} to={`${service!.baseRoute}-${city.slug}`}>{service!.name} {where}</Link>)}</div> },
-          { key: 'packs', Icon: Layers, label: `Outros packs ${where}`, hint: 'Outras combinações com preço de pack', count: `${otherPacks.length}`, unit: otherPacks.length === 1 ? 'pack' : 'packs',
+          { key: 'packs', Icon: Layers, label: `Outros packs ${where}`, hint: 'Outras combinações na mesma visita', count: `${otherPacks.length}`, unit: otherPacks.length === 1 ? 'pack' : 'packs',
             body: <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">{otherPacks.map(link => <Link key={link.href} className={linkClass} to={link.href}>{link.label}</Link>)}</div> },
           { key: 'antes', Icon: ShieldCheck, label: 'Antes de marcar', hint: 'Preço, disponibilidade e garantia', count: `${promises.length}`, unit: 'garantias',
             body: <div className="max-w-2xl space-y-3 text-base leading-relaxed text-[#505650]">{promises.map(text => <p key={text}>{text}</p>)}</div> },
