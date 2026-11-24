@@ -301,10 +301,16 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             <>
             <div className="sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 bg-[#0B2F2A]/95 px-4 pb-3 pt-1 backdrop-blur">
               <p className="mb-2 text-sm font-semibold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></p>
-              <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+              <div className="grid grid-cols-3 gap-1.5">
                 {ENTRY.map(e => (
-                  <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#D4AF37]/60 bg-white/[0.05] pl-1.5 pr-3 text-sm font-bold text-white hover:bg-[#D4AF37]/15">
-                    <img src={e.photo} alt="" className="h-8 w-8 rounded-full object-cover" />{e.label}<Plus className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
+                  <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="group relative h-[78px] overflow-hidden rounded-xl border border-[#D4AF37]/30 text-left active:scale-[0.97]">
+                    <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+                    <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
+                    <span className="absolute inset-x-1.5 bottom-1">
+                      <span className="block truncate text-[12px] font-bold leading-tight text-white">{e.label === 'Impermeabilização' ? 'Impermeabilizar' : e.label}</span>
+                      <span className="block truncate text-[10px] font-semibold text-[#D4AF37]">{e.from(city)}</span>
+                    </span>
+                    <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-3 w-3" strokeWidth={3} /></span>
                   </button>
                 ))}
               </div>
