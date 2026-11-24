@@ -11,7 +11,8 @@ import { botQuote, listBotCities } from '@/lib/botQuote';
 import { formatEuro } from '@/data/enginePrices';
 import { buildQuizOrder, type QuoteItem } from '@/lib/quizOrder';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
-import { buildWaUrl, type QuizLeadPayload } from '@/services/submissionService';
+import { type QuizLeadPayload } from '@/services/submissionService';
+import { WHATSAPP_BASE } from '@/constants/business';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
 import QuizFurnitureImage from './QuizFurnitureImage';
 import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
@@ -191,6 +192,11 @@ function separateOf(city: string, it: BasketItem): number | null {
   const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
   const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate;
   return typeof v === 'number' ? v : null;
+}
+/** Envio falhou (sessão SEO, 25 Nov): a mensagem de WhatsApp leva o pedido inteiro, porque o bot não o encontra no CRM. */
+function fallbackMessage(city: string, items: BasketItem[], priceText: string, gifts: BasketGift[]): string {
+  const offer = groupGifts(gifts).map(g => `oferecem ${g.text}`).join('; ');
+  return `Olá! Gostaria de saber o preço e a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}. No site deu ${priceText}, com a deslocação incluída${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`;
 }
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
@@ -468,7 +474,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             <label className="block"><span className="mb-1 block text-xs font-semibold text-white/70">Telemóvel (WhatsApp)</span>
               <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
             <p className="mt-3 text-xs text-white/60">Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.</p>
-            {failed && <a href={buildWaUrl({ hasSobOrcamento: quote.sob, hasUpsellSobItem: false }, 'SITE')} className="mt-3 block rounded-xl bg-[#25D366] p-3 text-center text-sm font-bold text-white">Não conseguimos enviar. Enviar pelo WhatsApp</a>}
+            {failed && <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, quote.gifts))}`} data-tracking-source="basket_fallback" target="_blank" rel="noopener noreferrer" className="mt-3 block rounded-xl bg-[#25D366] p-3 text-center text-sm font-bold text-white">Não conseguimos enviar. Enviar pelo WhatsApp</a>}
           </>
         )}
       </div>

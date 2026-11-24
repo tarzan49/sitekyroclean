@@ -455,7 +455,7 @@ ${formData.description || 'Sem observações adicionais'}
 
     if (!success) {
       const whatsappMessage = encodeURIComponent(
-        `Olá! Tentei pedir orçamento pelo site mas houve um erro.\n\n` +
+        `Olá! Gostaria de saber o preço e a disponibilidade. Tentei pedir pelo site mas deu erro.\n\n` +
         `Nome: ${formData.name}\n` +
         `Tel: ${formData.phone}\n` +
         `Serviço: ${serviceLabel} - ${serviceTypeLabel}\n` +
@@ -473,6 +473,7 @@ ${formData.description || 'Sem observações adicionais'}
             <div className="flex gap-2 mt-2">
               <a
                 href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
+                data-tracking-source="quiz_fallback"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-base rounded-lg hover:bg-green-700"

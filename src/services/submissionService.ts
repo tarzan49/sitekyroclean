@@ -11,6 +11,7 @@ import { rugPickupFee } from '@/constants/commercialPolicy';
 import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
 import { buildQuizOrder } from '@/lib/quizOrder';
 import { WHATSAPP_BASE } from '@/constants/business';
+import { formatEuro } from '@/data/enginePrices';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
@@ -183,7 +184,7 @@ export function buildWaUrl(payload: Pick<QuizLeadPayload, 'hasSobOrcamento' | 'h
 
 export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
   const value = payload.totalPrice;
-  const price = `${Number(value.toFixed(2)).toLocaleString('pt-PT')}€`;
+  const price = formatEuro(Number(value.toFixed(2)));
   return (payload.hasSobOrcamento || payload.hasUpsellSobItem) && value > 0
     ? `${price} de subtotal conhecido + serviços sob orçamento`
     : value > 0 ? price : 'Sob orçamento';
