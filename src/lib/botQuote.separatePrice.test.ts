@@ -21,10 +21,10 @@ describe('separatePrice', () => {
   });
 });
 
-describe('separatePrice.withoutGift', () => {
-  it('sofá 3L + colchão de casal: 169€ com o anti-ácaros oferecido, 149€ sem ele (dono, 24 Nov 2026)', () => {
+describe('separatePrice com oferta da visita', () => {
+  it('sofá 3L + colchão de casal: 169€ com o anti-ácaros oferecido, sem a opção sem ele (dono, 25 Nov 2026)', () => {
     const r = botQuote({ city: 'Lisboa', items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean' }, { kind: 'mattress', size: 'casal', treatment: 'clean' }] }) as any;
     expect(r.total).toBe(169);
-    expect(r.separatePrice).toMatchObject({ separate: 209, total: 169, saving: 40, withoutGift: 149 });
+    expect(r.separatePrice).toMatchObject({ separate: 209, total: 169, saving: 40, withoutGift: null });
   });
 });

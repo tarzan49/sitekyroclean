@@ -2672,7 +2672,7 @@ function withOneStruckPrice(input, r) {
   out.visitGifts = { ...v, usual: struck, tiers: vt };
   if (x.separatePrice || sep) {
     const tiers = vt ? Object.fromEntries(["premium", "essencial"].map((k) => [k, vt[k] ? { separate: vt[k].usual, total: vt[k].total, saving: cents(vt[k].usual - vt[k].total) } : null])) : null;
-    out.separatePrice = { ...x.separatePrice ?? sep, separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: v.withoutGift };
+    out.separatePrice = { ...x.separatePrice ?? sep, separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: null };
   }
   if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
   return out;
@@ -2801,7 +2801,7 @@ function botQuoteCore(input) {
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -3066,7 +3066,7 @@ function botQuoteInner(input) {
   if (!leather) return { ...withOdor, leatherTreatment: null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
 }
-var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
+var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca uma opção sem o tratamento oferecido (dono, 25 Nov 2026). Nunca outro valor riscado, nunca chamar desconto.';
 var up9Total = (x) => {
   const n = Math.ceil(x - 1e-9);
   return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
@@ -3123,7 +3123,7 @@ function withSeparatePrice(input, r) {
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
   const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
   const withoutGift = plain === null ? null : up9Total(plain);
-  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } };
+  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, withoutGift: null, rule: SEPARATE_PRICE_RULE } };
 }
 
 // src/constants/cityCoords.ts

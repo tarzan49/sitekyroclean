@@ -81,7 +81,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   }), [pieces, seats, mattress, qty, t]);
 
   // Um só pedido ao motor do bot (deslocação incluída), o mesmo que o cesto (VisitBasket) e o bot: total, a escada
-  // de ofertas (visitGifts), um só riscado (o pedido em separado) e a opção sem a oferta (dono, 24 Nov 2026).
+  // de ofertas (visitGifts), um só riscado (o pedido em separado) (dono, 24 Nov 2026); nunca a opção sem a oferta (dono, 25 Nov).
   type Q = { ok: boolean; quote?: boolean; total?: number | null; rugCombo?: { ok: boolean; comboPrice?: number } | null; separatePrice?: { separate: number } | null; chairsWas?: number | null; visitGifts?: { gifts: BasketGift[]; usual: number; total: number; withoutGift?: number | null } | null };
   const bq = useMemo(() => {
     const list: Record<string, unknown>[] = items.map(i => ({ ...i.base, treatment: i.treatment }));
@@ -95,7 +95,6 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   const gifts = bq.ok && bq.visitGifts ? bq.visitGifts.gifts : [];
   const separate = bq.ok ? (bq.visitGifts?.usual ?? bq.separatePrice?.separate ?? bq.chairsWas ?? null) : null;
   const crossed = total !== null && separate !== null && separate > total ? up9(separate) : null;
-  const withoutGift = gifts.length && bq.visitGifts?.withoutGift != null && total !== null && bq.visitGifts.withoutGift < total ? bq.visitGifts.withoutGift : null;
 
   const describe = (p: PieceKind) => {
     if (p === 'sofa') return `sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${TREATMENTS.sofa.find(x => x.id === t.sofa)!.wa})`;
@@ -104,7 +103,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
     return rugItem ? `tapete de ${rugW.replace('.', ',')} × ${rugL.replace('.', ',')} m` : 'um tapete (envio as medidas)';
   };
   const chosen = pieces.filter(p => p !== 'rug' || rug);
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} oferecido)` : ''}` : ''}${withoutGift !== null ? `; ou ${formatEuro(withoutGift)} sem o tratamento oferecido` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${chosen.map(describe).join(', ')}${total ? `, por ${formatEuro(total)}${gifts.length ? ` (com ${groupGifts(gifts).map(g => g.text).join(' e ')} oferecido)` : ''}` : ''}.`;
   const chip = (active: boolean) => `flex min-h-[36px] items-center justify-center rounded-xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
   const q = 'mb-1.5 text-base font-semibold text-[#1A1A1A]';
 
@@ -156,7 +155,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
           </span>
           <span className="flex items-baseline gap-2">{crossed !== null && <span className="text-xl font-semibold text-[#777] line-through decoration-[#D4AF37] decoration-2">{formatEuro(crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{total === null ? <span className="text-sm text-[#D4AF37]">Sob orçamento</span> : formatEuro(total)}</span></span>
         </div>
-        {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#8B6914]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}{withoutGift !== null && <li className="font-normal text-[#666]">ou {formatEuro(withoutGift)} sem o tratamento oferecido</li>}</ul>}
+        {total !== null && gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-right text-xs font-semibold text-[#8B6914]">{groupGifts(gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-2 flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
           <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp

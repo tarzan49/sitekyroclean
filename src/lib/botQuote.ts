@@ -507,7 +507,7 @@ function withOneStruckPrice<T>(input: unknown, r: T): T {
   out.visitGifts = { ...v, usual: struck, tiers: vt };
   if (x.separatePrice || sep) {
     const tiers = vt ? Object.fromEntries((['premium', 'essencial'] as const).map(k => [k, vt[k] ? { separate: vt[k]!.usual, total: vt[k]!.total, saving: cents(vt[k]!.usual - vt[k]!.total) } : null])) : null;
-    out.separatePrice = { ...(x.separatePrice ?? sep), separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: v.withoutGift };
+    out.separatePrice = { ...(x.separatePrice ?? sep), separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: null };
   }
   if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
   return out as T;
@@ -673,7 +673,7 @@ function botQuoteCore(input: unknown): CoreQuote {
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Com withoutGift, dá logo a seguir a 2.ª opção: "ou [withoutGift]€ sem o tratamento oferecido" (dono, 24 Nov 2026).';
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -740,7 +740,8 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  // `withoutGift`: the second option, the visit price without the gift, up to the 9 (149; owner, 24 Nov 2026).
+  // `withoutGift`: the visit price without the gift, up to the 9 (149). Only for the site (the Renovado price): never offered
+  // to the client as a second option (owner, 25 Nov 2026: "estaríamos a baixar o nosso ticket").
   // Owner, 24 Nov 2026 (sofá 3L + colchão casal = 89 + 79 = 168 -> 169): with a gift the total never falls under
   // the pieces quoted each on its own (each with its travel); without the gift the visit price stays (149).
   const EXTRA_KEYS = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'];
@@ -994,7 +995,7 @@ function botQuoteInner(input: unknown) {
  * struck price both go up to the next price ending in 9; `saving` = the difference. Gifts of the visit (escada A)
  * are added to the separate price at their normal value. Also on the Premium / Essencial options (`tiers`).
  */
-export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Com withoutGift (há uma oferta da visita): primeiro o total com a oferta e, numa linha à parte, "Sem o [tratamento oferecido], fica em [withoutGift]€." Nunca outro valor riscado, nunca chamar desconto.';
+export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca uma opção sem o tratamento oferecido (dono, 25 Nov 2026). Nunca outro valor riscado, nunca chamar desconto.';
 const up9Total = (x: number) => { const n = Math.ceil(x - 1e-9); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
 type SepTier = { separate: number; total: number; saving: number };
 function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
@@ -1045,5 +1046,5 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
   // With a gift of the visit (escada A), the price without it (owner, 24 Nov 2026: "se ele não quiser, faço por 149").
   const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
   const withoutGift = plain === null ? null : up9Total(plain);
-  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, withoutGift: withoutGift !== null && withoutGift < (main?.total ?? total) ? withoutGift : null, rule: SEPARATE_PRICE_RULE } } as T;
+  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, withoutGift: null, rule: SEPARATE_PRICE_RULE } } as T;
 }
