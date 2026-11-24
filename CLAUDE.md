@@ -118,6 +118,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - Hero das páginas de SEO: só botão de WhatsApp. A página inicial tem também "Calcular o meu preço" (questionário), por baixo do WhatsApp (dono, 25 Nov). Mensagens de WhatsApp pedem sempre "o preço e a disponibilidade".
 - Google Ads otimiza para "Serviço fechado" (fechos reais, valor "para ti", via `ads-conversions-feed`: com código "ref." vai o gclid, e os fechos marcados Google Ads no CRM sem código vão pelo telefone cifrado, dono 24 Nov); o clique no WhatsApp é secundário (dono, 3 Nov).
 - Nomes dos packs nas escolhas de preço do site: **Blindado** = limpeza + Premium, **Protegido** = limpeza + Essencial, **Renovado** = só limpeza; "Premium"/"Essencial" ficam por baixo e a mensagem de WhatsApp leva os dois (`WaterproofPackPicker.tsx`; dono, 24 Nov).
+- Widget "O seu preço" de todas as páginas = a lógica do orçamento (`StepPricePicker.tsx`): localidade, material, tamanho e só depois a opção, nada escolhido, preços pelas funções do `VisitBasket.tsx` (dono, 25 Nov).
 - Barra fixa do WhatsApp em todas as páginas: acompanha sempre e só se esconde quando a secção que está no ecrã tem um botão de WhatsApp (`MobileStickyBar.tsx`; dono, 24 Nov).
 - Cliques de contacto medem-se só pelo delegado global (`data-tracking-source`), nunca `onClick` com tracking.
 - Plugins do Vite que escrevem no `dist` levam `apply: 'build'`.
