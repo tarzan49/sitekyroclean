@@ -2997,6 +2997,7 @@ function withVisitGifts(input, r) {
   const asAskedPrice = price(rawIn);
   const giftCap = cents(VISIT_GIFTS_MAX_SHARE * (asAskedPrice ?? baseTotal));
   let giftUsed = 0;
+  let capped = false;
   const gifted = /* @__PURE__ */ new Map();
   let withGifts = base.slice();
   let usualBase = baseTotal;
@@ -3011,7 +3012,10 @@ function withVisitGifts(input, r) {
       if (priced2 === null || priced2 <= usualBase) continue;
       const mattresses = c.piece === "mattress" ? Number(rec(i).qty) || 1 : 0;
       const gift = { piece: c.piece, treatment: c.treatment, normal: c.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - usualBase) };
-      if (c.piece !== "mattress" && giftUsed + gift.normal > giftCap + 1e-9) continue;
+      if (c.piece !== "mattress" && giftUsed + gift.normal > giftCap + 1e-9) {
+        capped = true;
+        continue;
+      }
       const better = !best || c.piece === "mattress" !== (best.gift.piece === "mattress") ? !best || c.piece === "mattress" : gift.normal !== best.gift.normal ? gift.normal < best.gift.normal : keyOf(n) < keyOf(best.n);
       if (better) best = { n, gift, items, priced: priced2 };
     }
@@ -3021,7 +3025,7 @@ function withVisitGifts(input, r) {
     withGifts = best.items;
     usualBase = best.priced;
   }
-  if (!gifted.size) return none;
+  if (!gifted.size && !(capped && !q.rugCombo)) return none;
   const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
@@ -3061,6 +3065,7 @@ function withVisitGifts(input, r) {
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   const m = gifts.find((g) => g.piece === "mattress");
+  if (!gifts.length) return { ...out, visitGifts: null, mattressMiteOffer: null };
   return { ...out, visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 function withAskedDiscount(_input, r) {
