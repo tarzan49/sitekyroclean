@@ -110,10 +110,10 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
             })}
           </div>
         ) : (
-          <div className="flex items-center justify-between rounded-2xl border-2 border-[#E5E0D3] bg-white p-2">
-            <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-12 w-12 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Minus className="h-5 w-5" /></button>
+          <div className="flex items-center justify-between rounded-2xl border-2 border-[#E5E0D3] bg-white p-1 md:p-2">
+            <button type="button" aria-label="Menos uma cadeira" onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] md:h-12 md:w-12 text-[#1A1A1A] hover:bg-[#E9E3D3]"><Minus className="h-5 w-5" /></button>
             <span className="flex items-center gap-2 text-2xl font-semibold text-[#1A1A1A]"><ItemIcon className="h-5 w-5 text-[#D4AF37]" />{qty}</span>
-            <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-12 w-12 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-5 w-5" /></button>
+            <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-10 w-10 place-items-center rounded-xl bg-[#F3F0E7] md:h-12 md:w-12 text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-5 w-5" /></button>
           </div>
         )}
         {onMore && <button type="button" onClick={() => onMore({ kind, size, qty, extra })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
@@ -132,7 +132,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
               <button key={o.extra} type="button" role="radio" aria-checked={active} onClick={() => setExtra(o.extra)}
                 className={`relative flex min-h-[58px] items-stretch rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
                 {o.top && <span className="absolute -top-3 right-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
-                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="w-[76px] shrink-0 rounded-l-[14px] object-cover md:w-[100px]" />
+                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="h-0 min-h-full w-[76px] shrink-0 rounded-l-[14px] object-cover md:w-[100px]" />
                 <span className="flex min-w-0 flex-1 flex-col justify-center px-3 py-2">
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>
                   <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
