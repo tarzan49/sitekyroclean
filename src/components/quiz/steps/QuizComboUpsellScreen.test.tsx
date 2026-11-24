@@ -74,11 +74,12 @@ describe('final upsell navigation', () => {
     expect(savedItems().some(item => item.mattressSize)).toBe(false);
   });
 
-  it('keeps quote-only extras at zero and charges table price below the minimum', () => {
+  it('prices the rug with the bot engine (dono, 24 Nov 2026) and charges table price below the minimum', () => {
     render(<Harness />);
     addCarpet();
-    expect(screen.getByRole('button', { name: /Tapete.*sob orçamento/ })).toBeTruthy();
-    expect(savedItems().find(item => item.id === 'carpet')?.price).toBe(0);
+    // 2 × 3 m na mesma visita: lavagem do motor sem 2.ª deslocação = 59€.
+    expect(screen.getByRole('button', { name: /Tapete.*59€/ })).toBeTruthy();
+    expect(savedItems().find(item => item.id === 'carpet')?.price).toBe(59);
     click(/^Colchão/); confirm();
     expect(savedItems().find(item => item.mattressSize === 'casal')?.price).toBe(69);
     expect(screen.queryByText('Subtotal do extra')).toBeNull();

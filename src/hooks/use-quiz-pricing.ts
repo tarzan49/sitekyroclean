@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
 import { calcSofaUnitPrice, calcMattressUnitPrice, calcChairAntiAcaros, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems, carpetTotalArea } from '@/components/quiz/quizHelpers';
+import { siteRugPrice } from '@/lib/siteRugPrice';
 
 export function useQuizPricing(
   formData: QuizFormData,
@@ -14,6 +15,12 @@ export function useQuizPricing(
   carpetItems: CarpetItem[],
 ) {
   // Calculate total price early for analytics (moved up for hook dependency).
+  // Preço do tapete/alcatifa pelo motor do bot (rugEstimate.homePrice, deslocação incluída); null = sob orçamento.
+  const carpetEnginePrice = useMemo(() => formData.service !== 'carpet' ? null : siteRugPrice(
+    carpetItems.map(it => ({ width: parseFloat(String(it.largura).replace(',', '.')) || 0, length: parseFloat(String(it.comprimento).replace(',', '.')) || 0 })),
+    formData.location, false, formData.carpetKind === 'alcatifa' ? 'carpet' : 'rug',
+  ), [formData.service, formData.location, formData.carpetKind, carpetItems]);
+
   const calculateServicePrice = useMemo(() => {
     let price = 0;
 
@@ -62,13 +69,14 @@ export function useQuizPricing(
       }
 
       case 'carpet': {
-        // Sem preço fixo (2026-09-06): tapetes ficam sempre sob orçamento (ver hasSobOrcamento).
+        // Tapetes e alcatifas com o preço do motor do bot, deslocação incluída (dono, 24 Nov 2026).
+        price += carpetEnginePrice ?? 0;
         break;
       }
     }
 
     return price;
-  }, [formData, sofaItems, mattressItems, carpetItems]);
+  }, [formData, sofaItems, mattressItems, carpetItems, carpetEnginePrice]);
 
   // Calculate travel cost: uses expanded locationPrices from QuizTypes.
   // Taxa base antes da oferta por valor dos serviços. Antes de escolher localização não há
@@ -126,7 +134,7 @@ export function useQuizPricing(
   const chairAddonNeedsQuote = isChairService && chairAddonQty > 0 && chairAddonCalc(chairAddonQty) === null;
   const hasSobOrcamento =
     sofaNeedsQuote ||
-    (formData.service === 'carpet' && carpetHasValidItems(carpetItems)) ||
+    (formData.service === 'carpet' && carpetHasValidItems(carpetItems) && carpetEnginePrice === null) ||
     chairPrimaryNeedsQuote ||
     chairAddonNeedsQuote;
   // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofá de canto, em U ou modular)

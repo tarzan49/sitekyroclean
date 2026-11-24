@@ -5,6 +5,7 @@ import { cities, cityPrep } from '@/data/serviceCatalog';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import QuizTopBadge from '@/components/quiz/QuizTopBadge';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
+import { withRugEngine, RUG_PRICE_NOTE, CARPET_PRICE_NOTE } from '@/lib/siteRugPrice';
 import { calculateCustomPack, makePackItem, PACK_KIND_LABEL, type PackKind, type CustomPackItem, type PackExtra } from '@/lib/customPack';
 import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_PRICES, PACK_PERKS_ON } from '@/constants/packPerks';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
@@ -109,7 +110,10 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
     groupOrderRef.current = [];
   }, [initialCity, initialExtra, initialKinds]);
 
-  const prices = calculateCustomPack(items, city);
+  // Tapetes e alcatifas pelo motor do bot (dono, 24 Nov 2026).
+  const prices = withRugEngine(calculateCustomPack(items, city), items, city);
+  /** Só tapetes/alcatifas com preço do motor: a deslocação já está no preço. */
+  const travelIncluded = prices.travel === null && !prices.quote && items.length > 0 && items.every(i => i.kind === 'rug' || i.kind === 'carpet');
   /** Há artigos de outro tipo além do principal (os únicos com preço de pack). */
   const hasExtras = prices.lines.some(line => !line.isMain);
   const patch = (id: string, values: Partial<CustomPackItem>) => setItems(old => old.map(item => item.id === id ? { ...item, ...values } : item));
@@ -145,7 +149,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
     ...prices.lines.map(l => `${l.label}: ${l.amount === null ? 'sob orçamento' : money(l.amount)}${l.perkApplied ? ` (preço de pack, tabela ${money(l.tablePrice ?? 0)})` : ''}${!l.perkApplied && l.perkNote ? ` (preço de pack: ${l.perkNote.toLowerCase()})` : ''}${l.quote && l.amount !== null ? ' + extra sob orçamento' : ''}`),
     `Serviços: ${money(prices.subtotal)}`,
     ...(prices.savings > 0 ? [`Poupança do pack: ${money(prices.savings)}`] : []),
-    `Deslocação: ${prices.travel === null ? 'a confirmar' : money(prices.travel)}`,
+    `Deslocação: ${travelIncluded ? 'incluída' : prices.travel === null ? 'a confirmar' : money(prices.travel)}`,
     `${prices.quote ? 'Subtotal conhecido' : 'Estimativa total'}: ${money(prices.total)}${prices.quote ? ' + valores sob orçamento' : ''}`,
     'Podem confirmar o valor e a disponibilidade?',
   ].join('\n');
@@ -187,7 +191,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
           const sizeOptions = group.kind === 'sofa' ? sofaPrices : group.kind === 'mattress' ? mattressPrices : null;
           const measured = group.kind === 'rug' || group.kind === 'carpet';
           const isMain = lead.kind === prices.mainKind;
-          // Tapete acrescentado: fica sob orçamento, a regalia é por m².
+          // Tapete acrescentado: preço do motor do bot (lavagem, sem 2.ª deslocação).
           const rugPerkNote = lines.find(l => !l.perkApplied && l.perkNote)?.perkNote ?? null;
           const perk = lines.some(l => l.perkApplied) || rugPerkNote !== null;
           const amount = lines.some(l => l.amount === null) ? null : lines.reduce((sum, l) => sum + (l.amount ?? 0), 0);
@@ -245,7 +249,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
                 <label className="text-xs text-white/60">Comprimento (m)<input inputMode="decimal" className="mt-1 h-10 w-full rounded-lg border border-white/20 bg-white/[0.04] px-3 text-base text-white" value={lead.length} onChange={e => patch(lead.id, { length: e.target.value })} /></label>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[11px] text-white/60">Sempre sob orçamento.</p>
+                <p className="text-[11px] text-white/60">{group.kind === 'carpet' ? CARPET_PRICE_NOTE : RUG_PRICE_NOTE}</p>
                 {groups.filter(g => g.kind === group.kind).at(-1)?.key === group.key && <button type="button" onClick={() => add(group.kind)}
                   className="inline-flex h-8 items-center gap-1 rounded-full border border-dashed border-[#D4AF37]/60 px-2.5 text-xs font-semibold text-[#D4AF37] transition-colors touch-manipulation hover:border-[#D4AF37] hover:bg-[#D4AF37]/10">
                   <Plus className="h-3 w-3" />Outra peça com medidas diferentes
@@ -321,7 +325,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
             </li>)}
           </ul>
           <dl className="space-y-1 border-t border-white/10 pt-2 text-sm lg:pt-1">
-            <div className="flex items-baseline justify-between"><dt className="text-white/60">Deslocação</dt><dd className="font-semibold tabular-nums">{prices.travel === null ? 'a confirmar' : prices.travel === 0 ? 'Grátis' : money(prices.travel)}</dd></div>
+            <div className="flex items-baseline justify-between"><dt className="text-white/60">Deslocação</dt><dd className="font-semibold tabular-nums">{travelIncluded ? 'Incluída' : prices.travel === null ? 'a confirmar' : prices.travel === 0 ? 'Grátis' : money(prices.travel)}</dd></div>
             {prices.savings > 0 && <div className="flex items-baseline justify-between font-semibold text-[#D4AF37]"><dt className="flex items-center gap-1"><BadgePercent className="h-4 w-4" />Poupa com o pack</dt><dd className="tabular-nums">{money(prices.savings)}</dd></div>}
           </dl>
           {prices.quote && <p className="mt-1.5 text-xs text-[#D4AF37]">+ artigos ou extras sob orçamento</p>}

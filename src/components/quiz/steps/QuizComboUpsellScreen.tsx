@@ -12,6 +12,7 @@ import {
 } from '@/components/quiz/quizHelpers';
 import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE, PACK_PERK_RUG_SET_M2, perkMattressPrice, perkRugPaidArea } from '@/constants/packPerks';
 import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
+import { siteRugWashing, RUG_PRICE_NOTE } from '@/lib/siteRugPrice';
 
 interface QuizComboUpsellScreenProps {
   travelFee?: number;
@@ -144,6 +145,8 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
   const chairsCleanPrice = chairsQty > 0 ? pricing.chairs.amount : 0;
   const chairsFree = pricing.chairs.free;
   const rugPerk = pricing.rugPerk;
+  // Tapete na mesma visita: lavagem pelo motor do bot, sem 2.ª deslocação (dono, 24 Nov 2026).
+  const rugWashing = siteRugWashing(rugPerk ? perkRugPaidArea(carpetTotalAreaValue) : carpetTotalAreaValue, travelFee);
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
@@ -161,7 +164,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
     ? `${chairsQty} cadeira${chairsQty > 1 ? 's' : ''}`
     : 'Escolher quantidade';
   const carpetSummary = carpetValidCount > 0
-    ? `${carpetValidCount} tapete${carpetValidCount > 1 ? 's' : ''} · sob orçamento`
+    ? `${carpetValidCount} tapete${carpetValidCount > 1 ? 's' : ''}${rugWashing !== null ? ` · ${rugWashing}€` : ''}`
     : 'Indicar medidas';
 
   // Preço de tabela + preço de pack, por artigo, no resumo. Sem escolha
@@ -250,8 +253,8 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
         carpetArea: String(Math.round(carpetTotalAreaValue * 100) / 100),
         carpetItems,
         qty: carpetValidCount,
-        price: 0,
-        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)${rugPerk ? ` · ${fmt(carpetTotalAreaValue)} m², paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m²` : ''}`,
+        price: rugWashing ?? 0,
+        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''}${rugWashing !== null ? ` (${rugWashing}€)` : ' (sob orçamento)'}${rugPerk ? ` · ${fmt(carpetTotalAreaValue)} m², paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m²` : ''}`,
       });
     }
     setUpsellItems(items);
@@ -297,7 +300,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
         {perkEligible && view === 'mattress' && <p className="text-sm text-white/80 text-center">Casal: {perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € nesta visita. Poupa {casalSeparate - perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € face a uma visita separada de {casalSeparate} €.</p>}
-        {rugPerk && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada {PACK_PERK_RUG_SET_M2} m², paga {PACK_PERK_RUG_SET_M2 - 1}. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m².`}</p>}
+        {rugPerk && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada {PACK_PERK_RUG_SET_M2} m², paga {PACK_PERK_RUG_SET_M2 - 1}. Preço pelo motor, com as medidas.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m².`}</p>}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
           // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
@@ -446,7 +449,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
     { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, selected: mattressQtyTotal > 0 },
     { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaPriceLine, selected: sofaQtyTotal > 0 },
     { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, selected: chairsQty > 0 },
-    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: rugPerk ? PACK_PERK_RUG_NOTE : 'Sob orçamento', selected: carpetValidCount > 0 },
+    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: rugPerk ? PACK_PERK_RUG_NOTE : RUG_PRICE_NOTE, selected: carpetValidCount > 0 },
   ];
 
   const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);

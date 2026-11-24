@@ -14,6 +14,7 @@ import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
 import { getRecaptchaTokenSafe } from '@/lib/recaptcha';
+import { siteRugPrice } from '@/lib/siteRugPrice';
 
 /** All the data the submission pipeline needs. Assembled by useQuizSubmission. */
 export interface QuizLeadPayload {
@@ -251,20 +252,24 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
       }
     }
   } else if (service === 'carpet') {
-    // Sem preço fixo (2026-09-06): cada tapete medido vira a sua própria linha,
-    // sempre sob orçamento, nunca um total calculado por m².
+    // Preço do motor do bot, deslocação incluída (dono, 24 Nov 2026). Uma peça = o valor na própria
+    // linha; várias = cada uma com as medidas e o total do motor numa linha à parte.
+    const measured = carpetItems.filter(item => carpetItemArea(item) !== null);
+    const enginePrice = siteRugPrice(measured.map(it => ({ width: parseFloat(String(it.largura).replace(',', '.')) || 0, length: parseFloat(String(it.comprimento).replace(',', '.')) || 0 })), finalLocation, false, payload.carpetKind === 'alcatifa' ? 'carpet' : 'rug');
     carpetItems.forEach((item, i) => {
       const area = carpetItemArea(item);
       if (area === null) return;
-      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${carpetItemMeasure(item)} (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: null, total: null });
+      const own = enginePrice !== null && measured.length === 1 ? enginePrice : null;
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${carpetItemMeasure(item)} (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: own, total: own });
     });
+    if (enginePrice !== null && measured.length > 1) receiptLines.push({ label: `Lavagem das ${measured.length} peças, com a deslocação`, qty: 1, unitPrice: enginePrice, total: enginePrice });
     // Recolha e entrega (dono, 2026-10-05; 20€ desde 2026-10-10): o único valor
     // fixo de um pedido de tapetes. Desde 2026-10-10 já não diz "com a
     // deslocação": o bot soma-a ao preço em casa, que já a inclui (dono: "sim
     // tira"). A deslocação dos tapetes e das alcatifas é sob orçamento.
     const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems), finalLocation) : null;
     if (pickupFee !== null) receiptLines.push({ label: 'Recolha e entrega (até 5 dias úteis)', qty: 1, unitPrice: pickupFee, total: pickupFee });
-    else if (finalLocation) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: null, total: null });
+    else if (finalLocation) receiptLines.push({ label: `Deslocação: ${finalLocation} (incluída)`, qty: 1, unitPrice: null, total: null });
   }
 
   upsellItems.forEach(item => {

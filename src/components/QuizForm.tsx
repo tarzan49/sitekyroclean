@@ -408,7 +408,7 @@ Serviço: ${serviceLabel}
 Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
-Deslocação: ${rugPickupCost !== null ? `incluída na recolha e entrega (${rugPickupCost}€)` : rugTravelOnQuote ? 'sob orçamento' : `${finalTravelCost}€${smallOrderSurchargeCost ? ` (inclui ${smallOrderSurchargeCost}€ por ser um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ nesta zona)` : ''}`}
+Deslocação: ${rugPickupCost !== null ? `incluída na recolha e entrega (${rugPickupCost}€)` : rugTravelOnQuote ? 'incluída no preço' : `${finalTravelCost}€${smallOrderSurchargeCost ? ` (inclui ${smallOrderSurchargeCost}€ por ser um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ nesta zona)` : ''}`}
 ESTIMATIVA: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
