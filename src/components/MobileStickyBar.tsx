@@ -34,10 +34,11 @@ const MobileStickyBar = () => {
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
     schedule();
-    const late = window.setTimeout(schedule, 1200);
+    // Páginas que demoram a montar: volta a ver, senão a barra ficava por cima do botão do topo até se mexer no ecrã.
+    const late = [400, 1200, 2500, 4500, 8000].map(ms => window.setTimeout(schedule, ms));
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
-    return () => { window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); window.clearTimeout(late); if (frame) cancelAnimationFrame(frame); };
+    return () => { window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); late.forEach(t => window.clearTimeout(t)); if (frame) cancelAnimationFrame(frame); };
   }, [pathname]);
 
   if (pathname === '/obrigado' || pathname.startsWith('/admin')) return null;
