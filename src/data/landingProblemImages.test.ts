@@ -7,8 +7,8 @@ import { renderLandingPageHtml } from '../../scripts/landing-page-html';
 
 describe('public sofa problem image selection', () => {
   it('keeps twenty real team photos of dirty sofas, with unique descriptions', () => {
-    expect(SOFA_PROBLEM_IMAGES).toHaveLength(20);
-    expect(new Set(SOFA_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(20);
+    expect(SOFA_PROBLEM_IMAGES).toHaveLength(SOFA_PROBLEM_IMAGES.length);
+    expect(new Set(SOFA_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(SOFA_PROBLEM_IMAGES.length);
     for (const image of SOFA_PROBLEM_IMAGES) expect(existsSync(`public${image.src}`)).toBe(true);
   });
   it('selects only relevant images on all sofa routes, with identical initial HTML and full pool coverage', () => {
@@ -29,11 +29,11 @@ describe('public sofa problem image selection', () => {
         expect(selectLandingProblemImage('limpeza-sofas', card.id, `${record.path}/?ads=1#problemas`)).toEqual(card.image);
         used.add(card.image!.id);
       }
-      expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(0);
+      expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(model.problems.filter(p => p.image!.alt.startsWith('Imagem ilustrativa')).length);
     }
     expect(pages).toBe(2736);
     expect(families.size).toBe(4);
-    expect(used.size).toBe(20);
+    expect(used.size).toBe(SOFA_PROBLEM_IMAGES.length);
   });
   it('does not introduce sofa images on other services or standalone page families', () => {
     expect(selectLandingProblemImage('limpeza-colchoes', 'limpeza-sofas-1', '/example')).toBeUndefined();

@@ -1,10 +1,18 @@
 /** Illustrative library shared by React and prerender. Ten images per problem. */
 export const ALCATIFA_PROBLEM_IMAGES = [
   {
-    "id": "alcatifa-cafe-01",
+    "id": "alcatifa-cafe-v1",
     "problemId": "limpeza-alcatifas-2",
-    "src": "/images/landing-problems/alcatifas/alcatifa-cafe-01.webp",
-    "alt": "Alcatifa clara com mancha acastanhada e salpicos"
+    "src": "/images/landing-problems/alcatifas/alcatifa-cafe-v1.webp",
+    "alt": "Bocal a apagar uma mancha grande na alcatifa azul",
+    "video": "/videos/landing-problems/alcatifas/alcatifa-cafe-v1.mp4"
+  },
+  {
+    "id": "alcatifa-cafe-v2",
+    "problemId": "limpeza-alcatifas-2",
+    "src": "/images/landing-problems/alcatifas/alcatifa-cafe-v2.webp",
+    "alt": "Mancha escura e curva numa alcatifa bege",
+    "video": "/videos/landing-problems/alcatifas/alcatifa-cafe-v2.mp4"
   },
   {
     "id": "alcatifa-escadas-01",
@@ -67,69 +75,17 @@ export const ALCATIFA_PROBLEM_IMAGES = [
     "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido antracite"
   },
   {
-    "id": "alcatifa-passagem-01",
+    "id": "alcatifa-passagem-v1",
     "problemId": "limpeza-alcatifas-1",
-    "src": "/images/landing-problems/alcatifas/alcatifa-passagem-01.webp",
-    "alt": "Alcatifa de sala com manchas escuras de passagem"
+    "src": "/images/landing-problems/alcatifas/alcatifa-passagem-v1.webp",
+    "alt": "Extração numa zona de passagem escurecida da alcatifa",
+    "video": "/videos/landing-problems/alcatifas/alcatifa-passagem-v1.mp4"
   },
   {
-    "id": "alcatifa-rodapes-01",
+    "id": "alcatifa-rodapes-v2",
     "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-01.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido bege"
-  },
-  {
-    "id": "alcatifa-rodapes-02",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-02.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido cinzento-claro"
-  },
-  {
-    "id": "alcatifa-rodapes-03",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-03.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido taupe"
-  },
-  {
-    "id": "alcatifa-rodapes-04",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-04.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido azul"
-  },
-  {
-    "id": "alcatifa-rodapes-05",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-05.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido creme"
-  },
-  {
-    "id": "alcatifa-rodapes-06",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-06.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido cinzento"
-  },
-  {
-    "id": "alcatifa-rodapes-07",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-07.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido areia"
-  },
-  {
-    "id": "alcatifa-rodapes-08",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-08.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido verde-azeitona"
-  },
-  {
-    "id": "alcatifa-rodapes-09",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-09.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido castanho"
-  },
-  {
-    "id": "alcatifa-rodapes-10",
-    "problemId": "limpeza-alcatifas-3",
-    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-10.webp",
-    "alt": "Imagem ilustrativa: Pó junto ao rodapé da alcatifa em tecido antracite"
+    "src": "/images/landing-problems/alcatifas/alcatifa-rodapes-v2.webp",
+    "alt": "Água suja no bocal junto ao rodapé da alcatifa",
+    "video": "/videos/landing-problems/alcatifas/alcatifa-rodapes-v2.mp4"
   }
 ] as const;

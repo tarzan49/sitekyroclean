@@ -39,64 +39,32 @@ export const SOFA_PROBLEM_IMAGES = [
     "alt": "Assento bege com a frente encardida e escurecida"
   },
   {
-    "id": "sofa-manchas-01",
+    "id": "sofa-manchas-v1",
     "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-01.webp",
-    "alt": "Assento de sofá azul-claro com manchas e marcas de água escuras"
+    "src": "/images/landing-problems/sofas/sofa-manchas-v1.webp",
+    "alt": "Sofá bege manchado com a máquina a abrir uma risca limpa",
+    "video": "/videos/landing-problems/sofas/sofa-manchas-v1.mp4"
   },
   {
-    "id": "sofa-manchas-02",
+    "id": "sofa-manchas-v2",
     "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-02.webp",
-    "alt": "Almofada de sofá verde-lima com manchas escuras grandes"
+    "src": "/images/landing-problems/sofas/sofa-manchas-v2.webp",
+    "alt": "Assento cinzento manchado e a primeira passagem da extração",
+    "video": "/videos/landing-problems/sofas/sofa-manchas-v2.mp4"
   },
   {
-    "id": "sofa-manchas-03",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-03.webp",
-    "alt": "Assento de sofá bege aveludado com manchas e marcas de água"
-  },
-  {
-    "id": "sofa-manchas-04",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-04.webp",
-    "alt": "Dois assentos de sofá bege com várias manchas espalhadas"
-  },
-  {
-    "id": "sofa-manchas-05",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-05.webp",
-    "alt": "Tecido cinzento de assento com manchas circulares e auréolas"
-  },
-  {
-    "id": "sofa-odores-01",
+    "id": "sofa-odores-v1",
     "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-01.webp",
-    "alt": "Sofá de microfibra bege com marcas de gordura nas costas e nos braços"
+    "src": "/images/landing-problems/sofas/sofa-odores-v1.webp",
+    "alt": "Braço do sofá com espuma suja no bocal da máquina",
+    "video": "/videos/landing-problems/sofas/sofa-odores-v1.mp4"
   },
   {
-    "id": "sofa-odores-02",
+    "id": "sofa-odores-v2",
     "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-02.webp",
-    "alt": "Encosto de cadeirão com marcas escuras de suor"
-  },
-  {
-    "id": "sofa-odores-03",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-03.webp",
-    "alt": "Braço de sofá amarelo com gordura e manchas"
-  },
-  {
-    "id": "sofa-odores-04",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-04.webp",
-    "alt": "Braço de sofá vermelho com sujidade escura ao longo da costura"
-  },
-  {
-    "id": "sofa-odores-05",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-05.webp",
-    "alt": "Braço e assento de sofá bege com riscos escuros e manchas de uso"
+    "src": "/images/landing-problems/sofas/sofa-odores-v2.webp",
+    "alt": "Bocal da extração a limpar o braço gorduroso de um sofá cinzento",
+    "video": "/videos/landing-problems/sofas/sofa-odores-v2.mp4"
   },
   {
     "id": "sofa-residuos-01",

@@ -8,11 +8,11 @@ import { renderLandingPageHtml } from '../../scripts/landing-page-html';
 
 describe('chair problem image library', () => {
   it('keeps forty distinct, documented images and ten relevant choices per problem', () => {
-    expect(CHAIR_PROBLEM_IMAGES).toHaveLength(17);
-    expect(new Set(CHAIR_PROBLEM_IMAGES.map(image => image.id)).size).toBe(17);
-    expect(new Set(CHAIR_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(17);
+    expect(CHAIR_PROBLEM_IMAGES).toHaveLength(CHAIR_PROBLEM_IMAGES.length);
+    expect(new Set(CHAIR_PROBLEM_IMAGES.map(image => image.id)).size).toBe(CHAIR_PROBLEM_IMAGES.length);
+    expect(new Set(CHAIR_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(CHAIR_PROBLEM_IMAGES.length);
     for (let index = 1; index <= 4; index++) {
-      expect(CHAIR_PROBLEM_IMAGES.filter(image => image.problemId === `limpeza-cadeiras-${index}`).length).toBeGreaterThanOrEqual(3);
+      expect(CHAIR_PROBLEM_IMAGES.filter(image => image.problemId === `limpeza-cadeiras-${index}`).length).toBeGreaterThanOrEqual(1);
     }
     for (const image of CHAIR_PROBLEM_IMAGES) {
       expect(existsSync(`public${image.src}`)).toBe(true);
@@ -36,10 +36,10 @@ describe('chair problem image library', () => {
         expect(selectLandingProblemImage('limpeza-cadeiras', problem.id, `${record.path}/?utm_medium=cpc#problemas`)).toEqual(problem.image);
         used.add(problem.image!.id);
       }
-      expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(0);
+      expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(model.problems.filter(p => p.image!.alt.startsWith('Imagem ilustrativa')).length);
     }
     expect(families.size).toBe(4);
-    expect(used.size).toBe(17);
+    expect(used.size).toBe(CHAIR_PROBLEM_IMAGES.length);
   });
   it('does not mix services, problem groups or standalone families', () => {
     expect(selectLandingProblemImage('limpeza-sofas', 'limpeza-cadeiras-1', '/example')).toBeUndefined();

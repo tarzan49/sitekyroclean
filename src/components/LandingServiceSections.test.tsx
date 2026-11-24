@@ -36,9 +36,9 @@ describe('landing section integration', () => {
       expect(model).not.toBeNull();
       installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      const images = [...container.querySelectorAll('[data-problem-id] img')];
+      const images = [...container.querySelectorAll('[data-problem-id] img, [data-problem-id] video')];
       expect(images).toHaveLength(4);
-      expect(images.map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
+      expect(images.map(img => ({ src: img.getAttribute(img.tagName === 'VIDEO' ? 'poster' : 'src'), alt: img.getAttribute(img.tagName === 'VIDEO' ? 'aria-label' : 'alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
       expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
       cleanup();
     }
@@ -49,9 +49,9 @@ describe('landing section integration', () => {
       expect(model).not.toBeNull();
       installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      const images = [...container.querySelectorAll('[data-problem-id] img')];
+      const images = [...container.querySelectorAll('[data-problem-id] img, [data-problem-id] video')];
       expect(images).toHaveLength(4);
-      expect(images.map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
+      expect(images.map(img => ({ src: img.getAttribute(img.tagName === 'VIDEO' ? 'poster' : 'src'), alt: img.getAttribute(img.tagName === 'VIDEO' ? 'aria-label' : 'alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
       expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
       cleanup();
     }
@@ -67,10 +67,10 @@ describe('landing section integration', () => {
     ] as const) {
       installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      expect(container.querySelectorAll('img[src^="/images/landing-problems/sofas/"]')).toHaveLength(expected);
+      expect(container.querySelectorAll('img[src^="/images/landing-problems/sofas/"], video[poster^="/images/landing-problems/sofas/"]')).toHaveLength(expected);
       if (expected) {
         const selected = getLandingPageModel(route)!.problems.map(card => card.image!);
-        expect([...container.querySelectorAll('[data-problem-id] img')].map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(selected.map(image => ({ src: image.src, alt: image.alt })));
+        expect([...container.querySelectorAll('[data-problem-id] img, [data-problem-id] video')].map(img => ({ src: img.getAttribute(img.tagName === 'VIDEO' ? 'poster' : 'src'), alt: img.getAttribute(img.tagName === 'VIDEO' ? 'aria-label' : 'alt') }))).toEqual(selected.map(image => ({ src: image.src, alt: image.alt })));
       }
       expect(container.querySelectorAll('[data-problem-id]')).toHaveLength(4);
       cleanup();
@@ -124,6 +124,6 @@ describe('landing section integration', () => {
     await screen.findByText('O seu preço', { exact: false });
     expect(container.querySelector('#precos')).not.toBeNull();
     expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
-    expect([...container.querySelectorAll('[data-problem-id] img')]).toHaveLength(4);
+    expect([...container.querySelectorAll('[data-problem-id] img, [data-problem-id] video')]).toHaveLength(4);
   });
 });

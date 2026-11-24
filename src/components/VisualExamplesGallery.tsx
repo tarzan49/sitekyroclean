@@ -12,7 +12,7 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
   const [selected, setSelected] = useState<number | null>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const photo = (index: number, loading: "lazy" | "eager" = "lazy") => (
-    <div className={`relative overflow-hidden ${loading === "eager" && examples[index].video ? "mx-auto aspect-[9/16] h-[65dvh] max-w-full" : "aspect-square bg-[#173629]"}`}>
+    <div className={`relative overflow-hidden ${loading === "eager" ? (examples[index].video ? "mx-auto aspect-[9/16] h-[65dvh] max-w-full" : "aspect-video") : "aspect-square bg-[#173629]"}`}>
       {/* Vídeo real (impermeabilização, dono 24 Nov): em ciclo, sem som; a fotografia é o poster e o que fica no HTML estático. */}
       {examples[index].video ? <video src={examples[index].video} poster={examples[index].src} autoPlay muted loop playsInline preload={loading === "lazy" ? "metadata" : "auto"} aria-label={examples[index].alt} className={`absolute w-full h-full !max-w-none ${loading === "eager" ? "object-contain" : "object-cover"}`} /> : <img
         src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
@@ -24,8 +24,8 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
         decoding="async"
         width={400}
         height={400}
-        className="absolute w-full h-full object-cover !max-w-none"
-        style={examples[index].imageStyle}
+        className={`absolute w-full h-full !max-w-none ${loading === "eager" ? "object-contain" : "object-cover"}`}
+        style={loading === "eager" ? undefined : examples[index].imageStyle}
       />}
     </div>
   );
