@@ -55,8 +55,11 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
     }
     const treatment = treat ? 'clean+anti-acaros' : 'clean';
     const items = kind === 'mattress' ? mItems(treatment) : [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: count } : { kind: 'sofa', size, treatment, qty: count }];
-    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
+    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
+    // "Só limpeza" é mesmo só a limpeza: com várias peças o motor junta ofertas (escada A) ao total;
+    // aqui usa-se o total sem a oferta, senão a opção sem tratamento já trazia o anti-ácaros (dono, 25 Nov).
+    const plain = !treat && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
+    return [o.id, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
   })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, count, mCounts, city]);
   // Preço riscado do bot: limpeza + anti-ácaros feito à parte (40€ por colchão; dono, 24 Nov).
   const struck = useMemo(() => {

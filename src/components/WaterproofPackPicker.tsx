@@ -59,8 +59,10 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     if (kind === 'sofa' && size === PHOTO_SIZE) return [o.extra, null];
     const treatment = o.extra === 'premium' ? 'clean+premium' : o.extra === 'essencial' ? 'clean+essencial' : 'clean';
     const item = kind === 'sofa' ? (size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: count } : { kind: 'sofa', size, treatment, qty: count }) : { kind: 'chairs', qty, treatment };
-    const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return [o.extra, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
+    const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
+    // "Renovado" é só a limpeza: sem a oferta que o motor junta com várias peças (dono, 25 Nov).
+    const plain = o.extra === 'none' && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
+    return [o.extra, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
   })) as Record<PackExtra, number | null>, [kind, size, qty, count, city]);
 
   // "Em vez de": a limpeza e a impermeabilização pedidas em separado (cada uma com a sua deslocação), pelo bot.
