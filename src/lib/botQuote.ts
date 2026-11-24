@@ -1126,7 +1126,8 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
     if (tier && !asWp) return [i]; // not waterproofable (mattress, rug): only its cleaning
     return asWp ? [{ ...rec(i), treatment: 'clean' }, asWp] : null;
   };
-  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + g.normal, 0);
+  // The leather treatment is already in each leather sofa's own price (leather: true): adding the gift would count it twice.
+  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + (g.treatment === 'tratamento-pele' ? 0 : g.normal), 0);
   const sepOf = (tier?: 'premium' | 'essencial'): number | null => {
     const parts: unknown[] = [];
     for (const i of items) { const v = visits(i, tier); if (!v) return null; parts.push(...v); }
