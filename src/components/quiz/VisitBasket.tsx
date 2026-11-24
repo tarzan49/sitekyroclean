@@ -153,9 +153,9 @@ export function quoteBasket(city: string, items: BasketItem[]) {
 const aloneTotal = (city: string, it: BasketItem) => { const q = quoteBasket(city, [it]); return q.total === null || q.sob ? null : q.total; };
 /** O que uma peça a mais faz aparecer na escada A (dono, 25 Nov: "em cada [cartão] estar uma promoção"): as ofertas
  *  novas e quanto valem, pelo motor. */
-export function giftsUnlocked(city: string, items: BasketItem[], add: BasketItem): { text: string; value: number; normal: number } | null {
+export function giftsUnlocked(city: string, items: BasketItem[], add: BasketItem | BasketItem[]): { text: string; value: number; normal: number } | null {
   const before = new Map(groupGifts(quoteBasket(city, items).gifts).map(g => [g.key, g.normal]));
-  const after = groupGifts(quoteBasket(city, [...items, add]).gifts);
+  const after = groupGifts(quoteBasket(city, [...items, ...(Array.isArray(add) ? add : [add])]).gifts);
   const fresh = after.filter(g => g.normal > (before.get(g.key) ?? 0));
   const value = fresh.reduce((t, g) => t + g.normal - (before.get(g.key) ?? 0), 0);
   return fresh.length && value > 0 ? { text: fresh.map(g => g.text).join(' e '), value, normal: fresh.reduce((t, g) => t + g.normal, 0) } : null;
@@ -186,11 +186,11 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
 }
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
 /** A peça pedida sozinha com cada serviço em separado (separatePrice.separate do motor). */
-function separateOf(city: string, it: BasketItem): number | null {
-  const q = toQuote(it);
-  if (!q) return null;
+function separateOf(city: string, it: BasketItem | BasketItem[]): number | null {
+  const list = (Array.isArray(it) ? it : [it]).map(toQuote);
+  if (!list.length || list.some(x => !x)) return null;
   // Colchão com anti-ácaros: o motor dá o riscado em mattressMitePack (limpeza + anti-ácaros à parte, 40€).
-  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
+  const r = botQuote({ city: city || 'Lisboa', items: list as QuoteItem[] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
   const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate;
   return typeof v === 'number' ? v : null;
 }
@@ -336,9 +336,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
     if (!r.success) setFailed(true);
   };
 
-  const saveEditing = () => {
+  // Uma janela pode juntar várias peças de uma vez (dono, 25 Nov: "2 sofás de 2 lugares e 1 de 3"): substituem a que se editava.
+  const saveEditing = (group: BasketItem[]) => {
     if (!editing) return;
-    setItems(list => (list.some(i => i.id === editing.id) ? list.map(i => (i.id === editing.id ? editing : i)) : [...list, editing]));
+    setItems(list => { const at = list.findIndex(i => i.id === editing.id); const rest = list.filter(i => i.id !== editing.id); return at < 0 ? [...rest, ...group] : [...rest.slice(0, at), ...group, ...rest.slice(at)]; });
     setEditing(null);
   };
 
@@ -412,7 +413,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                     <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-12 w-12 sm:h-12 sm:w-12" />
                     <span className="min-w-0"><span className="block text-sm font-semibold leading-snug text-white">{itemLabel(it)}</span><span className="block text-xs font-semibold text-[#D4AF37]">Alterar</span></span>
                   </button>
-                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : null; })()}</span>
+                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const one = aloneTotal(city, { ...it, qty: 1 }); return one != null ? formatEuro(Math.round(one * it.qty * 100) / 100) : null; })()}</span>
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
@@ -535,6 +536,22 @@ function AddOnTag({ plus, normal }: { plus: number | null; normal: number | null
   </span>;
 }
 
+/** Quadrado com imagem e contador próprio: toca para juntar 1, depois − e + (vários tamanhos na mesma janela). */
+function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d: number) => void; cls: (on: boolean) => string; children: React.ReactNode }) {
+  return (
+    <div role="button" tabIndex={0} aria-pressed={count > 0} onClick={() => { if (!count) onBump(1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !count) { e.preventDefault(); onBump(1); } }} className={`${cls(count > 0)} cursor-pointer select-none`}>
+      {children}
+      {count > 0
+        ? <span className="mt-0.5 flex items-center gap-1.5">
+            <button type="button" aria-label="Menos" onClick={e => { e.stopPropagation(); onBump(-1); }} className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white"><Minus className="h-3.5 w-3.5" /></button>
+            <span className="w-4 text-center text-base font-extrabold text-[#E8C964]">{count}</span>
+            <button type="button" aria-label="Mais" onClick={e => { e.stopPropagation(); onBump(1); }} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></button>
+          </span>
+        : <span className="mt-0.5 flex h-7 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
+    </div>
+  );
+}
+
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
     <div className="flex items-center gap-3">
@@ -545,41 +562,49 @@ function Stepper({ value, min, max, onChange }: { value: number; min: number; ma
   );
 }
 
-function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { item: BasketItem; fresh: boolean; city: string; others: BasketItem[]; onChange: (i: BasketItem) => void; onSave: () => void; onCancel: () => void }) {
+function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { item: BasketItem; fresh: boolean; city: string; others: BasketItem[]; onChange: (i: BasketItem) => void; onSave: (group: BasketItem[]) => void; onCancel: () => void }) {
   const set = (p: Partial<BasketItem>) => onChange({ ...item, ...p });
   const rug = isRug(item.kind);
-  // O preço deste artigo em cada opção, pelo motor do bot, com o resto do cesto (o mesmo que o total vai mostrar).
-  // Quanto este artigo acrescenta ao total da visita (com a deslocação, se for o primeiro): o mesmo número do widget da página.
-  const base = quoteBasket(city, others).total ?? 0;
-  // Total da visita com esta peça como fica (dono, 17 Nov: o preço impossível de ler mal; 24 Nov: "Juntar · 80€"
-  // era o que a visita subia, não um preço).
-  const totalWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? null : q.total; };
-  const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? q.lines[others.length] ?? null : Math.round((q.total - (others.length ? base : 0)) * 100) / 100; };
+  // Sofás e colchões: cada tamanho com o seu contador, tudo a zero ao abrir (dono, 25 Nov: "não faz sentido já estar
+  // selecionado [...] 2 sofás de 2 lugares e 2 de 3 lugares"). As opções (pack, pele, anti-ácaros) valem para todos.
+  const multi = item.kind === 'sofa' || item.kind === 'mattress';
+  const keyOf = (it: BasketItem) => (it.kind === 'sofa' ? String(it.seats ?? Number(it.size?.split('-')[0])) : it.size ?? '');
+  const sizeOf = (k: string): Partial<BasketItem> => (item.kind === 'mattress' ? { size: k } : k === '6' ? { size: '5-lugares', seats: 6 } : { size: k === '1' ? '1-lugar' : `${k}-lugares`, seats: undefined });
+  const [counts, setCounts] = useState<Record<string, number>>(() => (multi && !fresh ? { [keyOf(item)]: item.qty } : {}));
+  const group = (p: Partial<BasketItem> = {}): BasketItem[] => (multi
+    ? Object.entries(counts).filter(([, n]) => n > 0).map(([k, n], i) => ({ ...item, ...p, ...sizeOf(k), qty: n, id: i === 0 ? item.id : `${item.id}-${k}` }))
+    : [{ ...item, ...p }]);
+  const totalOf = (list: BasketItem[]) => { const q = quoteBasket(city, list); return !list.length || q.total === null || q.sob ? null : q.total; };
+  // Total da visita com estas peças (dono, 17 Nov: o preço impossível de ler mal).
+  const totalWith = (p: Partial<BasketItem>) => totalOf([...others, ...group(p)]);
   // Preço de cada opção (dono, 25 Nov: "tens que meter os preços riscados [...] tudo direitinho"): com outras peças
-  // a deslocação já está paga, por isso mostra-se a linha desta peça na visita (sem a 2.ª deslocação); riscado =
-  // esta peça pedida sozinha (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice do motor).
+  // a deslocação já está paga, por isso mostra-se a linha destas peças na visita (sem a 2.ª deslocação); riscado =
+  // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
+  // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
+  const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const one = { ...x, qty: 1 }; const v = separateOf(city, one) ?? aloneTotal(city, one); if (v === null) return null; t += v * x.qty; } return g.length ? Math.round(t * 100) / 100 : null; };
   const packPrice = (p: Partial<BasketItem>) => {
-    const it = { ...item, ...p };
-    const alone = aloneTotal(city, it);
-    const shown = others.length ? (() => { const q = quoteBasket(city, [...others, it]); return q.sob ? null : q.lines[others.length] ?? null; })() : alone;
-    const sep = separateOf(city, it) ?? alone;
+    const g = group(p);
+    const alone = totalOf(g);
+    const shown = !others.length ? alone : (() => { const q = quoteBasket(city, [...others, ...g]); if (q.sob) return null; const ls = q.lines.slice(others.length); return ls.length && ls.every(v => v != null) ? Math.round(ls.reduce<number>((t, v) => t + (v as number), 0) * 100) / 100 : null; })();
+    const sep = sepUnits(g);
     return { shown, struck: sep !== null && shown !== null && sep > shown ? sep : null };
   };
   const addOn = (on: Partial<BasketItem>, off: Partial<BasketItem>) => {
     // O que a visita sobe de facto com o extra (com a escada A pode ser 0: "Oferecido").
-    const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : aloneTotal(city, { ...item, ...p }));
+    const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : totalOf(group(p)));
     const a = tot(on), b = tot(off);
-    const withAlone = separateOf(city, { ...item, ...on }) ?? aloneTotal(city, { ...item, ...on }), offAlone = aloneTotal(city, { ...item, ...off });
-    return { plus: a !== null && b !== null ? Math.max(0, a - b) : null, normal: withAlone !== null && offAlone !== null ? withAlone - offAlone : null };
+    const withAlone = sepUnits(group(on)), offAlone = sepUnits(group(off));
+    return { plus: a !== null && b !== null ? Math.max(0, a - b) : null, normal: withAlone !== null && offAlone !== null ? Math.round((withAlone - offAlone) * 100) / 100 : null };
   };
-  const seats = item.seats ?? Number(item.size?.split('-')[0]);
   // Primeiro só a escolha (lugares, tamanho, quantidade), sem preços; as opções com o riscado e o "Poupa" aparecem
   // depois de escolher e a folha desce até elas (dono, 25 Nov: "o poupa aparece quando a pessoa clica").
   const [picked, setPicked] = useState(!fresh);
   const optionsRef = useRef<HTMLDivElement>(null);
-  const choose = (p: Partial<BasketItem>) => { set(p); setPicked(true); window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); };
+  const reveal = () => { if (!picked) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); setPicked(true); };
+  const choose = (p: Partial<BasketItem>) => { set(p); reveal(); };
+  const bump = (k: string, d: number) => { setCounts(c => ({ ...c, [k]: Math.max(0, Math.min(9, (c[k] ?? 0) + d)) })); if (d > 0) reveal(); };
   const sized = !rug || (num(item.width) > 0 && num(item.length) > 0);
-  const ok = sized && (picked || rug);
+  const ok = multi ? group().length > 0 : sized && (picked || rug);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
@@ -599,15 +624,15 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         </div>
 
         {item.kind === 'sofa' && <>
-          <p className="mb-2 text-sm font-semibold text-white">Quantos lugares?</p>
-          <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(s => <button key={s} type="button" className={tile(picked && seats === s)} onClick={() => choose(s === 6 ? { size: '5-lugares', seats: 6 } : { size: s === 1 ? '1-lugar' : `${s}-lugares`, seats: undefined })}>
-            <QuizFurnitureImage service="sofa" sizeId={s >= 4 ? '4-lugares' : s === 1 ? '1-lugar' : `${s}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{s === 1 ? '1 lugar' : `${s} lugares`}</button>)}</div>
+          <p className="mb-2 text-sm font-semibold text-white">Quantos lugares? <span className="font-normal text-white/60">Pode juntar vários</span></p>
+          <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(n => <CountTile key={n} count={counts[String(n)] ?? 0} onBump={d => bump(String(n), d)} cls={tile}>
+            <QuizFurnitureImage service="sofa" sizeId={n >= 4 ? '4-lugares' : n === 1 ? '1-lugar' : `${n}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}</CountTile>)}</div>
           <p className="mb-3 text-xs text-white/60">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
         </>}
         {item.kind === 'mattress' && <>
-          <p className="mb-2 text-sm font-semibold text-white">Que tamanho?</p>
-          <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <button key={m.id} type="button" className={tile(picked && item.size === m.id)} onClick={() => choose({ size: m.id })}>
-            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}</button>)}</div>
+          <p className="mb-2 text-sm font-semibold text-white">Que tamanho? <span className="font-normal text-white/60">Pode juntar vários</span></p>
+          <div className="mb-3 grid grid-cols-3 gap-2">{MATTRESS.map(m => <CountTile key={m.id} count={counts[m.id] ?? 0} onBump={d => bump(m.id, d)} cls={tile}>
+            <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-12 w-14 sm:h-12 sm:w-14" />{m.label}</CountTile>)}</div>
         </>}
         {item.kind === 'chairs' && <>
           <p className="mb-2 text-sm font-semibold text-white">Quantas cadeiras?</p>
@@ -648,7 +673,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
             <span><span className="block">{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros</span><span className="block text-xs font-normal text-white/60">Produto Bactran, desinfeta o colchão</span></span>
             <AddOnTag {...addOn({ pack: 'premium' }, { pack: 'none' })} />
           </button>}
-          {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
+          {item.kind === 'chairs' && <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
             <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
           </div>}
@@ -667,8 +692,8 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         </div>}
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        {ok && (() => { const g = giftsUnlocked(city, others, item); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : priceWith({}); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares' : 'Escolha o tamanho') : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        {ok && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
+        <button type="button" disabled={!ok} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
