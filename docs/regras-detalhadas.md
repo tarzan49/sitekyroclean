@@ -1283,3 +1283,5 @@ Decididas pelo dono uma a uma, com os números do motor (testes: `src/lib/botQuo
 9. **Riscado dos packs de cadeiras a partir de 4** ("Sim, em todo o lado"): 139 (156), 99 (116).
 
 Corrigido no caminho: o riscado da opção Premium contava a impermeabilização de cadeiras só limpas (3L Blindado + 6 cadeiras: 559€, agora 399€). Por decidir: tapetes (sós ou com um sofá), "2 lugares mais chaise" (Fão, 94 ou 84).
+
+**"Pele de pêssego" = pele (dono, 24 Nov 2026, Rosa, Gaia):** o bot perguntou tecido ou pele, a cliente disse "Pele de pêssego" e ele escreveu "Sendo em tecido" e ofereceu Premium 219€ / Essencial 159€. Certo: só limpeza 89€ ou 129€ com o tratamento da pele. O material dito pelo cliente decide no código (kyro-bot `leatherGuard.ts`: `clientMaterial`, `applySaidMaterial`, `saidLeatherIssues`).
