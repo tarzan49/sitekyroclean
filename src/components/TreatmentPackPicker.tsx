@@ -3,6 +3,7 @@
 // as opções com o total final do bot (botQuote), um botão. Sem símbolos nas opções (dono, 24 Nov).
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { treatmentToItem } from '@/components/quiz/basketChoice';
+import VisitGiftLine, { visitGiftFor } from '@/components/VisitGiftLine';
 import type { BasketItem } from '@/components/quiz/VisitBasket';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
@@ -61,6 +62,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
     const plain = !treat && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     return [o.id, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
   })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, count, mCounts, city]);
+  const gift = useMemo(() => kind === 'rug' ? null : visitGiftFor(city, kind === 'mattress' ? mItems('clean') : [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', qty: count } : { kind: 'sofa', size, treatment: 'clean', qty: count }]), [kind, size, count, mCounts, city]);
   // Preço riscado do bot: limpeza + anti-ácaros feito à parte (40€ por colchão; dono, 24 Nov).
   const struck = useMemo(() => {
     if (kind !== 'mattress') return null;
@@ -156,6 +158,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
             );
           })}
         </div>
+        <VisitGiftLine gift={gift} />
         <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">{kind === 'rug' ? `Preço final ${cityPrep(city)} ${city}, lavagem em sua casa, deslocação incluída. Juta, sisal, seda ou persa: o valor é ajustado.` : `Preço final ${cityPrep(city)} ${city}, deslocação incluída.`}</p>
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}

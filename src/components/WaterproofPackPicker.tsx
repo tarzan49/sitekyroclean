@@ -4,6 +4,7 @@
 // bot (botQuote), nunca escritos à mão.
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { choiceToItem } from '@/components/quiz/basketChoice';
+import VisitGiftLine, { visitGiftFor } from '@/components/VisitGiftLine';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 import { cityPrep } from '@/data/serviceCatalog';
@@ -80,6 +81,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     return { premium: pick('clean+premium'), essencial: pick('clean+essencial') } as Record<string, number | null>;
   }, [kind, size, qty, count, city]);
 
+  const gift = useMemo(() => kind !== 'sofa' || size === 'foto' ? null : visitGiftFor(city, [size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', qty: count } : { kind: 'sofa', size, treatment: 'clean', qty: count }]), [kind, size, count, city]);
   const seats = Number(size.split('-')[0]);
   const what = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares (envio fotografia)' : kind === 'sofa' ? `${count > 1 ? `${count} sofás` : 'sofá'} de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}` : `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
   const chosen = OPTIONS.find(o => o.extra === extra)!;
@@ -168,6 +170,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
             );
           })}
         </div>
+        <VisitGiftLine gift={gift} />
         {!byPhoto && !compact && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final em {city}, deslocação incluída.</p>}
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
