@@ -90,7 +90,7 @@ const PainPointsSolutionsV1 = () => {
                   loading="lazy"
                   decoding="async"
                 />
-                {!/\/(cadeiras|colchoes)\//.test(problem.image) && <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] text-white">
+                {!/\/(cadeiras|colchoes|sofas)\//.test(problem.image) && <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] text-white">
                   Imagem ilustrativa
                 </span>}
               </div>

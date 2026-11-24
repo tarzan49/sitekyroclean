@@ -6,247 +6,127 @@ import { WATERPROOFING_PROBLEM_IMAGES } from './waterproofingProblemImages';
 
 export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string }
 
-/** Public illustrative library. Pure data shared by React and Node prerender. */
+/** Sofás: fotografias reais da equipa (24 Nov); o resto ainda ilustrativo. Pure data shared by React and Node prerender. */
 export const SOFA_PROBLEM_IMAGES = [
   {
     "id": "sofa-manchas-01",
     "problemId": "limpeza-sofas-1",
     "src": "/images/landing-problems/sofas/sofa-manchas-01.webp",
-    "alt": "Imagem ilustrativa: Mancha de café no assento de um sofá claro"
+    "alt": "Assento de sofá azul-claro com manchas e marcas de água escuras"
   },
   {
     "id": "sofa-manchas-02",
     "problemId": "limpeza-sofas-1",
     "src": "/images/landing-problems/sofas/sofa-manchas-02.webp",
-    "alt": "Imagem ilustrativa: Mancha de vinho no assento de um sofá cinzento"
+    "alt": "Almofada de sofá verde-lima com manchas escuras grandes"
   },
   {
     "id": "sofa-manchas-03",
     "problemId": "limpeza-sofas-1",
     "src": "/images/landing-problems/sofas/sofa-manchas-03.webp",
-    "alt": "Imagem ilustrativa: Marca de gordura num assento de tecido azul"
+    "alt": "Assento de sofá bege aveludado com manchas e marcas de água"
   },
   {
     "id": "sofa-manchas-04",
     "problemId": "limpeza-sofas-1",
     "src": "/images/landing-problems/sofas/sofa-manchas-04.webp",
-    "alt": "Imagem ilustrativa: Marca de chá junto ao braço de um sofá claro"
+    "alt": "Dois assentos de sofá bege com várias manchas espalhadas"
   },
   {
     "id": "sofa-manchas-05",
     "problemId": "limpeza-sofas-1",
     "src": "/images/landing-problems/sofas/sofa-manchas-05.webp",
-    "alt": "Imagem ilustrativa: Pequenas marcas de chocolate num sofá de chenille"
-  },
-  {
-    "id": "sofa-manchas-06",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-06.webp",
-    "alt": "Imagem ilustrativa: Marca de sumo numa almofada cinzenta"
-  },
-  {
-    "id": "sofa-manchas-07",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-07.webp",
-    "alt": "Imagem ilustrativa: Marca de café num assento verde"
-  },
-  {
-    "id": "sofa-manchas-08",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-08.webp",
-    "alt": "Imagem ilustrativa: Mancha de molho num sofá de tecido taupe"
-  },
-  {
-    "id": "sofa-manchas-09",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-09.webp",
-    "alt": "Imagem ilustrativa: Mancha antiga de bebida num sofá modular"
-  },
-  {
-    "id": "sofa-manchas-10",
-    "problemId": "limpeza-sofas-1",
-    "src": "/images/landing-problems/sofas/sofa-manchas-10.webp",
-    "alt": "Imagem ilustrativa: Pequenas manchas de bebida num sofá rosa"
+    "alt": "Tecido cinzento de assento com manchas circulares e auréolas"
   },
   {
     "id": "sofa-residuos-01",
     "problemId": "limpeza-sofas-2",
     "src": "/images/landing-problems/sofas/sofa-residuos-01.webp",
-    "alt": "Imagem ilustrativa: Pó, cotão e migalhas na união dos assentos de um sofá cinzento"
+    "alt": "Sofá-cama cinzento com migalhas, embalagens e manchas nos assentos"
   },
   {
     "id": "sofa-residuos-02",
     "problemId": "limpeza-sofas-2",
     "src": "/images/landing-problems/sofas/sofa-residuos-02.webp",
-    "alt": "Imagem ilustrativa: Cotão e pó na costura de um sofá bege"
+    "alt": "Sofá azul-escuro com pelos e pó acumulados nos assentos"
   },
   {
     "id": "sofa-residuos-03",
     "problemId": "limpeza-sofas-2",
     "src": "/images/landing-problems/sofas/sofa-residuos-03.webp",
-    "alt": "Imagem ilustrativa: Migalhas na união do encosto e assento azul"
+    "alt": "Assentos e encostos de sofá azul com pelos e cotão"
   },
   {
     "id": "sofa-residuos-04",
     "problemId": "limpeza-sofas-2",
     "src": "/images/landing-problems/sofas/sofa-residuos-04.webp",
-    "alt": "Imagem ilustrativa: Pelos e cotão numa costura de tecido escuro"
+    "alt": "Chaise longue cinzento-escura com marcas de pó nos assentos"
   },
   {
     "id": "sofa-residuos-05",
     "problemId": "limpeza-sofas-2",
     "src": "/images/landing-problems/sofas/sofa-residuos-05.webp",
-    "alt": "Imagem ilustrativa: Grãos e resíduos junto ao rebordo do assento"
-  },
-  {
-    "id": "sofa-residuos-06",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-06.webp",
-    "alt": "Imagem ilustrativa: Resíduos no canto de um sofá terracota"
-  },
-  {
-    "id": "sofa-residuos-07",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-07.webp",
-    "alt": "Imagem ilustrativa: Cotão nas pregas de um sofá de bombazina"
-  },
-  {
-    "id": "sofa-residuos-08",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-08.webp",
-    "alt": "Imagem ilustrativa: Resíduos na junção de um sofá modular verde"
-  },
-  {
-    "id": "sofa-residuos-09",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-09.webp",
-    "alt": "Imagem ilustrativa: Migalhas e cotão num assento castanho"
-  },
-  {
-    "id": "sofa-residuos-10",
-    "problemId": "limpeza-sofas-2",
-    "src": "/images/landing-problems/sofas/sofa-residuos-10.webp",
-    "alt": "Imagem ilustrativa: Pó acumulado na junção dos estofos"
+    "alt": "Sofá-chaise bege com borboto e pequenas marcas no braço e no assento"
   },
   {
     "id": "sofa-odores-01",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-01.webp",
-    "alt": "Imagem ilustrativa: Pessoa a verificar o odor de uma almofada do sofá"
+    "alt": "Sofá de microfibra bege com marcas de gordura nas costas e nos braços"
   },
   {
     "id": "sofa-odores-02",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-02.webp",
-    "alt": "Imagem ilustrativa: Pessoa a verificar o odor de uma almofada cinzenta"
+    "alt": "Sofá camel com o braço encardido pelo uso"
   },
   {
     "id": "sofa-odores-03",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-03.webp",
-    "alt": "Imagem ilustrativa: Verificação de odor numa almofada bege"
+    "alt": "Braço de sofá camel com o pelo baço e marcas de contacto"
   },
   {
     "id": "sofa-odores-04",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-04.webp",
-    "alt": "Imagem ilustrativa: Pessoa a avaliar o odor de uma almofada azul"
+    "alt": "Braço de sofá vermelho com sujidade escura ao longo da costura"
   },
   {
     "id": "sofa-odores-05",
     "problemId": "limpeza-sofas-3",
     "src": "/images/landing-problems/sofas/sofa-odores-05.webp",
-    "alt": "Imagem ilustrativa: Avaliação do odor de uma almofada verde"
-  },
-  {
-    "id": "sofa-odores-06",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-06.webp",
-    "alt": "Imagem ilustrativa: Pessoa a verificar o odor do assento solto"
-  },
-  {
-    "id": "sofa-odores-07",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-07.webp",
-    "alt": "Imagem ilustrativa: Verificação de odor numa almofada clara"
-  },
-  {
-    "id": "sofa-odores-08",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-08.webp",
-    "alt": "Imagem ilustrativa: Pessoa a avaliar uma almofada castanha"
-  },
-  {
-    "id": "sofa-odores-09",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-09.webp",
-    "alt": "Imagem ilustrativa: Verificação do odor de uma almofada terracota"
-  },
-  {
-    "id": "sofa-odores-10",
-    "problemId": "limpeza-sofas-3",
-    "src": "/images/landing-problems/sofas/sofa-odores-10.webp",
-    "alt": "Imagem ilustrativa: Pessoa a verificar uma almofada de sofá cinzenta"
+    "alt": "Braço e assento de sofá bege com riscos escuros e manchas de uso"
   },
   {
     "id": "sofa-desgaste-01",
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-01.webp",
-    "alt": "Imagem ilustrativa: Borboto e fibras gastas no braço de um sofá"
+    "alt": "Assento de sofá bege baço e escurecido pelo uso"
   },
   {
     "id": "sofa-desgaste-02",
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-02.webp",
-    "alt": "Imagem ilustrativa: Borboto no braço de um sofá cinzento"
+    "alt": "Assento de sofá cinzento-claro acinzentado pela sujidade do uso"
   },
   {
     "id": "sofa-desgaste-03",
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-03.webp",
-    "alt": "Imagem ilustrativa: Pelo achatado na borda de um sofá de veludo"
+    "alt": "Assento de sofá bege com a frente amarelada pelo uso"
   },
   {
     "id": "sofa-desgaste-04",
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-04.webp",
-    "alt": "Imagem ilustrativa: Desgaste superficial num assento de chenille"
+    "alt": "Chaise longue bege com o tecido acinzentado e manchas de uso"
   },
   {
     "id": "sofa-desgaste-05",
     "problemId": "limpeza-sofas-4",
     "src": "/images/landing-problems/sofas/sofa-desgaste-05.webp",
-    "alt": "Imagem ilustrativa: Fibras gastas num braço de tecido terracota"
-  },
-  {
-    "id": "sofa-desgaste-06",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-06.webp",
-    "alt": "Imagem ilustrativa: Marcas de uso numa almofada de bombazina"
-  },
-  {
-    "id": "sofa-desgaste-07",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-07.webp",
-    "alt": "Imagem ilustrativa: Borboto e atrito num braço de sofá verde"
-  },
-  {
-    "id": "sofa-desgaste-08",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-08.webp",
-    "alt": "Imagem ilustrativa: Textura achatada num braço de sofá bouclé"
-  },
-  {
-    "id": "sofa-desgaste-09",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-09.webp",
-    "alt": "Imagem ilustrativa: Atrito na borda de um assento castanho"
-  },
-  {
-    "id": "sofa-desgaste-10",
-    "problemId": "limpeza-sofas-4",
-    "src": "/images/landing-problems/sofas/sofa-desgaste-10.webp",
-    "alt": "Imagem ilustrativa: Tecido marcado pelo uso num braço azul-escuro"
+    "alt": "Sofá-cama bege aberto com os assentos encardidos"
   }
 ] as const;
 
