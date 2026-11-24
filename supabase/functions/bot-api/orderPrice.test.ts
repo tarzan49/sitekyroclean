@@ -1,6 +1,6 @@
 // Corre com: deno test supabase/functions/bot-api/orderPrice.test.ts
 import { assert, assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
-import { buildWhatsAppMessage } from "../_shared/whatsappReply.ts";
+import { buildWhatsAppMessage, SHOW_STRUCK_TOTAL } from "../_shared/whatsappReply.ts";
 import { orderPrice } from "./orderPrice.ts";
 
 const order = (items: Record<string, unknown>[], total: number | null, city = "Lisboa") => ({
@@ -13,7 +13,8 @@ const sofa = { kind: "sofa", size: "3-lugares", qty: 1, treatment: "clean" }, be
 
 Deno.test("sofá e colchão: cada peça com o preço do cesto, a oferta e o riscado (dono, 25 Nov)", () => {
   const m = msg(order([sofa, bed], 169));
-  assert(m.includes("• Sofá 3 lugares, limpeza: 89€\n• Colchão de casal, limpeza: 79€\n• Anti-ácaros no colchão: oferecido (normalmente 40€)\n• Deslocação incluída\n\nTotal: 169€ (em vez de 209€)"), m);
+  assert(m.includes("• Sofá 3 lugares, limpeza: 89€\n• Colchão de casal, limpeza: 79€\n• Anti-ácaros no colchão: oferecido (normalmente 40€)\n• Deslocação incluída\n\nTotal: 169€"), m);
+  assertEquals(m.includes("(em vez de 209€)"), SHOW_STRUCK_TOTAL);
 });
 
 Deno.test("uma peça só: a linha é o total, com a deslocação incluída", () => {

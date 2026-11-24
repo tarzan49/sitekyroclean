@@ -44,11 +44,11 @@ Deno.test("fails closed without the secret, and rejects a wrong key", async () =
   assertEquals((await call({ action: "cities" }, { key: "" })).status, 401);
 });
 
-Deno.test("quote runs the site engine: sofa 3 seats + double mattress in Porto is 134€", async () => {
+Deno.test("quote runs the site engine: sofa 3 seats + double mattress in Porto is 169€ (89 + 79, escada A, dono 24 Nov)", async () => {
   const res = await call({ action: "quote", city: "porto", items: [{ kind: "sofa", size: "3-lugares" }, { kind: "mattress", size: "casal" }] });
   assertEquals(res.status, 200);
   const { quote } = await res.json();
-  assertEquals([quote.city, quote.subtotal, quote.travel, quote.total, quote.handToOwner], ["Porto", 134, 0, 134, false]);
+  assertEquals([quote.city, quote.subtotal, quote.travel, quote.total, quote.handToOwner], ["Porto", 148, 0, 169, false]);
 });
 
 Deno.test("quote explains a bad item instead of guessing", async () => {

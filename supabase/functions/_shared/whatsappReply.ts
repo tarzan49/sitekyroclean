@@ -121,6 +121,12 @@ export interface QuotedPrice {
   gifts?: { label: string; normal: number }[]; usual?: number | null;
 }
 
+/**
+ * O riscado "(em vez de 209€)" fica desligado até o kyro-bot ter a correção 9c2b48f: antes dela o bot lê 209€ como preço já
+ * aceite pelo cliente (dono, 25 Nov 2026: "Sim, publica assim"). Ligar depois do deploy do bot.
+ */
+export const SHOW_STRUCK_TOTAL = false;
+
 const euro = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".", ",")}€`;
 
 /**
@@ -134,7 +140,7 @@ function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedP
     [...price.lines.map(l => `• ${l.label}: ${euro(l.amount)}`),
       ...(price.gifts ?? []).map(g => `• ${g.label}: oferecido (normalmente ${euro(g.normal)})`),
       price.travel > 0 ? `• Deslocação: ${euro(price.travel)}` : "• Deslocação incluída"].join("\n"),
-    `Total: ${euro(price.total)}${price.usual ? ` (em vez de ${euro(price.usual)})` : ""}`,
+    `Total: ${euro(price.total)}${SHOW_STRUCK_TOTAL && price.usual ? ` (em vez de ${euro(price.usual)})` : ""}`,
     "Já lhe envio de seguida as horas que temos livres.",
   ].join("\n\n");
 }
