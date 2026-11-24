@@ -11,16 +11,22 @@ import rugBrush from '@/assets/tapete-processo/escovacao.mp4';
 import rugBrushPoster from '@/assets/tapete-processo/escovacao-poster.jpg';
 import rugExtract from '@/assets/tapete-processo/extracao.mp4';
 import rugExtractPoster from '@/assets/tapete-processo/extracao-poster.jpg';
+import carpetExtract from '@/assets/alcatifa-processo/extracao.mp4';
+import carpetExtractPoster from '@/assets/alcatifa-processo/extracao-poster.jpg';
+import carpetBefore from '@/assets/alcatifa-processo/antes.jpg';
 
-type Service = 'limpeza-tapetes';
-const MEDIA: Record<Service, { pool: 'tapete'; heading: string; videos: [string, string][] }> = {
+type Service = 'limpeza-tapetes' | 'limpeza-alcatifas';
+type Clip = [string, string] | null;
+// Ordem: pulverização, escovação, extração. Alcatifas: só há vídeos reais de extração (a mancha a sair).
+const MEDIA: Record<Service, { pool?: 'tapete'; before?: string; heading: string; videos: [Clip, Clip, Clip] }> = {
   'limpeza-tapetes': { pool: 'tapete', heading: 'A lavagem do seu tapete', videos: [[rugSpray, rugSprayPoster], [rugBrush, rugBrushPoster], [rugExtract, rugExtractPoster]] },
+  'limpeza-alcatifas': { before: carpetBefore, heading: 'A limpeza da sua alcatifa', videos: [null, null, [carpetExtract, carpetExtractPoster]] },
 };
 
 function story(service: Service, custom?: { label: string; description: string; alt?: string }[]): StoryStep[] {
   const m = MEDIA[service];
-  const pair = BEFORE_AFTER_POOL[m.pool].find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
-  const media: Partial<StoryStep>[] = [{ image: pair?.before }, ...m.videos.map(([video, poster]) => ({ video, poster })), { image: pair?.after }];
+  const pair = m.pool ? BEFORE_AFTER_POOL[m.pool].find(p => p.kind === 'pair') as { before: string; after: string } | undefined : undefined;
+  const media: (Partial<StoryStep> | null)[] = [{ image: m.before ?? pair?.before }, ...m.videos.map(c => c ? { video: c[0], poster: c[1] } : null), pair?.after ? { image: pair.after } : null];
   const steps = custom && custom.length ? custom : SERVICE_PROCESS_GUIDES[service].steps;
   // O vídeo pelo nome da etapa; sem vídeo próprio, fica o anterior.
   const pick = (label: string, i: number) => /avalia|inspe/i.test(label) ? media[0] : /aplica|pulveri|trat|pré/i.test(label) ? media[1] : /escov/i.test(label) ? media[2] : /extra|lava/i.test(label) ? media[3] : /seca|final|confer|entrega/i.test(label) ? media[4] : i === 0 ? media[0] : null;
