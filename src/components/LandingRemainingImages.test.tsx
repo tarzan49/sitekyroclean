@@ -20,9 +20,10 @@ describe('remaining service image integration', () => {
       expect(model).not.toBeNull();
       installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      const images = [...container.querySelectorAll('[data-problem-id] img')];
+      // Impermeabilização: vídeo real com a fotografia como poster (dono, 24 Nov).
+      const images = [...container.querySelectorAll('[data-problem-id] img, [data-problem-id] video')];
       expect(images).toHaveLength(4);
-      expect(images.map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
+      expect(images.map(img => ({ src: img.getAttribute(img.tagName === 'VIDEO' ? 'poster' : 'src'), alt: img.getAttribute(img.tagName === 'VIDEO' ? 'aria-label' : 'alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
       expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
       cleanup();
     }

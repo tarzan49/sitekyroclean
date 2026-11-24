@@ -6,14 +6,15 @@ import SectionHeader from "@/components/SectionHeader";
 import * as Dialog from "@radix-ui/react-dialog";
 import type { CSSProperties } from "react";
 
-export interface VisualExample { label: string; alt: string; src: string; thumbnailSrc?: string; thumbnailSrcSet?: string; thumbnailSizes?: string; imageStyle?: CSSProperties; id?: string; description?: string }
+export interface VisualExample { label: string; alt: string; src: string; thumbnailSrc?: string; thumbnailSrcSet?: string; thumbnailSizes?: string; imageStyle?: CSSProperties; id?: string; description?: string; video?: string }
 
 export default function VisualExamplesGallery({ examples, name, overline = "Material", heading = "Veja exemplos de", id = "material", imageDescription, onEnquire, variant = "light" }: { variant?: "light" | "dark"; examples: VisualExample[]; name: string; overline?: string; heading?: string; id?: string; imageDescription?: string; onEnquire?: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const photo = (index: number, loading: "lazy" | "eager" = "lazy") => (
     <div className="relative aspect-square overflow-hidden bg-[#173629]">
-      <img
+      {/* Vídeo real (impermeabilização, dono 24 Nov): em ciclo, sem som; a fotografia é o poster e o que fica no HTML estático. */}
+      {examples[index].video ? <video src={examples[index].video} poster={examples[index].src} autoPlay muted loop playsInline preload={loading === "lazy" ? "metadata" : "auto"} aria-label={examples[index].alt} className="absolute w-full h-full object-cover !max-w-none" /> : <img
         src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
         srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet ?? exampleImageSrcSet(examples[index].src) : undefined}
         sizes={loading === "lazy" ? examples[index].thumbnailSizes ?? EXAMPLE_IMAGE_SIZES : undefined}
@@ -25,7 +26,7 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
         height={400}
         className="absolute w-full h-full object-cover !max-w-none"
         style={examples[index].imageStyle}
-      />
+      />}
     </div>
   );
 
@@ -51,7 +52,7 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
             </figure>
           ))}
         </div>
-        <p className={`mt-5 text-xs leading-relaxed ${variant === "dark" ? "text-white/70" : "text-[#536259]"}`}>Imagens ilustrativas. Toque para ampliar.</p>
+        <p className={`mt-5 text-xs leading-relaxed ${variant === "dark" ? "text-white/70" : "text-[#536259]"}`}>{examples.some(example => example.video || !/^Imagem ilustrativa/.test(example.alt)) ? "Fotografias e vídeos reais. Toque para ampliar." : "Imagens ilustrativas. Toque para ampliar."}</p>
         <Dialog.Root open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}>
           <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/75" />

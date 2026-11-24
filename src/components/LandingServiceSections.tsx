@@ -96,6 +96,7 @@ export default function LandingServiceSections() {
       id: card.id, label: card.title, description: card.description,
       src: card.image?.src ?? PROBLEM_IMAGES[model.serviceSlug][card.imageIndex],
       alt: card.image?.alt ?? card.title,
+      video: card.image?.video,
     }))} />,
     duvidas: newModel ? <CompactFAQ key={model.path} id="duvidas" dark faqs={model.faqs} heading={model.faqHeading} /> : <div id="duvidas" className="scroll-mt-20"><ServiceFAQ key={model.path} faqs={model.faqs} heading={model.faqHeading} /></div>,
     processo: newModel && hasProcessStory(model.serviceSlug) ? <ServiceProcessStory key={model.path} service={model.serviceSlug} city={model.locationName} cityPrep={model.prep} /> : newModel && (model.serviceSlug === 'limpeza-cadeiras' || model.serviceSlug === 'limpeza-colchoes') ? <ChairProcessStory key={model.path} service={model.serviceSlug} city={model.locationName} cityPrep={model.prep} /> : model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,

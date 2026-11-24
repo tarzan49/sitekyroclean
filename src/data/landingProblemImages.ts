@@ -4,7 +4,7 @@ import { CHAIR_PROBLEM_IMAGES } from './chairProblemImages';
 import { ALCATIFA_PROBLEM_IMAGES } from './alcatifaProblemImages';
 import { WATERPROOFING_PROBLEM_IMAGES } from './waterproofingProblemImages';
 
-export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string }
+export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string; video?: string }
 
 /** Sofás: fotografias reais da equipa (24 Nov); o resto ainda ilustrativo. Pure data shared by React and Node prerender. */
 export const SOFA_PROBLEM_IMAGES = [
