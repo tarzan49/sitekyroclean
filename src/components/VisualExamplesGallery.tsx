@@ -12,9 +12,9 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
   const [selected, setSelected] = useState<number | null>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const photo = (index: number, loading: "lazy" | "eager" = "lazy") => (
-    <div className="relative aspect-square overflow-hidden bg-[#173629]">
+    <div className={`relative overflow-hidden ${loading === "eager" && examples[index].video ? "mx-auto aspect-[9/16] h-[65dvh] max-w-full" : "aspect-square bg-[#173629]"}`}>
       {/* Vídeo real (impermeabilização, dono 24 Nov): em ciclo, sem som; a fotografia é o poster e o que fica no HTML estático. */}
-      {examples[index].video ? <video src={examples[index].video} poster={examples[index].src} autoPlay muted loop playsInline preload={loading === "lazy" ? "metadata" : "auto"} aria-label={examples[index].alt} className="absolute w-full h-full object-cover !max-w-none" /> : <img
+      {examples[index].video ? <video src={examples[index].video} poster={examples[index].src} autoPlay muted loop playsInline preload={loading === "lazy" ? "metadata" : "auto"} aria-label={examples[index].alt} className={`absolute w-full h-full !max-w-none ${loading === "eager" ? "object-contain" : "object-cover"}`} /> : <img
         src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
         srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet ?? exampleImageSrcSet(examples[index].src) : undefined}
         sizes={loading === "lazy" ? examples[index].thumbnailSizes ?? EXAMPLE_IMAGE_SIZES : undefined}
