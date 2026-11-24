@@ -5,6 +5,7 @@ import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 
 const HomepageBlogSection  = lazy(() => import("@/components/HomepageBlogSection"));
 const Services             = lazy(() => import("@/components/Services"));
+const HomeServiceVideos    = lazy(() => import("@/components/HomeServiceVideos"));
 const PainPointsSolutionsV1 = lazy(() => import("@/components/PainPointsSolutionsV1"));
 const HowItWorksV1         = lazy(() => import("@/components/HowItWorksV1"));
 const TestimonialsV1       = lazy(() => import("@/components/TestimonialsV1"));
@@ -25,7 +26,7 @@ const IndexV1 = () => {
         <HeroV1 />
 
         <Suspense fallback={<SectionLoader />}>
-          <Services />
+          <HomeServiceVideos />
         </Suspense>
 
         <div id="testemunhos" className="scroll-mt-16">
