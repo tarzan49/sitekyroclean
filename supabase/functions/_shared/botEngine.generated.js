@@ -433,7 +433,7 @@ function customPackLine(item, chairsBefore = 0) {
       if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
-      if (item.extra === "premium" || item.extra === "essencial") amount2 = endIn9Down(amount2);
+      if ((item.extra === "premium" || item.extra === "essencial") && item.primary !== "waterproofing") amount2 = endIn9Down(amount2);
     }
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
     const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;

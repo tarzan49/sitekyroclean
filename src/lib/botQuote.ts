@@ -584,12 +584,16 @@ function withBlackFridayPrices<T extends { ok: boolean }>(input: unknown, r: T):
   return { ...out, blackFriday: { normal, total: bf, until: '2026-11-30', rule: BLACK_FRIDAY_RULE } };
 }
 
-function botQuoteCore(input: unknown) {
+// Explicit return type: uWaterproofingQuote and withMattressMitePack call back into the engine, and an inferred
+// type here is circular (it broke `npm run typecheck`).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- read as JSON by the bot and the site, like before the cycle
+type CoreQuote = any;
+function botQuoteCore(input: unknown): CoreQuote {
   if (input && typeof input === 'object') {
     const rw = rugWaterproofingQuote(input as Record<string, unknown>);
-    if (rw) return rw.ok ? withAntiMiteGiftKept(withBigOrder(rw)) : rw;
-    const u = uWaterproofingQuote(input as Record<string, unknown>);
-    if (u) return withBigOrder(u);
+    if (rw) return (rw.ok ? withAntiMiteGiftKept(withBigOrder(rw)) : rw) as unknown as CoreQuote;
+    const u: unknown = uWaterproofingQuote(input as Record<string, unknown>);
+    if (u) return withBigOrder(u as ReturnType<typeof botQuoteInner>) as unknown as CoreQuote;
   }
   return withVisitGifts(input, withAntiMiteGift(input, withBigOrder(botQuoteInner(input))));
 }

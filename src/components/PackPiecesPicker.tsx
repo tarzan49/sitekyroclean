@@ -86,15 +86,11 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
     const v = quote(list); return v === null ? null : up9(v);
   }, [items, city, rugW, rugL, rug]);
   // Preço cortado = o mesmo pedido em separado (cada serviço com a sua deslocação): a única comparação permitida (dono, 19 Nov).
+  // Preço cortado = o separatePrice do motor (o mesmo pedido em separado), o MESMO valor que o bot diz (dono, 24 Nov 2026).
   const separate = useMemo(() => {
-    const parts: (number | null)[] = [];
-    for (const i of items) {
-      if (i.treatment === 'clean+essencial' || i.treatment === 'clean+premium') { parts.push(quote([{ ...i.base, treatment: 'clean' }]), quote([{ ...i.base, treatment: i.treatment.replace('clean+', '') }])); }
-      else parts.push(quote([{ ...i.base, treatment: i.treatment }]));
-    }
-    if (rugItem) { const r = botQuote({ city, items: [rugItem] }) as { rugEstimate?: { ok: boolean; homePrice?: number } | null }; parts.push(r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null); }
-    return parts.every(v => v !== null) ? (parts as number[]).reduce((a, b) => a + b, 0) : null;
-  }, [items, city, rugW, rugL, rug]);
+    const r = botQuote({ city, items: items.map(i => ({ ...i.base, treatment: i.treatment })) }) as { separatePrice?: { separate: number } | null; chairsWas?: number | null };
+    return r.separatePrice?.separate || r.chairsWas || null;
+  }, [items, city]);
   const crossed = total !== null && separate !== null && separate > total ? up9(separate) : null;
 
   const describe = (p: PieceKind) => {

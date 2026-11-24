@@ -58,16 +58,15 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
   // É a única comparação permitida (pack contra separado; regra do dono, 19 Nov).
   const separate = useMemo(() => {
     if (kind === 'sofa' && size === PHOTO_SIZE) return {} as Record<string, number | null>;
-    const one = (treatment: string) => {
-      const item = kind === 'sofa' ? (size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment } : { kind: 'sofa', size, treatment }) : { kind: 'chairs', qty, treatment };
-      const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-      return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null;
-    };
     // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026: "em vez de 39 × 12, paga 359").
     if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
-    const clean = one('clean');
-    const pick = (t: string) => { const w = one(t); return clean !== null && w !== null ? clean + w : null; };
-    return { premium: pick('premium'), essencial: pick('essencial') } as Record<string, number | null>;
+    // Sofás: o separatePrice do motor, o MESMO valor que o bot diz no WhatsApp (dono, 24 Nov 2026).
+    const pick = (t: string) => {
+      const item = size === '6-lugares' ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: t } : { kind: 'sofa', size, treatment: t };
+      const r = botQuote({ city, items: [item] }) as { separatePrice?: { separate: number } | null };
+      return r.separatePrice?.separate ?? null;
+    };
+    return { premium: pick('clean+premium'), essencial: pick('clean+essencial') } as Record<string, number | null>;
   }, [kind, size, qty, city]);
 
   const seats = Number(size.split('-')[0]);
