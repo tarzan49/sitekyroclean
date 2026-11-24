@@ -51,7 +51,7 @@ export default function LandingServiceSections() {
       <div className={container}>
         <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{model.prep} {model.locationName}</em></h2>
         <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">
-          <WaterproofPackPicker kind="sofa" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} />
+          <WaterproofPackPicker kind="sofa" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={openQuiz} />
         </div>
       </div>
     </section> : <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
