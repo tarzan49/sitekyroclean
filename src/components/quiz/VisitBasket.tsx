@@ -255,6 +255,12 @@ export function struckOf(city: string, it: BasketItem): number | null {
   const sep = separateOf(city, it);
   return q.gifts.length ? Math.min(sep ?? sum, sum) : sep ?? sum;
 }
+/** Linha do cesto: estas peças pedidas sozinhas. Sofás, colchões: cada um (o riscado do motor soma-os assim, e juntos só
+ *  descem no total); cadeiras, tapetes e alcatifas: o conjunto (escalões e m²). Assim as linhas nunca somam menos do que o total. */
+export function linePrice(city: string, it: BasketItem): number | null {
+  if (it.qty > 1 && (it.kind === 'sofa' || it.kind === 'mattress')) { const one = aloneTotal(city, { ...it, qty: 1 }); return one === null ? null : Math.round(one * it.qty * 100) / 100; }
+  return aloneTotal(city, it);
+}
 /** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, o que o total sobe de verdade
  *  (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€). Só a diferença de
  *  1€ dos totais a acabar em 9 fica no preço da peça.
@@ -506,7 +512,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                     <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-12 w-12 sm:h-12 sm:w-12" />
                     <span className="min-w-0"><span className="block text-sm font-semibold leading-snug text-white">{itemLabel(it)}</span><span className="block text-xs font-semibold text-[#D4AF37]">Alterar</span></span>
                   </button>
-                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : null; })()}</span>
+                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const v = linePrice(city, it); return v != null ? formatEuro(v) : null; })()}</span>
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
@@ -555,7 +561,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <>
             <h2 className="type-section-title font-playfair mb-4 text-white">{cityKnown(city) ? <>Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></> : <>Para onde enviamos o <em className="not-italic" style={{ color: GOLD }}>preço?</em></>}</h2>
             <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
-              {items.map(it => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{(() => { const v = aloneTotal(city, it); return v != null ? formatEuro(v) : ''; })()}</span></li>)}
+              {items.map(it => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{(() => { const v = linePrice(city, it); return v != null ? formatEuro(v) : ''; })()}</span></li>)}
               {groupGifts(quote.gifts).map(g => <li key={g.key} className="flex justify-between gap-2 text-[#E8C964]"><span>{capital(g.text)}</span><span className="font-semibold"><span className="mr-1.5 text-white/45 line-through">{formatEuro(g.normal)}</span>Oferecido</span></li>)}
               <li className="border-t border-white/10 pt-1 text-xs text-white/60">{cityKnown(city) ? `${city}, deslocação incluída no total` : `${city}, deslocação a confirmar no WhatsApp`}</li>
             </ul>

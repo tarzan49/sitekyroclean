@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, cityKnown, joinSaving, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, joinSaving, linePrice, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -120,4 +120,17 @@ describe('"Se juntar X, poupa Y": nunca mais do que o total mostra, para qualque
   for (const [bn, b] of Object.entries(baskets)) it(bn, () => {
     for (const [kind, x] of joins) { const said = joinSaving('Lisboa', b, kind); if (said > 0) expect(saving([...b, x]) - saving(b), `${bn} + ${kind} ${x.size ?? x.qty}: diz ${said}`).toBeGreaterThanOrEqual(said - 1); }
   });
+});
+
+describe('linhas do cesto: nunca somam menos do que o total (9€ dos totais em 9)', () => {
+  const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
+  const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
+  const pool: BasketItem[] = [S('1-lugar'), S('1-lugar', { qty: 2 }), S('2-lugares', { qty: 2 }), S('3-lugares'), S('3-lugares', { qty: 2 }), S('3-lugares', { qty: 3 }), S('5-lugares', { qty: 2 }), S('3-lugares', { pack: 'premium', qty: 2 }), S('3-lugares', { pack: 'essencial' }), S('3-lugares', { leather: true, qty: 2 }), S('3-lugares', { pack: 'premium', imperOnly: true }), M(), M({ qty: 3 }), M({ pack: 'premium', qty: 2 }), chairs(1, 'none'), chairs(6, 'none'), chairs(12, 'premium'), newItem('rug', { width: '2', length: '3', rugMaterial: 'juta ou sisal' }), newItem('carpet', { width: '4', length: '5' })];
+  for (const city of ['Lisboa', 'Porto']) it(city, () => {
+    for (const a of pool) for (const b of [null, ...pool]) {
+      const g = b ? [a, { ...b, id: `${b.id}x` }] : [a], q = quoteBasket(city, g);
+      const sum = g.reduce((t, x) => t + linePrice(city, x)!, 0);
+      expect(sum, `${g.map(x => `${x.qty}× ${x.kind} ${x.size ?? ''} ${x.pack}`).join(' + ')}: linhas ${sum}, total ${q.total}`).toBeGreaterThanOrEqual(q.total! - 9);
+    }
+  }, 60_000);
 });
