@@ -812,3 +812,8 @@ html.snap-home main > section#preco { padding-bottom: 16px !important; }
 html.snap-home main > div#testemunhos > section > * { width: 100%; }
 @media (max-width: 767px) { html.snap-home #avaliacoes [aria-roledescription="testemunho"] > * { height: 300px; } }
 @media (max-width: 767px) { html.snap-home #avaliacoes [aria-roledescription="testemunho"] p { -webkit-line-clamp: 3; } }
+/* Perguntas com muitas linhas (ex.: /limpeza-cadeiras, 8 perguntas): mais compactas no telemóvel para caber num ecrã (packs-tratamento, 24 Nov). */
+@media (max-width: 767px) {
+  html.snap-sections #duvidas button[aria-expanded] { padding-top: 8px; padding-bottom: 8px; gap: 10px; }
+  html.snap-sections #duvidas button[aria-expanded] > span:first-child { font-size: 14px; line-height: 1.35; }
+}

@@ -19,7 +19,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | MarcaSofaPage | 416 | 416 | FEITO em tecido, falta OK; marcas de pele ficam no molde antigo | MarcaColchao 312 e MarcaCadeiras 312 FEITO (24 Nov) |
 | TreatmentPage (`/tratamento-anti-acaros-*`, `/desbacterizacao-*`) | 206 | — | — | FEITO (24 Nov): texto encurtado com o OK do dono |
 | CommercialPage | 32 | — | — | por fazer |
-| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); colchões e cadeiras: packs-tratamento |
+| Hubs: `/limpeza-sofas`, colchões, cadeiras, tapetes, alcatifas, `/impermeabilizacao` | 6 | 1 | /limpeza-sofas FEITO | /limpeza-tapetes, /limpeza-alcatifas, /impermeabilizacao FEITO (24 Nov); /limpeza-colchoes e /limpeza-cadeiras FEITO (24 Nov, packs-tratamento) |
 | Página inicial | — | — | — | encaixe em curso (outra sessão, 328f1dad) |
 | Guias, /problemas, /en, blog | — | — | — | por fazer (blog no fim: só topo + widget) |
 
