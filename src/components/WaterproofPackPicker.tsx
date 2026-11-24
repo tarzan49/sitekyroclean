@@ -37,9 +37,9 @@ const PHOTO: Record<'sofa' | 'chairs', Record<string, string>> = {
 };
 
 export interface PackChoice { kind: Kind; size: string; qty: number; extra: PackExtra }
-interface Props { kind: Kind; city: string; source: string; onMore?: (choice: PackChoice) => void }
+interface Props { kind: Kind; city: string; source: string; onMore?: (choice: PackChoice) => void; compact?: boolean }
 
-export default function WaterproofPackPicker({ kind, city, source, onMore }: Props) {
+export default function WaterproofPackPicker({ kind, city, source, onMore, compact = false }: Props) {
   const [size, setSize] = useState('3-lugares');
   const [qty, setQty] = useState(6);
   const [extra, setExtra] = useState<PackExtra>('premium');
@@ -89,7 +89,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
       {/* 1. Uma só pergunta */}
       <div>
         <p className="hidden text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37] md:block">Passo 1</p>
-        <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-4 md:mt-1 md:text-lg">{kind === 'sofa' ? 'Quantos lugares tem o sofá?' : 'Quantas cadeiras?'}</p>
+        <p className={`${compact ? 'hidden md:block ' : ''}mb-2 text-base font-semibold text-[#1A1A1A] md:mb-4 md:mt-1 md:text-lg`}>{kind === 'sofa' ? 'Quantos lugares tem o sofá?' : 'Quantas cadeiras?'}</p>
         {kind === 'sofa' ? (
           <div className="grid grid-cols-6 gap-1.5 md:grid-cols-3 md:gap-2" role="radiogroup" aria-label="Lugares">
             {SOFA_SIZES.map(id => {
@@ -150,7 +150,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
             );
           })}
         </div>
-        {!byPhoto && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final em {city}, deslocação incluída.</p>}
+        {!byPhoto && !compact && <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final em {city}, deslocação incluída.</p>}
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full md:mt-5 md:min-h-14 items-center justify-center gap-2 rounded-2xl bg-[#25D366] whitespace-nowrap px-3 text-center text-[15px] font-bold text-white sm:text-base shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5">

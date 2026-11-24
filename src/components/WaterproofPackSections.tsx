@@ -53,7 +53,7 @@ export function useAutoSlide<T extends HTMLElement>(intervalMs = 3500) {
   return ref;
 }
 
-function storyFor(kind: Kind) {
+export function storyFor(kind: Kind) {
   const pair = BEFORE_AFTER_POOL[kind === 'sofa' ? 'sofa' : 'cadeiras'].find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
   const what = kind === 'sofa' ? 'sofá' : 'cadeiras';
   return [
