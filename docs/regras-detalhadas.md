@@ -1151,3 +1151,9 @@ Saiu a nota "deslocação ainda por definir: não dês valor de deslocação" (`
 - Regra para todas as páginas do site: a barra "Falar por WhatsApp" no fundo do ecrã acompanha sempre; só não aparece quando a secção que ocupa o ecrã já tem um botão de WhatsApp (mesmo que esse botão ainda esteja mais abaixo na secção).
 - Antes aparecia só depois de 400 px de scroll e escondia-se perto do fim; depois passou a esconder-se só com o botão à vista, e o dono apanhou-a por cima da escolha de preço das cadeiras ("já te tinha dito"). Hoje decide pela secção de primeiro nível com mais altura visível (`main section` que não está dentro de outra secção, mais o `footer`).
 - Código: `src/components/MobileStickyBar.tsx`.
+
+## Nomes dos packs nas escolhas de preço (dono, 24 Nov 2026)
+
+- Blindado = limpeza + impermeabilização Premium (até 10 anos); Protegido = limpeza + Essencial (1 a 2 anos); Renovado = só limpeza. Aprovados pelo dono depois de rejeitar ícones e selos ("tem de ser algo que o cliente olhe e associe, algo que venda").
+- Cada cartão tem uma fotografia real: Blindado = Pepsi a cair no sofá (vídeo imper-agua-01), Protegido = água a escorrer (imper-agua-07), Renovado = o sofá limpo do 1.º par da galeria; nas cadeiras, os vídeos de cadeiras.
+- "Premium" e "Essencial" continuam por baixo do nome e na mensagem de WhatsApp ("pack Blindado (limpeza + premium) de ..."), porque é como o bot fala. O bot (kyro-bot) ainda não usa os nomes novos nas respostas: se o dono quiser, isso é uma mudança à parte no ficheiro do bot.
