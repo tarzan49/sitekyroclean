@@ -3,7 +3,12 @@
 // total final já com deslocação, um botão. Preços pelo mesmo motor do
 // bot (botQuote), nunca escritos à mão.
 import { useMemo, useState } from 'react';
-import { Check, Minus, Plus, MessageCircle, ShieldCheck, Shield, Droplets, Sofa, Armchair, Camera, type LucideIcon } from 'lucide-react';
+import { Check, Minus, Plus, MessageCircle, Sofa, Armchair, Camera } from 'lucide-react';
+import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
+import premiumSofa from '@/assets/picker-premium-sofa.webp';
+import essencialSofa from '@/assets/picker-essencial-sofa.webp';
+import premiumChair from '@/assets/picker-premium-cadeira.webp';
+import essencialChair from '@/assets/picker-essencial-cadeira.webp';
 import { type PackExtra } from '@/lib/customPack';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -15,11 +20,20 @@ const PHOTO_SIZE = 'foto'; // canto, em U ou 7+ lugares: preço pela fotografia
 
 const CHAIR_MAX = 20;
 
-const OPTIONS: { extra: PackExtra; title: string; note: string; icon: LucideIcon; top?: boolean }[] = [
-  { extra: 'premium', title: 'Limpeza + Premium', note: 'Proteção até 10 anos', icon: ShieldCheck, top: true },
-  { extra: 'essencial', title: 'Limpeza + Essencial', note: 'Proteção de 1 a 2 anos', icon: Shield },
-  { extra: 'none', title: 'Só limpeza', note: 'Sem proteção', icon: Droplets },
+// Cada pack tem um nome que o define (dono, 24 Nov); "Premium"/"Essencial" ficam por baixo, como o bot diz.
+const OPTIONS: { extra: PackExtra; name: string; title: string; note: string; top?: boolean }[] = [
+  { extra: 'premium', name: 'Blindado', title: 'Limpeza + Premium', note: 'até 10 anos', top: true },
+  { extra: 'essencial', name: 'Protegido', title: 'Limpeza + Essencial', note: '1 a 2 anos' },
+  { extra: 'none', name: 'Renovado', title: 'Só limpeza', note: 'sem proteção' },
 ];
+
+// Fotografia real que diz a escolha num olhar (dono, 24 Nov): o líquido em cima do tecido nas
+// opções com proteção, o artigo limpo no "só limpeza".
+const afterOf = (cat: 'sofa' | 'cadeiras') => (BEFORE_AFTER_POOL[cat].find(p => p.kind === 'pair') as { after: string } | undefined)?.after ?? '';
+const PHOTO: Record<'sofa' | 'chairs', Record<string, string>> = {
+  sofa: { premium: premiumSofa, essencial: essencialSofa, none: afterOf('sofa') },
+  chairs: { premium: premiumChair, essencial: essencialChair, none: afterOf('cadeiras') },
+};
 
 interface Props { kind: Kind; city: string; source: string }
 
@@ -42,7 +56,7 @@ export default function WaterproofPackPicker({ kind, city, source }: Props) {
   const what = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares (envio fotografia)' : kind === 'sofa' ? `sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}` : `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
   const chosen = OPTIONS.find(o => o.extra === extra)!;
   const total = totals[extra];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: ${chosen.title.toLowerCase()} de ${what}, em ${city}${total ? ` (vi ${formatEuro(total)} no site)` : ''}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: pack ${chosen.name} (${chosen.title.toLowerCase()}) de ${what}, em ${city}${total ? ` (vi ${formatEuro(total)} no site)` : ''}.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (
@@ -89,17 +103,16 @@ export default function WaterproofPackPicker({ kind, city, source }: Props) {
           {OPTIONS.map(o => {
             const active = extra === o.extra;
             const value = totals[o.extra];
-            const Icon = o.icon;
             return (
               <button key={o.extra} type="button" role="radio" aria-checked={active} onClick={() => setExtra(o.extra)}
-                className={`relative flex min-h-[60px] items-center gap-2.5 rounded-2xl border-2 px-3 py-2.5 md:min-h-[66px] md:py-3 text-left sm:gap-3 sm:px-4 transition-all ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
-                {o.top && <span className="absolute -top-2.5 left-4 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhida</span>}
-                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl sm:h-11 sm:w-11 ${active ? 'bg-[#D4AF37] text-white' : 'bg-[#F3F0E7] text-[#D4AF37]'}`}><Icon className="h-5 w-5" /></span>
-                <span className="min-w-0 flex-1">
-                  <span className="block whitespace-nowrap text-[15px] font-semibold leading-tight text-[#1A1A1A] sm:text-base">{o.title}</span>
-                  <span className="block text-[13px] text-[#666] sm:text-sm">{o.note}</span>
+                className={`relative flex min-h-[72px] items-stretch overflow-hidden rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="w-[84px] shrink-0 object-cover md:w-[100px]" />
+                {o.top && <span className="absolute left-[92px] top-1.5 rounded-full bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white md:left-[108px]">Mais escolhido</span>}
+                <span className={`flex min-w-0 flex-1 flex-col justify-center px-3 ${o.top ? 'pt-4' : ''}`}>
+                  <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>
+                  <span className="block text-[12px] leading-snug text-[#666] sm:text-[13px]">{o.title} · {o.note}</span>
                 </span>
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 pr-3">
                   <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">{byPhoto ? 'Pela fotografia' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                   <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
                 </span>

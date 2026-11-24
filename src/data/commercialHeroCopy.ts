@@ -14,12 +14,13 @@ const IMPER_ESSENCIAL = formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM);
  * do catálogo mas tem preços próprios (por cadeira). */
 export const CHAIR_WATERPROOF_SUBTITLE_KEY = 'impermeabilizacao-cadeiras';
 
+// Limpezas: pergunta de abertura com "ainda hoje" (dono, 24 Nov). É pergunta, não promessa: a hora real vem sempre da bot-api.
 const subtitles: Record<string, string> = {
-  'limpeza-sofas': 'Cuidado profissional para o seu sofá, sem sair de casa.',
-  'limpeza-colchoes': 'Limpeza do colchão com cuidados adaptados ao tecido.',
-  'limpeza-cadeiras': 'Cuidamos dos assentos, encostos e tecidos das suas cadeiras.',
-  'limpeza-tapetes': 'Cuidados adaptados às fibras e ao estado do seu tapete.',
-  'limpeza-alcatifas': 'Limpeza da alcatifa com atenção às zonas de maior uso.',
+  'limpeza-sofas': 'Quer o seu sofá limpo ainda hoje? Vamos à sua casa: veja o preço e a próxima hora livre em menos de 1 minuto.',
+  'limpeza-colchoes': 'Quer o seu colchão limpo ainda hoje? Vamos à sua casa: veja o preço e a próxima hora livre em menos de 1 minuto.',
+  'limpeza-cadeiras': 'Quer as suas cadeiras limpas ainda hoje? Vamos à sua casa: veja o preço e a próxima hora livre em menos de 1 minuto.',
+  'limpeza-tapetes': 'Quer o seu tapete limpo ainda hoje? Lavamos em sua casa: envie as medidas e dizemos o preço e a próxima hora livre.',
+  'limpeza-alcatifas': 'Quer a sua alcatifa limpa ainda hoje? Vamos à sua casa: envie as medidas e dizemos o preço e a próxima hora livre.',
   // A Premium vem primeiro porque é o que os anúncios prometem, e quem chega de
   // um anúncio tem de reencontrar aqui a mesma versão e o mesmo preço. A
   // Essencial fica nomeada na mesma linha: continua a existir e continua a ser

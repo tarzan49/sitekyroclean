@@ -674,7 +674,7 @@ section.sr-inactive {
    suavemente na secção seguinte. Secções mais altas do que o ecrã deixam ler
    até ao fim antes de encaixar (comportamento do scroll-snap). */
 html.snap-sections { scroll-snap-type: y mandatory; scroll-padding-top: var(--header-h, 64px); }
-html.snap-sections main > section { scroll-snap-align: start; scroll-margin-top: 0 !important; min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
+html.snap-sections main > section, html.snap-sections main [data-landing-section] { scroll-snap-align: start; scroll-margin-top: 0 !important; min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
 html.snap-sections main > section[data-commercial-hero] { min-height: 100svh; }
 html.snap-sections footer { scroll-snap-align: end; }
 @media (prefers-reduced-motion: reduce) { html.snap-sections { scroll-snap-type: y proximity; } }
@@ -721,12 +721,16 @@ html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16p
 }
 /* Avaliações num só ecrã: cabeçalho junto, texto de cada avaliação em 4 linhas (o link abre a completa). */
 html.snap-sections #avaliacoes .mb-10 { margin-bottom: 16px; }
-html.snap-sections #avaliacoes .mb-10 p:last-child { display: none; }
 html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin-top: 12px; }
 @media (min-width: 768px) { html.snap-sections #avaliacoes h2 { font-size: 2rem; } html.snap-sections #avaliacoes .mb-10 { margin-bottom: 8px; } }
 /* O conteúdo de cada secção ocupa a largura toda (a centragem vertical em flex tirava-lha). */
-html.snap-sections main > section > * { width: 100%; }
+html.snap-sections main > section > *, html.snap-sections main [data-landing-section] > * { width: 100%; }
 /* Telemóvel: o menu esconde-se ao descer, por isso a secção encaixa no topo do ecrã. */
-@media (max-width: 767px) { html.snap-sections { scroll-padding-top: 0; } html.snap-sections main > section { min-height: 100svh; } }
+@media (max-width: 767px) { html.snap-sections { scroll-padding-top: 0; } html.snap-sections main > section, html.snap-sections main [data-landing-section] { min-height: 100svh; } }
 @keyframes kyro-story { from { width: 0%; } to { width: 100%; } }
+/* Famílias landing: cada secção vive dentro de [data-landing-section]; o fundo estica ao ecrã inteiro e o conteúdo fica ao centro. */
+html.snap-sections main [data-landing-section] > * { flex: 1; display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 0 !important; padding-top: 16px; padding-bottom: 16px; }
+html.snap-sections main [data-landing-section] > * > * { width: 100%; }
+/* Cabeçalhos de secção mais juntos ao conteúdo nas páginas com encaixe (o título não pode ficar cortado). */
+html.snap-sections [data-landing-section] .mb-10 { margin-bottom: 14px; }

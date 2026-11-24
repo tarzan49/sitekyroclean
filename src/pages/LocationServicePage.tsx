@@ -27,6 +27,13 @@ const LocationServicePage = () => {
   // O modelo traz o que o hero precisa: titulo, h1, cidade, servico e preco.
   const resolved = useLandingModel(location.pathname);
   const model = resolved.status === 'ready' ? resolved.model : null;
+  // Novo modelo de secções (ecrã inteiro + encaixe), em teste só na limpeza de sofás por cidade (dono, 24 Nov).
+  const snapPage = model?.serviceSlug === 'limpeza-sofas' && model?.family === 'localidade';
+  useEffect(() => {
+    if (!snapPage) return;
+    document.documentElement.classList.add('snap-sections');
+    return () => document.documentElement.classList.remove('snap-sections');
+  }, [snapPage]);
   const data = useMemo(() => (model && model.family === 'localidade' ? {
     title: model.title, metaDescription: model.metaDescription, h1: model.h1,
     city: model.municipalityName, citySlug: model.municipalitySlug,
