@@ -1243,3 +1243,7 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 ## Teto de 20% sem oferta: `[RETIRADA 25/11]` o total mantém a soma
 
 - "Sim, mantém a soma" (dono, a esta pergunta) esteve só na master (6861d75c), nunca foi publicado: o dono, depois de ver a tabela 159/179, respondeu na sessão SEO "159€", depois "Vou fazer 149 para esse caso." e "149 em vez de 179." (2 sofás de 3 lugares, só limpeza, Lisboa). O código voltou ao que estava (3L + 3L 159€); o 149€ e os outros pares estão por decidir.
+
+## Vários sofás acabam sempre em 9 (dono, 25 Nov 2026: "Sim, nos dois")
+
+Dois ou mais sofás no pedido (a quantidade conta), limpos ou impermeabilizados: total, opções Premium/Essencial e valores da condição acima de 300€ acabam em 9, para cima (616 -> 619, 446 -> 449). `withEndIn9` em `src/lib/botQuote.ts`, teste `botQuote.sofas9.test.ts`; vale no site e no bot.

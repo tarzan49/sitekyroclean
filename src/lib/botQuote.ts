@@ -527,18 +527,24 @@ function botQuoteChain(input: unknown) {
 /**
  * Mattress with anti-mites and rug with anti-odor always end in 9, up to the next one (owner, 24 Nov 2026:
  * "O tapete com anti-odor e o colchão com anti-ácaros acabam sempre em 9?" "sim"): casal 99, solteiro 84 -> 89,
- * rug 126 -> 129. Total, rug prices, options and struck prices alike, so they stay coherent.
+ * rug 126 -> 129. Several sofas too (25 Nov 2026, "Sim, nos dois": 616 -> 619, 446 -> 449). Total, rug prices, options and struck prices alike, so they stay coherent.
  */
 function withEndIn9<T>(input: unknown, r: T): T {
   const items = ((input ?? {}) as { items?: unknown }).items;
   const hit = Array.isArray(items) && items.some(i => { const x = (i ?? {}) as Record<string, unknown>; return (x.kind === 'mattress' && x.treatment === 'clean+anti-acaros') || ((x.kind === 'rug' || x.kind === 'carpet') && x.odor === true); });
+  // Sofa pieces in the order (qty counts): two or more, cleaned or waterproofed, also end in 9.
+  const sofas = Array.isArray(items) ? items.reduce((n: number, i) => { const it = (i ?? {}) as Record<string, unknown>; return it.kind === 'sofa' ? n + (Number(it.qty) > 1 ? Number(it.qty) : 1) : n; }, 0) : 0;
   const x = r as unknown as Record<string, any>;
-  if (!hit || !x?.ok || x.blackFriday) return r;
+  if ((!hit && sofas < 2) || !x?.ok || x.blackFriday) return r;
   const up9 = (v: unknown) => { if (typeof v !== 'number') return v; const n = Math.ceil(v); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
   const out: Record<string, any> = { ...x, total: x.quote ? x.total : up9(x.total) };
   if (x.rugEstimate) out.rugEstimate = { ...x.rugEstimate, homePrice: up9(x.rugEstimate.homePrice), pickupPrice: up9(x.rugEstimate.pickupPrice) };
   if (x.rugCombo) out.rugCombo = { ...x.rugCombo, comboPrice: up9(x.rugCombo.comboPrice), usualPrice: up9(x.rugCombo.usualPrice) };
   if (x.waterproofingTiers) out.waterproofingTiers = { ...x.waterproofingTiers, premium: up9(x.waterproofingTiers.premium), essencial: up9(x.waterproofingTiers.essencial) };
+  if (sofas >= 2 && x.bigOrder) {
+    const b = x.bigOrder, normal = out.total as number, special = up9(b.special) as number;
+    out.bigOrder = { ...b, normal, special, savings: cents(normal - special), tiers: b.tiers ? { ...b.tiers, premium: up9(b.tiers.premium), essencial: up9(b.tiers.essencial) } : b.tiers };
+  }
   if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, total: up9(x.mattressMitePack.total), separate: up9(x.mattressMitePack.separate) };
   // separate 0 = no struck price on the order itself (only on the options): it stays 0 (24 Nov 2026 audit: 9, Poupa -290).
   if (x.separatePrice) out.separatePrice = x.separatePrice.separate > 0

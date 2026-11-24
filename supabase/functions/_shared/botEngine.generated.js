@@ -2706,8 +2706,12 @@ function withEndIn9(input, r) {
     const x2 = i ?? {};
     return x2.kind === "mattress" && x2.treatment === "clean+anti-acaros" || (x2.kind === "rug" || x2.kind === "carpet") && x2.odor === true;
   });
+  const sofas = Array.isArray(items) ? items.reduce((n, i) => {
+    const it = i ?? {};
+    return it.kind === "sofa" ? n + (Number(it.qty) > 1 ? Number(it.qty) : 1) : n;
+  }, 0) : 0;
   const x = r;
-  if (!hit || !x?.ok || x.blackFriday) return r;
+  if (!hit && sofas < 2 || !x?.ok || x.blackFriday) return r;
   const up9 = (v) => {
     if (typeof v !== "number") return v;
     const n = Math.ceil(v);
@@ -2717,6 +2721,10 @@ function withEndIn9(input, r) {
   if (x.rugEstimate) out.rugEstimate = { ...x.rugEstimate, homePrice: up9(x.rugEstimate.homePrice), pickupPrice: up9(x.rugEstimate.pickupPrice) };
   if (x.rugCombo) out.rugCombo = { ...x.rugCombo, comboPrice: up9(x.rugCombo.comboPrice), usualPrice: up9(x.rugCombo.usualPrice) };
   if (x.waterproofingTiers) out.waterproofingTiers = { ...x.waterproofingTiers, premium: up9(x.waterproofingTiers.premium), essencial: up9(x.waterproofingTiers.essencial) };
+  if (sofas >= 2 && x.bigOrder) {
+    const b = x.bigOrder, normal = out.total, special = up9(b.special);
+    out.bigOrder = { ...b, normal, special, savings: cents(normal - special), tiers: b.tiers ? { ...b.tiers, premium: up9(b.tiers.premium), essencial: up9(b.tiers.essencial) } : b.tiers };
+  }
   if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, total: up9(x.mattressMitePack.total), separate: up9(x.mattressMitePack.separate) };
   if (x.separatePrice) out.separatePrice = x.separatePrice.separate > 0 ? { ...x.separatePrice, total: up9(x.separatePrice.total), separate: up9(x.separatePrice.separate), saving: up9(x.separatePrice.separate) - up9(x.separatePrice.total) } : { ...x.separatePrice, total: up9(x.separatePrice.total) };
   return out;
