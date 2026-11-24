@@ -23,7 +23,7 @@ const Hero = () => {
     <>
       <section
         id="orcamento"
-        className="relative bg-[#0B2F2A] md:min-h-[95vh] flex items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
+        className="relative bg-[#0B2F2A] min-h-[100svh] flex items-end md:items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
         aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
@@ -63,35 +63,16 @@ const Hero = () => {
         <div className="relative z-10 mx-auto grid w-full max-w-[1400px] px-5 md:grid-cols-[minmax(0,52%)_minmax(300px,1fr)] md:gap-4 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
           <div className="max-w-[610px]">
 
-            {/* Tag */}
-            <div className="inline-flex items-start mb-5">
-              <div className="flex flex-col gap-1">
-                <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                <span
-                  className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
-                  style={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
-                >
-                  KYRO CLEAN SOLUTIONS
-                </span>
-              </div>
-            </div>
-
             {/* H1 */}
             <h1
               className="font-playfair text-[2rem] min-[375px]:text-[2.375rem] sm:text-[2.625rem] md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] md:leading-[1.15] tracking-[-0.025em] mb-4 md:mb-5"
               style={{ textShadow: '0 2px 16px rgba(0,0,0,0.65)' }}
             >
-              Estofos como novos,<br />
-              <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
+              Os seus estofos como novos,{' '}
+              <span style={{ color: '#D4AF37' }}>ainda hoje.</span>
             </h1>
 
-            {/* Short value proposition stays on the dark sofa area, away from the extractor. */}
-            <p
-              className="mb-5 max-w-[430px] text-sm leading-relaxed text-white sm:text-base md:mb-6 md:max-w-[360px] md:text-base lg:max-w-[390px]"
-              style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
-            >
-              Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 1 minuto. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.
-            </p>
+            {/* Sem descrição por agora (dono, 24 Nov): primeiro vê só o título; a descrição volta depois. */}
 
           </div>
 
@@ -104,24 +85,7 @@ const Hero = () => {
           {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
           <div className="mx-auto flex w-full max-w-sm flex-col gap-2.5 md:mb-8 md:mt-0 md:w-[92%] md:max-w-[400px] md:self-end md:justify-self-center">
 
-              {/* Price CTA keeps the same secondary treatment on mobile and desktop. */}
-              <div className="group relative order-2">
-                <button
-                  onClick={handleOpenQuiz}
-                  className={[
-                    'relative w-full border border-[#D4AF37]/70 bg-black/35 font-bold text-white touch-manipulation backdrop-blur-md',
-                    'h-[48px] px-4 md:px-8 text-base md:text-[17px]',
-                    'shadow-[0_8px_24px_rgba(0,0,0,0.22)]',
-                    'hover:border-[#D4AF37] hover:bg-black/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.30)]',
-                    'hover:scale-[1.025]',
-                    'active:scale-[0.95]',
-                    'transition-all duration-150',
-                  ].join(' ')}
-                >
-                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
-                </button>
-              </div>
-
+              {/* Só o WhatsApp, com a mensagem genérica (dono, 24 Nov: sai o "Calcular o meu preço"). */}
               {/* WhatsApp is the primary CTA on mobile and desktop. */}
               <div className="group relative order-1">
                 <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
