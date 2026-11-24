@@ -34,7 +34,7 @@ describe('problem hero content', () => {
   });
   it('rugs and fitted carpets show the engine rate per m²', () => {
     for (const item of getAllProblems().filter(item => item.relatedServices[0] === 'limpeza-tapetes')) expect(getProblemHero(item).priceLabel).toBe('Limpeza desde 10€/m²');
-    for (const item of getAllProblems().filter(item => item.relatedServices[0] === 'limpeza-alcatifas')) expect(getProblemHero(item).priceLabel).toBe('Limpeza desde 7€/m²');
+    for (const item of getAllProblems().filter(item => item.relatedServices[0] === 'limpeza-alcatifas')) expect(getProblemHero(item).priceLabel).toBe('Limpeza desde 5€/m²');
   });
   it('distinguishes cleaning from treatment and protection', () => {
     const mites = getProblemHero(problem('acaros-colchao'));

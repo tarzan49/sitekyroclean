@@ -4,7 +4,8 @@
  * lavagem em casa, deslocação incluída, material comum (juta/sisal ajustado; seda/persa = dono).
  */
 import { botQuote } from './botQuote';
-import { roundToNine, RUG_RATE_COMMON, RUG_RATE_CARPET, RUG_ESTIMATE_MIN_AREA_M2, RUG_SMALL_COMBO_EXTRA } from './botRugEstimate';
+import { carpetWashing } from '../constants/rugRates';
+import { roundToNine, RUG_RATE_COMMON, RUG_ESTIMATE_MIN_AREA_M2, RUG_SMALL_COMBO_EXTRA } from './botRugEstimate';
 export { RUG_PRICE_FROM, RUG_PRICE_NOTE, CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export type RugMeasure = { width: number; length: number };
@@ -22,9 +23,10 @@ export function siteRugPrice(rugs: RugMeasure[], city: string | null | undefined
  * Lavagem de tapete comum acrescentada a outra peça na mesma visita (sem a deslocação, que já vai
  * na peça principal): a mesma conta do rugCombo do bot (rugsWashing = homePrice − deslocação, a acabar em 9).
  */
-export function siteRugWashing(areaM2: number, travelFee: number, rate: number = RUG_RATE_COMMON): number | null {
+export function siteRugWashing(areaM2: number, travelFee: number, kind: 'rug' | 'carpet' = 'rug'): number | null {
   if (!(areaM2 > 0)) return null;
-  return roundToNine(roundToNine(areaM2 * rate + travelFee) - travelFee);
+  const washing = kind === 'carpet' ? carpetWashing(areaM2) : areaM2 * RUG_RATE_COMMON;
+  return roundToNine(roundToNine(washing + travelFee) - travelFee);
 }
 
 type PackLine = { amount: number | null; quote?: boolean };
@@ -49,7 +51,7 @@ export function withRugEngine<L extends PackLine, P extends PackPrices<L>>(price
   const lines = prices.lines.map((l, i) => {
     if (!rugIdx.includes(i)) return l;
     const it = items[i];
-    const amount = rugIdx.length === 1 && rugsOnly ? r.rugEstimate!.homePrice! : siteRugWashing(dim(it.width) * dim(it.length) * it.qty, travelFee, it.kind === 'carpet' ? RUG_RATE_CARPET : RUG_RATE_COMMON);
+    const amount = rugIdx.length === 1 && rugsOnly ? r.rugEstimate!.homePrice! : siteRugWashing(dim(it.width) * dim(it.length) * it.qty, travelFee, it.kind === 'carpet' ? 'carpet' : 'rug');
     return { ...l, amount, quote: amount === null };
   });
   const homeTotal = r.rugEstimate.homePrice;

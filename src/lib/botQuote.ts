@@ -831,7 +831,7 @@ function botQuoteInner(input: unknown) {
   const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
   // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
   // Anything mixed with other items still goes to the owner.
-  // Alcatifas pelo mesmo motor, 7€/m² (dono, 24 Nov 2026).
+  // Alcatifas pelo mesmo motor, por escalões da área (CARPET_TIERS; dono, 24 Nov 2026).
   const isRugLike = (k: string) => k === 'rug' || k === 'carpet';
   const matOf = (n: number) => (items[n].kind === 'carpet' ? 'alcatifa' : (rawOf[n] as Record<string, unknown>).material);
   const rugsOnly = items.every(i => isRugLike(i.kind));

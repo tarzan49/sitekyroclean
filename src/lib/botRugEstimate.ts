@@ -21,7 +21,7 @@ import { locationPrices } from '../constants/travel';
 import { rugPickupFee } from '../constants/commercialPolicy';
 import { sofaCleaningPrice } from '../data/enginePrices';
 
-import { RUG_RATE_COMMON, RUG_RATE_NATURAL, RUG_RATE_CARPET } from '../constants/rugRates';
+import { RUG_RATE_COMMON, RUG_RATE_NATURAL, RUG_RATE_CARPET, carpetWashing } from '../constants/rugRates';
 export { RUG_RATE_COMMON, RUG_RATE_NATURAL, RUG_RATE_CARPET };
 export const RUG_ESTIMATE_MIN_AREA_M2 = 3;
 /** A rug under 3 m² added to other items costs 10€ more (owner, 22 Oct 2026). */
@@ -122,7 +122,9 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   const classes = rugs.map(r => rugMaterialClass(r.material));
   if (classes.includes('delicate')) return { ok: false, reason: 'tapete delicado (seda, viscose, persa, Arraiolos ou feito à mão): o responsável dá o preço' };
   const areaM2 = Math.round(rugs.reduce((s, r) => s + r.qty * r.width * r.length, 0) * 100) / 100;
-  const washing = rugs.reduce((s, r, i) => s + r.qty * r.width * r.length * rateOf(classes[i]), 0);
+  // Alcatifa por escalões da área total de alcatifa (dono, 24 Nov 2026); o resto por m².
+  const carpetArea = rugs.reduce((s, r, i) => s + (classes[i] === 'carpet' ? r.qty * r.width * r.length : 0), 0);
+  const washing = rugs.reduce((s, r, i) => s + (classes[i] === 'carpet' ? 0 : r.qty * r.width * r.length * rateOf(classes[i])), 0) + carpetWashing(carpetArea);
   const travelFee = locationPrices[city as keyof typeof locationPrices];
   const homePrice = roundToNine(washing + travelFee);
   // Alcatifa nunca tem recolha.
@@ -130,7 +132,7 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
   return {
     ok: true,
     areaM2,
-    ratePerM2: [...new Set(classes.map(rateOf))],
+    ratePerM2: [...new Set(classes.map(c => (c === 'carpet' && carpetArea > 0 ? Math.round(carpetWashing(carpetArea) / carpetArea * 100) / 100 : rateOf(c))))],
     travelFee,
     homePrice,
     pickupFee,

@@ -29,7 +29,7 @@ describe('shared landing composition', () => {
       const fee = locationPrices[model!.municipalityName];
       // Tapetes e alcatifas: a deslocação é sob orçamento (dono, 2026-10-05).
       if (model!.serviceSlug === 'limpeza-tapetes') expect(model!.pricingDescription).toContain('10€/m²');
-      else if (RUG_SERVICE_SLUGS.includes(model!.serviceSlug)) expect(model!.pricingDescription).toContain('7€/m²');
+      else if (RUG_SERVICE_SLUGS.includes(model!.serviceSlug)) expect(model!.pricingDescription).toContain('5€/m²');
       else if (fee !== undefined) expect(model!.pricingDescription).toContain(`+${fee}€`);
     }
   });
