@@ -14,6 +14,7 @@ import ChairProcessStory from './ChairProcessStory';
 import TreatmentPackPicker from './TreatmentPackPicker';
 import ServiceProcessStory, { hasProcessStory } from './ServiceProcessStory';
 import CarpetPricePicker from './CarpetPricePicker';
+import ImperPricePicker from './ImperPricePicker';
 import { isNewModel } from '@/lib/newModel';
 import PriceFactors from './PriceFactors';
 import { ServiceTrustDesktop, ServiceTrustMobile } from './ServiceTrustBlock';
@@ -62,7 +63,7 @@ export default function LandingServiceSections() {
       <div className={container}>
         <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{model.prep} {model.locationName}</em></h2>
         <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">
-          {model.serviceSlug === 'limpeza-alcatifas' ? <CarpetPricePicker city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} /> : model.serviceSlug === 'limpeza-tapetes' ? <TreatmentPackPicker kind="rug" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : model.serviceSlug === 'limpeza-colchoes' ? <TreatmentPackPicker kind="mattress" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : <WaterproofPackPicker kind={pickerKind} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(choiceToItem(c))} />}
+          {model.serviceSlug === 'impermeabilizacao' ? <ImperPricePicker initialKind={model.serviceKey === 'cadeiras' ? 'chairs' : 'sofa'} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} /> : model.serviceSlug === 'limpeza-alcatifas' ? <CarpetPricePicker city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} /> : model.serviceSlug === 'limpeza-tapetes' ? <TreatmentPackPicker kind="rug" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : model.serviceSlug === 'limpeza-colchoes' ? <TreatmentPackPicker kind="mattress" city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(treatmentToItem(c))} /> : <WaterproofPackPicker kind={pickerKind} city={model.municipalityName} source={`landing_picker_${model.serviceSlug}`} onMore={c => setBasket(choiceToItem(c))} />}
         </div>
       </div>
     </section> : <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
