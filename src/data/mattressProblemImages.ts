@@ -13,18 +13,6 @@ export const MATTRESS_PROBLEM_IMAGES = [
     "alt": "Colchão com sujidade e pó acumulados no tecido (fotografia 2)"
   },
   {
-    "id": "colchao-residuos-03",
-    "problemId": "limpeza-colchoes-1",
-    "src": "/images/landing-problems/colchoes/colchao-residuos-03.webp",
-    "alt": "Colchão com sujidade e pó acumulados no tecido (fotografia 3)"
-  },
-  {
-    "id": "colchao-residuos-04",
-    "problemId": "limpeza-colchoes-1",
-    "src": "/images/landing-problems/colchoes/colchao-residuos-04.webp",
-    "alt": "Colchão com sujidade e pó acumulados no tecido (fotografia 4)"
-  },
-  {
     "id": "colchao-manchas-01",
     "problemId": "limpeza-colchoes-2",
     "src": "/images/landing-problems/colchoes/colchao-manchas-01.webp",
@@ -107,11 +95,5 @@ export const MATTRESS_PROBLEM_IMAGES = [
     "problemId": "limpeza-colchoes-4",
     "src": "/images/landing-problems/colchoes/colchao-cuidados-04.webp",
     "alt": "Colchão usado e sujo antes da limpeza (fotografia 4)"
-  },
-  {
-    "id": "colchao-cuidados-05",
-    "problemId": "limpeza-colchoes-4",
-    "src": "/images/landing-problems/colchoes/colchao-cuidados-05.webp",
-    "alt": "Colchão usado e sujo antes da limpeza (fotografia 5)"
   }
 ];

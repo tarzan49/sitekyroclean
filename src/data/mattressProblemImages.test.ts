@@ -8,11 +8,11 @@ import { renderLandingPageHtml } from '../../scripts/landing-page-html';
 
 describe('mattress problem image library', () => {
   it('keeps forty distinct, documented images and ten relevant choices per problem', () => {
-    expect(MATTRESS_PROBLEM_IMAGES).toHaveLength(19);
-    expect(new Set(MATTRESS_PROBLEM_IMAGES.map(image => image.id)).size).toBe(19);
-    expect(new Set(MATTRESS_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(19);
+    expect(MATTRESS_PROBLEM_IMAGES).toHaveLength(16);
+    expect(new Set(MATTRESS_PROBLEM_IMAGES.map(image => image.id)).size).toBe(16);
+    expect(new Set(MATTRESS_PROBLEM_IMAGES.map(image => image.alt)).size).toBe(16);
     for (let index = 1; index <= 4; index++) {
-      expect(MATTRESS_PROBLEM_IMAGES.filter(image => image.problemId === `limpeza-colchoes-${index}`).length).toBeGreaterThanOrEqual(3);
+      expect(MATTRESS_PROBLEM_IMAGES.filter(image => image.problemId === `limpeza-colchoes-${index}`).length).toBeGreaterThanOrEqual(2);
     }
     for (const image of MATTRESS_PROBLEM_IMAGES) {
       expect(existsSync(`public${image.src}`)).toBe(true);
@@ -39,7 +39,7 @@ describe('mattress problem image library', () => {
       expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(0);
     }
     expect(families.size).toBe(4);
-    expect(used.size).toBe(19);
+    expect(used.size).toBe(16);
   });
   it('does not mix services, problem groups or standalone families', () => {
     expect(selectLandingProblemImage('limpeza-sofas', 'limpeza-colchoes-1', '/example')).toBeUndefined();
