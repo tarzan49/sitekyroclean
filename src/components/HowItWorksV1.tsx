@@ -11,9 +11,7 @@ export default function HowItWorksV1() {
     <section aria-labelledby="process-title" className="bg-[#071a12] text-white">
       <div className="mx-auto grid max-w-7xl gap-y-7 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-6 lg:py-14">
         <header className="lg:col-start-2 lg:row-start-1">
-          <p className="mb-3 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"><span className="h-px w-7 bg-[#D4AF37]" /> Como funciona</p>
-          <h2 id="process-title" className="type-section-title font-playfair">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
+          <h2 id="process-title" className="type-section-title font-playfair text-white">Nós tratamos da limpeza.<br /><em className="not-italic" style={{ color: "#D4AF37" }}>Você fica tranquilo.</em></h2>
         </header>
 
         <figure className="relative overflow-hidden lg:col-start-1 lg:row-span-2 lg:row-start-1">

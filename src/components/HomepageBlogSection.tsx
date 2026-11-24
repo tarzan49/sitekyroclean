@@ -26,13 +26,7 @@ const HomepageBlogSection = () => {
         {/* Header row */}
         <div className={`flex items-end justify-between mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           <div>
-            <div className="flex items-center gap-3 mb-5">
-              <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-              <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-                DICAS & CONSELHOS
-              </p>
-            </div>
-            <h2 className="type-section-title font-playfair      text-[#111111]">
+            <h2 className="type-section-title font-playfair text-[#111111]">
               Últimos{" "}
               <em className="not-italic" style={{ color: '#D4AF37' }}>artigos</em>
             </h2>

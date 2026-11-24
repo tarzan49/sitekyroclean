@@ -127,7 +127,7 @@ export default function PackComboPage() {
       <section id="montar" className="scroll-mt-20 py-14 md:py-20 lg:py-10 bg-[#FDFDF9]">
         <div className={container}>
           {simpleKind
-            ? <h2 className="mb-3 text-2xl font-semibold leading-tight text-[#1A1A1A] md:mb-4 md:text-3xl">Veja o seu preço <span className="text-[#D4AF37]">{cityPrep(city.name)} {city.name}</span></h2>
+            ? <h2 className="mb-8 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(city.name)} {city.name}</em></h2>
             : <SectionHeader
               overline={pack.name}
               heading="Monte o seu pack"
@@ -223,14 +223,9 @@ export default function PackComboPage() {
         return <section className="py-14 md:py-20" style={{ backgroundColor: '#FDFDF9' }}>
           <div className={container}>
             <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-                <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>Continuar</p>
-              </div>
               <h2 className="type-section-title font-playfair text-[#111111]">
                 Outras formas de pedir <em className="not-italic" style={{ color: '#D4AF37' }}>{where}</em>
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-[#505650] max-w-xl">Peça só um dos serviços, troque de pack ou confirme o que acontece antes da marcação.</p>
             </div>
             <div className="max-w-3xl divide-y divide-[#E8E4DE] border-y border-[#E8E4DE]">
               {rows.map(({ key, Icon, label, hint, count, unit, body }) => {

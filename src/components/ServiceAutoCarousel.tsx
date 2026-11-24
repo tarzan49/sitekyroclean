@@ -114,19 +114,10 @@ const ServiceAutoCarousel = ({
 
         {/* Editorial header — slightly larger */}
         <div className="mb-6 md:mb-8">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-              {overline}
-            </p>
-          </div>
-          <h2 className={`type-section-title font-playfair      mb-4 ${textMain}`}>
+          <h2 className={`type-section-title font-playfair ${textMain}`}>
             {restTitle}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-base md:text-base leading-relaxed max-w-xl ${textSub}`}>
-            {subtitle}
-          </p>
         </div>
 
         {/* Illustrative-only mode: a comparison already exists elsewhere on

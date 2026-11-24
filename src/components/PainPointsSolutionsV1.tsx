@@ -60,13 +60,7 @@ const PainPointsSolutionsV1 = () => {
 
         {/* Header */}
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-          <div className="flex items-center gap-3 mb-5">
-            <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <span className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.8 }}>
-              O QUE TRATAMOS
-            </span>
-          </div>
-          <h2 className="type-section-title font-playfair     text-[#111111]  max-w-xl">
+          <h2 className="type-section-title font-playfair text-[#111111]  max-w-xl">
             Os 4 problemas que{' '}
             <em className="not-italic" style={{ color: '#D4AF37' }}>
               resolvemos no próprio dia

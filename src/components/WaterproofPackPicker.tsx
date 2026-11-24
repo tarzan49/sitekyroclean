@@ -56,7 +56,17 @@ export default function WaterproofPackPicker({ kind, city, source }: Props) {
   const what = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares (envio fotografia)' : kind === 'sofa' ? `sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}` : `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`;
   const chosen = OPTIONS.find(o => o.extra === extra)!;
   const total = totals[extra];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade: pack ${chosen.name} (${chosen.title.toLowerCase()}) de ${what}, em ${city}${total ? ` (vi ${formatEuro(total)} no site)` : ''}.`;
+  // Mensagem pronta no WhatsApp com a escolha completa (dono, 24 Nov): o nome do pack, o que inclui, a peça,
+  // a cidade e o total que viu. O bot lê-a como um orçamento já escolhido e segue para as horas.
+  const WHAT_INCLUDES: Record<string, string> = {
+    premium: 'limpeza + impermeabilização Premium (até 10 anos)',
+    essencial: 'limpeza + impermeabilização Essencial (1 a 2 anos)',
+    none: 'só a limpeza, sem impermeabilização',
+  };
+  const forWhat = byPhoto ? 'um sofá de canto, em U ou com mais de 6 lugares' : kind === 'sofa' ? `um ${what}` : what;
+  const msg = byPhoto
+    ? `Olá! Escolhi o pack ${chosen.name}: ${WHAT_INCLUDES[extra]}, para ${forWhat}, em ${city}. Envio já a fotografia para confirmar o preço e a disponibilidade.`
+    : `Olá! Escolhi o pack ${chosen.name}: ${WHAT_INCLUDES[extra]}, para ${forWhat}, em ${city}${total ? `, por ${formatEuro(total)}` : ''}. Gostaria de confirmar o preço e a disponibilidade.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (
@@ -71,14 +81,14 @@ export default function WaterproofPackPicker({ kind, city, source }: Props) {
               const active = size === id;
               if (id === PHOTO_SIZE) return (
                 <button key={id} type="button" role="radio" aria-checked={active} onClick={() => setSize(id)}
-                  className={`col-span-2 flex min-h-[48px] flex-col md:min-h-[60px] items-center justify-center gap-1 rounded-2xl border-2 transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                  className={`col-span-2 flex min-h-[44px] flex-col md:min-h-[60px] items-center justify-center gap-1 rounded-2xl border-2 transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
                   <Camera className={`hidden h-5 w-5 md:block ${active ? 'text-[#D4AF37]' : 'text-[#B5AD99]'}`} />
                   <span className={`text-sm font-semibold leading-tight ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>Canto, U ou 7+</span>
                 </button>
               );
               return (
                 <button key={id} type="button" role="radio" aria-checked={active} onClick={() => setSize(id)}
-                  className={`flex min-h-[48px] flex-col md:min-h-[60px] items-center justify-center gap-1 rounded-2xl border-2 transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                  className={`flex min-h-[44px] flex-col md:min-h-[60px] items-center justify-center gap-1 rounded-2xl border-2 transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_6px_20px_-8px_rgba(212,175,55,0.6)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
                   <ItemIcon className={`hidden h-5 w-5 md:block ${active ? 'text-[#D4AF37]' : 'text-[#B5AD99]'}`} />
                   <span className={`text-xl font-semibold leading-none ${active ? 'text-[#1A1A1A]' : 'text-[#555]'}`}>{id.split('-')[0]}</span>
                 </button>
@@ -105,8 +115,8 @@ export default function WaterproofPackPicker({ kind, city, source }: Props) {
             const value = totals[o.extra];
             return (
               <button key={o.extra} type="button" role="radio" aria-checked={active} onClick={() => setExtra(o.extra)}
-                className={`relative flex min-h-[72px] items-stretch overflow-hidden rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
-                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="w-[84px] shrink-0 object-cover md:w-[100px]" />
+                className={`relative flex min-h-[64px] items-stretch overflow-hidden rounded-2xl border-2 text-left transition-all md:min-h-[84px] ${active ? 'border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] shadow-[0_10px_30px_-12px_rgba(212,175,55,0.55)]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]/50'}`}>
+                <img src={PHOTO[kind][o.extra]} alt="" loading="lazy" decoding="async" className="w-[76px] shrink-0 object-cover md:w-[100px]" />
                 {o.top && <span className="absolute left-[92px] top-1.5 rounded-full bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white md:left-[108px]">Mais escolhido</span>}
                 <span className={`flex min-w-0 flex-1 flex-col justify-center px-3 ${o.top ? 'pt-4' : ''}`}>
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>

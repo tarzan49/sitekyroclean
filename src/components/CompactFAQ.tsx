@@ -24,12 +24,7 @@ export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id 
       <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-12">
         {/* Cabeçalho editorial igual ao do resto do site (linha dourada, texto por cima, título, subtítulo). */}
         <div>
-          <div className="mb-3 flex items-center gap-3 md:mb-4">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-sm font-bold uppercase tracking-[0.08em]" style={{ color: '#D4AF37', opacity: 0.85 }}>Dúvidas Frequentes</p>
-          </div>
           <h2 className={`type-section-title font-playfair ${dark ? 'text-white' : 'text-[#111111]'}`}>{rest} <em className="not-italic" style={{ color: '#D4AF37' }}>{gold}</em></h2>
-          <p className={`mt-3 text-base leading-relaxed md:mt-4 ${dark ? 'text-white/80' : 'text-[#536259]'}`}>Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.</p>
         </div>
         <div className="divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white">
           {faqs.map((f, i) => {

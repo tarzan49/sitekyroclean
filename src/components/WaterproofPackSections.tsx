@@ -113,9 +113,7 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
     {/* 1. O que a proteção evita */}
     <section id="protecao" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Para que serve</p>
-        <h2 className="mt-2 text-2xl font-semibold leading-tight md:text-4xl text-[#1A1A1A] md:text-4xl">Limpo hoje, <span className={gold}>protegido amanhã</span></h2>
-        <p className="mt-2 max-w-2xl text-sm text-[#555] md:mt-3 md:text-base">Depois da limpeza, a impermeabilização cria uma barreira invisível nas fibras: os líquidos ficam à superfície e limpam-se com um pano.</p>
+        <h2 className="type-section-title font-playfair text-[#111111]">Limpo hoje, <em className="not-italic" style={{ color: "#D4AF37" }}>protegido amanhã</em></h2>
         <div ref={spillsRef} className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
           {SPILLS[kind].map(s => (
             <article key={s.title} className="w-[72%] shrink-0 snap-start overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white sm:w-auto">
@@ -134,8 +132,7 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
     {/* 2. A mesma visita em 3 imagens reais: antes, depois da limpeza, com a proteção. */}
     <section id="como-funciona" className="scroll-mt-20 bg-kyro-green py-12 text-white md:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Na mesma visita</p>
-        <h2 className="mt-2 text-2xl font-semibold leading-tight md:text-4xl">Assim ficam {item}, <span className={gold}>do antes à proteção</span></h2>
+        <h2 className="type-section-title font-playfair text-white">Assim ficam {item}, <em className="not-italic" style={{ color: "#D4AF37" }}>do antes à proteção</em></h2>
         {/* Telemóvel: um passo de cada vez, como uma história, com barras de progresso; toque = passo seguinte. */}
         <StoryPlayer story={story} />
         {/* Computador: os 3 passos lado a lado. */}
@@ -160,9 +157,7 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
     <section id="perguntas" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-12">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Dúvidas</p>
-          <h2 className="mt-2 text-2xl font-semibold leading-tight md:text-4xl text-[#1A1A1A]">O que nos <span className={gold}>perguntam</span></h2>
-          <p className="mt-2 hidden text-[#555] md:block">Limpeza e impermeabilização {cityLabel}.</p>
+          <h2 className="type-section-title font-playfair text-[#111111]">O que nos <em className="not-italic" style={{ color: "#D4AF37" }}>perguntam</em></h2>
         </div>
         <div className="divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white">
           {faqs.map((f, i) => {

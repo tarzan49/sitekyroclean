@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Clock, Send, MessageSquare } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
 import { submitContactForm } from "@/services/contactService";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -158,16 +158,9 @@ const Contact = () => {
       <div className="container mx-auto px-4">
         {/* Premium Section Header */}
         <div className={`text-center mb-12 md:mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <MessageSquare className="h-5 w-5 text-gold" />
-            <span className="text-gold font-semibold tracking-wide uppercase text-base">Fale Connosco</span>
-          </div>
-          <h2 className="type-section-title     text-[#111111] mb-3">
-            Prepare o seu espaço para impressionar.
+          <h2 className="type-section-title font-playfair text-[#111111]">
+            Prepare o seu espaço para <em className="not-italic" style={{ color: "#D4AF37" }}>impressionar.</em>
           </h2>
-          <p className="text-[#505650] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            A nossa equipa chega à hora marcada, com eficiência e atenção aos detalhes. Garantimos um serviço profissional adaptado ao seu ritmo e à sua casa.
-          </p>
           <div className="w-24 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mt-6"></div>
         </div>
 

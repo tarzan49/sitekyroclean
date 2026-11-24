@@ -52,13 +52,7 @@ const ServiceEliteGuarantee = ({
 
         {/* Editorial header */}
         <div className="mb-7 md:mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-              O nosso compromisso
-            </p>
-          </div>
-          <h2 className={`type-section-title font-playfair      mb-4 ${textMain}`}>
+          <h2 className={`type-section-title font-playfair ${textMain}`}>
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>

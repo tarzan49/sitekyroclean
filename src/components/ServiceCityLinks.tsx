@@ -37,20 +37,11 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
 
         {/* Editorial header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-              Áreas de serviço
-            </p>
-          </div>
-          <h2 className="type-section-title font-playfair      text-[#111111]">
+          <h2 className="type-section-title font-playfair text-[#111111]">
             {restLabel}{" "}
             <em className="not-italic" style={{ color: "#D4AF37" }}>{goldWord}</em>
             {" "}perto de si
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-[#505650] max-w-xl">
-            Escolha a sua região ou pesquise a localidade para consultar o serviço na sua zona.
-          </p>
         </div>
 
         <div className="max-w-3xl">

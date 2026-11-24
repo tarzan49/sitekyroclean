@@ -701,7 +701,6 @@ html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16p
   html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { display: none; }
   /* Avaliações: o selo do Google já está no topo da página. */
   html.snap-sections #avaliacoes a.inline-flex[target="_blank"] { display: none; }
-  html.snap-sections #avaliacoes h2 { font-size: 1.5rem; }
   html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16px; padding-bottom: 16px; }
 }
 @media (min-width: 768px) {
@@ -720,10 +719,10 @@ html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16p
   html.snap-sections [data-commercial-hero] > div:nth-of-type(3) { padding-bottom: 16px; }
 }
 /* Avaliações num só ecrã: cabeçalho junto, texto de cada avaliação em 4 linhas (o link abre a completa). */
-html.snap-sections #avaliacoes .mb-10 { margin-bottom: 16px; }
+html.snap-sections #avaliacoes .mb-8 { margin-bottom: 16px; }
 html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin-top: 12px; }
-@media (min-width: 768px) { html.snap-sections #avaliacoes h2 { font-size: 2rem; } html.snap-sections #avaliacoes .mb-10 { margin-bottom: 8px; } }
+@media (min-width: 768px) { html.snap-sections #avaliacoes .mb-8 { margin-bottom: 8px; } }
 /* O conteúdo de cada secção ocupa a largura toda (a centragem vertical em flex tirava-lha). */
 html.snap-sections main > section > *, html.snap-sections main [data-landing-section] > * { width: 100%; }
 /* Telemóvel: o menu esconde-se ao descer, por isso a secção encaixa no topo do ecrã. */
@@ -733,7 +732,7 @@ html.snap-sections main > section > *, html.snap-sections main [data-landing-sec
 html.snap-sections main [data-landing-section] > * { flex: 1; display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 0 !important; padding-top: 16px; padding-bottom: 16px; }
 html.snap-sections main [data-landing-section] > * > * { width: 100%; }
 /* Cabeçalhos de secção mais juntos ao conteúdo nas páginas com encaixe (o título não pode ficar cortado). */
-html.snap-sections [data-landing-section] .mb-10 { margin-bottom: 14px; }
+html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 @media (max-width: 767px) {
   /* Nas secções sem botão de WhatsApp a barra fixa aparece: o conteúdo acaba acima dela. */
   html.snap-sections [data-landing-section]:not([data-landing-section="precos"]) > *,

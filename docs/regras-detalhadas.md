@@ -1157,3 +1157,18 @@ Saiu a nota "deslocação ainda por definir: não dês valor de deslocação" (`
 - Blindado = limpeza + impermeabilização Premium (até 10 anos); Protegido = limpeza + Essencial (1 a 2 anos); Renovado = só limpeza. Aprovados pelo dono depois de rejeitar ícones e selos ("tem de ser algo que o cliente olhe e associe, algo que venda").
 - Cada cartão tem uma fotografia real: Blindado = Pepsi a cair no sofá (vídeo imper-agua-01), Protegido = água a escorrer (imper-agua-07), Renovado = o sofá limpo do 1.º par da galeria; nas cadeiras, os vídeos de cadeiras.
 - "Premium" e "Essencial" continuam por baixo do nome e na mensagem de WhatsApp ("pack Blindado (limpeza + premium) de ..."), porque é como o bot fala. O bot (kyro-bot) ainda não usa os nomes novos nas respostas: se o dono quiser, isso é uma mudança à parte no ficheiro do bot.
+
+
+## Limpeza de cadeiras: tabela única (dono, 24 Nov 2026)
+
+Dono: "O preço máximo de limpeza de uma cadeira é 20 euros. entre 1-4 cadeiras, entre 5 e 7 cadeiras começa a ser 17,5 a partir, entre 8 e 12 fica 15 eur a cadeira. se juntar imper cada preço desce 5 eur". Motivo: o pack das cadeiras mostrava 65€ por uma cadeira com Premium (25€ WhatsApp + 30€ + 10€).
+- Uma só tabela no site, no bot, no questionário e nas ofertas: `chairCleanTotal(qty, waterproofQty)` em `src/constants/chairPricing.ts`. 13+ cadeiras = 15€ (o dono disse "8 a 12"; acima disso confirmar com ele).
+- Com impermeabilização, −5€ por cadeira na limpeza; a impermeabilização mantém 30/23, 25/18, 22,50/15€.
+- Uma cadeira a mais nunca baixa o total (8 só limpeza = 122,50€, como 7).
+- [RETIRADA 24/11] WhatsApp 25€ (1–3) / 20€ (4–7) / 18€ (8) / 15€ (9+); site 20/15/12,50€; `site: true` com preço próprio; limpeza a 12,50€ com imper a partir de 9; 10+ cadeiras sob orçamento no site.
+
+## Títulos de secção (dono, 24 Nov 2026)
+
+- "Caga nos 2 títulos, vais remover o cabeçalho, vais colocar só um título em cada coisa e o título tem que ter o mesmo formato em todas as páginas": sem overline (linha dourada + texto pequeno em maiúsculas) e sem subtítulo por baixo do título.
+- Formato único: `type-section-title font-playfair`, #111111 em fundo claro, branco em fundo verde, a última palavra a dourado #D4AF37. Fonte única em `src/components/SectionHeader.tsx` (overline e subtitle ainda aceites como props, mas não se mostram); os 15 componentes com cabeçalho próprio foram alinhados no mesmo dia.
+- A mensagem de WhatsApp do widget de preço diz a escolha completa: "Olá! Escolhi o pack Blindado: limpeza + impermeabilização Premium (até 10 anos), para um sofá de 3 lugares, em Lisboa, por 219€. Gostaria de confirmar o preço e a disponibilidade." O bot ainda não tem regra própria para "Escolhi o pack X" (fica para o kyro-bot, com OK do dono).

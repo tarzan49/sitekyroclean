@@ -79,13 +79,7 @@ const AreasDeServico = () => {
         {/* Hero */}
         <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
           <div className="container mx-auto px-4 max-w-4xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-              <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                Cobertura Nacional
-              </p>
-            </div>
-            <h1 className="type-page-title font-playfair      text-[#111111]">
+            <h1 className="type-page-title font-playfair text-[#111111]">
               Áreas de{" "}
               <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
             </h1>
