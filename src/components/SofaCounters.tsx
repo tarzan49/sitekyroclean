@@ -21,7 +21,7 @@ export function sofaItems(counts: SofaCounts, treatment: string, extra: Record<s
 /** "um sofá de 3 lugares e 2 sofás de 2 lugares", para a mensagem de WhatsApp. */
 export function sofaWhat(counts: SofaCounts, noun = 'sofá', nounPlural = 'sofás'): string {
   const parts = chosen(counts).map(({ id, n }) => `${n === 1 ? `um ${noun}` : `${n} ${nounPlural}`} de ${seatsLabel(id)}`);
-  return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts[0] ?? '';
+  return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts[0] ?? `um ${noun}`;
 }
 
 export const sofaTotal = (counts: SofaCounts) => chosen(counts).reduce((a, x) => a + x.n, 0);

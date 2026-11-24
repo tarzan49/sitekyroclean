@@ -11,7 +11,7 @@ import { Check, Minus, Plus, MessageCircle } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
-import SofaCounters, { sofaItems, sofaWhat, type SofaCounts } from '@/components/SofaCounters';
+import SofaCounters, { sofaItems, sofaWhat, sofaTotal, type SofaCounts } from '@/components/SofaCounters';
 import { cityPrep } from '@/data/serviceCatalog';
 
 export type TreatmentKind = 'sofa' | 'mattress' | 'rug';
@@ -41,7 +41,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
   const [choice, setChoice] = useState<Option['id']>('treat');
   // Quantas peças iguais (dono, 25 Nov) e o cesto da visita quando a página não traz o seu ("em todas no site").
   // Sofás por tamanho, combináveis, com o total em pequeno (dono, 25 Nov).
-  const [counts, setCounts] = useState<SofaCounts>({ '3-lugares': 1 });
+  const [counts, setCounts] = useState<SofaCounts>({}) /* começa sem nada escolhido, como os packs (dono, 24 Nov) */;
   // Colchões: quantos de cada tamanho, cada um com o seu contador (dono, 25 Nov: "em cada tipo quantos colchões").
   const [mCounts, setMCounts] = useState<Record<string, number>>({ solteiro: 0, casal: 1, king: 0 });
   const bump = (id: string, d: number) => setMCounts(c => { const next = { ...c, [id]: Math.max(0, Math.min(9, (c[id] ?? 0) + d)) }; return Object.values(next).some(v => v > 0) ? next : c; });
@@ -141,7 +141,7 @@ export default function TreatmentPackPicker({ kind, city, source, onMore }: Prop
                 <span className="flex items-center gap-2 pl-2">
                   <span className="flex flex-col items-end leading-tight">
                   {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="mb-0.5 text-[12px] text-[#888] line-through">{formatEuro(struck)}</span>}
-                  <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">Sob orçamento</span> : formatEuro(value)}</span>
+                  <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">{kind === 'sofa' && !sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                   </span>
                   <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
                 </span>

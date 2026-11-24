@@ -21,7 +21,7 @@ const OPTIONS = [
 export default function ImperPricePicker({ city, source, initialKind = 'sofa' }: { city: string; source: string; initialKind?: Kind }) {
   const [kind, setKind] = useState<Kind>(initialKind);
   // Sofás por tamanho, combináveis (dono, 25 Nov): cada tamanho com o seu "+" e o total em pequeno.
-  const [counts, setCounts] = useState<SofaCounts>({ '3-lugares': 1 });
+  const [counts, setCounts] = useState<SofaCounts>({}) /* começa sem nada escolhido, como os packs (dono, 24 Nov) */;
   const [qty, setQty] = useState(6);
   const [choice, setChoice] = useState('premium');
   const [basket, setBasket] = useState(false);
@@ -68,7 +68,7 @@ export default function ImperPricePicker({ city, source, initialKind = 'sofa' }:
                 <span className="block text-[12px] leading-snug text-[#555]">{o.note}</span>
               </span>
               <span className="flex items-center gap-2 pr-3">
-                <span className={`whitespace-nowrap text-lg font-bold ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">Sob orçamento</span> : formatEuro(value)}</span>
+                <span className={`whitespace-nowrap text-lg font-bold ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">{kind === 'sofa' && !sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                 <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
               </span>
             </button>;

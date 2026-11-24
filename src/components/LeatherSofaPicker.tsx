@@ -20,7 +20,7 @@ export default function LeatherSofaPicker({ city, source, syntheticOnly = false 
   // Pele sintética/PU: só a limpeza (sem tratamento da pele nem impermeabilização).
   const options = syntheticOnly ? OPTIONS.filter(o => !o.leather) : OPTIONS;
   // Sofás por tamanho, combináveis, com o total em pequeno (dono, 25 Nov).
-  const [counts, setCounts] = useState<SofaCounts>({ '3-lugares': 1 });
+  const [counts, setCounts] = useState<SofaCounts>({}) /* começa sem nada escolhido, como os packs (dono, 24 Nov) */;
   const [choice, setChoice] = useState(syntheticOnly ? 'limpeza' : 'pele');
   const [basket, setBasket] = useState(false);
   const totals = useMemo(() => Object.fromEntries(options.map(o => {
@@ -52,7 +52,7 @@ export default function LeatherSofaPicker({ city, source, syntheticOnly = false 
                 <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
               </span>
               <span className="flex items-center gap-2 pr-3">
-                <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">Sob orçamento</span> : formatEuro(value)}</span>
+                <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">{!sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                 <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
               </span>
             </button>;
