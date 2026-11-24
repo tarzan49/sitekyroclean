@@ -678,18 +678,30 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
+  // Owner, 24 Nov 2026 (sofá 3L + colchão casal = 89 + 79 = 168 -> 169): with a gift the total never falls under
+  // the pieces quoted each on its own (each with its travel); without the gift the visit price stays (149).
+  const EXTRA_KEYS = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'];
+  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !EXTRA_KEYS.includes(k)));
+  const aloneOf = (x: Record<string, unknown>): number | null => {
+    const one = innerPriced({ ...noExtras, ...x }) as Priced & { rugEstimate?: { homePrice?: number | null } | null };
+    return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === 'number' ? one.rugEstimate.homePrice : null);
+  };
+  const parts = [...restore(base).map(i => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter(k => (typeof inp[k] === 'number' && (inp[k] as number) > 0) || (Array.isArray(inp[k]) && (inp[k] as unknown[]).length > 0)).map(k => aloneOf({ items: [], [k]: inp[k] }))];
+  const sumAlone = parts.every((v): v is number => typeof v === 'number') ? cents(parts.reduce((a, v) => a + v, 0)) : total;
+  const lift = Math.max(0, cents(sumAlone - total));
+  const paid = cents(total + lift);
+  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
-  const final = up9(total);
+  const final = up9(paid);
   const out = { ...r } as Record<string, unknown>;
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
   // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
-  const giftSum = cents(usual - total);
+  const giftSum = cents(usual - paid);
   const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
-  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: cents(v + giftSum), total: up9(v) } : null);
+  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null);
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }

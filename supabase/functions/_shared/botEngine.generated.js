@@ -433,7 +433,7 @@ function customPackLine(item, chairsBefore = 0) {
       if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
       if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
-      if ((item.extra === "premium" || item.extra === "essencial") && item.primary !== "waterproofing") amount2 = endIn9Down(amount2);
+      if (item.extra === "premium" || item.extra === "essencial") amount2 = endIn9Down(amount2);
     }
   } else if (item.kind === "sofa" && item.unitPrice && item.primary !== "waterproofing" && item.extra !== "anti-acaros") {
     const wp = item.extra === "premium" || item.extra === "essencial" ? SEAT6_WATERPROOFING_EXTRA[item.extra] : 0;
@@ -2778,19 +2778,29 @@ function withVisitGifts(input, r) {
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  const usual = cents(total + gifts.reduce((n, g) => n + g.normal, 0));
+  const EXTRA_KEYS = ["armchairs", "largeArmchairs", "puffs", "headboards"];
+  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !EXTRA_KEYS.includes(k)));
+  const aloneOf = (x) => {
+    const one = innerPriced({ ...noExtras, ...x });
+    return pricedTotal(one) ?? (typeof one.rugEstimate?.homePrice === "number" ? one.rugEstimate.homePrice : null);
+  };
+  const parts = [...restore(base).map((i) => aloneOf({ items: [i] })), ...EXTRA_KEYS.filter((k) => typeof inp[k] === "number" && inp[k] > 0 || Array.isArray(inp[k]) && inp[k].length > 0).map((k) => aloneOf({ items: [], [k]: inp[k] }))];
+  const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
+  const lift = Math.max(0, cents(sumAlone - total));
+  const paid = cents(total + lift);
+  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
-  const final = up9(total);
+  const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
   else out.total = final;
-  const giftSum = cents(usual - total);
+  const giftSum = cents(usual - paid);
   const t = r.waterproofingTiers;
-  const tier = (v) => typeof v === "number" ? { usual: cents(v + giftSum), total: up9(v) } : null;
+  const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) {
