@@ -1173,5 +1173,10 @@ Dono: "O preço máximo de limpeza de uma cadeira é 20 euros. entre 1-4 cadeira
 - Formato único: `type-section-title font-playfair`, #111111 em fundo claro, branco em fundo verde, a última palavra a dourado #D4AF37. Fonte única em `src/components/SectionHeader.tsx` (overline e subtitle ainda aceites como props, mas não se mostram); os 15 componentes com cabeçalho próprio foram alinhados no mesmo dia.
 - A mensagem de WhatsApp do widget de preço diz a escolha completa: "Olá! Escolhi o pack Blindado: limpeza + impermeabilização Premium (até 10 anos), para um sofá de 3 lugares, em Lisboa, por 219€. Gostaria de confirmar o preço e a disponibilidade." O bot ainda não tem regra própria para "Escolhi o pack X" (fica para o kyro-bot, com OK do dono).
 
+
+## Anti-odor em tapete: sempre 5€/m² (dono, 24 Nov 2026)
+
+"anti odor sera sempre 5 euros m2". Sai o mínimo de 15€ de 12 Nov `[RETIRADA 24/11]` ("15€ ou 5€/m², o que der mais"). `RUG_ODOR` em `botQuote.ts` fica `{ min: 0, perM2: 5 }`: 5€ × m², arredondado para baixo.
+
 ## Packs: regalias no artigo acrescentado [RETIRADA 24/11]
 Dono, 23 Nov 2026 (Joana Duarte): 2 ou mais peças na mesma visita = cada peça ao preço de tabela, somado, sem condição especial. Em 24 Nov o motor ainda dava "preço de pack" (colchão −14€, 1 cadeira oferecida por cada 4, sofá acrescentado a 35/55/65/79€, tapete "limpe 5 m², pague 4"), no site e no bot. Desligado em `src/constants/packPerks.ts` (`PACK_PERKS_ON = false`), textos do site e do ficheiro do bot (linha 765) acertados.
