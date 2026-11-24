@@ -1,6 +1,8 @@
-// Alcatifas: sem preço no site (dono: alcatifas continuam sob orçamento). Uma pergunta (as medidas), o botão de
-// WhatsApp com as medidas e o "+ Juntar mais artigos" a abrir o cesto da visita. Mesmo desenho dos outros widgets.
-import { lazy, Suspense, useState } from 'react';
+// Alcatifas: preço do motor do bot pelas medidas (homePrice, deslocação incluída; taxa em rugRates.ts). Uma pergunta
+// (as medidas), o total, o botão de WhatsApp com as medidas e o "+ Juntar mais artigos" a abrir o cesto da visita. Mesmo desenho dos outros widgets.
+import { lazy, Suspense, useMemo, useState } from 'react';
+import { botQuote } from '@/lib/botQuote';
+import { formatEuro } from '@/data/enginePrices';
 import { Minus, Plus, MessageCircle } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
 import type { BasketItem } from '@/components/quiz/VisitBasket';
@@ -13,7 +15,8 @@ export default function CarpetPricePicker({ city, source }: { city: string; sour
   const [l, setL] = useState(5);
   const [basket, setBasket] = useState(false);
   const area = Math.round(w * l * 10) / 10;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da limpeza de uma alcatifa de mais ou menos ${m(w)} x ${m(l)} m (${m(area)} m²), em ${city}. Envio fotografias.`;
+  const price = useMemo(() => { const r = botQuote({ city, items: [{ kind: 'carpet', width: w, length: l, treatment: 'clean' }] }) as { rugEstimate?: { ok: boolean; homePrice?: number } | null }; return r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null; }, [w, l, city]);
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade da limpeza de uma alcatifa de mais ou menos ${m(w)} x ${m(l)} m (${m(area)} m²), em ${city}${price ? `, por ${formatEuro(price)}` : ''}. Envio fotografias.`;
   const item: BasketItem = { id: `c${Date.now()}`, kind: 'carpet', qty: 1, pack: 'none', width: String(w), length: String(l) } as BasketItem;
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-2 md:gap-10">
@@ -33,12 +36,15 @@ export default function CarpetPricePicker({ city, source }: { city: string; sour
       </div>
       <div>
         <div className="rounded-2xl border-2 border-[#D4AF37] bg-gradient-to-br from-[#FFFBEF] to-[#F7EFD6] px-4 py-3">
-          <p className="text-lg font-bold text-[#1A1A1A]">Limpeza no local, {m(area)} m²</p>
-          <p className="text-[13px] leading-snug text-[#555]">O preço depende da fibra e do estado da alcatifa: envie as medidas e uma fotografia e dizemos-lhe o valor em menos de 1 minuto.</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-lg font-bold text-[#1A1A1A]">Limpeza no local, {m(area)} m²</p>
+            {price !== null && <span className="text-2xl font-bold text-[#1A1A1A]">{formatEuro(price)}</span>}
+          </div>
+          <p className="text-[13px] leading-snug text-[#555]">{price !== null ? `Preço final em ${city}, deslocação incluída.` : 'Envie as medidas e uma fotografia e dizemos-lhe o valor em menos de 1 minuto.'}</p>
         </div>
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
           className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-[#25D366] px-3 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] sm:text-base">
-          <MessageCircle className="h-5 w-5" /> Pedir o preço no WhatsApp
+          <MessageCircle className="h-5 w-5" /> {price !== null ? 'Pedir este orçamento no WhatsApp' : 'Pedir o preço no WhatsApp'}
         </a>
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} initialItems={[item]} /></Suspense>}
