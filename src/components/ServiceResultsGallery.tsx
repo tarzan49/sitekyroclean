@@ -66,9 +66,20 @@ export default function ServiceResultsGallery({ category, light = false, interva
       {/* Galeria com tipos misturados (ex.: sofá + impermeabilização): moldura fixa em 4:3,
           para o hero não mudar de altura quando passa um vídeo vertical. */}
       <div data-vertical-frame={!fixedFrame && itemCategory === "cadeiras" ? "" : undefined} className={`overflow-hidden ${fixedFrame ? "w-full aspect-[4/3]" : itemCategory === "cadeiras" ? "mx-auto w-[min(100%,300px)] aspect-[3/4] border-t-2 border-[#D4AF37]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
+        {/* Topo das cadeiras no telemóvel: as duas fotografias verticais lado a lado, a encher a largura (dono, 25 Nov). */}
+        {autoplay && chairsOnlyPairs && item.kind === "pair" && (
+          <div className="grid h-full grid-cols-2 gap-1.5 md:hidden">
+            {([[item.before, "Antes"], [item.after, "Depois"]] as const).map(([src, label]) => (
+              <figure key={label} className="relative min-h-0 overflow-hidden rounded-xl">
+                <img src={src} alt={`${label} da limpeza`} decoding="async" className="absolute inset-0 h-full w-full object-cover" width={600} height={800} />
+                <figcaption className="absolute left-2 top-2 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white">{label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
         {item.kind === "pair" ? (
           // Cadeiras (fotografias verticais) numa moldura fixa: ao centro, em 3:4, com barras dos lados, como os vídeos (dono, 24 Nov).
-          <div className={fixedFrame && itemCategory === "cadeiras" ? "mx-auto h-full aspect-[3/4]" : "h-full w-full"}>
+          <div className={`${autoplay && chairsOnlyPairs ? "max-md:hidden " : ""}${fixedFrame && itemCategory === "cadeiras" ? "mx-auto h-full aspect-[3/4]" : "h-full w-full"}`}>
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
             afterLabel={itemCategory === "impermeabilizacao" ? "Com proteção" : "Depois"}
@@ -94,7 +105,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
       <div className="flex flex-wrap items-center justify-between gap-2 py-2">
         <p className="text-sm" aria-live={playing ? "off" : "polite"} aria-atomic="true">
           <span className="font-semibold text-gold">{index + 1} / {pool.length}</span>
-          <span className="ml-2 opacity-60">{item.kind === "single" ? "Fotografia do resultado" : item.kind === "video" ? "Vídeo real de um trabalho" : "Arraste para comparar"}</span>
+          <span className="ml-2 opacity-60">{item.kind === "single" ? "Fotografia do resultado" : item.kind === "video" ? "Vídeo real de um trabalho" : autoplay && chairsOnlyPairs ? <><span className="md:hidden">Antes e depois</span><span className="max-md:hidden">Arraste para comparar</span></> : "Arraste para comparar"}</span>
         </p>
         <div className="flex items-center">
           <button type="button" className={control} aria-label="Exemplo anterior" onClick={() => select(index - 1)}><ChevronLeft size={20} /></button>

@@ -681,23 +681,7 @@ html.snap-sections footer { scroll-snap-align: end; }
 /* Compactação das secções para caberem num ecrã (só nas páginas com encaixe). */
 html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16px; padding-bottom: 16px; }
 @media (max-width: 767px) {
-  html.snap-sections [data-commercial-hero] { padding-top: calc(var(--header-h, 57px) + 6px); }
-  html.snap-sections [data-hero-part="breadcrumb"],
-  html.snap-sections [data-hero-part="prices"],
-  html.snap-sections [data-commercial-hero] [aria-label="Escolher exemplo"] { display: none; }
-  /* As 3 informações (duração, resposta, secagem) ficam, numa faixa baixa. */
-  html.snap-sections [data-hero-part="stats"] .grid { padding-top: 6px; padding-bottom: 8px; }
-  html.snap-sections [data-hero-part="stats"] svg { display: none; }
-  html.snap-sections [data-hero-part="stats"] .grid > * > * { margin-top: 0; }
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child { aspect-ratio: 3 / 2; width: 100%; }
-  html.snap-sections [data-hero-part="title"] { font-size: 1.35rem; }
-  html.snap-sections [data-hero-part="proof"] > * { min-height: 44px; }
-  html.snap-sections [data-commercial-hero] .grid.items-center.gap-4 { gap: 6px; }
-  html.snap-sections [data-hero-part="title"] { font-size: 1.5rem; }
-  html.snap-sections [data-hero-part="subtitle"] { font-size: 13px; line-height: 1.35; margin: 6px 0 8px; }
-  html.snap-sections [data-hero-part="proof"] { margin-bottom: 8px; }
-  html.snap-sections [data-hero-part="whatsapp"] { min-height: 46px; }
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { display: none; }
+  /* O topo no telemóvel está em styles/hero-mobile.css. */
   /* Avaliações: o selo do Google já está no topo da página. */
   html.snap-sections #avaliacoes a.inline-flex[target="_blank"] { display: none; }
   html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16px; padding-bottom: 16px; }
@@ -839,9 +823,6 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 
 /* Topo das cadeiras: fotografias verticais numa moldura vertical, sem barras escuras dos lados; à volta fica o
    verde do topo (dono, 24 Nov). Sobrepõe-se ao 3:2 / 4:3 das galerias do topo. */
-@media (max-width: 767px) {
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, 180px, calc((100svh - 443px) * 3 / 4)); margin-inline: auto; }
-}
 @media (min-width: 768px) {
   html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 3 / 4)); margin-inline: auto; }
 }

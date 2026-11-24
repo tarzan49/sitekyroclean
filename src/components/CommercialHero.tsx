@@ -42,13 +42,13 @@ interface Props {
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-/** No telemóvel cabem 3 linhas (~118 letras): frases inteiras até aí, o resto só no computador (nunca cortada com "…"). */
+/** No telemóvel cabem 4 linhas (~160 letras): frases inteiras até aí, o resto só no computador (nunca cortada com "…"). */
 export function splitHeroSubtitle(text: string): [string, string] {
-  if (text.length <= 118) return [text, ''];
+  if (text.length <= 160) return [text, ''];
   const parts = text.match(/[^.?!]+[.?!]+(?=\s|$)\s*|[^.?!]+$/g) ?? [text];
   let lead = parts[0];
   let k = 1;
-  while (k < parts.length && (lead + parts[k]).trim().length <= 118) lead += parts[k++];
+  while (k < parts.length && (lead + parts[k]).trim().length <= 160) lead += parts[k++];
   return [lead.trim(), parts.slice(k).join('').trim()];
 }
 

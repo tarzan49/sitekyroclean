@@ -5,6 +5,7 @@ import "./index.css";
 import "./styles/typography.css";
 import "./styles/surfaces.css";
 import "./styles/hero-light.css";
+import "./styles/hero-mobile.css";
 import { initErrorTracking } from "./lib/errorTracking";
 import { restoreConsent } from "./lib/consent";
 
