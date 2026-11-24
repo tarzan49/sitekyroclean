@@ -4,7 +4,7 @@
 // bot (botQuote), nunca escritos à mão.
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { choiceToItems } from '@/components/quiz/basketChoice';
-import VisitGiftLine, { visitGiftFor } from '@/components/VisitGiftLine';
+import { giftText, visitGiftFor } from '@/lib/visitGift';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 import { cityPrep } from '@/data/serviceCatalog';
@@ -67,9 +67,9 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     if (kind === 'sofa' && (size === PHOTO_SIZE || noSofa)) return [o.extra, null];
     const treatment = o.extra === 'premium' ? 'clean+premium' : o.extra === 'essencial' ? 'clean+essencial' : 'clean';
     const items = kind === 'sofa' ? sofaItems(treatment) : [{ kind: 'chairs', qty, treatment }];
-    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null; visitGifts?: { withoutGift?: number | null } | null };
-    // "Renovado" é só a limpeza: sem a oferta que o motor junta com várias peças (dono, 25 Nov).
-    const plain = o.extra === 'none' && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
+    const r = botQuote({ city, items }) as { ok: boolean; quote?: boolean; total?: number | null };
+    // Como o bot (dono, 25 Nov): com várias peças o Renovado já inclui a oferta, dita na própria opção.
+    const plain = r.total;
     return [o.extra, r.ok && !r.quote && typeof plain === 'number' ? plain : null];
   })) as Record<PackExtra, number | null>, [kind, sofaKey, qty, city]);
 
@@ -101,7 +101,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
     none: 'só limpeza, sem impermeabilização',
   };
   const piece = byPhoto ? 'sofá de canto, em U ou com mais de 6 lugares' : what;
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${WHAT_INCLUDES[extra]}) para ${piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? (count > 1 ? 'dos sofás' : 'do sofá') : 'das cadeiras'}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade do pack ${chosen.name} (${extra === 'none' && gift ? `limpeza com ${giftText(gift)} de oferta, sem impermeabilização` : WHAT_INCLUDES[extra]}) para ${piece}, ${cityPrep(city)} ${city}${total && !byPhoto ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia ${kind === 'sofa' ? (count > 1 ? 'dos sofás' : 'do sofá') : 'das cadeiras'}.`;
   const ItemIcon = kind === 'sofa' ? Sofa : Armchair;
 
   return (
@@ -140,10 +140,11 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
                 {o.top && <span className="absolute -top-3 left-3 z-10 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Mais escolhido</span>}
                 <span className="flex min-w-0 flex-1 flex-col justify-center px-4 py-2.5 text-left">
                   <span className="block text-lg font-bold leading-tight text-[#1A1A1A]">{o.name}</span>
-                  <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
+                  <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.extra === 'none' && gift ? `Com ${giftText(gift)} de oferta (normalmente ${formatEuro(gift.normal)})` : o.note}</span>
                 </span>
                 <span className="flex items-center gap-2 pr-3">
                   <span className="flex flex-col items-end leading-tight">
+                    {o.extra === 'none' && value !== null && gift?.usual && gift.usual > value && <span className="text-[11px] text-[#888] line-through">{formatEuro(gift.usual)}</span>}
                     {value !== null && separate[o.extra] && separate[o.extra]! > value && <span className="text-[11px] text-[#888] line-through">{formatEuro(separate[o.extra]!)}</span>}
                     <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">{byPhoto ? 'Pela fotografia' : noSofa ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
                   </span>
@@ -153,7 +154,6 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
             );
           })}
         </div>
-        <VisitGiftLine gift={gift} />
         {!byPhoto && !compact && <p className={`${gift ? 'hidden md:block ' : ''}mt-2 text-xs text-[#666] md:mt-3 md:text-sm`}>Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
 
         <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" data-tracking-source={source}
