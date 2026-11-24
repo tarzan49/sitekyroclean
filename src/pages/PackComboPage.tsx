@@ -10,6 +10,8 @@ import WaterproofPackPicker from '@/components/WaterproofPackPicker';
 import WaterproofPackSections from '@/components/WaterproofPackSections';
 import PackPiecesPicker, { type PieceKind } from '@/components/PackPiecesPicker';
 import type { DuoSide } from '@/components/DuoBeforeAfter';
+import TreatmentPackPicker from '@/components/TreatmentPackPicker';
+import TreatmentPackSections from '@/components/TreatmentPackSections';
 import CompactFAQ from '@/components/CompactFAQ';
 import CustomerReviews from '@/components/CustomerReviews';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
@@ -17,7 +19,7 @@ import SofaProcessGuide from '@/components/SofaProcessGuide';
 import ServiceFAQ from '@/components/ServiceFAQ';
 import ServiceLocationSchema from '@/components/ServiceLocationSchema';
 import NotFound from '@/pages/NotFound';
-import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity, PACK_KINDS, PACK_INITIAL_EXTRA } from '@/data/packComboData';
+import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, packIntro, otherPacksInCity, PACK_KINDS, PACK_INITIAL_EXTRA, MITES_PACKS } from '@/data/packComboData';
 import { services, cityPrep } from '@/data/serviceCatalog';
 import { pickReviewSubset } from '@/data/reviewsPool';
 import { locationPrices } from '@/constants/travel';
@@ -75,7 +77,7 @@ export default function PackComboPage() {
   useEffect(() => setOpenNext(null), [pathname]);
 
   // Secções de ecrã inteiro com encaixe no scroll (index.css): só nas páginas já compactadas.
-  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao' || Boolean(data && PACK_PIECES[data.pack.id]);
+  const snapPage = data?.pack.id === 'sofa-impermeabilizacao' || data?.pack.id === 'cadeiras-impermeabilizacao' || Boolean(data && PACK_PIECES[data.pack.id]) || data?.pack.id === 'tapete-anti-odor' || Boolean(data && MITES_PACKS[data.pack.id]);
   useEffect(() => {
     if (!snapPage) return;
     document.documentElement.classList.add('snap-sections');
@@ -87,12 +89,15 @@ export default function PackComboPage() {
 
   const { pack, city } = data;
   const priceFrom = packPriceFrom(pack, city.name);
-  const simpleKind = pack.id === 'sofa-impermeabilizacao' ? 'sofa' as const : pack.id === 'cadeiras-impermeabilizacao' ? 'chairs' as const : null;
+  const mitesPack = MITES_PACKS[pack.id];
+  const odorPack = pack.id === 'tapete-anti-odor';
+  const treatKind = odorPack ? 'rug' as const : mitesPack ? mitesPack.kind : null; // packs de tratamento (dono, 24 Nov)
+  const simpleKind = treatKind ?? (pack.id === 'sofa-impermeabilizacao' ? 'sofa' as const : pack.id === 'cadeiras-impermeabilizacao' ? 'chairs' as const : null);
   const pieces = PACK_PIECES[pack.id]; // formato peça a peça (dono, 24 Nov)
   const combo = Boolean(pieces);
   const travelFee = locationPrices[city.name];
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.id, city.name))}`;
-  const packServices = [pack.service1Slug, pack.service2Slug].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
+  const packServices = [...new Set([pack.service1Slug, pack.service2Slug])].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
   const reviews = pickReviewSubset(pack.service1Slug, `${pathname}`, 6);
   const faqs = packFaqs(pack, city.name);
 
@@ -133,7 +138,7 @@ export default function PackComboPage() {
         title={heading}
         subtitle={packIntro(pack)}
         serviceSlug={pack.service1Slug}
-        secondaryServiceSlug={simpleKind === 'chairs' ? undefined : pack.service2Slug}
+        secondaryServiceSlug={simpleKind === 'chairs' || mitesPack || odorPack ? undefined : pack.service2Slug}
         city={city.name}
         price={priceFrom}
         exactPrice={Boolean(simpleKind)}
@@ -157,7 +162,7 @@ export default function PackComboPage() {
               className="lg:!mb-5"
             />}
           <div className={simpleKind || combo ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
-            {combo ? <PackPiecesPicker pieces={pieces!} packName={pack.name} compact={pieces!.length > 2} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
+            {combo ? <PackPiecesPicker pieces={pieces!} packName={pack.name} compact={pieces!.length > 2} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : treatKind ? <TreatmentPackPicker kind={treatKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind && simpleKind !== 'mattress' && simpleKind !== 'rug' ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
               initialKinds={PACK_KINDS[pack.id]}
               initialExtra={PACK_INITIAL_EXTRA[pack.id]}
               initialCity={city.name}
@@ -176,7 +181,7 @@ export default function PackComboPage() {
       </section>
 
       {/* Packs de limpeza + impermeabilização: secções próprias (proteção, visita, perguntas). */}
-      {simpleKind && <WaterproofPackSections kind={simpleKind} cityLabel={`${cityPrep(city.name)} ${city.name}`} faqs={faqs} />}
+      {treatKind ? <TreatmentPackSections kind={treatKind} faqs={faqs} /> : simpleKind && simpleKind !== 'mattress' && simpleKind !== 'rug' && <WaterproofPackSections kind={simpleKind} cityLabel={`${cityPrep(city.name)} ${city.name}`} faqs={faqs} />}
 
       {/* 3. Porquê um pack: as regalias, ditas depois de já ter montado o pedido. Branco: alterna com o verde da secção 2. */}
       {combo && <>
