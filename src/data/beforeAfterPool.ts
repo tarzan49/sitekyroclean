@@ -143,8 +143,6 @@ import sofa15Antes from "@/assets/before-after-pool/sofa-15-antes.webp";
 import sofa15Depois from "@/assets/before-after-pool/sofa-15-depois.webp";
 import sofa14Antes from "@/assets/before-after-pool/sofa-14-antes.webp";
 import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
-import tapete06Antes from "@/assets/before-after-pool/tapete-06-antes.webp";
-import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
 
 export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "alcatifa" | "impermeabilizacao";
 
@@ -223,7 +221,6 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   tapete: [
     { kind: "pair", before: tapete04Antes, after: tapete04Depois },
     { kind: "pair", before: tapete03Antes, after: tapete03Depois },
-    { kind: "pair", before: tapete06Antes, after: tapete06Depois },
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
   ],
