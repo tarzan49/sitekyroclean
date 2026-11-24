@@ -41,6 +41,7 @@ export interface BasketItem {
   leather?: boolean;      // sofá de pele: só limpeza + tratamento da pele
   width?: string;         // tapete/alcatifa, em metros
   length?: string;
+  odor?: boolean;         // tapete/alcatifa: anti-odor (5€/m², só com a limpeza)
 }
 
 const PACKS: { pack: BasketPack; name: string; note: string }[] = [
@@ -49,6 +50,14 @@ const PACKS: { pack: BasketPack; name: string; note: string }[] = [
   { pack: 'none', name: 'Renovado', note: 'Só limpeza' },
 ];
 const SOFA_SEATS = [1, 2, 3, 4, 5, 6];
+// Tamanhos de um toque (dono, 25 Nov: a janela do tapete "tá muito fraca"): os tapetes mais comuns e divisões
+// típicas para a alcatifa; o preço de cada um é o do motor. "Outra medida" abre os campos.
+const RUG_SIZES: { label: string; w: string; l: string }[] = [
+  { label: 'Pequeno', w: '1,2', l: '1,7' }, { label: 'Médio', w: '1,6', l: '2,3' }, { label: 'Grande', w: '2', l: '3' }, { label: 'Muito grande', w: '2,5', l: '3,5' },
+];
+const CARPET_SIZES: { label: string; w: string; l: string }[] = [
+  { label: 'Quarto', w: '3', l: '4' }, { label: 'Sala', w: '4', l: '6' }, { label: 'Escritório', w: '6', l: '8' }, { label: 'Espaço grande', w: '10', l: '10' },
+];
 const MATTRESS = [{ id: 'solteiro', label: 'Solteiro' }, { id: 'casal', label: 'Casal' }, { id: 'king', label: 'King / Queen' }];
 const KIND_LABEL: Record<BasketKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 const GOLD = '#D4AF37';
@@ -67,7 +76,7 @@ export const newItem = (kind: BasketKind, over: Partial<BasketItem> = {}): Baske
 function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
   if (isRug(it.kind)) {
     const w = num(it.width), l = num(it.length);
-    return w && l ? { kind: it.kind, qty: 1, treatment: 'clean', width: w, length: l } : null;
+    return w && l ? { kind: it.kind, qty: 1, treatment: 'clean', width: w, length: l, ...(it.odor ? { odor: true } : {}) } : null;
   }
   if (it.kind === 'mattress') return { kind: 'mattress', size: it.size, qty: it.qty, treatment: it.pack === 'premium' ? 'clean+anti-acaros' : 'clean' };
   const treatment = it.leather || it.pack === 'none' ? 'clean' : it.pack === 'premium' ? 'clean+premium' : 'clean+essencial';
@@ -77,7 +86,7 @@ function toQuote(it: BasketItem): (QuoteItem & Record<string, unknown>) | null {
 }
 
 export function itemLabel(it: BasketItem): string {
-  if (isRug(it.kind)) return `${KIND_LABEL[it.kind]}${num(it.width) && num(it.length) ? ` ${it.width} × ${it.length} m` : ''}`;
+  if (isRug(it.kind)) return `${KIND_LABEL[it.kind]}${num(it.width) && num(it.length) ? ` ${it.width} × ${it.length} m` : ''}${it.odor ? ' + anti-odor' : ''}`;
   if (it.kind === 'mattress') return `${it.qty > 1 ? `${it.qty} × ` : ''}Colchão ${MATTRESS.find(m => m.id === it.size)?.label ?? ''}${it.pack === 'premium' ? ' + anti-ácaros' : ''}`;
   const pack = it.leather ? 'pele: limpeza + tratamento da pele' : PACKS.find(p => p.pack === it.pack)!.name;
   if (it.kind === 'chairs') return `${it.qty} cadeiras · ${pack}`;
@@ -486,18 +495,44 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
             <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
             <span className="flex items-center gap-2">{(() => { const v = aloneTotal(city, { ...item, pack: p.pack }); return v === null ? null : <span className="text-base font-bold text-white">{formatEuro(v)}</span>; })()}{item.pack === p.pack ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
           </button>))}</div>}
-        {rug && <>
-          <p className="mb-1 text-xs font-semibold text-white/70">Medidas em metros</p>
-          <div className="mb-2 grid grid-cols-2 gap-2">
-            <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
-            <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
-          </div>
-          <p className="mb-3 text-xs text-white/60">O preço sai das medidas, com a deslocação incluída.</p>
-        </>}
+        {rug && (() => {
+          const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
+          const preset = sizes.find(z => z.w === item.width && z.l === item.length);
+          const area = Math.round(num(item.width) * num(item.length) * 100) / 100;
+          const price = ok ? aloneTotal(city, item) : null;
+          const odorPlus = ok ? (() => { const a = aloneTotal(city, { ...item, odor: true }), b = aloneTotal(city, { ...item, odor: false }); return a !== null && b !== null ? a - b : null; })() : null;
+          return <>
+            <ul className="mb-4 flex flex-wrap gap-1.5 text-xs font-semibold text-white/85">
+              {[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', 'Deslocação incluída', 'Seca em 2 a 5 h'].map(t => <li key={t} className="flex items-center gap-1 rounded-full border border-[#D4AF37]/30 bg-white/[0.05] px-2.5 py-1"><Check className="h-3.5 w-3.5" style={{ color: GOLD }} />{t}</li>)}
+            </ul>
+            <p className="mb-2 text-sm font-semibold text-white">{item.kind === 'carpet' ? 'Qual é o espaço?' : 'Que tamanho tem?'}</p>
+            <div className="mb-2 grid grid-cols-2 gap-2">
+              {sizes.map(z => {
+                const w = num(z.w), l = num(z.l), max = Math.max(...sizes.map(x => num(x.l)));
+                const v = aloneTotal(city, { ...item, width: z.w, length: z.l });
+                return <button key={z.label} type="button" onClick={() => set({ width: z.w, length: z.l })} className={`${tile(preset === z)} !items-stretch !justify-start gap-2 !px-2.5 text-left`}>
+                  <span className="flex h-12 items-center justify-center"><span className="rounded-[3px] border-2 border-[#D4AF37]/70 bg-[repeating-linear-gradient(45deg,rgba(212,175,55,0.18)_0_3px,transparent_3px_7px)]" style={{ width: `${Math.max(14, (l / max) * 64)}px`, height: `${Math.max(10, (w / max) * 44)}px` }} /></span>
+                  <span className="block leading-tight">{z.label}</span>
+                  <span className="flex items-baseline justify-between gap-1 text-xs font-semibold"><span className="text-white/60">{z.w} × {z.l} m</span>{v !== null && <span className="text-sm font-bold text-white">{formatEuro(v)}</span>}</span>
+                </button>;
+              })}
+            </div>
+            <p className="mb-1 mt-3 text-xs font-semibold text-white/70">{preset ? 'Ou escreva a medida certa, em metros' : 'Medida em metros (de uma ponta à outra)'}</p>
+            <div className="mb-2 grid grid-cols-2 gap-2">
+              <input inputMode="decimal" placeholder="Largura (2,0)" value={item.width ?? ''} onChange={e => set({ width: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
+              <input inputMode="decimal" placeholder="Comprimento (3,0)" value={item.length ?? ''} onChange={e => set({ length: e.target.value })} className="min-h-12 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" />
+            </div>
+            {ok && <p className="mb-3 flex items-baseline justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{area.toLocaleString('pt-PT')} m², deslocação incluída</span>{price !== null && <span className="text-lg font-bold">{formatEuro(price)}</span>}</p>}
+            <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
+              <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60">Para o cheiro de animais ou de urina</span></span>
+              {odorPlus !== null && <span className="text-base font-bold text-white">{odorPlus > 0 ? `+${formatEuro(odorPlus)}` : 'oferecido'}</span>}
+            </button>
+          </>;
+        })()}
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {(() => { const g = others.some(o => o.id === item.id) ? null : giftsUnlocked(city, others, item); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : (others.length ? totalWith({}) : priceWith({})); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : priceWith({}); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
