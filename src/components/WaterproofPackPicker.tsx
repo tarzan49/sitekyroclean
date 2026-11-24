@@ -119,6 +119,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
           </div>
         )}
         {onMore && <button type="button" onClick={() => onMore({ kind, size, qty, extra })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {onMore && <p className="mt-1.5 text-center text-xs leading-relaxed text-[#666] md:text-sm">Junte outra peça à mesma visita e oferecemos-lhe um tratamento: anti-ácaros, anti-odor e outros.</p>}
         <p className={`${byPhoto ? '' : 'hidden'} mt-2 text-xs leading-relaxed text-[#666] md:mt-3 md:text-sm`}>{kind === 'sofa' ? (byPhoto ? 'Envie-nos uma fotografia do sofá e dizemos-lhe o preço em menos de 1 minuto.' : 'Sofá de canto, em U ou com mais de 6 lugares: o preço é dado pela fotografia.') : `Mais de ${CHAIR_MAX} cadeiras: peça o preço no WhatsApp.`}</p>
       </div>
 
