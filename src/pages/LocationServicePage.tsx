@@ -28,7 +28,7 @@ const LocationServicePage = () => {
   const resolved = useLandingModel(location.pathname);
   const model = resolved.status === 'ready' ? resolved.model : null;
   // Novo modelo de secções (ecrã inteiro + encaixe), em teste só na limpeza de sofás por cidade (dono, 24 Nov).
-  const snapPage = model?.serviceSlug === 'limpeza-sofas' || (model?.serviceSlug === 'limpeza-cadeiras' && model?.family === 'localidade');
+  const snapPage = model?.serviceSlug === 'limpeza-sofas' || (['limpeza-cadeiras', 'limpeza-colchoes'].includes(model?.serviceSlug ?? '') && model?.family === 'localidade');
   useEffect(() => {
     if (!snapPage) return;
     document.documentElement.classList.add('snap-sections');

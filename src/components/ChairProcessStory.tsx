@@ -6,30 +6,38 @@ import SectionHeader from '@/components/SectionHeader';
 import { StoryPlayer, type StoryStep } from '@/components/WaterproofPackSections';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 import { SERVICE_PROCESS_GUIDES } from '@/data/serviceProcessGuides';
-import sprayVideo from '@/assets/cadeiras-processo/pulverizacao.mp4';
-import sprayPoster from '@/assets/cadeiras-processo/pulverizacao-poster.jpg';
-import brushVideo from '@/assets/cadeiras-processo/escovacao.mp4';
-import brushPoster from '@/assets/cadeiras-processo/escovacao-poster.jpg';
-import extractVideo from '@/assets/cadeiras-processo/extracao.mp4';
-import extractPoster from '@/assets/cadeiras-processo/extracao-poster.jpg';
+import chairSpray from '@/assets/cadeiras-processo/pulverizacao.mp4';
+import chairSprayPoster from '@/assets/cadeiras-processo/pulverizacao-poster.jpg';
+import chairBrush from '@/assets/cadeiras-processo/escovacao.mp4';
+import chairBrushPoster from '@/assets/cadeiras-processo/escovacao-poster.jpg';
+import chairExtract from '@/assets/cadeiras-processo/extracao.mp4';
+import chairExtractPoster from '@/assets/cadeiras-processo/extracao-poster.jpg';
+// Colchões: um só serviço real da Porto 3 (Eunice, Porto, 21 Nov) para os três vídeos.
+import mattressSpray from '@/assets/colchoes-processo/pulverizacao.mp4';
+import mattressSprayPoster from '@/assets/colchoes-processo/pulverizacao-poster.jpg';
+import mattressBrush from '@/assets/colchoes-processo/escovacao.mp4';
+import mattressBrushPoster from '@/assets/colchoes-processo/escovacao-poster.jpg';
+import mattressExtract from '@/assets/colchoes-processo/extracao.mp4';
+import mattressExtractPoster from '@/assets/colchoes-processo/extracao-poster.jpg';
 
-function story(): StoryStep[] {
-  const pair = BEFORE_AFTER_POOL.cadeiras.find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
-  const media = [
-    { image: pair?.before },
-    { video: sprayVideo, poster: sprayPoster },
-    { video: brushVideo, poster: brushPoster },
-    { video: extractVideo, poster: extractPoster },
-    { image: pair?.after },
-  ];
-  return SERVICE_PROCESS_GUIDES['limpeza-cadeiras'].steps.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt, ...media[i] }));
+type Service = 'limpeza-cadeiras' | 'limpeza-colchoes';
+const MEDIA: Record<Service, { pool: 'cadeiras' | 'colchao'; heading: string; videos: [string, string][] }> = {
+  'limpeza-cadeiras': { pool: 'cadeiras', heading: 'A limpeza das suas cadeiras', videos: [[chairSpray, chairSprayPoster], [chairBrush, chairBrushPoster], [chairExtract, chairExtractPoster]] },
+  'limpeza-colchoes': { pool: 'colchao', heading: 'A limpeza do seu colchão', videos: [[mattressSpray, mattressSprayPoster], [mattressBrush, mattressBrushPoster], [mattressExtract, mattressExtractPoster]] },
+};
+
+function story(service: Service): StoryStep[] {
+  const m = MEDIA[service];
+  const pair = BEFORE_AFTER_POOL[m.pool].find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
+  const media = [{ image: pair?.before }, ...m.videos.map(([video, poster]) => ({ video, poster })), { image: pair?.after }];
+  return SERVICE_PROCESS_GUIDES[service].steps.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt, ...media[i] }));
 }
 
-export default function ChairProcessStory({ city, cityPrep }: { city?: string; cityPrep: string }) {
-  const steps = story();
+export default function ChairProcessStory({ city, cityPrep, service = 'limpeza-cadeiras' }: { city?: string; cityPrep: string; service?: Service }) {
+  const steps = story(service);
   return <section id="processo" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
-      <SectionHeader heading={`A limpeza das suas cadeiras${city ? ` ${cityPrep}` : ''}`} goldWord={city || 'passo a passo'} light />
+      <SectionHeader heading={`${MEDIA[service].heading}${city ? ` ${cityPrep}` : ''}`} goldWord={city || 'passo a passo'} light />
       <StoryPlayer story={steps} light />
       <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
         {steps.map((p, i) => <figure key={p.label} className="min-w-0">
