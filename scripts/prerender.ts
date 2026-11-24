@@ -935,9 +935,9 @@ export function prerenderRoutes(outDir: string): number {
       route.path,
       page.title,
       page.metaDescription,
-      // Modelo novo (dono, 24 Nov): a página mostra o subtítulo do topo, 4 benefícios e 5 perguntas; o HTML diz o mesmo.
-      { h1: page.h1, intro: treatment?.heroSubtitle, benefits: page.benefits.slice(0, 4), faqs: page.faqs.slice(0, 5), links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
-      [buildFaqSchema(page.faqs.slice(0, 5)), buildBreadcrumbSchema(crumbs)],
+      // Modelo novo (dono, 24 Nov): a página mostra o subtítulo do topo, 4 benefícios e 4 perguntas (6 na página nacional); o HTML diz o mesmo.
+      { h1: page.h1, intro: treatment?.heroSubtitle, benefits: page.benefits.slice(0, 4), faqs: page.faqs.slice(0, page.city ? 4 : 6), links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
+      [buildFaqSchema(page.faqs.slice(0, page.city ? 4 : 6)), buildBreadcrumbSchema(crumbs)],
     );
   }
 
