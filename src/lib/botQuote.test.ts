@@ -222,8 +222,9 @@ describe('puffs (owner, 21 Oct 2026)', () => {
     expect(bigOrderPrice(441, 15, true)).toBe(399);
     expect(bigOrderPrice(305, 0, true)).toBe(279);
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal', qty: 2 }, { kind: 'chairs', qty: 6 }], city: 'Porto' });
-    if (r.total > 300) expect(r.bigOrder?.special).toBeLessThan(r.total);
-    else expect(r.bigOrder).toBeNull();
+    // Com colchão a escada A (24 Nov 2026) substitui a condição: nunca desconto, oferta e total acabado em 9.
+    expect(r.bigOrder).toBeNull();
+    expect((r as any).visitGifts.total % 10).toBe(9);
     expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).bigOrder).toBeNull();
   });
 
