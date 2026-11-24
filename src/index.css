@@ -765,3 +765,9 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #material .grid + p { margin-top: 8px; }
   html.snap-sections #material > div > div:first-child { margin-bottom: 14px; }
 }
+@media (max-width: 767px) {
+  html.snap-sections #marca-tecido > div > div:first-child { margin-bottom: 12px; }
+  html.snap-sections #marca-tecido p.mb-5 { margin-bottom: 10px; }
+  html.snap-sections #marca-tecido .grid { gap: 8px; }
+  html.snap-sections #marca-tecido .grid > div { padding: 12px 14px; }
+}
