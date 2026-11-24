@@ -96,7 +96,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/guia-de-packs": {
     pt: {
       title: "Guia de Packs de Limpeza | Kyro Clean Solutions",
-      description: "Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita, com preço de pack no artigo acrescentado. Orçamento grátis.",
+      description: "Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita e uma só deslocação. Orçamento grátis.",
     },
     en: {
       title: "Cleaning Packs Guide | Kyro Clean Solutions",

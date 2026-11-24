@@ -1,3 +1,4 @@
+import { PACK_PERKS_ON } from '@/constants/packPerks';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect } from 'vitest';
@@ -12,13 +13,13 @@ const read = (path: string) => readFileSync(resolve(__dirname, '..', '..', path)
 // pessoas que podem passar pelos dois no mesmo dia. Estes testes existem para
 // que os números não voltem a viver em dois sítios.
 describe('as regalias de pack são as mesmas no quiz e no configurador', () => {
-  it('o configurador cobra pelo colchão acrescentado o mesmo que o upsell do quiz mostra', () => {
+  it.skipIf(!PACK_PERKS_ON)('o configurador cobra pelo colchão acrescentado o mesmo que o upsell do quiz mostra', () => {
     const casal = mattressPrices.find(option => option.id === 'casal')!;
     const items = [{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'casal' }];
     expect(calculateCustomPack(items, 'Braga').lines[1].amount).toBe(perkMattressPrice(Number(casal.cleaningPrice)));
   });
 
-  it('o configurador cobra pelo sofá acrescentado o preço fixo que o upsell do quiz mostra', () => {
+  it.skipIf(!PACK_PERKS_ON)('o configurador cobra pelo sofá acrescentado o preço fixo que o upsell do quiz mostra', () => {
     for (const option of sofaPrices) {
       if (typeof option.cleaningPrice !== 'number') continue;
       const items = [{ ...makePackItem('mattress', 'm'), size: 'casal' }, { ...makePackItem('sofa', 's'), size: option.id }];
@@ -26,7 +27,7 @@ describe('as regalias de pack são as mesmas no quiz e no configurador', () => {
     }
   });
 
-  it('as cadeiras acrescentadas seguem a mesma oferta por conjunto', () => {
+  it.skipIf(!PACK_PERKS_ON)('as cadeiras acrescentadas seguem a mesma oferta por conjunto', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '2-lugares' }, { ...makePackItem('chairs', 'c'), qty: 4 }];
     expect(calculateCustomPack(items, 'Braga').lines[1].amount).toBe(perkChairsPrice(calcChairClean(4)!, 4));
   });
@@ -76,5 +77,13 @@ describe('nenhuma página de pack promete um desconto que o código não aplica'
         expect(source, `${path} escreve ${price}€ à mão em vez de importar`).not.toContain(`${price}€`);
       }
     }
+  });
+});
+
+describe('2 ou mais peças na mesma visita (dono, 23 Nov 2026)', () => {
+  it('cada peça fica ao preço de tabela, somado, sem condição especial', async () => {
+    const { botQuote } = await import('@/lib/botQuote');
+    const r = botQuote({ city: 'Lisboa', items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }, { kind: 'mattress', size: 'casal', treatment: 'clean' }, { kind: 'chairs', qty: 6, treatment: 'clean' }] }) as { lines: { amount: number; tablePrice: number; perkApplied: boolean }[] };
+    for (const l of r.lines) { expect(l.perkApplied).toBe(false); expect(l.amount).toBe(l.tablePrice); }
   });
 });

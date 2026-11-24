@@ -29,7 +29,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
           heading="Aproveite a"
           goldWord="mesma visita"
           light={light}
-          subtitle="Escolha os artigos e os tratamentos que precisa. O primeiro fica ao preço de tabela e cada artigo acrescentado entra com preço de pack, com uma só deslocação."
+          subtitle="Escolha os artigos e os tratamentos que precisa. Cada artigo fica ao preço de tabela, com uma só deslocação."
         />
         <div className={`grid gap-3 ${options.length > 3 ? 'sm:grid-cols-2' : ''}`}>
           {options.map(option => (

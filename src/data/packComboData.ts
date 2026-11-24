@@ -13,7 +13,7 @@ import { formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FRO
 // nome novo tem de manter esse arranque. Os slugs `pack-*` não mudam.
 export interface PackCombo { id: string; name: string; slug: string; tagline: string; description: string; service1Slug: string; service2Slug: string; }
 export const packs: PackCombo[] = [
-  { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Comece com sofá e colchão e adapte os tamanhos, quantidades e tratamentos. A estimativa e a deslocação aparecem no resumo.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
+  { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Escolha os lugares do sofá, o tamanho do colchão e o tratamento de cada um. O total já vem com a deslocação.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
   { id: 'sofa-impermeabilizacao', name: 'Limpeza e Impermeabilização de Sofá', slug: 'pack-sofa-impermeabilizacao', tagline: 'O seu sofá já não é novo, mas gostava que voltasse a parecer?', description: 'Tiramos a sujidade das fibras com uma limpeza profunda e protegemo-lo a seguir: vinho, café ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'impermeabilizacao' },
   { id: 'cadeiras-impermeabilizacao', name: 'Limpeza e Impermeabilização de Cadeiras', slug: 'pack-cadeiras-impermeabilizacao', tagline: 'As cadeiras da mesa são as primeiras a sofrer com cada refeição?', description: 'Limpamos o tecido a fundo e protegemo-lo a seguir: molho, vinho ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, e o preço por cadeira desce com a quantidade.', service1Slug: 'limpeza-cadeiras', service2Slug: 'impermeabilizacao' },
   { id: 'sala-completa', name: 'Limpeza de Sofá, Cadeiras e Tapete', slug: 'pack-sala-completa', tagline: 'Sofá, cadeiras e tapetes à sua medida', description: 'Escolha os artigos da sala. Os tapetes ficam sempre sob orçamento: indique largura e comprimento de cada peça.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-tapetes' },
@@ -48,7 +48,7 @@ export const PACK_HOOK: Record<string, string> = {
   'sofa-impermeabilizacao': 'Limpeza e proteção contra nódoas na mesma visita, até 10 anos com a Premium.',
   'cadeiras-impermeabilizacao': 'Limpeza e proteção contra nódoas nas cadeiras, na mesma visita. Ideal para a mesa onde se come todos os dias.',
   'sala-completa': `Sofá, cadeiras e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
-  'quarto-completo': `Colchão e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, no tapete acrescentado: ${PACK_PERK_RUG_NOTE.toLowerCase()}.`,
+  'quarto-completo': `Colchão e tapete numa só visita, cada um ao preço de tabela e com uma só deslocação.`,
 };
 
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */
@@ -78,7 +78,7 @@ export function packFaqs(pack: PackCombo, cityName: string): { question: string;
   return [
     {
       question: `Quanto custa a ${pack.name.toLowerCase()} ${cityPrep(cityName)} ${cityName}?`,
-      answer: `Depende dos artigos, dos tamanhos e do tratamento que escolher. O configurador desta página mostra a estimativa enquanto escolhe, e ${travel}, cobrada uma única vez para a visita toda. O valor é confirmado antes da marcação.`,
+      answer: `Depende dos artigos, dos tamanhos e do tratamento que escolher. A escolha de preço desta página mostra o total enquanto escolhe, e ${travel}, cobrada uma única vez para a visita toda. O valor é confirmado antes da marcação.`,
     },
     {
       question: 'O que muda por ser um pack e não pedidos separados?',
@@ -86,7 +86,7 @@ export function packFaqs(pack: PackCombo, cityName: string): { question: string;
     },
     {
       question: 'Posso acrescentar ou tirar artigos depois de pedir?',
-      answer: `Pode. O pack é um ponto de partida editável: acrescente tapetes, alcatifas ou cadeiras no configurador, ou diga-nos na mensagem. Qualquer alteração ao pedido é orçamentada antes de avançarmos. ${RESPONSE_PROMISE.toLowerCase()}.`,
+      answer: `Pode. O pack é um ponto de partida editável: acrescente tapetes, alcatifas ou cadeiras na mensagem de WhatsApp. Qualquer alteração ao pedido é orçamentada antes de avançarmos. ${RESPONSE_PROMISE.toLowerCase()}.`,
     },
     {
       question: 'Quanto tempo demora e quando posso voltar a usar tudo?',
@@ -140,7 +140,7 @@ const WATERPROOF_PACK_FAQS: Record<string, { question: string; answer: string }[
   'sofa-impermeabilizacao': [
     {
       question: 'Quanto custa limpar e impermeabilizar um sofá?',
-      answer: `A limpeza com impermeabilização começa nos ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)}, e a impermeabilização acrescentada à limpeza desde ${formatEuro(SOFA_PROTECT_WITH_CLEANING_FROM)}. O valor depende do número de lugares e da versão (Premium ou Essencial), e aparece no configurador desta página.`,
+      answer: `A limpeza com impermeabilização começa nos ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)}, e a impermeabilização acrescentada à limpeza desde ${formatEuro(SOFA_PROTECT_WITH_CLEANING_FROM)}. O valor depende do número de lugares e da versão (Premium ou Essencial), e aparece na escolha de preço desta página.`,
     },
     ...WATERPROOF_COMMON,
   ],

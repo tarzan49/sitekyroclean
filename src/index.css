@@ -695,7 +695,7 @@ html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16p
   html.snap-sections [data-hero-part="proof"] > * { min-height: 44px; }
   html.snap-sections [data-commercial-hero] .grid.items-center.gap-4 { gap: 6px; }
   html.snap-sections [data-hero-part="title"] { font-size: 1.5rem; }
-  html.snap-sections [data-hero-part="subtitle"] { font-size: 13px; margin: 6px 0 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  html.snap-sections [data-hero-part="subtitle"] { font-size: 13px; margin: 6px 0 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   html.snap-sections [data-hero-part="proof"] { margin-bottom: 8px; }
   html.snap-sections [data-hero-part="whatsapp"] { min-height: 46px; }
   html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { display: none; }
@@ -747,3 +747,4 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
   html.snap-sections #problemas figcaption { padding-top: 6px; }
   html.snap-sections #problemas .grid + p { margin-top: 8px; }
 }
+@keyframes kyro-reveal { 0%, 25% { clip-path: inset(0 100% 0 0); } 70%, 100% { clip-path: inset(0 0 0 0); } }

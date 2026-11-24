@@ -29,6 +29,9 @@ import { isBlackFriday } from './campaigns';
  * de tabela, como num orçamento normal. */
 export const PACK_PERK_MIN_ORDER = 100;
 
+/** Preço de pack nos artigos acrescentados: desligado desde 23 Nov 2026 (dono: soma da tabela). */
+export const PACK_PERKS_ON = false;
+
 /** Colchão acrescentado: menos 14€ por unidade sobre o preço de tabela. */
 export const PACK_PERK_MATTRESS_OFF = 14;
 
@@ -116,7 +119,9 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 export function priceWithPackPerks(lines: PerkLineInput[], mainKind: string | undefined = lines[0]?.kind) {
   const tableSubtotal = round2(lines.reduce((sum, line) => sum + (line.tablePrice ?? 0), 0));
   // Na Black Friday o preço de pack vale mesmo abaixo dos 100€ (campaigns.ts).
-  const eligible = tableSubtotal >= PACK_PERK_MIN_ORDER || isBlackFriday();
+  // Desligado (dono, 23 Nov 2026, Joana Duarte): 2 ou mais peças na mesma visita = cada peça a preço de
+  // tabela, somado, sem condição especial. O cálculo fica para não partir quem o chama.
+  const eligible = PACK_PERKS_ON && (tableSubtotal >= PACK_PERK_MIN_ORDER || isBlackFriday());
   const results: PerkLineResult[] = lines.map(line => {
     const isMain = line.kind === mainKind;
     const table: PerkLineResult = { amount: line.tablePrice, tablePrice: line.tablePrice, isMain, perkApplied: false, perkNote: null };
@@ -146,23 +151,18 @@ export function priceWithPackPerks(lines: PerkLineInput[], mainKind: string | un
 // ── O que se diz ao cliente ─────────────────────────────────────────────────
 
 /** A regra numa frase, para a FAQ e para o prerender das páginas de pack. */
-export const PACK_PERK_RULE = `A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o artigo principal fica ao preço de tabela, em todas as unidades e tamanhos, e cada artigo de outro tipo que juntar à mesma visita entra com preço de pack: sofás a partir de ${PACK_PERK_SOFA_PRICE['1-lugar']}€, menos ${PACK_PERK_MATTRESS_OFF}€ em cada colchão, uma cadeira oferecida por cada conjunto de ${PACK_PERK_CHAIRS_SET} e, nos tapetes, ${PACK_PERK_RUG_NOTE.toLowerCase()}.`;
+export const PACK_PERK_RULE = 'Cada artigo que juntar à mesma visita fica ao preço de tabela, somado, sem condição especial; a deslocação é uma só.';
 
 /** Subtítulo curto: quem paga tabela e quem paga preço de pack. */
-export const PACK_PERK_SUMMARY = `A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o artigo principal fica ao preço de tabela e os artigos de outro tipo que acrescentar entram com preço de pack.`;
+export const PACK_PERK_SUMMARY = 'Cada artigo que juntar à mesma visita fica ao preço de tabela, somado, e a deslocação é uma só.';
 
 /** Os preços de pack, sem a condição, para um cartão de regalias. */
-export const PACK_PERK_PRICES = `Sofá a partir de ${PACK_PERK_SOFA_PRICE['1-lugar']}€, menos ${PACK_PERK_MATTRESS_OFF}€ em cada colchão, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET} e, nos tapetes, ${PACK_PERK_RUG_NOTE.toLowerCase()}.`;
+export const PACK_PERK_PRICES = 'Sem condição especial: cada artigo ao preço de tabela, somado, com uma só deslocação.';
 
 export const PACK_PERK_BULLETS = [
-  `Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal (abaixo disso, preço de tabela normal).`,
-  'O artigo principal fica ao preço de tabela, em todas as unidades e tamanhos. O preço de pack é para os artigos de outro tipo.',
-  `Sofá acrescentado: ${PACK_PERK_SOFA_PRICE['1-lugar']}€ o de 1 lugar, ${PACK_PERK_SOFA_PRICE['2-lugares']}€ o de 2 lugares, ${PACK_PERK_SOFA_PRICE['3-lugares']}€ o de 3 lugares, ${PACK_PERK_SOFA_PRICE['4-lugares']}€ o de 4 lugares; o de 5+ lugares fica ao preço de tabela.`,
-  `Colchão acrescentado: menos ${PACK_PERK_MATTRESS_OFF}€ por unidade, em qualquer tamanho.`,
-  `Cadeiras acrescentadas: uma oferecida por cada conjunto de ${PACK_PERK_CHAIRS_SET}.`,
-  `Tapete acrescentado: ${PACK_PERK_RUG_NOTE.toLowerCase()}, sempre sob orçamento.`,
+  'Cada artigo ao preço de tabela, somado, sem condição especial.',
   'Uma só deslocação para a visita toda, cobrada uma única vez.',
 ];
 
 /** O limite da regalia, dito pelo nome. Aparece na página, não só no código. */
-export const PACK_PERK_LIMIT = 'O preço de pack é para limpeza. Um sofá ou cadeiras acrescentados com impermeabilização ou anti-ácaros mantêm o preço de tabela desse tratamento; um colchão acrescentado com anti-ácaros mantém o desconto de pack.';
+export const PACK_PERK_LIMIT = 'Os tratamentos (impermeabilização, anti-ácaros) ficam também ao preço de tabela de cada artigo.';
