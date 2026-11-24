@@ -36,7 +36,7 @@ describe('mandatory commercial hero', () => {
       expect(proof).not.toContain('deslocação');
       expect(container.querySelector('[data-hero-part="prices"]')?.getAttribute('href')).toBe('#precos');
       const stats = container.querySelector('[data-hero-part="stats"]')!.textContent!;
-      expect(stats).toContain('± 1 h');
+      expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? '± 30 min' : '± 1 h');
       expect(stats).not.toContain('avaliações');
       expect(stats).toContain('<1 min');
       expect(stats).toContain(serviceSlug === 'impermeabilizacao' ? 'Ativação' : 'Secagem');

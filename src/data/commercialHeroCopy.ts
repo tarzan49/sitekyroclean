@@ -91,7 +91,10 @@ export const ON_SITE_DURATION = '± 1 h';
  * de uma palavra para caberem numa linha no telemóvel.
  */
 export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
-  { key: 'duration', value: ON_SITE_DURATION, label: 'Limpeza' },
+  // Impermeabilização: aplicação em média 30 min (dono, 24/11/2026).
+  serviceSlug === 'impermeabilizacao'
+    ? { key: 'duration', value: '± 30 min', label: 'Aplicação' }
+    : { key: 'duration', value: ON_SITE_DURATION, label: 'Limpeza' },
   { key: 'response', value: '<1 min', label: 'Resposta' },
   // A impermeabilização não seca, ativa: o tratamento precisa de até 24 h para
   // ficar operacional, ao contrário da limpeza, que devolve o artigo em 2 a 5 h
