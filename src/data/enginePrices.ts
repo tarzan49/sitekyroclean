@@ -11,7 +11,7 @@
 //
 // Sem imports com alias `@/`: o `scripts/prerender.ts` lê este ficheiro em Node
 // (ver a armadilha das constantes duplicadas no CLAUDE.md).
-import { sofaPrices, mattressPrices, type PriceOption } from '../components/quiz/QuizTypes';
+import { sofaPrices, mattressPrices, sofaCleaningShown, type PriceOption } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '../components/quiz/quizHelpers';
 import { CHAIR_WATERPROOF_BIG_ESSENTIAL, CHAIR_WATERPROOF_BIG_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_CLEAN_MID_FROM, CHAIR_CLEAN_BIG_FROM, chairCleanUnit } from '../constants/chairPricing';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL, mattressAntiAcarosPrice } from '../constants/antiAcarosPricing';
@@ -77,7 +77,7 @@ type SizePriceField = 'cleaningPrice' | 'waterproofingPrice' | 'waterproofingPre
 function sizeList(options: PriceOption[], field: SizePriceField): string {
   const parts = options
     .filter(size => typeof size[field] === 'number')
-    .map(size => `${formatEuro(size[field] as number)} (${size.label.toLowerCase()})`);
+    .map(size => `${formatEuro((field === 'cleaningPrice' && options === sofaPrices ? sofaCleaningShown(size) : size[field]) as number)} (${size.label.toLowerCase()})`);
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts.join('');
 }
 

@@ -109,6 +109,12 @@ export interface PriceOption {
 // sob orçamento (o dono não deu valores: não inventar). O motor devolve null
 // nesses casos (calcSofaUnitPrice) e o quiz marca-os como sob orçamento.
 //
+// Sofá de 5 lugares limpo sozinho (dono, 22 Nov 2026, Rosângela): 119€ final com os 10€ de deslocação,
+// por isso a base é 109€; num pedido maior fica nos 119€. O site mostra os 109€ + deslocação, como o bot.
+export const SOFA_5_ALONE_CLEANING_BASE = 109;
+/** A limpeza de um tamanho de sofá como o site a mostra (base sem deslocação): o 5+ sozinho vem do bot. */
+export const sofaCleaningShown = (o: { id: string; cleaningPrice: number | string }) => (o.id === '5-lugares' && typeof o.cleaningPrice === 'number' ? SOFA_5_ALONE_CLEANING_BASE : o.cleaningPrice);
+
 // Sofá de canto (dono, 2026-10-13: "sofá de canto faz a 109 eur"; 20 Nov: "Fazemos 119 num sofá de canto"): id 'canto',
 // só a limpeza tem preço; impermeabilização, anti-ácaros e pack ficam sob
 // orçamento, como no de 5+ lugares (o dono não deu valores: não inventar).

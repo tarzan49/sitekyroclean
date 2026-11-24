@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import WaterproofTierCards from './WaterproofTierCards';
+import { Fragment, lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { bootstrapLandingModel } from '@/data/landingModelBootstrap';
 import type { LandingPageModel } from '@/data/landingPageModel';
@@ -111,7 +112,7 @@ export default function LandingServiceSections() {
     </section>,
   };
   return <>
-    {LANDING_SECTION_ORDER.filter(section => section !== 'zonas' || !hideDirectory).map(section => <div key={section} data-landing-section={section}>{sections[section]}</div>)}
+    {LANDING_SECTION_ORDER.filter(section => section !== 'zonas' || !hideDirectory).map(section => <Fragment key={section}><div data-landing-section={section}>{sections[section]}</div>{section === 'precos' && newModel && model.serviceSlug === 'impermeabilizacao' && <div data-landing-section="versoes"><WaterproofTierCards city={model.municipalityName} /></div>}</Fragment>)}
     {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={model.municipalityName} initialItems={[basket]} /></Suspense>}
     <QuizFormLazy isOpen={isQuizOpen} onClose={closeQuiz} initialLocation={model.municipalityName} initialService={quizService} initialServiceType={model.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'} initialCarpetKind={model.serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'} />
   </>;

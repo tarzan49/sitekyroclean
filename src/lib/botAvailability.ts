@@ -1036,7 +1036,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     const dayName = new Date(`${friday}T12:00:00Z`).getUTCDay() === 4 ? 'quinta-feira' : 'sexta-feira';
     return { ...base, region: area, teams: [...(ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area])],
       handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
-      askWeek: true, askWeekRule: dayName === 'sexta-feira' ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll('sextas-feiras', 'quintas-feiras (só esta semana)').replaceAll('sexta-feira', 'quinta-feira'), fridayOnly: friday };
+      askWeek: true, askWeekRule: dayName === 'sexta-feira' ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.split('sextas-feiras').join('quintas-feiras (só esta semana)').split('sexta-feira').join('quinta-feira'), fridayOnly: friday };
   }
   if (req.ownerTime !== true && !fridayDone && ASK_WEEK_ZONES.has(area)) {
     const override = ZONE_TEAM_OVERRIDE[area];

@@ -53,7 +53,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(multi.waterproofingTiers.travel).toBe(0);
     // Hugo rule retired (dono, 24 Nov 2026): chairs with another piece are priced by position too.
     const hugo = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'premium' }, { kind: 'chairs', qty: 4, treatment: 'premium' }], city: 'Lisboa' });
-    expect(hugo.waterproofingTiers).toEqual({ travel: 0, premium: 249, essencial: hugo.waterproofingTiers.essencial });
+    expect(hugo.waterproofingTiers).toEqual({ travel: 0, premium: 259, essencial: hugo.waterproofingTiers.essencial });
     // When travel is charged, both versions carry it, capped at 10€ even in a 20€ town.
     expect(q('2-lugares', 'essencial', 'Porto').waterproofingTiers).toEqual({ travel: 10, premium: 129, essencial: 79 });
     expect(q('1-lugar', 'premium', 'Sines').waterproofingTiers).toEqual({ travel: 10, premium: 89, essencial: 49 });
@@ -77,10 +77,10 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect([1, 3, 4, 7, 8, 9, 10, 12].map(qty => ok({ items: [{ kind: 'chairs', qty }], city: 'Porto' }).subtotal)).toEqual([20, 60, 80, 125, 140, 150, 160, 180]);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }, { kind: 'chairs', qty: 2 }], city: 'Porto' }).subtotal).toBe(80);
     expect(ok({ items: [{ kind: 'chairs', qty: 2 }], city: 'Braga' }).travel).toBeGreaterThan(0);
-    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(15);
-    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(25);
-    expect(ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(100);
-    expect(ok({ items: [{ kind: 'chairs', qty: 6, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(85);
+    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(19);
+    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(29);
+    expect(ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(109);
+    expect(ok({ items: [{ kind: 'chairs', qty: 6, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(89);
   });
   it('mattress with anti-ácaros (reply 3.4)', () => {
     expect(ok({ items: [{ kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' }], city: 'Braga' }).subtotal).toBe(89);
@@ -124,10 +124,10 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('prices chair waterproofing alone for any number of chairs (dono, 24 Nov 2026: by position, Premium 25/22,50/20€, Essencial 15/12,50/10€)', () => {
     const premium = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'premium' }], city: 'Póvoa de Varzim' });
-    // By position (dono, 24 Nov 2026): Premium 4 x 25 + 4 x 22,50 + 2 x 20 = 230 (waterproofing alone does not round).
-    expect([premium.travel, premium.total, premium.handToOwner]).toEqual([0, 230, false]);
+    // By position (dono, 24 Nov 2026): Premium 4 x 25 + 4 x 22,50 + 2 x 20 = 230, alone ends in 9 upwards (dono, 24 Nov 2026).
+    expect([premium.travel, premium.total, premium.handToOwner]).toEqual([0, 239, false]);
     const essencial = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'essencial' }], city: 'Porto' });
-    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([150, 0, 150, false]);
+    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([159, 0, 159, false]);
     // Waterproofed-only chairs do not push the cleaned ones over a tier; the 4 cleaned chairs are also waterproofed, so 4 x (20 - 5) = 60€ (dono, 24 Nov 2026).
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
     expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([40, false]);

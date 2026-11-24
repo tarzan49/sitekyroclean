@@ -13,7 +13,7 @@
  * is out of date.
  */
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
-import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
+import { sofaPrices, mattressPrices, SOFA_5_ALONE_CLEANING_BASE } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES, calculateTravelFee, isSmallOrderFarPlace, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE, SMALL_ORDER_FAR_RULE } from '../constants/travel';
 import { isBlackFriday, blackFridayPricesActive, BLACK_FRIDAY_PRICES } from '../constants/campaigns';
 import { rugPickupFee, rugPickupOffered, NO_RUG_PICKUP_RULE, RUG_PICKUP_ASKED_RULE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
@@ -473,8 +473,39 @@ function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fa
   } as RugWpResult;
 }
 
-export function botQuote(input: unknown) {
+/**
+ * One struck price per order (24 Nov 2026 audit: 229 / 208 / 209 on the same order): the order done
+ * separately (separatePrice, which already adds the visit gifts), read on the order with the mattress or
+ * chairs anti-mites the client asked set to cleaning (it is the gift), so it is never counted twice. With a
+ * visit gift, visitGifts, separatePrice and mattressMitePack show that one struck price and one total.
+ */
+function withOneStruckPrice<T>(input: unknown, r: T): T {
+  const x = r as unknown as Record<string, any>;
+  const v = x?.visitGifts;
+  if (!v) return r;
+  const inp = (input ?? {}) as Record<string, unknown>;
+  const items = Array.isArray(inp.items) ? inp.items as Record<string, unknown>[] : [];
+  const asked = (i: Record<string, unknown>) => ['mattress', 'chairs'].includes(i?.kind as string) && i?.treatment === 'clean+anti-acaros';
+  const sep = items.some(asked)
+    ? (botQuoteChain({ ...inp, items: items.map(i => (asked(i) ? { ...i, treatment: 'clean' } : i)) }) as Record<string, any>).separatePrice
+    : x.separatePrice;
+  const out = { ...x };
+  const struck = sep && sep.separate > v.total ? sep.separate : v.usual;
+  const tierStruck = (k: 'premium' | 'essencial') => (v.tiers?.[k] ? { usual: sep?.tiers?.[k]?.separate > v.tiers[k].total ? sep.tiers[k].separate : v.tiers[k].usual, total: v.tiers[k].total } : null);
+  const vt = v.tiers ? { premium: tierStruck('premium'), essencial: tierStruck('essencial') } : null;
+  out.visitGifts = { ...v, usual: struck, tiers: vt };
+  if (x.separatePrice || sep) {
+    const tiers = vt ? Object.fromEntries((['premium', 'essencial'] as const).map(k => [k, vt[k] ? { separate: vt[k]!.usual, total: vt[k]!.total, saving: cents(vt[k]!.usual - vt[k]!.total) } : null])) : null;
+    out.separatePrice = { ...(x.separatePrice ?? sep), separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: v.withoutGift };
+  }
+  if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
+  return out as T;
+}
+function botQuoteChain(input: unknown) {
   return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
+}
+export function botQuote(input: unknown) {
+  return withOneStruckPrice(input, botQuoteChain(input));
 }
 
 /**
@@ -692,9 +723,11 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const sumAlone = parts.every((v): v is number => typeof v === 'number') ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
-  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
+  // The struck price ends in 9 too (89 + 79 + 40 = 208 -> 209): the one struck price of the order, also in separatePrice.
+  const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
+  const usual = up9(paid + giftSum);
   const final = up9(paid);
   const out = { ...r } as Record<string, unknown>;
   const rc = q.rugCombo;
@@ -707,9 +740,10 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     if (shift && e && typeof e.total === 'number' && !(rc && typeof rc.comboPrice === 'number')) out[k] = { ...e, total: cents(e.total + shift) };
   }
   // Premium / Essencial options: the same gifts on top, the price up to the next 9, the struck price beside it.
-  const giftSum = cents(usual - paid);
+  // Each option keeps its distance to the order as asked (the asked one equals the total).
+  const asAsked = pricedTotal(q) ?? total;
   const t = (r as unknown as { waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null }).waterproofingTiers;
-  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null);
+  const tier = (v: number | null): TierGift | null => (typeof v === 'number' ? { usual: up9(paid + (v - asAsked) + giftSum), total: up9(paid + (v - asAsked)) } : null);
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
@@ -827,7 +861,7 @@ function botQuoteInner(input: unknown) {
     // 10€ travel included, so the base is 109€ (travel added as usual); in a bigger order it stays 119€.
     if (rawItems.length === 1 && (raw as Record<string, unknown>)?.size === '5-lugares' && item.kind === 'sofa' && item.size === '5-lugares' && !item.unitPrice && item.extra === 'none' && item.primary !== 'waterproofing') {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ''];
-      items.push(fee === 10 ? { ...item, unitPrice: 109 } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
       rawOf.push(raw);
       continue;
     }

@@ -1,5 +1,5 @@
 import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_BIG_FROM, CHAIR_WATERPROOF_BIG_ESSENTIAL, CHAIR_WATERPROOF_BIG_PREMIUM } from '../constants/chairPricing';
-import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
+import { sofaPrices, mattressPrices, sofaCleaningShown } from '../components/quiz/QuizTypes';
 import { formatEuro, chairTierRows, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
@@ -54,7 +54,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").cleaningPrice) },
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").cleaningPrice) },
     { item: "Sofá 4 lugares", price: desde(sofaSize("4-lugares").cleaningPrice) },
-    { item: "Sofá 5+ lugares", price: desde(sofaSize("5-lugares").cleaningPrice) },
+    { item: "Sofá 5+ lugares", price: desde(sofaCleaningShown(sofaSize("5-lugares"))) },
     { item: "Sofá de canto (em L)", price: desde(sofaSize("canto").cleaningPrice) },
     { item: "Sofá em U ou modular", price: "Sob orçamento" },
     // Acrescentada à limpeza, a impermeabilização não custa o preço de

@@ -51,14 +51,14 @@ export const PACK_INITIAL_EXTRA: Record<string, PackExtra> = { 'sofa-impermeabil
  * outro tipo que o principal: um segundo colchão num pack de colchão paga
  * tabela (priceWithPackPerks), por isso nenhuma frase o pode prometer. */
 export const PACK_HOOK: Record<string, string> = {
-  'sofa-colchao': `A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o colchão acrescentado fica ${PACK_PERK_MATTRESS_OFF}€ mais barato. Uma só deslocação.`,
+  'sofa-colchao': 'Sofá e colchão na mesma visita, com o anti-ácaros no colchão oferecido (produto Bactran).',
   'sofa-impermeabilizacao': 'Limpeza e proteção contra nódoas na mesma visita, até 10 anos com a Premium.',
   'cadeiras-impermeabilizacao': 'Limpeza e proteção contra nódoas nas cadeiras, na mesma visita. Ideal para a mesa onde se come todos os dias.',
   'colchao-anti-acaros': 'Limpeza a fundo e anti-ácaros (produto Bactran) no colchão, na mesma visita.',
   'sofa-anti-acaros': 'Limpeza a fundo e anti-ácaros (produto Bactran) no sofá, na mesma visita.',
   'tapete-anti-odor': 'Lavagem a fundo e anti-odor no tapete, na mesma visita.',
-  'sala-completa': `Sofá, cadeiras e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
-  'quarto-completo': `Colchão e tapete numa só visita, cada um ao preço de tabela e com uma só deslocação.`,
+  'sala-completa': 'Sofá, cadeiras e tapete numa só visita, com tratamentos oferecidos: anti-ácaros nas cadeiras e anti-odor no tapete.',
+  'quarto-completo': 'Colchão e tapete numa só visita, com o anti-ácaros no colchão oferecido (produto Bactran).',
 };
 
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */

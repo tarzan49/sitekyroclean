@@ -165,4 +165,5 @@ export const PACK_PERK_BULLETS = [
 ];
 
 /** O limite da regalia, dito pelo nome. Aparece na página, não só no código. */
-export const PACK_PERK_LIMIT = 'Os tratamentos (impermeabilização, anti-ácaros) ficam também ao preço de tabela de cada artigo.';
+/** A oferta da visita (escada A, dono 24 Nov; visitGifts em botQuote.ts). */
+export const PACK_PERK_LIMIT = 'Por cada peça a mais na visita oferecemos um tratamento, com o valor riscado: primeiro o anti-ácaros no colchão, depois o mais em conta da visita (anti-ácaros nas cadeiras ou no sofá, anti-odor no tapete).';

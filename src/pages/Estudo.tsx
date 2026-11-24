@@ -1,3 +1,4 @@
+import ResourcePriceSection from '@/components/ResourcePriceSection';
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, BarChart3 } from "lucide-react";
@@ -74,14 +75,7 @@ const Estudo = () => {
               <span className="text-white/80">Estudo</span>
             </nav>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-gold" />
-              </div>
-              <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase">Dados próprios</p>
-            </div>
-
-            <h1 className="type-page-title font-playfair text-white mb-4">{STUDY_H1}</h1>
+            <h1 className="font-playfair mb-3 text-[28px] font-semibold leading-tight text-white md:text-5xl">{STUDY_H1.split(" ").slice(0, -1).join(" ")} <em className="not-italic text-[#D4AF37]">{STUDY_H1.split(" ").slice(-1)}</em></h1>
 
             <p className="text-white/60 text-sm mb-4">
               Por{" "}
@@ -150,6 +144,7 @@ const Estudo = () => {
 
           <QuizButton ctaLabel="Pedir orçamento" />
         </main>
+        <ResourcePriceSection source="resource_price_estudo" />
 
         <Footer />
       </div>

@@ -1,3 +1,4 @@
+import ResourcePriceSection from '@/components/ResourcePriceSection';
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ResourceLeadCard from "@/components/ResourceLeadCard";
 import ResourceNav from "@/components/ResourceNav";
@@ -120,7 +121,6 @@ const BlogPost = () => {
         <CommercialHero title={post.title} subtitle={resourceHeroSubtitle(post)} serviceSlug={serviceSlug}
           breadcrumbs={[{label:'Início',to:'/'},{label:'Guias',to:'/blog'},{label:post.category}]}
           whatsappHref={getResourceWhatsapp(post)} source={`blog-${post.slug}`} />
-        <ServicePriceSection serviceSlug={serviceSlug} />
         <section className="py-12 md:py-16 bg-kyro-green" aria-label="Avaliações de clientes">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Avaliações reais" heading="Nas palavras dos nossos" goldWord="clientes" light={false} subtitle="Transcrições de quem já recebeu a nossa equipa." />
@@ -201,6 +201,8 @@ const BlogPost = () => {
           </div>
         </article>
 
+        {/* Blog no modelo novo (dono, 24 Nov): o texto corrido e, no fim do artigo, o preço do serviço do artigo. */}
+        <ResourcePriceSection service={serviceSlug} source={`blog_price_${post.slug}`} />
         <ServicePackBanner packSlugs={[]} variant="dark" />
         <ResourceNav afterHero />
 

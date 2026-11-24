@@ -226,6 +226,7 @@ function calculateTravelFee(baseFee, servicesTotal) {
 }
 
 // src/components/quiz/QuizTypes.ts
+var SOFA_5_ALONE_CLEANING_BASE = 109;
 var sofaPrices = [
   { waterproofingUpsellDiscount: 10, id: "1-lugar", label: "1 Lugar", cleaningPrice: 49, waterproofingPrice: 39, bothPrice: 89, originalBothPrice: 88, waterproofingPremiumPrice: 79 },
   { waterproofingUpsellDiscount: 10, id: "2-lugares", label: "2 Lugares", cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 138, originalBothPrice: 138, waterproofingPremiumPrice: 119, packPremiumDelta: 50 },
@@ -287,6 +288,10 @@ var endIn9Down = (total) => {
 function chairPackWas(qty, tier) {
   return qty * endIn9Down(chairCleanTotal(1, 1) + chairWaterproofTotal(1, tier));
 }
+var endIn9Up = (total) => {
+  const n = Math.ceil(total - 1e-9);
+  return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
+};
 
 // src/constants/antiAcarosPricing.ts
 var SOFA_ANTI_ACAROS_PRICE = {
@@ -421,6 +426,7 @@ function customPackLine(item, chairsBefore = 0) {
   const waterproofingOnly2 = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly2 && item.kind === "chairs") {
     amount2 = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === "premium" ? "premium" : "essencial", true) : (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    if (amount2 !== null && !item.seatOnly) amount2 = endIn9Up(amount2);
   } else if (waterproofingOnly2 && item.waterproofingFixed) {
     amount2 = item.waterproofingFixed[item.extra === "premium" ? "premium" : "essencial"] * item.qty;
   } else if (waterproofingOnly2 && option2) {
@@ -480,6 +486,11 @@ function calculateCustomPack(items, city) {
       table[n] = { ...line, amount: amount2, ..."tablePrice" in line && typeof line.tablePrice === "number" ? { tablePrice: amount2 } : {} };
     });
     const wpRow = wpRows[0];
+    if (covered > 0) for (const n of wpRows) {
+      const it = items[n];
+      const exact = chairWaterproofTotal(it.qty, it.extra === "premium" ? "premium" : "essencial", !!it.seatOnly);
+      if (exact !== null && table[n].amount != null) table[n] = { ...table[n], amount: exact, ..."tablePrice" in table[n] && typeof table[n].tablePrice === "number" ? { tablePrice: exact } : {} };
+    }
     const sum2 = table.filter((_, n) => items[n].kind === "chairs").reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum2 - endIn9Down(sum2);
     if (covered > 0 && diff !== 0 && table[wpRow].amount != null) {
@@ -536,10 +547,10 @@ function carpetWashing(areaM2) {
 
 // src/constants/rugSitePrice.ts
 var RUG_PRICE_FROM = `Desde ${RUG_RATE_COMMON}€/m²`;
-var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, com a deslocação incluída; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
+var RUG_PRICE_NOTE = `${RUG_RATE_COMMON}€/m² em tapete comum, mais a deslocação; juta e sisal ${RUG_RATE_NATURAL}€/m².`;
 var CARPET_PRICE_FROM = `Desde ${RUG_RATE_CARPET}€/m²`;
 var carpetTierText = CARPET_TIERS.slice(0, -1).map((t, i) => `até ${CARPET_TIERS[i + 1].from} m² ${t.rate}€/m²`).join(", ");
-var CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), com a deslocação incluída.`;
+var CARPET_PRICE_NOTE = `Alcatifa a partir de ${RUG_RATE_CARPET}€/m², conforme a área (${carpetTierText}), mais a deslocação.`;
 
 // src/data/serviceCatalog.ts
 var cities = [
@@ -2635,8 +2646,31 @@ function rugWaterproofingQuote(input) {
     rugWaterproofing: { amount: amount2, sameVisit: false, travelExtra: travel ?? 0 }
   };
 }
-function botQuote(input) {
+function withOneStruckPrice(input, r) {
+  const x = r;
+  const v = x?.visitGifts;
+  if (!v) return r;
+  const inp = input ?? {};
+  const items = Array.isArray(inp.items) ? inp.items : [];
+  const asked = (i) => ["mattress", "chairs"].includes(i?.kind) && i?.treatment === "clean+anti-acaros";
+  const sep = items.some(asked) ? botQuoteChain({ ...inp, items: items.map((i) => asked(i) ? { ...i, treatment: "clean" } : i) }).separatePrice : x.separatePrice;
+  const out = { ...x };
+  const struck = sep && sep.separate > v.total ? sep.separate : v.usual;
+  const tierStruck = (k) => v.tiers?.[k] ? { usual: sep?.tiers?.[k]?.separate > v.tiers[k].total ? sep.tiers[k].separate : v.tiers[k].usual, total: v.tiers[k].total } : null;
+  const vt = v.tiers ? { premium: tierStruck("premium"), essencial: tierStruck("essencial") } : null;
+  out.visitGifts = { ...v, usual: struck, tiers: vt };
+  if (x.separatePrice || sep) {
+    const tiers = vt ? Object.fromEntries(["premium", "essencial"].map((k) => [k, vt[k] ? { separate: vt[k].usual, total: vt[k].total, saving: cents(vt[k].usual - vt[k].total) } : null])) : null;
+    out.separatePrice = { ...x.separatePrice ?? sep, separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: v.withoutGift };
+  }
+  if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
+  return out;
+}
+function botQuoteChain(input) {
   return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
+}
+function botQuote(input) {
+  return withOneStruckPrice(input, botQuoteChain(input));
 }
 var MATTRESS_MITES_SEPARATE = 40;
 var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
@@ -2805,11 +2839,12 @@ function withVisitGifts(input, r) {
   const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
-  const usual = cents(paid + gifts.reduce((n, g) => n + g.normal, 0));
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
+  const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
+  const usual = up9(paid + giftSum);
   const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
@@ -2820,9 +2855,9 @@ function withVisitGifts(input, r) {
     const e = r[k];
     if (shift && e && typeof e.total === "number" && !(rc && typeof rc.comboPrice === "number")) out[k] = { ...e, total: cents(e.total + shift) };
   }
-  const giftSum = cents(usual - paid);
+  const asAsked = pricedTotal(q) ?? total;
   const t = r.waterproofingTiers;
-  const tier = (v) => typeof v === "number" ? { usual: cents(v + lift + giftSum), total: up9(v + lift) } : null;
+  const tier = (v) => typeof v === "number" ? { usual: up9(paid + (v - asAsked) + giftSum), total: up9(paid + (v - asAsked)) } : null;
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) {
@@ -2923,7 +2958,7 @@ function botQuoteInner(input) {
     }
     if (rawItems.length === 1 && raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ""];
-      items.push(fee === 10 ? { ...item, unitPrice: 109 } : item);
+      items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE } : item);
       rawOf.push(raw);
       continue;
     }
@@ -3917,7 +3952,7 @@ function botAvailability(req, events, now, rules = DAY_RULES) {
       teams: [...ZONE_TEAM_OVERRIDE[area] ?? TEAMS_BY_REGION[area]],
       handToOwner: `Algarve: só ${dayName} (${friday.slice(8, 10)}/${friday.slice(5, 7)}); o dono confirma a hora no calendário`,
       askWeek: true,
-      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.replaceAll("sextas-feiras", "quintas-feiras (só esta semana)").replaceAll("sexta-feira", "quinta-feira"),
+      askWeekRule: dayName === "sexta-feira" ? ALGARVE_FRIDAY_RULE : ALGARVE_FRIDAY_RULE.split("sextas-feiras").join("quintas-feiras (só esta semana)").split("sexta-feira").join("quinta-feira"),
       fridayOnly: friday
     };
   }

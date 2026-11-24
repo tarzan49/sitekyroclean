@@ -936,7 +936,7 @@ export function prerenderRoutes(outDir: string): number {
       page.title,
       page.metaDescription,
       // Modelo novo (dono, 24 Nov): a página mostra o subtítulo do topo, 4 benefícios e 4 perguntas (6 na página nacional); o HTML diz o mesmo.
-      { h1: page.h1, intro: treatment?.heroSubtitle, benefits: page.benefits.slice(0, 4), faqs: page.faqs.slice(0, page.city ? 4 : 6), links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
+      { h1: page.h1, intro: treatment?.heroSubtitle ?? '', benefits: page.benefits.slice(0, 4), faqs: page.faqs.slice(0, page.city ? 4 : 6), links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
       [buildFaqSchema(page.faqs.slice(0, page.city ? 4 : 6)), buildBreadcrumbSchema(crumbs)],
     );
   }
@@ -979,7 +979,7 @@ export function prerenderRoutes(outDir: string): number {
           breadcrumb: crumbs.map(crumb => ({ label: crumb.name, href: crumb.url.replace(BASE_URL, '') })),
           h1: heading,
           intro: packIntro(data.pack),
-          howItWorks: data.pack.id === 'tapete-anti-odor' ? 'Indique as medidas aproximadas do tapete e escolha a lavagem com anti-odor ou só a lavagem: o preço final aparece logo, com a deslocação incluída. O anti-odor é 5€ por m² e só existe com a lavagem, na mesma visita.' : MITES_PACKS[data.pack.id] ? 'Escolha o tamanho no início da página e veja o total com a deslocação incluída: limpeza com anti-ácaros (produto Bactran) ou só a limpeza. A extração retira o pó e os ácaros das fibras; o Bactran elimina bactérias, bolores e odores.' : `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e tapetes e alcatifas ficam sempre sob orçamento.`,
+          howItWorks: data.pack.id === 'tapete-anti-odor' ? 'Indique as medidas aproximadas do tapete e escolha a lavagem com anti-odor ou só a lavagem: o preço final aparece logo, com a deslocação incluída. O anti-odor é 5€ por m² e só existe com a lavagem, na mesma visita.' : MITES_PACKS[data.pack.id] ? 'Escolha o tamanho no início da página e veja o total com a deslocação incluída: limpeza com anti-ácaros (produto Bactran) ou só a limpeza. A extração retira o pó e os ácaros das fibras; o Bactran elimina bactérias, bolores e odores.' : `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e o preço de tapetes e alcatifas sai pelas medidas.`,
           faqs,
           links,
           linksHeading: `Serviços e packs ${prep} ${data.city.name}`,

@@ -56,7 +56,9 @@ describe('nenhuma página de pack promete um desconto que o código não aplica'
     for (const path of packFacing) {
       const source = read(path);
       // Uma largura em `calc(100% - …)` é CSS, não um desconto anunciado.
-      const text = source.replace(/calc\((?:[^()]|\([^()]*\))*\)/g, '');
+      const text = source.replace(/calc\((?:[^()]|\([^()]*\))*\)/g, '')
+        // A ficha do Bactran (99,9% das bactérias) é eficácia do produto, não desconto.
+        .replace(/99,9\s*%/g, '');
       expect(text, `${path} menciona um desconto em percentagem`).not.toMatch(/\d+\s*%/);
       expect(source, `${path} menciona o limiar de 149€`).not.toContain('149');
     }

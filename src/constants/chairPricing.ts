@@ -67,3 +67,6 @@ export const endIn9Down = (total: number): number => {
 export function chairPackWas(qty: number, tier: ChairWaterproofTier): number {
   return qty * endIn9Down(chairCleanTotal(1, 1)! + chairWaterproofTotal(1, tier)!);
 }
+
+/** Para cima, a acabar em 9 (impermeabilização sozinha de cadeiras; dono, 24 Nov 2026). */
+export const endIn9Up = (total: number): number => { const n = Math.ceil(total - 1e-9); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };

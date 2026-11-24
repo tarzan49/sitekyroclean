@@ -64,7 +64,8 @@ export default function HomeServiceVideos() {
                 className="h-[min(50svh,420px)] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] lg:h-[380px]" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="font-playfair text-lg font-semibold leading-tight text-white">{item.title}</h3>
+                {/* Título numa só linha e do mesmo tamanho em todos os cartões (dono, 24 Nov: "tudo na mesma linha, alinhado"). */}
+                <h3 className="whitespace-nowrap font-playfair text-[15px] font-semibold leading-tight text-white sm:text-base lg:text-[15px] xl:text-base">{item.title}</h3>
                 <p className="mt-1 text-sm font-semibold text-[#D4AF37]">{item.price}</p>
               </div>
             </Link>
