@@ -78,10 +78,42 @@ import sofa16Antes from "@/assets/before-after-pool/sofa-16-antes.webp";
 import sofa16Depois from "@/assets/before-after-pool/sofa-16-depois.webp";
 import sofa17Antes from "@/assets/before-after-pool/sofa-17-antes.webp";
 import sofa17Depois from "@/assets/before-after-pool/sofa-17-depois.webp";
+import sofa18Antes from "@/assets/before-after-pool/sofa-18-antes.webp";
+import sofa18Depois from "@/assets/before-after-pool/sofa-18-depois.webp";
 import impermeabilizacaoVideo from "@/assets/before-after-pool/impermeabilizacao-video.mp4";
 import impermeabilizacaoVideoPoster from "@/assets/before-after-pool/impermeabilizacao-video-poster.webp";
 import impermeabilizacaoVideoPepsi from "@/assets/before-after-pool/impermeabilizacao-video-pepsi.mp4";
 import impermeabilizacaoVideoPepsiPoster from "@/assets/before-after-pool/impermeabilizacao-video-pepsi-poster.webp";
+import imperAgua01 from "@/assets/before-after-pool/imper-agua-01.mp4";
+import imperAgua01Poster from "@/assets/before-after-pool/imper-agua-01-poster.webp";
+import imperAgua02 from "@/assets/before-after-pool/imper-agua-02.mp4";
+import imperAgua02Poster from "@/assets/before-after-pool/imper-agua-02-poster.webp";
+import imperAgua03 from "@/assets/before-after-pool/imper-agua-03.mp4";
+import imperAgua03Poster from "@/assets/before-after-pool/imper-agua-03-poster.webp";
+import imperAgua04 from "@/assets/before-after-pool/imper-agua-04.mp4";
+import imperAgua04Poster from "@/assets/before-after-pool/imper-agua-04-poster.webp";
+import imperAgua05 from "@/assets/before-after-pool/imper-agua-05.mp4";
+import imperAgua05Poster from "@/assets/before-after-pool/imper-agua-05-poster.webp";
+import imperAgua06 from "@/assets/before-after-pool/imper-agua-06.mp4";
+import imperAgua06Poster from "@/assets/before-after-pool/imper-agua-06-poster.webp";
+import imperAgua07 from "@/assets/before-after-pool/imper-agua-07.mp4";
+import imperAgua07Poster from "@/assets/before-after-pool/imper-agua-07-poster.webp";
+import imperAgua08 from "@/assets/before-after-pool/imper-agua-08.mp4";
+import imperAgua08Poster from "@/assets/before-after-pool/imper-agua-08-poster.webp";
+import imperAgua09 from "@/assets/before-after-pool/imper-agua-09.mp4";
+import imperAgua09Poster from "@/assets/before-after-pool/imper-agua-09-poster.webp";
+import imperAgua10 from "@/assets/before-after-pool/imper-agua-10.mp4";
+import imperAgua10Poster from "@/assets/before-after-pool/imper-agua-10-poster.webp";
+import imperAgua11 from "@/assets/before-after-pool/imper-agua-11.mp4";
+import imperAgua11Poster from "@/assets/before-after-pool/imper-agua-11-poster.webp";
+import imperAgua12 from "@/assets/before-after-pool/imper-agua-12.mp4";
+import imperAgua12Poster from "@/assets/before-after-pool/imper-agua-12-poster.webp";
+import imperAgua13 from "@/assets/before-after-pool/imper-agua-13.mp4";
+import imperAgua13Poster from "@/assets/before-after-pool/imper-agua-13-poster.webp";
+import imperAgua14 from "@/assets/before-after-pool/imper-agua-14.mp4";
+import imperAgua14Poster from "@/assets/before-after-pool/imper-agua-14-poster.webp";
+import imperAgua15 from "@/assets/before-after-pool/imper-agua-15.mp4";
+import imperAgua15Poster from "@/assets/before-after-pool/imper-agua-15-poster.webp";
 import impermeabilizacao01Antes from "@/assets/before-after-pool/impermeabilizacao-01-antes.webp";
 import impermeabilizacao01Depois from "@/assets/before-after-pool/impermeabilizacao-01-depois.webp";
 import impermeabilizacao02Antes from "@/assets/before-after-pool/impermeabilizacao-02-antes.webp";
@@ -168,6 +200,8 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     // 24/11/2026 (dono): os 2 sofás das publicações de antes e depois de 19/11 (riscos cor-de-rosa; assentos acinzentados).
     { kind: "pair", before: sofa16Antes, after: sofa16Depois },
     { kind: "pair", before: sofa17Antes, after: sofa17Depois },
+    // 24/11/2026 (dono): sofá da Lisboa 1 em Agualva-Cacém (23/11), depois cortado sem o balde.
+    { kind: "pair", before: sofa18Antes, after: sofa18Depois },
     // 15/11/2026 (dono): sofá da Lisboa 1 (Rodolfo) em 2.º; 4.º e 5.º trocados; sofa-02 para o fim.
     { kind: "pair", before: sofa15Antes, after: sofa15Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
@@ -211,14 +245,23 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
   ],
+  // 15 vídeos do teste com líquido, acelerados, escolhidos e ordenados (dono, 24/11/2026).
   impermeabilizacao: [
-    { kind: "video", src: impermeabilizacaoVideo, poster: impermeabilizacaoVideoPoster },
-    { kind: "video", src: impermeabilizacaoVideoPepsi, poster: impermeabilizacaoVideoPepsiPoster,
-      alt: "Vídeo real: Pepsi derramada num sofá claro impermeabilizado fica à superfície e sai com um pano" },
-    { kind: "pair", before: impermeabilizacao01Antes, after: impermeabilizacao01Depois },
-    { kind: "pair", before: impermeabilizacao02Antes, after: impermeabilizacao02Depois, illustrative: true },
-    { kind: "pair", before: impermeabilizacao03Antes, after: impermeabilizacao03Depois, illustrative: true },
-    { kind: "pair", before: impermeabilizacao04Antes, after: impermeabilizacao04Depois, illustrative: true },
+    { kind: "video", src: imperAgua01, poster: imperAgua01Poster },
+    { kind: "video", src: imperAgua02, poster: imperAgua02Poster },
+    { kind: "video", src: imperAgua03, poster: imperAgua03Poster },
+    { kind: "video", src: imperAgua04, poster: imperAgua04Poster },
+    { kind: "video", src: imperAgua05, poster: imperAgua05Poster },
+    { kind: "video", src: imperAgua06, poster: imperAgua06Poster },
+    { kind: "video", src: imperAgua07, poster: imperAgua07Poster },
+    { kind: "video", src: imperAgua08, poster: imperAgua08Poster },
+    { kind: "video", src: imperAgua09, poster: imperAgua09Poster },
+    { kind: "video", src: imperAgua10, poster: imperAgua10Poster },
+    { kind: "video", src: imperAgua11, poster: imperAgua11Poster },
+    { kind: "video", src: imperAgua12, poster: imperAgua12Poster },
+    { kind: "video", src: imperAgua13, poster: imperAgua13Poster },
+    { kind: "video", src: imperAgua14, poster: imperAgua14Poster },
+    { kind: "video", src: imperAgua15, poster: imperAgua15Poster },
   ],
 };
 
