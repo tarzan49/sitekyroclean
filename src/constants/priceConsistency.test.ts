@@ -16,7 +16,7 @@ describe('anti-ácaros: um só preço em todo o lado', () => {
     expect(SOFA_ANTI_ACAROS_PRICE).toEqual({ '1-lugar': 20, '2-lugares': 40, '3-lugares': 50, '4-lugares': 60 });
     expect(CHAIR_ANTI_ACAROS_UNIT_PRICE).toBe(5);
     expect(CHAIR_ANTI_ACAROS_UNIT_LABEL).toBe('5€/un.');
-    expect(mattressPrices.map(mattressAntiAcarosPrice)).toEqual([15, 20, 25]);
+    expect(mattressPrices.map(mattressAntiAcarosPrice)).toEqual([15, 20, 20]); // king + anti-ácaros = 109€ (dono, 24 Nov)
   });
 
   it('is read from the shared module by the quiz, the configurator and the receipt', () => {

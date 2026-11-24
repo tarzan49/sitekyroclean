@@ -196,7 +196,8 @@ var mattressPrices = [
   // tratamento — reverter se não compensar.
   { id: "solteiro", label: "Solteiro", cleaningPrice: 59, waterproofingPrice: 35, bothPrice: 74, originalBothPrice: 94 },
   { id: "casal", label: "Casal", cleaningPrice: 69, waterproofingPrice: 40, bothPrice: 89, originalBothPrice: 109 },
-  { id: "king", label: "King / Queen", cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 104, originalBothPrice: 124 }
+  { id: "king", label: "King / Queen", cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 99, originalBothPrice: 124 }
+  // king + anti-ácaros = 109€ com a deslocação (dono, 24 Nov)
 ];
 
 // src/constants/chairPricing.ts
