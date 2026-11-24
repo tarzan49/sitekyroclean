@@ -2930,15 +2930,18 @@ function withOdorFloor(input, r) {
   if (!Array.isArray(items) || items.length < 2 || !items.some((i) => isChairWp(i) || isOdor(i) || isWpOnlyChairs(i))) return r;
   const own = pricedTotal(r);
   if (own === null) return r;
+  const rows = items.map((y) => y ?? {});
+  const count = (wp) => rows.filter((y) => ["premium", "essencial"].includes(String(y.treatment)) === wp).reduce((n, y) => n + (Number(y.qty) || 1), 0);
+  const chairsOnly = rows.every((y) => y.kind === "chairs") && count(true) !== count(false);
   const without = (i) => isOdor(i) ? { ...i, odor: false } : { ...i, treatment: "clean" };
   const finalOf = (its) => {
     const x2 = { ...inp, items: its };
     return pricedTotal(withEndIn9(x2, withSeparatePrice(x2, botQuoteCore(x2))));
   };
-  const alts = items.flatMap((i, n) => isChairWp(i) || isOdor(i) ? [finalOf(items.map((y, k) => k === n ? without(y) : y))] : isWpOnlyChairs(i) && !items.every((y) => (y ?? {}).kind === "chairs") ? [finalOf(items.filter((_, k) => k !== n))] : []).filter((v) => v !== null);
+  const alts = items.flatMap((i, n) => isChairWp(i) || isOdor(i) ? [finalOf(items.map((y, k) => k === n ? without(y) : y))] : isWpOnlyChairs(i) && !rows.every((y) => y.kind === "chairs") || chairsOnly ? [finalOf(items.filter((_, k) => k !== n))] : []).filter((v) => v !== null);
   const altTotal = alts.length ? Math.max(...alts) : null;
   if (altTotal === null || altTotal <= own) return r;
-  const diff = cents(altTotal - own);
+  const diff = cents((chairsOnly ? up9Total(altTotal) : altTotal) - own);
   const x = r;
   const out = { ...x };
   if (typeof x.rugCombo?.comboPrice === "number") out.rugCombo = { ...x.rugCombo, comboPrice: cents(x.rugCombo.comboPrice + diff) };
@@ -2982,7 +2985,7 @@ function withVisitGifts(input, r) {
     const x = rec(i);
     if (!clean(i)) return null;
     if (x.kind === "mattress") return { piece: "mattress", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
-    if (x.kind === "chairs" && !x.seatOnly) return { piece: "chairs", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
+    if (x.kind === "chairs" && !x.seatOnly && (chairRows.length === 1 || chairRows.every((y) => !/premium|essencial/.test(treat(y) ?? "")))) return { piece: "chairs", treatment: "anti-acaros", apply: { ...x, treatment: "clean+anti-acaros" } };
     if (x.kind === "sofa" && x.leatherGift === true) {
       const { leatherGift: _g, ...y } = x;
       return { piece: "sofa", treatment: "tratamento-pele", apply: { ...y, leather: true } };
@@ -3025,7 +3028,8 @@ function withVisitGifts(input, r) {
     withGifts = best.items;
     usualBase = best.priced;
   }
-  if (!gifted.size && !(capped && !q.rugCombo)) return none;
+  const cleaningOnly = rawIn.every((i) => ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
+  if (!gifted.size && !(capped && cleaningOnly && !q.rugCombo)) return none;
   const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;

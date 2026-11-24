@@ -77,3 +77,20 @@ describe('9. riscado dos packs de cadeiras a partir de 4 ("Sim, em todo o lado")
     expect([q([C(4, 'clean+premium')]).chairsWas, q([C(4, 'clean+essencial')]).chairsWas, q([C(3, 'clean+premium')]).chairsWas]).toEqual([156, 116, null]);
   });
 });
+
+describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medição de 24 Nov)', () => {
+  it('com impermeabilização o par fica como estava', () => {
+    expect(q([S('2-lugares', 'clean+essencial'), S('2-lugares')]).total).toBe(199);
+    expect(q([S('3-lugares', 'premium'), S()]).total).toBe(229);
+    expect(q([S(), S()]).total).toBe(179);
+  });
+  it('o anti-ácaros de umas poucas cadeiras nunca é a oferta', () => {
+    const r = q([C(1), S('3-lugares', 'clean', { leather: true }), C(6, 'clean+premium')]);
+    expect(r.visitGifts.gifts).toEqual([{ piece: 'sofa', treatment: 'tratamento-pele', normal: 40 }]);
+    expect(r.total).toBe(309);
+  });
+  it('juntar um serviço às cadeiras nunca baixa o total', () => {
+    expect([q([C(5, 'premium')]).total, q([C(5, 'premium'), C(1)]).total]).toEqual([139, 139]);
+    expect([q([C(6)]).total, q([C(6), C(2, 'essencial')]).total]).toEqual([120, 129]);
+  });
+});

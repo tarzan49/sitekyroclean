@@ -791,16 +791,23 @@ function withOdorFloor<T>(input: unknown, r: T): T {
   if (!Array.isArray(items) || items.length < 2 || !items.some(i => isChairWp(i) || isOdor(i) || isWpOnlyChairs(i))) return r;
   const own = pricedTotal(r as unknown as Priced);
   if (own === null) return r;
+  // The quiz sends one pack as a cleaning row and a waterproofing row of the same chairs: one service, no floor
+  // (1 Protegido in a 20€ town stays 39€).
+  const rows = items.map(y => (y ?? {}) as Record<string, unknown>);
+  const count = (wp: boolean) => rows.filter(y => ['premium', 'essencial'].includes(String(y.treatment)) === wp).reduce((n, y) => n + (Number(y.qty) || 1), 0);
+  const chairsOnly = rows.every(y => y.kind === 'chairs') && count(true) !== count(false);
   // Each anti-odor / chairs waterproofing taken out in turn (each of those floored the same way), so one more never lowers it.
   const without = (i: unknown) => (isOdor(i) ? { ...(i as object), odor: false } : { ...(i as object), treatment: 'clean' });
   const finalOf = (its: unknown[]) => { const x = { ...inp, items: its }; return pricedTotal(withEndIn9(x, withSeparatePrice(x, botQuoteCore(x))) as Priced); };
   const alts = items.flatMap((i, n) => (isChairWp(i) || isOdor(i) ? [finalOf(items.map((y, k) => (k === n ? without(y) : y)))]
-    : isWpOnlyChairs(i) && !items.every(y => ((y ?? {}) as Record<string, unknown>).kind === 'chairs') ? [finalOf(items.filter((_, k) => k !== n))] : []))
+    // A chairs order in several services too: never under it without one of them (5 só imper 139€, + 1 limpeza was 129€).
+    : (isWpOnlyChairs(i) && !rows.every(y => y.kind === 'chairs')) || chairsOnly ? [finalOf(items.filter((_, k) => k !== n))] : []))
     .filter((v): v is number => v !== null);
   const altTotal = alts.length ? Math.max(...alts) : null;
   if (altTotal === null || altTotal <= own) return r;
   // Same quote (its lines, its anti-odor), every price it gives raised to the order without the anti-odor.
-  const diff = cents(altTotal - own);
+  // Chairs with waterproofing end in 9.
+  const diff = cents((chairsOnly ? up9Total(altTotal) : altTotal) - own);
   const x = r as unknown as Record<string, any>;
   const out: Record<string, any> = { ...x };
   if (typeof x.rugCombo?.comboPrice === 'number') out.rugCombo = { ...x.rugCombo, comboPrice: cents(x.rugCombo.comboPrice + diff) };
@@ -868,7 +875,8 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     const x = rec(i);
     if (!clean(i)) return null;
     if (x.kind === 'mattress') return { piece: 'mattress', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
-    if (x.kind === 'chairs' && !x.seatOnly) return { piece: 'chairs', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
+    // Chairs are one piece: never the anti-mites of a few of them (1 limpeza + 6 Blindado would offer 5€ instead of the sofa's).
+    if (x.kind === 'chairs' && !x.seatOnly && (chairRows.length === 1 || chairRows.every(y => !/premium|essencial/.test(treat(y) ?? '')))) return { piece: 'chairs', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
     if (x.kind === 'sofa' && x.leatherGift === true) { const { leatherGift: _g, ...y } = x; return { piece: 'sofa', treatment: 'tratamento-pele', apply: { ...y, leather: true } }; }
     if (x.kind === 'sofa' && !x.leather) return { piece: 'sofa', treatment: 'anti-acaros', apply: { ...x, treatment: 'clean+anti-acaros' } };
     if ((x.kind === 'rug' || x.kind === 'carpet') && x.odor !== true) return { piece: x.kind, treatment: 'anti-odor', apply: { ...x, odor: true } };
@@ -911,8 +919,10 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   }
   // The 20% cap left the order with no gift: the total still never falls under the pieces alone, as with the gift
   // (owner, 24 Nov 2026, "Preço cheio + oferta", with 3L + 3L = 179 in front of him, not 159). Orders with nothing to
-  // offer keep their price; so do the ones with a rug, still to be decided by him.
-  if (!gifted.size && !(capped && !q.rugCombo)) return none;
+  // offer keep their price; so do the ones with a rug, still to be decided by him, and the ones with waterproofing (the
+  // table he saw was cleaning only).
+  const cleaningOnly = rawIn.every(i => ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean'));
+  if (!gifted.size && !(capped && cleaningOnly && !q.rugCombo)) return none;
   // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
   const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
   const total = price(restore(base));
