@@ -2619,7 +2619,7 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))))));
+  return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
 }
 var MATTRESS_MITES_SEPARATE = 40;
 var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
@@ -2966,6 +2966,63 @@ function botQuoteInner(input) {
   const leather = leatherFor(items, rawOf);
   if (!leather) return { ...withOdor, leatherTreatment: null };
   return { ...addToPrices(withOdor, leather.amount, leather.lines), waterproofingTiers: null, leatherTreatment: { amount: leather.amount, perSofa: leather.amount / items.filter((i, n) => i.kind === "sofa" && rawOf[n]?.leather === true).reduce((q, i) => q + i.qty, 0), rule: LEATHER_RULE } };
+}
+var SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
+var up9Total = (x) => {
+  const n = Math.ceil(x - 1e-9);
+  return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
+};
+function withSeparatePrice(input, r) {
+  const none = { ...r, separatePrice: null };
+  const q = r;
+  const inp = input ?? {};
+  const items = inp.items;
+  if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder || q.rugCombo) return none;
+  if (["armchairs", "largeArmchairs", "puffs", "headboards"].some((k) => typeof inp[k] === "number" && inp[k] > 0)) return none;
+  if (items.every((i) => i?.kind === "chairs")) return none;
+  const total = pricedTotal(q);
+  if (total === null) return none;
+  const alone = (i) => pricedTotal(innerPriced({ ...inp, items: [i] }));
+  const rec = (i) => i ?? {};
+  const visits = (i, tier) => {
+    const raw = rec(i).treatment ?? "clean";
+    const t = tier && /^clean\+(premium|essencial)$/.test(raw) ? "clean" : raw;
+    const wp = tier && t === "clean" ? tier : t.startsWith("clean+") && (t.endsWith("premium") || t.endsWith("essencial")) ? t.slice(6) : null;
+    if (!wp) return [i];
+    const asWp = alone({ ...rec(i), treatment: wp }) === null ? null : { ...rec(i), treatment: wp };
+    if (tier && !asWp) return [i];
+    return asWp ? [{ ...rec(i), treatment: "clean" }, asWp] : null;
+  };
+  const giftSum = (q.visitGifts?.gifts ?? []).reduce((a, g) => a + g.normal, 0);
+  const sepOf = (tier) => {
+    const parts = [];
+    for (const i of items) {
+      const v = visits(i, tier);
+      if (!v) return null;
+      parts.push(...v);
+    }
+    if (parts.length < 2) return null;
+    let sum2 = 0;
+    for (const p of parts) {
+      const v = alone(p);
+      if (v === null) return null;
+      sum2 += v;
+    }
+    return sum2 + giftSum;
+  };
+  const make = (sep, tot) => {
+    if (sep === null || tot === null) return null;
+    const t9 = up9Total(tot), s9 = up9Total(sep);
+    return s9 > t9 ? { separate: s9, total: t9, saving: s9 - t9 } : null;
+  };
+  const main = make(sepOf(), total);
+  const wt = q.waterproofingTiers;
+  const tiers = wt ? { premium: make(sepOf("premium"), wt.premium), essencial: make(sepOf("essencial"), wt.essencial) } : null;
+  if (!main && !(tiers && (tiers.premium || tiers.essencial))) return none;
+  const out = { ...r };
+  if (main) out.total = main.total;
+  if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
+  return { ...out, separatePrice: { ...main ?? { separate: 0, total, saving: 0 }, tiers, rule: SEPARATE_PRICE_RULE } };
 }
 
 // src/constants/cityCoords.ts

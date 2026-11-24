@@ -474,7 +474,7 @@ function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fa
 }
 
 export function botQuote(input: unknown) {
-  return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))))));
+  return withChairsWas(input, withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withSeparatePrice(input, withBlackFridayPrices(input, botQuoteCore(input)))))));
 }
 
 /**
@@ -908,16 +908,18 @@ function botQuoteInner(input: unknown) {
 export const SEPARATE_PRICE_RULE = 'Já está tudo calculado: mostra o total (total) com o preço em separado riscado e a poupança, ex.: "Total: 449€ (em vez de 529€ em separado). Poupa 80€." Nas opções Premium / Essencial, o mesmo com tiers. Nunca outro valor riscado, nunca chamar desconto.';
 const up9Total = (x: number) => { const n = Math.ceil(x - 1e-9); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
 type SepTier = { separate: number; total: number; saving: number };
-function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T & { separatePrice: { separate: number; total: number; saving: number; tiers: { premium: SepTier | null; essencial: SepTier | null } | null; rule: string } | null } {
-  const none = { ...r, separatePrice: null };
+function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T {
+  const none = { ...r, separatePrice: null } as T;
   const q = r as unknown as Priced & { blackFriday?: unknown; waterproofingTiers?: { premium: number | null; essencial: number | null } | null; visitGifts?: { gifts: VisitGift[] } | null };
   const inp = (input ?? {}) as Record<string, unknown>;
   const items = inp.items;
   if (!Array.isArray(items) || !items.length || q.blackFriday || q.bigOrder || q.rugCombo) return none;
   if (['armchairs', 'largeArmchairs', 'puffs', 'headboards'].some(k => typeof inp[k] === 'number' && (inp[k] as number) > 0)) return none;
+  // Chairs alone: their struck price is chairsWas (1 chair × quantity; owner, 24 Nov 2026), never this one.
+  if (items.every(i => (i as Record<string, unknown>)?.kind === 'chairs')) return none;
   const total = pricedTotal(q);
   if (total === null) return none;
-  const alone = (i: unknown) => pricedTotal(botQuoteCore({ ...inp, items: [i] }) as Priced);
+  const alone = (i: unknown) => pricedTotal(innerPriced({ ...inp, items: [i] }));
   const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
   // One item split into its separate visits: cleaning alone + waterproofing alone.
   const visits = (i: unknown, tier?: 'premium' | 'essencial'): unknown[] | null => {
@@ -950,5 +952,6 @@ function withSeparatePrice<T extends { ok: boolean }>(input: unknown, r: T): T &
   const out = { ...r } as Record<string, unknown>;
   if (main) out.total = main.total;
   if (wt && tiers) out.waterproofingTiers = { ...wt, premium: tiers.premium?.total ?? wt.premium, essencial: tiers.essencial?.total ?? wt.essencial };
-  return { ...(out as T), separatePrice: main || tiers ? { ...(main ?? { separate: 0, total, saving: 0 }), tiers, rule: SEPARATE_PRICE_RULE } : null };
+  // Typed as T (the result is read as JSON by the bot): a wider type here makes botQuote's type circular.
+  return { ...(out as T), separatePrice: { ...(main ?? { separate: 0, total, saving: 0 }), tiers, rule: SEPARATE_PRICE_RULE } } as T;
 }
