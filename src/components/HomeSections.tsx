@@ -1,14 +1,15 @@
 // Secções novas da página inicial (dono, 24 Nov: "o resto é para refazer tudo, está super default").
 // Mesmas peças aprovadas nas páginas de serviço: widget de preço dos packs, história antes/depois/proteção
 // com material real, perguntas compactas. Cada secção cabe num ecrã do telemóvel.
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import WaterproofPackPicker from './WaterproofPackPicker';
 import CompactFAQ from './CompactFAQ';
-import QuizFormLazy from './QuizFormLazy';
+import { choiceToItem } from './quiz/basketChoice';
+import type { BasketItem } from './quiz/VisitBasket';
+const VisitBasketLazy = lazy(() => import('./quiz/VisitBasket'));
 import { StoryPlayer, storyFor } from './WaterproofPackSections';
-import { useQuizLauncher } from '@/hooks/use-quiz-launcher';
 import { cities } from '@/data/serviceCatalog';
 import { RESOURCE_FAQS } from '@/data/resourceContent';
 import { MessageCircle, Phone } from 'lucide-react';
@@ -26,7 +27,9 @@ const CHIPS = [
 export function HomePriceSection() {
   const [kind, setKind] = useState<'sofa' | 'chairs'>('sofa');
   const [city, setCity] = useState('Lisboa');
-  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
+  // "Juntar mais artigos" leva a escolha feita para o cesto, como nas páginas de serviço (24 Nov:
+  // na inicial o cesto abria vazio, sem o sofá ou as cadeiras que a pessoa tinha acabado de escolher).
+  const [basket, setBasket] = useState<BasketItem | null>(null);
   const navigate = useNavigate();
   return (
     <section id="preco" className="scroll-mt-20 bg-kyro-green py-12 md:py-16">
@@ -44,10 +47,10 @@ export function HomePriceSection() {
           </select>
         </div>
         <div className="rounded-2xl bg-white p-3 md:p-6">
-          <WaterproofPackPicker key={kind} kind={kind} city={city} source="home_picker" onMore={() => openQuiz()} compact />
+          <WaterproofPackPicker key={kind} kind={kind} city={city} source="home_picker" onMore={c => setBasket(choiceToItem(c))} compact />
         </div>
       </div>
-      <QuizFormLazy isOpen={isQuizOpen} onClose={closeQuiz} initialLocation={city} />
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={[basket]} /></Suspense>}
     </section>
   );
 }

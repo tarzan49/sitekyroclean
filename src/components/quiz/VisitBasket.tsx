@@ -368,6 +368,9 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
   // O preço deste artigo em cada opção, pelo motor do bot, com o resto do cesto (o mesmo que o total vai mostrar).
   // Quanto este artigo acrescenta ao total da visita (com a deslocação, se for o primeiro): o mesmo número do widget da página.
   const base = quoteBasket(city, others).total ?? 0;
+  // Total da visita com esta peça como fica (dono, 17 Nov: o preço impossível de ler mal; 24 Nov: "Juntar · 80€"
+  // era o que a visita subia, não um preço).
+  const totalWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? null : q.total; };
   const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? q.lines[others.length] ?? null : Math.round((q.total - (others.length ? base : 0)) * 100) / 100; };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
@@ -386,7 +389,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
         {item.kind === 'mattress' && <>
           <p className="mb-1 text-xs font-semibold text-white/70">Tamanho</p>
           <div className="mb-3 grid grid-cols-3 gap-1.5">{MATTRESS.map(m => <button key={m.id} type="button" className={chip(item.size === m.id)} onClick={() => set({ size: m.id })}>{m.label}</button>)}</div>
-          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran){(() => { const a = priceWith({ pack: 'premium' }), b = priceWith({ pack: 'none' }); return a !== null && b !== null ? ` · +${formatEuro(a - b)}` : ''; })()}</button>
+          <button type="button" className={`${chip(item.pack === 'premium')} mb-3 w-full`} onClick={() => set({ pack: item.pack === 'premium' ? 'none' : 'premium' })}>{item.pack === 'premium' ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-ácaros (produto Bactran){(() => { const a = priceWith({ pack: 'premium' }), b = priceWith({ pack: 'none' }); return a !== null && b !== null ? (a - b > 0 ? ` · +${formatEuro(a - b)}` : ' · oferecido') : ''; })()}</button>
         </>}
         {(item.kind === 'sofa' || item.kind === 'mattress' || item.kind === 'chairs') && <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
@@ -405,7 +408,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
           </div>
           <p className="mb-3 text-xs text-white/60">O preço sai das medidas, com a deslocação incluída.</p>
         </>}
-        <div className="sticky bottom-0 -mx-4 -mb-4 bg-[#0B2F2A] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-2"><button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : priceWith({}); return v === null ? 'Juntar à visita' : `Juntar à visita · ${formatEuro(v)}`; })()}</button></div>
+        <div className="sticky bottom-0 -mx-4 -mb-4 bg-[#0B2F2A] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-2"><button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : (others.length ? totalWith({}) : priceWith({})); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></div>
       </div>
     </div>
   );
