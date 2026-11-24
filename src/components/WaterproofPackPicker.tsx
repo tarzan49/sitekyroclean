@@ -15,7 +15,7 @@ import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
 
 type Kind = 'sofa' | 'chairs';
-const SOFA_SIZES = ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares', '6-lugares', 'foto'];
+const SOFA_SIZES = ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares', '6-lugares']; // até 6; canto/U/7+ pede-se no WhatsApp (dono, 24 Nov)
 const PHOTO_SIZE = 'foto'; // canto, em U ou 7+ lugares: preço pela fotografia
 
 const CHAIR_MAX = 20;
@@ -88,7 +88,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
         <p className="hidden text-xs font-bold uppercase tracking-[0.18em] text-[#D4AF37] md:block">Passo 1</p>
         <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-4 md:mt-1 md:text-lg">{kind === 'sofa' ? 'Quantos lugares tem o sofá?' : 'Quantas cadeiras?'}</p>
         {kind === 'sofa' ? (
-          <div className="grid grid-cols-6 gap-1.5 md:grid-cols-4 md:gap-2" role="radiogroup" aria-label="Lugares">
+          <div className="grid grid-cols-6 gap-1.5 md:grid-cols-3 md:gap-2" role="radiogroup" aria-label="Lugares">
             {SOFA_SIZES.map(id => {
               const active = size === id;
               // Canto, U ou 7+: no telemóvel uma linha por baixo dos números (para a secção caber num ecrã).
@@ -115,6 +115,7 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
             <button type="button" aria-label="Mais uma cadeira" onClick={() => setQty(q => Math.min(CHAIR_MAX, q + 1))} className="grid h-12 w-12 place-items-center rounded-xl bg-[#F3F0E7] text-[#1A1A1A] hover:bg-[#E9E3D3]"><Plus className="h-5 w-5" /></button>
           </div>
         )}
+        {onMore && <button type="button" onClick={onMore} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 px-3 text-sm font-bold text-[#1A1A1A] transition-colors hover:bg-[#D4AF37]/20 md:mt-3 md:min-h-12"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
         <p className={`${byPhoto ? '' : 'hidden'} mt-2 text-xs leading-relaxed text-[#666] md:mt-3 md:text-sm`}>{kind === 'sofa' ? (byPhoto ? 'Envie-nos uma fotografia do sofá e dizemos-lhe o preço em menos de 1 minuto.' : 'Sofá de canto, em U ou com mais de 6 lugares: o preço é dado pela fotografia.') : `Mais de ${CHAIR_MAX} cadeiras: peça o preço no WhatsApp.`}</p>
       </div>
 
@@ -152,7 +153,6 @@ export default function WaterproofPackPicker({ kind, city, source, onMore }: Pro
           className="mt-3 flex min-h-12 w-full md:mt-5 md:min-h-14 items-center justify-center gap-2 rounded-2xl bg-[#25D366] whitespace-nowrap px-3 text-center text-[15px] font-bold text-white sm:text-base shadow-[0_10px_24px_-10px_rgba(37,211,102,0.7)] transition-transform hover:-translate-y-0.5">
           {byPhoto ? <Camera className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />} {byPhoto ? 'Enviar fotografia no WhatsApp' : 'Pedir este orçamento no WhatsApp'}
         </a>
-        {onMore && <button type="button" onClick={onMore} className="mt-1.5 !min-h-0 w-full py-1 text-center text-sm font-semibold text-[#1A1A1A] underline decoration-[#D4AF37] decoration-2 underline-offset-4">+ Juntar mais artigos à mesma visita</button>}
         <p className="hidden">Resposta em menos de 1 minuto</p>
       </div>
     </div>

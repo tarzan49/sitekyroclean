@@ -63,10 +63,10 @@ function storyFor(kind: Kind) {
   ];
 }
 
-type StoryStep = ReturnType<typeof storyFor>[number];
+export type StoryStep = { label: string; text: string; image?: string; alt?: string; video?: string; poster?: string };
 
 /** Os passos da visita no telemóvel, um de cada vez: 6 s por fotografia, o vídeo até acabar; toque avança. */
-function StoryPlayer({ story }: { story: StoryStep[] }) {
+export function StoryPlayer({ story, light = false }: { story: StoryStep[]; light?: boolean }) {
   const [step, setStep] = useState(0);
   const [run, setRun] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -85,7 +85,7 @@ function StoryPlayer({ story }: { story: StoryStep[] }) {
   }, [inView, step, run]);
   return (
     <div ref={ref} className="mt-5 md:hidden">
-      <button type="button" onClick={next} aria-label="Passo seguinte" className="relative block w-full overflow-hidden rounded-2xl border border-white/15 bg-black/30 text-left">
+      <button type="button" onClick={next} aria-label="Passo seguinte" className={`relative block w-full overflow-hidden rounded-2xl border text-left ${light ? "border-[#E5E0D3] bg-[#efeee7]" : "border-white/15 bg-black/30"}`}>
         <div className="absolute inset-x-3 top-3 z-10 flex gap-1.5">
           {story.map((p, i) => (
             <span key={p.label} className="h-1 flex-1 overflow-hidden rounded-full bg-white/25">
@@ -99,7 +99,7 @@ function StoryPlayer({ story }: { story: StoryStep[] }) {
           ? <video key={`v-${run}`} src={current.video} poster={current.poster} autoPlay muted playsInline onEnded={next} className="aspect-[4/5] max-h-[48svh] w-full object-cover" />
           : <img key={`i-${step}`} src={current.image} alt={current.alt} decoding="async" className="aspect-[4/5] max-h-[48svh] w-full object-cover" />}
       </button>
-      <p className="mt-3 min-h-[2.75rem] text-sm leading-relaxed text-white/80">{current.text}</p>
+      <p className={`mt-3 min-h-[2.75rem] text-sm leading-relaxed ${light ? "text-[#536259]" : "text-white/80"}`}>{current.text}</p>
     </div>
   );
 }

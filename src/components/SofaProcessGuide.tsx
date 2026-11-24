@@ -2,9 +2,57 @@ import { useId, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { SOFA_PROCESS_IMAGE as image, SOFA_PROCESS_STEPS as steps } from '@/data/sofaProcessGuide';
+import { StoryPlayer, type StoryStep } from '@/components/WaterproofPackSections';
+import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
+import sprayVideo from '@/assets/sofa-processo/pulverizacao.mp4';
+import sprayPoster from '@/assets/sofa-processo/pulverizacao-poster.jpg';
+import brushVideo from '@/assets/sofa-processo/escovacao.mp4';
+import brushPoster from '@/assets/sofa-processo/escovacao-poster.jpg';
+import extractVideo from '@/assets/sofa-processo/extracao.mp4';
+import extractPoster from '@/assets/sofa-processo/extracao-poster.jpg';
+
+/** As cinco etapas com material real da equipa: fotografia antes, vídeos de pulverização,
+ *  escovação e extração, fotografia depois. Os textos são os mesmos do prerender. */
+function realStory(): StoryStep[] {
+  const pair = BEFORE_AFTER_POOL.sofa.find(p => p.kind === 'pair') as { before: string; after: string } | undefined;
+  const media = [
+    { image: pair?.before },
+    { video: sprayVideo, poster: sprayPoster },
+    { video: brushVideo, poster: brushPoster },
+    { video: extractVideo, poster: extractPoster },
+    { image: pair?.after },
+  ];
+  return steps.map((s, i) => ({ label: s.label, text: s.description, alt: s.alt, ...media[i] }));
+}
+
+/** Novo modelo: história no telemóvel, cinco cartões reais no computador. */
+function SofaProcessStory({ city, cityPrep }: { city?: string; cityPrep: string }) {
+  const story = realStory();
+  return <section id="processo" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <SectionHeader heading={`A limpeza do seu sofá${city ? ` ${cityPrep}` : ''}`} goldWord={city || 'passo a passo'} light />
+      <StoryPlayer story={story} light />
+      <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
+        {story.map((p, i) => <figure key={p.label} className="min-w-0">
+          <div className="relative overflow-hidden rounded-xl bg-[#efeee7]">
+            {p.video
+              ? <video src={p.video} poster={p.poster} autoPlay muted loop playsInline preload="metadata" className="aspect-[3/4] max-h-[44svh] w-full object-cover" />
+              : <img src={p.image} alt={p.alt} loading="lazy" decoding="async" className="aspect-[3/4] max-h-[44svh] w-full object-cover" />}
+            <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#D4AF37]">{i + 1} · {p.label}</span>
+          </div>
+          <figcaption className="mt-2 text-sm leading-snug text-[#536259]">{p.text}</figcaption>
+        </figure>)}
+      </div>
+    </div>
+  </section>;
+}
 
 
-export default function SofaProcessGuide({ city, cityPrep = 'em', dark = false, switcher }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode }) {
+export default function SofaProcessGuide({ real = false, ...props }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode; real?: boolean }) {
+  return real ? <SofaProcessStory city={props.city} cityPrep={props.cityPrep ?? 'em'} /> : <SofaProcessTabs {...props} />;
+}
+
+function SofaProcessTabs({ city, cityPrep = 'em', dark = false, switcher }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode }) {
   const [active, setActive] = useState(0);
   const id = useId();
   const step = steps[active];

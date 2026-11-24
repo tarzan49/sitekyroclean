@@ -85,7 +85,7 @@ export default function LandingServiceSections() {
       alt: card.image?.alt ?? card.title,
     }))} />,
     duvidas: newModel ? <CompactFAQ key={model.path} id="duvidas" dark faqs={model.faqs} heading={model.faqHeading} /> : <div id="duvidas" className="scroll-mt-20"><ServiceFAQ key={model.path} faqs={model.faqs} heading={model.faqHeading} /></div>,
-    processo: model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
+    processo: model.serviceSlug === 'limpeza-sofas' ? <SofaProcessGuide key={model.path} real={newModel} city={model.locationName} cityPrep={model.prep} /> : <ServiceProcessGuide key={model.path} serviceSlug={model.serviceSlug} city={model.locationName} cityPrep={model.prep} />,
     'mesma-visita': <div id="mesma-visita" className="scroll-mt-20"><ServicePackBanner packSlugs={model.packSlugs} city={model.municipalitySlug} variant="dark" /></div>,
     zonas: <section id="zonas" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
