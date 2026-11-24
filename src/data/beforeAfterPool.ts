@@ -185,8 +185,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
-    // 24/11/2026 (dono): os 2 sofás das publicações de antes e depois de 19/11 (riscos cor-de-rosa; assentos acinzentados).
-    { kind: "pair", before: sofa16Antes, after: sofa16Depois },
+    // 24/11/2026 (dono): sofá das publicações de 19/11 (assentos acinzentados); riscos cor-de-rosa e sofa-04 retirados pelo dono.
     { kind: "pair", before: sofa17Antes, after: sofa17Depois },
     // 24/11/2026 (dono): sofá da Lisboa 1 em Agualva-Cacém (23/11), depois cortado sem o balde.
     { kind: "pair", before: sofa18Antes, after: sofa18Depois },
@@ -198,7 +197,6 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: sofa11Antes, after: sofa11Depois },
     { kind: "pair", before: sofa09Antes, after: sofa09Depois },
     { kind: "pair", before: sofa01Antes, after: sofa01Depois },
-    { kind: "pair", before: sofa04Antes, after: sofa04Depois },
     { kind: "pair", before: sofa14Depois, after: sofa14Antes },
     { kind: "pair", before: sofa08Antes, after: sofa08Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
