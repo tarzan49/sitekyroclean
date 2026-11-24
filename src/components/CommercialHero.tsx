@@ -38,6 +38,16 @@ interface Props {
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
+/** No telemóvel cabem 3 linhas (~118 letras): frases inteiras até aí, o resto só no computador (nunca cortada com "…"). */
+export function splitHeroSubtitle(text: string): [string, string] {
+  if (text.length <= 118) return [text, ''];
+  const parts = text.match(/[^.?!]+[.?!]+(?=\s|$)\s*|[^.?!]+$/g) ?? [text];
+  let lead = parts[0];
+  let k = 1;
+  while (k < parts.length && (lead + parts[k]).trim().length <= 118) lead += parts[k++];
+  return [lead.trim(), parts.slice(k).join('').trim()];
+}
+
 export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false, exactPrice = false, duo }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
@@ -56,6 +66,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
   // copy, que o prerender importa em Node para gerar o HTML estático.
   const statIcons = { rating: GoogleG, duration: Hourglass, response: Clock, drying: Timer };
   const stats = commercialHeroStats(serviceSlug).map(stat => ({ ...stat, icon: statIcons[stat.key] }));
+  const [lead, rest] = splitHeroSubtitle(subtitle ?? commercialHeroSubtitle(serviceSlug, municipality));
   return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[100svh] lg:flex-col">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
@@ -72,7 +83,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
             </Fragment>)}
           </nav>
           <h1 data-hero-part="title" data-long-title={`${words.join(' ')} ${gold}`.length > 90 ? 'xl' : `${words.join(' ')} ${gold}`.length > 52 ? '' : undefined} className={`font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white`} style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
-          <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
+          <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{lead}{rest && <span className="max-md:hidden"> {rest}</span>}</p>
           {/* Preço e avaliação lado a lado, por cima do botão (dono, 09/10/2026). */}
           <div data-hero-part="proof" className="mb-4 grid grid-cols-2 items-center">
             <a href={pricesHref} className="flex min-h-[56px] flex-col items-center justify-center border-r border-white/15 px-2 text-center">
