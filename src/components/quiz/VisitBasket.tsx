@@ -182,12 +182,12 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
   if (e.key === 'imper') {
     if (!items.length) return null;
     const alone = aloneTotal(city, it), q = quoteBasket(city, [...items, it]), line = q.sob ? null : q.lines[items.length] ?? null;
-    return alone !== null && line !== null && alone > line ? { kind: 'save', value: Math.round((alone - line) * 100) / 100, what: '+ sem deslocação' } : null;
+    return alone !== null && line !== null && alone > line ? { kind: 'save', value: Math.round((alone - line) * 100) / 100, what: '+ deslocação oferecida' } : null;
   }
   const g = giftsUnlocked(city, items, it);
   if (!g) return null;
   // O tratamento dito pelo nome (dono, 25 Nov: a oferta tem de ser o gancho do cartão).
-  const what = /pele/.test(g.text) ? '+ tratamento da pele' : /anti-odor/.test(g.text) ? '+ anti-odor' : '+ anti-ácaros';
+  const what = /pele/.test(g.text) ? '+ tratamento da pele oferecido' : /anti-odor/.test(g.text) ? '+ anti-odor oferecido' : '+ anti-ácaros oferecido';
   return { kind: 'gift', value: g.value, what };
 }
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
@@ -399,7 +399,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <div className="grid grid-cols-2 gap-2">
                   {ENTRY.map(e => (
                     <button key={e.key} type="button" onClick={() => pick(e)} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
-                      {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /><BaLabels /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
+                      {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
                       <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
                         <span className="block text-[15px] font-bold leading-tight text-white">{e.label}</span>
@@ -443,24 +443,18 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               const best = ENTRY.map(e => ({ e, p: promoOf(city, items, e) })).filter(x => x.p).sort((x, y) => y.p!.value - x.p!.value)[0];
               return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{best ? <>Se juntar {JOIN_NAME[best.e.key]}, poupa {formatEuro(best.p!.value)}</> : 'Cada peça a mais traz um tratamento oferecido'}</p>;
             })()}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {ENTRY.map(e => {
                 const promo = promoOf(city, items, e);
                 return (
-                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[140px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
-                  {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /><BaLabels low /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
-                  {/* O gancho (dono, 25 Nov): a oferta em destaque, em cima, com o presente e o valor. */}
-                  {promo && <span className={`absolute left-1.5 top-1.5 flex max-w-[calc(100%-12px)] items-center overflow-hidden whitespace-nowrap rounded-lg bg-[#D4AF37] px-1.5 py-1 font-extrabold uppercase leading-none text-[#0B2F2A] ${promo.value >= 100 ? 'gap-0.5 text-[9.5px] tracking-tight' : 'gap-1 text-[11px] tracking-wide'} shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]`}>
-                    <Gift className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} />{promo.kind === 'save' ? 'Poupa' : 'Oferta'} {formatEuro(promo.value)}
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/45 to-transparent motion-reduce:hidden" style={{ animation: 'shimmer 3.2s ease-in-out infinite' }} />
-                  </span>}
+                <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[118px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
+                  {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
                   {/* Vidro neutro só atrás do texto, com o vídeo a ver-se através (dono, 25 Nov: "não tornas verde"). */}
                   <span className="absolute inset-x-0 bottom-0 flex items-end gap-1 bg-black/45 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
                     <span className="min-w-0 flex-1">
-                      <span className={`block whitespace-nowrap font-bold leading-tight text-white drop-shadow ${e.label.length > 12 ? 'text-[10.5px] tracking-tighter' : 'text-[13px]'}`}>{e.label}</span>
-                      {promo && <span className="block whitespace-nowrap text-[10.5px] font-bold leading-tight text-[#D4AF37] drop-shadow">{promo.what}</span>}
+                      <span className="block whitespace-nowrap text-sm font-bold leading-tight text-white drop-shadow">{e.label}</span>
+                      {promo && <span className="mt-0.5 block whitespace-nowrap text-[11.5px] font-bold leading-tight text-[#E8C964] drop-shadow">{promo.what}</span>}
                     </span>
-                    {e.label.length <= 12 && <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/40"><Plus className="h-3.5 w-3.5" strokeWidth={3} /></span>}
                   </span>
                 </button>
                 );
@@ -556,15 +550,6 @@ function CountTile({ count, onBump, cls, children }: { count: number; onBump: (d
         : <span className="mt-0.5 flex h-7 items-center text-[11px] font-semibold text-white/45"><Plus className="mr-0.5 h-3 w-3" />Juntar</span>}
     </div>
   );
-}
-
-/** "Antes" e "Depois" por cima de cada metade da fotografia. */
-function BaLabels({ low }: { low?: boolean }) {
-  const pos = low ? 'bottom-[46px]' : 'top-1.5';
-  return <>
-    <span className={`absolute left-1.5 ${pos} rounded bg-black/55 px-1 py-px text-[9px] font-bold uppercase tracking-wide text-white`}>Antes</span>
-    <span className={`absolute right-1.5 ${pos} rounded bg-[#D4AF37] px-1 py-px text-[9px] font-bold uppercase tracking-wide text-[#0B2F2A]`}>Depois</span>
-  </>;
 }
 
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
