@@ -20,17 +20,18 @@ const OPTIONS = [
 export default function ImperPricePicker({ city, source, initialKind = 'sofa' }: { city: string; source: string; initialKind?: Kind }) {
   const [kind, setKind] = useState<Kind>(initialKind);
   const [seats, setSeats] = useState(3);
+  const [count, setCount] = useState(1); // quantos sofás iguais (dono, 25 Nov)
   const [qty, setQty] = useState(6);
   const [choice, setChoice] = useState('premium');
   const [basket, setBasket] = useState(false);
   const item = (treatment: string) => kind === 'chairs' ? { kind: 'chairs', qty, treatment }
-    : seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment } : { kind: 'sofa', size: seats === 1 ? '1-lugar' : `${Math.min(seats, 5)}-lugares`, treatment };
+    : seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment, qty: count } : { kind: 'sofa', size: seats === 1 ? '1-lugar' : `${Math.min(seats, 5)}-lugares`, treatment, qty: count };
   const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
     const r = botQuote({ city, items: [item(o.id)] }) as { ok: boolean; quote?: boolean; total?: number | null };
     return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? up9(r.total) : null];
-  })) as Record<string, number | null>, [kind, seats, qty, city]);
+  })) as Record<string, number | null>, [kind, seats, qty, count, city]);
   const total = totals[choice];
-  const what = kind === 'chairs' ? `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}` : `um sofá de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
+  const what = kind === 'chairs' ? `${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}` : `${count > 1 ? `${count} sofás` : 'um sofá'} de ${seats} ${seats === 1 ? 'lugar' : 'lugares'}`;
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade da impermeabilização ${choice === 'premium' ? 'Premium' : 'Essencial'} para ${what}, ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia.`;
   const chip = (active: boolean) => `flex min-h-[44px] items-center justify-center rounded-2xl border-2 font-semibold transition-all ${active ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`;
 
@@ -41,7 +42,14 @@ export default function ImperPricePicker({ city, source, initialKind = 'sofa' }:
           {(['sofa', 'chairs'] as const).map(k => <button key={k} type="button" role="radio" aria-checked={kind === k} onClick={() => setKind(k)} className={`${chip(kind === k)} text-sm`}>{k === 'sofa' ? 'Sofá' : 'Cadeiras'}</button>)}
         </div>
         {kind === 'sofa' ? <>
-          <p className="mb-1.5 text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <p className="text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
+            <div className="flex shrink-0 items-center gap-1.5" aria-label="Quantos sofás">
+              <button type="button" aria-label="Menos um sofá" onClick={() => setCount(c => Math.max(1, c - 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7]"><Minus className="h-3.5 w-3.5" /></button>
+              <span className="min-w-[1.5rem] text-center text-sm font-semibold">×{count}</span>
+              <button type="button" aria-label="Mais um sofá" onClick={() => setCount(c => Math.min(5, c + 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7]"><Plus className="h-3.5 w-3.5" /></button>
+            </div>
+          </div>
           <div className="grid grid-cols-6 gap-1.5" role="radiogroup" aria-label="Lugares">
             {[1, 2, 3, 4, 5, 6].map(n => <button key={n} type="button" role="radio" aria-checked={seats === n} onClick={() => setSeats(n)} className={`${chip(seats === n)} text-xl`}>{n}</button>)}
           </div>

@@ -1,7 +1,9 @@
 // Packs de várias peças (dono, 24 Nov): o cliente escolhe peça a peça (tamanho/quantidade + tratamento),
 // um só total do bot (botQuote, deslocação incluída), preço cortado = o mesmo pedido em separado,
 // ambos a acabar em 9 para cima. Tapetes nunca mostram preço no site: pedem as medidas no WhatsApp.
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
+
+const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
 import { cityPrep } from '@/data/serviceCatalog';
 import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
 import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
@@ -64,6 +66,7 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
   const [mattress, setMattress] = useState('casal');
   const [qty, setQty] = useState(6);
   const [rug, setRug] = useState(true);
+  const [basket, setBasket] = useState(false); // cesto da visita quando a página não traz o seu (dono, 25 Nov)
   const [rugW, setRugW] = useState('2');
   const [rugL, setRugL] = useState('1.6');
   const dim = (v: string) => { const n = Number(v.replace(',', '.')); return n > 0 && n <= 10 ? n : null; };
@@ -158,8 +161,9 @@ export default function PackPiecesPicker({ pieces, packName, city, source, compa
           className="mt-2 flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-[#16833e] px-3 py-3 text-base font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]">
           <MessageCircle className="h-5 w-5 shrink-0" />Pedir este orçamento no WhatsApp
         </a>
-        {onMore && <button type="button" onClick={onMore} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
+        {<button type="button" onClick={() => onMore ? onMore() : setBasket(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-sm font-bold text-[#1A1A1A]"><Plus className="h-4 w-4 text-[#D4AF37]" strokeWidth={3} />Juntar mais artigos à mesma visita</button>}
       </div>
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} /></Suspense>}
     </div>
   );
 }

@@ -3,7 +3,7 @@
 // +40€, +60€ em 5 e 6 lugares, `leather: true`). Mesmo desenho do WaterproofPackPicker.
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
-import { Check, MessageCircle, Plus } from 'lucide-react';
+import { Check, MessageCircle, Minus, Plus } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
@@ -18,22 +18,30 @@ const OPTIONS = [
 
 export default function LeatherSofaPicker({ city, source }: { city: string; source: string }) {
   const [seats, setSeats] = useState(3);
+  const [count, setCount] = useState(1); // quantos sofás iguais (dono, 25 Nov)
   const [choice, setChoice] = useState('pele');
   const [basket, setBasket] = useState(false);
   const size = seats === 1 ? '1-lugar' : seats >= 5 ? '5-lugares' : `${seats}-lugares`;
   const totals = useMemo(() => Object.fromEntries(OPTIONS.map(o => {
-    const item = seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', leather: o.leather } : { kind: 'sofa', size, treatment: 'clean', leather: o.leather };
+    const item = seats === 6 ? { kind: 'sofa', size: '5-lugares', seats: 6, look: 'compacto', treatment: 'clean', leather: o.leather, qty: count } : { kind: 'sofa', size, treatment: 'clean', leather: o.leather, qty: count };
     const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
     return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
-  })) as Record<string, number | null>, [seats, size, city]);
+  })) as Record<string, number | null>, [seats, size, count, city]);
   const chosen = OPTIONS.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para um sofá de pele de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para ${count > 1 ? `${count} sofás` : 'um sofá'} de pele de ${seats} ${seats === 1 ? 'lugar' : 'lugares'} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">
       <div>
-        <p className="mb-2 text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-base font-semibold text-[#1A1A1A]">Quantos lugares tem o sofá?</p>
+          <div className="flex shrink-0 items-center gap-1.5" aria-label="Quantos sofás">
+            <button type="button" aria-label="Menos um sofá" onClick={() => setCount(c => Math.max(1, c - 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7]"><Minus className="h-3.5 w-3.5" /></button>
+            <span className="min-w-[1.5rem] text-center text-sm font-semibold">×{count}</span>
+            <button type="button" aria-label="Mais um sofá" onClick={() => setCount(c => Math.min(5, c + 1))} className="grid h-8 w-8 place-items-center rounded-lg bg-[#F3F0E7]"><Plus className="h-3.5 w-3.5" /></button>
+          </div>
+        </div>
         <div className="grid grid-cols-6 gap-1.5 md:grid-cols-3 md:gap-2" role="radiogroup" aria-label="Lugares">
           {SEATS.map(n => <button key={n} type="button" role="radio" aria-checked={seats === n} onClick={() => setSeats(n)}
             className={`flex min-h-[44px] items-center justify-center rounded-2xl border-2 text-xl font-semibold transition-all ${seats === n ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#1A1A1A]' : 'border-[#E5E0D3] bg-white text-[#555]'}`}>{n}</button>)}
@@ -65,7 +73,7 @@ export default function LeatherSofaPicker({ city, source }: { city: string; sour
           <MessageCircle className="h-5 w-5" /> Pedir este orçamento no WhatsApp
         </a>
       </div>
-      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} initialItems={[choiceToItem({ kind: 'sofa', size, qty: 1, extra: 'none' })]} /></Suspense>}
+      {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} initialItems={[choiceToItem({ kind: 'sofa', size, qty: count, extra: 'none' })]} /></Suspense>}
     </div>
   );
 }
