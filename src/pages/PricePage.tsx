@@ -34,7 +34,7 @@ const PricePage = () => {
 
   const resolved = useLandingModel(pathname);
   const model = resolved.status === 'ready' ? resolved.model : null;
-  useSnapSections(model?.serviceSlug === 'limpeza-sofas'); // modelo novo em tudo o que é limpeza de sofás (dono, 24 Nov)
+  useSnapSections(['limpeza-sofas', 'limpeza-cadeiras'].includes(model?.serviceSlug ?? '')); // modelo novo em tudo o que é limpeza de sofás (dono, 24 Nov)
   const data = useMemo(() => (model && model.family === 'preco' ? {
     title: model.title, metaDescription: model.metaDescription,
     cityName: model.municipalityName, citySlug: model.municipalitySlug,

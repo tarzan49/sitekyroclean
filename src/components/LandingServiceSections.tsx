@@ -52,7 +52,7 @@ export default function LandingServiceSections() {
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
   // Novo modelo em teste (limpeza de sofás por cidade): escolha de preço simples com os totais do bot.
-  const newModel = model.serviceSlug === 'limpeza-sofas' || (['limpeza-cadeiras', 'limpeza-colchoes'].includes(model.serviceSlug) && model.family === 'localidade'); // sofás: todas as famílias; cadeiras: por cidade (dono, 24 Nov)
+  const newModel = ['limpeza-sofas', 'limpeza-cadeiras'].includes(model.serviceSlug) || (model.serviceSlug === 'limpeza-colchoes' && model.family === 'localidade'); // cadeiras em todas as famílias (dono, 24 Nov) // sofás: todas as famílias; cadeiras: por cidade (dono, 24 Nov)
   const pickerKind = model.serviceSlug === 'limpeza-cadeiras' ? 'chairs' as const : 'sofa' as const;
   const sections = {
     precos: newModel ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">

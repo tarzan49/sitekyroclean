@@ -32,7 +32,7 @@ const FreguesiaServicePage = () => {
   // O modelo ja traz tudo o que o hero desta pagina usa.
   const resolved = useLandingModel(location.pathname);
   const model = resolved.status === 'ready' ? resolved.model : null;
-  useSnapSections(model?.serviceSlug === 'limpeza-sofas'); // modelo novo em tudo o que é limpeza de sofás (dono, 24 Nov)
+  useSnapSections(['limpeza-sofas', 'limpeza-cadeiras'].includes(model?.serviceSlug ?? '')); // modelo novo em tudo o que é limpeza de sofás (dono, 24 Nov)
   const data = useMemo(() => (model && model.family === 'freguesia' ? {
     title: model.title, metaDescription: model.metaDescription, h1: model.h1,
     name: model.locationName, slug: model.parishSlug ?? '',

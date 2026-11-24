@@ -22,7 +22,7 @@ import mattressExtractPoster from '@/assets/colchoes-processo/extracao-poster.jp
 
 type Service = 'limpeza-cadeiras' | 'limpeza-colchoes';
 const MEDIA: Record<Service, { pool: 'cadeiras' | 'colchao'; heading: string; videos: [string, string][] }> = {
-  'limpeza-cadeiras': { pool: 'cadeiras', heading: 'A limpeza das suas cadeiras', videos: [[chairSpray, chairSprayPoster], [chairBrush, chairBrushPoster], [chairExtract, chairExtractPoster]] },
+  'limpeza-cadeiras': { pool: 'cadeiras', heading: 'A limpeza das cadeiras', videos: [[chairSpray, chairSprayPoster], [chairBrush, chairBrushPoster], [chairExtract, chairExtractPoster]] },
   'limpeza-colchoes': { pool: 'colchao', heading: 'A limpeza do seu colchão', videos: [[mattressSpray, mattressSprayPoster], [mattressBrush, mattressBrushPoster], [mattressExtract, mattressExtractPoster]] },
 };
 
