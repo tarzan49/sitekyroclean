@@ -26,6 +26,8 @@ import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
 import rugClip from '@/assets/tapete-processo/maquina.mp4';
 import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
 import imperClip from '@/assets/before-after-pool/imper-agua-01.mp4';
+// Impermeabilização das cadeiras: a prova do funil (água em gotas numa cadeira), não a escova da limpeza (dono, 25 Nov).
+import imperChairsClip from '@/assets/before-after-pool/imper-agua-cadeira-01.mp4';
 // Cartões de limpeza com o antes e depois que mais vende (dono, 25 Nov: "a melhor foto antes e depois que vendesse
 // instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
 import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
@@ -196,8 +198,9 @@ function separateOf(city: string, it: BasketItem | BasketItem[]): number | null 
   const list = (Array.isArray(it) ? it : [it]).map(toQuote);
   if (!list.length || list.some(x => !x)) return null;
   // Colchão com anti-ácaros: o motor dá o riscado em mattressMitePack (limpeza + anti-ácaros à parte, 40€).
-  const r = botQuote({ city: city || 'Lisboa', items: list as QuoteItem[] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null };
-  const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate;
+  // Cadeiras com impermeabilização: chairsWas (1 cadeira × a quantidade, dono 24 Nov), só nos packs de 5 ou mais.
+  const r = botQuote({ city: city || 'Lisboa', items: list as QuoteItem[] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null; chairsWas?: number | null };
+  const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate ?? r.chairsWas;
   return typeof v === 'number' ? v : null;
 }
 /** Envio falhou (sessão SEO, 25 Nov): a mensagem de WhatsApp leva o pedido inteiro, porque o bot não o encontra no CRM. */
@@ -287,7 +290,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       if (h.skip > 0) { h.skip -= 1; return; }
       const s = live.current;
       if (s.level <= h.depth) return;
-      if (s.editing) setEditing(null); else if (s.imperPick) setImperPick(false); else if (s.step === 'contact') setStep('basket'); else s.onClose();
+      if (s.editing) { if (s.editing.imperOnly) setImperPick(true); setEditing(null); } else if (s.imperPick) setImperPick(false); else if (s.step === 'contact') setStep('basket'); else s.onClose();
     };
     window.addEventListener('popstate', onPop);
     return () => {
@@ -346,6 +349,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
   const saveEditing = (group: BasketItem[]) => {
     if (!editing) return;
     setItems(list => { const at = list.findIndex(i => i.id === editing.id); const rest = list.filter(i => i.id !== editing.id); return at < 0 ? [...rest, ...group] : [...rest.slice(0, at), ...group, ...rest.slice(at)]; });
+    // Impermeabilização: volta a "O que vamos impermeabilizar?" para poder juntar a outra peça (dono, 25 Nov).
+    if (editing.imperOnly) setImperPick(true);
     setEditing(null);
   };
 
@@ -399,7 +404,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <div className="grid grid-cols-2 gap-2">
                   {ENTRY.map(e => (
                     <button key={e.key} type="button" onClick={() => pick(e)} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
-                      {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
+                      {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" style={e.kind === 'chairs' ? { objectPosition: '50% 85%' } : undefined} /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />}
                       <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
                         <span className="block text-[15px] font-bold leading-tight text-white">{e.label}</span>
@@ -419,7 +424,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                     <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-12 w-12 sm:h-12 sm:w-12" />
                     <span className="min-w-0"><span className="block text-sm font-semibold leading-snug text-white">{itemLabel(it)}</span><span className="block text-xs font-semibold text-[#D4AF37]">Alterar</span></span>
                   </button>
-                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const one = aloneTotal(city, { ...it, qty: 1 }); return one != null ? formatEuro(Math.round(one * it.qty * 100) / 100) : null; })()}</span>
+                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const n = it.kind === 'chairs' ? 1 : it.qty; const one = aloneTotal(city, it.kind === 'chairs' ? it : { ...it, qty: 1 }); return one != null ? formatEuro(Math.round(one * n * 100) / 100) : null; })()}</span>
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
@@ -437,7 +442,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
               <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Onde é o serviço?" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
-            <p className="mb-1 text-base font-semibold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></p>
+            <p className="mb-1 text-base font-semibold text-white">Quanto mais junta, mais <span style={{ color: GOLD }}>poupa</span></p>
             {(() => {
               // "Se juntar X, poupa Y" (dono, 25 Nov): a peça que mais dá, pelo motor; sem nenhuma, a frase geral.
               const best = ENTRY.map(e => ({ e, p: promoOf(city, items, e) })).filter(x => x.p).sort((x, y) => y.p!.value - x.p!.value)[0];
@@ -448,7 +453,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 const promo = promoOf(city, items, e);
                 return (
                 <button key={e.key} type="button" onClick={() => pick(e)} aria-label={`Juntar ${e.label}`} className={`group relative h-[118px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
-                  {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
+                  {e.ba ? <><img src={e.ba} alt={`${e.label}: antes e depois da limpeza`} className="absolute inset-0 h-full w-full object-cover" style={e.kind === 'chairs' ? { objectPosition: '50% 85%' } : undefined} /></> : <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
                   {/* Vidro neutro só atrás do texto, com o vídeo a ver-se através (dono, 25 Nov: "não tornas verde"). */}
                   <span className="absolute inset-x-0 bottom-0 flex items-end gap-1 bg-black/45 px-1.5 pb-1.5 pt-1 backdrop-blur-md">
                     <span className="min-w-0 flex-1">
@@ -500,18 +505,27 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <div className="flex-1 overflow-y-auto px-4 pt-4">
             <h2 className="type-section-title font-playfair mb-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>impermeabilizar?</em></h2>
             <div className="grid grid-cols-2 gap-3">
-              {([{ kind: 'sofa', label: 'Sofá', clip: imperClip, photo: imperPhoto }, { kind: 'chairs', label: 'Cadeiras', clip: chairsClip, photo: PHOTO.chairs }] as const).map(o => (
+              {([{ kind: 'sofa', label: 'Sofá', clip: imperClip, photo: imperPhoto }, { kind: 'chairs', label: 'Cadeiras', clip: imperChairsClip, photo: PHOTO.chairs }] as const).map(o => (
                 <button key={o.kind} type="button" onClick={() => { setImperPick(false); setEditing(newItem(o.kind, { pack: 'premium', imperOnly: true })); }} className="group relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
                   <video src={o.clip} poster={o.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
                   <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/45 px-3 py-2 backdrop-blur-md"><span className="text-lg font-bold text-white">{o.label}</span><Plus className="h-5 w-5" style={{ color: GOLD }} strokeWidth={3} /></span>
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs text-white/60">Só em tecido. Para limpar e impermeabilizar na mesma visita, escolha o sofá ou as cadeiras no ecrã anterior.</p>
+            {(() => {
+              const done = items.filter(i => i.imperOnly);
+              if (!done.length) return <p className="mt-3 text-xs text-white/60">Só em tecido. Para limpar e impermeabilizar na mesma visita, escolha o sofá ou as cadeiras no ecrã anterior.</p>;
+              const has = (k: BasketKind) => done.some(i => i.kind === k);
+              return <div className="mt-4 rounded-2xl border border-[#D4AF37]/30 bg-white/[0.04] p-3">
+                <ul className="mb-2 space-y-1">{done.map(i => <li key={i.id} className="flex items-center gap-2 text-sm font-semibold text-white"><Check className="h-4 w-4 shrink-0" style={{ color: GOLD }} />{itemLabel(i)}</li>)}</ul>
+                <p className="mb-3 text-sm text-[#E8C964]">{has('sofa') && has('chairs') ? 'Sofá e cadeiras impermeabilizados na mesma visita.' : has('chairs') ? 'Junte também o sofá e deixe tudo impermeabilizado.' : 'Junte também as cadeiras e deixe tudo impermeabilizado.'}</p>
+                <button type="button" onClick={() => setImperPick(false)} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A]">Seguir para o cesto</button>
+              </div>;
+            })()}
           </div>
         </div>
       )}
-      {editing && <ItemSheet item={editing} fresh={!items.some(i => i.id === editing.id)} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => setEditing(null)} />}
+      {editing && <ItemSheet item={editing} fresh={!items.some(i => i.id === editing.id)} city={city} others={items.filter(i => i.id !== editing.id)} onChange={setEditing} onSave={saveEditing} onCancel={() => { if (editing.imperOnly && !items.some(i => i.id === editing.id)) setImperPick(true); setEditing(null); }} />}
     </div>
     </div>
   );
@@ -586,7 +600,11 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // a deslocação já está paga, por isso mostra-se a linha destas peças na visita (sem a 2.ª deslocação); riscado =
   // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
   // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
-  const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const one = { ...x, qty: 1 }; const v = separateOf(city, one) ?? aloneTotal(city, one); if (v === null) return null; t += v * x.qty; } return g.length ? Math.round(t * 100) / 100 : null; };
+  const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) {
+    // As cadeiras têm escalões e uma só deslocação: a peça é o conjunto, nunca 1 cadeira × quantidade.
+    const n = x.kind === 'chairs' ? 1 : x.qty, one = x.kind === 'chairs' ? x : { ...x, qty: 1 };
+    const v = separateOf(city, one) ?? aloneTotal(city, one); if (v === null) return null; t += v * n;
+  } return g.length ? Math.round(t * 100) / 100 : null; };
   const packPrice = (p: Partial<BasketItem>): { shown: number | null; struck: number | null } => {
     // Pele: o motor põe o tratamento numa linha à parte, por isso soma-se à linha da limpeza na visita.
     if (p.leather && others.length) {
@@ -620,7 +638,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
   // O vídeo fica o da escolha com que se abriu (a impermeabilização mostra a água), sem trocar a cada toque.
-  const [clip] = useState(() => (item.kind === 'sofa' && item.pack !== 'none' ? imperClip : CLIP[item.kind]));
+  const [clip] = useState(() => (item.imperOnly && item.kind === 'chairs' ? imperChairsClip : item.kind === 'sofa' && item.pack !== 'none' ? imperClip : CLIP[item.kind]));
   const tile = (on: boolean) => `flex flex-col items-center justify-center gap-1 rounded-2xl border-2 px-1 py-2 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   return (
     <div className="absolute inset-0 z-20 flex flex-col bg-[#0B2F2A] bg-gradient-to-b from-[#0B2F2A] to-[#071a12] text-white" role="dialog" aria-modal="true" aria-label={KIND_LABEL[item.kind]}>
