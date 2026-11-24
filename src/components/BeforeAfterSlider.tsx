@@ -26,6 +26,9 @@ interface BeforeAfterSliderProps {
   sweepMs?: number;
 }
 
+// O puxador nunca sai da fotografia (nas pontas aparecia cortado ao meio; dono, 24 Nov).
+const handleAt = (pct: number) => `clamp(26px, ${pct}%, calc(100% - 26px))`;
+
 const BeforeAfterSlider = ({
   priority = false,
   beforeImage,
@@ -69,8 +72,8 @@ const BeforeAfterSlider = ({
         : `inset(0 0 ${100 - clamped}% 0)`;
     }
     if (handleWrapRef.current) {
-      if (orientation === "vertical") handleWrapRef.current.style.left = `${clamped}%`;
-      else handleWrapRef.current.style.top = `${clamped}%`;
+      if (orientation === "vertical") handleWrapRef.current.style.left = handleAt(clamped);
+      else handleWrapRef.current.style.top = handleAt(clamped);
     }
   }, [orientation]);
 
@@ -291,7 +294,7 @@ const BeforeAfterSlider = ({
         ref={handleWrapRef}
         className="absolute top-0 bottom-0 flex items-center justify-center pointer-events-none"
         style={{
-          [isVertical ? "left" : "top"]: `${sliderPosition}%`,
+          [isVertical ? "left" : "top"]: handleAt(sliderPosition),
           transform: isVertical ? "translateX(-50%)" : "translateY(-50%)",
           width: isVertical ? undefined : "100%",
           height: isVertical ? "100%" : undefined,

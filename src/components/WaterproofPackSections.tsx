@@ -115,12 +115,12 @@ export default function WaterproofPackSections({ kind, cityLabel, faqs }: { kind
     <section id="protecao" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="type-section-title font-playfair text-[#111111]">Limpo hoje, <em className="not-italic" style={{ color: "#D4AF37" }}>protegido amanhã</em></h2>
-        <div ref={spillsRef} className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+        <div ref={spillsRef} className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:gap-3 lg:grid-cols-4">
           {SPILLS[kind].map(s => (
-            <article key={s.title} className="w-[72%] shrink-0 snap-start overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white sm:w-auto">
+            <article key={s.title} className="min-w-0 overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white sm:w-auto">
               <img src={`/images/service-examples/${s.img}-400.webp`} srcSet={`/images/service-examples/${s.img}-400.webp 400w, /images/service-examples/${s.img}-800.webp 800w`} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 72vw"
                 alt={`${s.title} derramado num estofo`} width={400} height={300} loading="lazy" decoding="async" className="aspect-[4/3] max-h-[28svh] w-full object-cover sm:max-h-none" />
-              <div className="p-4">
+              <div className="p-2.5 sm:p-4">
                 <h3 className="font-semibold text-[#1A1A1A]">{s.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-[#555]">{s.text}</p>
               </div>

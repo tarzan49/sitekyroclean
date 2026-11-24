@@ -2,11 +2,13 @@ import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
+import { useFillSections } from '@/hooks/useFillSections';
 import { WHATSAPP_BASE } from '@/constants/business';
 
 const MobileStickyBar = () => {
   const [visible, setVisible] = useState(false);
   const { pathname } = useLocation();
+  useFillSections();
   const isEn = pathname.startsWith('/en/');
 
   // A barra acompanha sempre, em todas as páginas; só se esconde quando a parte da página

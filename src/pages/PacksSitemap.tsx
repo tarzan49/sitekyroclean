@@ -102,24 +102,25 @@ const PacksSitemap = () => {
         <section id="packs" className="py-10 md:py-14 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="type-section-title font-playfair text-[#111111] mb-4">Escolha o seu <em className="not-italic" style={{ color: "#D4AF37" }}>pack</em></h2>
-            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:gap-4 md:px-0">
+            <div className="grid gap-2 md:flex md:snap-x md:snap-mandatory md:gap-4 md:overflow-x-auto md:pb-2">
               {packs.map(pack => (
-                <article key={pack.id} className="flex w-[86%] shrink-0 snap-start flex-col rounded-2xl border border-[#E8E4DE] bg-white p-5 md:w-[calc(33.333%-11px)] md:p-6" style={{ borderTop: "3px solid #D4AF37" }}>
-                  <ul className="flex flex-wrap gap-1.5 mb-3" aria-label="Inclui">
+                <article key={pack.id} className="relative flex items-center justify-between gap-3 rounded-xl border border-[#E8E4DE] bg-white px-4 py-2.5 md:shrink-0 md:snap-start md:flex-col md:items-stretch md:justify-start md:rounded-2xl md:w-[calc(33.333%-11px)] md:p-6" style={{ borderTop: "2px solid #D4AF37" }}>
+                  <ul className="mb-3 hidden flex-wrap gap-1.5 md:flex" aria-label="Inclui">
                     {packChips(pack.id).map(chip => (
                       <li key={chip} className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-sm font-semibold text-[#111111]">
                         {chip}
                       </li>
                     ))}
                   </ul>
-                  <h3 className="font-playfair text-xl font-bold text-[#111111] leading-snug">{pack.name}</h3>
-                  <p className="text-base text-[#505650] mt-1">{pack.tagline}</p>
-                  <p className="text-base text-[#333] mt-3 flex-1">{PACK_HOOK[pack.id] ?? pack.description}</p>
+                  <h3 className="font-playfair text-[15px] font-bold leading-snug text-[#111111] md:text-xl">{pack.name}</h3>
+                  <p className="mt-1 hidden text-base text-[#505650] md:block">{pack.tagline}</p>
+                  <p className="mt-3 hidden flex-1 text-base text-[#333] md:block">{PACK_HOOK[pack.id] ?? pack.description}</p>
                   <Link
                     to={`/${pack.slug}-${city.slug}`}
-                    className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 text-base font-semibold text-white hover:bg-[#0d3c47] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"
+                    aria-label={`Ver o preço: ${pack.name} ${cityPrep(city.name)} ${city.name}`}
+                    className="inline-flex min-h-9 shrink-0 items-center md:mt-5 md:min-h-12 md:w-full justify-center gap-2 rounded-xl bg-[#111111] px-3 text-sm font-semibold text-white after:absolute after:inset-0 hover:bg-[#0d3c47] md:px-4 md:text-base md:after:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"
                   >
-                    Ver o preço {cityPrep(city.name)} {city.name}
+                    <span className="hidden md:inline">Ver o preço {cityPrep(city.name)} {city.name}</span>
                     <ArrowRight aria-hidden="true" className="h-4 w-4" style={{ color: "#D4AF37" }} />
                   </Link>
                 </article>

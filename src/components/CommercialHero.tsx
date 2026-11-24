@@ -71,7 +71,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
   const statIcons = { rating: GoogleG, duration: Hourglass, response: Clock, drying: Timer };
   const stats = commercialHeroStats(serviceSlug).map(stat => ({ ...stat, icon: statIcons[stat.key] }));
   const [lead, rest] = splitHeroSubtitle(subtitle ?? commercialHeroSubtitle(serviceSlug, municipality));
-  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className={`relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[100svh] lg:flex-col${video ? ' max-lg:flex max-lg:min-h-[100svh] max-lg:flex-col' : ''}`}>
+  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className={`relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white lg:flex lg:min-h-[var(--app-h,100svh)] lg:flex-col${video ? ' max-lg:flex max-lg:min-h-[var(--app-h,100svh)] max-lg:flex-col' : ''}`}>
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
       <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" width={1280} height={720} />

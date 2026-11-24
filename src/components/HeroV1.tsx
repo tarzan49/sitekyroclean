@@ -23,7 +23,7 @@ const Hero = () => {
     <>
       <section
         id="orcamento"
-        className="relative bg-[#0B2F2A] min-h-[100svh] flex items-stretch md:items-center z-[1] pt-[76px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
+        className="relative bg-[#0B2F2A] min-h-[var(--app-h,100svh)] flex items-stretch md:items-center z-[1] pt-[76px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
         aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}

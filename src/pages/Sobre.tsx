@@ -69,7 +69,7 @@ const Sobre = () => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildAboutPageSchema()) }} />
       <Header />
       <main>
-        <section data-commercial-hero className="flex min-h-[100svh] items-end bg-kyro-green text-white">
+        <section data-commercial-hero className="flex min-h-[var(--app-h,100svh)] items-end bg-kyro-green text-white">
           <div className="mx-auto w-full max-w-4xl px-5 pb-10 pt-24 sm:px-6">
             <nav className="mb-4 hidden items-center gap-1.5 text-sm text-white/70 md:flex" aria-label="Breadcrumb">
               <Link to="/" className="hover:text-[#D4AF37]">Início</Link><ChevronRight className="h-3 w-3" /><span>Sobre</span>

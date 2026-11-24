@@ -526,7 +526,9 @@ html {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* 0s e não 0.01ms: com 0.01ms tudo passa a ter transição e as medidas das secções (useFillSections) saíam a da altura antiga. */
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
   }
 }
 
@@ -674,8 +676,8 @@ section.sr-inactive {
    suavemente na secção seguinte. Secções mais altas do que o ecrã deixam ler
    até ao fim antes de encaixar (comportamento do scroll-snap). */
 html.snap-sections { scroll-snap-type: y mandatory; scroll-padding-top: var(--header-h, 64px); }
-html.snap-sections main > section, html.snap-sections main [data-landing-section] { scroll-snap-align: start; scroll-margin-top: 0 !important; min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
-html.snap-sections main > section[data-commercial-hero] { min-height: 100svh; }
+html.snap-sections main > section, html.snap-sections main [data-landing-section] { scroll-snap-align: start; scroll-margin-top: 0 !important; min-height: calc(var(--app-max, 100svh) - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
+html.snap-sections main > section[data-commercial-hero] { min-height: var(--app-h, 100svh); }
 html.snap-sections footer { scroll-snap-align: end; }
 @media (prefers-reduced-motion: reduce) { html.snap-sections { scroll-snap-type: y proximity; } }
 /* Compactação das secções para caberem num ecrã (só nas páginas com encaixe). */
@@ -689,8 +691,8 @@ html.snap-sections main > section:not([data-commercial-hero]) { padding-top: 16p
 @media (min-width: 768px) {
   html.snap-sections [data-commercial-hero] { padding-top: calc(var(--header-h, 61px) + 16px); }
   html.snap-sections [data-commercial-hero] [aria-label="Escolher exemplo"] { display: none; }
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child { width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child { width: min(100%, calc((var(--app-h, 100svh) - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:nth-child(2) { width: min(100%, calc((var(--app-h, 100svh) - var(--header-h, 61px) - 250px) * 4 / 3)); margin-inline: auto; }
   html.snap-sections #avaliacoes a.inline-flex[target="_blank"] { display: none; }
 }
 @media (min-width: 768px) { html.snap-sections [data-hero-part="stats"] .grid { padding-top: 12px; padding-bottom: 12px; } }
@@ -758,8 +760,20 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 }
 /* Página principal de serviço (dono, 24 Nov): blocos longos em cartões a deslizar no telemóvel. */
 @media (max-width: 767px) {
-  html.snap-sections #compromisso .grid, html.snap-sections #dicas .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
-  html.snap-sections #compromisso .grid > *, html.snap-sections #dicas .grid > * { flex: 0 0 80%; scroll-snap-align: start; }
+  html.snap-sections #compromisso .grid { gap: 10px; }
+  html.snap-sections #compromisso figure { position: relative; overflow: hidden; border-radius: 12px; }
+  html.snap-sections #compromisso figcaption { position: absolute; inset: auto 0 0 0; margin: 0; padding: 26px 14px 10px; font-size: 17px; color: #fff !important; background: linear-gradient(to top, rgba(7,26,18,.86), transparent); }
+  html.snap-sections #compromisso > div > div:first-child { margin-bottom: 14px; }
+  html.snap-sections #dicas .grid { gap: 6px; }
+  html.snap-sections #dicas .grid > * { padding: 6px 10px; }
+  html.snap-sections #packs .grid { gap: 6px; }
+  html.snap-sections #packs article { padding: 6px 12px; }
+  html.snap-sections main section#packs > div > h2 { margin-bottom: 10px; }
+  html.snap-sections #dicas .grid > * > div:first-child { width: 58px; height: 58px; }
+  html.snap-sections #dicas .grid h3 { font-size: 15px; line-height: 1.25; }
+  html.snap-sections #dicas .grid h3 + * { margin-top: 2px; }
+  html.snap-sections #compromisso .grid ~ p { margin-top: 8px; font-size: 12px; }
+  html.snap-sections #compromisso img { aspect-ratio: 3 / 1; }
   html.snap-sections #localidades button[aria-expanded] { padding-top: 12px; padding-bottom: 12px; }
   html.snap-sections #localidades button[aria-expanded] span.mt-1 { display: none; }
   html.snap-sections #localidades > div > div:first-child { margin-bottom: 14px; }
@@ -776,24 +790,26 @@ html.snap-sections [data-landing-section] .mb-8 { margin-bottom: 14px; }
 
 /* Página inicial: o topo (HeroV1, #orcamento) mantém a sua disposição própria dentro do encaixe. */
 @media (max-width: 767px) {
-  /* "Aproveite a mesma visita": cartões fortes a deslizar no telemóvel (cabe num ecrã). */
-  html.snap-sections #mesma-visita .grid, html.snap-sections [data-pack-banner] .grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 6px; }
-  html.snap-sections #mesma-visita .grid > *, html.snap-sections [data-pack-banner] .grid > * { flex: 0 0 85%; scroll-snap-align: start; }
+  /* "Aproveite a mesma visita": cartões empilhados, nenhum cortado (cabe num ecrã). */
+  html.snap-sections #mesma-visita .grid, html.snap-sections [data-pack-banner] .grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  html.snap-sections [data-pack-banner] .grid > * { padding: 12px 14px; border-radius: 12px; }
+  html.snap-sections [data-pack-banner] .grid > * span.font-playfair { font-size: 17px; }
+  html.snap-sections [data-pack-banner] .grid > * span.mt-2 { margin-top: 4px; font-size: 14px; line-height: 1.4; }
 }
 /* "Aproveite a mesma visita" vive dentro de um div (#mesma-visita): sem isto não era ponto de paragem e o encaixe
    podia saltá-la entre o passo a passo e as zonas (24 Nov). Ocupa o ecrã como as outras. */
 html.snap-sections main #mesma-visita { scroll-snap-align: start; scroll-margin-top: 0 !important; }
-html.snap-sections main #mesma-visita > section { min-height: calc(100svh - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
+html.snap-sections main #mesma-visita > section { min-height: calc(var(--app-max, 100svh) - var(--header-h, 64px)); display: flex; flex-direction: column; justify-content: center; }
 html.snap-sections main #mesma-visita > section > * { width: 100%; }
 @media (max-width: 767px) { html.snap-sections main #mesma-visita > section { padding-bottom: 92px; } }
-html.snap-sections main > section#orcamento { flex-direction: row; min-height: 100svh; padding-top: 76px !important; padding-bottom: 28px !important; }
+html.snap-sections main > section#orcamento { flex-direction: row; min-height: var(--app-h, 100svh); padding-top: 76px !important; padding-bottom: 28px !important; }
 @media (min-width: 768px) { html.snap-sections main > section#orcamento { padding-top: 100px; padding-bottom: 100px; } }
 html.snap-sections main > div#testemunhos { scroll-snap-align: start; }
 html.snap-sections #resultado video, html.snap-sections #resultado img { max-height: 42svh; }
 /* Página inicial: cada secção ocupa o ecrã inteiro a partir do topo e o conteúdo começa abaixo do menu fixo
    (o topo da página já fica por trás do menu, por isso o encaixe alinha a 0 e não abaixo do menu). */
 html.snap-home { scroll-padding-top: 0; }
-html.snap-home main > section, html.snap-home main > div#testemunhos { min-height: 100svh; }
+html.snap-home main > section, html.snap-home main > div#testemunhos { min-height: var(--app-max, 100svh); }
 html.snap-home main > section:not(#orcamento), html.snap-home main > div#testemunhos > section { padding-top: calc(var(--header-h, 57px) + 16px); }
 html.snap-home main > div#testemunhos { display: flex; flex-direction: column; }
 html.snap-home main > div#testemunhos > section { flex: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -824,7 +840,7 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 /* Topo das cadeiras: fotografias verticais numa moldura vertical, sem barras escuras dos lados; à volta fica o
    verde do topo (dono, 24 Nov). Sobrepõe-se ao 3:2 / 4:3 das galerias do topo. */
 @media (min-width: 768px) {
-  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, calc((100svh - var(--header-h, 61px) - 250px) * 3 / 4)); margin-inline: auto; }
+  html.snap-sections [data-commercial-hero] [aria-roledescription="carrossel"] > div:first-child[data-vertical-frame] { aspect-ratio: 3 / 4; width: min(100%, calc((var(--app-h, 100svh) - var(--header-h, 61px) - 250px) * 3 / 4)); margin-inline: auto; }
 }
 
 /* Portáteis de ecrã baixo (até ~820 px de altura): a barra fixa do WhatsApp (~80 px) tapava o fim do texto das
@@ -865,8 +881,8 @@ html.snap-home main > div#testemunhos > section > * { width: 100%; }
 /* Guias: texto inteiro; só nos ecrãs mesmo baixos fica em 2 linhas, para a secção caber. */
 @media (min-width: 768px) and (max-height: 690px) { html.snap-sections .expert-tip-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } }
 /* Topo das páginas em inglês: ocupa um ecrã e não mais (25 Nov). */
-[data-en-hero] { min-height: 100svh; }
-html.snap-sections main > section[data-en-hero] { min-height: 100svh; padding-top: 0 !important; padding-bottom: 0 !important; justify-content: flex-end; }
+[data-en-hero] { min-height: var(--app-h, 100svh); }
+html.snap-sections main > section[data-en-hero] { min-height: var(--app-h, 100svh); padding-top: 0 !important; padding-bottom: 0 !important; justify-content: flex-end; }
 [data-en-hero] [class*="grid"] svg { display: none; }
 [data-en-hero] > div:last-child .grid { padding-top: 6px; padding-bottom: 8px; }
 
@@ -900,3 +916,21 @@ a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]),[
 }
 a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]):hover,[data-hero-part="whatsapp"]:hover { background: linear-gradient(135deg, #156f3a, #0f6431) !important; }
 a[href*="wa.me/"]:is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) :is(span, svg) { color: #fff !important; letter-spacing: normal !important; text-transform: none !important; }
+
+/* Títulos em duas linhas equilibradas, nunca uma palavra sozinha em baixo (dono, 24 Nov, captura do iPhone). */
+.type-section-title, [data-hero-part="title"] { text-wrap: balance; }
+
+/* iPhone (dono, 24 Nov, capturas): nada fica por baixo da barra fixa, e os testemunhos usam o cartão todo. */
+@media (max-width: 767px) {
+  html.snap-sections main section:is(#precos, #preco, #montar):not(:has(a[href*="wa.me"])) { padding-bottom: 92px !important; }
+  html.snap-sections main [data-landing-section="precos"]:not(:has(a[href*="wa.me"])) > * { padding-bottom: 92px !important; }
+  html.snap-home main > div#testemunhos > section { padding-bottom: 92px; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote { display: flex; flex-direction: column; justify-content: center; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 17px; line-height: 1.5; -webkit-line-clamp: 6; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { font-size: 13px; line-height: 1.35; }
+  html.snap-sections #avaliacoes figure { background: #fff; border-radius: 14px; border: 1px solid #E5E0D3; }
+  html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { border-radius: 12px; }
+}
+
+/* Enquanto as secções se medem (useFillSections), nada transita: a medida tem de ser a final. */
+html.kyro-measuring * { transition: none !important; }

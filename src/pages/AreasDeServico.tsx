@@ -79,7 +79,7 @@ const AreasDeServico = () => {
       <Header />
       <main>
         {/* Hero */}
-        <section data-commercial-hero className="flex min-h-[100svh] items-end bg-kyro-green pt-24 pb-10 text-white md:pt-28 md:pb-14">
+        <section data-commercial-hero className="flex min-h-[var(--app-h,100svh)] items-end bg-kyro-green pt-24 pb-10 text-white md:pt-28 md:pb-14">
           <div className="container mx-auto px-5 max-w-4xl">
             <h1 className="font-playfair text-[28px] font-semibold leading-tight text-white md:text-5xl">
               Áreas de{" "}

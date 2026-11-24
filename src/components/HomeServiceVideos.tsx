@@ -1,7 +1,7 @@
 // Página inicial: os serviços em vídeos reais da equipa a passar na horizontal (dono, 24 Nov: os cartões
 // antigos com imagens "estão demasiado AI, sem presença"). Cada cartão = vídeo real + nome + "desde" do
-// motor de preços + link para a página do serviço. Um ecrã no telemóvel; a faixa avança sozinha e pára
-// quando a pessoa lhe toca.
+// motor de preços + link para a página do serviço. No telemóvel os 6 serviços veem-se inteiros num ecrã, em duas colunas, sem faixa a deslizar nem
+// cartões cortados (dono, 24 Nov, captura do iPhone).
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
@@ -36,37 +36,20 @@ export default function HomeServiceVideos() {
     io.observe(el); return () => io.disconnect();
   }, []);
 
-  // Avança um cartão a cada 4 s, em scroll suave; pára de vez quando a pessoa toca na faixa.
-  useEffect(() => {
-    const el = strip.current; if (!el || !inView || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let stopped = false;
-    const stop = () => { stopped = true; };
-    el.addEventListener('pointerdown', stop, { passive: true });
-    el.addEventListener('touchstart', stop, { passive: true });
-    const t = window.setInterval(() => {
-      if (stopped || el.scrollWidth <= el.clientWidth + 4) return;
-      const card = el.firstElementChild as HTMLElement | null;
-      const step = (card?.offsetWidth ?? el.clientWidth) + 12;
-      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-      el.scrollTo({ left: atEnd ? 0 : el.scrollLeft + step, behavior: 'smooth' });
-    }, 4000);
-    return () => { window.clearInterval(t); el.removeEventListener('pointerdown', stop); el.removeEventListener('touchstart', stop); };
-  }, [inView]);
-
   return (
     <section id="servicos" className="scroll-mt-20 bg-[#FDFDF9] pt-10 pb-[100px] md:py-16">
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <SectionHeader heading="O nosso trabalho," goldWord="em vídeo real" />
-        <div ref={strip} className="-mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0 lg:grid lg:grid-cols-6 lg:overflow-visible">
+        <div ref={strip} className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
           {ITEMS.map(item => (
-            <Link key={item.link} to={item.link} className="group relative w-[62%] shrink-0 snap-start overflow-hidden rounded-2xl bg-black sm:w-[38%] lg:w-auto">
+            <Link key={item.link} to={item.link} className="group relative overflow-hidden rounded-2xl bg-black">
               <video src={inView ? item.video : undefined} autoPlay muted loop playsInline preload="none"
-                className="h-[min(50svh,420px)] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] lg:h-[380px]" />
+                className="h-[112px] w-full sm:h-[260px] object-cover transition-transform duration-500 group-hover:scale-[1.03] lg:h-[380px]" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-4">
+              <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
                 {/* Título numa só linha e do mesmo tamanho em todos os cartões (dono, 24 Nov: "tudo na mesma linha, alinhado"). */}
                 <h3 className="whitespace-nowrap font-playfair text-[15px] font-semibold leading-tight text-white sm:text-base lg:text-[15px] xl:text-base">{item.title}</h3>
-                <p className="mt-1 text-sm font-semibold text-[#D4AF37]">{item.price}</p>
+                <p className="mt-0.5 text-sm font-semibold text-[#D4AF37]">{item.price}</p>
               </div>
             </Link>
           ))}

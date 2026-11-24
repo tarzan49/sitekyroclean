@@ -50,7 +50,7 @@ const SIZES = {
   rug: [{ label: 'Pequeno', w: '1,2', l: '1,7' }, { label: 'Médio', w: '1,6', l: '2,3' }, { label: 'Grande', w: '2', l: '3' }, { label: 'Muito grande', w: '2,5', l: '3,5' }],
   carpet: [{ label: 'Quarto', w: '3', l: '4' }, { label: 'Sala', w: '4', l: '6' }, { label: 'Escritório', w: '6', l: '8' }, { label: 'Espaço grande', w: '10', l: '10' }],
 };
-const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga'];
+const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais', 'Braga', 'Matosinhos', 'Almada'];
 const num = (v: string) => { const n = parseFloat(v.replace(',', '.')); return n > 0 ? n : 0; };
 const seatId = (n: number) => `${n}-${n === 1 ? 'lugar' : 'lugares'}`;
 
@@ -164,7 +164,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   if (!city) {
     questions = <>
       <p className="mb-2 text-base font-semibold text-[#1A1A1A] md:mb-3 md:text-lg">Onde é o serviço?</p>
-      <div className="grid grid-cols-2 gap-2">{FIRST_CITIES.map(c => <button key={c} type="button" onClick={() => { warm(); onCity?.(c); }} className={`min-h-14 px-2 text-base ${tile(false)}`}>{c}</button>)}</div>
+      <div className="grid grid-cols-2 gap-2">{FIRST_CITIES.map(c => <button key={c} type="button" onClick={() => { warm(); onCity?.(c); }} data-fill-tile className={`min-h-12 px-2 text-base ${tile(false)}`}>{c}</button>)}</div>
       <select aria-label="Outra localidade" value="" onChange={e => onCity?.(e.target.value)} className="mt-2 h-12 w-full rounded-2xl border-2 border-[#D4AF37] bg-white px-3 text-sm font-semibold text-[#1A1A1A]">
         <option value="" disabled>Outra localidade</option>
         {cities.map(c => <option key={c.slug} value={c.name}>{c.name}</option>)}
@@ -182,7 +182,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
         ? <SofaCounters counts={counts} onChange={setCounts} hideSummary />
         : <>
             {title('Quantos lugares?', 'Pode juntar vários')}
-            <div className="grid grid-cols-3 gap-2">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} className={`flex min-h-[112px] flex-col items-center justify-center gap-1 px-1 py-2 text-base md:min-h-[128px] ${tile(false)}`}>
+            <div className="grid grid-cols-3 gap-2">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} data-fill-tile className={`flex min-h-[112px] flex-col items-center justify-center gap-1 px-1 py-2 text-base md:min-h-[128px] ${tile(false)}`}>
               <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-11 w-16 sm:h-12 sm:w-16" />{n === 1 ? '1 lugar' : `${n} lugares`}
               <span className="flex items-center text-[11px] text-[#D4AF37]"><Plus className="mr-0.5 h-3 w-3" strokeWidth={3} aria-hidden />Juntar</span>
             </button>)}</div>
@@ -191,7 +191,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
       {what === 'mattress' && <>
         {title('Que tamanho?', 'Pode juntar vários')}
         <div className="grid grid-cols-3 gap-2">{MATTRESS.map(m => { const n = mCounts[m.id] ?? 0; return (
-          <div key={m.id} role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none flex-col items-center gap-0.5 px-1 py-2 text-center text-sm ${tile(n > 0)}`}>
+          <div key={m.id} data-fill-tile role="button" tabIndex={0} aria-pressed={n > 0} onClick={() => { if (!n) bumpMattress(m.id, 1); }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !n) { e.preventDefault(); bumpMattress(m.id, 1); } }} className={`flex cursor-pointer select-none flex-col items-center justify-center gap-0.5 px-1 py-2 text-center text-sm ${tile(n > 0)}`}>
             <QuizFurnitureImage service="mattress" sizeId={m.id} className="h-10 w-14 sm:h-10 sm:w-14" />{m.label}
             {n > 0 ? <span className="mt-0.5 flex items-center gap-1">
               <button type="button" aria-label={`Menos um colchão ${m.label}`} onClick={e => { e.stopPropagation(); bumpMattress(m.id, -1); }} className="grid h-8 min-h-0 w-8 min-w-0 place-items-center rounded-full bg-white/80 text-[#0B2F2A]"><Minus className="h-3.5 w-3.5" /></button>
@@ -232,7 +232,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   const area = isRug ? (Math.round(num(dims.w) * num(dims.l) * 100) / 100).toLocaleString('pt-PT') : '';
 
   return (
-    <div className={`mx-auto grid w-full gap-2.5 md:gap-8 ${sized ? 'max-w-4xl md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]' : 'max-w-2xl'}`} onPointerDown={warm}>
+    <div data-price-picker className={`mx-auto grid w-full gap-2.5 md:gap-8 ${sized ? 'max-w-4xl md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]' : 'max-w-2xl'}`} onPointerDown={warm}>
       <div>{questions}</div>
       {city && sized && <div className="flex flex-col">
         <div className="flex flex-col gap-2">

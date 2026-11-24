@@ -1289,6 +1289,8 @@ Corrigido no caminho: o riscado da opção Premium contava a impermeabilização
 **"Pele de pêssego" = pele (dono, 24 Nov 2026, Rosa, Gaia):** o bot perguntou tecido ou pele, a cliente disse "Pele de pêssego" e ele escreveu "Sendo em tecido" e ofereceu Premium 219€ / Essencial 159€. Certo: só limpeza 89€ ou 129€ com o tratamento da pele. O material dito pelo cliente decide no código (kyro-bot `leatherGuard.ts`: `clientMaterial`, `applySaidMaterial`, `saidLeatherIssues`).
 - Cartões de material do sofá (widget e questionário): 2 fotografias sempre na horizontal, reais da equipa (dono, 24 Nov 2026: "Tem que ser 2 fotos horizontal se for sofá"); nada de castanho: dourado em degradê no escolhido, sem botões que não fazem nada ("Escolha o material").
 
+
+
 ## Nunca pôr o preço em dúvida; askTeam sem semana nem dia (dono, 24 Nov 2026, Câmara de Lobos)
 
 Dono: "quando é que eu te ensinei que tu dizes a alguém se o valor fizer sentido?". O modelo inventou a frase (não estava em nenhuma regra). `dropIfPriceOk` (kyro-bot `agent.ts`) corta-a antes de sair. A mesma conversa pediu a semana e o dia porque a regra de 12/11 (Funchal e Coimbra = askWeek) ficou no contrato e na S59 depois da de 19/11 (askTeam) [RETIRADA 24/11]; `tavira0211Issues` trava a pergunta quando a ferramenta devolve askTeam. Câmara de Lobos é Madeira: sem horas do motor, a hora é a da equipa do Funchal.
@@ -1296,3 +1298,12 @@ Dono: "quando é que eu te ensinei que tu dizes a alguém se o valor fizer senti
 ## Equipa Funchal em pausa (dono, 25 Nov 2026) [RETIRADA 25/11, minutos depois: "pergunta-lhes, se a cliente quiser avançar, quando têm disponibilidade"; o interruptor fica no código, desligado]
 
 Dono: "para já enquanto eles me devem dinheiro". `teamPaused` em kyro-bot `vianaAsk.ts`; retoma-se esvaziando `team_paused:Funchal` na tabela de estado do VPS, sem deploy. Avaliar com o dono quando pagarem.
+
+## Formato no iPhone (dono, 24 Nov 2026, 6 capturas na conversa 925 530 647)
+
+Dono: "Tudo cortado. Nada está ao tamanho da tela." As secções tinham `min-height: 100svh`. No Safari do iPhone `svh` é a altura com todas as barras abertas (em privado desconta ainda o aviso "Reduzir proteções"): 615 px num iPhone de 402 px, contra 713 no cimo da página e 753 com as barras recolhidas. Sobravam até 138 px e via-se a secção seguinte cortada. Os testes anteriores foram em janela emulada sem barras, onde `svh` = ecrã, por isso passavam.
+Agora: `--app-h` (altura visível no cimo, para o topo) e `--app-max` (maior altura visível, para as secções), medidas em `viewportHeight.ts`; `useFillSections.ts` reparte o espaço que sobra por fotografias (perto da proporção delas), cartões de escolha, linhas e testemunhos, e encolhe a fotografia do topo se não couber. Faixas a deslizar (vídeos da página inicial, promessa, guias, mesma visita, manchas dos packs, guia de packs) passaram a grelha ou lista inteira. O puxador do antes/depois não sai da fotografia.
+
+Hero das páginas comerciais (dono, 25 Nov: "voltar a reconstruir um Hero com sentido e não uma coisa super compactada", "a partir do iPhone 11 e Androids de ponta"): `src/styles/hero-mobile.css`, só no telemóvel. Caminho, título, texto, preço, avaliação, botão, comparação com contador e setas e os 3 factos com ícone; a fotografia cresce com o que sobra (flex). Testado em WebKit de 360×640 a 440×830. Nunca esconder informação do topo para caber: encolhe-se a fotografia (mín. 190 px). Nas páginas dos anúncios o cabeçalho não é fixo: `--header-h` = 0 e o cabeçalho é o primeiro ponto do encaixe. "Reduzir movimento" usa `transition-duration: 0s` (com 0,01 ms as medidas do `useFillSections` saíam erradas e nada enchia).
+
+Nunca esticar caixas vazias para encher um ecrã (dono, 25 Nov, captura de "O seu preço" com botões gigantes: "achas que a disposição disto é assim?"): quem enche são as fotografias e o conteúdo; linhas, botões e cartões ficam em tamanho normal. No passo da localidade o widget leva a fotografia real do artigo (`CITY_PHOTO` em `StepPricePicker.tsx`).

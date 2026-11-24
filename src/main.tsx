@@ -1,3 +1,4 @@
+import { trackViewportHeight } from '@/lib/viewportHeight';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import App from "./App.tsx";
@@ -14,6 +15,8 @@ initContactTracking();
 
 // Lê o endereço de entrada antes de qualquer navegação. Ver o porquê no módulo.
 import { initAdsWhatsAppMessage } from './lib/adsWhatsAppMessage';
+
+trackViewportHeight();
 initAdsWhatsAppMessage();
 
 // Depois de um deploy, os chunks do build anterior deixam de existir (sem o
