@@ -27,6 +27,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | /sobre, /areas-de-servico | — | — | — | FEITO (24 Nov): secções de ecrã inteiro com encaixe |
 | /problemas/* (nacionais) e por cidade | — | — | — | todos os serviços FEITO (25 Nov): sofás, tapetes, alcatifas, colchões, cadeiras, impermeabilização |
 | /en/* | — | — | — | FEITO (25 Nov): topo num ecrã (667 px no telemóvel, 620 no computador); o guia Airbnb fica artigo, com o texto todo no HTML estático |
+| Legais (/politica-de-privacidade, /termos-e-condicoes, /politica-de-devolucoes), /obrigado, /obrigado-pelo-servico, 404 | — | — | — | FEITO (25 Nov): documento de texto corrido com topo verde, índice e separador entre os três; texto jurídico igual, agora todo no HTML estático (src/data/legalContent.ts); textos de apoio em src/data/supportPages.ts |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
 

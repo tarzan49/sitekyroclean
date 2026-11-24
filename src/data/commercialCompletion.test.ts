@@ -27,7 +27,7 @@ describe('commercial completion regressions', () => {
     }
   });
   it('does not let pre-existing stains exclude the promised repeat intervention', () => {
-    const source = fs.readFileSync('src/pages/PoliticaDevolucoes.tsx','utf8');
+    const source = fs.readFileSync('src/data/legalContent.ts','utf8');
     expect(source).not.toContain('independentemente de terem sido reportados');
     expect(source).toContain('não retira o acesso à repetição gratuita');
   });

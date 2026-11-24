@@ -1,14 +1,12 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Home, Phone, ArrowRight, Sofa, BedDouble, Shield, BookOpen } from "lucide-react";
-import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
-
-const popularPages = [
-  { to: "/limpeza-sofas",    icon: Sofa,       label: "Limpeza de Sofás",    desc: "Extração profissional ao domicílio" },
-  { to: "/limpeza-colchoes", icon: BedDouble,  label: "Limpeza de Colchões", desc: "Higienização e remoção de ácaros" },
-  { to: "/impermeabilizacao",icon: Shield,     label: "Impermeabilização",   desc: "Essencial ou Premium, até 10 anos" },
-  { to: "/blog",             icon: BookOpen,   label: "Blog",                desc: "Dicas e guias de manutenção" },
-];
+import { ArrowRight, Home, MessageCircle, Phone } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import SectionHeader from "@/components/SectionHeader";
+import { PHONE_TEL, PHONE_DISPLAY, WHATSAPP_BASE } from "@/constants/business";
+import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
+import { NOT_FOUND_H1, NOT_FOUND_LINKS, NOT_FOUND_LINKS_HEADING, NOT_FOUND_TEXT } from "@/data/supportPages";
 
 const NotFound = () => {
   useEffect(() => {
@@ -22,82 +20,33 @@ const NotFound = () => {
     return () => { robotsMeta?.setAttribute('content', 'index, follow'); };
   }, []);
 
-  return (
-  <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden"
-    style={{ background: "linear-gradient(160deg, #071a12 0%, #0B2F2A 55%, #0a2218 100%)" }}>
+  const h1 = NOT_FOUND_H1.split(" ");
+  const heading = NOT_FOUND_LINKS_HEADING.split(" ");
 
-    {/* Dot grid */}
-    <div className="absolute inset-0 pointer-events-none"
-      style={{ backgroundImage: "radial-gradient(circle, rgba(212,175,55,0.07) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-
-    {/* Ambient glows */}
-    <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full pointer-events-none"
-      style={{ background: "radial-gradient(ellipse, rgba(212,175,55,0.10) 0%, transparent 70%)" }} />
-    <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] rounded-full pointer-events-none"
-      style={{ background: "radial-gradient(ellipse, rgba(26,78,48,0.25) 0%, transparent 70%)" }} />
-
-    <div className="relative z-10 w-full max-w-2xl mx-auto text-center">
-
-      {/* 404 */}
-      <h1 className="type-page-title font-playfair     mb-2 select-none"
-        style={{
-          background: "linear-gradient(135deg, #D4AF37 0%, #EDD96A 50%, #D4AF37 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          filter: "drop-shadow(0 0 40px rgba(212,175,55,0.35))",
-        }}>
-        404
-      </h1>
-
-      {/* Message */}
-      <p className="text-sm font-bold tracking-[0.08em] uppercase text-gold/70 mb-3">
-        Página não encontrada
-      </p>
-      <h2 className="type-section-title font-playfair    text-white mb-3 ">
-        Esta página foi limpa, e não deixou rasto.
-      </h2>
-      <p className="text-white/80 text-base max-w-md mx-auto mb-10 leading-relaxed">
-        O endereço que procura não existe ou foi movido. Mas podemos ajudá-lo a encontrar o que precisa.
-      </p>
-
-      {/* CTAs */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
-        <Link to="/"
-          className="flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-base px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97]">
-          <Home className="w-4 h-4" />
-          Voltar ao início
-        </Link>
-        <a href={`tel:${PHONE_TEL}`}
-          data-tracking-source="not_found_page"
-          className="flex items-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-semibold text-base px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm">
-          <Phone className="w-4 h-4 text-gold" />
-          {PHONE_DISPLAY}
-        </a>
+  return <><Header /><main className="bg-[#FDFDF9]">
+    <section data-mobile-hero="text" className="flex min-h-[88svh] flex-col justify-center bg-kyro-green pb-12 pt-24 text-white lg:min-h-[560px]">
+      <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+        <h1 className="font-playfair text-[28px] font-semibold leading-tight text-white md:text-5xl">{h1.slice(0, -1).join(" ")} <em className="not-italic text-[#D4AF37]">{h1.slice(-1)}</em></h1>
+        <p className="mt-3 max-w-xl text-base leading-relaxed text-white/80 md:text-lg">{NOT_FOUND_TEXT}</p>
+        <div className="mt-8 max-w-md">
+          <a href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`} target="_blank" rel="noopener noreferrer" data-tracking-source="not_found_page" className="flex min-h-14 items-center justify-center gap-2 rounded-lg bg-[#16833e] px-4 py-3 text-base font-semibold text-white hover:bg-[#116b32]"><MessageCircle className="h-5 w-5 shrink-0" />Falar por WhatsApp</a>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <Link to="/" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/25 px-2 text-sm font-semibold text-white"><Home className="h-4 w-4 shrink-0 text-[#D4AF37]" />Página inicial</Link>
+            <a href={`tel:${PHONE_TEL}`} data-tracking-source="not_found_page" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/25 px-2 text-sm font-semibold text-white"><Phone className="h-4 w-4 shrink-0 text-[#D4AF37]" />{PHONE_DISPLAY}</a>
+          </div>
+        </div>
       </div>
+    </section>
 
-      {/* Popular pages */}
-      <p className="text-sm font-bold tracking-[0.08em] uppercase text-white/80 mb-5">
-        Páginas populares
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {popularPages.map(({ to, icon: Icon, label, desc }) => (
-          <Link key={to} to={to}
-            className="group flex items-start gap-3 text-left p-4 rounded-2xl border border-white/8 hover:border-gold/30 transition-all"
-            style={{ background: "rgba(11,47,42,0.55)", backdropFilter: "blur(12px)" }}>
-            <span className="w-8 h-8 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gold/20 transition-colors">
-              <Icon className="w-4 h-4 text-gold" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-white text-base leading-snug mb-0.5 group-hover:text-gold transition-colors">{label}</p>
-              <p className="text-white/80 text-sm leading-snug">{desc}</p>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-white/80 group-hover:text-gold/60 flex-shrink-0 mt-1 ml-auto transition-all group-hover:translate-x-0.5" />
-          </Link>
-        ))}
+    <section className="bg-[#FDFDF9] py-12 md:py-16">
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
+        <SectionHeader heading={heading.slice(0, -1).join(" ")} goldWord={heading.slice(-1)[0]} className="!mb-5" />
+        <div className="grid gap-x-10 border-t border-[#dfe5df] sm:grid-cols-2">
+          {NOT_FOUND_LINKS.map(link => <Link key={link.href} to={link.href} className="flex min-h-14 items-center justify-between gap-4 border-b border-[#dfe5df] text-base font-semibold text-[#173e2b]">{link.label}<ArrowRight className="h-4 w-4 shrink-0 text-[#D4AF37]" /></Link>)}
+        </div>
       </div>
-    </div>
-  </div>
-  );
+    </section>
+  </main><Footer /></>;
 };
 
 export default NotFound;

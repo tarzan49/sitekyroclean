@@ -2,30 +2,42 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { LEGAL_PAGES } from './legalPages';
-
-// `legalPages.ts` guarda os títulos das secções para o HTML estático; o texto
-// legal em si vive nos componentes React. São duas cópias da mesma lista de
-// títulos, exatamente o padrão que o `problemRouteData.test.ts` já vigia: o
-// remédio é um teste que rebenta quando divergirem, não confiar na memória.
-const readPage = (component: string) =>
-  fs.readFileSync(path.resolve(__dirname, `../pages/${component}.tsx`), 'utf-8');
+import { LEGAL_CONTENT, legalSectionId, renderLegalHtml } from './legalContent';
 
 const appSource = () => fs.readFileSync(path.resolve(__dirname, '../App.tsx'), 'utf-8');
 
 describe('páginas legais', () => {
-  it('declara as mesmas secções que o componente React desenha, pela mesma ordem', () => {
+  // O texto tem uma fonte só (legalContent.ts): a página e o HTML estático desenham-na.
+  it('cada página tem o seu texto, e nenhum texto fica sem página', () => {
+    expect(Object.keys(LEGAL_CONTENT).sort()).toEqual(LEGAL_PAGES.map(page => page.path).sort());
     for (const page of LEGAL_PAGES) {
-      const source = readPage(page.component);
-      const rendered = [...source.matchAll(/<Section title="([^"]*)"/g)].map(m => m[1]);
-      expect(rendered, page.path).toEqual(page.sections);
+      const sections = LEGAL_CONTENT[page.path];
+      expect(sections.length, page.path).toBeGreaterThan(5);
+      const ids = sections.map(section => legalSectionId(section.title));
+      expect(new Set(ids).size, page.path).toBe(ids.length);
+      for (const section of sections) {
+        const html = section.body.join('');
+        expect(html, section.title).not.toMatch(/undefined|—/);
+        expect(html.replace(/<[^>]+>/g, '').trim().length, section.title).toBeGreaterThan(20);
+      }
     }
   });
 
-  it('usa o <h1> e a data de atualização do componente', () => {
+  it('o HTML estático leva o texto todo de cada secção', () => {
     for (const page of LEGAL_PAGES) {
-      const source = readPage(page.component);
-      expect(source, page.path).toContain(page.h1);
-      expect(source, page.path).toContain(`Última atualização: ${page.updated}`);
+      const html = renderLegalHtml(page.path, []);
+      for (const section of LEGAL_CONTENT[page.path]) {
+        expect(html).toContain(`<h2>${section.title}</h2>`);
+        for (const block of section.body) expect(html).toContain(block);
+      }
+    }
+  });
+
+  // A numeração é do documento: uma secção retirada por engano deixa um buraco.
+  it('as secções numeradas seguem por ordem', () => {
+    for (const page of LEGAL_PAGES) {
+      const numbers = LEGAL_CONTENT[page.path].map(section => /^(\d+)\./.exec(section.title)?.[1]).filter(Boolean).map(Number);
+      expect(numbers, page.path).toEqual(numbers.map((_, index) => index + 1));
     }
   });
 

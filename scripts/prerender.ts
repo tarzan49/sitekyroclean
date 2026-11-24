@@ -11,7 +11,9 @@ import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments, treatmentContentSections, treatmentArticles } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '../src/constants/commercialPolicy';
-import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
+import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL, WHATSAPP_BASE } from '../src/constants/business';
+import { GOOGLE_REVIEW_URL } from '../src/constants/google';
+import { buildSubmittedWaMessage } from '../src/lib/whatsappMessages';
 import { locationPrices } from '../src/constants/travel';
 import { buildAboutPageSchema, buildStudySchemas } from '../src/lib/seoSchema';
 /**
@@ -44,6 +46,8 @@ import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPre
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { LEGAL_PAGES } from '../src/data/legalPages';
+import { renderLegalHtml } from '../src/data/legalContent';
+import { NOT_FOUND_H1, NOT_FOUND_LINKS, NOT_FOUND_LINKS_HEADING, NOT_FOUND_TEXT, QUOTE_CONFIRM_LABEL, QUOTE_EMPTY_H1, QUOTE_EMPTY_TEXT, QUOTE_SUMMARY_TITLE, REVIEW_ASK, REVIEW_BUTTON, REVIEW_H1, REVIEW_WHATSAPP } from '../src/data/supportPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero, problemBreadcrumb } from '../src/data/problemHero';
@@ -212,6 +216,8 @@ interface PageContent {
   // assinatura: é onde um motor generativo verifica de onde vem a afirmação.
   sources?: { id: string; label: string; publisher: string; url: string; checkedOn: string }[];
   localSection?: string;
+  /** Documento legal já em HTML (src/data/legalContent.ts). */
+  legalHtml?: string;
   problems?: { title: string; description: string; image?: { src: string; alt: string } }[];
   howItWorks?: string;
   benefits?: string[];
@@ -315,6 +321,8 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     }
     html += `</div><p>Imagens ilustrativas. Toque para ampliar.</p></section>`;
   }
+
+  if (c.legalHtml) html += c.legalHtml;
 
   if (c.localSection) {
     html += `<p>${escHtml(c.localSection)}</p>\n`;
@@ -1565,8 +1573,10 @@ export function prerenderRoutes(outDir: string): number {
     let notFoundHtml = injectMeta(template, notFoundTitle, notFoundDesc, `${BASE_URL}/`);
     notFoundHtml = notFoundHtml.replace('</head>', '  <meta name="robots" content="noindex, follow">\n</head>');
     notFoundHtml = injectContent(notFoundHtml, generatePageBody({
-      h1: 'Página não encontrada',
-      intro: notFoundDesc,
+      h1: NOT_FOUND_H1,
+      intro: NOT_FOUND_TEXT,
+      linksHeading: NOT_FOUND_LINKS_HEADING,
+      links: [...NOT_FOUND_LINKS],
     }));
     notFoundHtml = injectJsonLd(notFoundHtml, LOCAL_BIZ);
     fs.writeFileSync(path.join(outDir, '404.html'), notFoundHtml, 'utf-8');
@@ -1579,10 +1589,8 @@ export function prerenderRoutes(outDir: string): number {
   // três têm rota em App.tsx e estão no rodapé de todas as páginas, mas ficaram
   // de fora daquela lista — confirmado em produção a 2026-09-23, as três a
   // devolver 404. Ao contrário das client-only, são páginas a sério e ficam
-  // indexáveis: o texto legal continua a ser desenhado pelo React, e o HTML
-  // estático leva o título, a descrição, o <h1>, um resumo fiel e os títulos
-  // das secções — a mesma informação, outra renderização, como manda a regra
-  // anti-cloaking. Ver src/data/legalPages.ts.
+  // indexáveis. O texto sai de src/data/legalContent.ts, a mesma fonte da
+  // página React, por isso o HTML estático leva o documento inteiro.
   {
     for (const page of LEGAL_PAGES) {
       emit(
@@ -1591,9 +1599,8 @@ export function prerenderRoutes(outDir: string): number {
         page.description,
         {
           h1: page.h1,
-          intro: page.intro,
-          localSection: `Última atualização: ${page.updated}.`,
-          benefits: page.sections,
+          intro: `Última atualização: ${page.updated}`,
+          legalHtml: renderLegalHtml(page.path, LEGAL_PAGES.filter(other => other.path !== page.path).map(other => ({ href: other.path, label: other.h1 }))),
         },
         [buildBreadcrumbSchema([
           { name: 'Início', url: BASE_URL + '/' },
@@ -1619,8 +1626,14 @@ export function prerenderRoutes(outDir: string): number {
   // the audit's index-hygiene notes).
   {
     const CLIENT_ONLY_ROUTES = ['/obrigado', '/obrigado-pelo-servico', '/admin/panel', '/admin/deslocacoes'];
+    // As duas de agradecimento levam o que a página mostra sem pedido na sessão.
+    const bodies: Record<string, string> = {
+      '/obrigado': `<main><h1>${escHtml(QUOTE_EMPTY_H1.join(' '))}</h1><section><h2>${escHtml(QUOTE_SUMMARY_TITLE)}</h2><p>${escHtml(QUOTE_EMPTY_TEXT)}</p></section><a href="${escHtml(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage())}`)}">${escHtml(QUOTE_CONFIRM_LABEL)}</a><p>${escHtml(RESPONSE_PROMISE)}</p></main>`,
+      '/obrigado-pelo-servico': `<main><h1>${escHtml(REVIEW_H1)}</h1><p>${escHtml(REVIEW_ASK)}</p><a href="${escHtml(GOOGLE_REVIEW_URL)}">${escHtml(REVIEW_BUTTON)}</a><a href="${WHATSAPP_BASE}">${escHtml(REVIEW_WHATSAPP)}</a></main>`,
+    };
     for (const routePath of CLIENT_ONLY_ROUTES) {
       let html = template.replace('</head>', '  <meta name="robots" content="noindex, follow">\n</head>');
+      if (bodies[routePath]) html = injectContent(html, bodies[routePath]);
       html = injectJsonLd(html, LOCAL_BIZ);
       writeRoute(outDir, routePath, html);
     }
