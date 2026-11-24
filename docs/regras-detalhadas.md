@@ -1140,3 +1140,5 @@ Os 15 concelhos do distrito de Coimbra acrescentados a 23 Nov ao `botAvailabilit
 - 15€ (até ~30 km): Condeixa-a-Nova, Penacova, Miranda do Corvo, Lousã, Montemor-o-Velho, Vila Nova de Poiares, Cantanhede.
 - 20€: Penela, Soure, Mira, Góis, Arganil, Tábua, Oliveira do Hospital, Pampilhosa da Serra.
 Saiu a nota "deslocação ainda por definir: não dês valor de deslocação" (`COIMBRA_DISTRICT_FEE_NOTE`); `COIMBRA_DISTRICT_NO_FEE` fica só para os nomes curtos (Condeixa, Poiares). Ao Vitor já se disse "sem deslocação": para ele mantém-se (preço já dado ganha). As páginas de SEO das 15 cidades passam a existir (+360 rotas).
+
+- **24 Nov 2026 (dono):** avaliações Google passam a "+210" em todo o lado (site `REVIEW_COUNT`, bot `REVIEW_COUNT` + ficheiro do bot + bot-contract, Google Ads, Instagram via selo do site). Anúncio de sofás: "Sofá como novo desde 49€, com deslocação incluída." em vez do 89€ do sofá de 3 lugares ("as pessoas fogem"). [RETIRADA 24/11] "+200 avaliações".
