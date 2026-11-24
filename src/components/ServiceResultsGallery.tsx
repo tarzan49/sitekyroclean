@@ -24,7 +24,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
   const itemCategory = singleCategory ?? (item as { category?: BeforeAfterCategory }).category;
   // Moldura fixa em 4:3 quando a galeria mistura tipos ou é de vídeos verticais (impermeabilização):
   // o hero não muda de altura e as 3 características por baixo ficam no ecrã.
-  const fixedFrame = !singleCategory || singleCategory === "impermeabilizacao";
+  const fixedFrame = !singleCategory || singleCategory === "impermeabilizacao" || singleCategory === "cadeiras";
 
   useEffect(() => {
     const rail = thumbnailsRef.current;
@@ -62,11 +62,14 @@ export default function ServiceResultsGallery({ category, light = false, interva
           para o hero não mudar de altura quando passa um vídeo vertical. */}
       <div className={`overflow-hidden ${fixedFrame ? "w-full aspect-[4/3] bg-black/40" : itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[3/4]" : itemCategory === "impermeabilizacao" ? "mx-auto w-[min(100%,300px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
         {item.kind === "pair" ? (
+          // Cadeiras (fotografias verticais) numa moldura fixa: ao centro, em 3:4, com barras dos lados, como os vídeos (dono, 24 Nov).
+          <div className={fixedFrame && itemCategory === "cadeiras" ? "mx-auto h-full aspect-[3/4]" : "h-full w-full"}>
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
             afterLabel={itemCategory === "impermeabilizacao" ? "Com proteção" : "Depois"}
             priority={priority && index === 0} noFrame onDraggingChange={setDragging}
             sweepMs={autoplay ? intervalMs : undefined} />
+          </div>
         ) : item.kind === "video" ? (
           <div className="relative h-full w-full">
             <video key={index} src={item.src} poster={item.poster} autoPlay muted playsInline preload={priority && index === 0 ? "auto" : "metadata"}

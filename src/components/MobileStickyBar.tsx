@@ -9,15 +9,28 @@ const MobileStickyBar = () => {
   const { pathname } = useLocation();
   const isEn = pathname.startsWith('/en/');
 
+  // A barra acompanha sempre, em todas as páginas; só se esconde quando a parte da página
+  // que está no ecrã já tem um botão de WhatsApp à vista (dono, 24 Nov).
   useEffect(() => {
-    const onScroll = () => {
-      const scrolled = window.scrollY > 400;
-      const nearBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 120;
-      setVisible(scrolled && !nearBottom);
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const top = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
+      const bottom = window.innerHeight - 80;
+      const ownButtonInView = [...document.querySelectorAll<HTMLAnchorElement>('main a[href*="wa.me"], main a[href*="whatsapp"], footer a[href*="wa.me"], footer a[href*="whatsapp"]')]
+        .some(a => {
+          const r = a.getBoundingClientRect();
+          return r.width > 0 && r.height > 0 && r.bottom > top && r.top < bottom;
+        });
+      setVisible(!ownButtonInView);
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
+    schedule();
+    const late = window.setTimeout(schedule, 1200);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => { window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); window.clearTimeout(late); if (frame) cancelAnimationFrame(frame); };
+  }, [pathname]);
 
   if (pathname === '/obrigado' || pathname.startsWith('/admin')) return null;
 

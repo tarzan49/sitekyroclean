@@ -725,8 +725,6 @@ html.snap-sections #avaliacoes .mb-10 p:last-child { display: none; }
 html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { margin-top: 12px; }
 @media (min-width: 768px) { html.snap-sections #avaliacoes h2 { font-size: 2rem; } html.snap-sections #avaliacoes .mb-10 { margin-bottom: 8px; } }
-/* Nas páginas de ecrã inteiro a barra fixa tapava o fundo de cada secção; o menu já tem o WhatsApp. */
-html.snap-sections [data-sticky-bar] { display: none; }
 /* O conteúdo de cada secção ocupa a largura toda (a centragem vertical em flex tirava-lha). */
 html.snap-sections main > section > * { width: 100%; }
 /* Telemóvel: o menu esconde-se ao descer, por isso a secção encaixa no topo do ecrã. */
