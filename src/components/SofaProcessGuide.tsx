@@ -37,7 +37,7 @@ function SofaProcessStory({ city, cityPrep, custom, heading }: { city?: string; 
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       <SectionHeader heading={heading ? heading.text : `A limpeza do seu sofá${city ? ` ${cityPrep}` : ''}`} goldWord={heading ? heading.gold : city || 'passo a passo'} light />
       <StoryPlayer story={story} light />
-      <div className="mt-6 hidden gap-4 md:grid md:grid-cols-5">
+      <div className="mt-6 hidden gap-4 md:grid" style={{ gridTemplateColumns: `repeat(${story.length}, minmax(0, 1fr))` }}>
         {story.map((p, i) => <figure key={p.label} className="min-w-0">
           <div className="relative overflow-hidden rounded-xl bg-[#efeee7]">
             {p.video
