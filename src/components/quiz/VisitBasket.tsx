@@ -75,7 +75,7 @@ export function itemLabel(it: BasketItem): string {
   return `${it.qty > 1 ? `${it.qty} × ` : ''}Sofá ${seats} ${seats === 1 ? 'lugar' : 'lugares'} · ${pack}`;
 }
 
-type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: number | null; lines?: { amount: number | null; quote: boolean }[]; visitGifts?: { gifts: { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number }[]; usual: number; total: number } | null };
+type Quote = { ok: boolean; total?: number | null; quote?: boolean; travel?: number | null; lines?: { amount: number | null; quote: boolean }[]; visitGifts?: { withoutGift?: number | null; gifts: { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor'; normal: number }[]; usual: number; total: number } | null };
 export type BasketGift = NonNullable<Quote['visitGifts']>['gifts'][number];
 const GIFT_LABEL: Record<string, string> = { 'mattress:anti-acaros': 'o anti-ácaros no colchão', 'chairs:anti-acaros': 'o anti-ácaros nas cadeiras', 'sofa:anti-acaros': 'o anti-ácaros no sofá', 'rug:anti-odor': 'o anti-odor no tapete', 'carpet:anti-odor': 'o anti-odor na alcatifa', 'rug:anti-acaros': 'o anti-ácaros no tapete', 'carpet:anti-acaros': 'o anti-ácaros na alcatifa', 'sofa:anti-odor': 'o anti-odor no sofá' };
 export const giftLabel = (g: BasketGift) => GIFT_LABEL[`${g.piece}:${g.treatment}`] ?? g.treatment;
@@ -93,9 +93,9 @@ export function groupGifts(gifts: BasketGift[]): { key: string; text: string; no
 export function quoteBasket(city: string, items: BasketItem[]) {
   const q = items.map(toQuote);
   const valid = q.filter(Boolean) as QuoteItem[];
-  if (!valid.length) return { total: null as number | null, travel: null as number | null, sob: items.some(i => isRug(i.kind)), lines: [] as (number | null)[], gifts: [] as BasketGift[], usual: null as number | null };
+  if (!valid.length) return { total: null as number | null, travel: null as number | null, sob: items.some(i => isRug(i.kind)), lines: [] as (number | null)[], gifts: [] as BasketGift[], usual: null as number | null, withoutGift: null as number | null };
   const r = botQuote({ city, items: valid }) as Quote;
-  if (!r.ok) return { total: null, travel: null, sob: true, lines: [], gifts: [], usual: null };
+  if (!r.ok) return { total: null, travel: null, sob: true, lines: [], gifts: [], usual: null, withoutGift: null };
   // Linhas do motor pela mesma ordem dos itens válidos. Tapetes com valor do bot desde 24 Nov 2026 (dono):
   // só tapetes = rugEstimate.homePrice (deslocação incluída); com outras peças = rugCombo.comboPrice.
   // Alcatifas também, por escalões da área (dono, 24 Nov 2026).
@@ -112,13 +112,13 @@ export function quoteBasket(city: string, items: BasketItem[]) {
   const missingRug = items.some(i => isRug(i.kind)) && rugAlone === null && !rugCombo;
   if (!missingRug && (rugAlone !== null || rugCombo)) {
     const othersSob = (r.lines ?? []).some((l, j) => l.quote && valid[j]?.kind !== 'rug' && valid[j]?.kind !== 'carpet');
-    if (!othersSob) return { total: rugAlone ?? rugCombo!.comboPrice!, travel: rugAlone !== null ? null : 0, sob: false, lines, gifts: r.visitGifts?.gifts ?? [], usual: r.visitGifts?.usual ?? null };
+    if (!othersSob) return { total: rugAlone ?? rugCombo!.comboPrice!, travel: rugAlone !== null ? null : 0, sob: false, lines, gifts: r.visitGifts?.gifts ?? [], usual: r.visitGifts?.usual ?? null, withoutGift: r.visitGifts?.withoutGift ?? null };
   }
   const sob = missingRug || !!r.quote;
   const known = sob ? lines.reduce<number>((s, v) => s + (v ?? 0), 0) + (r.travel ?? 0) : null;
   return { total: sob ? (known && known > 0 ? known : null) : (typeof r.total === 'number' ? r.total : null), travel: r.travel ?? null, sob, lines,
     // Escada A (dono, 24 Nov): várias peças = o total nunca desce, oferece-se um tratamento com o preço riscado.
-    gifts: !sob && r.visitGifts ? r.visitGifts.gifts : [], usual: !sob && r.visitGifts ? r.visitGifts.usual : null };
+    gifts: !sob && r.visitGifts ? r.visitGifts.gifts : [], usual: !sob && r.visitGifts ? r.visitGifts.usual : null, withoutGift: !sob && r.visitGifts ? r.visitGifts.withoutGift ?? null : null };
 }
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -187,7 +187,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       waterproofingTier: main.pack === 'essencial' ? 'essencial' : 'premium',
       serviceLabel: KIND_LABEL[main.kind], serviceTypeLabel: 'Cesto da visita', crmServiceLabel: [...new Set(items.map(i => KIND_LABEL[i.kind]))].join(' + '),
       detailsSummary: details, priceText,
-      message: `Pedido pelo site (${city.trim()}): ${details}. Total: ${priceText}${quote.usual !== null && quote.usual > (quote.total ?? 0) ? ` (em vez de ${formatEuro(quote.usual)})` : ''}, deslocação incluída.`,
+      message: `Pedido pelo site (${city.trim()}): ${details}. Total: ${priceText}${quote.usual !== null && quote.usual > (quote.total ?? 0) ? ` (em vez de ${formatEuro(quote.usual)})` : ''}, deslocação incluída${quote.withoutGift != null && quote.gifts.length ? `; ou ${formatEuro(quote.withoutGift)} sem o tratamento oferecido` : ''}.`,
       sofaItems: [], mattressItems: [], upsellItems: [], carpetItems: [], chairQuantity: '0', chairWaterproofQty: 0, chairAntiAcaros: false,
       calculateServicePrice: quote.total ?? 0, totalPrice: quote.total ?? 0, hasSobOrcamento: quote.sob, hasUpsellSobItem: false,
       finalTravelCost: quote.travel ?? 0, hypoallergenic: null, hypoSurcharge: 0, slotLabel: '',
@@ -316,7 +316,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         {quote.gifts.length > 0 && <ul className="mb-2 space-y-0.5 text-xs text-[#E8C964]">{groupGifts(quote.gifts).map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
         <div className="mb-2 flex items-baseline justify-between">
           <span className="text-sm text-white/70">Total, deslocação incluída</span>
-          <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">+ tapetes sob orçamento</span>}</span>
+          <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">+ tapetes sob orçamento</span>}{quote.withoutGift != null && quote.gifts.length > 0 && <span className="block text-xs text-white/60">ou {formatEuro(quote.withoutGift)} sem o tratamento oferecido</span>}</span>
         </div>
         {step === 'basket'
           ? <button type="button" disabled={!canContinue} onClick={() => setStep('contact')} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">Continuar</button>
