@@ -2385,7 +2385,7 @@ function toItem(raw, index) {
     if (seats >= 8) size = "4+-lugares";
     else {
       const look = r.look;
-      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares: ${SEAT6_LOOK_GUIDE}`);
+      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares (num U de 5 ou 6 também: a segunda chaise soma um lugar): ${SEAT6_LOOK_GUIDE}`);
       unitPrice = SEAT6_LOOK_PRICES[look];
     }
   }
@@ -2730,7 +2730,19 @@ function withEndIn9(input, r) {
   if (x.separatePrice) out.separatePrice = x.separatePrice.separate > 0 ? { ...x.separatePrice, total: up9(x.separatePrice.total), separate: up9(x.separatePrice.separate), saving: up9(x.separatePrice.separate) - up9(x.separatePrice.total) } : { ...x.separatePrice, total: up9(x.separatePrice.total) };
   return out;
 }
-function botQuote(input) {
+function uAsSeats(input) {
+  const items = input?.items;
+  if (!Array.isArray(items)) return input;
+  return { ...input, items: items.map((raw) => {
+    const r = raw ?? {};
+    if (r.kind !== "sofa" || r.size !== "u" || typeof r.seats !== "number" || !Number.isInteger(r.seats) || r.seats < 2 || r.seats > 15) return raw;
+    if (!["clean", "clean+premium", "clean+essencial", "premium", "essencial"].includes(String(r.treatment ?? "clean"))) return raw;
+    const seats = r.seats === 7 ? 7 : r.seats + 1;
+    return { ...r, size: seats <= 4 ? `${seats}-lugares` : "5-lugares", seats };
+  }) };
+}
+function botQuote(rawInput) {
+  const input = uAsSeats(rawInput);
   return withOneStruckPrice(input, withEndIn9(input, botQuoteChain(input)));
 }
 var MATTRESS_MITES_SEPARATE = 40;

@@ -120,7 +120,7 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
     if (seats >= 8) size = '4+-lugares';
     else {
       const look = r.look as keyof typeof SEAT6_LOOK_PRICES;
-      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares: ${SEAT6_LOOK_GUIDE}`);
+      if (!(look in SEAT6_LOOK_PRICES)) return fail(`items[${index}].look é obrigatório num sofá de 6 ou 7 lugares (num U de 5 ou 6 também: a segunda chaise soma um lugar): ${SEAT6_LOOK_GUIDE}`);
       unitPrice = SEAT6_LOOK_PRICES[look];
     }
   }
@@ -555,7 +555,25 @@ function withEndIn9<T>(input: unknown, r: T): T {
     : { ...x.separatePrice, total: up9(x.separatePrice.total) };
   return out as T;
 }
-export function botQuote(input: unknown) {
+/**
+ * U sofa / two chaises (owner, 24 Nov 2026, 4 lugares com duas chaises cotado como 4: "4 lugares com 2 chaise long é
+ * como se adicionasse mais um lugar"): the first chaise is inside the seats, the second adds one, so a U of N seats is
+ * priced as the N+1 seat sofa in every treatment. Bigger chaises (6 seats) come straight as 5-lugares + seats 6 + look.
+ * 7 seats stay 7 (8+ = owner). Replaces the fixed 179/129€ and +150/+90€ of a U. Anti-mites stay sob orçamento.
+ */
+function uAsSeats(input: unknown): unknown {
+  const items = (input as { items?: unknown } | null)?.items;
+  if (!Array.isArray(items)) return input;
+  return { ...(input as object), items: items.map(raw => {
+    const r = (raw ?? {}) as Record<string, unknown>;
+    if (r.kind !== 'sofa' || r.size !== 'u' || typeof r.seats !== 'number' || !Number.isInteger(r.seats) || r.seats < 2 || r.seats > 15) return raw;
+    if (!['clean', 'clean+premium', 'clean+essencial', 'premium', 'essencial'].includes(String(r.treatment ?? 'clean'))) return raw;
+    const seats = r.seats === 7 ? 7 : r.seats + 1;
+    return { ...r, size: seats <= 4 ? `${seats}-lugares` : '5-lugares', seats };
+  }) };
+}
+export function botQuote(rawInput: unknown) {
+  const input = uAsSeats(rawInput);
   return withOneStruckPrice(input, withEndIn9(input, botQuoteChain(input)));
 }
 

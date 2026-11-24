@@ -1260,3 +1260,9 @@ Dois ou mais sofás no pedido (a quantidade conta), limpos ou impermeabilizados:
 
 O dono: "o comercial não faz muito sentido o valor estar lá [...] o contacto tem que ser diretamente connosco". O widget de preços chegou a ser feito e saiu no mesmo dia. Contactos: WhatsApp, telefone e email (`BUSINESS_EMAIL`). Faixa "Quem confia em nós": só clientes ditos pelo dono (`COMMERCIAL_CLIENTS`), nunca os contactos comerciais da folha "Base de dados CS"; a avaliação da Lumière saiu. Botão de WhatsApp: "um botão universal de whatsapp no site, esse botão tem que ser o botão do hero".
 - **Escolheu outra empresa pelo preço (dono, 24 Nov 2026, Tânia):** "Optamos por uma empresa a metade do preço" e o bot perguntou "o que pesou mais, o valor ou outra coisa?". A pergunta de 14/10 (S49) fica só para quem não disse o motivo [RETIRADA 24/11 quando o motivo já foi dito]. Com o preço dito: "Percebo, [nome], metade do preço pesa. A proteção que lhe propuseram tem as mesmas garantias: até 10 anos e até 5 lavagens, como a nossa Premium?". Travão `LOST_ON_PRICE` em kyro-bot `lostDealIssues`; caso c85 do portão. O ramo da limpeza (extração e deslocação) e a 2.ª resposta são proposta nossa, por confirmar com o dono.
+
+## Sofá em U ou com duas chaises = lugares + 1 (dono, 24 Nov 2026)
+
+Cliente pediu impermeabilização de "4 lugares com duas chaise longues"; o bot deu 189/129€ (4 lugares) sem ver a fotografia e manteve depois de a ver. "Isto leva imenso impermeabilizante"; "contas o preço de 5, 4 lugares com 2 chaise long é como se adicionasse mais um lugar"; há outros com a chaise ainda maior que são "tipo 6", julgados pela fotografia. O preço já dado ficou.
+- Motor: `uAsSeats` em `botQuote.ts` troca `u` de N lugares pelo sofá de N+1 (7 fica 7; anti-ácaros continua sob orçamento). 6 lugares por chaises maiores = `5-lugares` + `seats` 6 + `look`.
+- [RETIRADA 24/11] U só impermeabilização 179/129€ e limpeza do U + 150/90€ (ficava abaixo de um 4 lugares).

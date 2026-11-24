@@ -11,17 +11,17 @@ const ok = (input: unknown) => {
 };
 
 describe('botQuote: the numbers the bot replies with come from the site engine', () => {
-  it('a U sofa is priced by the seats counted in the photo: up to 4 as 4 lugares, 5+ as 5+; waterproofing = cleaning + 150€ Premium / + 90€ Essencial; alone 179€ / 129€ with travel (25 Oct 2026)', () => {
-    const u = (seats: number, treatment = 'clean') => ok({ items: [{ kind: 'sofa', size: 'u', seats, treatment }], city: 'Porto' });
-    expect([u(4).subtotal, u(4).handToOwner]).toEqual([99, false]);
-    expect([u(5).subtotal, u(5).handToOwner]).toEqual([119, false]);
-    const p = u(5, 'clean+premium');
-    expect([p.total, p.handToOwner, p.waterproofingTiers]).toEqual([279, false, { travel: 10, premium: 279, essencial: 219 }]);
-    const a = u(6, 'premium');
-    expect([a.total, a.handToOwner, a.waterproofingTiers]).toEqual([179, false, { travel: 0, premium: 179, essencial: 129 }]);
-    expect(u(3, 'essencial').total).toBe(129);
+  it('a U sofa (two chaises) of N seats costs as the N+1 seat sofa in every treatment (owner, 24 Nov 2026)', () => {
+    const q = (item: Record<string, unknown>) => ok({ items: [{ kind: 'sofa', ...item }], city: 'Seixal' });
+    for (const treatment of ['clean', 'clean+premium', 'clean+essencial', 'premium', 'essencial']) {
+      expect(q({ size: 'u', seats: 2, treatment }).total).toBe(q({ size: '3-lugares', treatment }).total);
+      expect(q({ size: 'u', seats: 4, treatment }).total).toBe(q({ size: '5-lugares', seats: 5, treatment }).total);
+      expect(q({ size: 'u', seats: 5, look: 'grande', treatment }).total).toBe(q({ size: '5-lugares', seats: 6, look: 'grande', treatment }).total);
+    }
+    expect(q({ size: 'u', seats: 4, treatment: 'premium' })).toMatchObject({ total: 219, waterproofingTiers: { premium: 219, essencial: 159 } });
+    expect(q({ size: 'u', seats: 4, treatment: 'clean+premium' })).toMatchObject({ total: 309, waterproofingTiers: { premium: 309, essencial: 249 } });
+    expect(q({ size: 'u', seats: 7, look: 'grande' }).handToOwner).toBe(false);
     expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);
-    expect(ok({ items: [{ kind: 'sofa', size: 'u', seats: 6, look: 'grande', treatment: 'clean+premium' }], city: 'Porto' }).waterproofingTiers).toMatchObject({ premium: 299, essencial: 239 });
   });
   it('sofa 3 seats in Oeiras: 79€ + 10€ travel (reply 2.1)', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Oeiras' });
