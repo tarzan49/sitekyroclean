@@ -40,8 +40,8 @@ import capaImperCadeiras from '@/assets/quiz-videos-capas/imper-cadeiras.jpg';
 // instantâneo"; imper continua com o vídeo). Pares do site, metade antes e metade depois do mesmo ângulo.
 import baSofa from '@/assets/quiz-antes-depois/sofa.webp';
 // Cartões do material (dono, 25 Nov: "assim como é no que vamos impermeabilizar"): fotografias reais de serviços.
-import matTecido from '@/assets/quiz-materiais/sofa-tecido.webp';
-import matPele from '@/assets/quiz-materiais/sofa-pele.webp';
+import matTecido from '@/assets/widget-materiais/sofa-tecido.webp';
+import matPele from '@/assets/widget-materiais/sofa-pele.webp';
 import matJuta from '@/assets/quiz-materiais/tapete-juta.webp';
 import matComum from '@/assets/quiz-materiais/tapete-comum.webp';
 import baColchao from '@/assets/quiz-antes-depois/colchao.webp';
@@ -341,7 +341,7 @@ const CLIP: Record<BasketKind, string> = { sofa: sofaClip, mattress: mattressCli
 /** A imagem enquanto o vídeo carrega é um fotograma do próprio vídeo (dono, 25 Nov: "nos tapetes tem que ter um vídeo de
  *  limpeza de tapetes": via-se uma fotografia de catálogo), e o ponto do vídeo que fica sempre à vista. */
 const CLIP_POSTER: Record<string, string> = { [sofaClip]: capaSofa, [mattressClip]: capaColchao, [chairsClip]: capaCadeiras, [rugClip]: capaTapete, [carpetClip]: capaAlcatifa, [imperClip]: capaImper, [imperChairsClip]: capaImperCadeiras };
-const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 50%', [mattressClip]: '50% 60%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
+const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 40%', [mattressClip]: '50% 60%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
 function waterproofFrom(city: string): string {
   const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
   const v = r.ok ? r.lines?.[0]?.amount : null;
@@ -804,9 +804,10 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         </div>}
         {materials && material === null && <>
           <p className="mb-2 text-sm font-semibold text-white">{materials.ask}</p>
-          <div className="mb-4 grid grid-cols-2 gap-3">
+          {/* Sofá: 2 fotografias na horizontal, uma por linha; tapete: 2 na vertical (dono, 24 Nov). */}
+          <div className={`mb-4 grid gap-3 ${item.kind === 'sofa' ? 'grid-cols-1' : 'grid-cols-2'}`}>
             {materials.options.map(o => (
-              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className="relative h-40 overflow-hidden rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]">
+              <button key={o.m} type="button" aria-pressed={material === o.m} onClick={() => chooseMaterial(o.m)} className={`relative overflow-hidden ${item.kind === 'sofa' ? 'h-36' : 'h-40'} rounded-2xl border border-[#D4AF37]/50 text-left active:scale-[0.98]`}>
                 <img src={o.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
                 <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-black/65 px-3 py-2"><span className="text-base font-bold text-white">{o.label}</span><Plus className="h-5 w-5 shrink-0" style={{ color: GOLD }} strokeWidth={3} /></span>
               </button>
