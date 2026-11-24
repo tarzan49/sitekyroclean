@@ -17,6 +17,14 @@ import QuizFurnitureImage from './QuizFurnitureImage';
 import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
 import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
 import imperPhoto from '@/assets/picker-premium-sofa.webp';
+// Primeiro ecrã: vídeos reais da equipa a limpar em vez de fotografias (dono, 24 Nov: "vídeos de fundo a fazer a
+// limpeza, com opacidade mais alta, na horizontal"). Os mesmos da página inicial; o tapete é a máquina de extração.
+import sofaClip from '@/assets/sofa-processo/extracao.mp4';
+import mattressClip from '@/assets/colchoes-processo/extracao.mp4';
+import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
+import rugClip from '@/assets/tapete-processo/maquina.mp4';
+import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
+import imperClip from '@/assets/before-after-pool/imper-agua-01.mp4';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 import { Star } from 'lucide-react';
 import type { QuizOrder } from '@/lib/quizOrder';
@@ -143,13 +151,13 @@ function fromPrice(city: string, k: BasketKind): string {
 
 // Entrada do cesto (dono, 24 Nov: o questionário inteiro no formato novo): seis escolhas, cada uma com o "desde"
 // do motor, o mesmo dos heróis. Impermeabilização = sofá com a proteção (Protegido; o pack escolhe-se na folha).
-const ENTRY: { key: string; kind: BasketKind; label: string; photo: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
-  { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
-  { key: 'imper', kind: 'sofa', label: 'Impermeabilização', photo: imperPhoto, over: { pack: 'essencial' }, from: c => waterproofFrom(c) },
-  { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, from: c => fromPrice(c, 'mattress') },
-  { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
-  { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, from: c => fromPrice(c, 'rug') },
-  { key: 'carpet', kind: 'carpet', label: 'Alcatifa', photo: PHOTO.carpet, from: c => fromPrice(c, 'carpet') },
+const ENTRY: { key: string; kind: BasketKind; label: string; photo: string; clip: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
+  { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, clip: sofaClip, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
+  { key: 'imper', kind: 'sofa', label: 'Impermeabilização', photo: imperPhoto, clip: imperClip, over: { pack: 'essencial' }, from: c => waterproofFrom(c) },
+  { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, clip: mattressClip, from: c => fromPrice(c, 'mattress') },
+  { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, clip: chairsClip, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
+  { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, clip: rugClip, from: c => fromPrice(c, 'rug') },
+  { key: 'carpet', kind: 'carpet', label: 'Alcatifa', photo: PHOTO.carpet, clip: carpetClip, from: c => fromPrice(c, 'carpet') },
 ];
 function waterproofFrom(city: string): string {
   const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
@@ -279,8 +287,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <div className="grid grid-cols-2 gap-2">
                   {ENTRY.map(e => (
                     <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
-                      <img src={e.photo} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                      <span className="absolute inset-0 bg-gradient-to-t from-[#071a12] via-[#071a12]/55 to-[#071a12]/10" />
+                      <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      <span className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/25 to-transparent" />
                       <span className="absolute inset-x-2.5 bottom-2">
                         <span className="block text-[15px] font-bold leading-tight text-white">{e.label}</span>
                         <span className="block text-xs font-semibold text-[#D4AF37]">{e.from(city)}</span>
