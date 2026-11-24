@@ -2597,7 +2597,25 @@ function rugWaterproofingQuote(input) {
   };
 }
 function botQuote(input) {
-  return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
+  return withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input)))));
+}
+var MATTRESS_MITES_SEPARATE = 40;
+var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
+function withMattressMitePack(input, r) {
+  const none = { ...r, mattressMitePack: null };
+  const q = r;
+  const items = input?.items;
+  if (!q.ok || q.quote || q.handToOwner || typeof q.total !== "number" || !Array.isArray(items)) return none;
+  const isMite = (i) => {
+    const x = i ?? {};
+    return x.kind === "mattress" && x.treatment === "clean+anti-acaros";
+  };
+  const n = items.filter(isMite).reduce((s, i) => s + (Number(i.qty) || 1), 0);
+  if (!n) return none;
+  const clean = botQuote({ ...input, items: items.map((i) => isMite(i) ? { ...i, treatment: "clean" } : i) });
+  if (!clean.ok || clean.quote || typeof clean.total !== "number") return none;
+  const separate = clean.total + MATTRESS_MITES_SEPARATE * n;
+  return separate > q.total ? { ...r, mattressMitePack: { separate, total: q.total, perMattress: MATTRESS_MITES_SEPARATE, rule: MATTRESS_MITE_PACK_RULE } } : none;
 }
 function withSmallOrderFarSurcharge(input, r) {
   const none = { ...r, smallOrderSurcharge: null };
