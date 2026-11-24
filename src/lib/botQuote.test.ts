@@ -124,10 +124,10 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('prices chair waterproofing alone for any number of chairs (dono, 24 Nov 2026: by position, Premium 25/22,50/20€, Essencial 15/12,50/10€)', () => {
     const premium = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'premium' }], city: 'Póvoa de Varzim' });
-    // By position (dono, 24 Nov 2026): Premium 4 x 25 + 4 x 22,50 + 2 x 20 = 230, ending in 9.
-    expect([premium.travel, premium.total, premium.handToOwner]).toEqual([0, 229, false]);
+    // By position (dono, 24 Nov 2026): Premium 4 x 25 + 4 x 22,50 + 2 x 20 = 230 (waterproofing alone does not round).
+    expect([premium.travel, premium.total, premium.handToOwner]).toEqual([0, 230, false]);
     const essencial = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'essencial' }], city: 'Porto' });
-    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([149, 0, 149, false]);
+    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([150, 0, 150, false]);
     // Waterproofed-only chairs do not push the cleaned ones over a tier; the 4 cleaned chairs are also waterproofed, so 4 x (20 - 5) = 60€ (dono, 24 Nov 2026).
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
     expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([40, false]);
