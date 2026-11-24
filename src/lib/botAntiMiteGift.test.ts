@@ -13,8 +13,10 @@ describe('anti-ácaros oferecido num pedido grande (dono, 30/10/2026)', () => {
       { kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }, { kind: 'mattress', size: 'casal' }, { kind: 'mattress', size: 'casal' },
     ] }) as any;
     expect(q.bigOrder.normal).toBeGreaterThan(300);
-    expect(q.antiMiteGift).toBe(q.total - clean.total);
-    expect(q.bigOrder.special).toBe(clean.total);
+    // Com a escada A (24 Nov) o pedido só com limpeza pode subir ao 9 seguinte; a condição especial fica o preço de tabela.
+    expect(q.antiMiteGift).toBe(q.total - q.bigOrder.special);
+    expect(clean.total - q.bigOrder.special).toBeGreaterThanOrEqual(0);
+    expect(clean.total - q.bigOrder.special).toBeLessThan(10);
   });
   it('sem anti-ácaros fica a condição de sempre', () => {
     const q = botQuote({ city: 'Porto', items: Array(4).fill({ kind: 'sofa', size: '3-lugares' }) }) as any;
@@ -28,7 +30,8 @@ describe('anti-ácaros no colchão oferecido a partir de 150€ (dono, 19/11/202
     const q = botQuote({ city: 'Porto', items }) as any;
     const mites = botQuote({ city: 'Porto', items: [items[0], { ...items[1], treatment: 'clean+anti-acaros' }] }) as any;
     expect(q.total).toBeGreaterThanOrEqual(150);
-    expect(q.mattressMiteOffer).toEqual({ normal: mites.total - q.total, total: q.total });
+    expect(q.mattressMiteOffer).toEqual({ normal: 20, total: q.total });
+    expect(q.total % 10).toBe(9);
     expect(mites.mattressMiteOffer).toEqual(q.mattressMiteOffer);
     expect(q.askedDiscount).toBeNull();
   });
