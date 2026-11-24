@@ -1239,6 +1239,6 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 - **`/obrigado-pelo-servico`:** `?nome=&cidade=&servico=` (sofa, colchao, tapete, cadeiras, alcatifa, impermeabilizacao) e `&zona=lisboa` para localidades fora da lista. A ficha do Google sai da cidade (`src/data/reviewLink.ts`): zona de Lisboa = ficha de Lisboa, o resto = Porto.
 - **Blog:** uma fotografia real por guia em `src/assets/blog/<slug>.webp` e a legenda em `blogImages.ts`; nada gerado por IA. O par `sofa-13` fica fora dos artigos: o "antes" tem a marca do Gemini.
 
-## Teto de 20% sem oferta: o total mantém a soma (dono, 25 Nov 2026)
+## Teto de 20% sem oferta: `[RETIRADA 25/11]` o total mantém a soma
 
-- Pergunta: sem oferta, o total mantém-se na soma das peças sozinhas? "Sim, mantém a soma". Quando o teto de 20% tira a oferta, o total continua a ser pelo menos a soma das peças sozinhas, ao 9 seguinte, sem riscado (3L + 3L 179€, 3L + 2L 169€, 2L + 2L 159€, 4L + 4L 219€, 3L + tapete sintético 2×3 159€ em Lisboa; de 25/11 até esta correção saíram a menos cerca de 20€). Só estes: pedidos que não têm nada para oferecer (só tapetes, impermeabilizações, etc.) ficam como estavam. `capped` em `withVisitGifts`.
+- "Sim, mantém a soma" (dono, a esta pergunta) esteve só na master (6861d75c), nunca foi publicado: o dono, depois de ver a tabela 159/179, respondeu na sessão SEO "159€", depois "Vou fazer 149 para esse caso." e "149 em vez de 179." (2 sofás de 3 lugares, só limpeza, Lisboa). O código voltou ao que estava (3L + 3L 159€); o 149€ e os outros pares estão por decidir.

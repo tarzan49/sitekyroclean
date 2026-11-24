@@ -45,8 +45,8 @@ describe('sofás e colchões com quantidade: linha = motor com a quantidade real
     if (!q.gifts.length && m.separatePrice) expect(struck).toBe(m.separatePrice.separate);
     // Com oferta: nunca acima de cada uma sozinha, nem acima do que o motor diz.
     if (q.gifts.length) { expect(struck).toBeLessThanOrEqual(each + 0.001); if (m.separatePrice) expect(struck).toBeLessThanOrEqual(m.separatePrice.separate); }
-    // Sem oferta, nunca abaixo do preço (um riscado abaixo do preço esconde a poupança). Tolerância do arredondamento ao 9 (3 × 3L: 267 → 269; dono, 25 Nov: "Sim, mantém a soma").
-    if (!q.gifts.length) expect(struck).toBeGreaterThanOrEqual(q.total! - 9);
+    // Sem oferta, nunca abaixo do preço (um riscado abaixo do preço esconde a poupança). Tolerância de 1€ dos totais em 9.
+    if (!q.gifts.length) expect(struck).toBeGreaterThanOrEqual(q.total! - 1);
   });
   it('uma peça só: o riscado do pack é o separatePrice do motor', () => {
     for (const size of ['2-lugares', '3-lugares', '4-lugares', '5-lugares']) for (const pack of ['premium', 'essencial'] as const) {

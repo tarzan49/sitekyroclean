@@ -158,15 +158,3 @@ describe('riscado das cadeiras (dono, 25 Nov 2026: "Sim, limita")', () => {
     }
   });
 });
-
-describe('teto de 20% sem oferta (dono, 25 Nov 2026: "Sim, mantém a soma")', () => {
-  it.each([['3-lugares', '3-lugares', 179], ['3-lugares', '2-lugares', 169], ['2-lugares', '2-lugares', 159], ['4-lugares', '4-lugares', 219]])('%s + %s = a soma das peças sozinhas, ao 9 (%i), sem oferta', (a, b, total) => {
-    const r = q('Lisboa', [sofa(a, 'clean'), sofa(b, 'clean')]);
-    expect([r.total, r.visitGifts]).toEqual([total, null]);
-    expect(r.total).toBeGreaterThanOrEqual(q('Lisboa', [sofa(a, 'clean')]).total + q('Lisboa', [sofa(b, 'clean')]).total);
-  });
-  it('com tapete também (3L + tapete sintético 2×3 = 159); só tapetes ficam como estavam', () => {
-    expect(q('Lisboa', [sofa('3-lugares', 'clean'), rug(2, 3, { material: 'sintetico' })]).rugCombo.comboPrice).toBe(159);
-    expect(q('Lisboa', [rug(2, 3), rug(2, 3)]).visitGifts ?? null).toBeNull();
-  });
-});

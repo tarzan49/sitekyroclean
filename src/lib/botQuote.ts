@@ -787,7 +787,6 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const asAskedPrice = price(rawIn);
   const giftCap = cents(VISIT_GIFTS_MAX_SHARE * (asAskedPrice ?? baseTotal));
   let giftUsed = 0;
-  let capped = false;
   const gifted = new Map<number, VisitGift>();
   let withGifts = base.slice();
   let usualBase = baseTotal;
@@ -803,7 +802,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
       const mattresses = c.piece === 'mattress' ? Number(rec(i).qty) || 1 : 0;
       const gift: VisitGift = { piece: c.piece, treatment: c.treatment, normal: c.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - usualBase) };
       // The mattress anti-mites stays out of the cap (owner, 25 Nov 2026: "colchão fora do teto").
-      if (c.piece !== 'mattress' && giftUsed + gift.normal > giftCap + 1e-9) { capped = true; continue; }
+      if (c.piece !== 'mattress' && giftUsed + gift.normal > giftCap + 1e-9) continue;
       // The mattress goes first (owner's ladder), then the cheapest treatment left.
       const better = !best || (c.piece === 'mattress') !== (best.gift.piece === 'mattress') ? !best || c.piece === 'mattress' : gift.normal !== best.gift.normal ? gift.normal < best.gift.normal : keyOf(n) < keyOf(best.n);
       if (better) best = { n, gift, items, priced };
@@ -814,9 +813,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     withGifts = best.items;
     usualBase = best.priced;
   }
-  // The 20% cap left the order with no gift: the total still never falls under the pieces alone, as with the gift
-  // (owner, 25 Nov 2026: "Sim, mantém a soma"; 3L + 3L = 179, not 159). Orders with nothing to offer keep their price.
-  if (!gifted.size && !capped) return none;
+  if (!gifted.size) return none;
   // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
   const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
   const total = price(restore(base));
@@ -867,7 +864,6 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) { out.bigOrder = null; out.antiMiteGift = null; }
   const m = gifts.find(g => g.piece === 'mattress');
-  if (!gifts.length) return { ...(out as T), visitGifts: null, mattressMiteOffer: null };
   return { ...(out as T), visitGifts: { gifts, usual, total: final, tiers, withoutGift: up9(total) < final ? up9(total) : null, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
