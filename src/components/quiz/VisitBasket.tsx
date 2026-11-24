@@ -414,8 +414,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                 <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} aria-label={`Juntar ${e.label}`} className={`group relative h-[116px] overflow-hidden rounded-2xl border text-left active:scale-[0.98] ${promo ? 'border-[#D4AF37]/70' : 'border-white/15'}`}>
                   <video src={e.clip} poster={e.photo} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
                   {/* O gancho (dono, 25 Nov): a oferta em destaque, em cima, com o presente e o valor. */}
-                  {promo && <span className="absolute left-1.5 top-1.5 flex items-center gap-1 overflow-hidden rounded-lg bg-[#D4AF37] px-1.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-wide text-[#0B2F2A] shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]">
-                    <Gift className="h-3.5 w-3.5" strokeWidth={2.5} />{promo.kind === 'save' ? 'Poupa' : 'Oferta'} {formatEuro(promo.value)}
+                  {promo && <span className={`absolute left-1.5 top-1.5 flex max-w-[calc(100%-12px)] items-center overflow-hidden whitespace-nowrap rounded-lg bg-[#D4AF37] px-1.5 py-1 font-extrabold uppercase leading-none text-[#0B2F2A] ${promo.value >= 100 ? 'gap-0.5 text-[9.5px] tracking-tight' : 'gap-1 text-[11px] tracking-wide'} shadow-[0_4px_14px_-4px_rgba(0,0,0,0.6)]`}>
+                    <Gift className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} />{promo.kind === 'save' ? 'Poupa' : 'Oferta'} {formatEuro(promo.value)}
                     <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/45 to-transparent motion-reduce:hidden" style={{ animation: 'shimmer 3.2s ease-in-out infinite' }} />
                   </span>}
                   {/* Vidro neutro só atrás do texto, com o vídeo a ver-se através (dono, 25 Nov: "não tornas verde"). */}
