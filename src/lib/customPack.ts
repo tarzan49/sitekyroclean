@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcSofaUnitPrice, calcMattressUnitPrice } from '../components/quiz/quizHelpers';
-import { chairWaterproofTotal, endIn9Down, chairCleanTotal, CHAIR_CLEAN_WATERPROOF_FACTOR } from '../constants/chairPricing';
+import { chairWaterproofTotal, endIn9Down, endIn9Up, chairCleanTotal, CHAIR_CLEAN_WATERPROOF_FACTOR } from '../constants/chairPricing';
 import { chairAntiAcarosTotal } from '../constants/antiAcarosPricing';
 import { locationPrices, calculateTravelFee } from '../constants/travel';
 import { priceWithPackPerks, type PerkTreatment } from '../constants/packPerks';
@@ -42,6 +42,8 @@ export function customPackLine(item: CustomPackItem, chairsBefore = 0) {
   const waterproofingOnly = item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial') && (item.kind === 'sofa' || item.kind === 'chairs');
   if (waterproofingOnly && item.kind === 'chairs') {
     amount = item.seatOnly ? chairWaterproofTotal(item.qty, item.extra === 'premium' ? 'premium' : 'essencial', true) : (item.extra === 'premium' ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    // Impermeabilização sozinha: acaba em 9, para cima (dono, 24 Nov 2026: "Sim, acaba em 9 [...] é na vida real").
+    if (amount !== null && !item.seatOnly) amount = endIn9Up(amount);
   } else if (waterproofingOnly && item.waterproofingFixed) {
     // Bot only: a corner sofa is waterproofed as a 5-seat sofa (owner, 20 Nov 2026), fixed price per sofa.
     amount = item.waterproofingFixed[item.extra === 'premium' ? 'premium' : 'essencial'] * item.qty;
@@ -117,6 +119,13 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
       table[n] = { ...line, amount, ...('tablePrice' in line && typeof line.tablePrice === 'number' ? { tablePrice: amount } : {}) };
     });
     const wpRow = wpRows[0];
+    // Covering cleaned chairs, the waterproofing row is part of one pack: start from its exact price (not the
+    // alone-price rounded up to 9), then the pack rounds to the nearest 9 below.
+    if (covered > 0) for (const n of wpRows) {
+      const it = items[n];
+      const exact = chairWaterproofTotal(it.qty, it.extra === 'premium' ? 'premium' : 'essencial', !!it.seatOnly);
+      if (exact !== null && table[n].amount != null) table[n] = { ...table[n], amount: exact, ...('tablePrice' in table[n] && typeof table[n].tablePrice === 'number' ? { tablePrice: exact } : {}) };
+    }
     const sum = table.filter((_, n) => items[n].kind === 'chairs').reduce((s2, l) => s2 + (l.amount ?? 0), 0);
     const diff = sum - endIn9Down(sum);
     // Waterproofing alone (no cleaned chairs it covers) keeps its exact price.
