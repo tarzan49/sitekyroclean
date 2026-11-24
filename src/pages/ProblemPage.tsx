@@ -46,7 +46,7 @@ const ProblemPage = () => {
   const data = useMemo(() => (slug ? getProblemBySlug(slug) : null), [slug]);
   // Modelo novo nas páginas de problema nacionais de sofás, tapetes e alcatifas (dono, 24 Nov).
   const svc = data?.relatedServices[0];
-  const fresh = svc === 'limpeza-sofas' || svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas' || svc === 'limpeza-colchoes';
+  const fresh = svc === 'limpeza-sofas' || svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas' || svc === 'limpeza-colchoes' || svc === 'impermeabilizacao' || svc === 'limpeza-cadeiras';
   useSnapSections(fresh);
   const relatedService = useMemo(
     () => (data ? services.find(s => s.slug === data.relatedServices[0]) : undefined),
@@ -120,9 +120,9 @@ const ProblemPage = () => {
 
         {svc === 'limpeza-sofas'
           ? <SofaProcessGuide key={`process-${slug}`} real steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
-          : svc === 'limpeza-colchoes'
-          ? <ChairProcessStory key={`process-${slug}`} service="limpeza-colchoes" cityPrep="em" steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
-          : svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas'
+          : svc === 'limpeza-colchoes' || svc === 'limpeza-cadeiras'
+          ? <ChairProcessStory key={`process-${slug}`} service={svc} cityPrep="em" steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+          : svc === 'limpeza-tapetes' || svc === 'limpeza-alcatifas' || svc === 'impermeabilizacao'
           ? <ServiceProcessStory key={`process-${slug}`} service={svc} steps={layout.processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : <ProblemTreatmentGuide key={`process-${slug}`} guide={layout.processGuide} slug={data.slug} />}
 

@@ -1,3 +1,4 @@
+import ImperPricePicker from "@/components/ImperPricePicker";
 import ProblemExamplesGallery from "@/components/ProblemExamplesGallery";
 import ProblemTreatmentGuide from "@/components/ProblemTreatmentGuide";
 import { getProblemLayout } from "@/data/problemLayout";
@@ -53,7 +54,8 @@ const ProblemCityPage = () => {
   const carpet = problem?.relatedServices[0] === 'limpeza-alcatifas';
   // Cadeiras e colchões também (packs-tratamento, dono 24 Nov): widget com o cesto e passo a passo real.
   const mine = ['limpeza-cadeiras', 'limpeza-colchoes'].includes(problem?.relatedServices[0] ?? '');
-  const fresh = sofa || rug || carpet || mine; // modelo novo: sofás, tapetes, alcatifas, cadeiras e colchões (dono, 24 Nov)
+  const imper = problem?.relatedServices[0] === 'impermeabilizacao'; // impermeabilização (dono, 25 Nov)
+  const fresh = sofa || rug || carpet || mine || imper; // modelo novo: sofás, tapetes, alcatifas, cadeiras e colchões (dono, 24 Nov)
   useSnapSections(fresh);
   const city = useMemo(() => routeData ? cities.find(c => c.slug === routeData.citySlug) : null, [routeData]);
 
@@ -133,7 +135,7 @@ const ProblemCityPage = () => {
         {fresh ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{prep} {city.name}</em></h2>
-            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{carpet ? <CarpetPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : rug ? <RugPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : mine ? <ServicePricePicker service={problem.relatedServices[0] as PickerService} city={city.name} source={`problem_picker_${problem.slug}`} /> : <SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} />}</div>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6">{imper ? <ImperPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : carpet ? <CarpetPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : rug ? <RugPricePicker city={city.name} source={`problem_picker_${problem.slug}`} /> : mine ? <ServicePricePicker service={problem.relatedServices[0] as PickerService} city={city.name} source={`problem_picker_${problem.slug}`} /> : <SofaPricePicker city={city.name} source={`problem_picker_${problem.slug}`} />}</div>
           </div>
         </section> : <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />}
 
@@ -152,8 +154,8 @@ const ProblemCityPage = () => {
 
         <ProblemExamplesGallery key={`examples-${problem.slug}`} problem={problem} />
 
-        {rug || carpet
-          ? <ServiceProcessStory key={problem.slug} service={carpet ? 'limpeza-alcatifas' : 'limpeza-tapetes'} steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
+        {rug || carpet || imper
+          ? <ServiceProcessStory key={problem.slug} service={imper ? 'impermeabilizacao' : carpet ? 'limpeza-alcatifas' : 'limpeza-tapetes'} steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : sofa
           ? <SofaProcessGuide key={problem.slug} real steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />
           : mine ? <ChairProcessStory key={problem.slug} service={problem.relatedServices[0] as 'limpeza-cadeiras' | 'limpeza-colchoes'} cityPrep={prep} steps={getProblemLayout(problem).processGuide.steps.map(s => ({ label: s.label, description: s.description }))} heading={{ text: 'Como tratamos este', gold: 'problema' }} />

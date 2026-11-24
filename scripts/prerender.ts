@@ -715,7 +715,7 @@ export function prerenderRoutes(outDir: string): number {
     for (const p of getAllProblems()) {
       const layout = getProblemLayout(p);
       // Modelo novo (dono, 24 Nov): sofás, tapetes e alcatifas mostram 6 perguntas; o HTML diz o mesmo.
-      const hubFaqs = ['limpeza-sofas', 'limpeza-tapetes', 'limpeza-alcatifas', 'limpeza-colchoes'].includes(p.relatedServices[0]) ? layout.faqs.slice(0, 6) : layout.faqs;
+      const hubFaqs = ['limpeza-sofas', 'limpeza-tapetes', 'limpeza-alcatifas', 'limpeza-colchoes', 'impermeabilizacao', 'limpeza-cadeiras'].includes(p.relatedServices[0]) ? layout.faqs.slice(0, 6) : layout.faqs;
       const hero = getProblemHero(p);
       emit(
         `/problemas/${p.slug}`,

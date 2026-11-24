@@ -25,7 +25,7 @@ Inventário (dist, 24 Nov: 21 797 páginas):
 | Recursos de texto: /perguntas-frequentes-limpeza-estofos, /glossario, /estudo | — | — | — | FEITO (24 Nov): topo novo (ResourceHubHero, também no índice do blog) + widget de preço no fim (ResourcePriceSection), texto corrido sem encaixe |
 | Artigos do blog | — | — | — | FEITO (24 Nov): topo (CommercialHero) + ResourcePriceSection do serviço do artigo no fim |
 | /sobre, /areas-de-servico | — | — | — | FEITO (24 Nov): secções de ecrã inteiro com encaixe |
-| /problemas/* (nacionais) | — | — | — | sofás, tapetes, alcatifas e colchões FEITO (24–25 Nov); outros (pelos de animais, urina genérica, impermeabilização) por fazer |
+| /problemas/* (nacionais) e por cidade | — | — | — | todos os serviços FEITO (25 Nov): sofás, tapetes, alcatifas, colchões, cadeiras, impermeabilização |
 | /en/* (turistas) | — | — | — | FEITO (24 Nov): encaixe, situações a deslizar, 4 perguntas; o guia longo /en/airbnb-portugal-cleaning-guide fica como artigo |
 
 A verificar: 11 páginas saem do prerender com o molde `NotFound` (ex.: `blog.html`, `perguntas-frequentes-limpeza-estofos.html`).
