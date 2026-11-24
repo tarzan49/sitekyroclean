@@ -1227,6 +1227,7 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 - [RETIRADA 25/11] "O questionário nunca pergunta o material" (dono, 11 Out, "não compliques o questionário"; ainda citada no comentário de `botRugEstimate.ts`).
 - **Cadeiras**: 2, 4, 6, 8, 10, 12 ou "Outro número" (até 100, o máximo do motor).
 - O menu de cada peça cabe inteiro em 375×667, sem textos cortados.
+- **Nenhum "Poupa" acima do que o total mostra** (25 Nov, depois de o riscado das cadeiras e o "~~89€~~ 79€" terem estado errados no ar): com outras peças a janela mostra o que o total sobe (`optionPrice`, margem de 1€), o riscado do total é só do motor (`usual` ou `separatePrice`) e a frase "Se juntar X, poupa Y" só promete o mínimo garantido para qualquer tamanho (`joinSaving`). Tudo coberto por `VisitBasket.prices.test.tsx`.
 
 ## Riscado das cadeiras limitado ao preço em separado (dono, 25 Nov 2026)
 

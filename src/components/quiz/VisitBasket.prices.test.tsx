@@ -2,7 +2,7 @@
 // cadeira e chegou a estar no ar, 6 cadeiras de imper 234€ riscado em vez de 159€).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from '@/lib/botQuote';
-import { aloneTotal, cityKnown, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
+import { aloneTotal, cityKnown, joinSaving, newItem, optionPrice, quoteBasket, struckOf, type BasketItem } from './VisitBasket';
 
 const motor = (items: object[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; chairsWas: number | null; separatePrice: { separate: number } | null };
 const chairs = (qty: number, pack: BasketItem['pack'], imperOnly = false) => newItem('chairs', { qty, pack, imperOnly });
@@ -104,4 +104,20 @@ describe('janela da peça: o preço e o "Poupa" são os que o total mostra', () 
       if (struck !== null) expect(struck - shown!, `${where}: poupa`).toBeLessThanOrEqual(sep - rise + 1);
     }
   }, 60_000);
+});
+
+describe('"Se juntar X, poupa Y": nunca mais do que o total mostra, para qualquer tamanho', () => {
+  const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
+  const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
+  const saving = (b: BasketItem[]) => { const q = quoteBasket('Lisboa', b); return q.usual !== null && q.total !== null ? q.usual - q.total : 0; };
+  const baskets: Record<string, BasketItem[]> = { 'colchão': [M()], 'colchão AA': [M({ pack: 'premium' })], '3L': [S('3-lugares')], '3L Blindado': [S('3-lugares', { pack: 'premium' })], '3L pele': [S('3-lugares', { leather: true })], '6 cadeiras': [chairs(6, 'none')], '3L + 2L': [S('3-lugares'), S('2-lugares')], '3L + colchão': [S('3-lugares'), M()], 'tapete': [newItem('rug', { width: '2', length: '3', rugMaterial: 'sintético ou lã' })] };
+  const joins: [Parameters<typeof joinSaving>[2], BasketItem][] = [
+    ...['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].map(z => ['sofa', S(z)] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...['solteiro', 'casal', 'king'].map(size => ['mattress', M({ size })] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...[1, 2, 3, 4, 6, 8, 12].map(n => ['chairs', chairs(n, 'none')] as [Parameters<typeof joinSaving>[2], BasketItem]),
+    ...[['1,2', '1,7'], ['1,6', '2,3'], ['2,5', '3,5']].map(([width, length]) => ['rug', newItem('rug', { width, length, rugMaterial: 'juta ou sisal' })] as [Parameters<typeof joinSaving>[2], BasketItem]),
+  ];
+  for (const [bn, b] of Object.entries(baskets)) it(bn, () => {
+    for (const [kind, x] of joins) { const said = joinSaving('Lisboa', b, kind); if (said > 0) expect(saving([...b, x]) - saving(b), `${bn} + ${kind} ${x.size ?? x.qty}: diz ${said}`).toBeGreaterThanOrEqual(said - 1); }
+  });
 });

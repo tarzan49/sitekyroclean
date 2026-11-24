@@ -208,6 +208,21 @@ function promoOf(city: string, items: BasketItem[], e: { key: string; kind: Bask
   const what = /pele/.test(g.text) ? '+ tratamento da pele oferecido' : /anti-odor/.test(g.text) ? '+ anti-odor oferecido' : '+ anti-ácaros oferecido';
   return { kind: 'gift', value: g.value, what };
 }
+/** "Se juntar X, poupa Y": só o que se confirma no total para qualquer tamanho da peça (o mínimo), pelo motor. */
+const JOIN_VARIANTS: Record<BasketKind, Partial<BasketItem>[]> = {
+  sofa: ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares'].map(size => ({ size, pack: 'none' as const })),
+  mattress: ['solteiro', 'casal', 'king'].map(size => ({ size, pack: 'none' as const })),
+  chairs: [1, 2, 4, 6, 12].map(qty => ({ qty, pack: 'none' as const })),
+  rug: [['1,2', '1,7'], ['2', '3'], ['2,5', '3,5']].flatMap(([width, length]) => ['sintético ou lã', 'juta ou sisal'].map(rugMaterial => ({ width, length, rugMaterial }))),
+  carpet: [['3', '4'], ['4', '6'], ['6', '8']].map(([width, length]) => ({ width, length })),
+};
+const savingOf = (q: { usual: number | null; total: number | null }) => (q.usual !== null && q.total !== null ? q.usual - q.total : 0);
+export function joinSaving(city: string, items: BasketItem[], kind: BasketKind): number {
+  const before = savingOf(quoteBasket(city, items));
+  let min = Infinity;
+  for (const v of JOIN_VARIANTS[kind]) { min = Math.min(min, savingOf(quoteBasket(city, [...items, newItem(kind, v)])) - before); if (min < 5) return 0; }
+  return Number.isFinite(min) ? Math.round(min * 100) / 100 : 0;
+}
 const JOIN_NAME: Record<string, string> = { sofa: 'um sofá', imper: 'a impermeabilização', mattress: 'um colchão', chairs: 'cadeiras', rug: 'um tapete', carpet: 'uma alcatifa' };
 /** A peça pedida sozinha com cada serviço em separado (separatePrice.separate do motor). */
 function separateOf(city: string, it: BasketItem | BasketItem[]): number | null {
@@ -374,6 +389,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
   const cityNames = useMemo(() => listBotCities().map(c => c.name), []);
   const quote = useMemo(() => quoteBasket(city, items), [city, items]);
+  const bestJoin = useMemo(() => (!items.length || !cityKnown(city) ? null : (['mattress', 'sofa', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(kind => ({ kind, value: joinSaving(city, items, kind) })).filter(x => x.value >= 5).sort((a, b) => b.value - a.value)[0] ?? null), [city, items]);
   const { isSubmitting, submit } = useQuizSubmission({ trackSubmission: () => {}, resetForm: () => {}, onClose: leave, navigate });
 
   if (!isOpen) return null;
@@ -461,7 +477,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             {items.length === 0 ? (
               <>
                 <h2 className="type-section-title font-playfair mb-2 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>limpar?</em></h2>
-                <p className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />2 peças ou mais: um tratamento oferecido</p>
+                <p className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Quanto mais junta, mais poupa</p>
                 <label className="mb-3 flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-3">
               <span className="text-xs font-semibold text-white/60">Localidade</span>
               <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Onde é o serviço?" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
@@ -511,8 +527,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
             <p className="mb-1 text-base font-semibold text-white">Quanto mais junta, mais <span style={{ color: GOLD }}>poupa</span></p>
             {(() => {
               // "Se juntar X, poupa Y" (dono, 25 Nov): a peça que mais dá, pelo motor; sem nenhuma, a frase geral.
-              const best = ENTRY.map(e => ({ e, p: promoOf(city, items, e) })).filter(x => x.p).sort((x, y) => y.p!.value - x.p!.value)[0];
-              return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{best ? <>Se juntar {JOIN_NAME[best.e.key]}, poupa {formatEuro(best.p!.value)}</> : 'Cada peça a mais traz um tratamento oferecido'}</p>;
+              return <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />{bestJoin ? <>Se juntar {JOIN_NAME[bestJoin.kind]}, poupa {formatEuro(bestJoin.value)}</> : 'Uma só visita para tudo'}</p>;
             })()}
             <div className="grid grid-cols-2 gap-2">
               {ENTRY.map(e => {
