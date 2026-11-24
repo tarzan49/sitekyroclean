@@ -1,6 +1,7 @@
 // Auditoria de 24 Nov 2026 a 12 136 pedidos: um teste por erro corrigido no motor.
 import { describe, expect, it } from 'vitest';
-import { botQuote } from './botQuote';
+import { botQuote, chairPackStruck } from './botQuote';
+import { chairPackWas } from '../constants/chairPricing';
 
 type Q = Record<string, any>;
 const q = (city: string, items: unknown[]): Q => botQuote({ city, items }) as Q;
@@ -105,9 +106,9 @@ describe('auditoria, 2.ª passagem (24 Nov 2026)', () => {
     expect(paid(q('Funchal', [chairs(4, 'clean+essencial'), chairs(6, 'clean+essencial')]))).toBeGreaterThanOrEqual(paid(q('Funchal', [chairs(4, 'clean'), chairs(6, 'clean+essencial')])));
     expect(paid(q('Faro', [chairs(4, 'clean+essencial'), rug(3, 4)]))).toBeGreaterThanOrEqual(paid(q('Faro', [chairs(4, 'clean'), rug(3, 4)])));
   });
-  it('o riscado da oferta fica sempre acima do total', () => {
-    const v = q('Coimbra', [chairs(1, 'clean+anti-acaros'), chairs(12, 'clean+anti-acaros')]).visitGifts;
-    if (v) expect(v.usual).toBeGreaterThan(v.total);
+  it('quando a oferta se perde no arredondamento ao 9 não há riscado (nunca um +10 inventado)', () => {
+    const r = q('Coimbra', [chairs(1, 'clean+anti-acaros'), chairs(12, 'clean+anti-acaros')]);
+    expect([r.visitGifts.usual, r.visitGifts.total, r.separatePrice]).toEqual([279, 279, null]);
   });
 });
 
@@ -127,6 +128,33 @@ describe('sofás de pele: o riscado não conta o tratamento duas vezes (25 Nov 2
     for (const items of [[L(size, n)], Array.from({ length: n }, () => L(size))]) {
       const r = q('Lisboa', items);
       expect([r.visitGifts.usual, r.separatePrice.separate, r.separatePrice.saving]).toEqual([usual, usual, usual - r.total]);
+    }
+  });
+});
+
+describe('riscado das cadeiras (dono, 25 Nov 2026: "Sim, limita")', () => {
+  it('1 a 100 cadeiras: nunca acima da limpeza + impermeabilização em separado, e o preço não muda', () => {
+    for (const city of ['Lisboa', 'Figueira da Foz', 'Cascais']) for (let n = 1; n <= 100; n++) {
+      const clean = q(city, [chairs(n, 'clean')]).total;
+      for (const t of ['premium', 'essencial'] as const) {
+        const max = clean + q(city, [chairs(n, t)]).total;
+        const was = chairPackStruck(n, t, city)!;
+        expect(was).toBe(Math.min(chairPackWas(n, t), max));
+        const r = q(city, [chairs(n, `clean+${t}`)]);
+        if (r.chairsWas !== null) expect([r.chairsWas, r.chairsWas > r.total]).toEqual([was, true]);
+      }
+    }
+    expect([q('Lisboa', [chairs(12, 'clean+premium')]).total, q('Lisboa', [chairs(12, 'clean+premium')]).chairsWas]).toEqual([359, 459]);
+    expect(q('Lisboa', [chairs(100, 'clean+premium')]).chairsWas).toBe(3099);
+  });
+  it('duas linhas de cadeiras: o riscado é as duas sozinhas + a oferta, ao 9, e nunca um valor inventado', () => {
+    const r = q('Lisboa', [chairs(1, 'clean'), chairs(1, 'clean')]);
+    expect([r.total, r.visitGifts.usual, r.separatePrice]).toEqual([69, 69, null]);
+    for (const city of ['Lisboa', 'Coimbra']) for (let a = 1; a <= 14; a++) for (let b = 1; b <= 14; b++) for (const [s, t] of [['clean', 'clean'], ['clean', 'clean+anti-acaros'], ['clean+anti-acaros', 'clean+anti-acaros']]) {
+      const x = q(city, [chairs(a, s), chairs(b, t)]);
+      if (!x.visitGifts || x.visitGifts.usual <= x.visitGifts.total) continue;
+      const sum = q(city, [chairs(a, s)]).total + q(city, [chairs(b, t)]).total + x.visitGifts.gifts.reduce((n: number, g: Q) => n + g.normal, 0);
+      expect(x.visitGifts.usual).toBeLessThan(sum + 10);
     }
   });
 });

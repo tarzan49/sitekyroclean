@@ -15,9 +15,8 @@ import essencialSofa from '@/assets/picker-essencial-sofa.webp';
 import premiumChair from '@/assets/picker-premium-cadeira.webp';
 import essencialChair from '@/assets/picker-essencial-cadeira.webp';
 import { type PackExtra } from '@/lib/customPack';
-import { botQuote } from '@/lib/botQuote';
+import { botQuote, chairPackStruck } from '@/lib/botQuote';
 import { WHATSAPP_BASE } from '@/constants/business';
-import { chairPackWas } from '@/constants/chairPricing';
 import { formatEuro } from '@/data/enginePrices';
 import SofaCounters from '@/components/SofaCounters';
 
@@ -78,8 +77,8 @@ export default function WaterproofPackPicker({ kind, city, source, onMore, compa
   // É a única comparação permitida (pack contra separado; regra do dono, 19 Nov).
   const separate = useMemo(() => {
     if (kind === 'sofa' && (size === PHOTO_SIZE || noSofa)) return {} as Record<string, number | null>;
-    // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026: "em vez de 39 × 12, paga 359").
-    if (kind === 'chairs') return { premium: chairPackWas(qty, 'premium'), essencial: chairPackWas(qty, 'essencial') } as Record<string, number | null>;
+    // Cadeiras: o riscado é o preço de 1 cadeira × a quantidade (dono, 24 Nov 2026), nunca acima da limpeza + impermeabilização em separado (dono, 25 Nov: "Sim, limita").
+    if (kind === 'chairs') return { premium: chairPackStruck(qty, 'premium', city), essencial: chairPackStruck(qty, 'essencial', city) } as Record<string, number | null>;
     // Sofás: o separatePrice do motor, o MESMO valor que o bot diz no WhatsApp (dono, 24 Nov 2026).
     const pick = (t: string) => {
       const r = botQuote({ city, items: sofaItems(t) }) as { separatePrice?: { separate: number } | null };

@@ -1227,3 +1227,8 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 - [RETIRADA 25/11] "O questionário nunca pergunta o material" (dono, 11 Out, "não compliques o questionário"; ainda citada no comentário de `botRugEstimate.ts`).
 - **Cadeiras**: 2, 4, 6, 8, 10, 12 ou "Outro número" (até 100, o máximo do motor).
 - O menu de cada peça cabe inteiro em 375×667, sem textos cortados.
+
+## Riscado das cadeiras limitado ao preço em separado (dono, 25 Nov 2026)
+
+- "Sim, limita": o riscado do pack de cadeiras (1 cadeira × quantidade, 24 Nov) nunca passa a limpeza sozinha + a impermeabilização sozinha dessas cadeiras, cada uma com a sua deslocação (`chairPackStruck` em `src/lib/botQuote.ts`, usado por `chairsWas` e pelo `WaterproofPackPicker`). Lisboa, Blindado: 12 cadeiras 468 → 459€; 100 cadeiras 3900 → 3099€. Os preços não mudam.
+- Duas linhas de cadeiras (1 + 1): quando a oferta se perde no arredondamento ao 9, `usual` = `total` e não há riscado (antes um +10€ inventado pelo código: ~~79~~ 69). O bot não mostra riscado se `usual` for igual ao total.

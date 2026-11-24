@@ -2693,6 +2693,7 @@ function withOneStruckPrice(input, r) {
     const tiers = vt ? Object.fromEntries(["premium", "essencial"].map((k) => [k, vt[k] ? { separate: vt[k].usual, total: vt[k].total, saving: cents(vt[k].usual - vt[k].total) } : null])) : null;
     out.separatePrice = { ...x.separatePrice ?? sep, separate: struck, total: v.total, saving: cents(struck - v.total), tiers, withoutGift: null };
   }
+  if (out.separatePrice && struck <= v.total) out.separatePrice = null;
   if (x.mattressMitePack) out.mattressMitePack = { ...x.mattressMitePack, separate: struck, total: v.total };
   return out;
 }
@@ -2741,13 +2742,18 @@ function withMattressMitePack(input, r) {
   const separate = clean.total + MATTRESS_MITES_SEPARATE * n;
   return separate > q.total ? { ...r, mattressMitePack: { separate, total: q.total, perMattress: MATTRESS_MITES_SEPARATE, rule: MATTRESS_MITE_PACK_RULE } } : none;
 }
+function chairPackStruck(qty, tier, city) {
+  const alone = (treatment) => pricedTotal(botQuote({ city, items: [{ kind: "chairs", qty, treatment }] }));
+  const clean = alone("clean"), wp = alone(tier);
+  return clean === null || wp === null ? null : Math.min(chairPackWas(qty, tier), cents(clean + wp));
+}
 function withChairsWas(input, r) {
   const raw = input?.items;
   const only = Array.isArray(raw) && raw.length === 1 ? raw[0] : null;
   const tier = only?.treatment === "clean+premium" ? "premium" : only?.treatment === "clean+essencial" ? "essencial" : null;
   const qty = Number(only?.qty);
   const total = r.total;
-  const was = only?.kind === "chairs" && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= 5 && typeof total === "number" ? chairPackWas(qty, tier) : null;
+  const was = only?.kind === "chairs" && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= 5 && typeof total === "number" ? chairPackStruck(qty, tier, String(input.city ?? "")) : null;
   return { ...r, chairsWas: was !== null && typeof total === "number" && was > total ? was : null };
 }
 function withSmallOrderFarSurcharge(input, r) {
@@ -2858,7 +2864,7 @@ function withOdorFloor(input, r) {
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
 var VISIT_GIFTS_MAX_SHARE = 0.2;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -2948,7 +2954,7 @@ function withVisitGifts(input, r) {
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
   const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
-  const usual = Math.max(up9(paid + giftSum), up9(paid) + 10);
+  const usual = up9(paid + giftSum);
   const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
@@ -2961,7 +2967,7 @@ function withVisitGifts(input, r) {
   }
   const asAsked = pricedTotal(q) ?? total;
   const t = r.waterproofingTiers;
-  const tier = (v) => typeof v === "number" ? { usual: Math.max(up9(paid + (v - asAsked) + giftSum), up9(paid + (v - asAsked)) + 10), total: up9(paid + (v - asAsked)) } : null;
+  const tier = (v) => typeof v === "number" ? { usual: up9(paid + (v - asAsked) + giftSum), total: up9(paid + (v - asAsked)) } : null;
   const tiers = t ? { premium: tier(t.premium), essencial: tier(t.essencial) } : null;
   if (t && tiers) out.waterproofingTiers = { ...t, premium: tiers.premium?.total ?? t.premium, essencial: tiers.essencial?.total ?? t.essencial };
   if (q.bigOrder) {
