@@ -23,7 +23,7 @@ const Hero = () => {
     <>
       <section
         id="orcamento"
-        className="relative bg-[#0B2F2A] min-h-[100svh] flex items-end md:items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
+        className="relative bg-[#0B2F2A] min-h-[100svh] flex items-stretch md:items-center z-[1] pt-[76px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
         aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
@@ -32,7 +32,7 @@ const Hero = () => {
             <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
             <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
           </picture>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 58%, rgba(5,28,23,.78) 68%, rgba(5,28,23,.92) 78%, rgba(5,28,23,.97) 100%)' }} />
         </div>
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
@@ -60,12 +60,12 @@ const Hero = () => {
         <div className="hidden md:block absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 mx-auto grid w-full max-w-[1400px] px-5 md:grid-cols-[minmax(0,52%)_minmax(300px,1fr)] md:gap-4 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-col px-5 md:grid md:grid-cols-[minmax(0,52%)_minmax(300px,1fr)] md:gap-4 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
           <div className="max-w-[610px]">
 
             {/* H1 */}
             <h1
-              className="font-playfair text-[2rem] min-[375px]:text-[2.375rem] sm:text-[2.625rem] md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] md:leading-[1.15] tracking-[-0.025em] mb-4 md:mb-5"
+              className="font-playfair text-[1.75rem] min-[375px]:text-[1.95rem] sm:text-[2.625rem] md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] md:leading-[1.15] tracking-[-0.025em] mb-4 md:mb-5"
               style={{ textShadow: '0 2px 16px rgba(0,0,0,0.65)' }}
             >
               Os seus estofos como novos,{' '}
@@ -77,7 +77,9 @@ const Hero = () => {
           </div>
 
           {/* Keep the cleaning line visible while bringing trust and both CTAs into the first mobile viewport. */}
-          <div className="-mx-5 h-[clamp(9rem,40vw,11rem)] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
+          <div className="-mx-5 min-h-[clamp(9rem,40vw,11rem)] flex-1 md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
+          {/* Linha subtil por cima da prova (dono, 24 Nov). */}
+          <p className="whitespace-nowrap text-center text-[10px] font-medium uppercase tracking-[0.1em] text-[#D4AF37]/85 md:hidden">Todo Portugal <span className="mx-1.5 text-white/30">|</span> Resposta em menos de 1 minuto</p>
           <div className="py-3 md:hidden">
             <HomeHeroTrust />
           </div>
