@@ -50,6 +50,9 @@ const CITY_BY_FOLDED = new Map(Object.keys(locationPrices).map(name => [fold(nam
  */
 export function resolveBotCity(input: unknown): string | null {
   if (typeof input !== 'string') return null;
+  // "Famalicão" alone is Vila Nova de Famalicão; only with Nazaré beside it is it the small parish there (24 Nov 2026:
+  // Daniela, Famalicão, was given Lisboa 1 and no hours).
+  if (/(^|[,()/]\s*)famalicao\s*($|[,()/])/.test(fold(input)) && !/nazare|leiria|2450/.test(fold(input))) return 'Vila Nova de Famalicão';
   for (const part of [input, ...input.split(/[,()/]/)]) {
     const key = fold(part);
     if (!key) continue;

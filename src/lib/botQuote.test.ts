@@ -311,3 +311,13 @@ describe('sofá de pele (dono, 20 Nov 2026: tratamento da pele +40€, +60€ em
     expect(botQuote({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium', leather: true }], city: 'Lisboa' }).ok).toBe(false);
   });
 });
+
+describe('Famalicão (24 Nov 2026, Daniela)', () => {
+  it('is Vila Nova de Famalicão unless Nazaré is named', () => {
+    expect(resolveBotCity('Famalicão')).toBe('Vila Nova de Famalicão');
+    expect(resolveBotCity('famalicao, Braga')).toBe('Vila Nova de Famalicão');
+    expect(resolveBotCity('Vila Nova de Famalicão')).toBe('Vila Nova de Famalicão');
+    expect(resolveBotCity('Famalicão, Nazaré')).toBe('Nazaré');
+    expect(resolveBotCity('Nazaré')).toBe('Nazaré');
+  });
+});

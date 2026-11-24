@@ -2333,6 +2333,7 @@ var fold2 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase
 var CITY_BY_FOLDED = new Map(Object.keys(locationPrices).map((name) => [fold2(name), name]));
 function resolveBotCity(input) {
   if (typeof input !== "string") return null;
+  if (/(^|[,()/]\s*)famalicao\s*($|[,()/])/.test(fold2(input)) && !/nazare|leiria|2450/.test(fold2(input))) return "Vila Nova de Famalicão";
   for (const part of [input, ...input.split(/[,()/]/)]) {
     const key = fold2(part);
     if (!key) continue;

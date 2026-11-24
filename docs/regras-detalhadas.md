@@ -1247,3 +1247,4 @@ O dono queixou-se do "poupa 1€" e aprovou ("Sim, fica") o limite: no cesto da 
 ## Vários sofás acabam sempre em 9 (dono, 25 Nov 2026: "Sim, nos dois")
 
 Dois ou mais sofás no pedido (a quantidade conta), limpos ou impermeabilizados: total, opções Premium/Essencial e valores da condição acima de 300€ acabam em 9, para cima (616 -> 619, 446 -> 449). `withEndIn9` em `src/lib/botQuote.ts`, teste `botQuote.sofas9.test.ts`; vale no site e no bot.
+- **"Famalicão" sozinho é Vila Nova de Famalicão (24 Nov 2026).** `resolveBotCity` lia a freguesia de Famalicão da Nazaré e dava a equipa Lisboa 1 sem horas (Daniela). Só com Nazaré, Leiria ou 2450 ao lado é a da Nazaré.
