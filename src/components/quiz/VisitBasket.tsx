@@ -21,7 +21,7 @@ import imperPhoto from '@/assets/picker-premium-sofa.webp';
 // Primeiro ecrã: vídeos reais da equipa a limpar em vez de fotografias (dono, 24 Nov: "vídeos de fundo a fazer a
 // limpeza, com opacidade mais alta, na horizontal"). Os mesmos da página inicial; o tapete é a máquina de extração.
 import sofaClip from '@/assets/sofa-processo/extracao.mp4';
-import mattressClip from '@/assets/colchoes-processo/extracao-espuma.mp4';
+import mattressClip from '@/assets/colchoes-processo/mancha-pulverizacao.mp4';
 import chairsClip from '@/assets/cadeiras-processo/extracao.mp4';
 import rugClip from '@/assets/tapete-processo/limpeza-soalho.mp4';
 import carpetClip from '@/assets/alcatifa-processo/extracao.mp4';
@@ -331,7 +331,7 @@ const CLIP: Record<BasketKind, string> = { sofa: sofaClip, mattress: mattressCli
 /** A imagem enquanto o vídeo carrega é um fotograma do próprio vídeo (dono, 25 Nov: "nos tapetes tem que ter um vídeo de
  *  limpeza de tapetes": via-se uma fotografia de catálogo), e o ponto do vídeo que fica sempre à vista. */
 const CLIP_POSTER: Record<string, string> = { [sofaClip]: capaSofa, [mattressClip]: capaColchao, [chairsClip]: capaCadeiras, [rugClip]: capaTapete, [carpetClip]: capaAlcatifa, [imperClip]: capaImper, [imperChairsClip]: capaImperCadeiras };
-const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 50%', [mattressClip]: '50% 55%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
+const CLIP_AT: Record<string, string> = { [sofaClip]: '50% 50%', [mattressClip]: '50% 60%', [chairsClip]: '50% 38%', [rugClip]: '50% 38%', [carpetClip]: '50% 45%', [imperClip]: '50% 45%', [imperChairsClip]: '50% 50%' };
 function waterproofFrom(city: string): string {
   const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
   const v = r.ok ? r.lines?.[0]?.amount : null;

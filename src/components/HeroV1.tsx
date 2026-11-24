@@ -116,14 +116,14 @@ const Hero = () => {
                 onClick={handleOpenQuiz}
                 aria-haspopup="dialog"
                 className={[
-                  'order-2 flex h-[56px] w-full items-center justify-center gap-2 px-4 text-[#0B2F2A] touch-manipulation md:h-[60px] md:px-8',
+                  'order-2 flex h-[56px] w-full items-center justify-center gap-2 rounded-[10px] px-4 text-[#0B2F2A] touch-manipulation md:h-[60px] md:px-8',
                   'bg-gradient-to-r from-[#D4AF37] via-[#E8C964] to-[#D4AF37] shadow-[0_6px_22px_rgba(212,175,55,0.38),inset_0_1px_0_rgba(255,255,255,0.35)]',
                   'hover:scale-[1.025] active:scale-[0.95] transition-all duration-150',
                   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-white',
                 ].join(' ')}
               >
                 <Calculator className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={2.25} aria-hidden="true" />
-                <span className="text-[13px] font-bold uppercase tracking-[0.14em]">Calcular o meu preço</span>
+                <span className="text-[15px] font-bold">Calcular o meu preço</span>
               </button>
 
           </div>
