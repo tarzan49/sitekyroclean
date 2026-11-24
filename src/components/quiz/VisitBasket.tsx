@@ -15,6 +15,8 @@ import { buildWaUrl, type QuizLeadPayload } from '@/services/submissionService';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
 import QuizFurnitureImage from './QuizFurnitureImage';
 import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
+import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
+import imperPhoto from '@/assets/picker-premium-sofa.webp';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 import { Star } from 'lucide-react';
 import type { QuizOrder } from '@/lib/quizOrder';
@@ -130,10 +132,27 @@ function readSaved(): { city: string; items: BasketItem[] } | null {
 const PHOTO: Record<BasketKind, string> = { sofa: '/images/services/sofa.webp', mattress: '/images/services/colchao.webp', chairs: '/images/services/cadeira.webp', rug: '/images/services/tapete.webp', carpet: '/images/services/process-alcatifas.webp' };
 /** "Desde" de cada artigo, pelo motor do bot (o artigo mais pequeno, só limpeza, sem deslocação); tapetes e alcatifas por m². */
 function fromPrice(city: string, k: BasketKind): string {
-  if (k === 'rug') return RUG_PRICE_FROM;
-  if (k === 'carpet') return CARPET_PRICE_FROM;
+  if (k === 'rug') return RUG_PRICE_FROM.replace(/^Desde/, 'desde');
+  if (k === 'carpet') return CARPET_PRICE_FROM.replace(/^Desde/, 'desde');
+  if (k === 'chairs') return `${CHAIR_PRICE_LABEL.toLowerCase()}/cadeira`;
   const item = k === 'sofa' ? { kind: 'sofa', size: '1-lugar' } : k === 'mattress' ? { kind: 'mattress', size: 'solteiro' } : { kind: 'chairs', qty: 1 };
   const r = botQuote({ city: city || 'Lisboa', items: [{ ...item, treatment: 'clean' }] }) as Quote;
+  const v = r.ok ? r.lines?.[0]?.amount : null;
+  return typeof v === 'number' ? `desde ${formatEuro(v)}` : '';
+}
+
+// Entrada do cesto (dono, 24 Nov: o questionário inteiro no formato novo): seis escolhas, cada uma com o "desde"
+// do motor, o mesmo dos heróis. Impermeabilização = sofá com a proteção (Protegido; o pack escolhe-se na folha).
+const ENTRY: { key: string; kind: BasketKind; label: string; photo: string; over?: Partial<BasketItem>; from: (city: string) => string }[] = [
+  { key: 'sofa', kind: 'sofa', label: 'Sofá', photo: PHOTO.sofa, over: { pack: 'none' }, from: c => fromPrice(c, 'sofa') },
+  { key: 'imper', kind: 'sofa', label: 'Impermeabilização', photo: imperPhoto, over: { pack: 'essencial' }, from: c => waterproofFrom(c) },
+  { key: 'mattress', kind: 'mattress', label: 'Colchão', photo: PHOTO.mattress, from: c => fromPrice(c, 'mattress') },
+  { key: 'chairs', kind: 'chairs', label: 'Cadeiras', photo: PHOTO.chairs, over: { pack: 'none' }, from: c => fromPrice(c, 'chairs') },
+  { key: 'rug', kind: 'rug', label: 'Tapete', photo: PHOTO.rug, from: c => fromPrice(c, 'rug') },
+  { key: 'carpet', kind: 'carpet', label: 'Alcatifa', photo: PHOTO.carpet, from: c => fromPrice(c, 'carpet') },
+];
+function waterproofFrom(city: string): string {
+  const r = botQuote({ city: city || 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'essencial' }] }) as Quote;
   const v = r.ok ? r.lines?.[0]?.amount : null;
   return typeof v === 'number' ? `desde ${formatEuro(v)}` : '';
 }
@@ -248,39 +267,44 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <>
             {items.length === 0 ? (
               <>
-                <h2 className="mb-3 font-playfair text-2xl font-semibold text-white">O que vamos <span style={{ color: GOLD }}>limpar</span>?</h2>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map((k, idx) => (
-                    <button key={k} type="button" onClick={() => setEditing(newItem(k))} className={`group relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98] ${idx === 4 ? 'col-span-2 h-28' : 'h-36'}`}>
-                      <img src={PHOTO[k]} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                      <span className="absolute inset-0 bg-gradient-to-t from-[#071a12] via-[#071a12]/40 to-transparent" />
-                      <span className="absolute inset-x-3 bottom-2.5">
-                        <span className="block text-base font-bold text-white">{KIND_LABEL[k]}</span>
-                        <span className="block text-xs font-semibold text-[#E8C964]">{fromPrice(city, k)}</span>
+                <h2 className="type-section-title font-playfair mb-4 text-white">O que vamos <em className="not-italic" style={{ color: GOLD }}>limpar?</em></h2>
+                <label className="mb-3 flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-3">
+              <span className="text-xs font-semibold text-white/60">Localidade</span>
+              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Onde é o serviço?" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
+              <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
+            </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {ENTRY.map(e => (
+                    <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="group relative h-[104px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 text-left active:scale-[0.98]">
+                      <img src={e.photo} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      <span className="absolute inset-0 bg-gradient-to-t from-[#071a12] via-[#071a12]/55 to-[#071a12]/10" />
+                      <span className="absolute inset-x-2.5 bottom-2">
+                        <span className="block text-[15px] font-bold leading-tight text-white">{e.label}</span>
+                        <span className="block text-xs font-semibold text-[#D4AF37]">{e.from(city)}</span>
                       </span>
-                      <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B2F2A]"><Plus className="h-4 w-4" strokeWidth={3} /></span>
                     </button>
                   ))}
                 </div>
               </>
             ) : (
+            <>
             <div className="sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 bg-[#0B2F2A]/95 px-4 pb-3 pt-1 backdrop-blur">
               <p className="mb-2 text-sm font-semibold text-white">Juntar à mesma <span style={{ color: GOLD }}>visita</span></p>
               <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-                {(['sofa', 'mattress', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(k => (
-                  <button key={k} type="button" onClick={() => setEditing(newItem(k))} className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#D4AF37]/60 bg-white/[0.05] pl-1.5 pr-3 text-sm font-bold text-white hover:bg-[#D4AF37]/15">
-                    <img src={PHOTO[k]} alt="" className="h-8 w-8 rounded-full object-cover" />{KIND_LABEL[k]}<Plus className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
+                {ENTRY.map(e => (
+                  <button key={e.key} type="button" onClick={() => setEditing(newItem(e.kind, e.over))} className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#D4AF37]/60 bg-white/[0.05] pl-1.5 pr-3 text-sm font-bold text-white hover:bg-[#D4AF37]/15">
+                    <img src={e.photo} alt="" className="h-8 w-8 rounded-full object-cover" />{e.label}<Plus className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} strokeWidth={3} />
                   </button>
                 ))}
               </div>
             </div>
-            )}
-
-            <label className="mb-3 mt-3 flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-3">
+            <label className="mb-3 flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-3">
               <span className="text-xs font-semibold text-white/60">Localidade</span>
-              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Ex.: Lisboa" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
+              <input list="basket-cities" value={city} onChange={e => setCity(e.target.value)} placeholder="Onde é o serviço?" className="h-11 min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/35" />
               <datalist id="basket-cities">{cityNames.map(c => <option key={c} value={c} />)}</datalist>
             </label>
+            </>
+            )}
 
             {items.length > 0 && <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-white/[0.04]">
               {items.map((it, i) => (
@@ -297,7 +321,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           </>
         ) : (
           <>
-            <h3 className="mb-3 font-playfair text-2xl font-bold text-white">Para onde enviamos as <span style={{ color: GOLD }}>horas</span>?</h3>
+            <h2 className="type-section-title font-playfair mb-4 text-white">Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></h2>
             <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
               {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{quote.lines[i] != null ? formatEuro(quote.lines[i] as number) : ''}</span></li>)}
               <li className="border-t border-white/10 pt-1 text-xs text-white/60">{city}, deslocação incluída no total</li>
@@ -342,7 +366,9 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
   const set = (p: Partial<BasketItem>) => onChange({ ...item, ...p });
   const rug = isRug(item.kind);
   // O preço deste artigo em cada opção, pelo motor do bot, com o resto do cesto (o mesmo que o total vai mostrar).
-  const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.lines[others.length] ?? null; };
+  // Quanto este artigo acrescenta ao total da visita (com a deslocação, se for o primeiro): o mesmo número do widget da página.
+  const base = quoteBasket(city, others).total ?? 0;
+  const priceWith = (p: Partial<BasketItem>) => { const q = quoteBasket(city, [...others, { ...item, ...p }]); return q.total === null || q.sob ? q.lines[others.length] ?? null : Math.round((q.total - (others.length ? base : 0)) * 100) / 100; };
   const seats = item.seats ?? Number(item.size?.split('-')[0]);
   const ok = !rug || (num(item.width) > 0 && num(item.length) > 0);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
@@ -379,7 +405,7 @@ function ItemSheet({ item, city, others, onChange, onSave, onCancel }: { item: B
           </div>
           <p className="mb-3 text-xs text-white/60">O preço sai das medidas, com a deslocação incluída.</p>
         </>}
-        <button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : priceWith({}); return v === null ? 'Juntar à visita' : `Juntar à visita · ${formatEuro(v)}`; })()}</button>
+        <div className="sticky bottom-0 -mx-4 -mb-4 bg-[#0B2F2A] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-2"><button type="button" disabled={!ok} onClick={onSave} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = rug ? null : priceWith({}); return v === null ? 'Juntar à visita' : `Juntar à visita · ${formatEuro(v)}`; })()}</button></div>
       </div>
     </div>
   );
