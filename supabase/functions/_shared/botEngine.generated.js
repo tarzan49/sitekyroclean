@@ -2707,7 +2707,16 @@ function withVisitGifts(input, r) {
   }
   if (!gifts.length) return none;
   const m = gifts.find((g) => g.piece === "mattress");
-  return { ...r, visitGifts: { gifts, usual, total, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total } : null };
+  const up9 = (x) => {
+    const n = Math.ceil(x);
+    return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
+  };
+  const final = up9(total);
+  const out = { ...r };
+  const rc = r.rugCombo;
+  if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
+  else out.total = final;
+  return { ...out, visitGifts: { gifts, usual, total: final, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 var withAntiMiteGiftKept = (r) => ({ ...r, antiMiteGift: r.antiMiteGift ?? null });
 function withAskedDiscount(_input, r) {

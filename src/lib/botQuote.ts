@@ -565,7 +565,7 @@ function botQuoteCore(input: unknown) {
  * 2+ pieces with a mattress: anti-mites on the mattress; 3+ pieces with chairs: + anti-mites on the chairs;
  * 4+ pieces with a rug: + anti-odor on the rug. A mattress order of 150€ or more keeps its gift (19 Nov).
  * `usual` = price with the offered treatments (the struck price); `total` = what the client pays (cleaning
- * only). Never on top of the big-order condition (above 300€). Works with a rug in the order (rugCombo).
+ * only, up to the next price ending in 9). Never on top of the big-order condition (above 300€). Works with a rug in the order (rugCombo).
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug'; treatment: 'anti-acaros' | 'anti-odor'; normal: number };
@@ -609,7 +609,14 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   }
   if (!gifts.length) return none;
   const m = gifts.find(g => g.piece === 'mattress');
-  return { ...r, visitGifts: { gifts, usual, total, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total } : null };
+  // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
+  const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
+  const final = up9(total);
+  const out = { ...r } as Record<string, unknown>;
+  const rc = (r as unknown as Priced).rugCombo;
+  if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
+  else out.total = final;
+  return { ...(out as T), visitGifts: { gifts, usual, total: final, rule: VISIT_GIFTS_RULE }, mattressMiteOffer: m ? { normal: m.normal, total: final } : null };
 }
 /** The rug-waterproofing result keeps the anti-mites gift of the rest of the order (or null). */
 const withAntiMiteGiftKept = <T extends object>(r: T) => ({ ...r, antiMiteGift: ((r as { antiMiteGift?: number | null }).antiMiteGift ?? null) as number | null });

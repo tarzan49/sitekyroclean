@@ -16,6 +16,12 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import WaterproofPackPicker from "@/components/WaterproofPackPicker";
+import SofaProcessGuide from "@/components/SofaProcessGuide";
+import CustomerReviews from "@/components/CustomerReviews";
+import CompactFAQ from "@/components/CompactFAQ";
+import { pickReviewSubset } from "@/data/reviewsPool";
+import { useSnapSections } from "@/hooks/useSnapSections";
 import IllustratedProcessGuide from "@/components/IllustratedProcessGuide";
 import { MATERIAL_PROCESS_GUIDES } from "@/data/materialProcessGuides";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -66,6 +72,10 @@ const MaterialPage = () => {
     if (!data) return "Sob orçamento";
     return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? "Sob orçamento";
   }, [data]);
+  // Sofás de tecido por cidade: modelo novo (dono, 24 Nov). Pele fica com o guia próprio (os vídeos são de tecido).
+  const sofaNew = data?.serviceSlug === 'limpeza-sofas' && !!cityName;
+  const fabric = sofaNew && data?.slug !== 'limpeza-sofa-pele';
+  useSnapSections(fabric); // pele: falta um widget próprio (limpeza + tratamento da pele, sem impermeabilização)
 
   useEffect(() => {
     if (data) {
@@ -122,21 +132,33 @@ const MaterialPage = () => {
 
         <CommercialHero title={data.h1} subtitle={`Cuidados profissionais para ${data.name.toLowerCase()}.`} serviceSlug={data.serviceSlug} city={cityName ?? undefined} price={servicePrice} image={heroImg} breadcrumbs={[{ label: "Início", to: "/" }, { label: data.serviceName, to: `/${data.serviceSlug}` }, { label: `${data.name}${cityName ? ` · ${cityName}` : ""}` }]} whatsappHref={waHref} source={`material_hero_${data.slug}`} />
 
-        <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />
+        {fabric ? <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <h2 className="mb-5 md:mb-10 type-section-title font-playfair text-[#111111]">O seu preço <em className="not-italic" style={{ color: "#D4AF37" }}>{cityPrep(cityName!)} {cityName}</em></h2>
+            <div className="md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6"><WaterproofPackPicker kind="sofa" city={cityName!} source={`material_picker_${data.slug}`} /></div>
+          </div>
+        </section> : <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        {sofaNew ? <section id="avaliacoes" className="scroll-mt-20 py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <CustomerReviews reviews={pickReviewSubset('limpeza-sofas', `${data.slug}-${citySlug}`, 6)} />
+          </div>
+        </section> : <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.slug}-${citySlug}`} heading="" />
           </div>
-        </section>
+        </section>}
 
         {/* Exemplos específicos, partilhados com as variantes por cidade. */}
         <MaterialExamplesGallery key={data.slug} materialSlug={data.slug} />
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
-        {processGuide ? (
+        {fabric && processGuide ? (
+          <SofaProcessGuide key={data.slug} real steps={processGuide.steps.map(st => ({ label: st.label, description: st.description }))} heading={{ text: 'Como limpamos o seu', gold: data.name.toLowerCase() }} />
+        ) : processGuide ? (
           <IllustratedProcessGuide dark key={data.slug} guide={processGuide} heading="Como limpamos o seu" goldWord={data.name.toLowerCase()} downloadName={data.slug} />
         ) : (
         <section className="py-14 md:py-20 bg-kyro-green">
@@ -175,7 +197,7 @@ const MaterialPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
+          sofaNew ? <CompactFAQ id="duvidas" faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} /> : <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
         )}
 
         {/* ═══ PACKS ═══ */}
