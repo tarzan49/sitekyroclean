@@ -472,7 +472,28 @@ function rugWaterproofingQuote(input: Record<string, unknown>): RugWpResult | Fa
 }
 
 export function botQuote(input: unknown) {
-  return withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input))));
+  return withMattressMitePack(input, withAskedDiscount(input, withSmallOrderFarSurcharge(input, withBlackFridayPrices(input, botQuoteCore(input)))));
+}
+
+/**
+ * Colchão com anti-ácaros: o anti-ácaros feito à parte custa 40€ por colchão (dono, 24 Nov 2026: "sim 40€ nos
+ * colchões"). `separate` = o mesmo pedido só com a limpeza + 40€ por colchão com anti-ácaros; é o preço riscado
+ * ("em vez de") do pack limpeza + anti-ácaros, no site e no WhatsApp.
+ */
+export const MATTRESS_MITES_SEPARATE = 40;
+export const MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
+function withMattressMitePack<T extends { ok: boolean }>(input: unknown, r: T): T & { mattressMitePack: { separate: number; total: number; perMattress: number; rule: string } | null } {
+  const none = { ...r, mattressMitePack: null };
+  const q = r as unknown as { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean };
+  const items = (input as { items?: unknown } | null)?.items;
+  if (!q.ok || q.quote || q.handToOwner || typeof q.total !== 'number' || !Array.isArray(items)) return none;
+  const isMite = (i: unknown) => { const x = (i ?? {}) as Record<string, unknown>; return x.kind === 'mattress' && x.treatment === 'clean+anti-acaros'; };
+  const n = items.filter(isMite).reduce((s: number, i) => s + (Number((i as Record<string, unknown>).qty) || 1), 0);
+  if (!n) return none;
+  const clean = botQuote({ ...(input as object), items: items.map(i => (isMite(i) ? { ...(i as object), treatment: 'clean' } : i)) }) as { ok: boolean; total?: number | null; quote?: boolean };
+  if (!clean.ok || clean.quote || typeof clean.total !== 'number') return none;
+  const separate = clean.total + MATTRESS_MITES_SEPARATE * n;
+  return separate > q.total ? { ...r, mattressMitePack: { separate, total: q.total, perMattress: MATTRESS_MITES_SEPARATE, rule: MATTRESS_MITE_PACK_RULE } } : none;
 }
 
 /**

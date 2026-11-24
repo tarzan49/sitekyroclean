@@ -44,6 +44,12 @@ export default function TreatmentPackPicker({ kind, city, source }: Props) {
     const r = botQuote({ city, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
     return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
   })) as Record<Option['id'], number | null>, [OPTIONS, kind, size, rugW, rugL, city]);
+  // Preço riscado do bot: limpeza + anti-ácaros feito à parte (40€ por colchão; dono, 24 Nov).
+  const struck = useMemo(() => {
+    if (kind !== 'mattress') return null;
+    const r = botQuote({ city, items: [{ kind: 'mattress', size, treatment: 'clean+anti-acaros' }] }) as { mattressMitePack?: { separate: number } | null };
+    return r.mattressMitePack?.separate ?? null;
+  }, [kind, size, city]);
 
   const m = (v: number) => String(v).replace('.', ',');
   const seats = Number(size.split('-')[0]);
@@ -103,7 +109,10 @@ export default function TreatmentPackPicker({ kind, city, source }: Props) {
                   <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
                 </span>
                 <span className="flex items-center gap-2 pl-2">
+                  <span className="flex flex-col items-end leading-tight">
+                  {o.id === 'treat' && struck !== null && value !== null && struck > value && <span className="text-[11px] text-[#888] line-through">{formatEuro(struck)}</span>}
                   <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="block w-[4.5rem] whitespace-normal text-right text-xs font-semibold leading-tight text-[#D4AF37]">Sob orçamento</span> : formatEuro(value)}</span>
+                  </span>
                   <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#D4AF37] bg-[#D4AF37] text-white' : 'border-[#CFC8B6]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
                 </span>
               </button>
