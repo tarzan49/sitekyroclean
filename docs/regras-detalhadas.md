@@ -1210,3 +1210,7 @@ Dono, 23 Nov 2026 (Joana Duarte): 2 ou mais peças na mesma visita = cada peça 
 ## Auditoria do motor de preços (24 Nov 2026, 12 136 pedidos)
 
 Corrigido em `botQuote.ts`/`customPack.ts`/`rugMeasure.ts` (teste `src/lib/botQuote.audit24nov.test.ts`): a ordem das peças não muda o total (desempate estável das ofertas, U com o nível de cada peça, posições das cadeiras com imper primeiro); `qty: 2` = duas linhas (5L sozinho só com 1 unidade, imper de várias peças pela quantidade, tapetes/alcatifas na escada e no Poupa); canto/5L/6L em imper sozinha passam pelo motor normal com o preço fixo 199/139, 219/159, 249/189 (deslocação incluída), por isso têm preço com outras peças e tapetes, ofertas e fim em 9; opções com imper sozinha riscam o próprio nível e acabam em 9; `separate` 0 fica 0; o mínimo "peças sozinhas" usa o preço final de cada peça; pedir anti-odor nunca baixa o total (`withOdorFloor`); cadeiras com imper em várias linhas seguem os escalões e acabam em 9 uma vez; alcatifa até 50 m por lado (`CARPET_SIDE_MAX_METERS`).
+
+## Poupa do pack limpeza + impermeabilização (dono, 25 Nov 2026)
+
+- "Só se for um pack de limpeza mais impermeabilização em que baixamos é na limpeza": a impermeabilização nunca leva desconto; a poupança do pack (3L Blindado 219€ contra 249€ em separado) sai toda da limpeza (60€ em vez de 89€). Os preços da tabela de 22 Nov ficam; o limite 10/15/20€ por tamanho proposto no mesmo dia não entra no motor. A imper sozinha numa visita desce só a deslocação (3L 159€ → 149€).
