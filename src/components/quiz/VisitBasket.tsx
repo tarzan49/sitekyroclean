@@ -681,15 +681,23 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   // depois de escolher e a folha desce até elas (dono, 25 Nov: "o poupa aparece quando a pessoa clica").
   const [picked, setPicked] = useState(!fresh);
   const optionsRef = useRef<HTMLDivElement>(null);
-  const reveal = () => { if (!picked) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); setPicked(true); };
+  const reveal = () => { if (!picked && rug) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); setPicked(true); };
   const choose = (p: Partial<BasketItem>) => { set(p); reveal(); };
   const bump = (k: string, d: number) => { setCounts(c => ({ ...c, [k]: Math.max(0, Math.min(9, (c[k] ?? 0) + d)) })); if (d > 0) reveal(); };
   const sized = !rug || (num(item.width) > 0 && num(item.length) > 0);
-  const ok = multi ? group().length > 0 : sized && (picked || rug);
+  // Pele ou tecido pergunta-se logo no menu do sofá (dono, 25 Nov): pele avança para o preço, tecido escolhe o pack.
+  const asksMaterial = item.kind === 'sofa' && !item.imperOnly;
+  const [material, setMaterial] = useState<'tecido' | 'pele' | null>(() => (!asksMaterial ? 'tecido' : fresh ? null : item.leather ? 'pele' : 'tecido'));
+  const ok = multi ? group().length > 0 && material !== null : sized && (picked || rug);
   // Nenhuma opção vem escolhida (dono, 25 Nov): a pessoa escolhe Blindado, Protegido, Renovado ou pele.
   const needsPack = item.kind === 'sofa' || item.kind === 'chairs';
   const [packPicked, setPackPicked] = useState(!fresh);
-  const ready = ok && (!needsPack || packPicked);
+  const ready = ok && (!needsPack || packPicked || material === 'pele');
+  const chooseMaterial = (m: 'tecido' | 'pele') => { if (m === material) return; setMaterial(m); setPackPicked(false); set({ leather: m === 'pele', ...(m === 'pele' ? { pack: 'none' as const } : {}) }); };
+  // Desce até ao preço quando a escolha fica completa (nos tapetes só ao tocar num tamanho, nunca a meio de escrever).
+  const wasOk = useRef(ok);
+  useEffect(() => { if (ok && !wasOk.current && !rug) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); wasOk.current = ok; }, [ok, rug]);
+  useEffect(() => { if (material && ok && asksMaterial && fresh) window.setTimeout(() => optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [material]);
   const chip = (on: boolean) => `min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${on ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.04] text-white/80'}`;
   // Ecrã inteiro dentro do questionário (dono, 25 Nov: a janela por cima não deixava ver nada e não havia
   // como voltar): "Voltar" em cima, o vídeo da peça, as escolhas em quadrados com imagem e o botão fixo em baixo.
@@ -702,13 +710,19 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
         <button type="button" onClick={onCancel} className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:bg-white/10"><ArrowLeft className="h-5 w-5" />Voltar</button>
       </header>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className="relative -mx-4 mb-4 h-40 overflow-hidden">
+        <div className={`relative -mx-4 mb-4 overflow-hidden ${asksMaterial ? 'h-28' : 'h-40'}`}>
           <video src={clip} poster={PHOTO[item.kind]} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="h-full w-full object-cover" />
           <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A] via-[#0B2F2A]/20 to-transparent" />
           <h3 className="absolute bottom-2 left-4 font-playfair text-3xl font-semibold text-white">{item.imperOnly ? <>Impermeabilização <span className="block text-lg" style={{ color: GOLD }}>{item.kind === 'chairs' ? 'das cadeiras' : 'do sofá'}</span></> : KIND_LABEL[item.kind]}</h3>
         </div>
 
         {item.kind === 'sofa' && <>
+          {asksMaterial && <>
+            <p className="mb-2 text-sm font-semibold text-white">É de pele ou couro?</p>
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              {([['tecido', 'Não, é de tecido'], ['pele', 'Sim, pele ou couro']] as const).map(([m, label]) => <button key={m} type="button" aria-pressed={material === m} onClick={() => chooseMaterial(m)} className={`${tile(material === m)} min-h-12`}>{label}</button>)}
+            </div>
+          </>}
           <p className="mb-2 text-sm font-semibold text-white">Quantos lugares? <span className="font-normal text-white/60">Pode juntar vários</span></p>
           <div className="mb-2 grid grid-cols-3 gap-2">{SOFA_SEATS.map(n => <CountTile key={n} count={counts[String(n)] ?? 0} onBump={d => bump(String(n), d)} cls={tile}>
             <QuizFurnitureImage service="sofa" sizeId={n >= 4 ? '4-lugares' : n === 1 ? '1-lugar' : `${n}-lugares`} className="h-12 w-12 sm:h-12 sm:w-12" />{n === 1 ? '1 lugar' : `${n} lugares`}</CountTile>)}</div>
@@ -759,18 +773,18 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
             <span className="text-sm font-semibold text-white">{item.kind === 'chairs' ? 'Cadeiras' : 'Quantidade'}</span>
             <Stepper value={item.qty} min={1} max={item.kind === 'chairs' ? 40 : 6} onChange={qty => set({ qty })} />
           </div>}
-          {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
+          {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(material === 'pele' ? [] : item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
             const on = packPicked && item.pack === p.pack && !item.leather;
             return <button key={p.pack} type="button" onClick={() => { set({ pack: p.pack, leather: false }); setPackPicked(true); }} className={`${chip(on)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
               <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60">{p.note}</span></span>
               <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} note={item.imperOnly || p.pack === 'none' ? 'na deslocação' : 'na limpeza'} />{on ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
             </button>;
           })}
-          {/* Pele (dono, 25 Nov): a última opção da mesma lista, com o preço total; nunca leva impermeabilização. */}
-          {item.kind === 'sofa' && !item.imperOnly && <button type="button" onClick={() => { set({ leather: true, pack: 'none' }); setPackPicked(true); }} className={`${chip(!!item.leather)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
-            <span><span className="block">Sofá de pele</span><span className="block text-xs font-normal text-white/60">Limpeza + tratamento da pele (limpeza e hidratação)</span></span>
-            <span className="flex items-center gap-2"><PriceTag {...packPrice({ leather: true, pack: 'none' })} note="na deslocação" />{item.leather ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <span className="h-4 w-4" />}</span>
-          </button>}
+          {/* Pele: um só preço, limpeza + tratamento da pele; nunca leva impermeabilização. */}
+          {material === 'pele' && <div className={`${chip(true)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
+            <span><span className="block">Limpeza + tratamento da pele</span><span className="block text-xs font-normal text-white/60">Limpeza e hidratação</span></span>
+            <PriceTag {...packPrice({ leather: true, pack: 'none' })} />
+          </div>}
           </div>}
           {rug && <>
             <p className="mb-3 flex items-center justify-between rounded-xl bg-[#D4AF37]/10 px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m², deslocação incluída</span><PriceTag {...packPrice({})} /></p>
@@ -783,7 +797,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       </div>
       <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? 'Escolha os lugares e quantos' : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
+        <button type="button" disabled={!ready} onClick={() => onSave(group())} className="min-h-12 w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-base font-bold text-[#0B2F2A] shadow-[0_8px_24px_-8px_rgba(212,175,55,0.6)] disabled:opacity-40">{(() => { const v = !ok ? null : others.length ? totalWith({}) : totalOf(group()); return !ok ? (rug ? 'Escolha ou escreva a medida' : item.kind === 'chairs' ? 'Escolha quantas cadeiras' : item.kind === 'sofa' ? (material === null ? 'Diga se é de pele ou tecido' : 'Escolha os lugares e quantos') : 'Escolha o tamanho e quantos') : !ready ? 'Escolha uma opção' : v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button></footer>
     </div>
   );
 }
