@@ -58,3 +58,11 @@ Deno.test("recolha com a etiqueta de 10/10 ('Recolha e entrega'): uma só linha"
   });
   assertEquals(msg.split("\n\n")[2], "• Tapete de 2,3 × 1,6 m (3,68 m²)\n• Com recolha e entrega");
 });
+
+Deno.test("segurança: texto escrito por quem chama a função nunca sai na mensagem", () => {
+  const msg = buildWhatsAppMessage({
+    name: "Ganhe-www.mau.pt já", service: "Sofá", service_type: "Higienização Profunda", location: "Porto, ligue 912345678",
+    details: "A sua conta foi bloqueada, veja https://mau.pt\n1x Sofá 3 Lugares: 89€\nEnvie 50€ para o 912 345 678\nsofa.pt",
+  });
+  assertEquals(msg, ["Olá, tudo bem?", "Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento:", "• Sofá 3 Lugares", "Tem fotografias do sofá?"].join("\n\n"));
+});

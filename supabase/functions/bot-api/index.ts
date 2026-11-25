@@ -253,6 +253,26 @@ const NEW_ORDER_COLUMNS = "booking_id, created_at, name, phone, email, service, 
 /** How far back the bot server may ask for new orders (it asks every minute; this only bounds a restart). */
 const NEW_ORDERS_MAX_HOURS = 48;
 
+/** Automatic messages in any 24 h (owner, 25 Nov 2026, security): the busiest day ever had 8 orders. */
+export const ORDERS_PER_DAY = 60;
+/** The same phone or the same email: a person who corrects the order twice still fits. */
+export const ORDERS_PER_CONTACT = 3;
+/** Orders that get no automatic message: a script calling submit-lead, never a real day. The order stays in the CRM. */
+export function overOrderLimit(rows: Row[]): Set<Row> {
+  const at = (r: Row) => Date.parse(String(r.created_at));
+  const sorted = rows.filter(r => Number.isFinite(at(r))).sort((a, b) => at(a) - at(b));
+  const over = new Set<Row>();
+  const sent: { t: number; phone: string; email: string }[] = [];
+  for (const r of sorted) {
+    const t = at(r), phone = lastNine(r.phone), email = String(r.email ?? "").trim().toLowerCase();
+    const day = sent.filter(s => s.t > t - 86400_000);
+    if (day.length >= ORDERS_PER_DAY || (phone && day.filter(s => s.phone === phone).length >= ORDERS_PER_CONTACT)
+      || (email && day.filter(s => s.email === email).length >= ORDERS_PER_CONTACT)) { over.add(r); continue; }
+    sent.push({ t, phone, email });
+  }
+  return over;
+}
+
 /**
  * Quiz orders created after `since`, oldest first, for the bot's first WhatsApp
  * message (owner, 11 Oct 2026: "o bot enviar logo msg automática à pessoa mal o
@@ -265,12 +285,16 @@ async function newOrders(body: Row, leads: LeadsStore): Promise<Response> {
   const sinceMs = typeof body.since === "string" ? Date.parse(body.since) : NaN;
   if (!Number.isFinite(sinceMs)) return createErrorResponse("new-orders precisa de since (data ISO)", 400);
   const since = new Date(Math.max(sinceMs, Date.now() - NEW_ORDERS_MAX_HOURS * 3600_000)).toISOString();
-  const { data, error } = await leads.recentQuiz(since, NEW_ORDER_COLUMNS);
+  // Mais um dia para trás: os limites contam os pedidos das 24 h antes de cada um.
+  const { data, error } = await leads.recentQuiz(new Date(Date.parse(since) - 86400_000).toISOString(), NEW_ORDER_COLUMNS);
   if (error) {
     safeLog("error", "[bot-api] new-orders falhou", { message: error.message });
     return createErrorResponse("Não foi possível ler os pedidos", 500);
   }
+  const overLimit = overOrderLimit(data ?? []);
+  if (overLimit.size) safeLog("warn", "[bot-api] new-orders: pedidos acima do limite, sem mensagem automática", { count: overLimit.size });
   const orders = (data ?? [])
+    .filter(r => !overLimit.has(r))
     .filter(r => typeof r.booking_id === "string" && typeof r.phone === "string" && Date.parse(String(r.created_at)) > sinceMs)
     .filter(r => !isTestOrder(r.name as string, lastNine(r.phone)))
     .sort((a, b) => Date.parse(String(a.created_at)) - Date.parse(String(b.created_at)))

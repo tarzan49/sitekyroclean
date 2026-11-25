@@ -8,6 +8,11 @@
 // fotografias. A mensagem abre editável na caixa do WhatsApp, não é enviada
 // sozinha.
 
+import { listBotCities } from "./botEngine.generated.js";
+
+// As localidades do site e os concelhos que servimos; uma localidade escrita à mão não vai na mensagem.
+const KNOWN_LOCATIONS = new Set((listBotCities() as { name: string }[]).map(c => c.name.toLowerCase()));
+
 type Treatment = "limpeza" | "impermeabilização";
 
 interface Noun { singular: string; plural: string; feminine: boolean }
@@ -72,9 +77,32 @@ export function photoQuestion(items: Item[]): string {
   return `Tem fotografias ${joinPt(items.map(withArticle))}?`;
 }
 
-function firstName(fullName: string): string {
-  const first = fullName.trim().split(/\s+/)[0] ?? "";
-  return first ? first.charAt(0).toUpperCase() + first.slice(1) : fullName;
+// Segurança (dono, 25 Nov 2026): esta mensagem sai sozinha, do nosso número, para o telefone que vier no pedido, e
+// qualquer pessoa pode chamar submit-lead com o texto que quiser. Por isso só passa o que o questionário escreve:
+// um nome próprio, uma localidade e linhas feitas das palavras dos nossos serviços. O resto fica fora da mensagem.
+function firstName(fullName: string | undefined): string | null {
+  const first = (fullName ?? "").normalize("NFC").trim().split(/\s+/)[0] ?? "";
+  return /^\p{L}[\p{L}'’-]{0,24}$/u.test(first) ? first.charAt(0).toUpperCase() + first.slice(1) : null;
+}
+const greeting = (name: string | undefined) => { const f = firstName(name); return f ? `Olá ${f}, tudo bem?` : "Olá, tudo bem?"; };
+
+const LINE_WORDS = new Set(("sofa sofas lugar lugares colchao colchoes solteiro casal king queen cadeira cadeiras tapete tapetes alcatifa alcatifas " +
+  "poltrona poltronas cadeirao cadeiroes puff puffs cabeceira cabeceiras chaise longue canto em u ou modular l " +
+  "limpeza lavagem higienizacao profunda pack impermeab impermeabilizacao premium essencial blindado protegido renovado so " +
+  "desbacterizacao anti acaros odor bactran pele tecido sintetico la juta sisal algodao seda fibra natural tratamento hidratacao da do de no na nos nas o a e com mais " +
+  "peca pecas paga sob orcamento x m cm x2 oferecemos oferta oferecido normalmente deslocacao incluida recolha entrega ate dias uteis " +
+  "protecao individual pequeno medio grande outro outra numero anos a1 bebe berco").split(" "));
+const LINE_MAX = 160, LINES_MAX = 15;
+/** Só palavras do questionário, números e a pontuação dele: nunca um endereço, um contacto ou uma frase. */
+export function safeLine(line: string): boolean {
+  if (!line || line.length > LINE_MAX || /\d{6,}/.test(line.replace(/[\s.]/g, "")) || !/^[\p{L}\p{N}\s.,;:()+×·|/€²–-]+$/u.test(line)) return false;
+  if (/\p{L}\.\p{L}/u.test(line)) return false;
+  const words = line.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().match(/[a-z]+/g) ?? [];
+  return words.every(w => LINE_WORDS.has(w));
+}
+function safeLocation(location: string | undefined): string | null {
+  const l = (location ?? "").trim();
+  return l && KNOWN_LOCATIONS.has(l.toLowerCase()) ? l : null;
 }
 
 // Quase todas as localidades servidas levam "em" (em Oeiras, em Lisboa), mas
@@ -95,7 +123,7 @@ const LOCATION_PREPOSITION: Record<string, string> = {
  * medidas (dono, 2026-10-10).
  */
 export function detailLines(details: string | undefined): string[] {
-  return (details ?? "").split("\n").map(l => l.trim()).filter(Boolean)
+  return (details ?? "").split(/\n| \| /).map(l => l.trim()).filter(safeLine).slice(0, LINES_MAX)
     .filter(l => !/^\d+x (Deslocação|Recolha(, entrega| e entrega))/.test(l))
     .map(l => {
       const m = /^(\d+)x (.*?)(?::\s*(?:\d[\d.,]*\s?€|Sob orçamento))?$/i.exec(l);
@@ -135,7 +163,7 @@ const euro = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".
  */
 function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedPrice): string {
   return [
-    `Olá ${firstName(lead.name)}, tudo bem?`,
+    greeting(lead.name),
     `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${loc}. O seu orçamento:`,
     [...price.lines.map(l => `• ${l.label}: ${euro(l.amount)}`),
       ...(price.gifts ?? []).map(g => `• ${g.label}: oferecido (normalmente ${euro(g.normal)})`),
@@ -148,23 +176,22 @@ function pricedMessage(lead: Record<string, string>, loc: string, price: QuotedP
 export function buildWhatsAppMessage(lead: Record<string, string>, price: QuotedPrice | null = null): string {
   const items = leadItems(lead.service ?? "", lead.service_type ?? "");
   const service = items.length ? ` para ${servicePhrase(items)}` : "";
-  const loc = lead.location
-    ? ` ${LOCATION_PREPOSITION[lead.location] ?? "em"} ${lead.location}`
-    : "";
+  const place = safeLocation(lead.location);
+  const loc = place ? ` ${LOCATION_PREPOSITION[place] ?? "em"} ${place}` : "";
   // Primeira pessoa do plural: quem presta o serviço é a equipa. O nome do
   // António fica só na apresentação, para a pessoa saber com quem fala.
-  if (price && price.lines.length) return pricedMessage(lead, loc, price);
+  if (price && price.lines.length && price.lines.every(l => safeLine(l.label)) && (price.gifts ?? []).every(g => safeLine(g.label))) return pricedMessage(lead, loc, price);
   const lines = detailLines(lead.details);
   if (lines.length) {
     return [
-      `Olá ${firstName(lead.name)}, tudo bem?`,
+      greeting(lead.name),
       `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${loc}:`,
       [...lines.map(l => `• ${l}`), ...(pickupOf(lead.details) ? ["• Com recolha e entrega"] : [])].join("\n"),
       ...(items.length ? [photoQuestion(items)] : []),
     ].join("\n\n");
   }
   return [
-    `Olá ${firstName(lead.name)}, tudo bem?`,
+    greeting(lead.name),
     `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}.`,
     ...(items.length ? [photoQuestion(items)] : []),
   ].join("\n\n");

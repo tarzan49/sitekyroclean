@@ -70,23 +70,17 @@ export function checkRateLimit(
  * Get client IP from request headers
  */
 export function getClientIP(req: Request): string {
-  // Check common headers for real IP (behind proxies/load balancers)
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    // Take first IP if multiple
-    return forwardedFor.split(',')[0].trim();
-  }
-  
-  const realIP = req.headers.get('x-real-ip');
-  if (realIP) {
-    return realIP.trim();
-  }
-  
+  // O cf-connecting-ip é posto pela Cloudflare à frente do Supabase; o x-forwarded-for pode vir escrito por quem chama
+  // (25 Nov 2026), por isso só serve de recurso.
   const cfConnectingIP = req.headers.get('cf-connecting-ip');
-  if (cfConnectingIP) {
-    return cfConnectingIP.trim();
-  }
-  
+  if (cfConnectingIP) return cfConnectingIP.trim();
+
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) return realIP.trim();
+
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) return forwardedFor.split(',')[0].trim();
+
   // Fallback
   return 'unknown';
 }
