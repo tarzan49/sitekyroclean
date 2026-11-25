@@ -1354,3 +1354,7 @@ Comerciais, 25 Nov: a faixa de clientes é giratória também no telemóvel (a g
 
 ## Cadeiras: limpeza + impermeabilização somadas (dono, 25 Nov 2026, "opção A")
 [RETIRADA 25/11] A limpeza a metade quando a cadeira leva impermeabilização (24 Nov, "359 acho que é um bom número"). Tornava a impermeabilização quase grátis: Wanda (Campanhã, 4 cadeiras + 2 tapetes) viu só limpeza 129€ e com Essencial 139€. Agora `CHAIR_CLEAN_WATERPROOF_FACTOR = 1`: cada serviço pela sua tabela, somado, no 9 mais perto, deslocação à parte como antes. Totais em Lisboa (Essencial / Premium): 1 = 49/59, 4 = 139/179, 6 = 199/259, 12 = 329/449. Preços já dados a clientes mantêm-se.
+
+## Mensagens vazias e fora de ordem na API (dono, 25 Nov 2026)
+
+Em coexistência a Meta entrega às vezes a mensagem vazia (`unsupported`, 131060/131051); o texto chega 0 a 3 s depois (uma vez 189 s) ou só no `history`. O bot pedia reenvio aos 2 min [RETIRADA 25/11]. Agora, aos 30 s: contacto novo recebe a pergunta de abertura; conversa existente não recebe nada e o dono recebe email. Mensagens entregues em lote fora de ordem: `trigger_ts` guarda a mais recente, para o envio não parar e reescrever (perdia 43 s).
