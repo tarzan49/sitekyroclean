@@ -1,6 +1,6 @@
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
 import { WHATSAPP_BASE } from "@/constants/business";
 import HomeHeroTrust from "@/components/HomeHeroTrust";
@@ -9,8 +9,19 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
 const imgDesktop = '/images/hero-sofa-v1.webp';
-const imgMobile = '/images/hero-sofa-mobile-extended.webp';
-const imgMobile750 = '/images/hero-sofa-mobile-extended-750.webp';
+
+// Vídeo real da equipa no topo do telemóvel (dono, 25 Nov: "o 3 e o q eu quero"); no computador fica a fotografia, porque o
+// vídeo é vertical. A capa é a primeira imagem do vídeo: carrega primeiro e o vídeo entra por cima sem salto.
+const CLIP = '/videos/home/topo-sofa';
+function HeroClip() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (window.matchMedia('(min-width: 768px), (prefers-reduced-motion: reduce)').matches) return;
+    const t = window.setTimeout(() => setOn(true), 600);
+    return () => window.clearTimeout(t);
+  }, []);
+  return on ? <video src={`${CLIP}.mp4`} poster={`${CLIP}.webp`} autoPlay muted loop playsInline preload="auto" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : null;
+}
 
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
@@ -31,8 +42,9 @@ const Hero = () => {
         <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
           <picture className="block h-full w-full">
             <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-            <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
+            <img src={`${CLIP}.webp`} alt="" className="h-full w-full object-cover" loading="eager" fetchPriority="high" width={720} height={1280} />
           </picture>
+          <HeroClip />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 46%, rgba(5,28,23,.74) 59%, rgba(5,28,23,.92) 72%, rgba(5,28,23,.97) 100%)' }} />
         </div>
         {/* Background */}
