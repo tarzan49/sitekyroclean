@@ -31,7 +31,7 @@ const IndexV1 = () => {
   }, []);
 
   return (
-    <div className="min-h-screen" data-home-scroller>
+    <div className="min-h-screen">
       <Header />
       <main>
         <HeroV1 />

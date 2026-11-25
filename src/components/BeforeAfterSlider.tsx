@@ -215,13 +215,32 @@ const BeforeAfterSlider = ({
     const el = containerRef.current;
     if (!el) return;
 
-    const onTouchStart = (e: TouchEvent) => startDrag(e.touches[0].clientX, e.touches[0].clientY);
-    const onTouchMove = (e: TouchEvent) => {
-      if (!isDraggingRef.current) return;
-      e.preventDefault();
-      moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+    // Deslizar a página para cima ou para baixo com o dedo em cima da comparação tem de funcionar (audit, 25 Nov: a
+    // página ficava presa). Só um gesto de lado move a linha; um toque parado leva-a para lá.
+    let from: { x: number; y: number } | null = null;
+    let decided = false;
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      from = { x: t.clientX, y: t.clientY }; decided = false;
+      if (orientation === 'horizontal') { decided = true; startDrag(t.clientX, t.clientY); }
     };
-    const onTouchEnd = () => endDrag();
+    const onTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!decided && from) {
+        const dx = Math.abs(t.clientX - from.x); const dy = Math.abs(t.clientY - from.y);
+        if (Math.max(dx, dy) < 6) return;
+        decided = true;
+        if (dx > dy) startDrag(t.clientX, t.clientY);
+      }
+      if (!isDraggingRef.current) return;
+      if (e.cancelable) e.preventDefault();
+      moveDrag(t.clientX, t.clientY);
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!decided && from && e.type === 'touchend') startDrag(from.x, from.y);
+      from = null;
+      endDrag();
+    };
 
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -234,14 +253,14 @@ const BeforeAfterSlider = ({
       el.removeEventListener('touchend', onTouchEnd);
       el.removeEventListener('touchcancel', onTouchEnd);
     };
-  }, [startDrag, moveDrag, endDrag]);
+  }, [startDrag, moveDrag, endDrag, orientation]);
 
   const isVertical = orientation === "vertical";
 
   const sliderInner = (
     <div
       ref={containerRef}
-      className={`relative select-none touch-none cursor-grab active:cursor-grabbing overflow-hidden ${
+      className={`relative select-none ${isVertical ? 'touch-pan-y' : 'touch-none'} cursor-grab active:cursor-grabbing overflow-hidden ${
         noFrame ? "w-full h-full" : (isVertical ? "aspect-square md:aspect-[4/3]" : "aspect-[3/4] md:aspect-[16/9]")
       }`}
       style={{ WebkitUserDrag: "none" } as React.CSSProperties}

@@ -73,7 +73,7 @@ export function useScrollReveal() {
         involved.forEach(el => el.classList.remove('sr-no-transition'));
       });
 
-      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('scroll', onScroll, { passive: true, capture: true });
     };
 
     // Wait for Framer Motion page transition (280ms) + lazy Suspense
@@ -82,7 +82,7 @@ export function useScrollReveal() {
     return () => {
       clearTimeout(timer);
       cancelAnimationFrame(rafId);
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onScroll, true);
       document
         .querySelectorAll<HTMLElement>('section.sr-ready')
         .forEach(el => el.classList.remove('sr-ready', 'sr-active', 'sr-inactive', 'sr-no-transition'));
