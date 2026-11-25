@@ -1358,3 +1358,7 @@ Comerciais, 25 Nov: a faixa de clientes é giratória também no telemóvel (a g
 ## Mensagens vazias e fora de ordem na API (dono, 25 Nov 2026)
 
 Em coexistência a Meta entrega às vezes a mensagem vazia (`unsupported`, 131060/131051); o texto chega 0 a 3 s depois (uma vez 189 s) ou só no `history`. O bot pedia reenvio aos 2 min [RETIRADA 25/11]. Agora, aos 30 s: contacto novo recebe a pergunta de abertura; conversa existente não recebe nada e o dono recebe email. Mensagens entregues em lote fora de ordem: `trigger_ts` guarda a mais recente, para o envio não parar e reescrever (perdia 43 s).
+
+## Funil original reposto (dono, 25 Nov 2026)
+
+"Foi definido um funil que foi sempre usado durante 2 meses em que fizemos 8.000 euros." As horas só depois de escolher (23 Nov) e "primeiro o pack, depois as datas" (19 Nov, Fernando) ficam [RETIRADA 25/11]: as opções, as horas e "Como gostaria de avançar?" vão na mesma mensagem, a última. Continua: marcar só com a opção escolhida. Última ordem no código: preço, fotografia, extra, vídeo, opções + horas.
