@@ -10,7 +10,7 @@ const QuizForm = lazy(() => import('./QuizFormLazy'));
 
 const imgDesktop = '/images/hero-sofa-v1.webp';
 
-// Vídeo real da equipa no topo do telemóvel (dono, 25 Nov: "o 3 e o q eu quero"); no computador fica a fotografia, porque o
+// Vídeo real da equipa no topo do telemóvel (dono, 25 Nov: "o 3 e o 4 intercalado": dois sofás que passam de um para o outro num só ficheiro, com o ciclo sem salto); no computador fica a fotografia, porque o
 // vídeo é vertical. A capa é a primeira imagem do vídeo: carrega primeiro e o vídeo entra por cima sem salto.
 const CLIP = '/videos/home/topo-sofa';
 function HeroClip() {
