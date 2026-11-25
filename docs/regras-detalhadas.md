@@ -1317,6 +1317,8 @@ Dono: "quero CTAs sérios e premium, quero criar uma lógica de CTAs no site, on
 
 **Cor e símbolos do 5B (dono, 25 Nov 2026, à noite):** "o cta branco nao combina nada com o site nas paginas com fundo verde [...] no falar por whatsapp convinha ter o simbolo do whatsapp ao lado e no calcular o preço uma calculadora". [RETIRADA 25/11: marfim #F7F3E8 e "sem ícones"] WhatsApp verde-esmeralda #1C7A4C com texto e símbolo brancos e filete #D4AF37, igual sobre verde, fotografia e branco; comparado com ouro, champanhe e verde-noite nas páginas reais. `onLight` só muda o botão do preço.
 
+**Barra fixa com o preço (dono, 25 Nov 2026, "quero como a cena da laas locks"; "Sim, publica"):** quem escolhe no widget e continua a descer mantém o total e o pedido à vista. `setPriceBar` (StepPricePicker, PackStepPicker) só com total do motor; `html[data-price-bar]` reserva espaço na secção do widget e aperta-a nos ecrãs baixos; no computador o total continua dentro do botão.
+
 Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo real, separadores e pesquisa dentro do topo; cada tema do blog num ecrã; glossário por letra, em linhas que abrem.
 
 ## Um push para master publica o site (descoberto a 25 Nov 2026)
