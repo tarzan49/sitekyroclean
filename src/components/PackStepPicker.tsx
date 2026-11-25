@@ -4,6 +4,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, Minus, Plus } from 'lucide-react';
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
+import { setPriceBar } from '@/lib/priceBar';
 import { PhotoCards } from '@/components/StepPricePicker';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import { groupGifts, type BasketGift, type BasketItem } from '@/components/quiz/VisitBasket';
@@ -108,6 +109,13 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
   const inVisit = pieces.filter(p => !sel[p]?.skip);
   const gifts = final ? groupGifts(final.gifts) : [];
   const msg = done ? `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${inVisit.map(describe).join(', ')}${final?.total ? `, por ${formatEuro(final.total)}${gifts.length ? ` (com ${gifts.map(g => g.text).join(' e ')} ${gifts.length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.` : '';
+  const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
+  // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
+  const [barKey] = useState(() => ({}));
+  const barTotal = done && final?.total != null ? formatEuro(final.total) : null;
+  const barWas = barTotal && final!.crossed !== null ? formatEuro(final!.crossed) : undefined;
+  useEffect(() => { setPriceBar(barKey, barTotal ? { total: barTotal, was: barWas, href, source } : null); }, [barKey, barTotal, barWas, href, source]);
+  useEffect(() => () => setPriceBar(barKey, null), [barKey]);
   const toBasket = (): BasketItem[] => inVisit.map((p, i) => {
     const v = sel[p]!; const id = `p${Date.now()}_${i}`;
     if (p === 'rug') return { id, kind: 'rug', qty: 1, pack: 'none', width: v.w, length: v.l };
@@ -168,7 +176,7 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
           {final!.crossed !== null && final!.total !== null && <span className="block text-sm font-bold text-[#D4AF37]">Poupa {formatEuro(Math.round((final!.crossed - final!.total) * 100) / 100)}</span>}</span>
       </div>
       {gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-sm font-semibold text-[#D4AF37]">{gifts.map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
-      <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={final!.total !== null ? formatEuro(final!.total) : undefined} className="mt-3" />
+      <WhatsAppCta onLight href={href} source={source} total={final!.total !== null ? formatEuro(final!.total) : undefined} className={`mt-3 ${barTotal ? 'max-md:hidden' : ''}`} />
       <PriceCta onLight className="mt-2" onClick={() => setBasket(toBasket())}>Juntar mais artigos</PriceCta>
     </>}
     {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
