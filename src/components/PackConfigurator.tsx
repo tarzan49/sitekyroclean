@@ -146,12 +146,15 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
   });
 
   const msg = [
-    `Olá! Gostaria de saber o preço e a disponibilidade deste pack ${cityPrep(city)} ${city}:`,
+    `Olá! Gostaria de saber ${prices.quote ? 'o preço e ' : ''}a disponibilidade deste pack ${cityPrep(city)} ${city}:`,
+    '',
     ...prices.lines.map(l => `${l.label}: ${l.amount === null ? 'sob orçamento' : money(l.amount)}${l.perkApplied ? ` (preço de pack, tabela ${money(l.tablePrice ?? 0)})` : ''}${!l.perkApplied && l.perkNote ? ` (preço de pack: ${l.perkNote.toLowerCase()})` : ''}${l.quote && l.amount !== null ? ' + extra sob orçamento' : ''}`),
     `Serviços: ${money(prices.subtotal)}`,
     ...(prices.savings > 0 ? [`Poupança do pack: ${money(prices.savings)}`] : []),
     `Deslocação: ${travelIncluded ? 'incluída' : prices.travel === null ? 'a confirmar' : money(prices.travel)}`,
     `${prices.quote ? 'Subtotal conhecido' : 'Estimativa total'}: ${money(prices.total)}${prices.quote ? ' + valores sob orçamento' : ''}`,
+    '',
+    'Envio as fotografias e a localidade.',
   ].join('\n');
 
   /** Resumo curto de um artigo para o cartão lateral; a versão longa

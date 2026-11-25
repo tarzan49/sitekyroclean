@@ -1,6 +1,7 @@
 // Packs de várias peças e sofá com anti-ácaros, com a lógica do orçamento (dono, 25 Nov): uma pergunta de cada vez,
 // peça a peça (material, tamanho, opção), nada escolhido à partida, fotografia real em cima e no fim o total do bot
 // (botQuote, deslocação incluída), o riscado do mesmo pedido em separado e a oferta, como o bot os dá.
+import { pricedWaMessage } from '@/lib/whatsappMessages';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, Minus, Plus } from 'lucide-react';
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
@@ -108,7 +109,8 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
   };
   const inVisit = pieces.filter(p => !sel[p]?.skip);
   const gifts = final ? groupGifts(final.gifts) : [];
-  const msg = done ? `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${inVisit.map(describe).join(', ')}${final?.total ? `, por ${formatEuro(final.total)}${gifts.length ? ` (com ${gifts.map(g => g.text).join(' e ')} ${gifts.length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.` : '';
+  const giftText = gifts.length ? ` (com ${gifts.map(g => g.text).join(' e ')} ${gifts.length > 1 ? 'oferecidos' : 'oferecido'})` : '';
+  const msg = done ? pricedWaMessage(`para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${inVisit.map(describe).join(', ')}`, final?.total ? `${formatEuro(final.total)}${giftText}` : null, 'as fotografias') : '';
   const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
   // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
   const [barKey] = useState(() => ({}));

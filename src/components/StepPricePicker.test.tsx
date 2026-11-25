@@ -27,7 +27,9 @@ describe('StepPricePicker', () => {
     const a = await screen.findByText(/Falar por WhatsApp ·/);
     const href = decodeURIComponent(a.closest('a')!.getAttribute('href')!);
     expect(href).toContain('do pack Blindado (limpeza + impermeabilização Premium');
-    expect(href).toContain(`em Lisboa, por ${want.shown}`);
+    expect(href).toContain('Gostaria de saber a disponibilidade do pack Blindado');
+    expect(href).toContain(`em Lisboa.\n\nValor no site: ${want.shown}`);
+    expect(href).toMatch(/\n\nEnvio a fotografia do sofá e a localidade\.$/);
   });
   it('pele: um só preço, sem impermeabilização', async () => {
     render(<StepPricePicker kind="sofa" city="Porto" source="t" />);

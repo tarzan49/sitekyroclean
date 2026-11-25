@@ -237,3 +237,14 @@ export function buildPackWaMessage(packId: string, cityName: string): string {
   const pack = PACK_MESSAGES[packId] ?? { request: 'limpar os meus estofos', kind: 'estofos' as const };
   return buildItemWaMessage(pack.request, pack.kind, cityName);
 }
+
+/** Pedido vindo de um widget de preço. Com o valor já à vista pede só a disponibilidade; sem valor, o preço também.
+ *  Sempre em parágrafos e a acabar na fotografia e na localidade (dono, 25 Nov). `about` segue "a disponibilidade"
+ *  (ex.: "do pack Blindado (…) para um sofá de 3 lugares, em Lisboa"); o bot lê "disponibilidade do pack X". */
+export function pricedWaMessage(about: string, price: string | null, photo = 'a fotografia'): string {
+  return [
+    `Olá! Gostaria de saber ${price ? '' : 'o preço e '}a disponibilidade ${about}.`,
+    ...(price ? [`Valor no site: ${price}.`] : []),
+    `Envio ${photo} e a localidade.`,
+  ].join('\n\n');
+}

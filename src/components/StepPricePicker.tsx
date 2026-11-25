@@ -2,6 +2,7 @@
 // do orçamento [...] deveria seguir a mesma lógica"): localidade, material, tamanho e só depois as opções com preço.
 // Nada vem escolhido e o botão diz o passo que falta. Os números são os do cesto (funções do VisitBasket, que lêem o
 // motor do bot), carregadas só quando a pessoa começa a escolher.
+import { pricedWaMessage } from '@/lib/whatsappMessages';
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { setPriceBar } from '@/lib/priceBar';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -166,8 +167,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
     if (what === 'mattress') return `da limpeza${extra ? ' com anti-ácaros (produto Bactran)' : ''} para ${describe()}`;
     return `da lavagem${extra ? ' com anti-odor' : ''} de ${describe()}`;
   };
-  const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'fotografias';
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}` : ''}. Envio ${photo}.`;
+  const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'as fotografias';
+  const msg = pricedWaMessage(`${service()}, ${cityPrep(city)} ${city}`, total !== null ? formatEuro(total) : null, photo);
   const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
 
   // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.

@@ -1,6 +1,7 @@
 // Sofás de pele (dono, 24 Nov): nunca impermeabilização. Duas opções com o total do bot (botQuote, deslocação
 // incluída): "Renovado" = só limpeza; "Renovado + Pele" = limpeza + tratamento da pele (limpeza e hidratação,
 // +40€, +60€ em 5 e 6 lugares, `leather: true`). Mesmo desenho do WaterproofPackPicker.
+import { pricedWaMessage } from '@/lib/whatsappMessages';
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
@@ -37,7 +38,7 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
   })) as Record<string, number | null>, [counts, city]);
   const chosen = options.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para ${sofaWhat(counts, 'sofá de pele', 'sofás de pele')} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
+  const msg = pricedWaMessage(`para ${sofaWhat(counts, 'sofá de pele', 'sofás de pele')} (${chosen.wa}), ${cityPrep(city)} ${city}`, total ? formatEuro(total) : null, 'a fotografia do sofá');
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">

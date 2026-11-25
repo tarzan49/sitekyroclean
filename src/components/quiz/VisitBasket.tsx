@@ -244,7 +244,12 @@ function separateOf(city: string, it: BasketItem | BasketItem[]): number | null 
 /** Envio falhou (sessão SEO, 25 Nov): a mensagem de WhatsApp leva o pedido inteiro, porque o bot não o encontra no CRM. */
 function fallbackMessage(city: string, items: BasketItem[], priceText: string, gifts: BasketGift[]): string {
   const offer = groupGifts(gifts).map(g => `oferecem ${g.text}`).join('; ');
-  return `Olá! Gostaria de saber o preço e a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}. No site deu ${priceText}${cityKnown(city) ? ', com a deslocação incluída' : ''}${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`;
+  const priced = /\d/.test(priceText);
+  return [
+    `Olá! Gostaria de saber ${priced ? '' : 'o preço e '}a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}.`,
+    `No site deu ${priceText}${cityKnown(city) ? ', com a deslocação incluída' : ''}${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`,
+    'Envio as fotografias e a localidade.',
+  ].join('\n\n');
 }
 /** Riscado de uma linha (a quantidade real, nunca 1 unidade × quantidade: as cadeiras têm escalões e a deslocação é
  *  uma só): as mesmas peças pedidas sozinhas, sem contar a oferta, mais o que o motor diz que cada unidade pouparia em
