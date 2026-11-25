@@ -921,6 +921,15 @@ async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
   return createSuccessResponse({ release: { released: !!done.released, reason: done.reason ?? null } });
 }
 
+// 25 Nov 2026: the database stopped answering and every availability call hung with it (the bot lost all hours).
+// The calendar is the source of the hours; the pre-bookings only add the last minutes, so they never hold it up.
+// A race, not an abort signal: the client library retries an aborted read three times (19 s).
+const HOLDS_TIMEOUT_MS = 2_500;
+function inTime<T>(p: PromiseLike<T>): Promise<T | { error: string }> {
+  let timer: ReturnType<typeof setTimeout>;
+  const late = new Promise<{ error: string }>(ok => { timer = setTimeout(() => ok({ error: "A base de dados não respondeu" }), HOLDS_TIMEOUT_MS); });
+  return Promise.race([Promise.resolve(p), late]).finally(() => clearTimeout(timer));
+}
 function supabaseHolds(): HoldStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -929,14 +938,16 @@ function supabaseHolds(): HoldStore | null {
   const cols = "conversation_id, event_id, title, starts_at, ends_at, updated_at, released_at";
   return {
     async get(id) {
-      const { data, error } = await client.from("bot_calendar_holds").select(cols).eq("conversation_id", id).limit(1);
-      if (error) return { error: error.message };
-      return (data?.[0] as HoldRow | undefined) ?? null;
+      const res = await inTime(client.from("bot_calendar_holds").select(cols).eq("conversation_id", id).limit(1));
+      if (!("data" in res)) return { error: res.error };
+      if (res.error) return { error: res.error.message };
+      return (res.data?.[0] as HoldRow | undefined) ?? null;
     },
     async recent(since) {
-      const { data, error } = await client.from("bot_calendar_holds").select(cols).is("released_at", null).gte("updated_at", since);
-      if (error) return { error: error.message };
-      return (data ?? []) as HoldRow[];
+      const res = await inTime(client.from("bot_calendar_holds").select(cols).is("released_at", null).gte("updated_at", since));
+      if (!("data" in res)) return { error: res.error };
+      if (res.error) return { error: res.error.message };
+      return (res.data ?? []) as HoldRow[];
     },
     async save(row) {
       const { error } = await client.from("bot_calendar_holds").upsert(row, { onConflict: "conversation_id" });
