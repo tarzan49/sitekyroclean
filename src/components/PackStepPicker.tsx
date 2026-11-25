@@ -168,8 +168,8 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
           {final!.crossed !== null && final!.total !== null && <span className="block text-sm font-bold text-[#D4AF37]">Poupa {formatEuro(Math.round((final!.crossed - final!.total) * 100) / 100)}</span>}</span>
       </div>
       {gifts.length > 0 && <ul className="mt-1.5 space-y-0.5 text-sm font-semibold text-[#D4AF37]">{gifts.map(g => <li key={g.key}>Oferecemos {g.text}, normalmente {formatEuro(g.normal)}</li>)}</ul>}
-      <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={final!.total !== null ? formatEuro(final!.total) : undefined} className="mt-3" />
-      <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => setBasket(toBasket())}>Juntar mais artigos</PriceCta>
+      <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={final!.total !== null ? formatEuro(final!.total) : undefined} className="mt-3" />
+      <PriceCta onLight className="mt-2" onClick={() => setBasket(toBasket())}>Juntar mais artigos</PriceCta>
     </>}
     {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
   </div>;
