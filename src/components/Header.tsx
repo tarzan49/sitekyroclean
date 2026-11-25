@@ -98,7 +98,7 @@ const Header = () => {
         um só estilo de botões, serviços com fotografia real e "desde" do motor. A altura não muda (57/61 px), porque as
         secções de ecrã inteiro contam com ela. */}
     <header className={`fixed top-0 left-0 right-0 z-50 border-b bg-white transition-shadow duration-200 ${scrolled ? 'border-transparent shadow-[0_6px_24px_-12px_rgba(11,47,42,0.28)]' : 'border-[#111111]/8'}`}>
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 pl-3 pr-1.5 sm:px-5 md:h-[60px] lg:gap-5 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-7xl min-[1440px]:max-w-[1400px] items-center justify-between gap-2 pl-3 pr-1.5 sm:px-5 md:h-[60px] lg:gap-5 lg:px-8">
 
         <Link
           to="/"
