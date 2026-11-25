@@ -262,4 +262,4 @@ export const COMMERCIAL_CONTACT_TEXT = 'Para saber o preço para a sua empresa, 
 export const COMMERCIAL_CONTACT_HINT = 'Envie o tipo de espaço, a localidade e as peças, de preferência com fotografias.';
 
 /** Empresas com quem já trabalhámos, confirmadas pelo dono a 24 Nov. Nunca acrescentar contactos comerciais da folha. */
-export const COMMERCIAL_CLIENTS = ['Real Indiana', 'Arcádia', 'Mikado', 'Palácio da Bolsa', 'RC Restaurante', 'Duello', 'Menina Colina', 'Garden Balthazar', 'Lumière', 'Praia da Luz', 'Sabores do Churrasco Premium', 'Al Mare', 'Genki', 'Mövenpick', 'Cais 51'];
+export const COMMERCIAL_CLIENTS = ['Real Indiana', 'Arcádia', 'Mikado', 'Palácio da Bolsa', 'RC Restaurante', 'Duello', 'Menina Colina', 'Garden Balthazar', 'Lumière', 'Praia da Luz', 'Sabores do Churrasco Premium', 'Al Mare', 'Genki', 'Mövenpick', 'Cais 51', 'Espaço Porto Cruz', 'Maré José Avillez', 'Tucanos', 'Smoke by D Cigars', 'Don Lopo', 'Boîte Porto', 'Belouracar', 'Delícia Positiva', 'Your Host'];
