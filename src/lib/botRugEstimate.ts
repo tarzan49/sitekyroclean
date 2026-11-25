@@ -141,6 +141,6 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
     sofaUpsellPrice: sofaCleaningPrice('3-lugares') + travelFee,
     sofaUsualPrice: sofaCleaningPrice('3-lugares') + travelFee,
     ...(materialAssumed ? { materialAssumed: true as const } : {}),
-    rule: (materialAssumed ? ASSUMED_NOTE : '') + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço cheio, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.',
+    rule: (materialAssumed ? ASSUMED_NOTE : '') + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Nunca oferecer o sofá nem outra peça que o cliente não pediu (dono, 25 Nov 2026).',
   };
 }

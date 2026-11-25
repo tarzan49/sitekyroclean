@@ -58,12 +58,12 @@ describe('visitGifts: casos 3 a 6 (dono, 24 Nov 2026)', () => {
   });
   it('sem colchão: o tratamento mais barato (sofá + cadeiras = cadeiras; dois sofás = um sofá)', () => {
     expect(pieces(botQuote({ items: [S, C], city: 'Lisboa' }))).toEqual(['chairs']);
-    // Dois sofás de 3L (~158€): o anti-ácaros de 50€ passa os 20% do pedido, não há oferta (dono, 25 Nov 2026).
-    expect(pieces(botQuote({ items: [S, S], city: 'Lisboa' }))).toEqual([]);
+    // Desde 25/11 ("Sempre") a primeira oferta vai mesmo acima dos 20%: dois sofás de 3L, não há oferta (dono, 25 Nov 2026).
+    expect(pieces(botQuote({ items: [S, S], city: 'Lisboa' }))).toEqual(['sofa']);
   });
   it('poltronas contam como peça', () => {
     // Sofá + 1 poltrona: os 50€ do sofá passam os 20%; com 4 poltronas já cabe (dono, 25 Nov 2026).
-    expect(pieces(botQuote({ items: [S], armchairs: 1, city: 'Lisboa' }))).toEqual([]);
+    expect(pieces(botQuote({ items: [S], armchairs: 1, city: 'Lisboa' }))).toEqual(['sofa']);
   });
   it('cadeiras já pedidas com anti-ácaros podem ser a oferta', () => {
     const r = botQuote({ items: [S, { ...C, treatment: 'clean+anti-acaros' }], city: 'Lisboa' }) as any;

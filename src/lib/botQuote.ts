@@ -894,7 +894,7 @@ function withOdorFloor<T>(input: unknown, r: T): T {
  */
 export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor' | 'tratamento-pele'; normal: number };
-/** The gifts of a visit never pass 20% of the order (owner, 25 Nov 2026: "não podemos oferecer um tratamento de 60€ num pedido de 150"). */
+/** From the second gift on, the gifts of a visit never pass 20% of the order; the first always goes (owner, 25 Nov 2026, "Sempre") (owner, 25 Nov 2026: "não podemos oferecer um tratamento de 60€ num pedido de 150"). */
 export const VISIT_GIFTS_MAX_SHARE = 0.2;
 export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
@@ -978,7 +978,8 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
       const mattresses = c.piece === 'mattress' ? Number(rec(i).qty) || 1 : 0;
       const gift: VisitGift = { piece: c.piece, treatment: c.treatment, normal: c.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - usualBase) };
       // The mattress anti-mites stays out of the cap (owner, 25 Nov 2026: "colchão fora do teto").
-      if (c.piece !== 'mattress' && giftUsed + gift.normal > giftCap + 1e-9) { capped = true; continue; }
+      // The first gift always goes, cap or not (owner, 25 Nov 2026, "Sempre": every second piece has a free treatment).
+      if (c.piece !== 'mattress' && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) { capped = true; continue; }
       // The mattress goes first (owner's ladder), then the cheapest treatment left.
       const better = !best || (c.piece === 'mattress') !== (best.gift.piece === 'mattress') ? !best || c.piece === 'mattress' : gift.normal !== best.gift.normal ? gift.normal < best.gift.normal : keyOf(n) < keyOf(best.n);
       if (better) best = { n, gift, items, priced };
@@ -1031,7 +1032,9 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     const before = pricedTotal(r1), after = pricedTotal(withSofaTravelOffer(one, r1));
     return before !== null && after !== null ? cents(n + before - after) : n;
   }, 0);
-  const lift = Math.max(0, cents(sumAlone - total));
+  // A first gift over the cap never moves the price: cleaned sofas and rugs already paid the full sum, the rest stays (25 Nov 2026).
+  const overCap = gifted.size === 1 && cents(gifts[0].piece === 'mattress' ? 0 : gifts[0].normal) > giftCap;
+  const lift = overCap && !(cleanedSofas || withRugs) ? 0 : Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
   // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };

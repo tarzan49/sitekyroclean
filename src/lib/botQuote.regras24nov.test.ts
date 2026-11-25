@@ -128,16 +128,16 @@ describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medi
   });
 });
 
-describe('4. tapetes ao preço cheio, com o anti-odor oferecido quando couber (dono, 25 Nov 2026: "A")', () => {
+describe('4. tapetes ao preço cheio, com o anti-odor oferecido sempre (dono, 25 Nov 2026: "A" e "Sempre")', () => {
   const R = (x: object = {}) => ({ kind: 'rug', width: 2, length: 3, ...x }), K = { kind: 'carpet', width: 4, length: 5 };
   const paid = (r: Q) => r.rugCombo?.comboPrice ?? (r.quote ? r.rugEstimate?.homePrice : r.total);
   it.each([
     ['um tapete só', [R()], 69, null],
-    ['2 tapetes', [R(), R()], 139, null],
-    ['2 tapetes em qty', [R({ qty: 2 })], 139, null],
+    ['2 tapetes', [R(), R()], 139, 169],
+    ['2 tapetes em qty', [R({ qty: 2 })], 139, 169],
     ['3 tapetes', [R(), R(), R()], 209, 239],
     ['tapete + alcatifa 20 m²', [R(), K], 239, 269],
-    ['sofá 3L + tapete', [S(), R()], 159, null],
+    ['sofá 3L + tapete', [S(), R()], 159, 189],
   ])('%s', (_n, items, total, usual) => {
     const r = q(items as unknown[]);
     expect([paid(r), r.visitGifts?.usual ?? null]).toEqual([total, usual]);

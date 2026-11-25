@@ -871,7 +871,7 @@ function rugEstimate(rugs, city) {
     sofaUpsellPrice: sofaCleaningPrice("3-lugares") + travelFee,
     sofaUsualPrice: sofaCleaningPrice("3-lugares") + travelFee,
     ...materialAssumed ? { materialAssumed: true } : {},
-    rule: (materialAssumed ? ASSUMED_NOTE : "") + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço cheio, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.'
+    rule: (materialAssumed ? ASSUMED_NOTE : "") + "Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Nunca oferecer o sofá nem outra peça que o cliente não pediu (dono, 25 Nov 2026)."
   };
 }
 
@@ -3062,7 +3062,7 @@ function withVisitGifts(input, r) {
       if (priced2 === null || priced2 <= usualBase) continue;
       const mattresses = c.piece === "mattress" ? Number(rec(i).qty) || 1 : 0;
       const gift = { piece: c.piece, treatment: c.treatment, normal: c.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - usualBase) };
-      if (c.piece !== "mattress" && giftUsed + gift.normal > giftCap + 1e-9) {
+      if (c.piece !== "mattress" && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) {
         capped = true;
         continue;
       }
@@ -3101,7 +3101,8 @@ function withVisitGifts(input, r) {
     const before = pricedTotal(r1), after = pricedTotal(withSofaTravelOffer(one, r1));
     return before !== null && after !== null ? cents(n + before - after) : n;
   }, 0);
-  const lift = Math.max(0, cents(sumAlone - total));
+  const overCap = gifted.size === 1 && cents(gifts[0].piece === "mattress" ? 0 : gifts[0].normal) > giftCap;
+  const lift = overCap && !(cleanedSofas || withRugs) ? 0 : Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
   const up9 = (x) => {
     const n = Math.ceil(x);
