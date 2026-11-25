@@ -22,6 +22,16 @@ interface RpcCapableClient {
 // o tipo muda, o `this` no runtime é sempre o `supabase` verdadeiro.
 const callIsAdmin = (fn: 'is_admin') => (supabase as unknown as RpcCapableClient).rpc(fn);
 
+/** Nível da sessão no próprio token: aal1 = só a senha, aal2 = senha e código. */
+export function sessionLevel(token: string | undefined): string {
+  try {
+    const part = (token ?? '').split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return String(JSON.parse(atob(part)).aal ?? 'aal1');
+  } catch {
+    return 'aal1';
+  }
+}
+
 // Substitui o antigo gate de password client-side (uma string comparada em
 // JS, visível em texto simples no bundle público — achado CRITICAL no audit
 // de código 2026-09-08). O acesso real ao painel /admin passa a depender de
@@ -46,6 +56,11 @@ export function useAdminSession() {
   // A verificação falhou (rede ou Supabase): não é o mesmo que não ter acesso.
   const [adminError, setAdminError] = useState<string | null>(null);
 
+  // Segundo fator (dono, 25 Nov 2026). Quem o exige é a base de dados (`is_admin()` recusa uma sessão só com senha quando a
+  // conta tem um fator confirmado); aqui decide-se apenas que ecrã mostrar.
+  const [factorId, setFactorId] = useState<string | null>(null);
+  const [noFactor, setNoFactor] = useState(false);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -62,20 +77,30 @@ export function useAdminSession() {
   // isso voltava a pôr o ecrã de carregamento, desmontava o painel e o CRM abria
   // outra vez nos Pedidos (dono, 2026-11-01: "a página dá reset").
   const userId = session?.user.id ?? null;
+  const level = sessionLevel(session?.access_token);
   useEffect(() => {
     if (!userId) {
+      setFactorId(null);
       setIsAdmin(false);
       setCheckingAdmin(false);
       return;
     }
     setCheckingAdmin(true);
     setAdminError(null);
-    callIsAdmin('is_admin').then(({ data, error }) => {
+    let stale = false;
+    callIsAdmin('is_admin').then(async ({ data, error }) => {
+      const factors = await supabase.auth.mfa.listFactors().catch(() => null);
+      if (stale) return;
+      setFactorId(factors?.data?.totp?.[0]?.id ?? null);
+      // Só se oferece ligar o segundo fator quando a lista chegou mesmo vazia, nunca porque falhou.
+      setNoFactor(!!factors?.data && !factors.data.totp.length);
       setIsAdmin(!error && data === true);
       setAdminError(error ? error.message : null);
       setCheckingAdmin(false);
     });
-  }, [userId]);
+    return () => { stale = true; };
+  }, [userId, level]);
 
-  return { session, loading, isAuthed: !!session, isAdmin, checkingAdmin, adminError };
+  const needsCode = !!session && !isAdmin && !!factorId && level !== 'aal2';
+  return { session, loading, isAuthed: !!session, isAdmin, checkingAdmin, adminError, factorId, needsCode, noFactor };
 }

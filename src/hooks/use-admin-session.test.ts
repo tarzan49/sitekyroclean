@@ -11,7 +11,7 @@ import { useAdminSession } from './use-admin-session';
  * erro visto em produção local: "undefined is not an object (evaluating
  * 'this.rest')".
  */
-function fakeSupabaseClient(session: { user: { id: string } } | null, isAdminResult: boolean) {
+function fakeSupabaseClient(session: { user: { id: string }; access_token?: string } | null, isAdminResult: boolean, totp: { id: string }[] = []) {
   return {
     rest: { marker: true },
     rpc(fn: string) {
@@ -21,6 +21,7 @@ function fakeSupabaseClient(session: { user: { id: string } } | null, isAdminRes
       return Promise.resolve({ data: isAdminResult, error: null });
     },
     auth: {
+      mfa: { listFactors: () => Promise.resolve({ data: { all: totp, totp }, error: null }) },
       getSession: () => Promise.resolve({ data: { session } }),
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } }),
     },
@@ -62,4 +63,19 @@ it('com sessão mas is_admin() devolve falso: isAdmin fica falso, isAuthed conti
     expect(result.current.checkingAdmin).toBe(false);
   });
   expect(result.current.isAdmin).toBe(false);
+});
+
+it('conta com segundo fator e sessão só com senha: pede o código', async () => {
+  mocks.client = fakeSupabaseClient({ user: { id: '1' }, access_token: `h.${btoa('{"aal":"aal1"}')}.s` }, false, [{ id: 'f1' }]);
+  const { result } = renderHook(() => useAdminSession());
+  await waitFor(() => expect(result.current.needsCode).toBe(true));
+  expect(result.current.factorId).toBe('f1');
+  expect(result.current.isAdmin).toBe(false);
+});
+
+it('conta sem segundo fator: entra e oferece ligá-lo', async () => {
+  mocks.client = fakeSupabaseClient({ user: { id: '1' } }, true);
+  const { result } = renderHook(() => useAdminSession());
+  await waitFor(() => expect(result.current.noFactor).toBe(true));
+  expect(result.current.needsCode).toBe(false);
 });

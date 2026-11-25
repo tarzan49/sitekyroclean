@@ -22,3 +22,19 @@ for (const [label, authenticated, admin, error, expected] of [
     assertEquals(await hasAdminAccess(client, 'test-token'), expected);
   });
 }
+
+const jwt = (aal: string) => `h.${btoa(JSON.stringify({ aal }))}.s`;
+for (const [label, factors, aal, expected] of [
+  ['com fator e só senha: recusado', [{ status: 'verified' }], 'aal1', false],
+  ['com fator e código: entra', [{ status: 'verified' }], 'aal2', true],
+  ['fator por confirmar não conta', [{ status: 'unverified' }], 'aal1', true],
+  ['sem fator: entra', [], 'aal1', true],
+] as const) {
+  Deno.test(label, async () => {
+    const client = {
+      auth: { getUser: async () => ({ data: { user: { id: 'u', factors: [...factors] } }, error: null }) },
+      from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { user_id: 'u' }, error: null }) }) }) }),
+    };
+    assertEquals(await hasAdminAccess(client, jwt(aal)), expected);
+  });
+}

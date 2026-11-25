@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AlertTriangle, Home, Settings2, Lock, LogOut, Users, Contact, TrendingUp } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
+import { AdminMfaChallenge, AdminMfaEnroll } from "@/components/admin/AdminMfa";
 
 const GrowthPanel = lazy(() => import("./admin/GrowthPanel"));
 const CrmPanel = lazy(() => import("./admin/CrmPanel"));
@@ -27,7 +28,7 @@ const TabFallback = () => (
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const AdminPanel = () => {
-  const { isAuthed, loading: authLoading, isAdmin, checkingAdmin, adminError } = useAdminSession();
+  const { isAuthed, loading: authLoading, isAdmin, checkingAdmin, adminError, factorId, needsCode, noFactor } = useAdminSession();
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -77,6 +78,8 @@ const AdminPanel = () => {
       </div>
     );
   }
+
+  if (needsCode && factorId) return <AdminMfaChallenge factorId={factorId} />;
 
   // Sessão válida mas sem entrada em `admin_users` (ver migration
   // 20260918010000_admin_authorization.sql) — não é a mesma coisa que não
@@ -213,6 +216,7 @@ const AdminPanel = () => {
             </div>
           </div>
         )}
+        {noFactor && <AdminMfaEnroll />}
         <Suspense fallback={<TabFallback />}>
           {activeTab === "crescimento" && <GrowthPanel />}
           {activeTab === "crm" && <CrmPanel />}
