@@ -4,7 +4,7 @@
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
-import { Check, Plus } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { botQuote } from '@/lib/botQuote';
 import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -65,8 +65,8 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
           })}
         </div>
         <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final com a deslocação incluída. {syntheticOnly ? 'Pele sintética: só limpeza.' : 'Na pele não fazemos impermeabilização.'}</p>
-        <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3 md:mt-5" />
-        <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => setBasket(true)}>Juntar mais artigos</PriceCta>
+        <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3 md:mt-5" />
+        <PriceCta onLight className="mt-2" onClick={() => setBasket(true)}>Juntar mais artigos</PriceCta>
       </div>
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(false)} initialCity={city} initialItems={choiceToItems({ kind: 'sofa', size: '3-lugares', qty: 1, extra: 'none', sofas: Object.entries(counts).filter(([, n]) => n > 0).map(([size, qty]) => ({ size, qty })) })} /></Suspense>}
     </div>

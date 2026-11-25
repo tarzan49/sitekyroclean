@@ -1313,6 +1313,8 @@ Nunca esticar caixas vazias para encher um ecrã (dono, 25 Nov, captura de "O se
 
 Dono: "quero CTAs sérios e premium, quero criar uma lógica de CTAs no site, onde os CTAs só podem ser o que for combinado, não pode fugir disso", e sobre a página inicial: "porque é que não fazes isto para todos os CTAs, não é preciso mais nada". Só há dois: verde "Falar por WhatsApp" e dourado "Calcular o meu preço" (`Cta.tsx`, estilo `.cta` em `index.css`). Saíram "Pedir orçamento por WhatsApp", "Pedir este orçamento", "Agendar limpeza", "Falar diretamente connosco", "Pedir preço no WhatsApp", "Confirmar o meu orçamento". Substitui a regra de 24 Nov do botão do topo. Hero das páginas de SEO continua só com o de WhatsApp.
 
+**Desenho 5B (dono, 25 Nov 2026, à tarde):** o dono achou o verde e dourado com degradê "0 premium e super AI"; viu seis direções (marfim, ouro, concierge, cápsula, convite, verde e ouro lisos), gostou da 5 e escolheu a 5B. WhatsApp: retângulo reto, maiúsculas espaçadas, filete #D4AF37 por dentro, marfim #F7F3E8 com texto #0B2F2A sobre verde e fotografia, #0B2F2A com texto branco sobre branco. Preço e botões de passo: moldura #D4AF37. Sem ícones; o símbolo oficial do WhatsApp só no botão redondo do cabeçalho (`WhatsAppGlyph.tsx`). Em fundo claro passa-se `onLight`. [RETIRADA 25/11] verde #188344 e dourado com degradê, MessageCircle e Calculator nos CTAs.
+
 Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo real, separadores e pesquisa dentro do topo; cada tema do blog num ecrã; glossário por letra, em linhas que abrem.
 
 ## Um push para master publica o site (descoberto a 25 Nov 2026)

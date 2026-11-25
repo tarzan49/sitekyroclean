@@ -8,6 +8,13 @@ const files = (dir: string): string[] => readdirSync(dir).flatMap(n => { const p
 const all = [...files('src/components'), ...files('src/pages')].filter(p => !/[\\/](admin|ui)[\\/]|Admin|QuoteVisualPreview|Cta\.tsx$/.test(p));
 
 describe('regra dos CTAs', () => {
+  it('desenho 5B: cores lisas, sem degradê, sombra, brilho nem ícone', () => {
+    const css = readFileSync('src/index.css', 'utf8');
+    const rules = [...css.matchAll(/(^|\})\s*\.cta[^{}]*\{([^}]*)\}/gm)].map(m => m[2]).join(" ");
+    expect(rules).not.toMatch(/gradient|box-shadow|filter:/);
+    expect(readFileSync('src/components/Cta.tsx', 'utf8')).not.toMatch(/lucide|<svg/);
+    for (const f of ['StepPricePicker', 'PackStepPicker', 'LeatherSofaPicker', 'EnHeader']) for (const m of readFileSync(`src/components/${f}.tsx`, 'utf8').matchAll(/<(WhatsAppCta|PriceCta)\b[^>]*/g)) expect(m[0]).toContain('onLight');
+  });
   it('nenhum texto antigo de CTA', () => {
     const old = /Pedir orçamento por WhatsApp|Agendar limpeza|Pedir este orçamento|Pedir preço no WhatsApp|Falar diretamente connosco|Confirmar o meu orçamento|Confirmar pelo WhatsApp/;
     const bad = all.filter(p => old.test(readFileSync(p, 'utf8').split('\n').filter(l => !/^\s*(\/\/|\*|\{?\/\*)/.test(l)).join('\n')));

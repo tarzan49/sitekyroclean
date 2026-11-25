@@ -903,29 +903,33 @@ html.snap-sections main > section[data-en-hero] { min-height: var(--app-h, 100sv
   html.snap-home #preco a[href*="wa.me"] { margin-top: 6px; }
 }
 
-/* Os únicos CTAs do site: o verde "Falar por WhatsApp" e o dourado "Calcular o meu preço" da página inicial (dono,
-   25 Nov 2026: "os CTAs só podem ser o que for combinado, não pode fugir disso"). Componentes em components/Cta.tsx. */
+/* Os únicos CTAs do site, desenho 5B (dono, 25 Nov 2026): WhatsApp cheio com filete dourado por dentro, preço em moldura
+   dourada; cores lisas, sem ícones, degradês, brilhos nem sombras. Componentes em components/Cta.tsx. */
 @layer components {
 .cta {
-  display: flex; width: 100%; height: 56px; min-height: 56px; align-items: center; justify-content: center; gap: 9px;
-  padding: 0 16px; border-radius: 10px; font-size: 16px; font-weight: 600; line-height: 1.15; letter-spacing: normal;
+  position: relative; display: flex; width: 100%; height: 56px; min-height: 56px; align-items: center; justify-content: center;
+  padding: 0 16px; border-radius: 0; font-size: 16px; font-weight: 500; line-height: 1.15; letter-spacing: normal;
   text-transform: none; text-align: center; touch-action: manipulation; cursor: pointer;
-  transition: transform .15s ease, filter .15s ease;
+  transition: background-color .15s ease, opacity .15s ease;
 }
-.cta-icon { width: 19px; height: 19px; flex-shrink: 0; }
-.cta-wa { background: linear-gradient(135deg, #188344, #13753b); border: 1px solid #ffffff1f; color: #fff; box-shadow: 0 5px 16px #061b1324; }
-.cta-wa :is(span, svg) { color: #fff; }
-.cta-gold { background: linear-gradient(90deg, #D4AF37, #E8C964 50%, #D4AF37); border: 1px solid #ffffff40; color: #0B2F2A; font-weight: 700; box-shadow: 0 6px 22px rgba(212, 175, 55, .34), inset 0 1px 0 rgba(255, 255, 255, .35); }
-.cta:hover { filter: brightness(1.05); }
-.cta:active { transform: scale(.97); }
+.cta :is(span, svg) { color: inherit; }
+.cta-wa { background: #F7F3E8; color: #0B2F2A; font-size: 13.5px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; }
+.cta-wa::after { content: ''; position: absolute; inset: 5px; border: 1px solid #D4AF37; pointer-events: none; }
+.cta-wa.cta-light { background: #0B2F2A; color: #fff; }
+.cta-gold { background: rgba(7, 26, 18, .5); border: 1px solid #D4AF37; color: #fff; }
+.cta-gold.cta-light { background: transparent; color: #0B2F2A; }
+.cta:active { opacity: .85; }
 .cta:focus-visible { outline: 3px solid #D4AF37; outline-offset: 3px; }
-.cta:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
-.cta.cta-sm { white-space: nowrap; width: auto; height: 42px; min-height: 42px; padding: 0 14px; gap: 7px; font-size: 14px; }
-.cta.cta-sm .cta-icon { width: 16px; height: 16px; }
-@media (min-width: 768px) { .cta:not(.cta-sm) { height: 60px; min-height: 60px; font-size: 17px; } }
+.cta:disabled { opacity: .45; cursor: not-allowed; }
+.cta.cta-sm { white-space: nowrap; width: auto; height: 44px; min-height: 44px; padding: 0 14px; font-size: 14px; }
+.cta-wa.cta-sm { padding: 0 16px; font-size: 11px; letter-spacing: .1em; }
+.cta-wa.cta-sm::after { inset: 3px; }
+@media (hover: hover) { .cta-wa:hover { background: #fff; } .cta-wa.cta-light:hover { background: #123d36; } .cta-gold:not(:disabled):hover { background: rgba(7, 26, 18, .8); } .cta-gold.cta-light:not(:disabled):hover { background: rgba(212, 175, 55, .12); } }
+@media (max-width: 379px) { .cta-wa:not(.cta-sm) { padding: 0 10px; font-size: 12.5px; letter-spacing: .09em; } }
+@media (min-width: 768px) { .cta:not(.cta-sm) { height: 60px; min-height: 60px; } .cta-gold:not(.cta-sm) { font-size: 17px; } .cta-wa:not(.cta-sm) { font-size: 14.5px; } }
 }
-/* Botões de contacto antigos que ainda não usam o componente ficam com o mesmo aspeto. */
-a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) { background: linear-gradient(135deg, #188344, #13753b) !important; border: 1px solid #ffffff1f !important; border-radius: 10px !important; color: #fff !important; font-weight: 600 !important; letter-spacing: normal !important; }
+/* Botões de contacto antigos que ainda não usam o componente ficam com as mesmas cores lisas. */
+a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) { background: #0B2F2A !important; border: 1px solid #D4AF37 !important; border-radius: 0 !important; box-shadow: none !important; color: #fff !important; font-weight: 600 !important; letter-spacing: normal !important; }
 a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) :is(span, svg) { color: #fff !important; letter-spacing: normal !important; text-transform: none !important; }
 
 /* Títulos em duas linhas equilibradas, nunca uma palavra sozinha em baixo (dono, 24 Nov, captura do iPhone). */

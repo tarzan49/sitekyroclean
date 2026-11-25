@@ -269,8 +269,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </button>}
         </div>
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
-        {ready && <WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={total !== null ? formatEuro(total) : undefined} className="mt-2" />}
-        {ready && <PriceCta className="mt-2" icon={<Plus className="cta-icon" strokeWidth={3} aria-hidden="true" />} onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
+        {ready && <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={total !== null ? formatEuro(total) : undefined} className="mt-2" />}
+        {ready && <PriceCta onLight className="mt-2" onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
         {ready && <p className="mt-1 hidden text-center text-sm text-[#666] md:block">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
       </div>}
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}

@@ -1,7 +1,8 @@
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ChevronDown, MessageCircle, Phone } from "lucide-react";
+import { ChevronDown, Phone } from "lucide-react";
+import WhatsAppGlyph from "@/components/WhatsAppGlyph";
 import {
   Sheet,
   SheetContent,
@@ -151,8 +152,8 @@ const Header = () => {
             {PHONE_DISPLAY}
           </a>
           <BasketButton onOpen={openQuiz} />
-          <PriceCta onClick={openQuiz} small className="max-xl:hidden" />
-          <WhatsAppCta href={waHref} source="header_desktop" small />
+          <PriceCta onLight onClick={openQuiz} small className="max-xl:hidden" />
+          <WhatsAppCta onLight href={waHref} source="header_desktop" small />
         </div>
 
         {/* Telemóvel: telefone e cesto leves, WhatsApp em destaque, menu */}
@@ -162,7 +163,7 @@ const Header = () => {
           </a>
           <BasketButton onOpen={openQuiz} className="!w-10 !min-w-0" />
           <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="header_mobile" aria-label="WhatsApp" className="grid h-11 w-11 min-w-0 touch-manipulation place-items-center active:opacity-80">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-[linear-gradient(135deg,#188344,#13753b)] text-white shadow-[0_5px_14px_-6px_rgba(6,27,19,0.5)]"><MessageCircle className="h-[18px] w-[18px]" strokeWidth={2.2} /></span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-[#0B2F2A] text-white"><WhatsAppGlyph className="h-[19px] w-[19px]" /></span>
           </a>
 
           <Sheet open={mobileMenuOpen} onOpenChange={open => { if (open) void loadServiceList(); setMobileMenuOpen(open); }}>

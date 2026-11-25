@@ -23,7 +23,7 @@ const EnHeader = () => {
             <Phone className="h-[18px] w-[18px] shrink-0 text-[#0B2F2A] md:h-4 md:w-4 md:text-[#D4AF37]" strokeWidth={2.2} />
             <span className="hidden md:inline">{PHONE_DISPLAY}</span>
           </a>
-          <WhatsAppCta href={waHref} source="en_header" en small />
+          <WhatsAppCta onLight href={waHref} source="en_header" en small />
         </div>
       </div>
     </header>
