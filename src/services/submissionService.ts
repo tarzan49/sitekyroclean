@@ -1,4 +1,4 @@
-import { endIn9Down } from '@/constants/chairPricing';
+import { chairsCombinedTotal } from '@/constants/chairPricing';
 import { getAttributionSnapshot, leadAttributionNote } from '@/lib/leadAttribution';
 import { readGaClientId, trackLeadEvent } from '@/lib/leadTracking';
 import { clearSubmissionId, currentSubmissionId } from '@/lib/submissionId';
@@ -236,17 +236,17 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
   } else if (service === 'chairs') {
     const cQty = parseInt(chairQuantity);
     if (!isNaN(cQty) && cQty > 0) {
-      const primaryTotal = isWaterproofBase ? calcChairWaterproofTier(cQty) : calcChairClean(cQty, Math.min(chairWaterproofQty || 0, cQty));
+      const primaryTotal = isWaterproofBase ? calcChairWaterproofTier(cQty) : calcChairClean(cQty);
       const primaryLabel = isWaterproofBase ? `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}` : 'Limpeza Cadeiras';
       receiptLines.push({ label: primaryLabel, qty: cQty, unitPrice: primaryTotal !== null ? Math.round(primaryTotal / cQty * 10) / 10 : null, total: primaryTotal });
       const wQty = chairWaterproofQty;
       if (wQty > 0) {
-        const addonTotal = isWaterproofBase ? calcChairClean(wQty, wQty) : calcChairWaterproofTier(wQty);
+        const addonTotal = isWaterproofBase ? calcChairClean(wQty) : calcChairWaterproofTier(wQty);
         const addonLabel = isWaterproofBase ? 'Limpeza Cadeiras' : `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}`;
         const addonUnit = addonTotal !== null ? Math.round(addonTotal / wQty * 10) / 10 : null;
-        // Total das cadeiras a acabar em 9, para baixo (dono, 24 Nov 2026): a diferença sai da linha da impermeabilização/limpeza extra.
-        const chairsSum = (primaryTotal ?? 0) + (addonTotal ?? 0);
-        const addonFinal = addonTotal !== null ? addonTotal - (chairsSum - endIn9Down(chairsSum)) : null;
+        // O total das cadeiras é o da tabela fixa (dono, 25 Nov 2026); a linha extra é o que falta para lá chegar.
+        const chairsSum = chairsCombinedTotal(isWaterproofBase ? wQty : cQty, isWaterproofBase ? cQty : wQty, isPremium ? 'premium' : 'essencial');
+        const addonFinal = addonTotal !== null ? chairsSum - (primaryTotal ?? 0) : null;
         receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonFinal !== null ? Math.round(addonFinal / wQty * 10) / 10 : addonUnit, total: addonFinal });
       }
       // Mesma regra que o total (use-quiz-pricing.ts): chairAntiAcarosQty.

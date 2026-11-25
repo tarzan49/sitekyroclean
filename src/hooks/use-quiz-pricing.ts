@@ -1,4 +1,4 @@
-import { endIn9Down } from '@/constants/chairPricing';
+import { chairsCombinedTotal } from '@/constants/chairPricing';
 import { calculateTravelFee, smallOrderFarSurcharge } from '@/constants/travel';
 import { rugPickupFee } from '@/constants/commercialPolicy';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
@@ -56,15 +56,15 @@ export function useQuizPricing(
         if (!isNaN(chairQty) && chairQty > 0) {
           chairs += formData.serviceType === 'waterproofing'
             ? (calcWaterproof(chairQty) ?? 0)
-            : (calcChairClean(chairQty, Math.min(formData.chairWaterproofQty || 0, chairQty)) ?? 0);
+            : (calcChairClean(chairQty) ?? 0);
         }
         const addonQty = formData.chairWaterproofQty;
         if (addonQty > 0) {
-          chairs += formData.serviceType === 'waterproofing'
-            ? (calcChairClean(addonQty, addonQty) ?? 0)
-            : (calcWaterproof(addonQty) ?? 0);
-          // Limpeza + impermeabilização: total a acabar em 9, para baixo (dono, 24 Nov 2026).
-          chairs = endIn9Down(chairs);
+          // Limpeza + impermeabilização: a tabela fixa de chairPricing (dono, 25 Nov 2026).
+          const base = isNaN(chairQty) ? 0 : chairQty;
+          chairs = formData.serviceType === 'waterproofing'
+            ? chairsCombinedTotal(addonQty, base, isPremium ? 'premium' : 'essencial')
+            : chairsCombinedTotal(base, addonQty, isPremium ? 'premium' : 'essencial');
         }
         price += chairs;
         // Anti-ácaros das cadeiras: mesma regra e mesmo preço que o recibo

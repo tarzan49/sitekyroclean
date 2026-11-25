@@ -11,8 +11,8 @@ const C = (qty: number, treatment = 'clean') => ({ kind: 'chairs', qty, treatmen
 
 describe('2. acima de 300€ o preço nunca desce ("Nunca desce")', () => {
   it.each([
-    ['10 cadeiras Blindado', [C(10, 'clean+premium')], 389, 399],
-    ['12 cadeiras Blindado', [C(12, 'clean+premium')], 449, 459],
+    ['10 cadeiras Blindado', [C(10, 'clean+premium')], 309, 399],
+    ['12 cadeiras Blindado', [C(12, 'clean+premium')], 359, 459],
     ['30 cadeiras, só limpeza ("Não, sem riscado")', [C(30)], 360, null],
   ])('%s', (_n, items, total, was) => {
     const r = q(items as unknown[]);
@@ -37,9 +37,9 @@ describe('3. cadeiras do mesmo serviço em duas linhas são uma ("Sim, como 6")'
       expect(a.lines[0].amount + a.lines[1].amount).toBeCloseTo(b.lines[0].amount, 2);
     }
   });
-  it('serviços diferentes: 4 limpeza + 2 Blindado = 159, riscado 189', () => {
+  it('serviços diferentes: 4 limpeza + 2 Blindado = 149, riscado 179', () => {
     const r = q([C(4), C(2, 'clean+premium')]);
-    expect([r.total, r.separatePrice.separate]).toEqual([159, 189]);
+    expect([r.total, r.separatePrice.separate]).toEqual([149, 179]);
   });
 });
 
@@ -48,11 +48,11 @@ it('o riscado da opção nunca conta a impermeabilização de uma peça só limp
 });
 
 describe('5 e 6. cadeiras', () => {
-  it('1 cadeira Protegido na Figueira: 20 + 15 no 9 mais perto + 10 = 49€ (dono, 25 Nov: opção A)', () => {
-    expect(q([C(1, 'clean+essencial')], {}, 'Figueira da Foz').total).toBe(49);
+  it('1 cadeira Protegido na Figueira fica a 39€ ("Fica assim")', () => {
+    expect(q([C(1, 'clean+essencial')], {}, 'Figueira da Foz').total).toBe(39);
   });
-  it('duas linhas de cadeiras não são outra peça: Cascais 1 limpeza + 1 Protegido = 69 ("Não, leva os +10€")', () => {
-    expect(q([C(1), C(1, 'clean+essencial')], {}, 'Cascais').total).toBe(69);
+  it('duas linhas de cadeiras não são outra peça: Cascais 1 limpeza + 1 Protegido = 59 ("Não, leva os +10€")', () => {
+    expect(q([C(1), C(1, 'clean+essencial')], {}, 'Cascais').total).toBe(59);
     expect(q([C(1), C(1)], {}, 'Cascais').total).toBe(60);
   });
 });
@@ -104,8 +104,8 @@ describe('sofá com anti-odor ou anti-ácaros (dono, 25 Nov 2026: "LIMPEZA + IMP
 });
 
 describe('9. riscado dos packs de cadeiras a partir de 4 ("Sim, em todo o lado")', () => {
-  it('4 = 179 (196) e 139 (156); até 3 não há', () => {
-    expect([q([C(4, 'clean+premium')]).chairsWas, q([C(4, 'clean+essencial')]).chairsWas, q([C(3, 'clean+premium')]).chairsWas]).toEqual([196, 156, null]);
+  it('4 Premium = 149 (196); a Essencial de 4 já está abaixo; até 3 não há', () => {
+    expect([q([C(4, 'clean+premium')]).chairsWas, q([C(4, 'clean+essencial')]).chairsWas, q([C(3, 'clean+premium')]).chairsWas]).toEqual([196, null, null]);
   });
 });
 
@@ -115,16 +115,16 @@ describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medi
     expect(q([S('3-lugares', 'premium'), S()]).total).toBe(229);
     expect(q([S(), S()]).total).toBe(179);
     // Sofa + a few chairs is not a pair of sofas.
-    expect([q([S(), C(2)]).total, q([S(), C(2, 'clean+essencial')]).total]).toEqual([129, 149]);
+    expect([q([S(), C(2)]).total, q([S(), C(2, 'clean+essencial')]).total]).toEqual([129, 139]);
   });
   it('o anti-ácaros de umas poucas cadeiras nunca é a oferta', () => {
     const r = q([C(1), S('3-lugares', 'clean', { leather: true }), C(6, 'clean+premium')]);
     expect(r.visitGifts.gifts).toEqual([{ piece: 'sofa', treatment: 'tratamento-pele', normal: 40 }]);
-    expect(r.total).toBe(369);
+    expect(r.total).toBe(319);
   });
   it('juntar um serviço às cadeiras nunca baixa o total', () => {
-    expect([q([C(5, 'premium')]).total, q([C(5, 'premium'), C(1)]).total]).toEqual([139, 139]);
-    expect([q([C(6)]).total, q([C(6), C(2, 'essencial')]).total]).toEqual([120, 139]);
+    expect([q([C(5, 'premium')]).total, q([C(5, 'premium'), C(1)]).total]).toEqual([139, 149]);
+    expect([q([C(6)]).total, q([C(6), C(2, 'essencial')]).total]).toEqual([120, 129]);
   });
 });
 

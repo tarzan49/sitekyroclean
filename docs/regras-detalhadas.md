@@ -1352,7 +1352,7 @@ O bot respondeu a um pedido só de tapetes com "Quantos lugares tem o sofá?", p
 Comerciais, 25 Nov: a faixa de clientes é giratória também no telemóvel (a grelha de duas colunas de 020fb45f saiu); páginas setor × cidade (`/limpeza-comercial-{setor}-{cidade}`, 408); imagens dos setores são de ambiente, nunca apresentadas como trabalhos nossos.
 - **Horas logo com o orçamento (dono, 25 Nov 2026, Joana, Lisboa):** o bot respondeu duas vezes "vemos logo as horas livres". Dono: "em Lisboa dás horas de imediato" e, sobre "horas só depois de escolher": "esquece essa regra, não faz sentido nenhum e não foi dita assim". Apagada em código, ficheiro do bot, contrato e aqui. Onde o motor dá horas, as duas horas reais vão na mensagem do orçamento, com ou sem opção escolhida; "Qual das opções" em último. Quem adia ou recusa segue a regra dele; zonas sem horas seguem a regra da zona. kyro-bot `funnel23.ts` (`hoursWithheld`), casos c83, c84, c90.
 
-## Cadeiras: limpeza + impermeabilização somadas (dono, 25 Nov 2026, "opção A")
+## [RETIRADA 25/11, 2 h depois: 12 Premium a 449€ "não faz sentido nenhum"] Cadeiras: limpeza + impermeabilização somadas (opção A)
 [RETIRADA 25/11] A limpeza a metade quando a cadeira leva impermeabilização (24 Nov, "359 acho que é um bom número"). Tornava a impermeabilização quase grátis: Wanda (Campanhã, 4 cadeiras + 2 tapetes) viu só limpeza 129€ e com Essencial 139€. Agora `CHAIR_CLEAN_WATERPROOF_FACTOR = 1`: cada serviço pela sua tabela, somado, no 9 mais perto, deslocação à parte como antes. Totais em Lisboa (Essencial / Premium): 1 = 49/59, 4 = 139/179, 6 = 199/259, 12 = 329/449. Preços já dados a clientes mantêm-se.
 
 ## Mensagens vazias e fora de ordem na API (dono, 25 Nov 2026)
@@ -1368,3 +1368,6 @@ Acerto do dono no mesmo dia: o fecho é opções, depois as horas, depois "Qual 
 ### 25 Nov 2026: Lisboa com uma pessoa a 26/11 e aviso "não misturar serviços" retirado
 - Dono: "amanhã só vai estar uma pessoa em Lisboa" → `SOLO_DAYS` em `botAvailability.ts` (Lisboa 1, 26/11): um serviço de cada vez, com a viagem entre moradas.
 - Dono: "Parar com o nao misturar servicos em todas as prints q se envia" → a mensagem "Para não misturar serviços, manda as fotografias..." saiu da `bot-api`; a equipa nunca a recebe. [RETIRADA 25/11]
+
+## Cadeiras: tabela fixa de limpeza + impermeabilização (dono, 25 Nov 2026)
+Construída com o dono número a número: 6 Essencial = 169€, 1 Essencial = 39€, +20€ por cadeira da 4.ª à 12.ª ("289€"), 12 Premium = 359€; a Premium das outras é a proposta que aceitou com a tabela. `CHAIR_PACK_TABLE` em `chairPricing.ts` (sem a deslocação de 10€ até 3 cadeiras); acima de 12, +20€ Essencial e +25€ Premium cada, no 9 mais perto. Só limpeza e só impermeabilização não mudaram. Nenhum outro sítio calcula este preço; `chairPricing.test.ts` compara bot e site com a tabela. O preço riscado só aparece quando é maior do que o total (4 e 5 Essencial ficam sem riscado).

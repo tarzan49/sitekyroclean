@@ -140,7 +140,7 @@ describe('riscado das cadeiras (dono, 25 Nov 2026: "Sim, limita")', () => {
         if (r.chairsWas !== null) expect([r.chairsWas, r.chairsWas > r.total]).toEqual([was, true]);
       }
     }
-    expect([q('Lisboa', [chairs(12, 'clean+premium')]).total, q('Lisboa', [chairs(12, 'clean+premium')]).chairsWas]).toEqual([449, 459]);
+    expect([q('Lisboa', [chairs(12, 'clean+premium')]).total, q('Lisboa', [chairs(12, 'clean+premium')]).chairsWas]).toEqual([359, 459]);
     expect(q('Lisboa', [chairs(100, 'clean+premium')]).chairsWas).toBe(3099);
   });
   it('cadeiras em várias linhas são uma peça: nunca oferta, e nunca acima de cada linha sozinha (dono, 24 Nov: "Sim, como 6")', () => {
