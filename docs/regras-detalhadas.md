@@ -1313,3 +1313,7 @@ Nunca esticar caixas vazias para encher um ecrã (dono, 25 Nov, captura de "O se
 Dono: "quero CTAs sérios e premium, quero criar uma lógica de CTAs no site, onde os CTAs só podem ser o que for combinado, não pode fugir disso", e sobre a página inicial: "porque é que não fazes isto para todos os CTAs, não é preciso mais nada". Só há dois: verde "Falar por WhatsApp" e dourado "Calcular o meu preço" (`Cta.tsx`, estilo `.cta` em `index.css`). Saíram "Pedir orçamento por WhatsApp", "Pedir este orçamento", "Agendar limpeza", "Falar diretamente connosco", "Pedir preço no WhatsApp", "Confirmar o meu orçamento". Substitui a regra de 24 Nov do botão do topo. Hero das páginas de SEO continua só com o de WhatsApp.
 
 Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo real, separadores e pesquisa dentro do topo; cada tema do blog num ecrã; glossário por letra, em linhas que abrem.
+
+## Um push para master publica o site (descoberto a 25 Nov 2026)
+
+`.github/workflows/deploy-site.yml` (2e528ade, 16/11) faz build e `wrangler deploy` em cada push a master. A regra dizia o contrário e, por isso, preços por aprovar estiveram no ar na noite de 24/11 e os tapetes (39001b78) entraram às 00h58 de 25/11 sem OK (reposto com `wrangler rollback`). Depois de publicar, confirmar com `wrangler deployments list`.
