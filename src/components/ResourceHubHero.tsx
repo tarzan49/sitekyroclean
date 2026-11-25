@@ -15,14 +15,14 @@ const TABS = [['/blog', 'Guias'], ['/perguntas-frequentes-limpeza-estofos', 'Per
 export default function ResourceHubHero({ title, description, image, video, poster, children }: { title: string; description: string; image?: string; video?: string; poster?: string; children?: ReactNode }) {
   const words = title.split(' '); const gold = words.pop();
   return <section data-mobile-hero="text" data-resource-hero className="relative isolate overflow-hidden bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
-    {image && <div className="hidden md:block"><HeroPhoto src={image} /></div>}
-    {video && <div aria-hidden="true" data-resource-media className="absolute inset-0 -z-10 md:hidden">
-      <video src={video} poster={poster} autoPlay muted loop playsInline preload="metadata" className="h-[62%] w-full object-cover" />
-      <span className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(7,26,18,.12) 0%, rgba(7,26,18,.25) 26%, #0B2F2A 60%, #071a12 100%)' }} />
+    {image && !video && <div className="hidden md:block"><HeroPhoto src={image} /></div>}
+    {video && <div aria-hidden="true" data-resource-media className="absolute inset-0 -z-10 md:inset-auto md:!w-auto md:right-[9%] md:top-1/2 md:z-0 md:aspect-[9/16] md:h-[64%] md:-translate-y-[46%] md:overflow-hidden md:rounded-2xl md:shadow-2xl">
+      <video src={video} poster={poster} autoPlay muted loop playsInline preload="metadata" className="h-[62%] w-full object-cover md:h-full" />
+      <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(7,26,18,.12)_0%,rgba(7,26,18,.25)_26%,#0B2F2A_60%,#071a12_100%)] md:hidden" />
     </div>}
     <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-2 text-sm text-white/85 md:mb-4 md:text-white/70"><Link to="/">Início</Link><span>/</span><Link to="/blog">Recursos</Link></nav>
-      <div className="grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+      <div className="grid items-center gap-4 md:max-w-[520px]">
         <div>
           <h1 className="font-playfair mb-2 text-[30px] font-semibold leading-[1.13] text-white md:mb-3 md:text-5xl">{words.join(' ')} <em className="not-italic text-[#D4AF37]">{gold}</em></h1>
           <p className="max-w-2xl text-base leading-relaxed text-white/85 md:text-lg md:text-white/80">{description}</p>

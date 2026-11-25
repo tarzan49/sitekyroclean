@@ -146,12 +146,12 @@ const Header = () => {
         </nav>
 
         <div className="hidden shrink-0 items-center gap-2 lg:flex">
-          <a href={`tel:${PHONE_TEL}`} data-tracking-source="header_desktop" className="mr-1 hidden h-10 items-center gap-2 whitespace-nowrap text-[15px] font-semibold text-[#111111] transition-colors hover:text-[#0B2F2A] xl:flex">
+          <a href={`tel:${PHONE_TEL}`} data-tracking-source="header_desktop" className="mr-1 hidden h-10 items-center gap-2 whitespace-nowrap text-[15px] font-semibold text-[#111111] transition-colors hover:text-[#0B2F2A] min-[1440px]:flex">
             <Phone className="h-4 w-4 text-[#D4AF37]" strokeWidth={2.2} />
             {PHONE_DISPLAY}
           </a>
           <BasketButton onOpen={openQuiz} />
-          <PriceCta onClick={openQuiz} small />
+          <PriceCta onClick={openQuiz} small className="max-xl:hidden" />
           <WhatsAppCta href={waHref} source="header_desktop" small />
         </div>
 
