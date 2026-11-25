@@ -1315,6 +1315,8 @@ Dono: "quero CTAs sérios e premium, quero criar uma lógica de CTAs no site, on
 
 **Desenho 5B (dono, 25 Nov 2026, à tarde):** o dono achou o verde e dourado com degradê "0 premium e super AI"; viu seis direções (marfim, ouro, concierge, cápsula, convite, verde e ouro lisos), gostou da 5 e escolheu a 5B. WhatsApp: retângulo reto, maiúsculas espaçadas, filete #D4AF37 por dentro, marfim #F7F3E8 com texto #0B2F2A sobre verde e fotografia, #0B2F2A com texto branco sobre branco. Preço e botões de passo: moldura #D4AF37. Sem ícones; o símbolo oficial do WhatsApp só no botão redondo do cabeçalho (`WhatsAppGlyph.tsx`). Em fundo claro passa-se `onLight`. [RETIRADA 25/11] verde #188344 e dourado com degradê, MessageCircle e Calculator nos CTAs.
 
+**Cor e símbolos do 5B (dono, 25 Nov 2026, à noite):** "o cta branco nao combina nada com o site nas paginas com fundo verde [...] no falar por whatsapp convinha ter o simbolo do whatsapp ao lado e no calcular o preço uma calculadora". [RETIRADA 25/11: marfim #F7F3E8 e "sem ícones"] WhatsApp verde-esmeralda #1C7A4C com texto e símbolo brancos e filete #D4AF37, igual sobre verde, fotografia e branco; comparado com ouro, champanhe e verde-noite nas páginas reais. `onLight` só muda o botão do preço.
+
 Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo real, separadores e pesquisa dentro do topo; cada tema do blog num ecrã; glossário por letra, em linhas que abrem.
 
 ## Um push para master publica o site (descoberto a 25 Nov 2026)

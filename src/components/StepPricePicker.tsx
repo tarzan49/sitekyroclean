@@ -3,6 +3,7 @@
 // Nada vem escolhido e o botão diz o passo que falta. Os números são os do cesto (funções do VisitBasket, que lêem o
 // motor do bot), carregadas só quando a pessoa começa a escolher.
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
+import { setPriceBar } from '@/lib/priceBar';
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, ChevronRight, Minus, Plus } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -167,6 +168,14 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   };
   const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'fotografias';
   const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}` : ''}. Envio ${photo}.`;
+  const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
+
+  // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
+  const [barKey] = useState(() => ({}));
+  const bar = total !== null;
+  const was = bar ? price(chosen).struck : null;
+  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, href, source } : null); }, [barKey, total, was, href, source]);
+  useEffect(() => () => setPriceBar(barKey, null), [barKey]);
 
 
   const title = (text: string, hint?: string) => <p className="mb-2 text-sm font-semibold text-[#1A1A1A] md:mb-3 md:text-base">{text}{hint && <span className="font-normal text-[#666]"> {hint}</span>}</p>;
@@ -269,7 +278,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </button>}
         </div>
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
-        {ready && <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} total={total !== null ? formatEuro(total) : undefined} className="mt-2" />}
+        {ready && <WhatsAppCta onLight href={href} source={source} total={total !== null ? formatEuro(total) : undefined} className={`mt-2 ${bar ? 'max-md:hidden' : ''}`} />}
         {ready && <PriceCta onLight className="mt-2" onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
         {ready && <p className="mt-1 hidden text-center text-sm text-[#666] md:block">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
       </div>}
