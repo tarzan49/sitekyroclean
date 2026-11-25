@@ -1329,3 +1329,10 @@ Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo r
 - Várias peças: os totais não baixam (3L com anti-ácaros + colchão 209), só o riscado passa a ser o verdadeiro.
 - Pele, só impermeabilização e os dois tratamentos na mesma peça continuam fora.
 - Black Friday: o anti-odor de um sofá ou colchão não está na tabela (3L com anti-odor e BFGTA saía a 69€ com o tratamento dentro, desde 24/11).
+
+## Manchas de sangue: explicar antes e depois (dono, 25 Nov 2026, Carla)
+
+Colchão com sangue seco de 4 a 6 meses, para trocar na garantia. O bot avisou que podia ficar uma marca, mas também disse que esperava "quase impercetível"; a mancha não saiu. O dono corrigiu o rascunho ("se não saiu é porque não sai", "a foto não adianta de nada"), aprovou a explicação e mandou o bot aprender a explicá-lo "antes e depois quando alguém fala em manchas de sangue".
+
+- Antes (S24): a explicação vai com o orçamento, sem promessas; se a peça tem de ficar sem marca (troca, devolução, venda), diz-se com clareza antes de marcar.
+- Depois (S66, exceção ao silêncio de 5 Nov): `bloodStain.ts` envia uma só explicação de texto fixo. O modelo lê a conversa e só deixa sair se for sangue e só isso; dinheiro, nova visita, estrago ou outra pergunta ficam só para o dono. "Lhe dissemos antes" só sai se a frase existir mesmo numa mensagem nossa. A conversa continua em pausa e o dono recebe email.
