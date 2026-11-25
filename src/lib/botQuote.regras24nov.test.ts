@@ -58,17 +58,48 @@ describe('5 e 6. cadeiras', () => {
 });
 
 describe('7. anti-odor em sofá e colchão ("casa e 99 e solteiro e 89", king "109€", sofá +40)', () => {
-  it.each([[M('solteiro'), 89], [M('casal'), 99], [M('king'), 109], [S(), 129]])('%o', (item, total) => {
+  it.each([[M('solteiro'), 89], [M('casal'), 99], [M('king'), 109]])('%o', (item, total) => {
     const r = q([{ ...(item as object), odor: true }]);
     expect(r.total).toBe(total);
     expect(r.pieceOdor.amount).toBeGreaterThan(0);
     expect(r.lines.at(-1).label).toMatch(/^Tratamento anti-odor/);
   });
-  it('acaba sempre em 9 e só se soma à limpeza', () => {
-    for (const city of ['Lisboa', 'Braga', 'Figueira da Foz', 'Ovar']) for (const size of ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares']) expect(q([S(size, 'clean', { odor: true })], {}, city).total % 10).toBe(9);
-    expect(q([S('3-lugares', 'clean+premium', { odor: true })]).ok).toBe(false);
+  it('nunca sozinho, com anti-ácaros na mesma peça, nem em pele', () => {
+    expect(q([S('3-lugares', 'premium', { odor: true })]).ok).toBe(false);
     expect(q([S('3-lugares', 'clean', { odor: true, leather: true })]).ok).toBe(false);
     expect(q([M('casal', 'clean+anti-acaros', { odor: true })]).ok).toBe(false);
+    expect(q([S('3-lugares', 'clean+premium', { odor: true, mites: true })]).ok).toBe(false);
+    expect(q([S('3-lugares', 'clean', { mites: true })]).ok).toBe(false);
+  });
+});
+
+describe('sofá com anti-odor ou anti-ácaros (dono, 25 Nov 2026: "LIMPEZA + IMPER COM ANTI ODOR OFERECES O ANTI ODOR, ANTI ACAROS IGUAL [...] OFERECES A DESLOCACAO ATÉ 10 EUR")', () => {
+  it.each([['Lisboa', '3-lugares', 119], ['Lisboa', '2-lugares', 109], ['Lisboa', '5-lugares', 149], ['Aveiro', '3-lugares', 129], ['Fátima', '3-lugares', 129]])('só limpeza com anti-odor, %s %s: %i, com a deslocação incluída', (city, size, total) => {
+    const r = q([S(size as string, 'clean', { odor: true })], {}, city as string);
+    expect([r.total, r.sofaTravelOffer.amount]).toEqual([total, 10]);
+  });
+  it('3L com anti-ácaros = com anti-odor (119), e acaba sempre em 9', () => {
+    expect([q([S('3-lugares', 'clean+anti-acaros')]).total, q([S('2-lugares', 'clean+anti-acaros')]).total, q([S('1-lugar', 'clean+anti-acaros')]).total]).toEqual([119, 109, 69]);
+    for (const city of ['Lisboa', 'Braga', 'Figueira da Foz', 'Ovar']) for (const size of ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares']) expect(q([S(size, 'clean', { odor: true })], {}, city).total % 10).toBe(9);
+  });
+  it('limpeza + impermeabilização: o tratamento vai oferecido, o total é o do pack, o riscado leva o valor normal', () => {
+    for (const size of ['1-lugar', '2-lugares', '3-lugares', '4-lugares', '5-lugares', 'canto']) for (const t of ['clean+premium', 'clean+essencial']) for (const x of [{ odor: true }, { mites: true }]) expect(q([S(size, t, x)]).total).toBe(q([S(size, t)]).total);
+    const r = q([S('3-lugares', 'clean+premium', { odor: true })]);
+    expect([r.total, r.separatePrice.separate, r.waterproofingTiers.essencial, r.separatePrice.tiers.essencial.separate]).toEqual([219, 289, 159, 229]);
+    expect(r.lines.at(-1)).toMatchObject({ label: 'Tratamento anti-odor sofá, oferecido, normalmente 40€', amount: 0 });
+    expect(q([S('3-lugares', 'clean+premium', { mites: true })]).sofaOffer.offers).toEqual([{ treatment: 'anti-acaros', normal: 50 }]);
+    expect(q([S('5-lugares', 'clean+premium', { mites: true })]).sofaOffer.offers).toEqual([{ treatment: 'anti-acaros', normal: null }]);
+  });
+  it('várias peças: o total não baixa, o riscado é o verdadeiro', () => {
+    const r = q([S('3-lugares', 'clean+anti-acaros'), M()]);
+    expect([r.total, r.separatePrice.separate, r.visitGifts.usual]).toEqual([209, 239, 239]);
+    const c = q([S('3-lugares', 'clean+anti-acaros'), C(2)]);
+    expect([c.total, c.visitGifts.usual]).toEqual([179, 179]);
+  });
+  it('Black Friday: o anti-odor não entra na tabela (saía a 69€ com o tratamento dentro)', () => {
+    const r = q([S('3-lugares', 'clean', { odor: true })], { campaign: 'BFGTA' });
+    expect([r.blackFriday, r.total]).toEqual([null, 119]);
+    expect(q([M('casal', 'clean', { odor: true })], { campaign: 'BFGTA' }).blackFriday).toBeNull();
   });
 });
 

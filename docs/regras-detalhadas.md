@@ -1281,7 +1281,7 @@ Decididas pelo dono uma a uma, com os números do motor (testes: `src/lib/botQuo
 4. **Tapetes ao preço cheio** (dono, 25 Nov: "A"): a soma das peças sozinhas, ao 9, com o anti-odor de um tapete oferecido quando cabe nos 20%: sofá 3L + tapete 2×3 159 (era 138), 2 tapetes 139 (129), 3 tapetes 209 com oferta (189; riscado 239), tapete + alcatifa 20 m² 239 com oferta (229; riscado 269). Alcatifas sozinhas ficam pela área total. O sofá na visita de um tapete (`sofaUpsellPrice`) passa de 79 para 89 (69 + 89 = 159). [RETIRADA 25/11] "sofá na visita do tapete a 79€" e a soma com uma só deslocação.
 5. **1–2 cadeiras Protegido nas cidades de 20€**: "Fica assim" (39 / 59).
 6. **+10€ de serviço pequeno**: duas linhas de cadeiras não são outra peça ("Não, leva os +10€"): Cascais, 1 limpeza + 1 Protegido 59.
-7. **Anti-odor**: "Sim, esses preços" (sofá +40), colchão "casa e 99 e solteiro e 89", king "109€", sempre com limpeza e a acabar em 9 (`pieceOdor`). [RETIRADA 24/11] colchão +25/+30/+40 somado à mão.
+7. **Anti-odor** [sofá com impermeabilização e deslocação: RETIRADO 25/11, ver "Sofá com anti-odor ou anti-ácaros"]: "Sim, esses preços" (sofá +40), colchão "casa e 99 e solteiro e 89", king "109€", sempre com limpeza e a acabar em 9 (`pieceOdor`). [RETIRADA 24/11] colchão +25/+30/+40 somado à mão.
 8. **Alcatifas**: fica "Desde 5€/m²", com os escalões ao lado ("e OPCAO A").
 9. **Riscado dos packs de cadeiras a partir de 4** ("Sim, em todo o lado"): 139 (156), 99 (116).
 
@@ -1319,3 +1319,13 @@ Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo r
 
 `.github/workflows/deploy-site.yml` (2e528ade, 16/11) faz build e `wrangler deploy` em cada push a master. A regra dizia o contrário e, por isso, preços por aprovar estiveram no ar na noite de 24/11 e os tapetes (39001b78) entraram às 00h58 de 25/11 sem OK (reposto com `wrangler rollback`). Depois de publicar, confirmar com `wrangler deployments list`.
 - **Dono apaga e reenvia a mesma mensagem corrigida, no fecho (dono, 25 Nov 2026, 6 cadeiras em Setúbal):** o bot volta 2 min depois da mensagem dele, não 10 (kyro-bot `ownerDelete.ts` `onlyCorrected`); se o dono escreveu outra coisa, continuam os 10 min de 23 Nov. E quando o cliente pede outro dia depois da linha do dono ("Hoje não posso. Podem na 6a feira?"), a resposta com esse dia e as horas do motor já não fica retida (`ownerLineDayHourIssue`): não contraria o dono.
+
+## Sofá com anti-odor ou anti-ácaros (dono, 25 Nov 2026)
+
+"LIMPEZA + IMPER COM ANTI ODOR OFERECES O ANTI ODOR, ANTI ACAROS IGUAL, JA AGR OFERECES A DESLOCACAO ATÉ 10 EUR EM SOFA ANTI ODOR E ANTI ACAROS, SE PASSAR DISOS A PESSOA PAGA EXTRA MAS SMP DIZENDO DESLOCACAO INCLUIDA" (dito à sessão do site).
+
+- Sofá com limpeza + impermeabilização: o anti-odor (`odor: true`) ou o anti-ácaros (`mites: true`) vai oferecido em todos os tamanhos; total = o do pack (3L Lisboa 219/159€), linha à parte a 0€ "oferecido, normalmente X€" (`sofaOffer`), riscado = o separado + o valor normal (3L Blindado com anti-odor 289€). Anti-ácaros 20/40/50/60€ (1 a 4 lugares); 5, 6 lugares e canto não têm valor de tabela: oferecido sem número. [RETIRADA 25/11] "com impermeabilização só o 2 lugares tem preço, os outros vão ao dono".
+- Sofá só limpeza com um dos dois: `withSofaTravelOffer` oferece até 10€ da deslocação, o que passar paga-se, total ao 9 para cima (Lisboa 1L 89, 2L 109, 3L 119, 4L 139, 5L 149; Aveiro e Fátima 3L 129). O 3L com anti-ácaros = com anti-odor (119).
+- Várias peças: os totais não baixam (3L com anti-ácaros + colchão 209), só o riscado passa a ser o verdadeiro.
+- Pele, só impermeabilização e os dois tratamentos na mesma peça continuam fora.
+- Black Friday: o anti-odor de um sofá ou colchão não está na tabela (3L com anti-odor e BFGTA saía a 69€ com o tratamento dentro, desde 24/11).
