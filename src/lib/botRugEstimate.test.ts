@@ -5,7 +5,7 @@ import { rugComboEstimate, rugEstimate, rugMaterialClass, roundToNine } from './
 describe('rugEstimate (owner, 10 Oct 2026)', () => {
   it("matches the owner's own rug quotes", () => {
     const sandra = rugEstimate([{ width: 2, length: 2.9, qty: 1, material: 'microfibra' }], 'Póvoa de Varzim');
-    expect(sandra.ok && [sandra.homePrice, sandra.pickupPrice, sandra.sofaUpsellPrice, sandra.sofaUsualPrice]).toEqual([69, 89, 79, 89]);
+    expect(sandra.ok && [sandra.homePrice, sandra.pickupPrice, sandra.sofaUpsellPrice, sandra.sofaUsualPrice]).toEqual([69, 89, 89, 89]);
     const liliana = rugEstimate([{ width: 3, length: 2.5, qty: 1, material: 'juta' }], 'Vila Nova de Gaia');
     expect(liliana.ok && [liliana.homePrice, liliana.pickupPrice]).toEqual([99, 119]);
     const sonia = rugEstimate([{ width: 2.5, length: 3.5, qty: 1, material: 'Juta' }], 'Vila Nova de Gaia');

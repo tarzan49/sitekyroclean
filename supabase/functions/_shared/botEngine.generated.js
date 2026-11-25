@@ -867,11 +867,11 @@ function rugEstimate(rugs, city) {
     homePrice,
     pickupFee,
     pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
-    // No special condition on a sofa added to the rug's visit: table price, one travel (owner, 23 Nov 2026, Maria José).
-    sofaUpsellPrice: sofaCleaningPrice("3-lugares"),
+    // A sofa added to the rug's visit pays its full price (owner, 25 Nov 2026, tapetes: "A"; 69 + 89 = 159€).
+    sofaUpsellPrice: sofaCleaningPrice("3-lugares") + travelFee,
     sofaUsualPrice: sofaCleaningPrice("3-lugares") + travelFee,
     ...materialAssumed ? { materialAssumed: true } : {},
-    rule: (materialAssumed ? ASSUMED_NOTE : "") + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço de tabela, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.'
+    rule: (materialAssumed ? ASSUMED_NOTE : "") + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço cheio, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.'
   };
 }
 
@@ -2875,7 +2875,8 @@ function withBlackFridayPrices(input, r) {
   let bf;
   if (rugsOnly) {
     if (raw.some((i) => i.odor === true || (i.treatment ?? "clean") !== "clean") || !q.rugEstimate?.ok || typeof q.rugEstimate.homePrice !== "number") return none;
-    bf = end9(q.rugEstimate.homePrice * BLACK_FRIDAY_PRICES.rugFactor);
+    const table = innerPriced({ ...inp, campaign: void 0 }).rugEstimate?.homePrice ?? q.rugEstimate.homePrice;
+    bf = end9(table * BLACK_FRIDAY_PRICES.rugFactor);
   } else {
     const chairs = raw.filter((i) => i?.kind === "chairs").reduce((s, i) => s + (typeof i.qty === "number" ? i.qty : 1), 0);
     let sum2 = 0, pieces = 0;
@@ -2959,14 +2960,20 @@ var pricedTotal = (r) => {
   if (typeof r.rugCombo?.comboPrice === "number") return r.rugCombo.comboPrice;
   return !r.quote && typeof r.total === "number" ? r.total : null;
 };
+var RUG_COMBO_FULL_RULE = 'Lavagem em casa, na mesma visita: comboPrice = o preço cheio de cada peça, somado, sem condição especial e sem "em vez de" que não seja o das ofertas (visitGifts.usual). Depois a impermeabilização como opção, a prova e as horas.';
+var payTotal = (r) => pricedTotal(r) ?? (r.ok && !r.handToOwner && r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === "number" ? r.rugEstimate.homePrice : null);
 function withVisitGifts(input, r) {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
   const q = r;
   const inp = expandPieces(input ?? {});
   const rawIn = inp.items;
-  if (pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  if (!Array.isArray(rawIn)) return none;
   const rec = (i) => i ?? {};
-  const price = (items) => pricedTotal(innerPriced({ ...inp, items }));
+  const isRug = (i) => rec(i).kind === "rug" || rec(i).kind === "carpet";
+  const rugsOnly = rawIn.every(isRug) && rawIn.some((i) => rec(i).kind === "rug");
+  const totalOf = rugsOnly ? payTotal : pricedTotal;
+  if (totalOf(q) === null) return none;
+  const price = (items) => totalOf(innerPriced({ ...inp, items }));
   const treat = (i) => rec(i).treatment;
   const clean = (i) => treat(i) === void 0 || treat(i) === "clean";
   const asked = /* @__PURE__ */ new Set();
@@ -3027,7 +3034,9 @@ function withVisitGifts(input, r) {
     usualBase = best.priced;
   }
   const cleanedSofas = rawIn.every((i) => rec(i).kind === "sofa" && ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
-  if (!gifted.size && !(capped && cleanedSofas && !extras)) return none;
+  const withRugs = rawIn.length > 1 && rawIn.some((i) => rec(i).kind === "rug") && rawIn.every((i) => isRug(i) || rec(i).kind === "sofa" && ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
+  if (!gifted.size && (extras || !(capped && cleanedSofas || withRugs))) return none;
+  if (rugsOnly && extras) return none;
   const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
@@ -3041,7 +3050,8 @@ function withVisitGifts(input, r) {
   };
   const paidItems = restore(base);
   const chairSet = paidItems.filter((i) => rec(i).kind === "chairs");
-  const parts = [...paidItems.filter((i) => rec(i).kind !== "chairs").map((i) => [i]), ...chairSet.length ? [chairSet] : []].map((its) => aloneOf({ items: its }));
+  const carpetSet = rugsOnly || !gifted.size ? paidItems.filter((i) => rec(i).kind === "carpet") : [];
+  const parts = [...paidItems.filter((i) => rec(i).kind !== "chairs" && !carpetSet.includes(i)).map((i) => [i]), ...chairSet.length ? [chairSet] : [], ...carpetSet.length ? [carpetSet] : []].map((its) => aloneOf({ items: its }));
   const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
@@ -3054,9 +3064,12 @@ function withVisitGifts(input, r) {
   const final = up9(paid);
   const out = { ...r };
   const rc = q.rugCombo;
-  if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final };
-  else out.total = final;
-  const shift = cents(final - (typeof q.total === "number" ? q.total : final));
+  if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final, usualPrice: final, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };
+  else if (rugsOnly) {
+    const re = q.rugEstimate;
+    out.rugEstimate = { ...re, homePrice: final, pickupPrice: typeof re.pickupPrice === "number" ? cents(re.pickupPrice + final - re.homePrice) : re.pickupPrice };
+  } else out.total = final;
+  const shift = rugsOnly ? 0 : cents(final - (typeof q.total === "number" ? q.total : final));
   for (const k of ["puff", "armchair", "headboard"]) {
     const e = r[k];
     if (shift && e && typeof e.total === "number" && !(rc && typeof rc.comboPrice === "number")) out[k] = { ...e, total: cents(e.total + shift) };

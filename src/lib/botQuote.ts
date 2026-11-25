@@ -730,7 +730,9 @@ function withBlackFridayPrices<T extends { ok: boolean }>(input: unknown, r: T):
   let bf: number;
   if (rugsOnly) {
     if (raw.some(i => i.odor === true || (i.treatment ?? 'clean') !== 'clean') || !q.rugEstimate?.ok || typeof q.rugEstimate.homePrice !== 'number') return none;
-    bf = end9(q.rugEstimate.homePrice * BLACK_FRIDAY_PRICES.rugFactor);
+    // On the table of the rugs together, as before the full price of 25 Nov 2026.
+    const table = (innerPriced({ ...inp, campaign: undefined }) as { rugEstimate?: { homePrice?: number } }).rugEstimate?.homePrice ?? q.rugEstimate.homePrice;
+    bf = end9(table * BLACK_FRIDAY_PRICES.rugFactor);
   } else {
     const chairs = raw.filter(i => i?.kind === 'chairs').reduce((s, i) => s + (typeof i.qty === 'number' ? i.qty : 1), 0);
     let sum = 0, pieces = 0;
@@ -840,6 +842,11 @@ const pricedTotal = (r: Priced): number | null => {
   if (typeof r.rugCombo?.comboPrice === 'number') return r.rugCombo.comboPrice;
   return !r.quote && typeof r.total === 'number' ? r.total : null;
 };
+/** A rug in the visit at the full price (owner, 25 Nov 2026): never "com o tapete seria X, fazemos por Y" (119€ over a "usual" 108€). */
+const RUG_COMBO_FULL_RULE = 'Lavagem em casa, na mesma visita: comboPrice = o preço cheio de cada peça, somado, sem condição especial e sem "em vez de" que não seja o das ofertas (visitGifts.usual). Depois a impermeabilização como opção, a prova e as horas.';
+/** What the client pays, the rug-only price included (homePrice). */
+const payTotal = (r: Priced & { rugEstimate?: { ok?: boolean; homePrice?: number | null } | null }): number | null =>
+  pricedTotal(r) ?? (r.ok && !r.handToOwner && r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null);
 type TierGift = { usual: number; total: number };
 function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { visitGifts: { gifts: VisitGift[]; usual: number; total: number; tiers: { premium: TierGift | null; essencial: TierGift | null } | null; withoutGift: number | null; rule: string } | null; mattressMiteOffer: { normal: number; total: number } | null } {
   const none = { ...r, visitGifts: null, mattressMiteOffer: null };
@@ -847,9 +854,15 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   // A sofa or mattress with qty 2 is two pieces, as two items (24 Nov 2026, Ovar: 369 vs 399 for the same order).
   const inp = expandPieces((input ?? {}) as Record<string, unknown>);
   const rawIn = inp.items;
-  if (pricedTotal(q) === null || !Array.isArray(rawIn)) return none;
+  if (!Array.isArray(rawIn)) return none;
   const rec = (i: unknown) => (i ?? {}) as Record<string, unknown>;
-  const price = (items: unknown[]) => pricedTotal(innerPriced({ ...inp, items }));
+  // Rugs and carpets alone are priced by rugEstimate.homePrice (owner, 25 Nov 2026, tapetes: "A" = preço cheio). Carpets
+  // alone stay out: their price is by the total area.
+  const isRug = (i: unknown) => rec(i).kind === 'rug' || rec(i).kind === 'carpet';
+  const rugsOnly = rawIn.every(isRug) && rawIn.some(i => rec(i).kind === 'rug');
+  const totalOf = rugsOnly ? payTotal : pricedTotal;
+  if (totalOf(q) === null) return none;
+  const price = (items: unknown[]) => totalOf(innerPriced({ ...inp, items }));
   const treat = (i: unknown) => rec(i).treatment as string | undefined;
   const clean = (i: unknown) => treat(i) === undefined || treat(i) === 'clean';
   // A mattress or chairs already asked with anti-mites: candidates on a cleaning base; restored (paid) when not offered.
@@ -918,7 +931,11 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   // (owner, 24 Nov 2026, "Preço cheio + oferta", with 3L + 3L = 179 in front of him, not 159). Orders with nothing to
   // offer keep their price; so does anything but sofas only, cleaned only: that is the table he saw.
   const cleanedSofas = rawIn.every(i => rec(i).kind === 'sofa' && ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean'));
-  if (!gifted.size && !(capped && cleanedSofas && !extras)) return none;
+  // With a rug, cleaned pieces pay the full price too (owner, 25 Nov 2026, "A": sofá 3L + tapete 159€, 2 tapetes 139€).
+  const withRugs = rawIn.length > 1 && rawIn.some(i => rec(i).kind === 'rug')
+    && rawIn.every(i => isRug(i) || (rec(i).kind === 'sofa' && ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean')));
+  if (!gifted.size && (extras || !((capped && cleanedSofas) || withRugs))) return none;
+  if (rugsOnly && extras) return none;
   // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
   const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
   const total = price(restore(base));
@@ -940,7 +957,9 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   // Puffs, armchairs and headboards are priced apart (puff.total = total + their price), so only the items enter here.
   const paidItems = restore(base);
   const chairSet = paidItems.filter(i => rec(i).kind === 'chairs');
-  const parts = [...paidItems.filter(i => rec(i).kind !== 'chairs').map(i => [i]), ...(chairSet.length ? [chairSet] : [])].map(its => aloneOf({ items: its }));
+  // Carpets are priced by their total area: one set.
+  const carpetSet = rugsOnly || !gifted.size ? paidItems.filter(i => rec(i).kind === 'carpet') : [];
+  const parts = [...paidItems.filter(i => rec(i).kind !== 'chairs' && !carpetSet.includes(i)).map(i => [i]), ...(chairSet.length ? [chairSet] : []), ...(carpetSet.length ? [carpetSet] : [])].map(its => aloneOf({ items: its }));
   const sumAlone = parts.every((v): v is number => typeof v === 'number') ? cents(parts.reduce((a, v) => a + v, 0)) : total;
   const lift = Math.max(0, cents(sumAlone - total));
   const paid = cents(total + lift);
@@ -954,10 +973,13 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const final = up9(paid);
   const out = { ...r } as Record<string, unknown>;
   const rc = q.rugCombo;
-  if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final };
-  else out.total = final;
+  if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final, usualPrice: final, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };
+  else if (rugsOnly) {
+    const re = (q as { rugEstimate?: { homePrice: number; pickupPrice?: number | null } }).rugEstimate!;
+    out.rugEstimate = { ...re, homePrice: final, pickupPrice: typeof re.pickupPrice === 'number' ? cents(re.pickupPrice + final - re.homePrice) : re.pickupPrice };
+  } else out.total = final;
   // The extras' own totals (total + their price) follow the new total.
-  const shift = cents(final - (typeof q.total === 'number' ? q.total : final));
+  const shift = rugsOnly ? 0 : cents(final - (typeof q.total === 'number' ? q.total : final));
   for (const k of ['puff', 'armchair', 'headboard']) {
     const e = (r as unknown as Record<string, { total?: number } | null | undefined>)[k];
     if (shift && e && typeof e.total === 'number' && !(rc && typeof rc.comboPrice === 'number')) out[k] = { ...e, total: cents(e.total + shift) };

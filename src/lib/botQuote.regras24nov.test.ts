@@ -96,3 +96,32 @@ describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medi
     expect([q([C(6)]).total, q([C(6), C(2, 'essencial')]).total]).toEqual([120, 129]);
   });
 });
+
+describe('4. tapetes ao preço cheio, com o anti-odor oferecido quando couber (dono, 25 Nov 2026: "A")', () => {
+  const R = (x: object = {}) => ({ kind: 'rug', width: 2, length: 3, ...x }), K = { kind: 'carpet', width: 4, length: 5 };
+  const paid = (r: Q) => r.rugCombo?.comboPrice ?? (r.quote ? r.rugEstimate?.homePrice : r.total);
+  it.each([
+    ['um tapete só', [R()], 69, null],
+    ['2 tapetes', [R(), R()], 139, null],
+    ['2 tapetes em qty', [R({ qty: 2 })], 139, null],
+    ['3 tapetes', [R(), R(), R()], 209, 239],
+    ['tapete + alcatifa 20 m²', [R(), K], 239, 269],
+    ['sofá 3L + tapete', [S(), R()], 159, null],
+  ])('%s', (_n, items, total, usual) => {
+    const r = q(items as unknown[]);
+    expect([paid(r), r.visitGifts?.usual ?? null]).toEqual([total, usual]);
+    if (usual) expect(r.visitGifts.gifts).toEqual([{ piece: 'rug', treatment: 'anti-odor', normal: 30 }]);
+  });
+  it('alcatifas sozinhas ficam pela área total (20 + 20 m² = 40 m²)', () => {
+    expect(paid(q([K, K]))).toBe(paid(q([{ kind: 'carpet', width: 4, length: 10 }])));
+  });
+  it('tapete pequeno: preço cheio com o anti-odor oferecido, nunca um "preço normal" abaixo do total', () => {
+    const r = q([S(), { kind: 'rug', width: 1.2, length: 1.8 }]);
+    expect([r.rugCombo.comboPrice, r.rugCombo.usualPrice, r.visitGifts.usual]).toEqual([119, 119, 129]);
+  });
+  it('a ordem não muda o preço e pedir o anti-odor nunca baixa', () => {
+    expect(paid(q([R(), S()]))).toBe(159);
+    expect(paid(q([S(), R({ odor: true })]))).toBeGreaterThanOrEqual(159);
+    expect(paid(q([R({ odor: true }), R()]))).toBeGreaterThanOrEqual(139);
+  });
+});

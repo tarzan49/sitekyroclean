@@ -137,10 +137,10 @@ export function rugEstimate(rugs: RugEstimateItem[], city: string | null): RugEs
     homePrice,
     pickupFee,
     pickupPrice: pickupFee === null ? null : homePrice + pickupFee,
-    // No special condition on a sofa added to the rug's visit: table price, one travel (owner, 23 Nov 2026, Maria José).
-    sofaUpsellPrice: sofaCleaningPrice('3-lugares'),
+    // A sofa added to the rug's visit pays its full price (owner, 25 Nov 2026, tapetes: "A"; 69 + 89 = 159€).
+    sofaUpsellPrice: sofaCleaningPrice('3-lugares') + travelFee,
     sofaUsualPrice: sofaCleaningPrice('3-lugares') + travelFee,
     ...(materialAssumed ? { materialAssumed: true as const } : {}),
-    rule: (materialAssumed ? ASSUMED_NOTE : '') + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço de tabela, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.',
+    rule: (materialAssumed ? ASSUMED_NOTE : '') + 'Em casa: homePrice, com a deslocação incluída. Com recolha e entrega: pickupPrice (null = sem recolha). Depois, numa mensagem à parte e uma vez só: o sofá na mesma visita por sofaUpsellPrice (preço cheio, sem "em vez de" e sem condição especial), com as opções de impermeabilização do sofá; total = soma, a acabar em 9.',
   };
 }
