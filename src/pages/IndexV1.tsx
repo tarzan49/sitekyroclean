@@ -16,8 +16,9 @@ const TestimonialsV1       = lazy(() => import("@/components/TestimonialsV1"));
 const FinalCTAV1           = lazy(() => import("@/components/FinalCTAV1"));
 const Footer               = lazy(() => import("@/components/Footer"));
 
+// Ocupa já um ecrã: quando a secção chega, a página não muda de altura a meio do scroll.
 const SectionLoader = () => (
-  <div className="py-8 flex justify-center">
+  <div className="flex min-h-[100dvh] items-center justify-center">
     <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
   </div>
 );
@@ -30,7 +31,7 @@ const IndexV1 = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-home-scroller>
       <Header />
       <main>
         <HeroV1 />

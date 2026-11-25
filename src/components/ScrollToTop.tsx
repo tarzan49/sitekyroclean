@@ -19,6 +19,7 @@ const ScrollToTop = () => {
     }
 
     window.scrollTo(0, 0);
+    document.querySelector('[data-home-scroller]')?.scrollTo(0, 0);
   }, [pathname, state]);
 
   return null;

@@ -8,33 +8,50 @@ import SectionHeader from './SectionHeader';
 import { CHAIR_PRICE_SHORT, formatEuro, MATTRESS_CLEANING_FROM, SOFA_CLEANING_FROM, SOFA_WATERPROOF_ESSENCIAL_FROM } from '@/data/enginePrices';
 import { RUG_PRICE_FROM, CARPET_PRICE_FROM } from '@/constants/rugSitePrice';
 import sofaVideo from '@/assets/sofa-processo/extracao.mp4';
+import sofaPoster from '@/assets/sofa-processo/extracao-poster.jpg';
 import mattressVideo from '@/assets/colchoes-processo/extracao.mp4';
+import mattressPoster from '@/assets/colchoes-processo/extracao-poster.jpg';
 import chairsVideo from '@/assets/cadeiras-processo/extracao.mp4';
+import chairsPoster from '@/assets/cadeiras-processo/extracao-poster.jpg';
 import rugVideo from '@/assets/tapetes-processo/extracao.mp4';
+import rugPoster from '@/assets/tapetes-processo/extracao-poster.jpg';
 import carpetVideo from '@/assets/alcatifa-processo/extracao.mp4';
+import carpetPoster from '@/assets/alcatifa-processo/extracao-poster.jpg';
 import waterproofVideo from '@/assets/before-after-pool/imper-agua-01.mp4';
+import waterproofPoster from '@/assets/before-after-pool/imper-agua-01-poster.webp';
 
 const fromLabel = (v: string) => (/^desde/i.test(v) ? v.replace(/^desde/i, 'Desde') : `Desde ${v}`);
 
 const ITEMS = [
-  { title: 'Limpeza de Sofás', price: fromLabel(formatEuro(SOFA_CLEANING_FROM)), video: sofaVideo, link: '/limpeza-sofas' },
-  { title: 'Impermeabilização', price: fromLabel(formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)), video: waterproofVideo, link: '/impermeabilizacao' },
-  { title: 'Limpeza de Colchões', price: fromLabel(formatEuro(MATTRESS_CLEANING_FROM)), video: mattressVideo, link: '/limpeza-colchoes' },
-  { title: 'Limpeza de Cadeiras', price: fromLabel(CHAIR_PRICE_SHORT.replace(/^a partir de\s*/i, '')), video: chairsVideo, link: '/limpeza-cadeiras' },
-  { title: 'Limpeza de Tapetes', price: fromLabel(RUG_PRICE_FROM), video: rugVideo, link: '/limpeza-tapetes' },
-  { title: 'Limpeza de Alcatifas', price: fromLabel(CARPET_PRICE_FROM), video: carpetVideo, link: '/limpeza-alcatifas' },
+  { title: 'Limpeza de Sofás', price: fromLabel(formatEuro(SOFA_CLEANING_FROM)), video: sofaVideo, poster: sofaPoster, link: '/limpeza-sofas' },
+  { title: 'Impermeabilização', price: fromLabel(formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)), video: waterproofVideo, poster: waterproofPoster, link: '/impermeabilizacao' },
+  { title: 'Limpeza de Colchões', price: fromLabel(formatEuro(MATTRESS_CLEANING_FROM)), video: mattressVideo, poster: mattressPoster, link: '/limpeza-colchoes' },
+  { title: 'Limpeza de Cadeiras', price: fromLabel(CHAIR_PRICE_SHORT.replace(/^a partir de\s*/i, '')), video: chairsVideo, poster: chairsPoster, link: '/limpeza-cadeiras' },
+  { title: 'Limpeza de Tapetes', price: fromLabel(RUG_PRICE_FROM), video: rugVideo, poster: rugPoster, link: '/limpeza-tapetes' },
+  { title: 'Limpeza de Alcatifas', price: fromLabel(CARPET_PRICE_FROM), video: carpetVideo, poster: carpetPoster, link: '/limpeza-alcatifas' },
 ];
 
 export default function HomeServiceVideos() {
   const strip = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
+  const [load, setLoad] = useState(false);
 
-  // Só carrega e reproduz os vídeos quando a secção está à vista.
+  // Nunca um quadrado preto (dono, 25 Nov, vídeo): a fotografia de cada vídeo está sempre por baixo, o vídeo carrega
+  // uma vez, logo a seguir ao topo da página, e nunca mais se descarrega; fora do ecrã só fica em pausa.
   useEffect(() => {
+    const start = () => setLoad(true);
+    const t = window.setTimeout(start, 2500);
     const el = strip.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.25 });
-    io.observe(el); return () => io.disconnect();
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) start();
+      el.querySelectorAll('video').forEach(v => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); });
+    });
+    io.observe(el); return () => { io.disconnect(); window.clearTimeout(t); };
   }, []);
+  useEffect(() => {
+    const el = strip.current; if (!load || !el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) el.querySelectorAll('video').forEach(v => { v.play().catch(() => {}); });
+  }, [load]);
 
   return (
     <section id="servicos" className="scroll-mt-20 bg-[#FDFDF9] pt-10 pb-[100px] md:py-16">
@@ -42,9 +59,10 @@ export default function HomeServiceVideos() {
         <SectionHeader heading="O nosso trabalho," goldWord="em vídeo real" />
         <div ref={strip} className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
           {ITEMS.map(item => (
-            <Link key={item.link} to={item.link} className="group relative overflow-hidden rounded-2xl bg-black">
-              <video src={inView ? item.video : undefined} autoPlay muted loop playsInline preload="none"
-                className="h-[112px] w-full sm:h-[260px] object-cover transition-transform duration-500 group-hover:scale-[1.03] lg:h-[380px]" />
+            <Link key={item.link} to={item.link} className="group relative overflow-hidden rounded-2xl bg-[#e9e6dc]">
+              <img src={item.poster} alt="" aria-hidden="true" decoding="async" data-no-fill className="absolute inset-0 h-full w-full object-cover" />
+              <video src={load ? item.video : undefined} poster={item.poster} muted loop playsInline preload="auto"
+                className="relative h-[112px] w-full sm:h-[260px] object-cover transition-transform duration-500 group-hover:scale-[1.03] lg:h-[380px]" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
                 {/* Título numa só linha e do mesmo tamanho em todos os cartões (dono, 24 Nov: "tudo na mesma linha, alinhado"). */}

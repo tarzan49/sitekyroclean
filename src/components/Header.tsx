@@ -1,3 +1,4 @@
+import { pageScroller, pageScrollTop } from "@/lib/pageScroller";
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
@@ -69,10 +70,10 @@ const Header = () => {
   // Sombra só depois de descer: no topo, a barra fica limpa.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(pageScrollTop() > 8);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", onScroll, true);
   }, []);
 
   // As avaliações da própria página, quando as tem; senão, as da página inicial.
@@ -105,7 +106,7 @@ const Header = () => {
           aria-label="Kyro Clean Solutions, página inicial"
           onClick={(e) => {
             closeMenu();
-            if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+            if (location.pathname === "/") { e.preventDefault(); pageScroller().scrollTo({ top: 0, behavior: "smooth" }); }
           }}
           className="flex h-11 min-w-0 shrink items-center whitespace-nowrap font-playfair text-[15.5px] font-bold leading-none tracking-[-0.03em] text-[#111111] max-[359px]:text-[13px] min-[400px]:text-[17px] md:text-[20px] xl:text-[21px]"
         >

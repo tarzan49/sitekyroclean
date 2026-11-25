@@ -1336,3 +1336,5 @@ Colchão com sangue seco de 4 a 6 meses, para trocar na garantia. O bot avisou q
 
 - Antes (S24): a explicação vai com o orçamento, sem promessas; se a peça tem de ficar sem marca (troca, devolução, venda), diz-se com clareza antes de marcar.
 - Depois (S66, exceção ao silêncio de 5 Nov): `bloodStain.ts` envia uma só explicação de texto fixo. O modelo lê a conversa e só deixa sair se for sangue e só isso; dinheiro, nova visita, estrago ou outra pergunta ficam só para o dono. "Lhe dissemos antes" só sai se a frase existir mesmo numa mensagem nossa. A conversa continua em pausa e o dono recebe email.
+## Página inicial: encaixe no iPhone (dono, 25 Nov 2026)
+Vídeo do dono: vídeos pretos, secções paradas a meio, barra do WhatsApp por cima das setas das avaliações, rodapé a abrir pelo fim. Causas: secções com --app-max enquanto as barras do Safari abriam e fechavam; `useFillSections` punha min-height 0 para medir e obrigava a novo encaixe; `scroll-mt-16` no #testemunhos (desvio de 64 px); `src` dos vídeos retirado fora do ecrã; `footer { scroll-snap-align: end }`. As outras páginas com encaixe ainda têm o rodapé a `end` e a medida antiga.

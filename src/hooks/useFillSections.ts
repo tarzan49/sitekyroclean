@@ -1,3 +1,4 @@
+import { pageScroller } from '@/lib/pageScroller';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -52,9 +53,18 @@ function fill(section: HTMLElement, saved: Saved[]) {
   const px = (v: string) => parseFloat(root.getPropertyValue(v)) || 0;
   const hero = section.hasAttribute('data-commercial-hero');
   const home = document.documentElement.classList.contains('snap-home');
-  const target = hero ? px('--app-h') : px('--app-max') - (home ? 0 : root.getPropertyValue('--header-h').trim() ? px('--header-h') : 64);
+  const target = home ? pageScroller().clientHeight : hero ? px('--app-h') : px('--app-max') - (home ? 0 : root.getPropertyValue('--header-h').trim() ? px('--header-h') : 64);
   if (!target) return;
   const spareNow = () => {
+    // Página inicial: mede-se pelo conteúdo, sem tirar a altura à secção. Encolhê-la para medir (mesmo num instante)
+    // obrigava o Safari a encaixar outra vez e a secção parava cortada a meio (dono, 25 Nov, vídeo).
+    if (home) {
+      const cs = getComputedStyle(section);
+      const kids = [...section.children].filter((k): k is HTMLElement => k instanceof HTMLElement && k.offsetHeight > 0 && !/absolute|fixed/.test(getComputedStyle(k).position));
+      if (!kids.length) return 0;
+      const natural = kids[kids.length - 1].getBoundingClientRect().bottom - kids[0].getBoundingClientRect().top + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      return Math.floor(target - natural);
+    }
     const old = section.style.cssText;
     section.style.setProperty('min-height', '0', 'important');
     section.style.setProperty('flex', '0 0 auto', 'important');
