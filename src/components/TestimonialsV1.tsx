@@ -1,9 +1,9 @@
-import { PUBLISHED_REVIEWS } from '@/data/reviewsPool';
+import { PUBLISHED_REVIEWS, STAR_ONLY_REVIEWS } from '@/data/reviewsPool';
 import CustomerReviews from './CustomerReviews';
 import SectionHeader from './SectionHeader';
 
-// Dono, 25 Nov: todas as do Google com texto de 4 e 5 estrelas; nunca 1, 2 ou 3.
-const REVIEWS = PUBLISHED_REVIEWS.filter(r => (r.rating ?? 0) >= 4);
+// Dono, 25 Nov: todas as do Google de 4 e 5 estrelas, as sem comentário no fim; nunca 1, 2 ou 3.
+const REVIEWS = [...PUBLISHED_REVIEWS, ...STAR_ONLY_REVIEWS].filter(r => (r.rating ?? 0) >= 4);
 
 export default function Testimonials() {
   return <section id="avaliacoes" className="py-14 md:py-20 bg-[#FDFDF9] overflow-hidden">
