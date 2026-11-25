@@ -192,6 +192,8 @@ export const SOLO_DAYS: ReadonlyArray<{ team: string; date: string; untilHour?: 
   { team: 'Lisboa 1', date: '2026-11-02' },
   // Owner, 17 Nov 2026: "o joab diz q quinta so pode a partir do 12:00".
   { team: 'Lisboa 1', date: '2026-11-19', untilHour: 12 },
+  // Owner, 25 Nov 2026: "amanhã só vai estar uma pessoa em Lisboa".
+  { team: 'Lisboa 1', date: '2026-11-26' },
 ];
 const staggers = (team: string, from: number) => {
   if (!STAGGER_TEAMS.has(team)) return false;

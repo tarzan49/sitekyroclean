@@ -1364,3 +1364,7 @@ Em coexistência a Meta entrega às vezes a mensagem vazia (`unsupported`, 13106
 "Foi definido um funil que foi sempre usado durante 2 meses em que fizemos 8.000 euros." As horas só depois de escolher (23 Nov) e "primeiro o pack, depois as datas" (19 Nov, Fernando) ficam [RETIRADA 25/11]: as opções, as horas e "Como gostaria de avançar?" vão na mesma mensagem, a última. Continua: marcar só com a opção escolhida. Última ordem no código: preço, fotografia, extra, vídeo, opções + horas.
 
 Acerto do dono no mesmo dia: o fecho é opções, depois as horas, depois "Qual das opções faz mais sentido para si?", uma só pergunta.
+
+### 25 Nov 2026: Lisboa com uma pessoa a 26/11 e aviso "não misturar serviços" retirado
+- Dono: "amanhã só vai estar uma pessoa em Lisboa" → `SOLO_DAYS` em `botAvailability.ts` (Lisboa 1, 26/11): um serviço de cada vez, com a viagem entre moradas.
+- Dono: "Parar com o nao misturar servicos em todas as prints q se envia" → a mensagem "Para não misturar serviços, manda as fotografias..." saiu da `bot-api`; a equipa nunca a recebe. [RETIRADA 25/11]
