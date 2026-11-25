@@ -921,11 +921,16 @@ async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
   return createSuccessResponse({ release: { released: !!done.released, reason: done.reason ?? null } });
 }
 
+const HOLDS_TIMEOUT_MS = 3_000;
 function supabaseHolds(): HoldStore | null {
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) return null;
-  const client = createClient(url, key);
+  const client = createClient(url, key, {
+    // 25 Nov 2026: the database stopped answering and every availability call hung with it (the bot lost all hours).
+    // The calendar is the source of the hours; the pre-bookings only add the last minutes, so they never hold it up.
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(HOLDS_TIMEOUT_MS) }) },
+  });
   const cols = "conversation_id, event_id, title, starts_at, ends_at, updated_at, released_at";
   return {
     async get(id) {
