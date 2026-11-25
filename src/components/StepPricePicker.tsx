@@ -144,9 +144,10 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   useEffect(() => { window.dispatchEvent(new Event('resize')); }, [ready]);
   const warm = () => { if (!calcModule) loadCalc().catch(() => undefined); };
 
-  const price = (over: Partial<BasketItem>) => (calc && city && sized ? calc.servicePrice(city, group(over)) : { shown: null, struck: null, travel: null as number | null });
+  const price = (over: Partial<BasketItem>) => (calc && city && sized ? calc.servicePrice(city, group(over)) : { shown: null, struck: null, travel: null as number | null, split: null });
   const total = ready ? price(chosen).shown : null;
-  const travel = ready ? price(chosen).travel : null;
+  const split = ready ? price(chosen).split : null;
+  const travelNote = split && calc ? calc.travelNote(split) : undefined;
   const add = () => { const on = price(withExtra(true)), off = price(withExtra(false)); const plus = on.shown !== null && off.shown !== null ? Math.max(0, Math.round((on.shown - off.shown) * 100) / 100) : null; const sum = (l: BasketItem[]) => l.reduce<number | null>((t, x) => { const v = calc!.struckOf(city, x); return t === null || v === null ? null : t + v; }, 0); const a = calc ? sum(group(withExtra(true))) : null, b = calc ? sum(group(withExtra(false))) : null; const was = a !== null && b !== null ? Math.round((a - b) * 100) / 100 : null; return { plus, was: was !== null && plus !== null && was - plus >= 5 ? was : null }; };
   const gift = calc && ready ? calc.giftsUnlocked(city, [], group(chosen)) : null;
 
@@ -168,14 +169,14 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
     return `da lavagem${extra ? ' com anti-odor' : ''} de ${describe()}`;
   };
   const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'fotografias';
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}${travel ? ` + ${formatEuro(travel)} de deslocação` : travel === 0 ? ', com deslocação grátis' : ''}` : ''}. Envio ${photo}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${split && calc ? `, por ${calc.priceInWords(split)}` : ''}. Envio ${photo}.`;
   const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
 
   // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
   const [barKey] = useState(() => ({}));
   const bar = total !== null;
   const was = bar ? price(chosen).struck : null;
-  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, travel: travel === null ? undefined : travel ? `+ ${formatEuro(travel)} deslocação` : 'deslocação grátis', href, source } : null); }, [barKey, total, was, travel, href, source]);
+  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, travel: travelNote, href, source } : null); }, [barKey, total, was, travelNote, href, source]);
   useEffect(() => () => setPriceBar(barKey, null), [barKey]);
 
 
@@ -257,7 +258,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   }
 
   const row = (on: boolean) => `flex min-h-[54px] max-md:[@media(min-height:700px)]:min-h-[70px] w-full items-center justify-between gap-2 px-3.5 py-1.5 text-left md:min-h-[72px] md:px-5 ${tile(on)}`;
-  const text = (name: string, note: string) => <span className="min-w-0"><span className="block text-base font-bold leading-tight md:text-lg">{name}</span><span className="block text-xs font-normal leading-snug opacity-75 md:text-sm">{note}</span></span>;
+  const text = (name: string, note: string, free = false) => <span className="min-w-0"><span className="block text-base font-bold leading-tight md:text-lg">{name}</span><span className="block text-xs font-normal leading-snug opacity-75 md:text-sm">{note}</span>{free && <span className="block text-[11px] font-semibold leading-snug">deslocação grátis</span>}</span>;
   const addOn = () => { const a = add(); return a.plus === null ? null : <span className="flex shrink-0 flex-col items-end leading-tight">{a.was !== null && <span className="text-[11px] opacity-60 line-through">+{formatEuro(a.was)}</span>}<span className="text-lg font-bold">{a.plus > 0 ? `+${formatEuro(a.plus)}` : 'Oferecido'}</span></span>; };
   const area = isRug ? (Math.round(num(dims.w) * num(dims.l) * 100) / 100).toLocaleString('pt-PT') : '';
 
@@ -267,7 +268,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
       {city && sized && <div className="flex flex-col">
         <div className="flex flex-col gap-2">
           {needsPack && options.map(o => <button key={o.pack} type="button" aria-pressed={pack === o.pack} onClick={() => setPack(o.pack)} className={row(pack === o.pack)}>
-            {text(o.name, o.note)}
+            {text(o.name, o.note, !!calc && !!city && calc.freeTravel(city, group({ pack: o.pack })))}
             <span className="flex items-center gap-2">{calc ? <PriceTag {...price({ pack: o.pack })} on={pack === o.pack} /> : <span className="h-5 w-14 animate-pulse rounded bg-[#E9EBE8]" aria-hidden />}<span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${pack === o.pack ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{pack === o.pack && <Check className="h-3 w-3" strokeWidth={3} />}</span></span>
           </button>)}
           {leather && <div className={row(true)}>{text('Limpeza + tratamento da pele', 'Limpeza e hidratação')}{calc && <PriceTag {...price({})} on />}</div>}
@@ -281,7 +282,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
         {ready && <WhatsAppCta onLight href={href} source={source} total={total !== null ? formatEuro(total) : undefined} className={`mt-2 ${bar ? 'max-md:hidden' : ''}`} />}
         {ready && <PriceCta onLight className="mt-2" onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
-        {ready && <p className="mt-1 hidden text-center text-[11px] text-[#8a8a8a] md:block">{travel ? `+ ${formatEuro(travel)} deslocação` : travel === 0 ? 'Deslocação grátis' : ''}</p>}
+        {ready && <p className="mt-1 hidden text-center text-xs text-[#666] md:block">{travelNote}</p>}
       </div>}
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
     </div>

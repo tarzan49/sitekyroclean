@@ -69,7 +69,7 @@ const MobileStickyBar = () => {
             ? <div className="flex items-center gap-3 min-[390px]:gap-4" >
                 <p className="shrink-0 leading-none" aria-live="polite">
                   <span className="flex items-baseline gap-1.5"><span className={`font-playfair text-[27px] font-semibold leading-none tracking-[-0.02em] ${light ? 'text-[#0B2F2A]' : 'text-white'}`}>{deal.total}</span>{deal.was && <s className={`text-[13px] ${light ? 'text-[#0B2F2A]/50' : 'text-white/50'}`}>{deal.was}</s>}</span>
-                  {deal.travel && <span className={`mt-1.5 block whitespace-nowrap text-[10px] leading-none ${light ? 'text-[#0B2F2A]/55' : 'text-white/50'}`}>{deal.travel}</span>}
+                  {deal.travel && <span className={`mt-1.5 block whitespace-nowrap text-[11px] leading-none ${light ? 'text-[#0B2F2A]/65' : 'text-white/60'}`}>{deal.travel}</span>}
                 </p>
                 <WhatsAppCta href={deal.href} source={`${deal.source}_bar`} className="cta-bar" />
               </div>

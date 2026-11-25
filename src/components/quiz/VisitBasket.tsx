@@ -1,7 +1,7 @@
 // Cesto da visita (dono, 24 Nov 2026): o questionário novo, em dois ecrãs.
 // 1) O cesto: o que veio do widget de preço já lá está; juntam-se sofás, colchões, cadeiras, tapetes e
 //    alcatifas na mesma visita, cada um com o seu pack. O total é o do bot (botQuote do pedido inteiro,
-//    deslocação incluída), nunca escrito à mão. Tapetes e alcatifas com o preço do bot (24 Nov 2026).
+//    deslocação mostrada à parte, dono 25 Nov), nunca escrito à mão. Tapetes e alcatifas com o preço do bot (24 Nov 2026).
 // 2) Contacto: nome e telemóvel. O pedido vai pelo mesmo envio (submit-lead + quiz_order), por isso a
 //    mensagem automática e o funil do bot no WhatsApp continuam iguais.
 import { WhatsAppCta } from '@/components/Cta';
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Gift, Minus, Plus, Trash2, X } from 'lucide-react';
 import { botQuote, listBotCities } from '@/lib/botQuote';
 import { formatEuro } from '@/data/enginePrices';
+import { priceSplit, separateService, serviceLines, splitText, travelLabel, type EngineItem, type PriceSplit } from '@/lib/servicePrice';
 import { buildQuizOrder, type QuoteItem } from '@/lib/quizOrder';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { type QuizLeadPayload } from '@/services/submissionService';
@@ -184,8 +185,7 @@ export function quoteBasket(city: string, items: BasketItem[]) {
     gifts: !sob && r.visitGifts ? r.visitGifts.gifts : [], usual: !sob ? usualOf(typeof r.total === 'number' ? r.total : null) : null, withoutGift: !sob && r.visitGifts ? r.visitGifts.withoutGift ?? null : null };
 }
 
-/** Cada peça pedida sozinha, com a sua deslocação (o motor): é o que cada linha do cesto mostra, por isso as
- *  linhas somadas com as ofertas dão o riscado ("o mesmo pedido em separado", dono 24 Nov). */
+/** Cada peça pedida sozinha, com a sua deslocação (o total do motor). */
 export const aloneTotal = (city: string, it: BasketItem) => { const q = quoteBasket(city, [it]); return q.total === null || q.sob ? null : q.total; };
 /** O que uma peça a mais faz aparecer na escada A (dono, 25 Nov: "em cada [cartão] estar uma promoção"): as ofertas
  *  novas e quanto valem, pelo motor. */
@@ -195,15 +195,6 @@ export function giftsUnlocked(city: string, items: BasketItem[], add: BasketItem
   const fresh = after.filter(g => g.normal > (before.get(g.key) ?? 0));
   const value = fresh.reduce((t, g) => t + g.normal - (before.get(g.key) ?? 0), 0);
   return fresh.length && value > 0 ? { text: fresh.map(g => g.text).join(' e '), value, normal: fresh.reduce((t, g) => t + g.normal, 0) } : null;
-}
-/** Impermeabilização: a vantagem é a poupança do pack, limpeza + impermeabilização contra os dois em separado
- *  (dono, 25 Nov: "na imper a oferta é de poupança na limpeza"), pelo separatePrice do motor. */
-export function packSaving(city: string, it: BasketItem): number | null {
-  const q = toQuote(it);
-  if (!q) return null;
-  const r = botQuote({ city: city || 'Lisboa', items: [q] }) as { separatePrice?: { saving?: number } | null };
-  const v = r.separatePrice?.saving;
-  return typeof v === 'number' && v > 0 ? v : null;
 }
 /** "Se juntar X, poupa Y": só o que se confirma no total para qualquer tamanho da peça (o mínimo), pelo motor. */
 const JOIN_PACKS = ['none', 'essencial', 'premium'] as const;
@@ -215,58 +206,45 @@ const JOIN_VARIANTS: Record<BasketKind, Partial<BasketItem>[]> = {
   rug: [['1,2', '1,7'], ['2', '3'], ['2,5', '3,5'], ['3', '4'], ['4', '5']].flatMap(([width, length]) => ['sintético ou lã', 'juta ou sisal'].map(rugMaterial => ({ width, length, rugMaterial }))),
   carpet: [['3', '4'], ['4', '6'], ['6', '8'], ['8', '10'], ['10', '15']].map(([width, length]) => ({ width, length })),
 };
-const savingOf = (q: { usual: number | null; total: number | null }) => (q.usual !== null && q.total !== null ? q.usual - q.total : 0);
+/** Tudo na base do serviço: a poupança nunca conta deslocações (dono, 25 Nov). */
 export function joinSaving(city: string, items: BasketItem[], kind: BasketKind): number {
-  const q = quoteBasket(city, items), before = savingOf(q), giftValue = (x: typeof q) => x.gifts.reduce((t, g) => t + g.normal, 0);
+  const of = (l: BasketItem[]) => { const x = splitOf(city, l); return x && { service: x.service, saving: x.struck === null ? 0 : x.struck - x.service, gifts: quoteBasket(city, l).gifts.reduce((t, g) => t + g.normal, 0) }; };
+  const q = of(items);
+  if (!q) return 0;
   let min = Infinity;
   for (const v of JOIN_VARIANTS[kind]) {
-    const extra = newItem(kind, v), both = quoteBasket(city, [...items, extra]), alone = aloneTotal(city, extra);
-    if (both.total === null || q.total === null || alone === null) return 0;
-    const shown = savingOf(both) - before;
-    // O que juntar poupa mesmo (os dois pedidos em separado menos a visita, mais a oferta nova): 6 cadeiras Blindado não
-    // mostram riscado sozinhas e o riscado do conjunto trazia a poupança delas, "Se juntar um colchão, poupa 120€" (eram 40€).
-    const real = q.total + alone - both.total + giftValue(both) - giftValue(q);
+    const extra = newItem(kind, v), both = of([...items, extra]), alone = splitOf(city, [extra]);
+    if (!both || !alone) return 0;
+    const shown = both.saving - q.saving;
+    // O que juntar poupa mesmo (os serviços dos dois pedidos em separado menos o da visita, mais a oferta nova).
+    const real = q.service + alone.service - both.service + both.gifts - q.gifts;
     min = Math.min(min, real >= shown - 1 ? shown : real);
     if (min < 5) return 0;
   }
   return Number.isFinite(min) ? Math.round(min * 100) / 100 : 0;
 }
-/** A peça pedida sozinha com cada serviço em separado (separatePrice.separate do motor). */
-function separateOf(city: string, it: BasketItem | BasketItem[]): number | null {
-  const list = (Array.isArray(it) ? it : [it]).map(toQuote);
-  if (!list.length || list.some(x => !x)) return null;
-  // Colchão com anti-ácaros: o motor dá o riscado em mattressMitePack (limpeza + anti-ácaros à parte, 40€).
-  // Cadeiras com impermeabilização: chairsWas (1 cadeira × a quantidade, dono 24 Nov), só nos packs de 5 ou mais.
-  const r = botQuote({ city: city || 'Lisboa', items: list as QuoteItem[] }) as { separatePrice?: { separate?: number } | null; mattressMitePack?: { separate?: number } | null; chairsWas?: number | null };
-  const v = r.separatePrice?.separate ?? r.mattressMitePack?.separate ?? r.chairsWas;
-  return typeof v === 'number' ? v : null;
-}
 /** Envio falhou (sessão SEO, 25 Nov): a mensagem de WhatsApp leva o pedido inteiro, porque o bot não o encontra no CRM. */
-function fallbackMessage(city: string, items: BasketItem[], priceText: string, gifts: BasketGift[]): string {
+function fallbackMessage(city: string, items: BasketItem[], priceText: string, split: PriceSplit | null, gifts: BasketGift[]): string {
   const offer = groupGifts(gifts).map(g => `oferecem ${g.text}`).join('; ');
-  return `Olá! Gostaria de saber o preço e a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}. No site deu ${priceText}${cityKnown(city) ? ', com a deslocação incluída' : ''}${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`;
+  return `Olá! Gostaria de saber o preço e a disponibilidade para limpar em ${city.trim()}: ${items.map(itemLabel).join(', ')}. No site deu ${split ? splitText(split) : priceText}${offer ? ` (${offer})` : ''}. O pedido pelo site deu erro.`;
 }
-/** Riscado de uma linha (a quantidade real, nunca 1 unidade × quantidade: as cadeiras têm escalões e a deslocação é
- *  uma só): as mesmas peças pedidas sozinhas, sem contar a oferta, mais o que o motor diz que cada unidade pouparia em
- *  separado (limpeza e impermeabilização, anti-ácaros). Cadeiras: o chairsWas do motor. */
+/** O pedido separado em serviço e deslocação (dono, 25 Nov: o número grande é o serviço); o total é o do motor. */
+export function splitOf(city: string, items: BasketItem[]): PriceSplit | null {
+  if (!items.length || !cityKnown(city) || items.some(i => !toQuote(i))) return null;
+  const q = quoteBasket(city, items);
+  return q.total === null || q.sob ? null : priceSplit(city, items.map(i => toQuote(i)!) as EngineItem[]);
+}
+/** Riscado de uma linha, na base do serviço: limpeza e impermeabilização (ou anti-ácaros) em separado, sem deslocações. */
 export function struckOf(city: string, it: BasketItem): number | null {
-  const q = quoteBasket(city, [it]);
-  if (q.total === null || q.sob) return null;
-  if (it.kind === 'chairs') return separateOf(city, it) ?? q.total;
-  const one = { ...it, qty: 1 }, oneAlone = separateOf(city, one) ?? aloneTotal(city, one);
-  if (oneAlone === null) return q.total;
-  const sum = Math.round(oneAlone * it.qty * 100) / 100;
-  if (it.qty === 1) return sum;
-  // Com quantidade: o valor em separado que o motor dá para o conjunto. Se a quantidade desbloqueia uma oferta, esse
-  // valor já conta a oferta (que o cesto mostra numa linha própria), por isso nunca passa de cada uma sozinha.
-  const sep = separateOf(city, it);
-  return q.gifts.length ? Math.min(sep ?? sum, sum) : sep ?? sum;
+  const q = toQuote(it);
+  return q && splitOf(city, [it]) ? separateService(city, q as EngineItem) : null;
 }
-/** Linha do cesto: estas peças pedidas sozinhas. Sofás, colchões: cada um (o riscado do motor soma-os assim, e juntos só
- *  descem no total); cadeiras, tapetes e alcatifas: o conjunto (escalões e m²). Assim as linhas nunca somam menos do que o total. */
-export function linePrice(city: string, it: BasketItem): number | null {
-  if (it.qty > 1 && (it.kind === 'sofa' || it.kind === 'mattress')) { const one = aloneTotal(city, { ...it, qty: 1 }); return one === null ? null : Math.round(one * it.qty * 100) / 100; }
-  return aloneTotal(city, it);
+/** As linhas do cesto: cada peça ao preço do serviço, somadas = o subtotal do serviço. Sem preço fechado (localidade que o
+ *  motor não conhece, uma peça sob orçamento), as linhas do motor, sem deslocação. */
+export function basketLines(city: string, items: BasketItem[]): (number | null)[] {
+  if (splitOf(city, items)) { const l = serviceLines(city, items.map(i => toQuote(i)!) as EngineItem[]); if (l) return l; }
+  const lines = quoteBasket(city, items).lines;
+  return items.map((_, i) => lines[i] ?? null);
 }
 /** Cadeiras com o mesmo serviço são uma só linha (dono, 24 Nov: "Sim, como 6"): 1 + 2 mostravam 30€ + 50€ com o total 70€. */
 export function mergeChairs(list: BasketItem[]): BasketItem[] {
@@ -277,47 +255,35 @@ export function mergeChairs(list: BasketItem[]): BasketItem[] {
   }
   return out;
 }
-/** As linhas do pedido guardado são as que a pessoa viu no cesto (cada peça com a sua deslocação), não as da visita:
- *  um sofá e um colchão gravavam 79€ + 69€ com o total 169€ (25 Nov 2026). */
-export const orderLines = (city: string, items: BasketItem[]) => items.map(it => ({ label: itemLabel(it), qty: it.qty, total: linePrice(city, it) }));
-/** Preço de uma opção na janela da peça: o que estas peças custam e, com outras no cesto, o que o total sobe de verdade
- *  (25 Nov 2026: mostrava a linha sem a deslocação, "~~89€~~ 79€", quando o total subia 89€ ou 90€). Só a diferença de
- *  1€ dos totais a acabar em 9 fica no preço da peça.
- *  Riscado: as mesmas peças pedidas sozinhas, com os serviços em separado (`struckOf`). */
+/** As linhas do pedido guardado são as que a pessoa viu no cesto: cada peça e, quando se paga, a deslocação. Somam o total. */
+export const orderLines = (city: string, items: BasketItem[]): { label: string; qty: number; total: number | null }[] => {
+  const lines = basketLines(city, items), split = splitOf(city, items);
+  return [...items.map((it, i) => ({ label: itemLabel(it), qty: it.qty, total: lines[i] })),
+    ...(split && split.travel > 0 ? [{ label: `Deslocação: ${city.trim()}`, qty: 1, total: split.travel }] : [])];
+};
+/** Preço de uma opção na janela da peça. Cesto vazio: o serviço. Com outras no cesto: o que o total sobe de verdade
+ *  (25 Nov 2026); só a diferença de 1€ dos totais a acabar em 9 fica no preço da peça.
+ *  Riscado na base do serviço (`struckOf`), para a poupança nunca contar deslocações. */
 export function optionPrice(city: string, others: BasketItem[], list: BasketItem[]): { shown: number | null; struck: number | null } {
-  const totalOf = (l: BasketItem[]) => { const q = quoteBasket(city, l); return !l.length || q.total === null || q.sob ? null : q.total; };
-  const alone = totalOf(list);
-  if (alone === null) return { shown: null, struck: null };
-  const before = others.length ? totalOf(others) : 0, after = others.length ? totalOf([...others, ...list]) : alone;
-  const rise = before !== null && after !== null ? Math.round((after - before) * 100) / 100 : alone;
-  const shown = Math.abs(rise - alone) <= 1 ? alone : Math.max(0, rise);
+  if (!others.length) { const { shown, struck } = servicePrice(city, list); return { shown, struck }; }
+  const alone = splitOf(city, list), before = splitOf(city, others), after = splitOf(city, [...others, ...list]);
+  if (!alone) return { shown: null, struck: null };
+  const rise = before && after ? Math.round((after.total - before.total) * 100) / 100 : alone.service;
+  const shown = Math.abs(rise - alone.total) <= 1 ? alone.total : Math.max(0, rise);
   let sep: number | null = 0;
   for (const x of list) { const v = struckOf(city, x); sep = v === null || sep === null ? null : sep + v; }
   return { shown, struck: sep !== null && sep > shown ? Math.round(sep * 100) / 100 : null };
 }
-/** Deslocação que o motor somou a este pedido (dono, 25 Nov: o preço grande é o do serviço e a deslocação vai à parte,
- *  muito discreta). 0 = grátis; null = por confirmar. */
-export function travelIn(city: string, list: BasketItem[]): number | null {
-  const q = list.map(toQuote);
-  if (!q.length || q.some(x => !x) || !cityKnown(city)) return null;
-  const r = botQuote({ city, items: q as QuoteItem[] }) as Quote;
-  return r.ok && typeof r.travel === 'number' ? r.travel : null;
+/** Deslocação que o motor somou a este pedido. 0 = não se paga à parte; null = por confirmar. */
+export const travelIn = (city: string, list: BasketItem[]): number | null => splitOf(city, list)?.travel ?? null;
+/** Preço de um pedido sem a deslocação, o riscado na mesma base e o texto discreto da deslocação. */
+export function servicePrice(city: string, list: BasketItem[]): { shown: number | null; struck: number | null; travel: number | null; split: PriceSplit | null } {
+  const split = splitOf(city, list);
+  return split ? { shown: split.service, struck: split.struck, travel: split.travel, split } : { shown: null, struck: null, travel: null, split: null };
 }
-/** Preço de uma opção sem a deslocação, e o riscado na mesma base (limpeza e impermeabilização em separado, as duas
- *  também sem deslocação), para a poupança nunca contar deslocações. */
-export function servicePrice(city: string, list: BasketItem[]): { shown: number | null; struck: number | null; travel: number | null } {
-  const { shown, struck } = optionPrice(city, [], list), travel = travelIn(city, list);
-  if (shown === null || travel === null) return { shown, struck, travel: null };
-  const base = Math.round((shown - travel) * 100) / 100;
-  const net = (l: BasketItem[]) => { const q = quoteBasket(city, l), t = travelIn(city, l); return q.total === null || q.sob || t === null ? null : q.total - t; };
-  let was: number | null = null;
-  if (struck !== null) {
-    const pack = list.every(x => (x.kind === 'sofa' || x.kind === 'chairs') && x.pack !== 'none' && !x.imperOnly && !x.leather);
-    if (pack) { const a = net(list.map(x => ({ ...x, pack: 'none' as const }))), b = net(list.map(x => ({ ...x, imperOnly: true }))); was = a !== null && b !== null ? Math.min(struck, a + b + ((9 - ((a + b) % 10)) % 10 + 10) % 10) : null; }
-    else was = struck - travel;
-  }
-  return { shown: base, struck: was !== null && was - base >= 5 ? Math.round(was * 100) / 100 : null, travel };
-}
+export const travelNote = travelLabel, priceInWords = splitText;
+/** A opção, sozinha, já não paga deslocação (o motor): "deslocação grátis" em pequeno no cartão. */
+export const freeTravel = (city: string, list: BasketItem[]) => { const x = splitOf(city, list); return !!x && x.travel === 0 && !x.included; };
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -360,9 +326,14 @@ function waterproofFrom(city: string): string {
 }
 
 /** A localidade tem preço fechado no motor? (Sem ela, ou numa que ele não conhece, o preço fica sem a deslocação.) */
+const known = new Map<string, boolean>();
 export function cityKnown(city: string): boolean {
   if (city.trim().length < 2) return false;
+  const hit = known.get(city);
+  if (hit !== undefined) return hit;
+  if (known.size > 200) known.clear();
   const r = botQuote({ city, items: [{ kind: 'sofa', size: '3-lugares', qty: 1, treatment: 'clean' }] }) as Quote;
+  known.set(city, r.ok && !r.quote);
   return r.ok && !r.quote;
 }
 const plain = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -441,6 +412,8 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
   const cityNames = useMemo(() => listBotCities().map(c => c.name), []);
   const quote = useMemo(() => quoteBasket(city, items), [city, items]);
+  const split = useMemo(() => splitOf(city, items), [city, items]);
+  const lines = useMemo(() => basketLines(city, items), [city, items]);
   const bestJoin = useMemo(() => (!items.length || !cityKnown(city) ? null : (['mattress', 'sofa', 'chairs', 'rug', 'carpet'] as BasketKind[]).map(kind => ({ kind, value: joinSaving(city, items, kind) })).filter(x => x.value >= 5).sort((a, b) => b.value - a.value)[0] ?? null), [city, items]);
   const { isSubmitting, submit } = useQuizSubmission({ trackSubmission: () => {}, resetForm: () => {}, onClose: leave, navigate });
 
@@ -461,10 +434,10 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
       waterproofingTier: main.pack === 'essencial' ? 'essencial' : 'premium',
       serviceLabel: KIND_LABEL[main.kind], serviceTypeLabel: 'Cesto da visita', crmServiceLabel: [...new Set(items.map(i => KIND_LABEL[i.kind]))].join(' + '),
       detailsSummary: details, priceText,
-      message: `Pedido pelo site (${city.trim()}): ${details}. Total: ${priceText}${quote.usual !== null && quote.usual > (quote.total ?? 0) ? ` (em vez de ${formatEuro(quote.usual)})` : ''}${cityKnown(city) ? ', deslocação incluída' : ''}.`,
+      message: `Pedido pelo site (${city.trim()}): ${details}. ${split ? `Serviço: ${formatEuro(split.service)}${split.struck !== null ? ` (em vez de ${formatEuro(split.struck)})` : ''}, ${travelLabel(split)}. ` : ''}Total: ${priceText}.`,
       sofaItems: [], mattressItems: [], upsellItems: [], carpetItems: [], chairQuantity: '0', chairWaterproofQty: 0, chairAntiAcaros: false,
       calculateServicePrice: quote.total ?? 0, totalPrice: quote.total ?? 0, hasSobOrcamento: quote.sob, hasUpsellSobItem: false,
-      finalTravelCost: quote.travel ?? 0, hypoallergenic: null, hypoSurcharge: 0, slotLabel: '',
+      finalTravelCost: split?.travel ?? quote.travel ?? 0, hypoallergenic: null, hypoSurcharge: 0, slotLabel: '',
       carpetKind: items.some(i => i.kind === 'carpet') ? 'alcatifa' : 'tapete',
       basketOrder: {
         ...buildQuizOrder({ service: main.kind === 'rug' || main.kind === 'carpet' ? 'carpet' : main.kind, serviceType: 'both', waterproofingTier: 'premium', sofaItems: [], mattressItems: [], upsellItems: [], carpetItems: [], chairQuantity: '0', chairWaterproofQty: 0, chairAntiAcaros: false, finalLocation: city.trim(), totalPrice: quote.total ?? 0, hasSobOrcamento: quote.sob, hasUpsellSobItem: false, priceText, slotLabel: '' },
@@ -523,7 +496,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         <button type="button" onClick={onClose} aria-label="Fechar" className="flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/10"><X className="h-5 w-5" /></button>
       </header>
 
-      <div className={`flex-1 overflow-y-auto px-4 pt-4 ${items.length === 0 && step === 'basket' ? 'flex flex-col pb-4 [&>*]:shrink-0' : 'pb-32'}`}>
+      <div className={`flex-1 overflow-y-auto px-4 pt-4 ${items.length === 0 && step === 'basket' ? 'flex flex-col pb-4 [&>*]:shrink-0' : 'pb-44'}`}>
         {step === 'basket' ? (
           <>
             {items.length === 0 ? (
@@ -558,7 +531,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
                     <QuizFurnitureImage service={isRug(it.kind) ? 'carpet' : it.kind} sizeId={it.size} className="h-12 w-12 sm:h-12 sm:w-12" />
                     <span className="min-w-0"><span className="block text-sm font-semibold leading-snug text-white">{itemLabel(it)}</span><span className="block text-xs font-semibold text-[#D4AF37]">Alterar</span></span>
                   </button>
-                  <span className="shrink-0 text-sm font-bold text-white">{(() => { const v = linePrice(city, it); return v != null ? formatEuro(v) : null; })()}</span>
+                  <span className="shrink-0 text-sm font-bold text-white">{lines[i] != null ? formatEuro(lines[i]!) : null}</span>
                   <button type="button" onClick={() => setItems(l => l.filter(x => x.id !== it.id))} aria-label={`Tirar ${itemLabel(it)}`} className="flex h-11 w-10 shrink-0 items-center justify-center text-white/45 hover:text-white"><Trash2 className="h-4 w-4" /></button>
                 </li>
               ))}
@@ -604,26 +577,32 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
           <>
             <h2 className="type-section-title font-playfair mb-4 text-white">{cityKnown(city) ? <>Para onde enviamos as <em className="not-italic" style={{ color: GOLD }}>horas?</em></> : <>Para onde enviamos o <em className="not-italic" style={{ color: GOLD }}>preço?</em></>}</h2>
             <ul className="mb-4 space-y-1 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.05] p-3 text-sm text-white">
-              {items.map(it => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{(() => { const v = linePrice(city, it); return v != null ? formatEuro(v) : ''; })()}</span></li>)}
+              {items.map((it, i) => <li key={it.id} className="flex justify-between gap-2"><span>{itemLabel(it)}</span><span className="font-semibold">{lines[i] != null ? formatEuro(lines[i]!) : ''}</span></li>)}
               {groupGifts(quote.gifts).map(g => <li key={g.key} className="flex justify-between gap-2 text-[#E8C964]"><span>{capital(g.text)}</span><span className="font-semibold"><span className="mr-1.5 text-white/45 line-through">{formatEuro(g.normal)}</span>Oferecido</span></li>)}
-              <li className="border-t border-white/10 pt-1 text-xs text-white/60">{cityKnown(city) ? `${city}, deslocação incluída no total` : `${city}, deslocação a confirmar no WhatsApp`}</li>
+              <li className="border-t border-white/10 pt-1 text-xs text-white/60">{cityKnown(city) ? city : `${city}, deslocação a confirmar no WhatsApp`}</li>
             </ul>
             <label className="mb-3 block"><span className="mb-1 block text-xs font-semibold text-white/70">Nome</span>
               <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
             <label className="block"><span className="mb-1 block text-xs font-semibold text-white/70">Telemóvel (WhatsApp)</span>
               <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="912 345 678" className="min-h-12 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-white placeholder:text-white/35 text-base outline-none focus:border-[#D4AF37]" /></label>
             <p className="mt-3 text-xs text-white/60">{cityKnown(city) ? 'Recebe o orçamento e as próximas horas livres no WhatsApp em menos de 1 minuto.' : 'Confirmamos o preço com a deslocação e a disponibilidade no WhatsApp.'}</p>
-            {failed && <div className="mt-3"><p className="mb-2 text-sm text-white/80">Não conseguimos enviar o pedido.</p><WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, quote.gifts))}`} source="basket_fallback" /></div>}
+            {failed && <div className="mt-3"><p className="mb-2 text-sm text-white/80">Não conseguimos enviar o pedido.</p><WhatsAppCta href={`${WHATSAPP_BASE}?text=${encodeURIComponent(fallbackMessage(city, items, priceText, split, quote.gifts))}`} source="basket_fallback" /></div>}
           </>
         )}
       </div>
 
       {/* Cesto vazio: sem total "-" nem botão parado; a escolha faz-se nas fotografias. */}
       {(items.length > 0 || step === 'contact') && <footer className="fixed inset-x-0 bottom-0 md:absolute border-t border-[#D4AF37]/25 bg-[#071a12]/95 backdrop-blur px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-sm text-white/70">{items.length > 0 && !cityKnown(city) ? 'Subtotal, sem a deslocação' : 'Total, deslocação incluída'}</span>
-          <span className="text-right">{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="mr-2 text-sm text-white/50 line-through">{formatEuro(quote.usual)}</span>}<span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!city.trim() ? 'falta a localidade' : !cityKnown(city) ? 'deslocação a confirmar no WhatsApp' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}{quote.usual !== null && quote.total !== null && quote.usual > quote.total && <span className="block text-xs font-bold text-[#E8C964]">Poupa {formatEuro(quote.usual - quote.total)}</span>}</span>
-        </div>
+        {split
+          ? <dl className="mb-2 space-y-0.5 text-xs text-white/60">
+              <div className="flex items-baseline justify-between gap-2"><dt>Serviço{split.struck !== null && <span className="ml-1.5 whitespace-nowrap font-bold text-[#E8C964]">Poupa {formatEuro(Math.round((split.struck - split.service) * 100) / 100)}</span>}</dt><dd className="text-sm font-semibold text-white">{split.struck !== null && <span className="mr-1.5 text-xs font-normal text-white/50 line-through">{formatEuro(split.struck)}</span>}{formatEuro(split.service)}</dd></div>
+              <div className="flex items-baseline justify-between gap-2"><dt>Deslocação</dt><dd>{split.travel > 0 ? formatEuro(split.travel) : split.included ? 'incluída' : 'grátis'}</dd></div>
+              <div className="flex items-baseline justify-between gap-2 text-sm text-white/70"><dt>Total</dt><dd className="text-xl font-bold text-white">{formatEuro(split.total)}</dd></div>
+            </dl>
+          : <div className="mb-2 flex items-baseline justify-between gap-2">
+              <span className="text-sm text-white/70">{items.length > 0 && !cityKnown(city) ? 'Serviço' : 'Total'}</span>
+              <span className="text-right"><span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!cityKnown(city) ? '+ deslocação, conforme a localidade' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}</span>
+            </div>}
         {step === 'basket'
           ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="cta cta-gold">Continuar</button> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
           : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="cta cta-gold disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
@@ -690,7 +669,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
 
 // Riscado + "Poupa X€" em todas as opções (dono, 25 Nov: "isto é que é o desconto que a pessoa está à procura";
 // "vale para todos os upsells"). Valores só do motor.
-function PriceTag({ shown, struck: rawStruck }: { shown: number | null; struck: number | null; note?: string }) {
+function PriceTag({ shown, struck: rawStruck }: { shown: number | null; struck: number | null }) {
   if (shown === null) return null;
   // Poupança de trocos não se mostra (dono, 25 Nov: "poupa 1€ na deslocação [...] isso é demais"): só a partir de 5€.
   const struck = rawStruck !== null && rawStruck - shown >= 5 ? rawStruck : null;
@@ -753,15 +732,13 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const totalOf = (list: BasketItem[]) => { const q = quoteBasket(city, list); return !list.length || q.total === null || q.sob ? null : q.total; };
   // Total da visita com estas peças (dono, 17 Nov: o preço impossível de ler mal).
   const totalWith = (p: Partial<BasketItem>) => totalOf([...others, ...group(p)]);
-  // Preço de cada opção (dono, 25 Nov: "tens que meter os preços riscados [...] tudo direitinho"): com outras peças
-  // a deslocação já está paga, por isso mostra-se a linha destas peças na visita (sem a 2.ª deslocação); riscado =
-  // as mesmas peças pedidas sozinhas (Blindado/Protegido: limpeza e impermeabilização em separado, separatePrice).
-  // Riscado = cada peça pedida sozinha, com a sua deslocação (e, no pack, limpeza e impermeabilização em separado), somado.
+  // Preço de cada opção: o serviço (dono, 25 Nov, deslocação à parte); com outras peças, o que o total sobe. Riscado = o
+  // serviço de cada peça sozinha (no pack, limpeza e impermeabilização em separado), somado.
   const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const v = struckOf(city, x); if (v === null) return null; t += v; } return g.length ? Math.round(t * 100) / 100 : null; };
   const packPrice = (p: Partial<BasketItem>) => optionPrice(city, others, group(p));
   const addOn = (on: Partial<BasketItem>, off: Partial<BasketItem>) => {
     // O que a visita sobe de facto com o extra (com a escada A pode ser 0: "Oferecido").
-    const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : totalOf(group(p)));
+    const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : servicePrice(city, group(p)).shown);
     const a = tot(on), b = tot(off);
     const withAlone = sepUnits(group(on)), offAlone = sepUnits(group(off));
     return { plus: a !== null && b !== null ? Math.max(0, a - b) : null, normal: withAlone !== null && offAlone !== null ? Math.round((withAlone - offAlone) * 100) / 100 : null };
@@ -857,7 +834,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           const sizes = item.kind === 'carpet' ? CARPET_SIZES : RUG_SIZES;
           const preset = sizes.find(z => z.w === item.width && z.l === item.length);
           return <>
-            <p className="mb-3 text-center text-[11px] font-semibold text-[#E8C964]">{[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', ...(cityKnown(city) ? ['Deslocação incluída'] : []), 'Seca em 2 a 5 h'].join(' · ')}</p>
+            <p className="mb-3 text-center text-[11px] font-semibold text-[#E8C964]">{[item.kind === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa', 'Seca em 2 a 5 h'].join(' · ')}</p>
             <p className="mb-2 text-sm font-semibold text-white">{item.kind === 'carpet' ? 'Qual é o espaço?' : 'Que tamanho tem?'}</p>
             <div className="mb-2 grid grid-cols-2 gap-2">
               {sizes.map(z => {
@@ -892,8 +869,8 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           {(item.kind === 'sofa' || item.kind === 'chairs') && <div className="mb-3 space-y-1.5">{(material === 'pele' ? [] : item.imperOnly ? IMPER_ONLY : PACKS).map(p => {
             const on = packPicked && item.pack === p.pack && !item.leather;
             return <button key={p.pack} type="button" onClick={() => { set({ pack: p.pack, leather: false }); setPackPicked(true); }} className={`${chip(on)} flex w-full items-center justify-between gap-2 py-2 text-left`}>
-              <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">{p.note}</span></span>
-              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} note={item.imperOnly || p.pack === 'none' ? 'na deslocação' : 'na limpeza'} />{on ? <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0B2F2A] text-white"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span> : <span className="h-5 w-5 rounded-full border-2 border-white/25" />}</span>
+              <span><span className="block">{p.name}</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">{p.note}</span>{!others.length && freeTravel(city, group({ pack: p.pack, leather: false })) && <span className="block text-[11px] font-semibold text-[#E8C964] group-[.is-on]:text-[#0B2F2A]/80">deslocação grátis</span>}</span>
+              <span className="flex items-center gap-2"><PriceTag {...packPrice({ pack: p.pack, leather: false })} />{on ? <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0B2F2A] text-white"><Check className="h-3.5 w-3.5" strokeWidth={3} /></span> : <span className="h-5 w-5 rounded-full border-2 border-white/25" />}</span>
             </button>;
           })}
           {/* Pele: um só preço, limpeza + tratamento da pele; nunca leva impermeabilização. */}
@@ -903,7 +880,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
           </div>}
           </div>}
           {rug && <>
-            <p className="mb-3 flex items-center justify-between rounded-xl border border-[#D4AF37]/40 bg-white/[0.05] px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m²{cityKnown(city) ? ', deslocação incluída' : ''}</span><PriceTag {...packPrice({})} /></p>
+            <p className="mb-3 flex items-center justify-between rounded-xl border border-[#D4AF37]/40 bg-white/[0.05] px-3 py-2 text-sm text-white"><span>{(Math.round(num(item.width) * num(item.length) * 100) / 100).toLocaleString('pt-PT')} m²</span><PriceTag {...packPrice({})} /></p>
             <button type="button" className={`${chip(!!item.odor)} mb-1 flex w-full items-center justify-between py-2 text-left`} onClick={() => set({ odor: !item.odor })}>
               <span><span className="block">{item.odor ? <Check className="mr-1 inline h-4 w-4" /> : null}Com anti-odor</span><span className="block text-xs font-normal text-white/60 group-[.is-on]:text-[#0B2F2A]/80">Para o cheiro de animais ou de urina</span></span>
               <AddOnTag {...addOn({ odor: true }, { odor: false })} />
@@ -914,7 +891,7 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
       {/* O botão só aparece quando há algo para confirmar (dono, 24 Nov, sobre o "Escolha o material" parado no widget). */}
       {ok && <footer className="border-t border-[#D4AF37]/25 bg-[#071a12]/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {ready && (() => { const g = giftsUnlocked(city, others, group()); return g ? <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#E8C964]"><Gift className="h-4 w-4 shrink-0" />Na mesma visita oferecemos {g.text}, normalmente {formatEuro(g.normal)}</p> : null; })()}
-        {!ready ? <p className="flex min-h-12 items-center justify-center text-sm font-semibold text-[#D4AF37]">Escolha uma opção</p> : <button type="button" onClick={() => onSave(group())} className="cta cta-gold">{(() => { const v = others.length ? totalWith({}) : totalOf(group()); return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button>}</footer>}
+        {!ready ? <p className="flex min-h-12 items-center justify-center text-sm font-semibold text-[#D4AF37]">Escolha uma opção</p> : <button type="button" onClick={() => onSave(group())} className="cta cta-gold">{(() => { const v = others.length ? totalWith({}) : servicePrice(city, group()).shown; return v === null ? 'Juntar à visita' : others.length ? `Juntar à visita · total ${formatEuro(v)}` : `Juntar à visita · ${formatEuro(v)}`; })()}</button>}</footer>}
     </div>
   );
 }
