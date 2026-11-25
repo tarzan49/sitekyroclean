@@ -1315,6 +1315,8 @@ Dono: "quero CTAs sérios e premium, quero criar uma lógica de CTAs no site, on
 
 **Desenho 5B (dono, 25 Nov 2026, à tarde):** o dono achou o verde e dourado com degradê "0 premium e super AI"; viu seis direções (marfim, ouro, concierge, cápsula, convite, verde e ouro lisos), gostou da 5 e escolheu a 5B. WhatsApp: retângulo reto, maiúsculas espaçadas, filete #D4AF37 por dentro, marfim #F7F3E8 com texto #0B2F2A sobre verde e fotografia, #0B2F2A com texto branco sobre branco. Preço e botões de passo: moldura #D4AF37. Sem ícones; o símbolo oficial do WhatsApp só no botão redondo do cabeçalho (`WhatsAppGlyph.tsx`). Em fundo claro passa-se `onLight`. [RETIRADA 25/11] verde #188344 e dourado com degradê, MessageCircle e Calculator nos CTAs.
 
+**Cor e símbolos do 5B (dono, 25 Nov 2026, à noite):** "o cta branco nao combina nada com o site nas paginas com fundo verde [...] no falar por whatsapp convinha ter o simbolo do whatsapp ao lado e no calcular o preço uma calculadora". [RETIRADA 25/11: marfim #F7F3E8 e "sem ícones"] WhatsApp verde-esmeralda #1C7A4C com texto e símbolo brancos e filete #D4AF37, igual sobre verde, fotografia e branco; comparado com ouro, champanhe e verde-noite nas páginas reais. `onLight` só muda o botão do preço.
+
 Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo real, separadores e pesquisa dentro do topo; cada tema do blog num ecrã; glossário por letra, em linhas que abrem.
 
 ## Um push para master publica o site (descoberto a 25 Nov 2026)
@@ -1339,7 +1341,7 @@ Colchão com sangue seco de 4 a 6 meses, para trocar na garantia. O bot avisou q
 - Antes (S24): a explicação vai com o orçamento, sem promessas; se a peça tem de ficar sem marca (troca, devolução, venda), diz-se com clareza antes de marcar.
 - Depois (S66, exceção ao silêncio de 5 Nov): `bloodStain.ts` envia uma só explicação de texto fixo. O modelo lê a conversa e só deixa sair se for sangue e só isso; dinheiro, nova visita, estrago ou outra pergunta ficam só para o dono. "Lhe dissemos antes" só sai se a frase existir mesmo numa mensagem nossa. A conversa continua em pausa e o dono recebe email.
 ## Página inicial: encaixe no iPhone (dono, 25 Nov 2026)
-Vídeo do dono: vídeos pretos, secções paradas a meio, barra do WhatsApp por cima das setas das avaliações, rodapé a abrir pelo fim. Causas: secções com --app-max enquanto as barras do Safari abriam e fechavam; `useFillSections` punha min-height 0 para medir e obrigava a novo encaixe; `scroll-mt-16` no #testemunhos (desvio de 64 px); `src` dos vídeos retirado fora do ecrã; `footer { scroll-snap-align: end }`. As outras páginas com encaixe ainda têm o rodapé a `end` e a medida antiga.
+Vídeo do dono: vídeos pretos, secções paradas a meio, barra do WhatsApp por cima das setas das avaliações, rodapé a abrir pelo fim. Causas: secções com --app-max enquanto as barras do Safari abriam e fechavam; `useFillSections` punha min-height 0 para medir e obrigava a novo encaixe; `scroll-mt-16` no #testemunhos (desvio de 64 px); `src` dos vídeos retirado fora do ecrã; `footer { scroll-snap-align: end }`. No mesmo dia, audit do site inteiro (304 páginas, todas as famílias, iPhone e Android): o mesmo encaixe passou a todas as páginas (#root), e o BeforeAfterSlider deixou de prender o deslizar vertical (touch-none).
 
 
 ## Segunda peça com tratamento grátis (dono, 25 Nov 2026, Ligia, 2 tapetes em Machico)

@@ -8,13 +8,17 @@ const files = (dir: string): string[] => readdirSync(dir).flatMap(n => { const p
 const all = [...files('src/components'), ...files('src/pages')].filter(p => !/[\\/](admin|ui)[\\/]|Admin|QuoteVisualPreview|Cta\.tsx$/.test(p));
 
 describe('regra dos CTAs', () => {
-  it('desenho 5B: cores lisas, sem degradê, sombra, brilho nem ícone', () => {
+  it('desenho 5B: cor lisa, sem degradê, sombra nem brilho; só o símbolo do WhatsApp e a calculadora', () => {
     const css = readFileSync('src/index.css', 'utf8');
     const rules = [...css.matchAll(/(^|\})\s*\.cta[^{}]*\{([^}]*)\}/gm)].map(m => m[2]).join(" ");
     expect(rules).not.toMatch(/gradient|box-shadow|filter:/);
     // Nenhuma outra folha pode pintar o CTA por cima (25 Nov: surfaces.css deixava-o verde e ilegível no topo).
     for (const f of ['surfaces', 'hero-mobile']) expect(readFileSync(`src/styles/${f}.css`, 'utf8')).not.toMatch(/data-hero-part="whatsapp"\]\{[^}]*background/);
-    expect(readFileSync('src/components/Cta.tsx', 'utf8')).not.toMatch(/lucide|<svg/);
+    const cta = readFileSync('src/components/Cta.tsx', 'utf8');
+    expect(cta).not.toMatch(/lucide|<svg/);
+    expect(cta).toMatch(/<WhatsAppGlyph[^]*<CalculatorGlyph/);
+    // O WhatsApp é sempre verde-esmeralda: o marfim não combinava com as páginas verdes (dono, 25 Nov).
+    expect(css).toMatch(/\.cta-wa \{ background: #1C7A4C/);
     for (const f of ['StepPricePicker', 'PackStepPicker', 'LeatherSofaPicker', 'EnHeader']) for (const m of readFileSync(`src/components/${f}.tsx`, 'utf8').matchAll(/<(WhatsAppCta|PriceCta)\b[^>]*/g)) expect(m[0]).toContain('onLight');
   });
   it('nenhum texto antigo de CTA', () => {

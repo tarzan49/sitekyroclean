@@ -903,8 +903,9 @@ html.snap-sections main > section[data-en-hero] { min-height: var(--app-h, 100sv
   html.snap-home #preco a[href*="wa.me"] { margin-top: 6px; }
 }
 
-/* Os únicos CTAs do site, desenho 5B (dono, 25 Nov 2026): WhatsApp cheio com filete dourado por dentro, preço em moldura
-   dourada; cores lisas, sem ícones, degradês, brilhos nem sombras. Componentes em components/Cta.tsx. */
+/* Os únicos CTAs do site, desenho 5B (dono, 25 Nov 2026): WhatsApp cheio verde-esmeralda com filete dourado por
+   dentro e o símbolo do WhatsApp, preço em moldura dourada com a calculadora; a mesma cor sobre verde, fotografia e branco
+   (dono, 25 Nov: "o cta branco nao combina"); cores lisas, sem degradês, brilhos nem sombras. Componentes em components/Cta.tsx. */
 @layer components {
 .cta {
   position: relative; display: flex; width: 100%; height: 56px; min-height: 56px; align-items: center; justify-content: center;
@@ -913,23 +914,38 @@ html.snap-sections main > section[data-en-hero] { min-height: var(--app-h, 100sv
   transition: background-color .15s ease, opacity .15s ease;
 }
 .cta :is(span, svg) { color: inherit; }
-.cta-wa { background: #F7F3E8; color: #0B2F2A; font-size: 13.5px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; }
+.cta-icon { width: 20px; height: 20px; flex: none; margin-right: 11px; }
+.cta-sm .cta-icon { width: 16px; height: 16px; margin-right: 8px; }
+.cta-wa { background: #1C7A4C; color: #fff; font-size: 13.5px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; }
 .cta-wa::after { content: ''; position: absolute; inset: 5px; border: 1px solid #D4AF37; pointer-events: none; }
-.cta-wa.cta-light { background: #0B2F2A; color: #fff; }
 .cta-gold { background: rgba(7, 26, 18, .5); border: 1px solid #D4AF37; color: #fff; }
 .cta-gold.cta-light { background: transparent; color: #0B2F2A; }
+.cta-wa.cta-bar { width: auto; min-width: 0; flex: 1; height: 54px; min-height: 54px; padding: 0 8px; font-size: 12.5px; letter-spacing: .06em; }
+.cta-bar .cta-icon { margin-right: 8px; }
 .cta:active { opacity: .85; }
 .cta:focus-visible { outline: 3px solid #D4AF37; outline-offset: 3px; }
 .cta:disabled { opacity: .45; cursor: not-allowed; }
 .cta.cta-sm { white-space: nowrap; width: auto; height: 44px; min-height: 44px; padding: 0 14px; font-size: 14px; }
 .cta-wa.cta-sm { padding: 0 16px; font-size: 11px; letter-spacing: .1em; }
 .cta-wa.cta-sm::after { inset: 3px; }
-@media (hover: hover) { .cta-wa:hover { background: #fff; } .cta-wa.cta-light:hover { background: #123d36; } .cta-gold:not(:disabled):hover { background: rgba(7, 26, 18, .8); } .cta-gold.cta-light:not(:disabled):hover { background: rgba(212, 175, 55, .12); } }
-@media (max-width: 379px) { .cta-wa:not(.cta-sm) { padding: 0 10px; font-size: 12.5px; letter-spacing: .09em; } }
-@media (min-width: 768px) { .cta:not(.cta-sm) { height: 60px; min-height: 60px; } .cta-gold:not(.cta-sm) { font-size: 17px; } .cta-wa:not(.cta-sm) { font-size: 14.5px; } }
+@media (hover: hover) { .cta-wa:hover { background: #219059; } .cta-gold:not(:disabled):hover { background: rgba(7, 26, 18, .8); } .cta-gold.cta-light:not(:disabled):hover { background: rgba(212, 175, 55, .12); } }
+@media (max-width: 379px) { .cta-wa:not(.cta-sm) { padding: 0 10px; font-size: 12.5px; letter-spacing: .09em; } .cta-wa.cta-bar { padding: 0 6px; font-size: 11.5px; letter-spacing: .03em; } .cta-bar .cta-icon { width: 18px; height: 18px; margin-right: 6px; } }
+@media (min-width: 768px) { .cta:not(.cta-sm) { height: 60px; min-height: 60px; } .cta-gold:not(.cta-sm) { font-size: 17px; } .cta-wa:not(.cta-sm):not(.cta-bar) { font-size: 14.5px; } }
 }
+/* Barra fixa com o preço (dono, 25 Nov): a secção do widget centra-se no espaço que sobra por cima dela. */
+@media (max-width: 767px) {
+  html[data-price-bar]:not(.snap-home) main section:is(#precos, section):has([data-price-picker]) { padding-top: 10px !important; padding-bottom: calc(86px + env(safe-area-inset-bottom)) !important; }
+  html[data-price-bar].snap-home main > section#preco { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
+}
+@media (max-width: 767px) and (max-height: 699px) {
+  html[data-price-bar] [data-price-picker] { row-gap: 8px; }
+  html[data-price-bar] [data-price-picker] .cta-gold { height: 46px; min-height: 46px; font-size: 15px; }
+  html[data-price-bar] [data-price-picker] button[aria-pressed] .opacity-75 { font-size: 11px; }
+}
+@media (max-width: 767px) and (max-height: 639px) { html[data-price-bar] [data-price-picker] p.mb-1.mt-2 { display: none; } html[data-price-bar] [data-price-picker] .cta-gold { height: 44px; min-height: 44px; } html[data-price-bar] [data-price-picker] input[inputmode="decimal"] { margin-top: 8px; } }
+@media (max-width: 379px) { html[data-price-bar] [data-price-picker] button[aria-pressed] .rounded-full.h-5 { display: none; } html[data-price-bar] [data-price-picker] button[aria-pressed] .opacity-75 { font-size: 10.5px; letter-spacing: -.01em; } }
 /* Botões de contacto antigos que ainda não usam o componente ficam com as mesmas cores lisas. */
-a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) { background: #0B2F2A !important; border: 1px solid #D4AF37 !important; border-radius: 0 !important; box-shadow: none !important; color: #fff !important; font-weight: 600 !important; letter-spacing: normal !important; }
+a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) { background: #1C7A4C !important; border: 1px solid #D4AF37 !important; border-radius: 0 !important; box-shadow: none !important; color: #fff !important; font-weight: 600 !important; letter-spacing: normal !important; }
 a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) :is(span, svg) { color: #fff !important; letter-spacing: normal !important; text-transform: none !important; }
 
 /* Títulos em duas linhas equilibradas, nunca uma palavra sozinha em baixo (dono, 24 Nov, captura do iPhone). */
@@ -950,17 +966,21 @@ a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1
 /* Enquanto as secções se medem (useFillSections), nada transita: a medida tem de ser a final. */
 html.kyro-measuring * { transition: none !important; }
 
-/* Página inicial: encaixe estável (dono, 25 Nov, vídeo do iPhone: secções paradas a meio, tapadas pela barra, e o rodapé
+/* Encaixe estável em todas as páginas com secções de ecrã inteiro (dono, 25 Nov, vídeo do iPhone: secções paradas a meio, tapadas pela barra, e o rodapé
    a abrir pelo fim). No telemóvel quem desliza é a caixa da página, com a altura visível do ecrã: as barras do Safari não
    abrem nem fecham a meio, por isso uma secção é sempre exatamente um ecrã e o encaixe bate sempre certo. Um gesto passa
    uma secção (scroll-snap-stop) e o rodapé abre pelo início. */
 html.snap-home main > div#testemunhos { scroll-margin-top: 0; }
-html.snap-home footer { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--header-h, 57px); }
+html.snap-sections footer { scroll-snap-align: start; scroll-snap-stop: always; }
+html.snap-home footer { scroll-margin-top: var(--header-h, 57px); }
 @media (max-width: 767px) {
-  html.snap-home, html.snap-home body { height: 100%; overflow: hidden; }
-  html.snap-home { scroll-snap-type: none; }
-  html.snap-home [data-home-scroller] { height: 100vh; height: 100dvh; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-type: y mandatory; }
-  html.snap-home body:is([style*="overflow"], [style*="position: fixed"]) [data-home-scroller] { overflow-y: hidden; }
+  html.snap-sections { --app-h: 100dvh !important; --app-max: 100dvh !important; scroll-snap-type: none; }
+  html.snap-sections, html.snap-sections body { height: 100%; overflow: hidden; }
+  html.snap-sections #root { height: 100vh; height: 100dvh; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-type: y mandatory; scroll-padding-top: var(--header-h, 64px); }
+  html.snap-home #root { scroll-padding-top: 0; }
+  html.snap-sections:has([data-paid-landing]) #root { scroll-padding-top: 0; }
+  html.snap-sections body:is([style*="overflow"], [style*="position: fixed"]) #root { overflow-y: hidden; }
+  html.snap-sections main > section, html.snap-sections main [data-landing-section], html.snap-sections main #mesma-visita { scroll-snap-stop: always; }
   html.snap-home main > section, html.snap-home main > section#orcamento, html.snap-home main > div#testemunhos { min-height: 100vh; min-height: 100dvh; scroll-snap-stop: always; }
   /* Avaliações: o título em cima e as setas acima da barra do WhatsApp; o cartão enche o meio. */
   html.snap-home main > div#testemunhos > section { justify-content: flex-start; padding-top: calc(var(--header-h, 57px) + 18px); padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
@@ -979,4 +999,29 @@ html.snap-home footer { scroll-snap-align: start; scroll-snap-stop: always; scro
 @media (max-width: 767px) and (max-height: 659px) {
   html.snap-home #preco button { min-height: 40px; height: auto; padding-top: 4px; padding-bottom: 4px; }
   html.snap-home #preco :is(.mb-3, .mb-4) { margin-bottom: 8px; }
+}
+/* Ecrãs úteis baixos (Galaxy S e iPhone em privado com as barras abertas), todas as páginas: nenhuma secção passa do
+   ecrã nem fica atrás da barra do WhatsApp (audit, 25 Nov). */
+@media (max-width: 767px) and (max-height: 699px) {
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p,
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] [data-len] blockquote p { font-size: 15.5px; line-height: 1.4; -webkit-line-clamp: 4; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] [data-len="l"] blockquote { justify-content: flex-start; }
+}
+@media (max-width: 767px) and (max-height: 659px) {
+  html.snap-sections main section:is(#duvidas, #perguntas, #precos, #clientes, #protecao, #montar, [id^="tema-"]) { padding-top: 8px !important; }
+  html.snap-sections main section:is(#duvidas, #perguntas, #precos, #clientes, #protecao, #montar, [id^="tema-"]) :is(h2.type-section-title) { font-size: 22px; line-height: 1.15; }
+  html.snap-sections :is(#duvidas, #perguntas) button[aria-expanded] { min-height: 42px; padding-top: 4px; padding-bottom: 4px; }
+  html.snap-sections :is(#duvidas, #perguntas) [data-faq-list] p { font-size: 14px; line-height: 1.4; }
+  html.snap-sections :is(#duvidas, #perguntas) [data-faq-list] p > span { padding-bottom: 8px; }
+  html.snap-sections :is(#duvidas, #perguntas) > div { gap: 12px; }
+  html.snap-sections #protecao article img { max-height: 15svh; }
+  html.snap-sections #protecao article > div { padding: 6px 9px; }
+  html.snap-sections #protecao article p { margin-top: 0; font-size: 13px; line-height: 1.3; }
+  html.snap-sections #protecao .grid { margin-top: 8px; gap: 8px; }
+  html.snap-sections #clientes .grid { row-gap: 6px; }
+  html.snap-sections #clientes li { min-height: 44px !important; }
+  html.snap-sections #clientes img { max-height: 42px; }
+  html.snap-sections :is(#precos, #montar) button { min-height: 40px; }
+  html.snap-sections [id^="tema-"] li > a { padding-top: 5px; padding-bottom: 5px; }
+  html.snap-sections [id^="tema-"] li > a img { height: 46px; }
 }
