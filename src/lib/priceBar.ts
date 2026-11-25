@@ -2,7 +2,7 @@
 // WhatsApp com a mensagem desse pedido. Sem total (nada escolhido ou sob orçamento) a barra fica só com o botão.
 import { useSyncExternalStore } from 'react';
 
-export interface PriceBarDeal { total: string; was?: string; href: string; source: string }
+export interface PriceBarDeal { total: string; was?: string; travel?: string; href: string; source: string }
 
 let deal: PriceBarDeal | null = null;
 let owner: object | null = null;

@@ -144,8 +144,9 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   useEffect(() => { window.dispatchEvent(new Event('resize')); }, [ready]);
   const warm = () => { if (!calcModule) loadCalc().catch(() => undefined); };
 
-  const price = (over: Partial<BasketItem>) => (calc && city && sized ? calc.optionPrice(city, [], group(over)) : { shown: null, struck: null });
+  const price = (over: Partial<BasketItem>) => (calc && city && sized ? calc.servicePrice(city, group(over)) : { shown: null, struck: null, travel: null as number | null });
   const total = ready ? price(chosen).shown : null;
+  const travel = ready ? price(chosen).travel : null;
   const add = () => { const on = price(withExtra(true)), off = price(withExtra(false)); const plus = on.shown !== null && off.shown !== null ? Math.max(0, Math.round((on.shown - off.shown) * 100) / 100) : null; const sum = (l: BasketItem[]) => l.reduce<number | null>((t, x) => { const v = calc!.struckOf(city, x); return t === null || v === null ? null : t + v; }, 0); const a = calc ? sum(group(withExtra(true))) : null, b = calc ? sum(group(withExtra(false))) : null; const was = a !== null && b !== null ? Math.round((a - b) * 100) / 100 : null; return { plus, was: was !== null && plus !== null && was - plus >= 5 ? was : null }; };
   const gift = calc && ready ? calc.giftsUnlocked(city, [], group(chosen)) : null;
 
@@ -167,14 +168,14 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
     return `da lavagem${extra ? ' com anti-odor' : ''} de ${describe()}`;
   };
   const photo = what === 'sofa' ? (group().reduce((n, x) => n + x.qty, 0) > 1 ? 'a fotografia dos sofás' : 'a fotografia do sofá') : what === 'chairs' ? 'a fotografia das cadeiras' : 'fotografias';
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}` : ''}. Envio ${photo}.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade ${service()}, ${cityPrep(city)} ${city}${total !== null ? `, por ${formatEuro(total)}${travel ? ` + ${formatEuro(travel)} de deslocação` : travel === 0 ? ', com deslocação grátis' : ''}` : ''}. Envio ${photo}.`;
   const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
 
   // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
   const [barKey] = useState(() => ({}));
   const bar = total !== null;
   const was = bar ? price(chosen).struck : null;
-  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, href, source } : null); }, [barKey, total, was, href, source]);
+  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, travel: travel === null ? undefined : travel ? `+ ${formatEuro(travel)} deslocação` : 'deslocação grátis', href, source } : null); }, [barKey, total, was, travel, href, source]);
   useEffect(() => () => setPriceBar(barKey, null), [barKey]);
 
 
@@ -271,7 +272,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </button>)}
           {leather && <div className={row(true)}>{text('Limpeza + tratamento da pele', 'Limpeza e hidratação')}{calc && <PriceTag {...price({})} on />}</div>}
           {what === 'mattress' && <div className={row(!extra)}>{text('Limpeza', 'Extração a fundo, seca em 2 a 5 h')}{calc && <PriceTag {...price({})} on={!extra} />}</div>}
-          {isRug && <div className={row(!extra)}>{text(`${what === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa'}, ${area} m²`, 'Deslocação incluída, seca em 2 a 5 h')}{calc && <PriceTag {...price({})} on={!extra} />}</div>}
+          {isRug && <div className={row(!extra)}>{text(`${what === 'carpet' ? 'Lavagem no local' : 'Lavagem em sua casa'}, ${area} m²`, 'Seca em 2 a 5 h')}{calc && <PriceTag {...price({})} on={!extra} />}</div>}
           {(what === 'mattress' || isRug) && <button type="button" aria-pressed={extra} onClick={() => setExtra(v => !v)} className={row(extra)}>
             {text(what === 'mattress' ? 'Com anti-ácaros' : 'Com anti-odor', what === 'mattress' ? 'Produto Bactran, desinfeta o colchão' : 'Para o cheiro de animais ou de urina')}
             <span className="flex items-center gap-2">{calc && addOn()}<span className={`grid h-5 w-5 shrink-0 place-items-center rounded-md border-2 ${extra ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{extra && <Check className="h-3 w-3" strokeWidth={3} />}</span></span>
@@ -280,7 +281,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
         {ready && <WhatsAppCta onLight href={href} source={source} total={total !== null ? formatEuro(total) : undefined} className={`mt-2 ${bar ? 'max-md:hidden' : ''}`} />}
         {ready && <PriceCta onLight className="mt-2" onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
-        {ready && <p className="mt-1 hidden text-center text-sm text-[#666] md:block">Preço final {cityPrep(city)} {city}, deslocação incluída.</p>}
+        {ready && <p className="mt-1 hidden text-center text-[11px] text-[#8a8a8a] md:block">{travel ? `+ ${formatEuro(travel)} deslocação` : travel === 0 ? 'Deslocação grátis' : ''}</p>}
       </div>}
       {basket && <Suspense fallback={null}><VisitBasketLazy isOpen onClose={() => setBasket(null)} initialCity={city} initialItems={basket} /></Suspense>}
     </div>

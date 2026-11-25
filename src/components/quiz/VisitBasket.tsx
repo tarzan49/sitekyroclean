@@ -295,6 +295,29 @@ export function optionPrice(city: string, others: BasketItem[], list: BasketItem
   for (const x of list) { const v = struckOf(city, x); sep = v === null || sep === null ? null : sep + v; }
   return { shown, struck: sep !== null && sep > shown ? Math.round(sep * 100) / 100 : null };
 }
+/** Deslocação que o motor somou a este pedido (dono, 25 Nov: o preço grande é o do serviço e a deslocação vai à parte,
+ *  muito discreta). 0 = grátis; null = por confirmar. */
+export function travelIn(city: string, list: BasketItem[]): number | null {
+  const q = list.map(toQuote);
+  if (!q.length || q.some(x => !x) || !cityKnown(city)) return null;
+  const r = botQuote({ city, items: q as QuoteItem[] }) as Quote;
+  return r.ok && typeof r.travel === 'number' ? r.travel : null;
+}
+/** Preço de uma opção sem a deslocação, e o riscado na mesma base (limpeza e impermeabilização em separado, as duas
+ *  também sem deslocação), para a poupança nunca contar deslocações. */
+export function servicePrice(city: string, list: BasketItem[]): { shown: number | null; struck: number | null; travel: number | null } {
+  const { shown, struck } = optionPrice(city, [], list), travel = travelIn(city, list);
+  if (shown === null || travel === null) return { shown, struck, travel: null };
+  const base = Math.round((shown - travel) * 100) / 100;
+  const net = (l: BasketItem[]) => { const q = quoteBasket(city, l), t = travelIn(city, l); return q.total === null || q.sob || t === null ? null : q.total - t; };
+  let was: number | null = null;
+  if (struck !== null) {
+    const pack = list.every(x => (x.kind === 'sofa' || x.kind === 'chairs') && x.pack !== 'none' && !x.imperOnly && !x.leather);
+    if (pack) { const a = net(list.map(x => ({ ...x, pack: 'none' as const }))), b = net(list.map(x => ({ ...x, imperOnly: true }))); was = a !== null && b !== null ? Math.min(struck, a + b + ((9 - ((a + b) % 10)) % 10 + 10) % 10) : null; }
+    else was = struck - travel;
+  }
+  return { shown: base, struck: was !== null && was - base >= 5 ? Math.round(was * 100) / 100 : null, travel };
+}
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
