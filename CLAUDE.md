@@ -22,7 +22,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 
 - Início: `git status` + `git log -5 --oneline`; `git pull` se não estiver alinhado com `origin/master`.
 - Fim: commit + push. Repositório **público** (`tarzan49/sitekyroclean`): nada de dados de clientes, NIFs, chaves.
-- `.env` é local, nunca vai para o Git. Produção (cleansolutions.com.pt) é o Worker `kyro-site` desde 16 Nov (o Pages só aceita 20.000 ficheiros): **um push para master PUBLICA o site** (GitHub Action `deploy-site.yml`, ~3 min), por isso nada sem OK de publicação do dono vai para master, e preços só com a `bot-api` publicada ao mesmo tempo. Publicar = build limpo (`git archive HEAD`) com as `VITE_*` do `.env` + `npx wrangler deploy` com o token em `Kyro-segredos/cloudflare-kyro-site.env`; confirmar que o JS não tem `placeholder.supabase`.
+- `.env` é local, nunca vai para o Git. Produção (cleansolutions.com.pt) é o Worker `kyro-site` desde 16 Nov (o Pages só aceita 20.000 ficheiros): **a GitHub Action `deploy-site.yml` está desligada desde 25 Nov (um push já não publica)**; mesmo assim nada sem OK de publicação do dono vai para master, e preços só com a `bot-api` publicada ao mesmo tempo. Publicar = build limpo (`git archive HEAD`) com as `VITE_*` do `.env` + `npx wrangler deploy` com o token em `Kyro-segredos/cloudflare-kyro-site.env`; confirmar que o JS não tem `placeholder.supabase`.
 - Eu corro os comandos e os deploys; não peço ao dono para os correr.
 
 ## 2. Verificar
@@ -124,6 +124,7 @@ Regra de manutenção: este ficheiro não passa de ~30 KB. Uma regra nova entra 
 - O HTML estático (`scripts/prerender.ts`) é o que o Google e as IAs leem; tem de dizer o mesmo que a página React (regra anti-cloaking). Dados partilhados vivem em `src/data/*` e são lidos pelos dois lados.
 - Constantes duplicadas são a armadilha nº 1: uma mudança de preço/facto faz-se na fonte única e verifica-se no prerender.
 - Rota nova só no React precisa de entrada no `prerender.ts`, senão serve 404.
+- Topo da página inicial: no telemóvel o vídeo do processo (pulverização, escovação, extração; `topo-sofa.mp4`), no computador a fotografia do técnico; nunca mudar sem o dono escolher (dono, 25 Nov).
 - Hero das páginas de SEO: só botão de WhatsApp. A página inicial tem também "Calcular o meu preço" (questionário), por baixo do WhatsApp (dono, 25 Nov). Mensagens de WhatsApp pedem sempre "o preço e a disponibilidade".
 - Google Ads otimiza para "Serviço fechado" (fechos reais, valor "para ti", via `ads-conversions-feed`: com código "ref." vai o gclid, e os fechos marcados Google Ads no CRM sem código vão pelo telefone cifrado, dono 24 Nov); o clique no WhatsApp é secundário (dono, 3 Nov).
 - Nomes dos packs nas escolhas de preço do site: **Blindado** = limpeza + Premium, **Protegido** = limpeza + Essencial, **Renovado** = só limpeza; "Premium"/"Essencial" ficam por baixo e a mensagem de WhatsApp leva os dois (`WaterproofPackPicker.tsx`; dono, 24 Nov).
