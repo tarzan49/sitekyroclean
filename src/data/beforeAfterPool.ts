@@ -134,8 +134,6 @@ import sofa10Antes from "@/assets/before-after-pool/sofa-10-antes.webp";
 import sofa10Depois from "@/assets/before-after-pool/sofa-10-depois.webp";
 import sofa11Antes from "@/assets/before-after-pool/sofa-11-antes.webp";
 import sofa11Depois from "@/assets/before-after-pool/sofa-11-depois.webp";
-import sofa13Antes from "@/assets/before-after-pool/sofa-13-antes.webp";
-import sofa13Depois from "@/assets/before-after-pool/sofa-13-depois.webp";
 import tapete01Antes from "@/assets/before-after-pool/tapete-01-antes.webp";
 import tapete01Depois from "@/assets/before-after-pool/tapete-01-depois.webp";
 import tapete03Antes from "@/assets/before-after-pool/tapete-03-antes.webp";
@@ -199,7 +197,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     // Ordem por efeito wow (dono, 24 Nov).
-    { kind: "pair", before: sofa13Antes, after: sofa13Depois },
+    // sofa-13 saiu (dono, 25 Nov 2026: "Tiro-o do site"): o "antes" tinha a marca de uma ferramenta de IA.
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa07Antes, after: sofa07Depois },

@@ -47,7 +47,7 @@ describe('visitGifts: opções e pedidos acima de 300€ (dono, 24 Nov 2026)', (
   it('acima de 300€ numa peça só: preço de tabela, nunca desce (dono, 24 Nov 2026)', () => {
     const r = botQuote({ items: [{ kind: 'chairs', qty: 30 }], city: 'Porto' }) as any;
     expect(r.visitGifts).toBeNull();
-    expect([r.bigOrder, r.total, r.chairsWas]).toEqual([null, 360, 600]);
+    expect([r.bigOrder, r.total, r.chairsWas]).toEqual([null, 360, null]);
   });
 });
 

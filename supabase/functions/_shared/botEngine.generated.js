@@ -2832,15 +2832,13 @@ function chairPackStruck(qty, tier, city) {
   return clean === null || wp === null ? null : Math.min(chairPackWas(qty, tier), cents(clean + wp));
 }
 var CHAIR_PACK_STRUCK_MIN = 4;
-var CHAIR_CLEAN_STRUCK_MIN_TOTAL = 300;
 function withChairsWas(input, r) {
   const raw = expandPieces(input ?? {}).items;
   const only = Array.isArray(raw) && raw.length === 1 ? raw[0] : null;
   const tier = only?.treatment === "clean+premium" ? "premium" : only?.treatment === "clean+essencial" ? "essencial" : null;
   const qty = Number(only?.qty);
   const total = r.total;
-  const plainClean = only?.kind === "chairs" && !only.seatOnly && (only.treatment ?? "clean") === "clean" && Number.isSafeInteger(qty) && typeof total === "number" && total > CHAIR_CLEAN_STRUCK_MIN_TOTAL;
-  const was = plainClean ? cents(qty * chairCleanTotal(1)) : only?.kind === "chairs" && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= CHAIR_PACK_STRUCK_MIN && typeof total === "number" ? chairPackStruck(qty, tier, String(input.city ?? "")) : null;
+  const was = only?.kind === "chairs" && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= CHAIR_PACK_STRUCK_MIN && typeof total === "number" ? chairPackStruck(qty, tier, String(input.city ?? "")) : null;
   return { ...r, chairsWas: was !== null && typeof total === "number" && was > total ? was : null };
 }
 function withSmallOrderFarSurcharge(input, r) {

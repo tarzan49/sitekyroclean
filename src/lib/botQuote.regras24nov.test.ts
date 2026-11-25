@@ -13,7 +13,7 @@ describe('2. acima de 300€ o preço nunca desce ("Nunca desce")', () => {
   it.each([
     ['10 cadeiras Blindado', [C(10, 'clean+premium')], 309, 390],
     ['12 cadeiras Blindado', [C(12, 'clean+premium')], 359, 459],
-    ['30 cadeiras, só limpeza', [C(30)], 360, 600],
+    ['30 cadeiras, só limpeza ("Não, sem riscado")', [C(30)], 360, null],
   ])('%s', (_n, items, total, was) => {
     const r = q(items as unknown[]);
     expect([r.total, r.chairsWas, r.bigOrder]).toEqual([total, was, null]);

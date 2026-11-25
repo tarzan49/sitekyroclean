@@ -22,7 +22,7 @@ import { rugComboEstimate, rugEstimate } from './botRugEstimate';
 import { closeNowOffer } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 import { type AskedDiscount } from './botAskedDiscount';
-import { chairCleanTotal, chairPackWas, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
+import { chairPackWas, CHAIR_WATERPROOF_SMALL_MAX, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -672,17 +672,14 @@ export function chairPackStruck(qty: number, tier: 'premium' | 'essencial', city
 }
 /** From 4 chairs, site and bot alike (owner, 24 Nov 2026, 4 Blindado 139€ ~~156€~~: "Sim, em todo o lado"). */
 export const CHAIR_PACK_STRUCK_MIN = 4;
-/** Cleaning only above 300€: 1 chair × the quantity (owner, 24 Nov 2026, 30 cadeiras 360€ ~~600€~~). */
-export const CHAIR_CLEAN_STRUCK_MIN_TOTAL = 300;
 function withChairsWas<T extends object>(input: unknown, r: T): T & { chairsWas: number | null } {
   const raw = expandPieces((input ?? {}) as Record<string, unknown>).items;
   const only = Array.isArray(raw) && raw.length === 1 ? raw[0] as Record<string, unknown> : null;
   const tier = only?.treatment === 'clean+premium' ? 'premium' : only?.treatment === 'clean+essencial' ? 'essencial' : null;
   const qty = Number(only?.qty);
   const total = (r as { total?: unknown }).total;
-  const plainClean = only?.kind === 'chairs' && !only.seatOnly && (only.treatment ?? 'clean') === 'clean' && Number.isSafeInteger(qty) && typeof total === 'number' && total > CHAIR_CLEAN_STRUCK_MIN_TOTAL;
-  const was = plainClean ? cents(qty * chairCleanTotal(1)!)
-    : only?.kind === 'chairs' && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= CHAIR_PACK_STRUCK_MIN && typeof total === 'number' ? chairPackStruck(qty, tier, String((input as { city?: unknown }).city ?? '')) : null;
+  // Cleaning only has no struck price (owner, 24 Nov 2026, 30 cadeiras 360€: "Não, sem riscado").
+  const was = only?.kind === 'chairs' && tier && !only.seatOnly && Number.isSafeInteger(qty) && qty >= CHAIR_PACK_STRUCK_MIN && typeof total === 'number' ? chairPackStruck(qty, tier, String((input as { city?: unknown }).city ?? '')) : null;
   return { ...r, chairsWas: was !== null && typeof total === 'number' && was > total ? was : null };
 }
 
