@@ -926,5 +926,20 @@ html.snap-sections main > section[data-en-hero] { min-height: var(--app-h, 100sv
 a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) { background: linear-gradient(135deg, #188344, #13753b) !important; border: 1px solid #ffffff1f !important; border-radius: 10px !important; color: #fff !important; font-weight: 600 !important; letter-spacing: normal !important; }
 a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1DA851"]) :is(span, svg) { color: #fff !important; letter-spacing: normal !important; text-transform: none !important; }
 
+/* Títulos em duas linhas equilibradas, nunca uma palavra sozinha em baixo (dono, 24 Nov, captura do iPhone). */
+.type-section-title, [data-hero-part="title"] { text-wrap: balance; }
+
+/* iPhone (dono, 24 Nov, capturas): nada fica por baixo da barra fixa, e os testemunhos usam o cartão todo. */
+@media (max-width: 767px) {
+  html.snap-sections main section:is(#precos, #preco, #montar):not(:has(a[href*="wa.me"])) { padding-bottom: 92px !important; }
+  html.snap-sections main [data-landing-section="precos"]:not(:has(a[href*="wa.me"])) > * { padding-bottom: 92px !important; }
+  html.snap-home main > div#testemunhos > section { padding-bottom: 92px; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote { display: flex; flex-direction: column; justify-content: center; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 17px; line-height: 1.5; -webkit-line-clamp: 6; }
+  html.snap-sections #avaliacoes [aria-roledescription="testemunho"] p { font-size: 13px; line-height: 1.35; }
+  html.snap-sections #avaliacoes figure { background: #fff; border-radius: 14px; border: 1px solid #E5E0D3; }
+  html.snap-sections #avaliacoes [aria-roledescription="carrossel"] + div { border-radius: 12px; }
+}
+
 /* Enquanto as secções se medem (useFillSections), nada transita: a medida tem de ser a final. */
 html.kyro-measuring * { transition: none !important; }

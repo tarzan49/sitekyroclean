@@ -30,9 +30,9 @@ export default function HeaderServiceList({ dark = false, onNavigate }: { dark?:
           <li key={s.to}>
             {dark ? (
               <Link to={s.to} onClick={onNavigate} aria-current={active ? 'page' : undefined}
-                className={`relative flex h-[74px] items-end overflow-hidden rounded-xl border active:opacity-90 ${active ? 'border-[#D4AF37]' : 'border-white/15'}`}>
-                <img src={s.img} alt="" width={150} height={74} decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-                <span className="absolute inset-0 bg-gradient-to-t from-[#061a16] via-[#061a16]/65 to-[#061a16]/10" />
+                className={`relative flex h-[clamp(70px,calc(34svh-152px),118px)] items-end overflow-hidden rounded-xl border active:opacity-90 ${active ? 'border-[#D4AF37]' : 'border-white/15'}`}>
+                <img src={s.img} alt="" width={280} height={180} decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                 <span className="relative min-w-0 px-2.5 pb-2">
                   <span className={`block whitespace-nowrap font-semibold leading-tight text-white ${s.label.length > 12 ? 'text-[13.5px]' : 'text-[15px]'}`}>{s.label}</span>
                   <span className="block whitespace-nowrap text-xs font-semibold text-[#E8C964]">{s.price}</span>

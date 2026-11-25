@@ -16,7 +16,7 @@ export default function ResourceHubHero({ title, description, image, video, post
   const words = title.split(' '); const gold = words.pop();
   return <section data-mobile-hero="text" data-resource-hero className="relative isolate overflow-hidden bg-kyro-green text-white pt-24 pb-10 sm:pb-14">
     {image && <div className="hidden md:block"><HeroPhoto src={image} /></div>}
-    {video && <div aria-hidden="true" className="absolute inset-0 -z-10 md:hidden">
+    {video && <div aria-hidden="true" data-resource-media className="absolute inset-0 -z-10 md:hidden">
       <video src={video} poster={poster} autoPlay muted loop playsInline preload="metadata" className="h-[62%] w-full object-cover" />
       <span className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(7,26,18,.12) 0%, rgba(7,26,18,.25) 26%, #0B2F2A 60%, #071a12 100%)' }} />
     </div>}
@@ -34,7 +34,7 @@ export default function ResourceHubHero({ title, description, image, video, post
         </div>
       </div>
       <nav aria-label="Recursos" className="mt-4 grid grid-cols-3 gap-2 md:hidden">
-        {TABS.map(([to, label]) => <NavLink key={to} to={to} end className={({ isActive }) => `flex min-h-12 items-center justify-center rounded-xl border-2 text-[15px] font-semibold ${isActive ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964] text-[#0B2F2A]' : 'border-white/20 bg-white/[0.06] text-white'}`}>{label}</NavLink>)}
+        {TABS.map(([to, label]) => <NavLink key={to} to={to} end className={({ isActive }) => `flex min-h-12 items-center justify-center rounded-xl border-2 text-[15px] font-semibold ${isActive ? 'is-on border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-white/20 bg-white/[0.06] text-white'}`}>{label}</NavLink>)}
       </nav>
       {children && <div className="mt-3 md:hidden">{children}</div>}
     </div>

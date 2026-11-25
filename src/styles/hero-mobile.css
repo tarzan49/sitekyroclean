@@ -123,5 +123,7 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
   html.snap-sections main > section[data-resource-hero] { min-height: var(--app-h, 100svh); justify-content: flex-end; padding-top: calc(var(--header-h, 57px) + 12px) !important; padding-bottom: 18px !important; }
   html.snap-sections main > section[data-resource-hero] nav a { min-height: 32px; }
   html.snap-sections main > section[data-resource-hero] nav[aria-label="Recursos"] a { min-height: 48px; }
-  html.snap-sections main > section#termos { justify-content: flex-start; }
+  html.snap-sections [data-resource-hero] > [data-resource-media] { display: block; }
+  html.snap-sections main > section[data-resource-hero] nav[aria-label="Recursos"] a { color: #fff; }
+  html.snap-sections main > section[data-resource-hero] nav[aria-label="Recursos"] a.is-on { color: #0B2F2A; }
 }

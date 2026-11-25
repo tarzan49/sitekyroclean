@@ -162,7 +162,7 @@ const Header = () => {
           </a>
           <BasketButton onOpen={openQuiz} className="!w-10 !min-w-0" />
           <a href={waHref} target="_blank" rel="noopener noreferrer" data-tracking-source="header_mobile" aria-label="WhatsApp" className="grid h-11 w-11 min-w-0 touch-manipulation place-items-center active:opacity-80">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-[#25D366] text-white shadow-[0_6px_14px_-6px_rgba(37,211,102,0.9)]"><MessageCircle className="h-[18px] w-[18px]" strokeWidth={2.2} /></span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-[linear-gradient(135deg,#188344,#13753b)] text-white shadow-[0_5px_14px_-6px_rgba(6,27,19,0.5)]"><MessageCircle className="h-[18px] w-[18px]" strokeWidth={2.2} /></span>
           </a>
 
           <Sheet open={mobileMenuOpen} onOpenChange={open => { if (open) void loadServiceList(); setMobileMenuOpen(open); }}>
