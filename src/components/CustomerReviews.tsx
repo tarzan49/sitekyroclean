@@ -49,8 +49,8 @@ export default function CustomerReviews({ reviews }: { reviews: PoolReview[] }) 
       <div className="flex items-stretch -ml-4">{reviews.map((review,i)=><div key={`${review.name}-${i}`} role="group" aria-roledescription="testemunho" aria-label={`${i+1} de ${reviews.length}`} className="shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/3 pl-4 min-w-0">{isNear(i, selected, reviews.length) ? <CustomerReviewCard review={review} /> : <div aria-hidden="true" className="h-[340px] sm:h-[380px] rounded-sm bg-[#faf8f1]" />}</div>)}</div>
     </div>
     {reviews.length>1&&<div className="flex items-center justify-between gap-4 mt-5 bg-[#173629] border border-white/15 rounded-sm p-2 text-white">
-      <p className="whitespace-nowrap pl-2 text-sm tabular-nums">{selected+1} / {reviews.length}<span className="ml-2 text-white/70 max-[389px]:hidden">Histórias de clientes</span></p>
-      <div className="flex gap-1">
+      <p className="whitespace-nowrap pl-2 text-sm tabular-nums">{selected+1} / {reviews.length}<span className="ml-2 text-white/70 max-[389px]:hidden">Histórias<span className="max-[439px]:hidden"> de clientes</span></span></p>
+      <div className="flex shrink-0 gap-1">
         {!reduced&&<button type="button" aria-label={paused?'Retomar avaliações automáticas':'Pausar avaliações automáticas'} onClick={()=>setPaused(v=>!v)} className="w-11 h-11 flex items-center justify-center hover:bg-white/10">{paused?<Play className="w-4 h-4" />:<Pause className="w-4 h-4" />}</button>}
         <button type="button" aria-label="Avaliação anterior" onClick={()=>{setPaused(true);api?.scrollPrev();}} className="w-11 h-11 flex items-center justify-center border border-white/20 hover:bg-white/10"><ArrowLeft className="w-4 h-4" /></button>
         <button type="button" aria-label="Próxima avaliação" onClick={()=>{setPaused(true);api?.scrollNext();}} className="w-11 h-11 flex items-center justify-center bg-gold text-[#173629]"><ArrowRight className="w-4 h-4" /></button>
