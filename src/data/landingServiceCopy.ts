@@ -22,11 +22,11 @@ const problems: Record<LandingService, { title: string; description: string }[]>
     { title: 'Pó e resíduos no colchão', description: 'A superfície e as costuras acumulam resíduos com o uso. Avaliamos o revestimento para escolher a limpeza; o tratamento anti-ácaros é um extra opcional e não uma promessa clínica.' },
     { title: 'Manchas de suor e líquidos', description: 'Suor, bebidas e acidentes podem marcar o revestimento. O tipo de tecido e o tempo decorrido influenciam o resultado, e algumas alterações de cor podem permanecer.' },
     { title: 'Odores acumulados', description: 'A origem do odor pode estar no revestimento ou nas camadas interiores. Explique o que aconteceu e os produtos usados para avaliarmos o alcance da intervenção.' },
-    { title: 'Dúvidas sobre os cuidados do colchão', description: 'Se procura higienizar o colchão, ajudamos a distinguir a limpeza dos tratamentos opcionais. Não prometemos resolver sintomas de alergia ou substituir aconselhamento de saúde.' },
+    { title: 'Dúvidas sobre os cuidados do colchão', description: 'Se procura higienizar o colchão, ajudamos a distinguir a limpeza dos tratamentos opcionais. Para sintomas de alergia, o acompanhamento é com o seu médico.' },
   ],
   'limpeza-tapetes': [
     { title: 'Sujidade acumulada nas fibras', description: 'Poeira, areia e resíduos do calçado ficam presos na trama. Avaliamos as fibras e a base para escolher um procedimento compatível com a peça.' },
-    { title: 'Manchas de bebidas e alimentos', description: 'Cada derrame precisa de avaliação do material, da cor e dos produtos já aplicados. Não prometemos remoção total de manchas antigas ou alterações permanentes.' },
+    { title: 'Manchas de bebidas e alimentos', description: 'Cada derrame precisa de avaliação do material, da cor e dos produtos já aplicados. O tratamento é escolhido para a mancha e para o tecido, antes da extração.' },
     { title: 'Pelos e resíduos de animais', description: 'Os pelos podem ficar presos entre as fibras, sobretudo nas zonas de descanso dos animais. Indicamos os cuidados adequados ao tapete e avaliamos eventuais odores associados.' },
     { title: 'Cores alteradas e fibras gastas', description: 'A sujidade pode disfarçar as cores, mas desbotamento e desgaste são situações diferentes. Explicamos o que a limpeza pode melhorar sem prometer restaurar a cor original.' },
   ],

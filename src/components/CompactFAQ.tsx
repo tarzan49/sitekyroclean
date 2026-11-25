@@ -15,6 +15,7 @@ interface Props {
 
 export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id = 'perguntas', dark = false }: Props) {
   const [open, setOpen] = useState<number | null>(() => { const i = faqs.length <= 4 ? faqs.findIndex(f => f.answer.length <= 240) : -1; return i < 0 ? null : i; });
+  const [all, setAll] = useState(false);
   const words = heading.trim().split(' ');
   const gold = words.pop() ?? '';
   const rest = words.join(' ');
@@ -26,7 +27,7 @@ export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id 
         <div>
           <h2 className={`type-section-title font-playfair ${dark ? 'text-white' : 'text-[#111111]'}`}>{rest} <em className="not-italic" style={{ color: '#D4AF37' }}>{gold}</em></h2>
         </div>
-        <div className="divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white">
+        <div data-faq-list data-all={all || undefined} className="divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border border-[#E5E0D3] bg-white">
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (
@@ -42,6 +43,7 @@ export default function CompactFAQ({ faqs, heading = 'Perguntas Frequentes', id 
               </div>
             );
           })}
+          {faqs.length > 4 && !all && <button type="button" data-faq-more onClick={() => setAll(true)} className="hidden w-full items-center justify-center px-4 text-[15px] font-semibold text-[#0B2F2A] underline underline-offset-4">Ver todas as perguntas</button>}
         </div>
       </div>
     </section>

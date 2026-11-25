@@ -8,7 +8,7 @@ import SectionHeader from '@/components/SectionHeader';
 import PackConfigurator from '@/components/PackConfigurator';
 import WaterproofPackPicker from '@/components/WaterproofPackPicker';
 import WaterproofPackSections from '@/components/WaterproofPackSections';
-import PackPiecesPicker, { type PieceKind } from '@/components/PackPiecesPicker';
+import PackStepPicker, { type PieceKind } from '@/components/PackStepPicker';
 import type { DuoSide } from '@/components/DuoBeforeAfter';
 import TreatmentPackPicker from '@/components/TreatmentPackPicker';
 import TreatmentPackSections from '@/components/TreatmentPackSections';
@@ -162,7 +162,7 @@ export default function PackComboPage() {
               className="lg:!mb-5"
             />}
           <div className={simpleKind || combo ? 'md:rounded-2xl md:border md:border-[#E5E0D3] md:bg-white md:p-6' : 'bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4'}>
-            {combo ? <PackPiecesPicker pieces={pieces!} packName={pack.name} compact={pieces!.length > 2} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : treatKind ? <TreatmentPackPicker kind={treatKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind && simpleKind !== 'mattress' && simpleKind !== 'rug' ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
+            {combo ? <PackStepPicker pieces={pieces!} packName={pack.name} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : treatKind === 'sofa' ? <PackStepPicker pieces={['sofa']} mitesOnly packName={pack.name} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : treatKind ? <TreatmentPackPicker kind={treatKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : simpleKind && simpleKind !== 'mattress' && simpleKind !== 'rug' ? <WaterproofPackPicker kind={simpleKind} city={city.name} source={`pack_configurator_${pack.id}_${city.slug}`} /> : <PackConfigurator
               initialKinds={PACK_KINDS[pack.id]}
               initialExtra={PACK_INITIAL_EXTRA[pack.id]}
               initialCity={city.name}

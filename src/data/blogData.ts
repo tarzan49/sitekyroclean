@@ -89,7 +89,7 @@ Configurações maiores ou diferentes são avaliadas no orçamento. A deslocaç�
       },
       {
         "heading": "O que está incluído",
-        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "heading": "Como comparar dois orçamentos",
@@ -274,7 +274,7 @@ Deslocação à parte. A duração depende do uso, cuidados e condições aplic�
       },
       {
         "heading": "Limpeza e extras",
-        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "heading": "Pedir o serviço certo",
@@ -292,7 +292,7 @@ Deslocação à parte. A duração depende do uso, cuidados e condições aplic�
       },
       {
         "q": "O anti-ácaros está incluído?",
-        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "q": "Tenho de limpar de seis em seis meses?",
@@ -336,7 +336,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Manchas e tratamentos",
-        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "heading": "Preparar a cama para voltar a usar",
@@ -350,7 +350,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Inclui anti-ácaros?",
-        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "q": "Limpam espuma e látex?",
@@ -512,7 +512,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "O âmbito da intervenção",
-        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nPerante bolor, avaliamos se é possível intervir ou se o estado da peça exige outra solução."
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente.\n\nPerante bolor, avaliamos se é possível intervir ou se o estado da peça exige outra solução."
       },
       {
         "heading": "Decidir o próximo passo",
@@ -530,7 +530,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "A desbacterização vem com a limpeza?",
-        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "q": "Devo deitar fora uma peça com bolor?",
@@ -743,7 +743,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Escolher o método",
-        "body": "Avaliamos fibra, base, instalação e estado. Nas alcatifas compatíveis, tratamos, escovamos e extraímos a sujidade antes da conferência e secagem. Não prometemos recuperar desgaste ou diferenças de cor por uso."
+        "body": "Avaliamos fibra, base, instalação e estado. Nas alcatifas compatíveis, tratamos, escovamos e extraímos a sujidade antes da conferência e secagem. A extração retira a sujidade entranhada nas fibras."
       },
       {
         "heading": "Reabrir as áreas tratadas",
@@ -804,7 +804,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "O que pedir à equipa",
-        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nIdentifique a peça e o objetivo do pedido. Se existem sintomas de alergia, a orientação clínica deve vir do profissional de saúde."
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente.\n\nIdentifique a peça e o objetivo do pedido. Se existem sintomas de alergia, a orientação clínica deve vir do profissional de saúde."
       },
       {
         "heading": "Defina uma rotina possível",
@@ -822,7 +822,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "O tratamento tem benefício clínico garantido?",
-        "a": "Não prometemos melhoria de sintomas ou tratamento de doenças."
+        "a": "Não. A limpeza retira pó, resíduos e sujidade das fibras; para sintomas, o acompanhamento é com o seu médico."
       },
       {
         "q": "Posso pedir só uma avaliação do extra?",
@@ -971,7 +971,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Quando pedir limpeza",
-        "body": "Manchas, gordura de uso, pó e resíduos são motivos para avaliar uma limpeza. Lavagem e higienização não significam automaticamente um serviço com desinfeção incluída. A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "body": "Manchas, gordura de uso, pó e resíduos são motivos para avaliar uma limpeza. Lavagem e higienização não significam automaticamente um serviço com desinfeção incluída. A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "heading": "Quando avaliar proteção",
@@ -1234,7 +1234,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "A limpeza inclui desbacterização?",
-        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       },
       {
         "q": "A proteção evita todas as manchas?",
@@ -1337,7 +1337,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "O que a extração não garante",
-        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nSecagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente.\n\nSecagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [
@@ -1355,7 +1355,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Extração é desinfeção?",
-        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente."
       }
     ],
     "relatedService": {
@@ -1510,7 +1510,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Mancha e odor são avaliados separadamente",
-        "body": "A remoção de uma marca visível e o tratamento do cheiro podem ter resultados diferentes. Resíduos no núcleo podem persistir. Não prometemos eliminar o odor quando não é possível alcançar a sua origem."
+        "body": "A remoção de uma marca visível e o tratamento do cheiro podem ter resultados diferentes. Resíduos no núcleo podem persistir. O tratamento atua na zona onde o líquido chegou e a extração retira os resíduos alcançáveis."
       },
       {
         "heading": "Intervenção e regresso ao uso",

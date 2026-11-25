@@ -53,7 +53,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     "id": "tratamento-anti-acaros",
     "term": "Tratamento Anti-ácaros",
-    "definition": "Tratamento opcional dirigido a ácaros, sujeito à compatibilidade do artigo e às instruções do produto. É escolhido e orçamentado separadamente da limpeza. Não prometemos eliminação total nem tratamento de alergias ou asma.",
+    "definition": "Tratamento opcional dirigido a ácaros, sujeito à compatibilidade do artigo e às instruções do produto. É escolhido e orçamentado separadamente da limpeza.",
     "serviceLink": {
       "label": "Avaliar tratamento anti-ácaros",
       "to": "/tratamento-anti-acaros"

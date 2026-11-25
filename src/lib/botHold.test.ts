@@ -247,12 +247,15 @@ describe('planBotBooking', () => {
   });
 
   it('a visit that runs into the next hour\'s service is not "the same hour" (owner, 29 Oct 2026, Marlene: "se reservas é porque confirmas")', () => {
+    // Dated after WATERPROOFING_FROM (owner, 6 Nov 2026: no Porto/Braga waterproofing before 11/11) and PORTO1_ALL_PREMIUM_FROM
+    // (owner, 14 Nov 2026); the file's October NOW falls before both. Now = Tuesday 24 Nov, job on Thursday 26 Nov.
+    const now = new Date('2026-11-24T09:45:00Z'), date = '2026-11-26';
     // Waterproofing at 16h (90 minutes) with a Porto 1 cleaning at 17h: Porto 1 takes both.
-    const cleaning = { id: 'o', summary: 'Serviço 75€ (149€) Limpeza de sofá e tapete - 911 111 111 - Rua Inventada 1, 4100-000 Porto', description: 'Equipa: Porto 1', status: 'CONFIRMED', start: '2026-10-08T16:00:00.000Z', end: '2026-10-08T17:00:00.000Z' };
-    const marlene = book({ city: 'São João da Madeira', address: 'Rua Inventada 2, 3700-000 São João da Madeira', items: [{ kind: 'sofa', size: '3-lugares', qty: 1, treatment: 'premium' }], service: 'Impermeabilização Premium sofá 3 lugares', time: '16h' });
-    expect(planBotBooking(marlene, [cleaning], NOW)).toMatchObject({ ok: true, team: 'Porto 1' });
+    const cleaning = { id: 'o', summary: 'Serviço 75€ (149€) Limpeza de sofá e tapete - 911 111 111 - Rua Inventada 1, 4100-000 Porto', description: 'Equipa: Porto 1', status: 'CONFIRMED', start: '2026-11-26T17:00:00.000Z', end: '2026-11-26T18:00:00.000Z' };
+    const marlene = book({ date, city: 'São João da Madeira', address: 'Rua Inventada 2, 3700-000 São João da Madeira', items: [{ kind: 'sofa', size: '3-lugares', qty: 1, treatment: 'premium' }], service: 'Impermeabilização Premium sofá 3 lugares', time: '16h' });
+    expect(planBotBooking(marlene, [cleaning], now)).toMatchObject({ ok: true, team: 'Porto 1' });
     // Starting at the same hour still goes to the owner.
-    expect(planBotBooking({ ...marlene, time: '16h30' }, [cleaning], NOW)).toEqual({ ok: false, sameTime: true });
+    expect(planBotBooking({ ...marlene, time: '16h30' }, [cleaning], now)).toEqual({ ok: false, sameTime: true });
   });
 });
 

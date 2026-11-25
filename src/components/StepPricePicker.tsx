@@ -80,7 +80,7 @@ const tile = (on: boolean) => `rounded-2xl border-2 font-semibold transition-col
 
 /** Cartões com fotografia (material, peça): a escolha é o próprio botão e enche o ecrã. Sofás sempre na horizontal
  *  (dono, 24 Nov 2026: "tem que ser 2 fotos horizontal se for sofá"); as outras peças, na vertical. */
-function PhotoCards<T extends string>({ ask, options, onPick, wide = false }: { ask: string; options: { id: T; label: string; photo: string }[]; onPick: (id: T) => void; wide?: boolean }) {
+export function PhotoCards<T extends string>({ ask, options, onPick, wide = false }: { ask: string; options: { id: T; label: string; photo: string }[]; onPick: (id: T) => void; wide?: boolean }) {
   return <>
     <p className="mb-3 text-lg font-semibold text-[#1A1A1A] md:text-xl">{ask}</p>
     <div className={`grid gap-3 md:grid-cols-2 md:gap-5 ${wide ? '' : 'grid-cols-2'}`}>

@@ -90,7 +90,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
       "Capa anti-ácaros reduz exposição mas não elimina os ácaros existentes",
       "Reduza a humidade no interior da casa, os ácaros preferem ambientes húmidos",
     ],
-    warning: "O tratamento anti-ácaros é um complemento específico à limpeza; não prometemos eliminação permanente",
+    warning: "O tratamento anti-ácaros é um complemento específico à limpeza, aplicado depois da extração",
   },
   animais: {
     title: "Controlo imediato com animais de estimação",

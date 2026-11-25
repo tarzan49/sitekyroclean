@@ -135,3 +135,19 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
   html.snap-sections :is(#duvidas, #perguntas) button[aria-expanded] > span:first-child { font-size: 14.5px; line-height: 1.28; }
   html.snap-sections #dicas .grid > * { padding: 6px 9px; }
 }
+
+/* Ecrãs úteis baixos: 5 perguntas e "Ver todas as perguntas" (o texto todo continua no HTML). */
+@media (max-width: 767px) and (max-height: 699px) {
+  html.snap-sections [data-faq-list]:not([data-all]) > div:nth-child(n+6) { display: none; }
+  html.snap-sections [data-faq-list] > [data-faq-more] { display: flex; min-height: 46px; }
+  html.snap-sections #packs article { padding-top: 5px; padding-bottom: 5px; }
+  html.snap-sections #packs article h3 { font-size: 14px; }
+  html.snap-sections #packs article a { min-height: 30px; }
+  html.snap-sections details.group\/directory > summary { min-height: 38px; padding-top: 4px; padding-bottom: 4px; font-size: 14.5px; }
+}
+/* Com o aviso de cookies aberto, a barra fixa do WhatsApp espera. */
+html[data-consent="open"] [data-sticky-bar] { visibility: hidden; }
+@media (max-width: 767px) and (max-height: 655px) {
+  html.snap-sections [data-faq-list]:not([data-all]) > div:nth-child(n+5) { display: none; }
+  html.snap-sections #dicas .grid > *:nth-child(n+4) { display: none; }
+}

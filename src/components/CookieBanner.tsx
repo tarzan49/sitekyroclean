@@ -17,10 +17,11 @@ const CookieBanner = () => {
     if (!el) return;
     const root = document.documentElement;
     const apply = () => root.style.setProperty('--kyro-consent-h', `${el.offsetHeight}px`);
+    root.dataset.consent = 'open'; // a barra fixa do WhatsApp espera pela decisão (dono, 25 Nov: os dois juntos tapavam meio ecrã)
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(el);
-    return () => { observer.disconnect(); root.style.removeProperty('--kyro-consent-h'); };
+    return () => { observer.disconnect(); root.style.removeProperty('--kyro-consent-h'); delete root.dataset.consent; };
   }, [visible]);
 
   useEffect(() => {
@@ -61,39 +62,15 @@ const CookieBanner = () => {
       className="fixed bottom-0 left-0 right-0 z-[90] px-2 pb-2 sm:px-6 sm:pb-5"
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
     >
-      <div className="max-w-2xl mx-auto rounded-xl sm:rounded-2xl border border-gold/20 bg-kyro-green shadow-[0_-4px_32px_rgba(0,0,0,0.45)] px-3 py-2.5 sm:px-6 sm:py-5">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] leading-snug sm:text-base sm:leading-relaxed text-white/75">
-              {isEn ? (
-                <>
-                  With your permission, we use analytics and advertising cookies to measure visits and campaigns. See our{' '}
-                  <Link
-                    to="/politica-de-privacidade"
-                    className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
-                  >
-                    Privacy Policy
-                  </Link>
-                  .
-                </>
-              ) : (
-                <>
-                  Com a sua autorização, usamos cookies de análise e publicidade para medir visitas e campanhas. Consulte a nossa{' '}
-                  <Link
-                    to="/politica-de-privacidade"
-                    className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
-                  >
-                    Política de Privacidade
-                  </Link>
-                  .
-                </>
-              )}
-            </p>
-          </div>
-
+      <div className="max-w-2xl mx-auto rounded-xl sm:rounded-2xl border border-gold/20 bg-kyro-green shadow-[0_-4px_32px_rgba(0,0,0,0.45)] px-3 py-2 sm:px-6 sm:py-4">
+        {/* Uma só linha no telemóvel: texto curto à esquerda, as duas decisões à direita. */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-white/80 sm:text-base">
+            {isEn ? 'Cookies to measure visits and campaigns. ' : 'Cookies para medir visitas e campanhas. '}
+            <Link to="/politica-de-privacidade" className="text-[#D4AF37] underline underline-offset-2">{isEn ? 'Privacy Policy' : 'Privacidade'}</Link>
+          </p>
           {/* Actions */}
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
             <button
               onClick={decline}
               className="h-10 sm:h-11 px-3.5 sm:px-4 text-sm font-medium text-white/80 hover:text-white transition-colors touch-manipulation rounded-lg"
