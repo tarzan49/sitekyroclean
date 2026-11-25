@@ -50,27 +50,18 @@ function fill(section: HTMLElement, saved: Saved[]) {
   saved.length = 0;
   const keep = (el: HTMLElement) => { if (!saved.some(s => s.el === el)) saved.push({ el, css: el.style.cssText }); };
   const root = getComputedStyle(document.documentElement);
-  const px = (v: string) => parseFloat(root.getPropertyValue(v)) || 0;
   const hero = section.hasAttribute('data-commercial-hero');
   const home = document.documentElement.classList.contains('snap-home');
-  const target = home ? pageScroller().clientHeight : hero ? px('--app-h') : px('--app-max') - (home ? 0 : root.getPropertyValue('--header-h').trim() ? px('--header-h') : 64);
-  if (!target) return;
+  const headerH = root.getPropertyValue('--header-h').trim() ? parseFloat(root.getPropertyValue('--header-h')) || 0 : 64;
+  const target = pageScroller().clientHeight - (hero || home ? 0 : headerH);
+  if (target < 200) return;
+  // Mede-se pelo conteúdo, sem tirar a altura à secção: encolhê-la para medir (mesmo num instante) obrigava o Safari a
+  // encaixar outra vez e a secção parava cortada a meio (dono, 25 Nov, vídeo).
   const spareNow = () => {
-    // Página inicial: mede-se pelo conteúdo, sem tirar a altura à secção. Encolhê-la para medir (mesmo num instante)
-    // obrigava o Safari a encaixar outra vez e a secção parava cortada a meio (dono, 25 Nov, vídeo).
-    if (home) {
-      const cs = getComputedStyle(section);
-      const kids = [...section.children].filter((k): k is HTMLElement => k instanceof HTMLElement && k.offsetHeight > 0 && !/absolute|fixed/.test(getComputedStyle(k).position));
-      if (!kids.length) return 0;
-      const natural = kids[kids.length - 1].getBoundingClientRect().bottom - kids[0].getBoundingClientRect().top + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
-      return Math.floor(target - natural);
-    }
-    const old = section.style.cssText;
-    section.style.setProperty('min-height', '0', 'important');
-    section.style.setProperty('flex', '0 0 auto', 'important');
-    const natural = section.getBoundingClientRect().height;
-    section.style.cssText = old;
-    return Math.floor(target - natural);
+    const cs = getComputedStyle(section);
+    const kids = [...section.children].filter((k): k is HTMLElement => k instanceof HTMLElement && k.offsetHeight > 0 && !/absolute|fixed/.test(getComputedStyle(k).position)).map(k => k.getBoundingClientRect());
+    if (!kids.length) return 0;
+    return Math.floor(target - (Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)));
   };
   const isShown = (e: HTMLElement) => e.offsetParent !== null && e.getClientRects().length > 0;
   let spare = spareNow() - 4;
