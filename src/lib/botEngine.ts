@@ -8,7 +8,7 @@ export { planBotBooking, planBotHold, planOwnerBooking, TEAM_COLOR } from './bot
 export { agendaCheck } from './agendaCheck';
 export { teamAccounts } from './teamAccounts';
 export { tagWaterproofBase } from './waterproofBase';
-export { addDays, checkProcedure, clientPhoneFromTitle, clientPhoneOfEvent, clientReviewDue, factsFromTitle, isRugPickupVisit, lisbonDayOf, procedureApplies, procedureClientMessage, procedureAdjustment, procedureClosedMessage, procedureFrom, procedurePromptMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE } from './serviceProcedure';
+export { addDays, checkProcedure, clientPhoneFromTitle, clientPhoneOfEvent, clientReviewDue, factsFromTitle, isRugPickupVisit, lisbonDayOf, procedureApplies, procedureClientMessage, procedureAdjustment, procedureClosedMessage, procedureFrom, procedurePromptMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, slotForMedia } from './serviceProcedure';
 export { describeQuizOrder } from './quizOrder';
 export { isTestOrder } from './testLead';
 export { labelFacts } from './labelFacts';

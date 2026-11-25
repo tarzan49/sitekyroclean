@@ -423,10 +423,6 @@ export function procedureClosedMessage(label: string, serviceDay: string, missin
   return `O prazo do serviço ${label}, ${dm(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.${share}`;
 }
 
-/** Quando a equipa manda uma fotografia sem responder à mensagem de um serviço. */
-export const PROCEDURE_NOT_A_REPLY_MESSAGE =
-  'Para não misturar serviços, manda as fotografias e o vídeo em resposta à mensagem do serviço: carrega nessa mensagem, escolhe Responder e envia.';
-
 /**
  * O que uma linha de serviço da agenda diz para a mensagem: "Limpeza de sofá"
  * do título ("Serviço 45€ (89€) (anúncio) Limpeza de sofá - 9… - Ana Silva - Rua…")

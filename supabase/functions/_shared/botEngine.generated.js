@@ -3721,7 +3721,9 @@ var SOLO_DAYS = [
   // Owner, 31 Oct 2026: "lisboa 1 so vai ter 1 membro da equipa la na segunda pq o outro vai pro algarve".
   { team: "Lisboa 1", date: "2026-11-02" },
   // Owner, 17 Nov 2026: "o joab diz q quinta so pode a partir do 12:00".
-  { team: "Lisboa 1", date: "2026-11-19", untilHour: 12 }
+  { team: "Lisboa 1", date: "2026-11-19", untilHour: 12 },
+  // Owner, 25 Nov 2026: "amanhã só vai estar uma pessoa em Lisboa".
+  { team: "Lisboa 1", date: "2026-11-26" }
 ];
 var staggers = (team, from) => {
   if (!STAGGER_TEAMS.has(team)) return false;
@@ -5180,7 +5182,6 @@ function procedureClosedMessage(label, serviceDay, missing, pay) {
   const share = pay ? ` Neste serviço a equipa fica com ${pay.teamShare}%${pay.bonus ? ` + ${pay.bonus}€` : ""}.` : "";
   return `O prazo do serviço ${label}, ${dm2(serviceDay)}, acabou sem ${missingText(missing)}. O procedimento deste serviço ficou incompleto.${share}`;
 }
-var PROCEDURE_NOT_A_REPLY_MESSAGE = "Para não misturar serviços, manda as fotografias e o vídeo em resposta à mensagem do serviço: carrega nessa mensagem, escolhe Responder e envia.";
 function isPlace(part, summary, location) {
   const n = (x) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const hay = n(`${location} ${summary.replace(part, "")}`);
@@ -5715,7 +5716,6 @@ function certificateNumber(serviceDate, taken, tier = "premium") {
 }
 export {
   FIRST_NUDGE_FROM,
-  PROCEDURE_NOT_A_REPLY_MESSAGE,
   TEAM_COLOR,
   addDays2 as addDays,
   agendaCheck,

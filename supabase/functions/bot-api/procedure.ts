@@ -10,7 +10,7 @@
 // through the team; `clientReviewDue` decides when).
 import {
   addDays, checkProcedure, clientPhoneFromTitle, clientPhoneOfEvent, clientReviewDue, eventTeam, isRugPickupVisit, factsFromTitle, lisbonDayOf, procedureFrom, procedurePromptMessage,
-  procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, serviceVatOf, slotForMedia, PROCEDURE_NOT_A_REPLY_MESSAGE,
+  procedureAdjustment, procedureClientMessage, procedureClosedMessage, procedureReceiptMessage, procedureReminderMessage, procedureStatusChanges, reminderDue, FIRST_NUDGE_FROM, serviceVatOf, slotForMedia,
 } from "../_shared/botEngine.generated.js";
 import type { CalendarEvent } from "../_shared/ics.ts";
 import { createErrorResponse, createSuccessResponse, safeLog } from "../_shared/security.ts";
@@ -238,7 +238,7 @@ export async function procedureDue(events: CalendarEvent[], store: ProcedureStor
     clientCertificates.push({ eventId: r.calendar_event_id, phone: phone!, serviceRequestId: r.service_request_id,
       firstName: labelFor(serviceByEvent.get(r.calendar_event_id), ev).firstName, serviceStart: ev.start! });
   }
-  return createSuccessResponse({ prompts, reminders, closed, clientReviews, clientReviewSkips, clientCertificates, notReplyMessage: PROCEDURE_NOT_A_REPLY_MESSAGE });
+  return createSuccessResponse({ prompts, reminders, closed, clientReviews, clientReviewSkips, clientCertificates });
 }
 
 /** The bot sent the message of a service (or a reminder) to the team: keep the WhatsApp ids. */
