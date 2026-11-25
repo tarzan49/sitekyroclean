@@ -1362,3 +1362,5 @@ Em coexistência a Meta entrega às vezes a mensagem vazia (`unsupported`, 13106
 ## Funil original reposto (dono, 25 Nov 2026)
 
 "Foi definido um funil que foi sempre usado durante 2 meses em que fizemos 8.000 euros." As horas só depois de escolher (23 Nov) e "primeiro o pack, depois as datas" (19 Nov, Fernando) ficam [RETIRADA 25/11]: as opções, as horas e "Como gostaria de avançar?" vão na mesma mensagem, a última. Continua: marcar só com a opção escolhida. Última ordem no código: preço, fotografia, extra, vídeo, opções + horas.
+
+Acerto do dono no mesmo dia: o fecho é opções, depois as horas, depois "Qual das opções faz mais sentido para si?", uma só pergunta.
