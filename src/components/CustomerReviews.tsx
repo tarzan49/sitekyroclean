@@ -7,6 +7,12 @@ import { GOOGLE_REVIEWS_VIEW_URL } from '@/constants/google';
 import { GoogleG } from '@/components/icons/GoogleG';
 import CustomerReviewCard from './CustomerReviewCard';
 
+/** Cartões montados à volta do que está à vista: com 140+ avaliações, os
+ *  outros ficam só com a moldura (a mesma altura), e a secção não pesa. */
+const BEFORE = 4, AFTER = 7;
+const isNear = (i: number, selected: number, total: number) =>
+  total <= BEFORE + AFTER + 1 || (i - selected + total) % total <= AFTER || (selected - i + total) % total <= BEFORE;
+
 export default function CustomerReviews({ reviews }: { reviews: PoolReview[] }) {
   const [ref, api] = useEmblaCarousel({loop:true,align:'start'});
   const root = useRef<HTMLDivElement>(null);
@@ -40,11 +46,11 @@ export default function CustomerReviews({ reviews }: { reviews: PoolReview[] }) 
       <GoogleG className="w-6 h-6" /><span className="text-lg font-bold">{REVIEW_RATING}<span className="text-sm font-normal text-[#617166]"> / 5</span></span><span className="text-sm">{REVIEW_COUNT}+ avaliações no Google</span><ExternalLink className="w-3.5 h-3.5" />
     </a>
     <div ref={ref} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onFocusCapture={()=>setPaused(true)} className="overflow-hidden" role="region" aria-label="Testemunhos dos clientes" aria-roledescription="carrossel">
-      <div className="flex items-stretch -ml-4">{reviews.map((review,i)=><div key={`${review.name}-${i}`} role="group" aria-roledescription="testemunho" aria-label={`${i+1} de ${reviews.length}`} className="shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/3 pl-4 min-w-0"><CustomerReviewCard review={review} /></div>)}</div>
+      <div className="flex items-stretch -ml-4">{reviews.map((review,i)=><div key={`${review.name}-${i}`} role="group" aria-roledescription="testemunho" aria-label={`${i+1} de ${reviews.length}`} className="shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/3 pl-4 min-w-0">{isNear(i, selected, reviews.length) ? <CustomerReviewCard review={review} /> : <div aria-hidden="true" className="h-[340px] sm:h-[380px] rounded-sm bg-[#faf8f1]" />}</div>)}</div>
     </div>
     {reviews.length>1&&<div className="flex items-center justify-between gap-4 mt-5 bg-[#173629] border border-white/15 rounded-sm p-2 text-white">
-      <p className="whitespace-nowrap pl-2 text-sm tabular-nums">{selected+1} / {reviews.length}<span className="ml-2 text-white/70 max-[389px]:hidden">Histórias de clientes</span></p>
-      <div className="flex gap-1">
+      <p className="whitespace-nowrap pl-2 text-sm tabular-nums">{selected+1} / {reviews.length}<span className="ml-2 text-white/70 max-[389px]:hidden">Histórias<span className="max-[439px]:hidden"> de clientes</span></span></p>
+      <div className="flex shrink-0 gap-1">
         {!reduced&&<button type="button" aria-label={paused?'Retomar avaliações automáticas':'Pausar avaliações automáticas'} onClick={()=>setPaused(v=>!v)} className="w-11 h-11 flex items-center justify-center hover:bg-white/10">{paused?<Play className="w-4 h-4" />:<Pause className="w-4 h-4" />}</button>}
         <button type="button" aria-label="Avaliação anterior" onClick={()=>{setPaused(true);api?.scrollPrev();}} className="w-11 h-11 flex items-center justify-center border border-white/20 hover:bg-white/10"><ArrowLeft className="w-4 h-4" /></button>
         <button type="button" aria-label="Próxima avaliação" onClick={()=>{setPaused(true);api?.scrollNext();}} className="w-11 h-11 flex items-center justify-center bg-gold text-[#173629]"><ArrowRight className="w-4 h-4" /></button>

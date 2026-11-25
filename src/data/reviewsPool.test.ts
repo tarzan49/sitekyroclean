@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PUBLISHED_REVIEWS, formatReviewDate, pickReviewSubset, reviewRegion } from './reviewsPool';
+import { PUBLISHED_REVIEWS, STAR_ONLY_REVIEWS, formatReviewDate, pickReviewSubset, reviewRegion } from './reviewsPool';
 
 const SERVICES = ['limpeza-sofas', 'limpeza-colchoes', 'limpeza-tapetes', 'limpeza-cadeiras', 'limpeza-alcatifas', 'impermeabilizacao'];
 
@@ -14,6 +14,21 @@ describe('Google reviews on service pages', () => {
     expect(PUBLISHED_REVIEWS.some(r => ['Isabel N.', 'Marta C.', 'Beatriz N.', 'Ricardo A.', 'Teresa F.', 'Maria S.', 'Rui T.'].includes(r.name))).toBe(false);
     expect(formatReviewDate('2026-09')).toBe('setembro de 2026');
     expect(formatReviewDate('2025')).toBe('2025');
+  });
+
+  it('has every 4 and 5 star Google review with text, once (dono, 25 Nov)', () => {
+    expect(PUBLISHED_REVIEWS.length).toBeGreaterThanOrEqual(145);
+    const texts = PUBLISHED_REVIEWS.map(r => `${r.name}|${r.city ?? ''}|${r.text}`);
+    expect(new Set(texts).size).toBe(texts.length);
+    expect(PUBLISHED_REVIEWS.some(r => /Traduzido pelo Google|\(Original\)/.test(r.text))).toBe(false);
+    // Só estrelas: nunca com texto nosso e nunca nas páginas de serviço.
+    expect(STAR_ONLY_REVIEWS.length).toBeGreaterThanOrEqual(58);
+    for (const r of STAR_ONLY_REVIEWS) {
+      expect(r.text).toBe('');
+      expect(r.rating).toBeGreaterThanOrEqual(4);
+      expect(r.date).toMatch(/^\d{4}-\d{2}$/);
+    }
+    for (const s of SERVICES) expect(pickReviewSubset(s, '/x-lisboa', 40).every(r => r.text)).toBe(true);
   });
 
   it('shows six reviews, leads with the page service and mixes other services', () => {
