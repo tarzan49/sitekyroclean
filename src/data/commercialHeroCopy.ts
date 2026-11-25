@@ -1,7 +1,7 @@
 import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
-import { RUG_SERVICE_SLUGS, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { RUG_SERVICE_SLUGS } from '../constants/commercialPolicy';
 import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
 import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE, CARPET_TIERS_SENTENCE } from '../constants/rugSitePrice';
@@ -57,18 +57,17 @@ export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `$
 export const commercialHeroPriceLine = (serviceSlug: string, municipality?: string, price?: string): string => {
   // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
   // Tapetes e alcatifas com valor do motor desde 24 Nov 2026 (dono).
-  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}, mais a deslocação.`;
-  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}: ${CARPET_TIERS_SENTENCE}, mais a deslocação.`;
-  if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
+  if (serviceSlug === 'limpeza-tapetes') return `${RUG_PRICE_FROM}.`;
+  if (serviceSlug === 'limpeza-alcatifas') return `${CARPET_PRICE_FROM}: ${CARPET_TIERS_SENTENCE}.`;
+  if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento.';
   const service = services.find(item => item.slug === serviceSlug);
-  const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
   // Cadeiras: os escalões por extenso ("20€ por cadeira até 4, 15€ a 5.ª e
   // 6.ª, 12,50€ da 7.ª à 9.ª"), porque o preço desce com a quantidade e o hero
   // tem espaço para o dizer (dono, 27/09/2026). Ver `startingPriceLabel`.
   const priceText = /orçamento/i.test(value) ? 'Sob orçamento'
     : startingPriceLabel(serviceSlug, value);
-  return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
+  return `${priceText}.`;
 };
 
 /**

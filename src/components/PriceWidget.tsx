@@ -15,7 +15,7 @@ import {
   widgetWaterproofPrice, widgetSofaUnitPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing,
 } from "@/lib/priceWidgetCalc";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from "@/data/locationPriceTestimonialsData";
-import { siteRugPrice, RUG_PRICE_NOTE, CARPET_PRICE_NOTE } from "@/lib/siteRugPrice";
+import { siteRugSplit, RUG_PRICE_NOTE, CARPET_PRICE_NOTE } from "@/lib/siteRugPrice";
 
 // Shared marketing widget: uses the quiz images and existing pricing engine.
 interface Props {
@@ -63,7 +63,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   // Tapetes (não alcatifa) com valor do motor do bot (dono, 24 Nov 2026).
   const toNum = (v: string) => parseFloat(String(v).replace(',', '.')) || 0;
   const rugTotal = isRugService
-    ? siteRugPrice(Object.values(w.carpetItemsByRow).flat().map(it => ({ width: toNum(it.largura), length: toNum(it.comprimento) })), initialLocation ?? 'Lisboa', false, isAlcatifaService ? 'carpet' : 'rug')
+    ? siteRugSplit(Object.values(w.carpetItemsByRow).flat().map(it => ({ width: toNum(it.largura), length: toNum(it.comprimento) })), initialLocation ?? 'Lisboa', false, isAlcatifaService ? 'carpet' : 'rug')
     : null;
 
   return (
@@ -80,7 +80,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         {initialLocation && <span className="inline-flex items-center gap-1 text-base text-white/80"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
       </div>
       {hasSelection && <div className="px-4 sm:px-6">
-        <QuizEstimate totalPrice={rugTotal !== null ? rugTotal : total > 0 ? pricing.grandTotal : 0} needsQuote={rugTotal !== null ? false : hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? pricing.travelFee : undefined} />
+        <QuizEstimate totalPrice={rugTotal !== null ? rugTotal.total : total > 0 ? pricing.grandTotal : 0} needsQuote={rugTotal !== null ? false : hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={rugTotal !== null ? rugTotal.travel : initialLocation && total > 0 ? pricing.travelFee : undefined} />
         {!initialLocation && !isRugService && <p className="pt-2 text-center text-base text-white/80">Deslocação a confirmar conforme a localidade.</p>}
       </div>}
       <div className="px-4 sm:px-6 pt-5 pb-4 text-center">
@@ -196,9 +196,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                   )}
                   {(() => {
                     // Tapetes com valor (dono, 24 Nov 2026): o preço em casa do motor do bot.
-                    const rugPrice = siteRugPrice(items.map(it => ({ width: toNum(it.largura), length: toNum(it.comprimento) })), initialLocation ?? 'Lisboa', false, isAlcatifaService ? 'carpet' : 'rug');
+                    const rugPrice = siteRugSplit(items.map(it => ({ width: toNum(it.largura), length: toNum(it.comprimento) })), initialLocation ?? 'Lisboa', false, isAlcatifaService ? 'carpet' : 'rug');
                     return rugPrice !== null
-                      ? <p className="text-base text-center text-white">{isAlcatifaService ? 'Limpeza' : 'Lavagem em casa'}: <span className="text-gold font-bold">{rugPrice}€</span>, deslocação incluída{initialLocation ? '' : ' (Lisboa)'}</p>
+                      ? <p className="text-base text-center text-white">{isAlcatifaService ? 'Limpeza' : 'Lavagem em casa'}: <span className="text-gold font-bold">{rugPrice.service}€</span> <span className="text-sm text-white/70">+ deslocação</span></p>
                       : <p className="text-sm text-center text-white/80">{isAlcatifaService ? CARPET_PRICE_NOTE : RUG_PRICE_NOTE}</p>;
                   })()}
                 </div>
@@ -227,7 +227,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
         {isRugService
-          ? <p className="text-base text-white/80 mb-3">{isAlcatifaService ? 'Preço com a deslocação incluída.' : `Preço com a deslocação incluída. ${RUG_PICKUP_RULE}`}</p>
+          ? <p className="text-base text-white/80 mb-3">{isAlcatifaService ? 'Deslocação conforme a localidade.' : `Deslocação conforme a localidade. ${RUG_PICKUP_RULE}`}</p>
           : !hasSelection && <p className="text-base text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
         <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full min-h-12 py-3 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />

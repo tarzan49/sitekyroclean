@@ -93,14 +93,15 @@ describe('recolha dos tapetes', () => {
     expect(RUG_PICKUP_RULE).toContain(`entre ${RUG_PICKUP_MIN_AREA_M2} e ${RUG_PICKUP_MAX_AREA_M2} m²`);
   });
 
-  it('em tapetes e alcatifas a deslocação vem incluída no preço por m² (dono, 24 Nov 2026)', () => {
+  it('em tapetes e alcatifas a deslocação é à parte e não aparece nos "desde" (dono, 25 Nov 2026)', () => {
     for (const slug of ['limpeza-tapetes', 'limpeza-alcatifas'] as const) {
-      expect(commercialHeroPriceLine(slug, 'Porto')).toMatch(/€\/m², mais a deslocação/);
+      expect(commercialHeroPriceLine(slug, 'Porto')).not.toMatch(/desloca/);
       const travelFaq = getLandingFaqs({ serviceSlug: slug, pageKey: 'teste', municipality: 'Porto', family: 'localidade' })
         .concat(getLandingFaqs({ serviceSlug: slug, pageKey: 'outra', municipality: 'Porto', family: 'preco' }))
         .find(f => /deslocação está incluída/.test(f.question));
-      if (travelFaq) expect(travelFaq.answer).not.toMatch(/taxa da tabela/);
+      if (travelFaq) expect(travelFaq.answer).toMatch(/10€/);
+      if (travelFaq) expect(travelFaq.answer).not.toMatch(/incluída/);
     }
-    expect(commercialHeroPriceLine('limpeza-sofas', 'Porto')).toMatch(/deslocação 10€/);
+    expect(commercialHeroPriceLine('limpeza-sofas', 'Porto')).not.toMatch(/desloca/);
   });
 });

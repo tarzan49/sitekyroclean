@@ -100,7 +100,7 @@ const Sobre = () => {
                   <Link to={service.baseRoute} className="text-[15px] font-semibold text-[#111111] hover:text-[#D4AF37]">{service.name}</Link>
                   <p className="mt-0.5 text-xs leading-snug text-[#505650]">
                     {/\/m²/.test(service.priceFrom)
-                      ? `${service.priceFrom}, com a deslocação incluída`
+                      ? service.priceFrom
                       : isPricedPerChair(service.slug)
                         ? startingPriceLabel(service.slug, service.priceFrom)
                         : `${startingPriceLabel(service.slug, service.priceFrom)} por artigo`}

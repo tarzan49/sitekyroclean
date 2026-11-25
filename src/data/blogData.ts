@@ -386,7 +386,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Como pedir o preço",
-        "body": "O preço do tapete sai das medidas, com a deslocação incluída, tal como na alcatifa. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
+        "body": "O preço do tapete sai das medidas, com a deslocação à parte, tal como na alcatifa. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
       },
       {
         "heading": "O material vem antes da máquina",
@@ -735,7 +735,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
     "sections": [
       {
         "heading": "Medir e distinguir as zonas",
-        "body": "Indique largura e comprimento das áreas, corredores e salas. Fotografias das zonas de passagem e das manchas ajudam a preparar a proposta. A alcatifa tem preço por metro quadrado, com a deslocação incluída."
+        "body": "Indique largura e comprimento das áreas, corredores e salas. Fotografias das zonas de passagem e das manchas ajudam a preparar a proposta. A alcatifa tem preço por metro quadrado, mais a deslocação."
       },
       {
         "heading": "Combinar o acesso ao escritório",

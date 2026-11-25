@@ -217,6 +217,7 @@ function isSmallOrderFarPlace(city, place) {
   return !SMALL_ORDER_NEAR_PARISHES.some((p) => text2.includes(foldPlace(p)));
 }
 var SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
+var TRAVEL_FREE_ABOVE = { 10: 120, 15: 135, 20: 150 };
 function calculateTravelFee(baseFee, servicesTotal) {
   if (isBlackFriday()) return 0;
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
@@ -732,10 +733,12 @@ function rugPickupFee(totalAreaM2, city) {
   return RUG_PICKUP_FEE;
 }
 var RUG_PICKUP_FEE_RULE = `A recolha e entrega tem um custo adicional de ${RUG_PICKUP_FEE}€.`;
+var RUG_TRAVEL_RULE = "Os tapetes e as alcatifas sozinhos pagam sempre a deslocação da localidade.";
 var travelFees = Object.values(locationPrices);
 var TRAVEL_FEE_MIN = Math.min(...travelFees);
 var TRAVEL_FEE_MAX = Math.max(...travelFees);
-var TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
+var TRAVEL_RULE = `A deslocação é calculada à parte conforme a localidade (a partir de ${TRAVEL_FEE_MIN}€) e pode ser grátis em pedidos acima de certo valor (desde ${Math.min(...Object.values(TRAVEL_FREE_ABOVE))}€, conforme a localidade e o serviço).`;
+var TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade, e pode ser grátis em pedidos acima de certo valor. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. ${RUG_TRAVEL_RULE}`;
 var SERVICE_CONDITIONS = [
   PRICE_PROMISE,
   TRAVEL_PROMISE,

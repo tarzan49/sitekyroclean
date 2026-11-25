@@ -113,7 +113,7 @@ export const SECTORS: SectorData[] = [
       { item: 'Colchões', detail: 'Extração e anti-ácaros entre check-out e check-in.' },
       { item: 'Sofás e sofás-cama', detail: 'Manchas de café, vinho ou maquilhagem, entre duas estadias.' },
       { item: 'Impermeabilização', detail: 'O líquido fica à superfície e limpa-se com um pano.' },
-      { item: 'Tapetes', detail: 'Lavados no local, com a deslocação incluída no preço.' },
+      { item: 'Tapetes', detail: 'Lavados no local, com preço por m² e deslocação à parte.' },
     ],
     rules: [
       { text: 'Os estabelecimentos de alojamento local devem reunir sempre condições de higiene e limpeza, e manter as instalações e equipamentos em boas condições de conservação.', source: 'Decreto-Lei n.º 128/2014, art. 12.º, n.º 1, al. a) e n.º 4', url: 'https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/2014-56406355' },

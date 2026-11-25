@@ -1,6 +1,6 @@
 // Packs de várias peças e sofá com anti-ácaros, com a lógica do orçamento (dono, 25 Nov): uma pergunta de cada vez,
 // peça a peça (material, tamanho, opção), nada escolhido à partida, fotografia real em cima e no fim o total do bot
-// (botQuote, deslocação incluída), o riscado do mesmo pedido em separado e a oferta, como o bot os dá.
+// (botQuote) com a deslocação à parte (dono, 25 Nov), o riscado na mesma base e a oferta, como o bot os dá.
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, Minus, Plus } from 'lucide-react';
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
@@ -9,6 +9,7 @@ import { PhotoCards } from '@/components/StepPricePicker';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import { groupGifts, type BasketGift, type BasketItem } from '@/components/quiz/VisitBasket';
 import { botQuote } from '@/lib/botQuote';
+import { priceSplit, splitText, travelLabel, type PriceSplit } from '@/lib/servicePrice';
 import { cityPrep } from '@/data/serviceCatalog';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
@@ -44,7 +45,7 @@ const MATTRESS = [{ id: 'solteiro', label: 'Solteiro' }, { id: 'casal', label: '
 const RUGS = [{ label: 'Pequeno', w: '1,2', l: '1,7' }, { label: 'Médio', w: '1,6', l: '2,3' }, { label: 'Grande', w: '2', l: '3' }, { label: 'Muito grande', w: '2,5', l: '3,5' }];
 const tile = (on: boolean) => `rounded-2xl border-2 font-bold text-[#1A1A1A] transition-all ${on ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37] to-[#E8C964]' : 'border-[#E5E0D3] bg-white hover:border-[#D4AF37]'}`;
 
-type Q = { ok: boolean; quote?: boolean; total?: number | null; rugCombo?: { ok: boolean; comboPrice?: number } | null; separatePrice?: { separate: number } | null; chairsWas?: number | null; visitGifts?: { gifts: BasketGift[]; usual: number; total: number; withoutGift?: number | null } | null };
+type Q = { ok: boolean; quote?: boolean; total?: number | null; rugCombo?: { ok: boolean; comboPrice?: number } | null; visitGifts?: { gifts: BasketGift[]; usual: number; total: number; withoutGift?: number | null } | null };
 
 export default function PackStepPicker({ pieces, packName, city, source, mitesOnly = false }: { pieces: PieceKind[]; packName: string; city: string; source: string; mitesOnly?: boolean }) {
   const [sel, setSel] = useState<Partial<Record<PieceKind, Sel>>>({});
@@ -67,17 +68,20 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
   };
   // Um só pedido ao motor do bot, o mesmo que o cesto e o WhatsApp fazem.
   const priced = (items: Record<string, unknown>[], cleanOnly = false) => {
-    if (!items.length) return { total: null as number | null, crossed: null as number | null, gifts: [] as BasketGift[] };
+    if (!items.length) return { total: null as number | null, crossed: null as number | null, gifts: [] as BasketGift[], split: null as PriceSplit | null };
     const r = botQuote({ city, items }) as Q;
-    if (!r.ok) return { total: null, crossed: null, gifts: [] };
+    if (!r.ok) return { total: null, crossed: null, gifts: [], split: null };
     const rug = items.some(i => i.kind === 'rug');
     // Sofá sozinho só com limpeza: o preço sem a oferta (dono, 25 Nov).
     const plain = cleanOnly && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     const raw = rug && items.length > 1 ? (r.rugCombo?.ok ? r.rugCombo.comboPrice : null) : !r.quote ? plain : null;
     const total = typeof raw === 'number' ? (items.length > 1 ? up9(raw) : raw) : null;
     const gifts = !cleanOnly && r.visitGifts ? r.visitGifts.gifts : [];
-    const sep = r.visitGifts?.usual ?? r.separatePrice?.separate ?? r.chairsWas ?? null;
-    return { total, crossed: total !== null && sep !== null && !cleanOnly && sep - total >= 5 ? (items.length > 1 ? up9(sep) : sep) : null, gifts };
+    // O número mostrado é o serviço; o total do motor (o que se paga) fica para o fim.
+    const base = total === null ? null : priceSplit(city, items);
+    const split = base && total !== null ? { ...base, total, service: Math.round((total - base.travel) * 100) / 100 } : null;
+    const crossed = split && split.struck !== null && !cleanOnly && split.struck - split.service >= 5 ? split.struck : null;
+    return { total: split ? split.service : total, crossed, gifts, split };
   };
   const before = (n: number) => pieces.slice(0, n).map(k => toItem(k, sel[k])).filter((x): x is Record<string, unknown> => !!x);
 
@@ -108,13 +112,14 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
   };
   const inVisit = pieces.filter(p => !sel[p]?.skip);
   const gifts = final ? groupGifts(final.gifts) : [];
-  const msg = done ? `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${inVisit.map(describe).join(', ')}${final?.total ? `, por ${formatEuro(final.total)}${gifts.length ? ` (com ${gifts.map(g => g.text).join(' e ')} ${gifts.length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.` : '';
+  const msg = done ? `Olá! Gostaria de saber o preço e a disponibilidade para a ${packName.toLowerCase()} ${cityPrep(city)} ${city}: ${inVisit.map(describe).join(', ')}${final?.split ? `, por ${splitText(final.split)}${gifts.length ? ` (com ${gifts.map(g => g.text).join(' e ')} ${gifts.length > 1 ? 'oferecidos' : 'oferecido'})` : ''}` : ''}.` : '';
   const href = `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
   // Com total, o WhatsApp vive na barra fixa do telemóvel, ao lado do preço, e sai daqui para não haver dois iguais.
   const [barKey] = useState(() => ({}));
   const barTotal = done && final?.total != null ? formatEuro(final.total) : null;
   const barWas = barTotal && final!.crossed !== null ? formatEuro(final!.crossed) : undefined;
-  useEffect(() => { setPriceBar(barKey, barTotal ? { total: barTotal, was: barWas, href, source } : null); }, [barKey, barTotal, barWas, href, source]);
+  const barTravel = final?.split ? travelLabel(final.split) : undefined;
+  useEffect(() => { setPriceBar(barKey, barTotal ? { total: barTotal, was: barWas, travel: barTravel, href, source } : null); }, [barKey, barTotal, barWas, barTravel, href, source]);
   useEffect(() => () => setPriceBar(barKey, null), [barKey]);
   const toBasket = (): BasketItem[] => inVisit.map((p, i) => {
     const v = sel[p]!; const id = `p${Date.now()}_${i}`;
@@ -163,15 +168,15 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
         // Quando o tratamento vem oferecido na visita, o total é o mesmo: só se mostra com ele (dono, 25 Nov: nunca a opção sem a oferta).
         .filter(({ o, p }, _, list) => !(o.id === 'clean' && list.length > 1 && p?.total != null && list.some(x => x.o.id !== 'clean' && x.p?.total === p.total))).map(({ o, p }) => { return <button key={o.id} type="button" aria-pressed={s?.treat === o.id} onClick={() => { set(k, { treat: o.id }); setAt(at + 1); }} className={row(s?.treat === o.id)}>
         <span className="min-w-0"><span className="block text-base font-bold leading-tight md:text-lg">{o.name}</span><span className="block text-xs font-normal leading-snug opacity-75 md:text-sm">{o.note}</span></span>
-        <span className="shrink-0 text-right text-lg font-bold">{p?.total != null ? formatEuro(p.total) : ''}</span>
+        <span className="shrink-0 text-right text-lg font-bold">{p?.total != null ? formatEuro(p.total) : ''}{at === 0 && p?.split && p.split.travel === 0 && !p.split.included && <span className="block text-[11px] font-semibold leading-snug">deslocação grátis</span>}</span>
       </button>; })}</div>
-      {at > 0 && <p className="mt-2 text-xs text-[#666]">Valores da visita até aqui, com a deslocação.</p>}
+      {at > 0 && <p className="mt-2 text-xs text-[#666]">Valores da visita até aqui.</p>}
     </>}
 
     {done && <>
       <ul className="mb-3 divide-y divide-[#E5E0D3] overflow-hidden rounded-2xl border-2 border-[#E5E0D3] bg-white">{pieces.map((p, i) => { const [a, b] = short(p); return <li key={p} className="flex min-h-[60px] items-center justify-between gap-3 px-4 py-2"><span className="flex min-w-0 items-center gap-3"><span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full ${sel[p]?.skip ? 'bg-[#EEF1EE] text-[#777]' : 'bg-[#0B2F2A] text-[#D4AF37]'}`}>{!sel[p]?.skip && <Check className="h-3.5 w-3.5" strokeWidth={3} />}</span><span className="min-w-0"><span className="block font-semibold text-[#1A1A1A]">{a}</span><span className="block text-sm text-[#555]">{b}</span></span></span><button type="button" onClick={() => { setSel(x => ({ ...x, [p]: {} })); setAt(i); }} className="min-h-11 shrink-0 text-sm font-semibold text-[#0B2F2A] underline underline-offset-4">Mudar</button></li>; })}</ul>
       <div className="flex items-end justify-between border-t border-[#E5E0D3] pt-3">
-        <span className="text-sm text-[#555]">Total {cityPrep(city)} {city}<span className="block text-xs">deslocação incluída</span></span>
+        <span className="text-sm text-[#555]">Serviço {cityPrep(city)} {city}{final!.split && <span className="block text-xs">{travelLabel(final!.split)}{final!.split.travel > 0 && `, total ${formatEuro(final!.split.total)}`}</span>}</span>
         <span className="text-right"><span className="flex items-baseline justify-end gap-2">{final!.crossed !== null && <span className="text-lg font-semibold text-[#777] line-through">{formatEuro(final!.crossed)}</span>}<span className="text-3xl font-bold text-[#1A1A1A]">{final!.total === null ? <span className="text-base text-[#D4AF37]">Sob orçamento</span> : formatEuro(final!.total)}</span></span>
           {final!.crossed !== null && final!.total !== null && <span className="block text-sm font-bold text-[#D4AF37]">Poupa {formatEuro(Math.round((final!.crossed - final!.total) * 100) / 100)}</span>}</span>
       </div>

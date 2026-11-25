@@ -34,7 +34,9 @@ describe('quote total presentation', () => {
 describe('travel cost visibility', () => {
   it('always shows the travel cost inline, without needing to open the breakdown', () => {
     render(<QuizEstimate {...base} totalPrice={30} travelCost={10} />);
-    expect(screen.getByText(/Inclui 10€ de deslocação a Porto/)).toBeTruthy();
+    // Dono, 25 Nov 2026: o número grande é o serviço, a deslocação vem à parte.
+    expect(screen.getByLabelText('20 euros')).toBeTruthy();
+    expect(screen.getByText(/\+ 10€ deslocação a Porto/)).toBeTruthy();
   });
 
   it('stays silent when there is no travel cost to explain', () => {
@@ -44,6 +46,6 @@ describe('travel cost visibility', () => {
 
   it('does not repeat itself on the travel-only step', () => {
     render(<QuizEstimate {...base} travelOnly totalPrice={10} travelCost={10} />);
-    expect(screen.queryByText(/Inclui/)).toBeNull();
+    expect(screen.queryByText(/\+ 10€/)).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
-import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, DEPOSIT_RULE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
+import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, DEPOSIT_RULE, TREATMENT_EXTRAS, TRAVEL_RULE } from '../constants/commercialPolicy';
+import { cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
 import { CARPET_PRICE_NOTE, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
@@ -28,12 +29,12 @@ const topics: readonly FaqTopic[] = ['orcamento', 'preparacao', 'tratamento', 'c
 const common: readonly FaqEntry[] = [
   { id: 'estimativa', topic: 'orcamento', question: 'O valor do simulador é o preço final?', answer: PRICE_PROMISE },
   { id: 'deslocacao', topic: 'orcamento', question: 'A deslocação está incluída no preço do serviço?', answer: ({ municipality, serviceSlug }) => {
-    // Tapetes e alcatifas: a deslocação entra no orçamento (dono, 2026-10-05).
-    if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return `Em tapetes e alcatifas, a deslocação já vem incluída no preço. ${RUG_PICKUP_FEE_RULE}`;
     const fee = locationPrices[municipality];
     return fee === undefined
-      ? 'A deslocação é cobrada separadamente. Indique a localidade e a morada para confirmarmos o valor antes da marcação.'
-      : `A deslocação é cobrada separadamente dos serviços. A taxa da tabela para ${municipality} é ${fee}€. Confirmamos a morada e o total do pedido antes da marcação.`;
+      ? 'A deslocação é cobrada à parte. Indique a localidade e a morada para confirmarmos o valor antes da marcação.'
+      : RUG_SERVICE_SLUGS.includes(serviceSlug)
+        ? `Não: o preço por m² é o da lavagem. A deslocação ${cityPrep(municipality)} ${municipality} são ${fee}€. ${RUG_PICKUP_FEE_RULE}`
+        : `Não: o preço mostrado é o do serviço. ${TRAVEL_RULE} A taxa da tabela para ${municipality} é ${fee}€. Confirmamos a morada e o total do pedido antes da marcação.`;
   } },
   { id: 'orcamento-gratuito', topic: 'orcamento', question: 'Pedir orçamento tem algum custo ou compromisso?', answer: `O orçamento é gratuito e sem compromisso. Envie fotografias, quantidades e localidade para avaliarmos o pedido. ${RESPONSE_PROMISE}.` },
   { id: 'sinal', topic: 'orcamento', question: 'Preciso de pagar algo antes do serviço?', answer: DEPOSIT_RULE },

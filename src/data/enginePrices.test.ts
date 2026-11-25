@@ -145,7 +145,7 @@ describe('cadeiras: "Desde" o preço mais baixo por cadeira', () => {
   });
 
   it('o hero e o título-pilar das cadeiras dizem "Desde 12,50€"', () => {
-    expect(commercialHeroPriceLine('limpeza-cadeiras', 'Porto').startsWith(`${CHAIR_PRICE_LABEL} + deslocação`)).toBe(true);
+    expect(commercialHeroPriceLine('limpeza-cadeiras', 'Porto')).toBe(`${CHAIR_PRICE_LABEL}.`);
     expect(getPillarPage('/limpeza-cadeiras').title).toContain(`| ${CHAIR_PRICE_TITLE} |`);
     const waterproof = getLandingPageModel('/impermeabilizacao-cadeiras-porto')!;
     expect(waterproof.intro).toContain(`desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)}`);

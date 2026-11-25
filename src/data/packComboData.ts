@@ -2,9 +2,9 @@ import { CHAIR_WATERPROOF_PREMIUM as CHAIR_WATERPROOF_MID_PREMIUM, CHAIR_WATERPR
 import { cities, services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { PACK_PERK_MATTRESS_OFF, PACK_PERK_CHAIRS_SET, PACK_PERK_LIMIT, PACK_PERK_RULE, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE } from '../constants/packPerks';
-import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
+import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE, TRAVEL_RULE } from '../constants/commercialPolicy';
 import type { PackKind, PackExtra } from '../lib/customPack';
-import { botQuote } from '../lib/botQuote';
+import { priceSplit } from '../lib/servicePrice';
 import { chairTierSentence, formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, CHAIR_CLEANING_FROM, CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT, CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT, CHAIR_WATERPROOF_ESSENCIAL_UNIT } from './enginePrices';
 // These are editable starting combinations, not separate price lists.
 // Live amounts come from the same article tables used by the quote form.
@@ -14,12 +14,12 @@ import { chairTierSentence, formatEuro, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTEC
 // nome novo tem de manter esse arranque. Os slugs `pack-*` não mudam.
 export interface PackCombo { id: string; name: string; slug: string; tagline: string; description: string; service1Slug: string; service2Slug: string; }
 export const packs: PackCombo[] = [
-  { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Escolha os lugares do sofá, o tamanho do colchão e o tratamento de cada um. O total já vem com a deslocação.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
+  { id: 'sofa-colchao', name: 'Limpeza de Sofá e Colchão', slug: 'pack-sofa-e-colchao', tagline: 'Sala e quarto na mesma visita', description: 'Escolha os lugares do sofá, o tamanho do colchão e o tratamento de cada um. Vê logo o preço do serviço e a deslocação.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-colchoes' },
   { id: 'sofa-impermeabilizacao', name: 'Limpeza e Impermeabilização de Sofá', slug: 'pack-sofa-impermeabilizacao', tagline: 'O seu sofá já não é novo, mas gostava que voltasse a parecer?', description: 'Tiramos a sujidade das fibras com uma limpeza profunda e protegemo-lo a seguir: vinho, café ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'impermeabilizacao' },
   { id: 'cadeiras-impermeabilizacao', name: 'Limpeza e Impermeabilização de Cadeiras', slug: 'pack-cadeiras-impermeabilizacao', tagline: 'As cadeiras da mesa são as primeiras a sofrer com cada refeição?', description: 'Limpamos o tecido a fundo e protegemo-lo a seguir: molho, vinho ou sumo ficam à superfície e saem com um pano. Proteção Premium até 10 anos, ou Essencial de 1 a 2 anos, e o preço por cadeira desce com a quantidade.', service1Slug: 'limpeza-cadeiras', service2Slug: 'impermeabilizacao' },
   { id: 'colchao-anti-acaros', name: 'Limpeza de Colchão com Anti-ácaros', slug: 'pack-colchao-anti-acaros', tagline: 'Dorme todas as noites num colchão que nunca foi limpo a fundo?', description: 'Tiramos o pó, o suor e os ácaros das fibras com uma limpeza profunda e aplicamos a seguir o anti-ácaros e anti-bacteriano (produto Bactran), que elimina bactérias, bolores e odores. Tudo na mesma visita.', service1Slug: 'limpeza-colchoes', service2Slug: 'limpeza-colchoes' },
   { id: 'sofa-anti-acaros', name: 'Limpeza de Sofá com Anti-ácaros', slug: 'pack-sofa-anti-acaros', tagline: 'O sofá onde a família se senta todos os dias está mesmo limpo?', description: 'Tiramos o pó, a sujidade e os ácaros das fibras com uma limpeza profunda e aplicamos a seguir o anti-ácaros (produto Bactran), que elimina bactérias, bolores e odores. Tudo na mesma visita.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-sofas' },
-  { id: 'tapete-anti-odor', name: 'Limpeza de Tapete com Anti-odor', slug: 'pack-tapete-anti-odor', tagline: 'O tapete ficou com cheiro dos animais ou de um acidente?', description: 'Lavamos o tapete a fundo em sua casa e aplicamos a seguir o tratamento anti-odor, que trata o cheiro que fica nas fibras. Indique as medidas e veja o preço final.', service1Slug: 'limpeza-tapetes', service2Slug: 'limpeza-tapetes' },
+  { id: 'tapete-anti-odor', name: 'Limpeza de Tapete com Anti-odor', slug: 'pack-tapete-anti-odor', tagline: 'O tapete ficou com cheiro dos animais ou de um acidente?', description: 'Lavamos o tapete a fundo em sua casa e aplicamos a seguir o tratamento anti-odor, que trata o cheiro que fica nas fibras. Indique as medidas e veja o preço.', service1Slug: 'limpeza-tapetes', service2Slug: 'limpeza-tapetes' },
   { id: 'sala-completa', name: 'Limpeza de Sofá, Cadeiras e Tapete', slug: 'pack-sala-completa', tagline: 'Sofá, cadeiras e tapetes à sua medida', description: 'Escolha os artigos da sala. O tapete tem preço por m²: indique a largura e o comprimento de cada peça.', service1Slug: 'limpeza-sofas', service2Slug: 'limpeza-tapetes' },
   { id: 'quarto-completo', name: 'Limpeza de Colchão e Tapete', slug: 'pack-quarto-completo', tagline: 'Personalize os cuidados do quarto', description: 'Combine colchões e tapetes e acrescente, se pretender, o tratamento anti-ácaros. O tapete tem preço por m², pelas medidas.', service1Slug: 'limpeza-colchoes', service2Slug: 'limpeza-tapetes' },
 ];
@@ -61,16 +61,18 @@ export const PACK_HOOK: Record<string, string> = {
   'quarto-completo': 'Colchão e tapete numa só visita, com o anti-ácaros no colchão oferecido (produto Bactran).',
 };
 
+/** O preço do serviço de um artigo, sem a deslocação (motor). */
+const serviceOf = (city: string, item: Record<string, unknown>): number | null => priceSplit(city, [item])?.service ?? null;
+
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */
 export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
   // Packs de limpeza + impermeabilização: o total mais baixo que o bot dá (dono, 24 Nov: preços iguais aos do bot),
-  // limpeza + Essencial de 1 lugar ou de 1 cadeira, com a deslocação da cidade.
+  // limpeza + Essencial de 1 lugar ou de 1 cadeira.
   if (pack.id === 'sofa-impermeabilizacao' || pack.id === 'cadeiras-impermeabilizacao') {
     const item = pack.id === 'sofa-impermeabilizacao' ? { kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' } : { kind: 'chairs', qty: 1, treatment: 'clean+essencial' };
-    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; travel?: number | null };
-    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 25 Nov: limpeza 20€ + Essencial 15€, no 9 mais perto = 39€).
-    const travel = pack.id === 'cadeiras-impermeabilizacao' ? (r.travel ?? 0) : 0;
-    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total - travel);
+    // O preço do serviço; a deslocação é à parte (dono, 25 Nov).
+    const v = serviceOf(cityName, item);
+    if (v !== null) return formatEuro(v);
   }
   // Tapete com anti-odor: o preço em casa do bot, 1,6 x 2,3 m com anti-odor (dono, 24 Nov: o site volta a mostrar os tapetes).
   if (pack.id === 'tapete-anti-odor') {
@@ -79,8 +81,8 @@ export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
   }
   // Packs de limpeza + anti-ácaros: o total mais baixo do bot (colchão de solteiro, sofá de 1 lugar).
   if (MITES_PACKS[pack.id]) {
-    const r = botQuote({ city: cityName, items: [{ ...MITES_PACKS[pack.id].smallest, treatment: 'clean+anti-acaros' }] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total);
+    const v = serviceOf(cityName, { ...MITES_PACKS[pack.id].smallest, treatment: 'clean+anti-acaros' });
+    if (v !== null) return formatEuro(v);
   }
   const amounts = [pack.service1Slug, pack.service2Slug]
     .map(slug => services.find(s => s.slug === slug)?.priceFrom ?? '')
@@ -118,24 +120,24 @@ export function packFaqs(pack: PackCombo, cityName: string): { question: string;
   ];
 }
 
-/** Pergunta do preço com os totais do bot (botQuote), com a deslocação da cidade (dono, 24 Nov). */
+/** Pergunta do preço com os preços do serviço do motor, deslocação à parte (dono, 25 Nov). */
 function waterproofPriceFaq(packId: string, cityName: string) {
   const t = (item: Record<string, unknown>) => {
-    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
+    const v = serviceOf(cityName, item);
+    return v !== null ? formatEuro(v) : 'sob orçamento';
   };
   const where = `${cityPrep(cityName)} ${cityName}`;
   if (packId === 'sofa-impermeabilizacao') {
     const s3 = (tr: string) => t({ kind: 'sofa', size: '3-lugares', treatment: tr });
     return {
       question: 'Quanto custa limpar e impermeabilizar um sofá?',
-      answer: `${where}, com a deslocação incluída: um sofá de 3 lugares fica em ${s3('clean+premium')} com a Premium ou ${s3('clean+essencial')} com a Essencial (só a limpeza, ${s3('clean')}). A partir de ${t({ kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' })} num sofá de 1 lugar. Escolha os lugares no início da página para ver o seu valor.`,
+      answer: `${where}: um sofá de 3 lugares fica em ${s3('clean+premium')} com a Premium ou ${s3('clean+essencial')} com a Essencial (só a limpeza, ${s3('clean')}). A partir de ${t({ kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' })} num sofá de 1 lugar. Escolha os lugares no início da página para ver o seu valor. ${TRAVEL_RULE}`,
     };
   }
   const c = (q: number, tr: string) => t({ kind: 'chairs', qty: q, treatment: tr });
   return {
     question: 'Quanto custa limpar e impermeabilizar cadeiras?',
-    answer: `${where}, com a deslocação incluída: 6 cadeiras ficam em ${c(6, 'clean+premium')} com a Premium ou ${c(6, 'clean+essencial')} com a Essencial (só a limpeza, ${c(6, 'clean')}). Uma cadeira com a Essencial, desde ${packPriceFrom(packs.find(p => p.id === 'cadeiras-impermeabilizacao')!, cityName)} mais a deslocação. Escolha o número de cadeiras no início da página para ver o seu valor.`,
+    answer: `${where}: 6 cadeiras ficam em ${c(6, 'clean+premium')} com a Premium ou ${c(6, 'clean+essencial')} com a Essencial (só a limpeza, ${c(6, 'clean')}). Uma cadeira com a Essencial, desde ${packPriceFrom(packs.find(p => p.id === 'cadeiras-impermeabilizacao')!, cityName)}. Escolha o número de cadeiras no início da página para ver o seu valor. ${TRAVEL_RULE}`,
   };
 }
 
@@ -183,14 +185,14 @@ export const MITES_PACKS: Record<string, { kind: 'mattress' | 'sofa'; smallest: 
 function mitesFaqs(packId: string, cityName: string) {
   const m = MITES_PACKS[packId];
   const t = (item: Record<string, unknown>) => {
-    const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return r.ok && !r.quote && typeof r.total === 'number' ? formatEuro(r.total) : 'sob orçamento';
+    const v = serviceOf(cityName, item);
+    return v !== null ? formatEuro(v) : 'sob orçamento';
   };
   const what = m.kind === 'mattress' ? 'colchão' : 'sofá';
   return [
     {
       question: `Quanto custa limpar um ${what} com anti-ácaros?`,
-      answer: `${cityPrep(cityName)} ${cityName}, com a deslocação incluída: ${m.exampleLabel} fica em ${t({ ...m.example, treatment: 'clean+anti-acaros' })} com o anti-ácaros (só a limpeza, ${t({ ...m.example, treatment: 'clean' })}). A partir de ${t({ ...m.smallest, treatment: 'clean+anti-acaros' })} ${m.smallestLabel}. Escolha o tamanho no início da página para ver o seu valor.`.replace(/^./, c => c.toUpperCase()),
+      answer: `${cityPrep(cityName)} ${cityName}: ${m.exampleLabel} fica em ${t({ ...m.example, treatment: 'clean+anti-acaros' })} com o anti-ácaros (só a limpeza, ${t({ ...m.example, treatment: 'clean' })}). A partir de ${t({ ...m.smallest, treatment: 'clean+anti-acaros' })} ${m.smallestLabel}. Escolha o tamanho no início da página para ver o seu valor. ${TRAVEL_RULE}`.replace(/^./, c => c.toUpperCase()),
     },
     {
       question: 'O que faz o tratamento anti-ácaros?',
@@ -211,15 +213,14 @@ function mitesFaqs(packId: string, cityName: string) {
   ];
 }
 
-/** Tapete com anti-odor: tapetes nunca mostram preço no site (dono, 24 Nov): pede-se as medidas no WhatsApp. */
+/** Tapete com anti-odor: a lavagem em casa, sem a deslocação. */
 function rugHome(cityName: string, w: number, l: number, odor: boolean): number | null {
-  const r = botQuote({ city: cityName, items: [{ kind: 'rug', width: w, length: l, treatment: 'clean', odor }] }) as { ok: boolean; rugEstimate?: { ok: boolean; homePrice?: number } };
-  return r.ok && r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null;
+  return serviceOf(cityName, { kind: 'rug', width: w, length: l, treatment: 'clean', odor });
 }
 function rugOdorFaqs(cityName: string) {
   const f = (w: number, l: number, o: boolean) => { const v = rugHome(cityName, w, l, o); return v === null ? 'sob orçamento' : formatEuro(v); };
   return [
-    { question: 'Quanto custa lavar um tapete com anti-odor?', answer: `${cityPrep(cityName)} ${cityName}, em sua casa e com a deslocação incluída: um tapete de 2 x 3 m fica em ${f(2, 3, true)} com o anti-odor (só a lavagem, ${f(2, 3, false)}). O anti-odor é 5€ por m². Indique as medidas no início da página para ver o seu valor.`.replace(/^./, c => c.toUpperCase()) },
+    { question: 'Quanto custa lavar um tapete com anti-odor?', answer: `${cityPrep(cityName)} ${cityName}, em sua casa: um tapete de 2 x 3 m fica em ${f(2, 3, true)} com o anti-odor (só a lavagem, ${f(2, 3, false)}). O anti-odor é 5€ por m². Indique as medidas no início da página para ver o seu valor. A deslocação é a da localidade, à parte.`.replace(/^./, c => c.toUpperCase()) },
     { question: 'O anti-odor pode ser feito sem a lavagem?', answer: 'Não. O anti-odor é sempre aplicado depois da lavagem a fundo, na mesma visita: primeiro sai a sujidade, depois tratamos o cheiro.' },
     { question: 'Serve para cheiro de cão, gato ou urina?', answer: 'Sim, é para isso que existe: cheiro de animais, urina ou humidade que ficou nas fibras do tapete.' },
     { question: 'Levam o tapete ou é lavado em casa?', answer: 'Lavamos o tapete em sua casa, com o mesmo resultado e sem esperar pela entrega.' },

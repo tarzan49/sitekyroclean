@@ -71,7 +71,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Cabeceira estofada", price: "Sob orçamento", note: "add-on" },
   ],
   "limpeza-tapetes": [
-    { item: "Tapetes (qualquer dimensão)", price: RUG_PRICE_FROM, note: "lavagem em casa, deslocação incluída" },
+    { item: "Tapetes (qualquer dimensão)", price: RUG_PRICE_FROM, note: "lavagem em casa, mais a deslocação" },
     { item: "Tapete persa/oriental", price: "Sob orçamento", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [
@@ -79,7 +79,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     ...chairTierRows(),
   ],
   "limpeza-alcatifas": [
-    { item: "Alcatifas (qualquer dimensão)", price: CARPET_PRICE_FROM, note: `${CARPET_TIERS_SENTENCE}, com a deslocação incluída` },
+    { item: "Alcatifas (qualquer dimensão)", price: CARPET_PRICE_FROM, note: `${CARPET_TIERS_SENTENCE}, mais a deslocação` },
   ],
   "impermeabilizacao": [
     { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").waterproofingPrice), note: `Essencial, ${eur(sofaSize("1-lugar").waterproofingPremiumPrice!)} na Premium` },

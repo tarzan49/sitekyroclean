@@ -1,5 +1,5 @@
 // Regras confirmadas pelo responsável em 10/09/2026. Importável também em Node.
-import { locationPrices, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE } from './travel';
+import { locationPrices, TRAVEL_FREE_ABOVE, SMALL_ORDER_FAR_MIN, SMALL_ORDER_FAR_SURCHARGE } from './travel';
 import { cities } from '../data/serviceCatalog';
 export const RESPONSE_PROMISE = 'Resposta em menos de 1 minuto';
 export const DRYING_PROMISE = 'Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço.';
@@ -71,11 +71,9 @@ export function rugPickupFee(totalAreaM2: number, city?: string | null): number 
 
 export const RUG_PICKUP_FEE_RULE = `A recolha e entrega tem um custo adicional de ${RUG_PICKUP_FEE}€.`;
 
-// Tapetes e alcatifas: na lavagem em casa a deslocação não tem valor de
-// tabela, entra no orçamento (dono, 2026-10-05). Os outros serviços continuam
-// com a deslocação de `locationPrices`.
+// Tapetes e alcatifas: preço do motor, com a deslocação da localidade à parte (dono, 25 Nov 2026).
 export const RUG_SERVICE_SLUGS = ['limpeza-tapetes', 'limpeza-alcatifas'];
-export const RUG_TRAVEL_RULE = 'Em tapetes e alcatifas, a deslocação também é sob orçamento.';
+export const RUG_TRAVEL_RULE = 'Os tapetes e as alcatifas sozinhos pagam sempre a deslocação da localidade.';
 
 // Os limites da deslocação saem da tabela de cada cidade, nunca de um número
 // escrito à mão: o rodapé chegou a ter um parágrafo só sobre Braga
@@ -83,7 +81,12 @@ export const RUG_TRAVEL_RULE = 'Em tapetes e alcatifas, a deslocação também �
 const travelFees = Object.values(locationPrices);
 export const TRAVEL_FEE_MIN = Math.min(...travelFees);
 export const TRAVEL_FEE_MAX = Math.max(...travelFees);
-export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
+/** A frase única da deslocação (dono, 25 Nov 2026: o preço mostrado é o do serviço). "Pode ser": a impermeabilização sozinha,
+ *  os tapetes e as localidades mais longe seguem regras próprias do motor. */
+export const TRAVEL_RULE = `A deslocação é calculada à parte conforme a localidade (a partir de ${TRAVEL_FEE_MIN}€) e pode ser grátis em pedidos acima de certo valor (desde ${Math.min(...Object.values(TRAVEL_FREE_ABOVE))}€, conforme a localidade e o serviço).`;
+/** Junto de tabelas com vários preços. */
+export const TRAVEL_NOTE = 'Valores do serviço; deslocação à parte, conforme a localidade.';
+export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade, e pode ser grátis em pedidos acima de certo valor. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Nas zonas a mais de 20 km da equipa, um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ tem mais ${SMALL_ORDER_FAR_SURCHARGE}€; juntando outra peça na mesma visita, deixa de ter. ${RUG_TRAVEL_RULE}`;
 
 /**
  * O bloco "Condições do serviço e garantia" que aparece no fundo de todas as

@@ -5,7 +5,7 @@ import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { cityPrep } from '@/data/serviceCatalog';
 import { Check } from 'lucide-react';
-import { botQuote } from '@/lib/botQuote';
+import { priceSplit, splitText, travelLabel, type PriceSplit } from '@/lib/servicePrice';
 import StepPricePicker from '@/components/StepPricePicker';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { formatEuro } from '@/data/enginePrices';
@@ -32,12 +32,11 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
   const [basket, setBasket] = useState(false);
   const totals = useMemo(() => Object.fromEntries(options.map(o => {
     if (!sofaTotal(counts)) return [o.id, null];
-    const r = botQuote({ city, items: sofaItems(counts, 'clean', { leather: o.leather }) }) as { ok: boolean; quote?: boolean; total?: number | null };
-    return [o.id, r.ok && !r.quote && typeof r.total === 'number' ? r.total : null];
-  })) as Record<string, number | null>, [counts, city]);
+    return [o.id, priceSplit(city, sofaItems(counts, 'clean', { leather: o.leather }))];
+  })) as Record<string, PriceSplit | null>, [counts, city]);
   const chosen = options.find(o => o.id === choice)!;
   const total = totals[choice];
-  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para ${sofaWhat(counts, 'sofá de pele', 'sofás de pele')} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${formatEuro(total)}` : ''}. Envio a fotografia do sofá.`;
+  const msg = `Olá! Gostaria de saber o preço e a disponibilidade para ${sofaWhat(counts, 'sofá de pele', 'sofás de pele')} (${chosen.wa}), ${cityPrep(city)} ${city}${total ? `, por ${splitText(total)}` : ''}. Envio a fotografia do sofá.`;
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10">
@@ -58,13 +57,13 @@ function SyntheticSofaPicker({ city, source, syntheticOnly = false }: { city: st
                 <span className="block text-[12px] leading-snug text-[#555] sm:text-[13px]">{o.note}</span>
               </span>
               <span className="flex items-center gap-2 pr-3">
-                <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">{!sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value)}</span>
+                <span className={`whitespace-nowrap text-lg font-bold sm:text-xl ${active ? 'text-[#1A1A1A]' : 'text-[#444]'}`}>{value === null ? <span className="text-xs text-[#D4AF37]">{!sofaTotal(counts) ? 'Escolha o tamanho' : 'Sob orçamento'}</span> : formatEuro(value.service)}</span>
                 <span className={`grid h-5 w-5 place-items-center rounded-full border-2 ${active ? 'border-[#0B2F2A] bg-[#0B2F2A] text-[#D4AF37]' : 'border-[#D4AF37]'}`}>{active && <Check className="h-3 w-3" strokeWidth={3} />}</span>
               </span>
             </button>;
           })}
         </div>
-        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">Preço final com a deslocação incluída. {syntheticOnly ? 'Pele sintética: só limpeza.' : 'Na pele não fazemos impermeabilização.'}</p>
+        <p className="mt-2 text-xs text-[#666] md:mt-3 md:text-sm">{total ? `${travelLabel(total)}. `.replace(/^./, c => c.toUpperCase()) : ''}{syntheticOnly ? 'Pele sintética: só limpeza.' : 'Na pele não fazemos impermeabilização.'}</p>
         <WhatsAppCta onLight href={`${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`} source={source} className="mt-3 md:mt-5" />
         <PriceCta onLight className="mt-2" onClick={() => setBasket(true)}>Juntar mais artigos</PriceCta>
       </div>

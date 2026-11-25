@@ -1,8 +1,8 @@
 // Os preços que as páginas do modelo novo mostram no widget (WaterproofPackPicker, TreatmentPackPicker,
 // CarpetPricePicker, ImperPricePicker), em linhas de tabela para o HTML estático (anti-cloaking:
-// o Google lê os mesmos totais do bot que o cliente vê; dono, 24 Nov). Tudo pelo botQuote, com a
-// deslocação da cidade incluída; nunca valores escritos à mão.
-import { botQuote } from './botQuote';
+// o Google lê os mesmos totais do bot que o cliente vê; dono, 24 Nov). Tudo pelo motor: o preço do
+// serviço, sem a deslocação (dono, 25 Nov); nunca valores escritos à mão.
+import { priceSplit, type EngineItem } from './servicePrice';
 import { formatEuro } from '../data/enginePrices';
 
 export interface PriceRow { item: string; price: string }
@@ -21,12 +21,7 @@ const chairsLabel = (n: number) => `${n} ${n === 1 ? 'cadeira' : 'cadeiras'}`;
 const m = (v: number) => String(v).replace('.', ',');
 
 function total(city: string, items: unknown[]): number | null {
-  const r = botQuote({ city, items }) as { ok?: boolean; quote?: boolean; total?: number | null };
-  return r.ok && !r.quote && typeof r.total === 'number' ? r.total : null;
-}
-function rugTotal(city: string, item: unknown): number | null {
-  const r = botQuote({ city, items: [item] }) as { rugEstimate?: { ok: boolean; homePrice?: number } | null };
-  return r.rugEstimate?.ok && typeof r.rugEstimate.homePrice === 'number' ? r.rugEstimate.homePrice : null;
+  return priceSplit(city, items as EngineItem[])?.service ?? null;
 }
 const eur = (v: number | null) => (v === null ? 'pelo WhatsApp' : formatEuro(v));
 const packs = (city: string, mk: (t: string) => unknown) =>
@@ -45,9 +40,9 @@ export function newModelPriceRows(serviceSlug: string, serviceKey: string | unde
       ? CHAIR_QTYS.map(n => ({ item: chairsLabel(n), price: `Premium ${eur(total(city, [{ kind: 'chairs', qty: n, treatment: 'premium' }]))}, Essencial ${eur(total(city, [{ kind: 'chairs', qty: n, treatment: 'essencial' }]))}` }))
       : SOFA_SIZES.map(n => ({ item: seatsLabel(n), price: `Premium ${eur(total(city, [sofaItem(n, 'premium')]))}, Essencial ${eur(total(city, [sofaItem(n, 'essencial')]))}` }));
   } else if (serviceSlug === 'limpeza-alcatifas') {
-    rows = CARPETS.map(a => { const w = a === 20 ? 4 : a === 50 ? 5 : 10; const l = a / w; return { item: `Alcatifa de ${a} m²`, price: eur(rugTotal(city, { kind: 'carpet', width: w, length: l, treatment: 'clean' })) }; });
+    rows = CARPETS.map(a => { const w = a === 20 ? 4 : a === 50 ? 5 : 10; const l = a / w; return { item: `Alcatifa de ${a} m²`, price: eur(total(city, [{ kind: 'carpet', width: w, length: l, treatment: 'clean' }])) }; });
   } else if (serviceSlug === 'limpeza-tapetes') {
-    rows = RUGS.map(([w, l]) => ({ item: `Tapete de ${m(w)} x ${m(l)} m`, price: `Lavagem ${eur(rugTotal(city, { kind: 'rug', width: w, length: l, treatment: 'clean', odor: false }))}, com anti-odor ${eur(rugTotal(city, { kind: 'rug', width: w, length: l, treatment: 'clean', odor: true }))}` }));
+    rows = RUGS.map(([w, l]) => ({ item: `Tapete de ${m(w)} x ${m(l)} m`, price: `Lavagem ${eur(total(city, [{ kind: 'rug', width: w, length: l, treatment: 'clean', odor: false }]))}, com anti-odor ${eur(total(city, [{ kind: 'rug', width: w, length: l, treatment: 'clean', odor: true }]))}` }));
   } else if (serviceSlug === 'limpeza-colchoes') {
     rows = MATTRESSES.map(x => ({ item: x.label, price: `Com anti-ácaros ${eur(total(city, [{ kind: 'mattress', size: x.id, treatment: 'clean+anti-acaros' }]))}, só a limpeza ${eur(total(city, [{ kind: 'mattress', size: x.id, treatment: 'clean' }]))}` }));
   } else if (serviceSlug === 'limpeza-cadeiras') {

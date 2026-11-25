@@ -4,11 +4,18 @@
  * lavagem em casa, deslocação incluída, material comum (juta/sisal ajustado; seda/persa = dono).
  */
 import { botQuote } from './botQuote';
+import { priceSplit } from './servicePrice';
 import { carpetWashing } from '../constants/rugRates';
 import { roundToNine, RUG_RATE_COMMON, RUG_ESTIMATE_MIN_AREA_M2, RUG_SMALL_COMBO_EXTRA } from './botRugEstimate';
 export { RUG_PRICE_FROM, RUG_PRICE_NOTE, CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export type RugMeasure = { width: number; length: number };
+
+/** O mesmo preço separado: lavagem e deslocação da localidade (dono, 25 Nov 2026: o preço mostrado é o do serviço). */
+export function siteRugSplit(rugs: RugMeasure[], city: string | null | undefined, odor = false, kind: 'rug' | 'carpet' = 'rug') {
+  const valid = rugs.filter(r => r.width > 0 && r.length > 0);
+  return valid.length && city ? priceSplit(city, valid.map(v => ({ kind, width: v.width, length: v.length, treatment: 'clean', ...(odor ? { odor: true } : {}) }))) : null;
+}
 
 /** Preço em casa de um ou mais tapetes na cidade; null sem medidas válidas ou sem cidade servida. */
 export function siteRugPrice(rugs: RugMeasure[], city: string | null | undefined, odor = false, kind: 'rug' | 'carpet' = 'rug'): number | null {

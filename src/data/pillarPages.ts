@@ -40,12 +40,10 @@ import {
   chairTierSentence,
 } from './enginePrices';
 import { RUG_PRICE_FROM, RUG_PRICE_NOTE } from '../constants/rugSitePrice';
-import { botQuote } from '../lib/botQuote';
+import { priceSplit } from '../lib/servicePrice';
 
-// Sofá de 1 lugar com limpeza + Essencial, pelo motor do bot: total e riscado com a deslocação (dono, 24 Nov).
-const ONE_SEAT_PACK = botQuote({ city: 'Lisboa', items: [{ kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' }] }) as { total?: number | null; separatePrice?: { separate: number } | null };
-const ONE_SEAT_PACK_TOTAL = ONE_SEAT_PACK.total as number;
-const ONE_SEAT_PACK_SEPARATE = ONE_SEAT_PACK.separatePrice?.separate as number;
+// Sofá de 1 lugar com limpeza + Essencial, pelo motor do bot: o preço do serviço e o riscado na mesma base (dono, 25 Nov).
+const ONE_SEAT_PACK = priceSplit('Lisboa', [{ kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' }])!;
 import { CARPET_PRICE_FROM, CARPET_PRICE_NOTE } from '../constants/rugSitePrice';
 
 export type PillarSlug = 'limpeza-sofas' | 'limpeza-colchoes' | 'limpeza-tapetes' | 'limpeza-cadeiras' | 'limpeza-alcatifas' | 'impermeabilizacao';
@@ -136,7 +134,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     serviceName: 'Limpeza de Tapetes',
     breadcrumbLabel: catalog('limpeza-tapetes').name,
     title: 'Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions',
-    description: `Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. ${RUG_PRICE_FROM}, deslocação incluída.`,
+    description: `Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. ${RUG_PRICE_FROM}.`,
     h1: 'Higienização Profissional de Tapetes',
     priceFrom: catalog('limpeza-tapetes').priceFrom,
     faqs: [
@@ -201,7 +199,7 @@ export const PILLAR_PAGES: PillarPage[] = [
       { question: 'Qual a diferença entre a Essencial e a Premium?', answer: 'A Essencial é à base de água, aguenta até 2 lavagens e mantém a proteção real por 1 a 2 anos, consoante o uso. A Premium é à base de solvente, mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos. Para casas com crianças, animais ou uso intenso, a Premium compensa a longo prazo.' },
       { question: 'Quanto custa a impermeabilização?', answer: `A versão Essencial começa em ${formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} por cadeira a partir de 5 cadeiras (${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} até 4). A versão Premium começa em ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} por cadeira a partir de 5 cadeiras (${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} até 4). Peça orçamento gratuito.` },
       { question: 'Quanto tempo dura a impermeabilização?', answer: 'Depende da versão escolhida. Com a Essencial, a proteção real dura 1 a 2 anos, consoante o uso. Com a Premium, mais resistente ao desgaste, a proteção dura até 10 anos. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
-      { question: 'Posso fazer impermeabilização sem limpeza prévia?', answer: `Recomendamos sempre limpeza prévia para maior eficácia. No Pack Proteção Total, limpeza e impermeabilização Essencial na mesma visita, um sofá de 1 lugar fica em ${formatEuro(ONE_SEAT_PACK_TOTAL)} com a deslocação, em vez de ${formatEuro(ONE_SEAT_PACK_SEPARATE)} pedidos em separado.` },
+      { question: 'Posso fazer impermeabilização sem limpeza prévia?', answer: `Recomendamos sempre limpeza prévia para maior eficácia. No Pack Proteção Total, limpeza e impermeabilização Essencial na mesma visita, um sofá de 1 lugar fica em ${formatEuro(ONE_SEAT_PACK.service)}${ONE_SEAT_PACK.struck !== null ? `, em vez de ${formatEuro(ONE_SEAT_PACK.struck)} em separado` : ''}. A deslocação é à parte.` },
       { question: 'Que materiais não se impermeabilizam?', answer: 'A impermeabilização é para tecidos: algodão, linho, poliéster, microfibra, chenille e semelhantes. Em pele, couro, pele sintética, napa ou curvim não a fazemos, porque esses materiais já não deixam entrar os líquidos; aí o cuidado certo é a limpeza, e na pele a hidratação. Tecidos que já vêm tratados de fábrica (como o Aquaclean) também dispensam.' },
     ],
   },

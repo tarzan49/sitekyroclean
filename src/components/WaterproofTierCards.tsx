@@ -32,7 +32,7 @@ export default function WaterproofTierCards({ city }: { city: string }) {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-[#666]">Nas duas, os líquidos ficam à superfície e saem com um pano. Preços {cityPrepOf(city)} {city}, com a deslocação incluída. Só em tecido: na pele não fazemos impermeabilização.</p>
+        <p className="mt-3 text-xs text-[#666]">Nas duas, os líquidos ficam à superfície e saem com um pano. Preços {cityPrepOf(city)} {city}, deslocação à parte. Só em tecido: na pele não fazemos impermeabilização.</p>
       </div>
     </section>
   );

@@ -37,7 +37,7 @@ export function getLandingEditorial(context: EditorialContext) {
   const metaWhere = family === 'freguesia' ? `em ${place}, ${municipality}` : where;
   let intro: string;
   if (family === 'preco') {
-    intro = `${serviceLabel} ${where}: ${quoteOnly ? 'serviço sob orçamento' : rugPriced ? `${rugFrom.toLowerCase()}, com a deslocação incluída` : 'estimativa conforme os artigos e as opções escolhidas'}. ${brief.budget}`;
+    intro = `${serviceLabel} ${where}: ${quoteOnly ? 'serviço sob orçamento' : rugPriced ? `${rugFrom.toLowerCase()}, com a deslocação à parte` : 'estimativa conforme os artigos e as opções escolhidas'}. ${brief.budget}`;
   } else if (family === 'freguesia') {
     intro = `${serviceLabel} em ${place}, município ${cityPrepDe(municipality)} ${municipality}, com ${brief.assessment}. ${brief.request}`;
   } else if (family === 'variante') {
@@ -46,6 +46,6 @@ export function getLandingEditorial(context: EditorialContext) {
     intro = `${serviceLabel} ${where}, com ${brief.assessment}. ${brief.request}`;
   }
   if (consultation) intro += ' Disponibilidade sob consulta.';
-  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento, incluindo a deslocação' : rugPriced ? `${rugFrom}, com a deslocação incluída` : 'Orçamento gratuito, com deslocação discriminada'}.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
+  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento, incluindo a deslocação' : rugPriced ? `${rugFrom}, com deslocação discriminada` : 'Orçamento gratuito, com deslocação discriminada'}.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
   return { intro, metaDescription };
 }

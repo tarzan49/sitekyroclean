@@ -193,6 +193,9 @@ export function smallOrderFarSurcharge(city: string | null | undefined, place: s
 }
 export const SMALL_ORDER_FAR_RULE = `Longe de Odivelas (mais de 20 km de carro), um serviço abaixo de ${SMALL_ORDER_FAR_MIN}€ leva mais ${SMALL_ORDER_FAR_SURCHARGE}€ (já está no total). Diz numa frase que é por ser um serviço pequeno nesta zona e que, se juntar outra peça na mesma visita, deixa de ter esse acréscimo.`;
 
+/** Acima deste valor de serviços a deslocação deixa de se pagar, por escalão da localidade (as mesmas contas do `calculateTravelFee`); nas de 25€ paga-se sempre. */
+export const TRAVEL_FREE_ABOVE: Readonly<Record<number, number>> = { 10: 120, 15: 135, 20: 150 };
+
 /** Services and extras at their actual quoted prices, excluding travel. */
 export function calculateTravelFee(baseFee: number, servicesTotal: number): number {
   if (isBlackFriday()) return 0;

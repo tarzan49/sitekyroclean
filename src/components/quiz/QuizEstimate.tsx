@@ -17,7 +17,9 @@ interface QuizEstimateProps {
 }
 
 export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, location, travelCost, travelRowLabel, travelOnQuote = false, smallOrderSurcharge = 0 }: QuizEstimateProps) {
-  const target = Math.round(totalPrice);
+  // O número grande é o do serviço; a deslocação vem por baixo, discreta (dono, 25 Nov 2026).
+  const apart = travelOnly ? 0 : travelCost ?? 0;
+  const target = Math.round(totalPrice - apart);
   const [amount, setAmount] = useState(target);
   const displayed = useRef(target);
 
@@ -59,7 +61,7 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
           real reportado: "1 cadeira" a 20€ + 10€ deslocação aparecia só como
           "30€", parecendo que a cadeira sozinha custava 30€). */}
       {travelCost !== undefined && travelCost > 0 && !travelOnly && (
-        <p className="text-sm text-white/80 -mt-0.5">Inclui {travelCost}€ de {travelRowLabel ? travelRowLabel.toLowerCase() : 'deslocação'}{location ? ` a ${location}` : ''}</p>
+        <p className="text-xs text-right text-white/65 -mt-0.5">+ {travelCost}€ {travelRowLabel ? travelRowLabel.toLowerCase() : 'deslocação'}{location ? ` a ${location}` : ''}</p>
       )}
       {smallOrderSurcharge > 0 && !travelOnly && (
         <p className="text-sm text-gold -mt-0.5">Inclui {smallOrderSurcharge}€ por ser um serviço abaixo de {SMALL_ORDER_FAR_MIN}€ nesta zona. Junte outra peça na mesma visita e deixa de ter este acréscimo.</p>
@@ -74,6 +76,7 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
             <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost - smallOrderSurcharge)}€</dd></div>
             <div className="flex justify-between gap-3"><dt>{travelRowLabel ?? 'Deslocação'}{location ? ` · ${location}` : ''}</dt><dd>{travelOnQuote ? 'Incluída' : travelCost === 0 && location ? 'Gratuita' : `${travelCost}€`}</dd></div>
             {smallOrderSurcharge > 0 && <div className="flex justify-between gap-3"><dt>Serviço abaixo de {SMALL_ORDER_FAR_MIN}€</dt><dd>{smallOrderSurcharge}€</dd></div>}
+            <div className="flex justify-between gap-3 font-semibold text-white"><dt>Total</dt><dd>{Math.round(totalPrice)}€</dd></div>
             {needsQuote && <div className="text-gold">Acrescem os serviços sob orçamento.</div>}
           </dl>
         </details>
