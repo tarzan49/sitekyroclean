@@ -102,7 +102,7 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
 
 /* Letra das secções no tamanho normal (dono, 25 Nov: "está tudo compactado"); só os ecrãs úteis abaixo de 640 px
    (que já não são iPhones nem Androids atuais) ficam com a letra apertada do index.css. */
-@media (max-width: 767px) and (min-height: 640px) {
+@media (max-width: 767px) and (min-height: 700px) {
   html.snap-sections #duvidas button[aria-expanded] > span:first-child, html.snap-sections #perguntas button[aria-expanded] > span:first-child { font-size: 16px; line-height: 1.35; }
   html.snap-sections #dicas .grid h3 { font-size: 16.5px; }
   html.snap-sections #avaliacoes [aria-roledescription="testemunho"] blockquote p { font-size: 17.5px; line-height: 1.5; -webkit-line-clamp: 6; }
@@ -128,3 +128,10 @@ html.snap-sections main > section[data-commercial-hero][data-paid-landing] { scr
 }
 
 [data-resource-hero] > div[data-resource-media].absolute { display: block; }
+
+/* Ecrãs úteis baixos (Galaxy S com a barra aberta): perguntas e guias mais juntos para caberem num ecrã. */
+@media (max-width: 767px) and (max-height: 699px) {
+  html.snap-sections :is(#duvidas, #perguntas) button[aria-expanded] { padding-top: 6px; padding-bottom: 6px; min-height: 48px; }
+  html.snap-sections :is(#duvidas, #perguntas) button[aria-expanded] > span:first-child { font-size: 14.5px; line-height: 1.28; }
+  html.snap-sections #dicas .grid > * { padding: 6px 9px; }
+}

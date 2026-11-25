@@ -202,8 +202,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
         ? <SofaCounters counts={counts} onChange={setCounts} hideSummary />
         : <>
             {title('Quantos lugares?', 'Pode juntar vários')}
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} className={`flex min-h-[104px] [@media(max-height:699px)]:min-h-[92px] [@media(max-height:699px)]:py-1 flex-col items-center justify-center gap-1 px-1 py-1.5 text-[17px] md:min-h-[128px] md:text-base ${tile(false)}`}>
-              <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-[52px] w-24 [@media(max-height:699px)]:h-10 [@media(max-height:699px)]:w-20 md:h-12 md:w-16" />{n === 1 ? '1 lugar' : `${n} lugares`}
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">{SEATS.map(n => <button key={n} type="button" onClick={() => setCounts(c => ({ ...c, [seatId(n)]: 1 }))} aria-label={`Juntar um sofá de ${n} ${n === 1 ? 'lugar' : 'lugares'}`} className={`flex min-h-[104px] [@media(max-height:699px)]:min-h-[76px] [@media(max-height:699px)]:py-1 flex-col items-center justify-center gap-1 px-1 py-1.5 text-[17px] md:min-h-[128px] md:text-base ${tile(false)}`}>
+              <QuizFurnitureImage service="sofa" sizeId={seatId(Math.min(n, 4))} className="h-[52px] w-24 [@media(max-height:699px)]:h-8 [@media(max-height:699px)]:w-20 md:h-12 md:w-16" />{n === 1 ? '1 lugar' : `${n} lugares`}
               <span className="flex items-center text-[11px] text-[#D4AF37]"><Plus className="mr-0.5 h-3 w-3" strokeWidth={3} aria-hidden />Juntar</span>
             </button>)}</div>
             <p className="mt-2 text-xs leading-snug text-[#666]">Canto, em U ou mais de 6 lugares: preço pela fotografia no WhatsApp.</p>
@@ -222,7 +222,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
       </>}
       {what === 'chairs' && <>
         {title('Quantas cadeiras?')}
-        <div className={`grid gap-2 md:grid-cols-3 ${sized ? 'grid-cols-3' : 'grid-cols-2'}`}>{CHAIRS.map(n => <button key={n} type="button" aria-pressed={!ownQty && qty === n} onClick={() => { setOwnQty(false); setQty(n); warm(); }} className={`${sized ? 'h-10 min-h-0 text-sm' : 'flex min-h-[112px] flex-col items-center justify-center gap-1 text-[17px] md:min-h-[104px] md:text-base'} ${tile(!ownQty && qty === n)}`}>{!sized && <QuizFurnitureImage service="chairs" className="h-16 w-16 md:h-12 md:w-12" />}{n} cadeiras</button>)}</div>
+        <div className={`grid gap-2 md:grid-cols-3 ${sized ? 'grid-cols-3' : 'grid-cols-2'}`}>{CHAIRS.map(n => <button key={n} type="button" aria-pressed={!ownQty && qty === n} onClick={() => { setOwnQty(false); setQty(n); warm(); }} className={`${sized ? 'h-10 min-h-0 text-sm' : 'flex min-h-[112px] [@media(max-height:699px)]:min-h-[84px] flex-col items-center justify-center gap-1 text-[17px] md:min-h-[104px] md:text-base'} ${tile(!ownQty && qty === n)}`}>{!sized && <QuizFurnitureImage service="chairs" className="h-16 w-16 [@media(max-height:699px)]:h-10 [@media(max-height:699px)]:w-10 md:h-12 md:w-12" />}{n} cadeiras</button>)}</div>
         {!ownQty && !sized && <button type="button" onClick={() => { setOwnQty(true); setQty(0); warm(); }} className={`mt-2 h-12 w-full text-base ${tile(false)}`}>Outro número</button>}
         {ownQty && !sized && <label className="mt-2 flex items-center justify-between gap-3 rounded-2xl border-2 border-[#D4AF37]/60 bg-white px-3 py-1.5">
           <span className="text-sm font-semibold text-[#1A1A1A]">Número de cadeiras</span>
