@@ -41,8 +41,6 @@
 #                           deixam de entrar orçamentos
 #   api.bigdatacloud.net    `src/lib/locationDetection.ts`, o "Usar a minha
 #                           localização" do quiz
-#   localhost:3010          `KyroConnectionStatus.tsx`, só no painel admin e só
-#                           na máquina do dono
 #   www.google.com/recaptcha/, www.gstatic.com/recaptcha/, recaptcha.google.com
 #                           reCAPTCHA v3 (`src/lib/recaptcha.ts`), carregado
 #                           só no momento de enviar um pedido. Faltaram aqui de
@@ -138,9 +136,18 @@
 /*
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com https: http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com https:; frame-src 'self' https://td.doubleclick.net https://www.facebook.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# O painel tem os dados dos clientes e não mede nada: segunda política, que soma à de cima (o browser cumpre as duas).
+# Só fala com a nossa Supabase, não abre dentro de outra página e nunca fica em cache (25 Nov 2026, auditoria de
+# segurança). No resto do site o `https:` fica: o Google Ads manda as conversões para o domínio do país de quem visita.
+/admin/*
+  Content-Security-Policy: connect-src 'self' https://kswapioiaetfccxzfwkg.supabase.co wss://kswapioiaetfccxzfwkg.supabase.co; img-src 'self' data: blob: https://kswapioiaetfccxzfwkg.supabase.co; frame-src 'self' blob: https://kswapioiaetfccxzfwkg.supabase.co; form-action 'self'; frame-ancestors 'none'
+  Cache-Control: no-store
