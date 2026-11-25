@@ -1091,7 +1091,7 @@ Dono, 23 Nov 2026, Joana Duarte (Lagos): sofá 3L com chaise 94€ sozinho; com 
 
 ## Manchas antigas e pelo gasto (dono, 23 Nov 2026, Antónia Venda)
 
-Manchas antigas, já esfregadas ou de origem desconhecida, e pelo gasto: o bot nunca afirma o resultado. Diz que a mancha pode sair ou ficar muito mais clara, mas que "não conseguimos dar a garantia de que saia por completo". Estreita a regra de 17 Nov ("nunca 'não garantimos'") só nestes casos; o travão `noPromise` do kyro-bot não apanha esta frase.
+Manchas antigas, já esfregadas ou de origem desconhecida, e pelo gasto: o bot nunca afirma o resultado. Diz que a mancha pode sair ou ficar muito mais clara, mas que "não conseguimos dar a garantia de que saia por completo". Estreita a regra de 17 Nov ("nunca 'não garantimos'") só nestes casos; o travão `noPromise` do kyro-bot apanhava esta frase; desde 25 Nov deixa passar "não conseguimos dar a garantia de que saia por completo".
 
 ### Duas peças na mesma conversa: o dia novo é da peça da última pergunta (dono, 23 Nov 2026, Antónia Venda)
 
