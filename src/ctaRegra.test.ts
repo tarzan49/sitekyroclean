@@ -12,6 +12,8 @@ describe('regra dos CTAs', () => {
     const css = readFileSync('src/index.css', 'utf8');
     const rules = [...css.matchAll(/(^|\})\s*\.cta[^{}]*\{([^}]*)\}/gm)].map(m => m[2]).join(" ");
     expect(rules).not.toMatch(/gradient|box-shadow|filter:/);
+    // Nenhuma outra folha pode pintar o CTA por cima (25 Nov: surfaces.css deixava-o verde e ilegível no topo).
+    for (const f of ['surfaces', 'hero-mobile']) expect(readFileSync(`src/styles/${f}.css`, 'utf8')).not.toMatch(/data-hero-part="whatsapp"\]\{[^}]*background/);
     expect(readFileSync('src/components/Cta.tsx', 'utf8')).not.toMatch(/lucide|<svg/);
     for (const f of ['StepPricePicker', 'PackStepPicker', 'LeatherSofaPicker', 'EnHeader']) for (const m of readFileSync(`src/components/${f}.tsx`, 'utf8').matchAll(/<(WhatsAppCta|PriceCta)\b[^>]*/g)) expect(m[0]).toContain('onLight');
   });

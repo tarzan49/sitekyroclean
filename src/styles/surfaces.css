@@ -44,7 +44,6 @@ section[class*="bg-[#FDFDF9]"]{background:var(--kyro-paper)!important}
   [data-mobile-hero] [data-hero-part="breadcrumb"] a{min-height:44px}
   [data-mobile-hero] [data-hero-part="title"]{font-size:32px;line-height:1.14;letter-spacing:-.025em;text-shadow:none!important;max-width:24ch}
   [data-mobile-hero] [data-hero-part="subtitle"]{font-size:16px;line-height:1.6;color:#d0dad3;margin-top:16px;margin-bottom:24px;text-shadow:none!important}
-  [data-mobile-hero] [data-hero-part="whatsapp"]{min-height:54px;font-size:15px;background:linear-gradient(135deg,#188344,#13753b);border:1px solid #ffffff12;border-radius:10px;padding:14px 10px;box-shadow:0 5px 16px #061b1312}
   [data-mobile-hero] [data-hero-part="prices"]{min-height:48px;font-size:14px;margin-top:4px}
   [data-mobile-hero] [data-hero-part="prices"]+p{font-size:13px;line-height:1.6;color:#c4d0c8;text-align:center;margin-top:4px}
   [data-mobile-hero] [data-hero-part="comparison"]>div{border-top:0}
