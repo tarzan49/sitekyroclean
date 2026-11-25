@@ -1,6 +1,6 @@
 import { PriceCta, WhatsAppCta } from '@/components/Cta';
 import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
 import { WHATSAPP_BASE } from "@/constants/business";
 import HomeHeroTrust from "@/components/HomeHeroTrust";
@@ -8,9 +8,27 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
-const imgDesktop = '/images/hero-sofa-v1.webp';
-const imgMobile = '/images/hero-sofa-mobile-extended.webp';
-const imgMobile750 = '/images/hero-sofa-mobile-extended-750.webp';
+// Topo com vídeo real da equipa (dono, 25 Nov: saiu a imagem de IA do técnico). A capa carrega primeiro (é o que conta
+// para a rapidez) e o vídeo entra por cima; com "Reduzir movimento" fica só a capa.
+const CLIP = { m: '/videos/home/topo-m', d: '/videos/home/topo-d' } as const;
+function HeroClip({ kind, className }: { kind: 'm' | 'd'; className: string }) {
+  return <>
+    <picture className="block h-full w-full">
+      <source media={kind === 'm' ? '(min-width: 768px)' : '(max-width: 767px)'} srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img src={`${CLIP[kind]}.webp`} alt="" className={className} loading="eager" decoding="sync" fetchPriority="high" width={kind === 'm' ? 720 : 1280} height={kind === 'm' ? 1280 : 720} />
+    </picture>
+    <HeroVideo kind={kind} className={`absolute inset-0 motion-reduce:hidden ${className}`} />
+  </>;
+}
+function HeroVideo({ kind, className }: { kind: 'm' | 'd'; className: string }) {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (window.matchMedia(kind === 'm' ? '(min-width: 768px)' : '(max-width: 767px)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = window.setTimeout(() => setOn(true), 900);
+    return () => window.clearTimeout(t);
+  }, [kind]);
+  return on ? <video src={`${CLIP[kind]}.mp4`} autoPlay muted loop playsInline preload="auto" aria-hidden="true" className={className} /> : null;
+}
 
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
@@ -29,29 +47,12 @@ const Hero = () => {
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
         <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
-          <picture className="block h-full w-full">
-            <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-            <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
-          </picture>
+          <HeroClip kind="m" className="h-full w-full object-cover object-center" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.78) 0%, rgba(5,28,23,.55) 18%, transparent 30%, transparent 46%, rgba(5,28,23,.74) 59%, rgba(5,28,23,.92) 72%, rgba(5,28,23,.97) 100%)' }} />
         </div>
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
-          <picture>
-            <source media="(max-width: 767px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-            <img
-              src={imgDesktop}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: 'center 30%' }}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
-              width={1600}
-              height={893}
-            />
-          </picture>
+          <HeroClip kind="d" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0" style={{ background: 'rgba(8, 10, 30, 0.42)' }} />
         </div>
 
