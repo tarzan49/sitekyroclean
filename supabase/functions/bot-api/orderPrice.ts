@@ -1,8 +1,8 @@
 // O preço que a mensagem automática do questionário leva, sempre pelo motor (botQuote): cada peça com o preço que a
-// pessoa viu no cesto (a peça sozinha, com a sua deslocação), as ofertas da visita e o total (dono, 25 Nov 2026,
+// pessoa viu no cesto (o serviço), a deslocação à parte (dono, 25 Nov 2026), as ofertas da visita e o total (dono, 25 Nov 2026,
 // "Sim, corrige": um sofá e um colchão saíam 79€ + 69€ com "Total: 169€" e sem o anti-ácaros oferecido; os tapetes
 // saíam sem preço, mesmo quando o site o mostrou). Null quando o pedido é sob orçamento.
-import { botQuote, describeQuizOrder } from "../_shared/botEngine.generated.js";
+import { botQuote, describeQuizOrder, priceSplit, serviceLines } from "../_shared/botEngine.generated.js";
 import type { QuotedPrice } from "../_shared/whatsappReply.ts";
 
 type Row = Record<string, unknown>;
@@ -71,7 +71,11 @@ export function orderPrice(r: Row): QuotedPrice | null {
     const all = priced(city, items);
     if (!all) return null;
     const gifts = giftLines((all.q.visitGifts?.gifts ?? []) as Gift[]);
-    if (items.length === 1) return { lines: [{ label: itemText(items[0]), amount: all.total }], travel: 0, total: all.total, gifts, usual: null };
+    const usualTotal = items.length === 1 ? null : all.q.visitGifts?.usual ?? all.q.separatePrice?.separate ?? null;
+    // Serviço, deslocação e total, como o site mostra (dono, 25 Nov 2026): a mesma regra, `src/lib/servicePrice.ts`.
+    const split = priceSplit(city, items), amounts = split && split.total === all.total ? serviceLines(city, items) : null;
+    if (split && amounts) return { lines: items.map((i, k) => ({ label: itemText(i), amount: amounts[k] })), travel: split.travel, total: all.total, gifts, usual: typeof usualTotal === "number" && usualTotal - all.total >= 5 ? usualTotal : null };
+    if (items.length === 1) return { lines: [{ label: itemText(items[0]), amount: all.total }], travel: null, total: all.total, gifts, usual: null };
     const usual = all.q.visitGifts?.usual ?? all.q.separatePrice?.separate ?? null;
     const lines = items.map(i => {
       // Vários sofás ou colchões iguais: o preço de cada um, como a linha do cesto.
@@ -89,6 +93,6 @@ export function orderPrice(r: Row): QuotedPrice | null {
       const sum = visit.reduce<number>((t, a) => t + (a ?? 0), 0);
       if (rugs <= 1 && visit.length === items.length && visit.every(a => typeof a === "number") && Math.abs(all.total - sum) <= 9) shown = items.map((i, k) => ({ label: itemText(i), amount: visit[k] as number }));
     }
-    return { lines: shown, travel: 0, total: all.total, gifts, usual: struck };
+    return { lines: shown, travel: null, total: all.total, gifts, usual: struck };
   } catch { return null; }
 }

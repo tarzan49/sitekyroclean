@@ -1,3 +1,4 @@
+// Totais de várias peças = serviço somado ao 9 + UMA deslocação (owner 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo sítio?").
 import { describe, it, expect } from 'vitest';
 import { botQuote } from './botQuote';
 
@@ -22,9 +23,9 @@ describe('separatePrice', () => {
 });
 
 describe('separatePrice com oferta da visita', () => {
-  it('sofá 3L + colchão de casal: 169€ com o anti-ácaros oferecido, sem a opção sem ele (dono, 25 Nov 2026)', () => {
+  it('sofá 3L + colchão de casal: 149€ com o anti-ácaros oferecido, sem a opção sem ele (dono, 25 Nov 2026)', () => {
     const r = botQuote({ city: 'Lisboa', items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean' }, { kind: 'mattress', size: 'casal', treatment: 'clean' }] }) as any;
-    expect(r.total).toBe(169);
-    expect(r.separatePrice).toMatchObject({ separate: 209, total: 169, saving: 40, withoutGift: null });
+    expect(r.total).toBe(149);
+    expect(r.separatePrice).toMatchObject({ separate: 209, total: 149, saving: 60, withoutGift: null });
   });
 });

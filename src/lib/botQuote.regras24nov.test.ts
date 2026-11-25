@@ -1,3 +1,4 @@
+// Totais de várias peças = serviço somado ao 9 + UMA deslocação (owner 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo sítio?").
 // Regras de preço decididas pelo dono uma a uma (24 Nov 2026), com os casos dele em Lisboa. A regra 1 ficou como estava:
 // preços cheios com o tratamento oferecido (escada A, botQuote.visitGifts.test.ts).
 import { describe, expect, it } from 'vitest';
@@ -44,7 +45,7 @@ describe('3. cadeiras do mesmo serviço em duas linhas são uma ("Sim, como 6")'
 });
 
 it('o riscado da opção nunca conta a impermeabilização de uma peça só limpa (3L Blindado + 6 cadeiras dava ~~559~~)', () => {
-  expect(q([S('3-lugares', 'clean+premium'), C(6)]).separatePrice.tiers.premium).toEqual({ separate: 399, total: 339, saving: 60 });
+  expect(q([S('3-lugares', 'clean+premium'), C(6)]).separatePrice.tiers.premium).toEqual({ separate: 399, total: 329, saving: 70 });
 });
 
 describe('5 e 6. cadeiras', () => {
@@ -92,9 +93,9 @@ describe('sofá com anti-odor ou anti-ácaros (dono, 25 Nov 2026: "LIMPEZA + IMP
   });
   it('várias peças: o total não baixa, o riscado é o verdadeiro', () => {
     const r = q([S('3-lugares', 'clean+anti-acaros'), M()]);
-    expect([r.total, r.separatePrice.separate, r.visitGifts.usual]).toEqual([209, 239, 239]);
+    expect([r.total, r.separatePrice.separate, r.visitGifts.usual]).toEqual([189, 239, 239]);
     const c = q([S('3-lugares', 'clean+anti-acaros'), C(2)]);
-    expect([c.total, c.visitGifts.usual]).toEqual([179, 179]);
+    expect([c.total, c.visitGifts.usual]).toEqual([159, 179]);
   });
   it('Black Friday: o anti-odor não entra na tabela (saía a 69€ com o tratamento dentro)', () => {
     const r = q([S('3-lugares', 'clean', { odor: true })], { campaign: 'BFGTA' });
@@ -113,14 +114,14 @@ describe('preço cheio só nos pedidos de limpeza; cadeiras são uma peça (medi
   it('com impermeabilização o par fica como estava', () => {
     expect(q([S('2-lugares', 'clean+essencial'), S('2-lugares')]).total).toBe(199);
     expect(q([S('3-lugares', 'premium'), S()]).total).toBe(229);
-    expect(q([S(), S()]).total).toBe(179);
+    expect(q([S(), S()]).total).toBe(159);
     // Sofa + a few chairs is not a pair of sofas.
     expect([q([S(), C(2)]).total, q([S(), C(2, 'clean+essencial')]).total]).toEqual([129, 149]);
   });
   it('o anti-ácaros de umas poucas cadeiras nunca é a oferta', () => {
     const r = q([C(1), S('3-lugares', 'clean', { leather: true }), C(6, 'clean+premium')]);
     expect(r.visitGifts.gifts).toEqual([{ piece: 'sofa', treatment: 'tratamento-pele', normal: 40 }]);
-    expect(r.total).toBe(369);
+    expect(r.total).toBe(359);
   });
   it('juntar um serviço às cadeiras nunca baixa o total', () => {
     expect([q([C(5, 'premium')]).total, q([C(5, 'premium'), C(1)]).total]).toEqual([139, 139]);
@@ -133,11 +134,11 @@ describe('4. tapetes ao preço cheio, com o anti-odor oferecido sempre (dono, 25
   const paid = (r: Q) => r.rugCombo?.comboPrice ?? (r.quote ? r.rugEstimate?.homePrice : r.total);
   it.each([
     ['um tapete só', [R()], 69, null],
-    ['2 tapetes', [R(), R()], 139, 169],
-    ['2 tapetes em qty', [R({ qty: 2 })], 139, 169],
-    ['3 tapetes', [R(), R(), R()], 209, 239],
-    ['tapete + alcatifa 20 m²', [R(), K], 239, 269],
-    ['sofá 3L + tapete', [S(), R()], 159, 189],
+    ['2 tapetes', [R(), R()], 129, 169],
+    ['2 tapetes em qty', [R({ qty: 2 })], 129, 169],
+    ['3 tapetes', [R(), R(), R()], 179, 239],
+    ['tapete + alcatifa 20 m²', [R(), K], 219, 269],
+    ['sofá 3L + tapete', [S(), R()], 139, 189],
   ])('%s', (_n, items, total, usual) => {
     const r = q(items as unknown[]);
     expect([paid(r), r.visitGifts?.usual ?? null]).toEqual([total, usual]);
@@ -148,11 +149,11 @@ describe('4. tapetes ao preço cheio, com o anti-odor oferecido sempre (dono, 25
   });
   it('tapete pequeno: preço cheio com o anti-odor oferecido, nunca um "preço normal" abaixo do total', () => {
     const r = q([S(), { kind: 'rug', width: 1.2, length: 1.8 }]);
-    expect([r.rugCombo.comboPrice, r.rugCombo.usualPrice, r.visitGifts.usual]).toEqual([119, 119, 129]);
+    expect([r.rugCombo.comboPrice, r.rugCombo.usualPrice, r.visitGifts.usual]).toEqual([109, 109, 129]);
   });
   it('a ordem não muda o preço e pedir o anti-odor nunca baixa', () => {
-    expect(paid(q([R(), S()]))).toBe(159);
-    expect(paid(q([S(), R({ odor: true })]))).toBeGreaterThanOrEqual(159);
-    expect(paid(q([R({ odor: true }), R()]))).toBeGreaterThanOrEqual(139);
+    expect(paid(q([R(), S()]))).toBe(139);
+    expect(paid(q([S(), R({ odor: true })]))).toBeGreaterThanOrEqual(139);
+    expect(paid(q([R({ odor: true }), R()]))).toBeGreaterThanOrEqual(129);
   });
 });

@@ -1,3 +1,4 @@
+// Totais de várias peças = serviço somado ao 9 + UMA deslocação (owner 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo sítio?").
 // Auditoria de 24 Nov 2026 a 12 136 pedidos: um teste por erro corrigido no motor.
 import { describe, expect, it } from 'vitest';
 import { botQuote, chairPackStruck } from './botQuote';
@@ -64,13 +65,12 @@ describe('auditoria 24 Nov 2026', () => {
     expect(q('Lisboa', [sofa('3-lugares', 'clean+premium'), rug(2, 3)]).waterproofingTiers?.premium).toEqual(expect.any(Number));
   });
 
-  it('6. escada A com 5L em imper sozinha (oferta, fim 9) e mínimo das peças sozinhas já arredondadas', () => {
+  it('6. escada A com 5L em imper sozinha (oferta, fim 9) e nunca abaixo de uma peça sozinha', () => {
     const r = q('Lisboa', [mattress('casal'), sofa('5-lugares', 'premium')]);
     expect(r.visitGifts?.gifts?.[0]?.piece).toBe('mattress');
     expect(r.total % 10).toBe(9);
     const items = [sofa('1-lugar', 'clean'), chairs(5, 'clean'), rug(2.5, 3.5, { odor: true })];
-    const alone = items.reduce((s, i) => s + paid(q('Porto', [i])), 0);
-    expect(paid(q('Porto', items))).toBeGreaterThanOrEqual(alone - (q('Porto', [items[0]]).smallOrderSurcharge ? 10 : 0));
+    for (const i of items) expect(paid(q('Porto', items))).toBeGreaterThanOrEqual(paid(q('Porto', [i])));
   });
 
   it('7. pedir o anti-odor nunca baixa o total', () => {
@@ -97,7 +97,7 @@ describe('escada A, dono 25 Nov 2026', () => {
     const r = q('Lisboa', [sofa('3-lugares', 'clean'), sofa('1-lugar', 'clean'), chairs(6, 'clean')]);
     const sum = (r.visitGifts?.gifts ?? []).filter((g: Q) => g.piece !== 'mattress').reduce((a: number, g: Q) => a + g.normal, 0);
     expect(sum).toBeLessThanOrEqual(0.2 * paid(r));
-    expect(q('Lisboa', [sofa('3-lugares', 'clean'), mattress('casal')]).visitGifts).toMatchObject({ total: 169, gifts: [{ piece: 'mattress', normal: 40 }] });
+    expect(q('Lisboa', [sofa('3-lugares', 'clean'), mattress('casal')]).visitGifts).toMatchObject({ total: 149, usual: 209, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
 });
 
@@ -153,9 +153,9 @@ describe('riscado das cadeiras (dono, 25 Nov 2026: "Sim, limita")', () => {
 });
 
 describe('a segunda peça tem sempre um tratamento grátis, ao preço cheio (dono, 24 Nov e 25 Nov 2026: "Sempre")', () => {
-  it.each([['3-lugares', '3-lugares', 179], ['3-lugares', '2-lugares', 169], ['2-lugares', '2-lugares', 159], ['4-lugares', '4-lugares', 219]])('%s + %s = a soma das peças sozinhas, ao 9 (%i), com oferta', (a, b, total) => {
+  it.each([['3-lugares', '3-lugares', 159], ['3-lugares', '2-lugares', 149], ['2-lugares', '2-lugares', 139], ['4-lugares', '4-lugares', 199]])('%s + %s = a soma dos serviços, ao 9 (%i), com oferta', (a, b, total) => {
     const r = q('Lisboa', [sofa(a, 'clean'), sofa(b, 'clean')]);
     expect([r.total, r.visitGifts.gifts.length]).toEqual([total, 1]);
-    expect(r.total).toBeGreaterThanOrEqual(q('Lisboa', [sofa(a, 'clean')]).total + q('Lisboa', [sofa(b, 'clean')]).total);
+    for (const z of [a, b]) expect(r.total).toBeGreaterThanOrEqual(q('Lisboa', [sofa(z, 'clean')]).total);
   });
 });

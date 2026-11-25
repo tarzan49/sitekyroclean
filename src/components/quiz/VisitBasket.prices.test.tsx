@@ -30,8 +30,8 @@ describe('cadeiras: linha do motor com a quantidade inteira; riscado na base do 
     expect(row('clean')).toEqual([30, 90, 120, 180]);
     expect(row('premium')).toEqual([39, 119, 159, 279]);
     expect(row('clean+premium')).toEqual([59, 179, 259, 449]);
-    // Limpeza 110€ + impermeabilização 149€ = 259€, o preço do pack: sem deslocações não há riscado.
-    expect(servicePrice('Lisboa', [chairs(6, 'premium')])).toMatchObject({ shown: 259, struck: null, travel: 0 });
+    // O riscado é o do motor (chairsWas; dono, 25 Nov 2026).
+    expect(servicePrice('Lisboa', [chairs(6, 'premium')])).toMatchObject({ shown: 259, struck: 279, travel: 0 });
     expect(servicePrice('Lisboa', [chairs(12, 'premium')])).toMatchObject({ shown: 449, struck: 459, travel: 0 });
   });
 });
@@ -46,17 +46,15 @@ describe('sofás e colchões com quantidade: linha = motor com a quantidade real
     expect(aloneTotal('Lisboa', it_)).toBe(q.total);
     const treatment = it_.kind === 'mattress' ? (it_.pack === 'premium' ? 'clean+anti-acaros' : 'clean') : T[it_.pack];
     const m = motor([{ kind: it_.kind, size: it_.size, qty: it_.qty, treatment }]);
-    const each = struckOf('Lisboa', { ...it_, qty: 1 })! * it_.qty, struck = struckOf('Lisboa', it_)!, sp = servicePrice('Lisboa', [it_]);
+    const sp = servicePrice('Lisboa', [it_]);
     expect(sp.shown! + sp.travel!).toBe(m.total);
-    expect(struck).toBe(each);
     // O riscado mostrado nunca passa do que o motor diz (que conta deslocações) e nunca fica abaixo do preço.
     if (sp.struck !== null) { const was = Math.max(q.usual ?? 0, m.separatePrice?.separate ?? 0); expect(sp.struck).toBeLessThanOrEqual(was); expect(sp.struck - sp.shown!).toBeGreaterThanOrEqual(5); expect(sp.struck - sp.shown!).toBeLessThanOrEqual(was - m.total); }
   });
-  it('uma peça só: o riscado do pack é a limpeza mais a impermeabilização em separado, sem deslocações, ao 9', () => {
+  it('uma peça só: a poupança do pack é a do motor (separatePrice)', () => {
     for (const size of ['2-lugares', '3-lugares', '4-lugares', '5-lugares']) for (const pack of ['premium', 'essencial'] as const) {
-      const of = (treatment: string) => { const r = motor([{ kind: 'sofa', size, qty: 1, treatment }]) as unknown as { total: number; travel: number }; return r.total - r.travel; };
-      const sum = of('clean') + of(pack), up = Math.ceil((sum + 1) / 10) * 10 - 1;
-      expect(struckOf('Lisboa', newItem('sofa', { size, qty: 1, pack }))).toBe(Math.max(up, of(T[pack])));
+      const m = motor([{ kind: 'sofa', size, qty: 1, treatment: T[pack] }]), sp = servicePrice('Lisboa', [newItem('sofa', { size, qty: 1, pack })]);
+      expect(sp.struck! - sp.shown!).toBe(m.separatePrice!.separate - m.total);
     }
   });
 });
@@ -88,7 +86,7 @@ describe('total do cesto: o riscado é o do motor, nunca um valor do site', () =
   it('sofá limpo sozinho não tem riscado', () => expect(quoteBasket('Lisboa', [S('3-lugares')]).usual).toBeNull());
 });
 
-describe('janela da peça: o preço e o "Poupa" são os que o total mostra', () => {
+describe('janela da peça: o preço é o serviço das peças', () => {
   const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
   const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
   const R = (rugMaterial: string) => newItem('rug', { width: '2', length: '3', rugMaterial });
@@ -99,14 +97,14 @@ describe('janela da peça: o preço e o "Poupa" são os que o total mostra', () 
   for (const qty of [1, 2]) { groups[`${qty}× 3L pele`] = [S('3-lugares', { qty, leather: true })]; groups[`${qty}× 3L só imper`] = [S('3-lugares', { qty, pack: 'premium', imperOnly: true })]; for (const size of ['solteiro', 'casal', 'king']) for (const pack of ['none', 'premium'] as const) groups[`${qty}× ${size} ${pack}`] = [M({ size, qty, pack })]; }
   for (const q of [1, 2, 6, 7, 12, 25]) for (const pack of ['none', 'essencial', 'premium'] as const) groups[`${q} cadeiras ${pack}`] = [chairs(q, pack)];
   for (const city of ['Lisboa', 'Porto']) for (const [on, o] of Object.entries(others)) it(`${city}: ${on} + ${Object.keys(groups).length} grupos`, () => {
-    const before = o.length ? quoteBasket(city, o).total! : 0;
+    // Dono, 25 Nov 2026: com outras no cesto a opção mostra o serviço da peça, nunca o que o total sobe.
     for (const [gn, g] of Object.entries(groups)) {
-      const { shown, struck } = optionPrice(city, o, g), rise = o.length ? quoteBasket(city, [...o, ...g]).total! - before : splitOf(city, g)!.service;
-      const where = `${city}: ${on} + ${gn}`;
-      expect(shown, where).not.toBeNull();
-      expect(Math.abs(shown! - Math.max(0, rise)), `${where}: mostra ${shown}, o total sobe ${rise}`).toBeLessThanOrEqual(1);
-      const sep = g.reduce((t, x) => t + struckOf(city, x)!, 0);
-      if (struck !== null) expect(struck - shown!, `${where}: poupa`).toBeLessThanOrEqual(sep + (o.length ? 0 : quoteBasket(city, g).gifts.reduce((t, y) => t + y.normal, 0) + 9) - rise + 1);
+      const { shown, struck } = optionPrice(city, g), where = `${city}: ${on} + ${gn}`, alone = splitOf(city, g)!, both = splitOf(city, [...o, ...g])!;
+      expect(shown, where).toBe(alone.service);
+      expect(struck, where).toBe(alone.struck);
+      expect(both.total, where).toBe(quoteBasket(city, [...o, ...g]).total);
+      // Pele: com mais peças a oferta da visita pode passar a ser outra e o tratamento da pele volta a pagar-se (teto das ofertas).
+      if (!g.some(x => x.leather)) expect(both.service, where).toBeLessThanOrEqual((o.length ? splitOf(city, o)!.service : 0) + shown! + 9);
     }
   }, 60_000);
 });
@@ -136,7 +134,7 @@ describe('"Se juntar X, poupa Y": nunca mais do que o total mostra, para qualque
   });
 });
 
-describe('linhas do cesto: somam o serviço, e serviço + deslocação é o total do motor', () => {
+describe('serviço + deslocação é o total do motor; preço por peça só com uma peça', () => {
   const S = (size: string, o: Partial<BasketItem> = {}) => newItem('sofa', { size, pack: 'none', ...o });
   const M = (o: Partial<BasketItem> = {}) => newItem('mattress', { size: 'casal', pack: 'none', ...o });
   const pool: BasketItem[] = [S('1-lugar'), S('1-lugar', { qty: 2 }), S('2-lugares', { qty: 2 }), S('3-lugares'), S('3-lugares', { qty: 2 }), S('3-lugares', { qty: 3 }), S('5-lugares', { qty: 2 }), S('3-lugares', { pack: 'premium', qty: 2 }), S('3-lugares', { pack: 'essencial' }), S('3-lugares', { leather: true, qty: 2 }), S('3-lugares', { pack: 'premium', imperOnly: true }), M(), M({ qty: 3 }), M({ pack: 'premium', qty: 2 }), chairs(1, 'none'), chairs(6, 'none'), chairs(12, 'premium'), newItem('rug', { width: '2', length: '3', rugMaterial: 'juta ou sisal' }), newItem('carpet', { width: '4', length: '5' })];
@@ -147,22 +145,16 @@ describe('linhas do cesto: somam o serviço, e serviço + deslocação é o tota
       expect(split.total, where).toBe(q.total);
       expect(split.service + split.travel, where).toBeCloseTo(q.total!, 2);
       expect(split.travel, where).toBeGreaterThanOrEqual(0);
-      expect(lines.reduce<number>((t, v) => t + v!, 0), where).toBeCloseTo(split.service, 2);
-      for (const v of lines) expect(v!, where).toBeGreaterThan(0);
+      // Várias peças: nunca a conta peça a peça, só o preço da visita (dono, 25 Nov 2026).
+      expect(lines, where).toEqual(g.length > 1 ? [null, null] : [split.service]);
       if (split.struck !== null) { expect(split.struck, where).toBeGreaterThan(split.service); expect(split.struck - split.service, where).toBeLessThanOrEqual(q.usual !== null ? q.usual - q.total! : split.service); }
-      // "Deslocação grátis" só quando as peças não a trazem dentro do preço.
-      if (split.travel === 0 && !split.included) { const alone = g.reduce((t, x) => t + (splitOf(city, [{ ...x, qty: x.kind === 'chairs' ? x.qty : 1 }])!.service * (x.kind === 'chairs' ? 1 : x.qty)), 0); expect(split.service, where).toBeLessThanOrEqual(alone + 9); }
     }
   }, 60_000);
 });
 
 describe('linhas do pedido guardado', () => {
-  it('são as do cesto, com a deslocação quando se paga, e somam o total (um sofá e um colchão gravavam 79€ + 69€ = 169€)', () => {
-    for (const list of [[newItem('sofa', { pack: 'none' }), newItem('mattress')], [newItem('sofa'), newItem('mattress'), newItem('chairs')], [newItem('sofa', { leather: true, pack: 'premium' })]]) {
-      const sum = orderLines('Lisboa', list).reduce((t, l) => t + l.total!, 0);
-      expect(sum, JSON.stringify(list)).toBeCloseTo(quoteBasket('Lisboa', list).total!, 2);
-    }
-    expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' }), newItem('mattress')]).map(l => l.total)).toEqual([89, 80]);
+  it('são as do cesto: várias peças sem preços, uma peça com o preço e a deslocação', () => {
+    for (const list of [[newItem('sofa', { pack: 'none' }), newItem('mattress')], [newItem('sofa'), newItem('mattress'), newItem('chairs')]]) expect(orderLines('Lisboa', list).map(l => l.total)).toEqual(list.map(() => null));
     expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' })]).map(l => [l.label.startsWith('Deslocação'), l.total])).toEqual([[false, 79], [true, 10]]);
   });
 });

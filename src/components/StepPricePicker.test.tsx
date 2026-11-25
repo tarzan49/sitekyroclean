@@ -21,7 +21,7 @@ describe('StepPricePicker', () => {
     expect(screen.getByText('Quantos lugares?')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Juntar um sofá de 3 lugares'));
     for (const name of ['Blindado', 'Protegido', 'Renovado']) expect(screen.getByText(name).closest('button')!.getAttribute('aria-pressed')).toBe('false');
-    const want = optionPrice('Lisboa', [], [newItem('sofa', { size: '3-lugares', qty: 1, pack: 'premium' })]);
+    const want = optionPrice('Lisboa', [newItem('sofa', { size: '3-lugares', qty: 1, pack: 'premium' })]);
     expect(await screen.findByText(euros(want.shown!))).toBeTruthy();
     fireEvent.click(screen.getByText('Blindado'));
     const a = await screen.findByText(/Falar por WhatsApp ·/);
@@ -34,7 +34,7 @@ describe('StepPricePicker', () => {
     fireEvent.click(screen.getByText('Pele / couro'));
     fireEvent.click(screen.getByLabelText('Juntar um sofá de 4 lugares'));
     expect(screen.queryByText('Blindado')).toBeNull();
-    const want = optionPrice('Porto', [], [newItem('sofa', { size: '4-lugares', qty: 1, pack: 'none', leather: true })]);
+    const want = optionPrice('Porto', [newItem('sofa', { size: '4-lugares', qty: 1, pack: 'none', leather: true })]);
     expect((await screen.findAllByText(euros(want.shown!))).length).toBeGreaterThan(0);
   });
   it('cadeiras: nenhuma quantidade nem opção escolhida à partida', () => {

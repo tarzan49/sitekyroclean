@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Gift, Minus, Plus, Trash2, X } from 'lucide-react';
 import { botQuote, listBotCities } from '@/lib/botQuote';
 import { formatEuro } from '@/data/enginePrices';
-import { priceSplit, separateService, serviceLines, splitText, travelLabel, type EngineItem, type PriceSplit } from '@/lib/servicePrice';
+import { priceSplit, splitText, travelLabel, type EngineItem, type PriceSplit } from '@/lib/servicePrice';
 import { buildQuizOrder, type QuoteItem } from '@/lib/quizOrder';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { type QuizLeadPayload } from '@/services/submissionService';
@@ -234,17 +234,17 @@ export function splitOf(city: string, items: BasketItem[]): PriceSplit | null {
   const q = quoteBasket(city, items);
   return q.total === null || q.sob ? null : priceSplit(city, items.map(i => toQuote(i)!) as EngineItem[]);
 }
-/** Riscado de uma linha, na base do serviço: limpeza e impermeabilização (ou anti-ácaros) em separado, sem deslocações. */
+/** Riscado de uma peça sozinha: o do motor, ou o preço quando não há. */
 export function struckOf(city: string, it: BasketItem): number | null {
-  const q = toQuote(it);
-  return q && splitOf(city, [it]) ? separateService(city, q as EngineItem) : null;
+  const x = splitOf(city, [it]);
+  return x && (x.struck ?? x.service);
 }
-/** As linhas do cesto: cada peça ao preço do serviço, somadas = o subtotal do serviço. Sem preço fechado (localidade que o
- *  motor não conhece, uma peça sob orçamento), as linhas do motor, sem deslocação. */
+/** Preço ao lado de cada peça do cesto: só com uma peça. Com várias nunca se mostra a conta "79 + 69" (dono, 25 Nov 2026),
+ *  só o preço da visita. */
 export function basketLines(city: string, items: BasketItem[]): (number | null)[] {
-  if (splitOf(city, items)) { const l = serviceLines(city, items.map(i => toQuote(i)!) as EngineItem[]); if (l) return l; }
-  const lines = quoteBasket(city, items).lines;
-  return items.map((_, i) => lines[i] ?? null);
+  if (items.length !== 1) return items.map(() => null);
+  const x = splitOf(city, items);
+  return [x ? x.service : quoteBasket(city, items).lines[0] ?? null];
 }
 /** Cadeiras com o mesmo serviço são uma só linha (dono, 24 Nov: "Sim, como 6"): 1 + 2 mostravam 30€ + 50€ com o total 70€. */
 export function mergeChairs(list: BasketItem[]): BasketItem[] {
@@ -255,24 +255,17 @@ export function mergeChairs(list: BasketItem[]): BasketItem[] {
   }
   return out;
 }
-/** As linhas do pedido guardado são as que a pessoa viu no cesto: cada peça e, quando se paga, a deslocação. Somam o total. */
+/** As linhas do pedido guardado, como no cesto: uma peça com o preço (e a deslocação, quando se paga); várias sem preços. */
 export const orderLines = (city: string, items: BasketItem[]): { label: string; qty: number; total: number | null }[] => {
   const lines = basketLines(city, items), split = splitOf(city, items);
   return [...items.map((it, i) => ({ label: itemLabel(it), qty: it.qty, total: lines[i] })),
-    ...(split && split.travel > 0 ? [{ label: `Deslocação: ${city.trim()}`, qty: 1, total: split.travel }] : [])];
+    ...(split && split.travel > 0 && items.length === 1 ? [{ label: `Deslocação: ${city.trim()}`, qty: 1, total: split.travel }] : [])];
 };
-/** Preço de uma opção na janela da peça. Cesto vazio: o serviço. Com outras no cesto: o que o total sobe de verdade
- *  (25 Nov 2026); só a diferença de 1€ dos totais a acabar em 9 fica no preço da peça.
- *  Riscado na base do serviço (`struckOf`), para a poupança nunca contar deslocações. */
-export function optionPrice(city: string, others: BasketItem[], list: BasketItem[]): { shown: number | null; struck: number | null } {
-  if (!others.length) { const { shown, struck } = servicePrice(city, list); return { shown, struck }; }
-  const alone = splitOf(city, list), before = splitOf(city, others), after = splitOf(city, [...others, ...list]);
-  if (!alone) return { shown: null, struck: null };
-  const rise = before && after ? Math.round((after.total - before.total) * 100) / 100 : alone.service;
-  const shown = Math.abs(rise - alone.total) <= 1 ? alone.total : Math.max(0, rise);
-  let sep: number | null = 0;
-  for (const x of list) { const v = struckOf(city, x); sep = v === null || sep === null ? null : sep + v; }
-  return { shown, struck: sep !== null && sep > shown ? Math.round(sep * 100) / 100 : null };
+/** Preço de uma opção na janela da peça: o serviço dessas peças, com ou sem outras no cesto (dono, 25 Nov 2026: "69", nunca
+ *  o que o total sobe); o total da visita está no botão. Riscado na base do serviço. */
+export function optionPrice(city: string, list: BasketItem[]): { shown: number | null; struck: number | null } {
+  const { shown, struck } = servicePrice(city, list);
+  return { shown, struck };
 }
 /** Deslocação que o motor somou a este pedido. 0 = não se paga à parte; null = por confirmar. */
 export const travelIn = (city: string, list: BasketItem[]): number | null => splitOf(city, list)?.travel ?? null;
@@ -283,7 +276,7 @@ export function servicePrice(city: string, list: BasketItem[]): { shown: number 
 }
 export const travelNote = travelLabel, priceInWords = splitText;
 /** A opção, sozinha, já não paga deslocação (o motor): "deslocação grátis" em pequeno no cartão. */
-export const freeTravel = (city: string, list: BasketItem[]) => { const x = splitOf(city, list); return !!x && x.travel === 0 && !x.included; };
+export const freeTravel = (city: string, list: BasketItem[]) => { const x = splitOf(city, list); return !!x && x.travel === 0; };
 const capital = (t: string) => t.replace(/^o |^a /, '').replace(/^./, c => c.toUpperCase());
 
 const SAVE_KEY = 'kyro_visit_basket';
@@ -596,7 +589,7 @@ export default function VisitBasket({ isOpen, onClose, initialCity = '', initial
         {split
           ? <dl className="mb-2 space-y-0.5 text-xs text-white/60">
               <div className="flex items-baseline justify-between gap-2"><dt>Serviço{split.struck !== null && <span className="ml-1.5 whitespace-nowrap font-bold text-[#E8C964]">Poupa {formatEuro(Math.round((split.struck - split.service) * 100) / 100)}</span>}</dt><dd className="text-sm font-semibold text-white">{split.struck !== null && <span className="mr-1.5 text-xs font-normal text-white/50 line-through">{formatEuro(split.struck)}</span>}{formatEuro(split.service)}</dd></div>
-              <div className="flex items-baseline justify-between gap-2"><dt>Deslocação</dt><dd>{split.travel > 0 ? formatEuro(split.travel) : split.included ? 'incluída' : 'grátis'}</dd></div>
+              <div className="flex items-baseline justify-between gap-2"><dt>Deslocação</dt><dd>{split.travel > 0 ? formatEuro(split.travel) : 'grátis'}</dd></div>
               <div className="flex items-baseline justify-between gap-2 text-sm text-white/70"><dt>Total</dt><dd className="text-xl font-bold text-white">{formatEuro(split.total)}</dd></div>
             </dl>
           : <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -732,10 +725,10 @@ function ItemSheet({ item, fresh, city, others, onChange, onSave, onCancel }: { 
   const totalOf = (list: BasketItem[]) => { const q = quoteBasket(city, list); return !list.length || q.total === null || q.sob ? null : q.total; };
   // Total da visita com estas peças (dono, 17 Nov: o preço impossível de ler mal).
   const totalWith = (p: Partial<BasketItem>) => totalOf([...others, ...group(p)]);
-  // Preço de cada opção: o serviço (dono, 25 Nov, deslocação à parte); com outras peças, o que o total sobe. Riscado = o
+  // Preço de cada opção: o serviço das peças, com ou sem outras no cesto (dono, 25 Nov, deslocação à parte). Riscado = o
   // serviço de cada peça sozinha (no pack, limpeza e impermeabilização em separado), somado.
   const sepUnits = (g: BasketItem[]) => { let t = 0; for (const x of g) { const v = struckOf(city, x); if (v === null) return null; t += v; } return g.length ? Math.round(t * 100) / 100 : null; };
-  const packPrice = (p: Partial<BasketItem>) => optionPrice(city, others, group(p));
+  const packPrice = (p: Partial<BasketItem>) => optionPrice(city, group(p));
   const addOn = (on: Partial<BasketItem>, off: Partial<BasketItem>) => {
     // O que a visita sobe de facto com o extra (com a escada A pode ser 0: "Oferecido").
     const tot = (p: Partial<BasketItem>) => (others.length ? totalWith(p) : servicePrice(city, group(p)).shown);

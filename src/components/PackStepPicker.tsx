@@ -25,7 +25,6 @@ export type PieceKind = 'sofa' | 'mattress' | 'chairs' | 'rug';
 type Opt = { id: string; name: string; note: string; wa: string };
 type Sel = { material?: 'tecido' | 'pele'; seats?: number; size?: string; qty?: number; w?: string; l?: string; skip?: boolean; treat?: string };
 
-const up9 = (n: number) => Math.ceil((n + 1) / 10) * 10 - 1;
 const dim = (v?: string) => { const n = Number(String(v ?? '').replace(',', '.')); return n > 0 && n <= 10 ? n : null; };
 const PACKS: Opt[] = [
   { id: 'clean+premium', name: 'Blindado', note: 'Limpeza + Premium, até 10 anos', wa: 'limpeza + impermeabilização Premium' },
@@ -68,20 +67,26 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
   };
   // Um só pedido ao motor do bot, o mesmo que o cesto e o WhatsApp fazem.
   const priced = (items: Record<string, unknown>[], cleanOnly = false) => {
-    if (!items.length) return { total: null as number | null, crossed: null as number | null, gifts: [] as BasketGift[], split: null as PriceSplit | null };
+    if (!items.length) return { total: null as number | null, crossed: null as number | null, visitTotal: null as number | null, gifts: [] as BasketGift[], split: null as PriceSplit | null };
     const r = botQuote({ city, items }) as Q;
-    if (!r.ok) return { total: null, crossed: null, gifts: [], split: null };
+    if (!r.ok) return { total: null, visitTotal: null, crossed: null, gifts: [], split: null };
     const rug = items.some(i => i.kind === 'rug');
     // Sofá sozinho só com limpeza: o preço sem a oferta (dono, 25 Nov).
     const plain = cleanOnly && typeof r.visitGifts?.withoutGift === 'number' ? r.visitGifts.withoutGift : r.total;
     const raw = rug && items.length > 1 ? (r.rugCombo?.ok ? r.rugCombo.comboPrice : null) : !r.quote ? plain : null;
-    const total = typeof raw === 'number' ? (items.length > 1 ? up9(raw) : raw) : null;
+    const total = typeof raw === 'number' ? raw : null;
     const gifts = !cleanOnly && r.visitGifts ? r.visitGifts.gifts : [];
     // O número mostrado é o serviço; o total do motor (o que se paga) fica para o fim.
     const base = total === null ? null : priceSplit(city, items);
-    const split = base && total !== null ? { ...base, total, service: Math.round((total - base.travel) * 100) / 100 } : null;
+    const split = base && total !== null ? (total === base.total ? base : { ...base, total, service: Math.round((total - base.travel) * 100) / 100 }) : null;
     const crossed = split && split.struck !== null && !cleanOnly && split.struck - split.service >= 5 ? split.struck : null;
-    return { total: split ? split.service : total, crossed, gifts, split };
+    return { total: split ? split.service : total, visitTotal: total, crossed, gifts, split };
+  };
+  // A opção mostra o serviço dessa peça, nunca o que o total sobe (dono, 25 Nov); com o tratamento oferecido na visita, a limpeza.
+  const ownPrice = (it: Record<string, unknown>, visitTotal: number | null): number | null => {
+    const plain = { ...it, treatment: 'clean' };
+    const offered = it.treatment === 'clean+anti-acaros' && visitTotal !== null && priced([...before(at), plain]).visitTotal === visitTotal;
+    return priceSplit(city, [offered ? plain : it])?.service ?? null;
   };
   const before = (n: number) => pieces.slice(0, n).map(k => toItem(k, sel[k])).filter((x): x is Record<string, unknown> => !!x);
 
@@ -164,13 +169,12 @@ export default function PackStepPicker({ pieces, packName, city, source, mitesOn
       {photo}
       {k === 'chairs' && <div className={`mb-2 flex h-12 items-center justify-between px-2 ${tile(false)}`}><button type="button" aria-label="Menos uma cadeira" onClick={() => set('chairs', { qty: Math.max(1, s!.qty! - 1) })} className="grid h-9 min-h-0 w-9 min-w-0 place-items-center rounded-lg bg-[#EEF1EE]"><Minus className="h-4 w-4" /></button><span>{s!.qty} {s!.qty === 1 ? 'cadeira' : 'cadeiras'}</span><button type="button" aria-label="Mais uma cadeira" onClick={() => set('chairs', { qty: Math.min(40, s!.qty! + 1) })} className="grid h-9 min-h-0 w-9 min-w-0 place-items-center rounded-lg bg-[#EEF1EE]"><Plus className="h-4 w-4" /></button></div>}
       {ask(`${short(k)[0]}: que opção prefere?`)}
-      <div className="flex flex-col gap-2">{optsOf(k).map(o => { const it = toItem(k, s, o.id); return { o, p: it ? priced([...before(at), it], mitesOnly && o.id === 'clean') : null }; })
+      <div className="flex flex-col gap-2">{optsOf(k).map(o => { const it = toItem(k, s, o.id); const p = it ? priced([...before(at), it], mitesOnly && o.id === 'clean') : null; return { o, p, own: it ? (at === 0 ? p!.total : ownPrice(it, p!.visitTotal)) : null }; })
         // Quando o tratamento vem oferecido na visita, o total é o mesmo: só se mostra com ele (dono, 25 Nov: nunca a opção sem a oferta).
-        .filter(({ o, p }, _, list) => !(o.id === 'clean' && list.length > 1 && p?.total != null && list.some(x => x.o.id !== 'clean' && x.p?.total === p.total))).map(({ o, p }) => { return <button key={o.id} type="button" aria-pressed={s?.treat === o.id} onClick={() => { set(k, { treat: o.id }); setAt(at + 1); }} className={row(s?.treat === o.id)}>
+        .filter(({ o, p }, _, list) => !(o.id === 'clean' && list.length > 1 && p?.total != null && list.some(x => x.o.id !== 'clean' && x.p?.visitTotal === p.visitTotal))).map(({ o, p, own }) => { return <button key={o.id} type="button" aria-pressed={s?.treat === o.id} onClick={() => { set(k, { treat: o.id }); setAt(at + 1); }} className={row(s?.treat === o.id)}>
         <span className="min-w-0"><span className="block text-base font-bold leading-tight md:text-lg">{o.name}</span><span className="block text-xs font-normal leading-snug opacity-75 md:text-sm">{o.note}</span></span>
-        <span className="shrink-0 text-right text-lg font-bold">{p?.total != null ? formatEuro(p.total) : ''}{at === 0 && p?.split && p.split.travel === 0 && !p.split.included && <span className="block text-[11px] font-semibold leading-snug">deslocação grátis</span>}</span>
+        <span className="shrink-0 text-right text-lg font-bold">{own != null ? formatEuro(own) : ''}{at === 0 && p?.split && p.split.travel === 0 && <span className="block text-[11px] font-semibold leading-snug">deslocação grátis</span>}</span>
       </button>; })}</div>
-      {at > 0 && <p className="mt-2 text-xs text-[#666]">Valores da visita até aqui.</p>}
     </>}
 
     {done && <>

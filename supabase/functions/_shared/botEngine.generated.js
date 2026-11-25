@@ -221,8 +221,8 @@ var TRAVEL_FREE_ABOVE = { 10: 120, 15: 135, 20: 150 };
 function calculateTravelFee(baseFee, servicesTotal) {
   if (isBlackFriday()) return 0;
   if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
-  const cents2 = Math.round(servicesTotal * 100);
-  if (baseFee === 10 && cents2 > 12e3 || baseFee === 15 && cents2 > 13500 || baseFee === 20 && cents2 >= 15e3) return 0;
+  const cents3 = Math.round(servicesTotal * 100);
+  if (baseFee === 10 && cents3 > 12e3 || baseFee === 15 && cents3 > 13500 || baseFee === 20 && cents3 >= 15e3) return 0;
   return baseFee;
 }
 
@@ -362,8 +362,8 @@ function priceWithPackPerks(lines, mainKind = lines[0]?.kind) {
 var RUG_SIDE_MAX_METERS = 20;
 var RUG_SIDE_DOUBTFUL_METERS = 8;
 var CARPET_SIDE_MAX_METERS = 50;
-function rugSide(raw, maxMeters = RUG_SIDE_MAX_METERS) {
-  const n = typeof raw === "number" ? raw : Number(String(raw ?? "").trim().replace(",", "."));
+function rugSide(raw2, maxMeters = RUG_SIDE_MAX_METERS) {
+  const n = typeof raw2 === "number" ? raw2 : Number(String(raw2 ?? "").trim().replace(",", "."));
   if (!Number.isFinite(n) || n <= 0) return null;
   if (n > maxMeters) {
     const meters = Math.round(n) / 100;
@@ -2360,9 +2360,9 @@ var BOT_SIZES = {
   mattress: mattressPrices.map((p) => p.id)
 };
 var fail = (error) => ({ ok: false, error });
-function toItem(raw, index) {
-  if (!raw || typeof raw !== "object") return fail(`items[${index}] tem de ser um objeto`);
-  const r = raw;
+function toItem(raw2, index) {
+  if (!raw2 || typeof raw2 !== "object") return fail(`items[${index}] tem de ser um objeto`);
+  const r = raw2;
   const kind = r.kind;
   if (!KINDS.includes(kind)) return fail(`items[${index}].kind tem de ser um de: ${KINDS.join(", ")}`);
   const treatment = r.treatment ?? "clean";
@@ -2488,23 +2488,23 @@ var SEAT6_WATERPROOFING_ALONE = { premium: 249, essencial: 189 };
 var CANTO_WATERPROOFING_ALONE = { premium: 199, essencial: 139 };
 var lessTravel = (p) => ({ premium: p.premium - WATERPROOFING_TRAVEL_MAX, essencial: p.essencial - WATERPROOFING_TRAVEL_MAX });
 function uWaterproofingQuote(input) {
-  const raw = input.items;
-  if (!Array.isArray(raw)) return null;
+  const raw2 = input.items;
+  if (!Array.isArray(raw2)) return null;
   const treatmentOf = (r) => String(r.treatment ?? "");
   const isRealU = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "u";
   const isCantoAlone = (r) => !!r && typeof r === "object" && r.kind === "sofa" && r.size === "canto" && ["premium", "essencial"].includes(treatmentOf(r));
   const aloneFixed = (r) => isCantoAlone(r) ? CANTO_WATERPROOFING_ALONE : U_WATERPROOFING_ALONE;
   const isU = (r) => isRealU(r);
   const isUw = (r) => isU(r) && ["clean+premium", "clean+essencial", "premium", "essencial"].includes(treatmentOf(r));
-  const uItems = raw.filter(isUw);
+  const uItems = raw2.filter(isUw);
   if (!uItems.length) return null;
-  if (raw.some((r) => !isUw(r) && r && typeof r === "object" && /premium|essencial/.test(treatmentOf(r)))) return null;
-  const alone = uItems.every((r) => !treatmentOf(r).startsWith("clean"));
-  if (!alone && uItems.some((r) => !treatmentOf(r).startsWith("clean"))) return null;
+  if (raw2.some((r) => !isUw(r) && r && typeof r === "object" && /premium|essencial/.test(treatmentOf(r)))) return null;
+  const alone2 = uItems.every((r) => !treatmentOf(r).startsWith("clean"));
+  if (!alone2 && uItems.some((r) => !treatmentOf(r).startsWith("clean"))) return null;
   const n = uItems.reduce((sum2, r) => sum2 + (typeof r.qty === "number" ? r.qty : 1), 0);
   const tier = uItems.some((r) => /premium/.test(treatmentOf(r))) ? "premium" : "essencial";
-  const others = raw.filter((r) => !isUw(r));
-  if (alone) {
+  const others = raw2.filter((r) => !isUw(r));
+  if (alone2) {
     const city = resolveBotCity(input.city);
     if (city === null || EXTENDED_TRIP_CITIES.has(city)) return null;
     const base2 = others.length ? botQuoteCore({ ...input, items: others }) : null;
@@ -2543,7 +2543,7 @@ function uWaterproofingQuote(input) {
       closeNow: closeNowOffer({ total: total2, waterproofing: true, handToOwner: false, rug: null })
     };
   }
-  const base = botQuoteCore({ ...input, items: raw.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
+  const base = botQuoteCore({ ...input, items: raw2.map((r) => isUw(r) ? { ...r, treatment: "clean" } : r) });
   if (!base.ok || base.quote || base.total === null) return null;
   const premium = cents(base.total + U_WATERPROOFING_EXTRA.premium * n);
   const essencial = cents(base.total + U_WATERPROOFING_EXTRA.essencial * n);
@@ -2610,16 +2610,16 @@ function pieceOdorFor(items, rawOf) {
   return amount2 ? { amount: amount2, lines } : null;
 }
 var SOFA_OFFER_RULE = 'O tratamento vai oferecido no pack limpeza + impermeabilização: o total é o do pack. Diz numa linha à parte "Oferecemos o anti-odor (normalmente 40€)."; sem valor normal (normal null) diz só que vai oferecido. Nunca somar.';
-var sofaOfferNormal = (i, raw) => raw.odor === true ? SOFA_ODOR : SOFA_ANTI_ACAROS_PRICE[i.size] ?? null;
+var sofaOfferNormal = (i, raw2) => raw2.odor === true ? SOFA_ODOR : SOFA_ANTI_ACAROS_PRICE[i.size] ?? null;
 function sofaOfferFor(items, rawOf) {
   const offers = [], lines = [];
   items.forEach((i, n) => {
-    const raw = rawOf[n] ?? {};
-    if (i.kind !== "sofa" || !isWaterproofing(i) || i.primary === "waterproofing" || raw.odor !== true && raw.mites !== true) return;
-    const unit = sofaOfferNormal(i, raw);
+    const raw2 = rawOf[n] ?? {};
+    if (i.kind !== "sofa" || !isWaterproofing(i) || i.primary === "waterproofing" || raw2.odor !== true && raw2.mites !== true) return;
+    const unit = sofaOfferNormal(i, raw2);
     const normal = unit === null ? null : unit * i.qty;
-    offers.push({ treatment: raw.odor === true ? "anti-odor" : "anti-acaros", normal });
-    lines.push({ label: `Tratamento ${raw.odor === true ? "anti-odor" : "anti-ácaros"} sofá${i.qty > 1 ? ` (${i.qty} un.)` : ""}, oferecido${normal === null ? "" : `, normalmente ${normal}€`}`, amount: 0, tablePrice: 0, perkApplied: false, perkNote: void 0, quote: false });
+    offers.push({ treatment: raw2.odor === true ? "anti-odor" : "anti-acaros", normal });
+    lines.push({ label: `Tratamento ${raw2.odor === true ? "anti-odor" : "anti-ácaros"} sofá${i.qty > 1 ? ` (${i.qty} un.)` : ""}, oferecido${normal === null ? "" : `, normalmente ${normal}€`}`, amount: 0, tablePrice: 0, perkApplied: false, perkNote: void 0, quote: false });
   });
   return offers.length ? { offers, lines } : null;
 }
@@ -2639,12 +2639,12 @@ function leatherFor(items, rawOf) {
   return amount2 ? { amount: amount2, lines } : null;
 }
 function rugWaterproofingQuote(input) {
-  const raw = input.items;
-  if (!Array.isArray(raw)) return null;
+  const raw2 = input.items;
+  if (!Array.isArray(raw2)) return null;
   const isRw = (r) => !!r && typeof r === "object" && r.kind === "rug" && ["premium", "essencial"].includes(String(r.treatment));
-  const rugs = raw.filter(isRw);
+  const rugs = raw2.filter(isRw);
   if (!rugs.length) return null;
-  const others = raw.filter((r) => !isRw(r));
+  const others = raw2.filter((r) => !isRw(r));
   const hasExtras = [input.puffs, input.armchairs].some((v) => typeof v === "number" && v > 0) || Array.isArray(input.headboards) && input.headboards.length > 0;
   const sameVisit = others.length > 0 || hasExtras;
   const lines = [];
@@ -2796,17 +2796,17 @@ function withEndIn9(input, r) {
 function uAsSeats(input) {
   const items = input?.items;
   if (!Array.isArray(items)) return input;
-  return { ...input, items: items.map((raw) => {
-    const r = raw ?? {};
-    if (r.kind !== "sofa" || r.size !== "u" || typeof r.seats !== "number" || !Number.isInteger(r.seats) || r.seats < 2 || r.seats > 15) return raw;
-    if (!["clean", "clean+premium", "clean+essencial", "premium", "essencial"].includes(String(r.treatment ?? "clean"))) return raw;
+  return { ...input, items: items.map((raw2) => {
+    const r = raw2 ?? {};
+    if (r.kind !== "sofa" || r.size !== "u" || typeof r.seats !== "number" || !Number.isInteger(r.seats) || r.seats < 2 || r.seats > 15) return raw2;
+    if (!["clean", "clean+premium", "clean+essencial", "premium", "essencial"].includes(String(r.treatment ?? "clean"))) return raw2;
     const seats = r.seats === 7 ? 7 : r.seats + 1;
     return { ...r, size: seats <= 4 ? `${seats}-lugares` : "5-lugares", seats };
   }) };
 }
 var SOFA_TRAVEL_OFFER = 10;
 var SOFA_MITES_AS_ODOR = /* @__PURE__ */ new Set(["3-lugares"]);
-var SOFA_TRAVEL_OFFER_RULE = 'O total já tem os primeiros 10€ da deslocação oferecidos: dá só o total, "com a deslocação incluída". Nunca digas a deslocação à parte nem "desconto".';
+var SOFA_TRAVEL_OFFER_RULE = 'O total já tem os primeiros 10€ da deslocação oferecidos: diz "Serviço: X€ + Y€ de deslocação. Total: Z€." (X = total − travel; com travel 0, "deslocação grátis"). Nunca lhe chames "desconto".';
 function withSofaTravelOffer(input, r) {
   const inp = expandPieces(input ?? {});
   const items = inp.items;
@@ -2816,21 +2816,121 @@ function withSofaTravelOffer(input, r) {
   const it = items[0] ?? {};
   const odor = it.odor === true && (it.treatment ?? "clean") === "clean", mites = it.treatment === "clean+anti-acaros";
   if (it.kind !== "sofa" || it.leather === true || !(odor || mites)) return r;
-  const raw = innerPriced(inp);
-  const offered = Math.min(SOFA_TRAVEL_OFFER, raw.travel ?? 0);
-  let total = up9Total(raw.subtotal + (raw.travel ?? 0) - offered);
+  const raw2 = innerPriced(inp);
+  const offered = Math.min(SOFA_TRAVEL_OFFER, raw2.travel ?? 0);
+  let total = up9Total(raw2.subtotal + (raw2.travel ?? 0) - offered);
   if (mites && SOFA_MITES_AS_ODOR.has(String(it.size))) {
     const as = withSofaTravelOffer({ ...inp, items: [{ ...it, treatment: "clean", odor: true }] }, innerPriced({ ...inp, items: [{ ...it, treatment: "clean", odor: true }] }));
     const same = as.total;
     if (typeof same === "number") total = Math.min(total, same);
   }
-  const travel = cents(Math.max(0, (raw.travel ?? 0) - offered));
-  const lines = Array.isArray(x.lines) && x.lines.length === 1 && raw.subtotal > total - travel ? [{ ...x.lines[0], amount: cents(total - travel) }] : x.lines;
+  const travel = cents(Math.max(0, (raw2.travel ?? 0) - offered));
+  const lines = Array.isArray(x.lines) && x.lines.length === 1 && raw2.subtotal > total - travel ? [{ ...x.lines[0], amount: cents(total - travel) }] : x.lines;
   return total < x.total ? { ...x, total, travel, lines, subtotal: lines === x.lines ? x.subtotal : cents(total - travel), sofaTravelOffer: { amount: cents(x.total - total), rule: SOFA_TRAVEL_OFFER_RULE } } : r;
 }
-function botQuoteOf(rawInput) {
+var ONE_TRAVEL_RULE = 'Uma visita tem UMA só deslocação: o total é o serviço (a soma das peças, cada uma ao seu preço sozinha sem deslocação, a acabar em 9 para cima) mais a deslocação da localidade, grátis acima do limite. Diz "Serviço: [service]€ + [travel]€ de deslocação. Total: [total]€." (travel 0 = "deslocação grátis").';
+var visitTravel = (fee, service, waterproofing) => isBlackFriday() ? 0 : waterproofing ? fee <= WATERPROOFING_TRAVEL_MAX ? 0 : WATERPROOFING_TRAVEL_MAX : calculateTravelFee(fee, service);
+function withOneTravel(input, r) {
+  const x = r;
+  if (!x?.ok || x.sharedTrip || x.blackFriday || x.rugWaterproofing || x.handToOwner && !(x.extendedTrip && x.cityKnown)) return r;
+  const inp = expandPieces(input ?? {});
+  const items = inp.items;
+  if (!Array.isArray(items) || items.length < 2) return r;
+  const city = resolveBotCity(inp.city);
+  const fee = city === null ? void 0 : locationPrices[city];
+  if (fee === void 0) return r;
+  const isRug2 = (i) => i.kind === "rug" || i.kind === "carpet";
+  const rugsOnly = items.every(isRug2), mixed = !rugsOnly && items.some(isRug2);
+  const now = rugsOnly ? x.rugEstimate?.homePrice : mixed ? x.rugCombo?.comboPrice : x.quote ? null : x.total;
+  if (typeof now !== "number") return r;
+  const isWp = (i) => /premium|essencial/.test(String(i.treatment ?? ""));
+  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !["armchairs", "largeArmchairs", "puffs", "headboards"].includes(k)));
+  const gifts = x.visitGifts?.gifts ?? [];
+  const plan = (rows) => {
+    const left = gifts.slice();
+    const paid = rows.map((i) => {
+      const at = left.findIndex((g2) => g2.piece === i.kind && (g2.treatment === "tratamento-pele" ? i.leather === true : g2.treatment === "anti-odor" ? i.odor === true : i.treatment === "clean+anti-acaros"));
+      if (at < 0) return i;
+      const [g] = left.splice(at, 1);
+      return g.treatment === "tratamento-pele" ? { ...i, leather: false } : g.treatment === "anti-odor" ? { ...i, odor: false } : { ...i, treatment: "clean" };
+    });
+    const set = (k) => paid.filter((i) => i.kind === k);
+    const groups2 = [...paid.filter((i) => i.kind !== "chairs" && i.kind !== "carpet").map((i) => [i]), ...["chairs", "carpet"].map(set).filter((g) => g.length)];
+    const out2 = [];
+    for (const g of groups2) {
+      const a = quoteAlone({ ...noExtras, items: g });
+      const rug = g.every(isRug2);
+      const t = rug ? a.rugEstimate?.homePrice : a.quote ? null : a.total;
+      const tr = rug ? a.rugEstimate?.travelFee : a.travel ?? null;
+      if (!a.ok || typeof t !== "number" || typeof tr !== "number") return null;
+      const travel = tr + (rug ? 0 : a.smallOrderSurcharge?.amount ?? 0);
+      out2.push({ net: cents(t - (travel < t ? travel : 0)), alone: cents(t - (rug ? 0 : a.smallOrderSurcharge?.amount ?? 0)), wp: g.some(isWp) });
+    }
+    return out2;
+  };
+  const priceOf = (g) => {
+    if (g.length < 2) return null;
+    const service = up9Total(g.reduce((n, p2) => n + p2.net, 0));
+    const travel = visitTravel(fee, service, g.some((p2) => p2.wp));
+    let total = cents(service + travel);
+    for (const p2 of g) total = Math.max(total, p2.alone);
+    if (g.length > 2 && travel < fee && g.length <= 8) for (let k = 0; k < g.length; k++) total = Math.max(total, priceOf(g.filter((_, n) => n !== k)).total);
+    const t = Math.min(Math.max(travel, fee), cents(total - service));
+    return { service: cents(total - t), travel: t, total };
+  };
+  const groups = plan(items);
+  const p = groups && priceOf(groups);
+  if (!p) return r;
+  const without = (i) => isRug2(i) && i.odor === true ? { ...i, odor: false } : i.kind === "chairs" && !i.seatOnly && /^clean\+(premium|essencial)$/.test(String(i.treatment)) ? { ...i, treatment: "clean" } : null;
+  for (const [n, i] of items.entries()) {
+    const w = without(i);
+    if (!w) continue;
+    const a = botQuoteOf({ ...noExtras, items: items.map((y, k) => k === n ? w : y) });
+    const t = rugsOnly ? a.rugEstimate?.homePrice : mixed ? a.rugCombo?.comboPrice : a.quote ? null : a.total;
+    if (a.ok && typeof t === "number") p.total = Math.max(p.total, t);
+  }
+  p.travel = cents(Math.max(p.travel, Math.min(fee, p.total - p.service)));
+  p.service = cents(p.total - p.travel);
+  const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
+  const usualOf = (g, q, sep) => Math.max(q.total, up9Total(g.reduce((n, y) => n + y.alone, 0) + giftSum), sep ?? 0);
+  const usual = usualOf(groups, p, x.separatePrice?.separate);
+  const diff = cents(p.total - now);
+  const out = { ...x, travel: p.travel, smallOrderSurcharge: null, oneTravel: { ...p, rule: ONE_TRAVEL_RULE } };
+  if (rugsOnly) out.rugEstimate = { ...x.rugEstimate, homePrice: p.total, pickupPrice: plus(x.rugEstimate.pickupPrice, diff) };
+  else if (mixed) out.rugCombo = { ...x.rugCombo, comboPrice: p.total, usualPrice: p.total, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };
+  else out.total = p.total;
+  for (const k of ["puff", "armchair", "headboard"]) if (x[k] && typeof x[k].total === "number") out[k] = { ...x[k], total: cents(x[k].total + diff) };
+  let tiers = null;
+  if (x.waterproofingTiers) {
+    const at = (k) => {
+      if (typeof x.waterproofingTiers[k] !== "number") return null;
+      const g = plan(items.map((i) => isWp(i) ? { ...i, treatment: String(i.treatment).replace(/premium|essencial/, k) } : i));
+      const q = g && priceOf(g);
+      return q ? { total: q.total, usual: usualOf(g, q, x.separatePrice?.tiers?.[k]?.separate), travel: q.travel } : null;
+    };
+    tiers = { premium: at("premium"), essencial: at("essencial") };
+    out.waterproofingTiers = { ...x.waterproofingTiers, travel: p.travel, premium: tiers.premium?.total ?? x.waterproofingTiers.premium, essencial: tiers.essencial?.total ?? x.waterproofingTiers.essencial };
+  }
+  if (x.visitGifts) out.visitGifts = { ...x.visitGifts, total: p.total, usual, withoutGift: null, tiers: x.visitGifts.tiers && tiers ? Object.fromEntries(["premium", "essencial"].map((k) => [k, tiers[k] ? { usual: tiers[k].usual, total: tiers[k].total } : x.visitGifts.tiers[k]])) : x.visitGifts.tiers };
+  if (x.mattressMiteOffer) out.mattressMiteOffer = { ...x.mattressMiteOffer, total: p.total };
+  if (x.mattressMitePack) out.mattressMitePack = x.visitGifts ? { ...x.mattressMitePack, separate: usual, total: p.total } : { ...x.mattressMitePack, total: p.total };
+  if (x.separatePrice) {
+    const sep = x.visitGifts ? usual : x.separatePrice.separate;
+    const t = x.separatePrice.tiers && tiers ? Object.fromEntries(["premium", "essencial"].map((k) => {
+      const s0 = x.visitGifts ? tiers[k]?.usual : x.separatePrice.tiers[k]?.separate;
+      return [k, typeof s0 === "number" && tiers[k] && s0 > tiers[k].total ? { separate: s0, total: tiers[k].total, saving: cents(s0 - tiers[k].total) } : null];
+    })) : x.separatePrice.tiers;
+    const any = t && (t.premium || t.essencial);
+    out.separatePrice = sep > p.total ? { ...x.separatePrice, separate: sep, total: p.total, saving: cents(sep - p.total), tiers: t } : any ? { ...x.separatePrice, separate: 0, total: p.total, saving: 0, tiers: t } : null;
+  }
+  return out;
+}
+function quoteAlone(rawInput) {
   const input = uAsSeats(rawInput);
   return withSofaTravelOffer(input, withOneStruckPrice(input, withEndIn9(input, botQuoteChain(input))));
+}
+function botQuoteOf(rawInput) {
+  return withOneTravel(uAsSeats(rawInput), quoteAlone(rawInput));
 }
 function botQuote(input) {
   const inp = input ?? {};
@@ -2838,14 +2938,14 @@ function botQuote(input) {
   if (merged === inp) return botQuoteOf(input);
   const r = botQuoteOf(merged);
   const x = r;
-  const raw = inp.items, set = merged.items;
+  const raw2 = inp.items, set = merged.items;
   if (!Array.isArray(x.lines) || x.lines.length < set.length) return r;
   const used = /* @__PURE__ */ new Map();
-  const lines = raw.map((row, n) => {
+  const lines = raw2.map((row, n) => {
     const at = set.findIndex((i) => row?.kind === "chairs" ? chairRowKey(i) === chairRowKey(row) : i === row);
     const line = x.lines[at];
     if (row?.kind !== "chairs" || typeof line?.amount !== "number") return line;
-    const last = !raw.slice(n + 1).some((y) => chairRowKey(y) === chairRowKey(row));
+    const last = !raw2.slice(n + 1).some((y) => chairRowKey(y) === chairRowKey(row));
     const before = used.get(at) ?? 0;
     const amount2 = last ? cents(line.amount - before) : cents(line.amount * (Number(row.qty) || 1) / (Number(set[at].qty) || 1));
     used.set(at, cents(before + amount2));
@@ -2854,7 +2954,7 @@ function botQuote(input) {
   return { ...r, lines: [...lines, ...x.lines.slice(set.length)] };
 }
 var MATTRESS_MITES_SEPARATE = 40;
-var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
+var MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€", com o serviço, a deslocação e o total: "Serviço: X€ + Y€ de deslocação. Total: Z€." (X = total − travel; com travel 0, "deslocação grátis"). O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
 function withMattressMitePack(input, r) {
   const none = { ...r, mattressMitePack: null };
   const q = r;
@@ -2872,14 +2972,14 @@ function withMattressMitePack(input, r) {
   return separate > q.total ? { ...r, mattressMitePack: { separate, total: q.total, perMattress: MATTRESS_MITES_SEPARATE, rule: MATTRESS_MITE_PACK_RULE } } : none;
 }
 function chairPackStruck(qty, tier, city) {
-  const alone = (treatment) => pricedTotal(botQuote({ city, items: [{ kind: "chairs", qty, treatment }] }));
-  const clean = alone("clean"), wp = alone(tier);
+  const alone2 = (treatment) => pricedTotal(botQuote({ city, items: [{ kind: "chairs", qty, treatment }] }));
+  const clean = alone2("clean"), wp = alone2(tier);
   return clean === null || wp === null ? null : Math.min(chairPackWas(qty, tier), cents(clean + wp));
 }
 var CHAIR_PACK_STRUCK_MIN = 4;
 function withChairsWas(input, r) {
-  const raw = expandPieces(input ?? {}).items;
-  const only = Array.isArray(raw) && raw.length === 1 ? raw[0] : null;
+  const raw2 = expandPieces(input ?? {}).items;
+  const only = Array.isArray(raw2) && raw2.length === 1 ? raw2[0] : null;
   const tier = only?.treatment === "clean+premium" ? "premium" : only?.treatment === "clean+essencial" ? "essencial" : null;
   const qty = Number(only?.qty);
   const total = r.total;
@@ -2912,20 +3012,20 @@ function withBlackFridayPrices(input, r) {
   const none = { ...r, blackFriday: null };
   const inp = input ?? {};
   const q = r;
-  const raw = Array.isArray(inp.items) ? inp.items : [];
-  const rugsOnly = raw.length > 0 && raw.every((i) => i?.kind === "rug");
+  const raw2 = Array.isArray(inp.items) ? inp.items : [];
+  const rugsOnly = raw2.length > 0 && raw2.every((i) => i?.kind === "rug");
   if (!q.ok || q.quote && !rugsOnly || q.handToOwner || q.sharedTrip || !blackFridayPricesActive(inp.campaign)) return none;
-  if (!raw.length || q.rugCombo?.ok) return none;
+  if (!raw2.length || q.rugCombo?.ok) return none;
   const end9 = (v) => Math.floor((v + 1) / 10) * 10 - 1;
   let bf;
   if (rugsOnly) {
-    if (raw.some((i) => i.odor === true || (i.treatment ?? "clean") !== "clean") || !q.rugEstimate?.ok || typeof q.rugEstimate.homePrice !== "number") return none;
+    if (raw2.some((i) => i.odor === true || (i.treatment ?? "clean") !== "clean") || !q.rugEstimate?.ok || typeof q.rugEstimate.homePrice !== "number") return none;
     const table = innerPriced({ ...inp, campaign: void 0 }).rugEstimate?.homePrice ?? q.rugEstimate.homePrice;
     bf = end9(table * BLACK_FRIDAY_PRICES.rugFactor);
   } else {
-    const chairs = raw.filter((i) => i?.kind === "chairs").reduce((s, i) => s + (typeof i.qty === "number" ? i.qty : 1), 0);
+    const chairs = raw2.filter((i) => i?.kind === "chairs").reduce((s, i) => s + (typeof i.qty === "number" ? i.qty : 1), 0);
     let sum2 = 0, pieces = 0;
-    for (const i of raw) {
+    for (const i of raw2) {
       if (!i || (i.treatment ?? "clean") !== "clean" || i.leather === true || i.odor === true) return none;
       const qty = typeof i.qty === "number" ? i.qty : 1;
       let unit;
@@ -2938,7 +3038,7 @@ function withBlackFridayPrices(input, r) {
       sum2 += unit * qty;
       pieces += i.kind === "chairs" ? 1 : qty;
     }
-    bf = pieces > 1 || raw.some((i) => i.kind === "chairs") ? end9(sum2) : sum2;
+    bf = pieces > 1 || raw2.some((i) => i.kind === "chairs") ? end9(sum2) : sum2;
   }
   const normal = rugsOnly ? q.rugEstimate.homePrice : q.total;
   if (typeof normal !== "number" || bf >= normal) return none;
@@ -2998,7 +3098,7 @@ function withOdorFloor(input, r) {
 }
 var MATTRESS_MITE_OFFER_MIN = 150;
 var VISIT_GIFTS_MAX_SHARE = 0.2;
-var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
+var VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€". Antes do total, o serviço (as peças ao preço de cada uma sem deslocação, somadas e acabadas em 9 para cima, nunca acima do total) e a deslocação (o total menos o serviço): "Serviço: X€ + Y€ de deslocação.". Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 var innerPriced = (x) => botQuoteInner(x);
 var pricedTotal = (r) => {
   if (!r.ok || r.handToOwner) return null;
@@ -3014,8 +3114,8 @@ function withVisitGifts(input, r) {
   const rawIn = inp.items;
   if (!Array.isArray(rawIn)) return none;
   const rec = (i) => i ?? {};
-  const isRug = (i) => rec(i).kind === "rug" || rec(i).kind === "carpet";
-  const rugsOnly = rawIn.every(isRug) && rawIn.some((i) => rec(i).kind === "rug");
+  const isRug2 = (i) => rec(i).kind === "rug" || rec(i).kind === "carpet";
+  const rugsOnly = rawIn.every(isRug2) && rawIn.some((i) => rec(i).kind === "rug");
   const totalOf = rugsOnly ? payTotal : pricedTotal;
   if (totalOf(q) === null) return none;
   const price = (items) => totalOf(innerPriced({ ...inp, items }));
@@ -3050,7 +3150,6 @@ function withVisitGifts(input, r) {
   const asAskedPrice = price(rawIn);
   const giftCap = cents(VISIT_GIFTS_MAX_SHARE * (asAskedPrice ?? baseTotal));
   let giftUsed = 0;
-  let capped = false;
   const gifted = /* @__PURE__ */ new Map();
   let withGifts = base.slice();
   let usualBase = baseTotal;
@@ -3065,10 +3164,7 @@ function withVisitGifts(input, r) {
       if (priced2 === null || priced2 <= usualBase) continue;
       const mattresses = c.piece === "mattress" ? Number(rec(i).qty) || 1 : 0;
       const gift = { piece: c.piece, treatment: c.treatment, normal: c.piece === "mattress" ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced2 - usualBase) };
-      if (c.piece !== "mattress" && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) {
-        capped = true;
-        continue;
-      }
+      if (c.piece !== "mattress" && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) continue;
       const better = !best || c.piece === "mattress" !== (best.gift.piece === "mattress") ? !best || c.piece === "mattress" : gift.normal !== best.gift.normal ? gift.normal < best.gift.normal : keyOf(n) < keyOf(best.n);
       if (better) best = { n, gift, items, priced: priced2 };
     }
@@ -3078,42 +3174,19 @@ function withVisitGifts(input, r) {
     withGifts = best.items;
     usualBase = best.priced;
   }
-  const cleanedSofas = rawIn.every((i) => rec(i).kind === "sofa" && ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
-  const withRugs = rawIn.length > 1 && rawIn.some((i) => rec(i).kind === "rug") && rawIn.every((i) => isRug(i) || rec(i).kind === "sofa" && ["clean", "clean+anti-acaros"].includes(treat(i) ?? "clean"));
-  if (!gifted.size && (extras || !(capped && cleanedSofas || withRugs))) return none;
-  if (rugsOnly && extras) return none;
+  if (!gifted.size || rugsOnly && extras) return none;
   const restore = (items) => items.map((i, n) => asked.has(n) && !gifted.has(n) ? rawIn[n] : i);
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  const EXTRA_KEYS = ["armchairs", "largeArmchairs", "puffs", "headboards"];
-  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !EXTRA_KEYS.includes(k)));
-  const aloneOf = (x) => {
-    const one = { ...noExtras, ...x };
-    const r1 = withEndIn9(one, withSeparatePrice(one, botQuoteCore(one)));
-    return pricedTotal(r1) ?? (r1.ok && !r1.handToOwner && typeof r1.rugEstimate?.homePrice === "number" ? r1.rugEstimate.homePrice : null);
-  };
-  const paidItems = restore(base);
-  const chairSet = paidItems.filter((i) => rec(i).kind === "chairs");
-  const carpetSet = rugsOnly || !gifted.size ? paidItems.filter((i) => rec(i).kind === "carpet") : [];
-  const parts = [...paidItems.filter((i) => rec(i).kind !== "chairs" && !carpetSet.includes(i)).map((i) => [i]), ...chairSet.length ? [chairSet] : [], ...carpetSet.length ? [carpetSet] : []].map((its) => aloneOf({ items: its }));
-  const sumAlone = parts.every((v) => typeof v === "number") ? cents(parts.reduce((a, v) => a + v, 0)) : total;
-  const offeredAlone = paidItems.reduce((n, i) => {
-    if (rec(i).kind !== "sofa") return n;
-    const one = { ...noExtras, items: [i] }, r1 = withEndIn9(one, withSeparatePrice(one, botQuoteCore(one)));
-    const before = pricedTotal(r1), after = pricedTotal(withSofaTravelOffer(one, r1));
-    return before !== null && after !== null ? cents(n + before - after) : n;
-  }, 0);
-  const overCap = gifted.size === 1 && cents(gifts[0].piece === "mattress" ? 0 : gifts[0].normal) > giftCap;
-  const lift = overCap && !(cleanedSofas || withRugs) ? 0 : Math.max(0, cents(sumAlone - total));
-  const paid = cents(total + lift);
+  const paid = total;
   const up9 = (x) => {
     const n = Math.ceil(x);
     return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
   };
   const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
   const final = up9(paid);
-  const usual = Math.max(final, up9(paid + giftSum - offeredAlone));
+  const usual = Math.max(final, up9(paid + giftSum));
   const out = { ...r };
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === "number") out.rugCombo = { ...rc, comboPrice: final, usualPrice: final, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };
@@ -3187,33 +3260,33 @@ function botQuoteInner(input) {
   if (rawItems.length > MAX_ITEMS) return fail(`No máximo ${MAX_ITEMS} artigos por orçamento`);
   const items = [];
   const rawOf = [];
-  for (const [i, raw] of rawItems.entries()) {
-    const item = toItem(raw, i);
+  for (const [i, raw2] of rawItems.entries()) {
+    const item = toItem(raw2, i);
     if ("ok" in item) return item;
     if (item.kind === "sofa" && item.size === "canto" && (item.extra === "premium" || item.extra === "essencial")) {
       items.push(item.primary === "waterproofing" ? { ...item, waterproofingFixed: lessTravel(CANTO_WATERPROOFING_ALONE), travelIncluded: true } : { ...item, waterproofingFixed: U_WATERPROOFING_EXTRA });
-      rawOf.push(raw);
+      rawOf.push(raw2);
       continue;
     }
-    const rawSeats = Number(raw?.seats);
+    const rawSeats = Number(raw2?.seats);
     if (item.kind === "sofa" && item.size === "5-lugares" && item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && !(Number.isInteger(rawSeats) && rawSeats > 7)) {
       items.push({ ...item, waterproofingFixed: lessTravel(Number.isInteger(rawSeats) && rawSeats >= 6 ? SEAT6_WATERPROOFING_ALONE : SEAT5_WATERPROOFING_ALONE), travelIncluded: true });
-      rawOf.push(raw);
+      rawOf.push(raw2);
       continue;
     }
-    if (raw?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
+    if (raw2?.size === "5-lugares" && item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.extra === "none" && item.primary !== "waterproofing") {
       const fee = locationPrices[resolveBotCity(rawCity) ?? ""];
       items.push(fee === 10 ? { ...item, unitPrice: SOFA_5_ALONE_CLEANING_BASE, travelIncluded: true } : item);
-      rawOf.push(raw);
+      rawOf.push(raw2);
       continue;
     }
     if (item.kind === "sofa" && item.size === "5-lugares" && !item.unitPrice && item.primary !== "waterproofing" && (item.extra === "premium" || item.extra === "essencial")) {
       items.push({ ...item, waterproofingFixed: SEAT5_WATERPROOFING_EXTRA });
-      rawOf.push(raw);
+      rawOf.push(raw2);
       continue;
     }
     items.push(item);
-    rawOf.push(raw);
+    rawOf.push(raw2);
   }
   const city = resolveBotCity(rawCity);
   if (locationPrices[city ?? ""] === WATERPROOFING_TRAVEL_MAX) items.forEach((it, n) => {
@@ -3314,19 +3387,19 @@ function withSeparatePrice(input, r) {
   if (chairsOnly && (items.length < 2 || items.some((i) => ["premium", "essencial"].includes(String(i?.treatment))))) return none;
   const total = pricedTotal(q);
   if (total === null) return none;
-  const alone = (i) => {
+  const alone2 = (i) => {
     const one = { ...inp, items: [i] };
     return pricedTotal(withSofaTravelOffer(one, innerPriced(one)));
   };
   const rec = (i) => i ?? {};
   const visits = (i, tier) => {
-    const raw = rec(i).treatment ?? "clean";
-    if (tier && (raw === "premium" || raw === "essencial")) return [{ ...rec(i), treatment: tier }];
-    if (chairsOnly) return [tier && /^clean\+/.test(raw) ? { ...rec(i), treatment: `clean+${tier}` } : i];
-    const pack = /^clean\+(premium|essencial)$/.exec(raw);
+    const raw2 = rec(i).treatment ?? "clean";
+    if (tier && (raw2 === "premium" || raw2 === "essencial")) return [{ ...rec(i), treatment: tier }];
+    if (chairsOnly) return [tier && /^clean\+/.test(raw2) ? { ...rec(i), treatment: `clean+${tier}` } : i];
+    const pack = /^clean\+(premium|essencial)$/.exec(raw2);
     const wp = pack ? tier ?? pack[1] : null;
     if (!wp) return [i];
-    const asWp = alone({ ...rec(i), treatment: wp, odor: void 0, mites: void 0 }) === null ? null : { ...rec(i), treatment: wp };
+    const asWp = alone2({ ...rec(i), treatment: wp, odor: void 0, mites: void 0 }) === null ? null : { ...rec(i), treatment: wp };
     if (tier && !asWp) return [i];
     return asWp ? [{ ...rec(i), treatment: "clean", odor: void 0, mites: void 0 }, { ...asWp, odor: void 0, mites: void 0 }] : null;
   };
@@ -3342,7 +3415,7 @@ function withSeparatePrice(input, r) {
     if (parts.length < 2) return null;
     let sum2 = 0;
     for (const p of parts) {
-      const v = alone(p);
+      const v = alone2(p);
       if (v === null) return null;
       sum2 += v;
     }
@@ -3365,6 +3438,88 @@ function withSeparatePrice(input, r) {
   const plain = q.visitGifts?.gifts?.length ? pricedTotal(innerPriced(inp)) : null;
   const withoutGift = plain === null ? null : up9Total(plain);
   return { ...out, separatePrice: { ...main ?? { separate: 0, total: out.total, saving: 0 }, tiers, withoutGift: null, rule: SEPARATE_PRICE_RULE } };
+}
+
+// src/lib/servicePrice.ts
+var cents2 = (n) => Math.round(n * 100) / 100;
+var isRug = (i) => i.kind === "rug" || i.kind === "carpet";
+var qtyOf = (i) => Number(i.qty) || 1;
+var byUnit = (i) => i.kind === "sofa" || i.kind === "mattress";
+var cache = /* @__PURE__ */ new Map();
+function quote(city, items) {
+  const key = `${city}|${JSON.stringify(items)}`;
+  let r = cache.get(key);
+  if (!r) {
+    if (cache.size > 4e3) cache.clear();
+    r = botQuote({ city, items });
+    cache.set(key, r);
+  }
+  return r;
+}
+function raw(city, items) {
+  if (!items.length || !city) return null;
+  const r = quote(city, items);
+  if (!r.ok) return null;
+  const rugs = items.filter(isRug).length;
+  const total = rugs === items.length ? r.rugEstimate?.ok ? r.rugEstimate.homePrice : null : rugs ? r.rugCombo?.ok ? r.rugCombo.comboPrice : null : r.quote ? null : r.total;
+  if (typeof total !== "number") return null;
+  const base = rugs === items.length ? r.rugEstimate?.travelFee ?? r.travel : r.travel;
+  if (typeof base !== "number") return null;
+  const travel = cents2(base + (rugs ? 0 : r.smallOrderSurcharge?.amount ?? 0));
+  return { r, total, travel: travel < total ? travel : 0 };
+}
+function alone(city, item) {
+  const n = byUnit(item) ? qtyOf(item) : 1;
+  const x = raw(city, [n > 1 ? { ...item, qty: 1 } : item]);
+  return x && { net: cents2((x.total - x.travel) * n), travel: cents2(x.travel * n) };
+}
+function withoutGifted(items, gifts) {
+  const left = gifts.slice();
+  return items.map((i) => {
+    const at = left.findIndex((g2) => g2.piece === i.kind && (g2.treatment === "tratamento-pele" ? i.leather === true : g2.treatment === "anti-odor" ? i.odor === true : i.treatment === "clean+anti-acaros"));
+    if (at < 0) return i;
+    const [g] = left.splice(at, 1);
+    const plain = { ...i };
+    if (g.treatment === "tratamento-pele") delete plain.leather;
+    else if (g.treatment === "anti-odor") delete plain.odor;
+    else plain.treatment = "clean";
+    return plain;
+  });
+}
+function visit(city, items, x) {
+  const one = x.r.oneTravel;
+  if (!one) return null;
+  const plain = withoutGifted(items, x.r.visitGifts?.gifts ?? []);
+  const nets = plain.map((i) => alone(city, i)?.net ?? null);
+  if (!nets.every((v) => v !== null)) return null;
+  return { plain, nets, service: one.service };
+}
+function priceSplit(city, items) {
+  const x = raw(city, items);
+  if (!x) return null;
+  const v = visit(city, items, x);
+  const service = v ? v.service : cents2(x.total - x.travel), travel = cents2(x.total - service);
+  const was = x.r.visitGifts?.usual ?? x.r.separatePrice?.separate ?? x.r.mattressMitePack?.separate ?? x.r.chairsWas ?? null;
+  const struck = was !== null && was - x.total >= 5 ? cents2(was - travel) : null;
+  return { total: x.total, travel, service, struck };
+}
+function serviceLines(city, items) {
+  const x = raw(city, items), split = priceSplit(city, items);
+  if (!x || !split) return null;
+  const v = visit(city, items, x);
+  if (!v && items.length === 1) return [split.service];
+  const nets = v ? v.nets : items.map((i) => alone(city, i)?.net ?? null);
+  if (!nets.every((n) => n !== null)) return null;
+  const lines = nets.slice();
+  let gap = cents2(split.service - lines.reduce((s, n) => s + n, 0));
+  if (gap > 0) lines[lines.length - 1] = cents2(lines[lines.length - 1] + gap);
+  while (gap < 0) {
+    const k = lines.indexOf(Math.max(...lines)), cut = Math.min(-gap, lines[k]);
+    if (cut <= 0) break;
+    lines[k] = cents2(lines[k] - cut);
+    gap = cents2(gap + cut);
+  }
+  return lines;
 }
 
 // src/constants/cityCoords.ts
@@ -3794,13 +3949,13 @@ ${e.description}`;
 function visitMinutes(items) {
   if (!Array.isArray(items) || !items.length) return 60;
   let total = 0;
-  for (const raw of items) {
-    const qty = Math.max(1, Math.min(50, Math.floor(Number(raw?.qty) || 1)));
-    const t = String(raw?.treatment ?? "clean");
+  for (const raw2 of items) {
+    const qty = Math.max(1, Math.min(50, Math.floor(Number(raw2?.qty) || 1)));
+    const t = String(raw2?.treatment ?? "clean");
     const waterproof = /essencial|premium/.test(t);
-    switch (raw?.kind) {
+    switch (raw2?.kind) {
       case "sofa":
-        total += qty * ((/^1(-|$)/.test(String(raw?.size ?? "")) ? MINUTES.armchair : MINUTES.sofa) + (waterproof ? MINUTES.waterproofing : 0));
+        total += qty * ((/^1(-|$)/.test(String(raw2?.size ?? "")) ? MINUTES.armchair : MINUTES.sofa) + (waterproof ? MINUTES.waterproofing : 0));
         break;
       case "mattress":
         total += qty * (MINUTES.mattress + (waterproof ? MINUTES.waterproofing : 0));
@@ -3810,7 +3965,7 @@ function visitMinutes(items) {
         break;
       case "rug":
       case "carpet": {
-        const m2 = Number(raw?.width) * Number(raw?.length);
+        const m2 = Number(raw2?.width) * Number(raw2?.length);
         total += qty * (Number.isFinite(m2) && m2 > 0 ? m2 * MINUTES.rugPerM2 : 30);
         break;
       }
@@ -4343,12 +4498,12 @@ function tagWaterproofBase(text2) {
 var MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 };
 var text = (v, max) => typeof v === "string" ? v.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim().slice(0, max) : "";
 var euro = (n) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".", ",")}€`;
-function bookingTotal(quote, wantsCloseNow, date, now) {
-  if (wantsCloseNow !== true) return { total: quote.total, closeNow: false };
-  if (!quote.closeNow.ok || quote.closeNow.total == null) return "condição de 10% sem preço do motor: decide o responsável";
+function bookingTotal(quote2, wantsCloseNow, date, now) {
+  if (wantsCloseNow !== true) return { total: quote2.total, closeNow: false };
+  if (!quote2.closeNow.ok || quote2.closeNow.total == null) return "condição de 10% sem preço do motor: decide o responsável";
   const days = (Date.parse(`${date}T12:00:00Z`) - Date.parse(`${lisbon(now.getTime()).date}T12:00:00Z`)) / 864e5;
   if (days > CLOSE_NOW_DAYS) return `condição de 10% só para os próximos ${CLOSE_NOW_DAYS} dias`;
-  return { total: quote.closeNow.total, closeNow: true };
+  return { total: quote2.closeNow.total, closeNow: true };
 }
 var agreedTotalOf = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v <= 5e3 ? Math.round(v * 100) / 100 : null;
 function planBotHold(req, events, now, ownEventId) {
@@ -4365,24 +4520,24 @@ function planBotHold(req, events, now, ownEventId) {
   const slot = availability.requested;
   if (!slot) return { error: "time inválido" };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
-  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
-  if ("error" in quote) return { error: String(quote.error) };
+  const quote2 = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
+  if ("error" in quote2) return { error: String(quote2.error) };
   const city = availability.city;
-  const what = quote.lines.map((l) => l.label).join(" + ");
+  const what = quote2.lines.map((l) => l.label).join(" + ");
   const chatTotal = agreedTotalOf(r.agreedTotal);
-  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
+  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote2, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
-  const price = chatTotal ? euro(chatTotal) : quote.quote ? "sob orçamento" : euro(agreed.total) + (agreed.closeNow ? " (com 10% para fechar já)" : "");
+  const price = chatTotal ? euro(chatTotal) : quote2.quote ? "sob orçamento" : euro(agreed.total) + (agreed.closeNow ? " (com 10% para fechar já)" : "");
   const name = text(r.name, MAX.name) || "cliente";
   const title = `Pré-reserva – ${name} – ${city} – ${what} – ${price}`;
-  const pickup = quote.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote.rugPickup.fee)}` : "";
+  const pickup = quote2.rugPickup?.fee != null && r.rugPickup === true ? `Recolha e entrega: ${euro(quote2.rugPickup.fee)}` : "";
   const pickupOwner = rugPickupOwnerReason(r.city, r.rugPickup === true);
   const description = [
     'Pré-reserva feita pelo bot do WhatsApp: confirma (muda o título para "Serviço X€ (Y€) …") ou apaga.',
     pickupOwner ? `${pickupOwner}: muda a cor para a equipa que faz a recolha.` : "",
     `Telefone: ${text(r.phone, MAX.phone) || "ver conversa"}`,
     `Artigos: ${what}`,
-    `Total: ${price}${quote.quote ? "" : ` (deslocação incluída)`}`,
+    `Total: ${price}${quote2.quote ? "" : ` (deslocação incluída)`}`,
     pickup,
     text(r.address, MAX.address) ? `Morada: ${text(r.address, MAX.address)}` : "Morada: por pedir",
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : "",
@@ -4505,17 +4660,17 @@ function planBotBooking(req, events, now, ownEventId) {
   if (!slot) return { error: "time inválido" };
   if (!slot.free && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
   if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
-  const quote = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
-  if ("error" in quote) return { error: String(quote.error) };
+  const quote2 = botQuote({ items: r.items, city: r.city, sharedTrip: !!availability.sharedTrip });
+  if ("error" in quote2) return { error: String(quote2.error) };
   const chatTotal = agreedTotalOf(r.agreedTotal);
-  if (!chatTotal && (quote.quote || !(quote.total > 0))) return { ok: false, handToOwner: "sob orçamento: o responsável dá o valor e marca" };
-  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote, r.closeNow, slot.date, now);
+  if (!chatTotal && (quote2.quote || !(quote2.total > 0))) return { ok: false, handToOwner: "sob orçamento: o responsável dá o valor e marca" };
+  const agreed = chatTotal ? { total: chatTotal, closeNow: false } : bookingTotal(quote2, r.closeNow, slot.date, now);
   if (typeof agreed === "string") return { ok: false, handToOwner: agreed };
   const total = agreed.total;
   const team = (slot.free ? availability.sharedTrip?.team ?? chooseTeam(others, r.city, slot.start, slot.end, waterproofingKind(r.items, total), !waterproofingOnly(r.items), total, rugPickup) : null) ?? null;
   if (!team && !ownerChose) return { ok: false, taken: true, alternatives: availability.suggestion };
-  const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
-  const what = quote.lines.map((l) => l.label).join(" + ");
+  const pickupFee = quote2.rugPickup?.fee != null && r.rugPickup === true ? quote2.rugPickup.fee : 0;
+  const what = quote2.lines.map((l) => l.label).join(" + ");
   const service = tagWaterproofBase(text(r.service, 120) || what);
   const ad = typeof r.adOrigin === "string" ? AD_MARK[r.adOrigin] ?? "" : "";
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
@@ -4524,8 +4679,8 @@ function planBotBooking(req, events, now, ownEventId) {
     !team ? "Marcado pelo bot do WhatsApp numa hora escolhida por ti. Sem equipa livre a essa hora: escolhe a cor da equipa que o faz." : ownerChose ? `Marcado pelo bot do WhatsApp numa hora ${isWeekend(r.date) ? "de fim de semana " : ""}escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).` : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
     availability.sharedTrip ? `Total: ${euro(total)} (sem deslocação: a equipa já está na zona nesse dia)` : `Total: ${euro(total)} (deslocação incluída)`,
-    chatTotal ? `Preço combinado na conversa${quote.quote || !(quote.total > 0) ? "" : ` (tabela ${euro(quote.total)})`}.` : "",
-    agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : "",
+    chatTotal ? `Preço combinado na conversa${quote2.quote || !(quote2.total > 0) ? "" : ` (tabela ${euro(quote2.total)})`}.` : "",
+    agreed.closeNow ? `Condição para fechar já: 10% a menos (tabela ${euro(quote2.total)}), marcado na conversa para os próximos ${CLOSE_NOW_DAYS} dias.` : "",
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : "",
     `bot:${conversationId}`
   ].filter(Boolean).join("\n");
@@ -5116,6 +5271,7 @@ function describeQuizOrder(row) {
     const items2 = (Array.isArray(o.lines) ? o.lines : []).filter((l) => !/^Deslocação:/.test(l.label)).map((l) => {
       const rug = /^(Tapete|Alcatifa) \d+:/.test(l.label) ? rugs2[rugIndex2++] : void 0;
       const label = rug ? rugLine(rug, rugIndex2 - 1) : l.label;
+      if (l.price === null && typeof o.total === "number" && !o.sobOrcamento) return `${l.qty}x ${label}`;
       return `${l.qty}x ${label}: ${l.price === null ? "sob orçamento" : fmtEuro(l.price)}`;
     });
     const quoteItems = Array.isArray(o.quote?.items) ? o.quote.items : [];
@@ -5409,8 +5565,8 @@ var OTHER_DETAIL_WORDS = /\b(?:bloco|bl|lote|lt|porta|fra[cç][aã]o|apartamento
 var POSTCODE_ALL = new RegExp(POSTCODE.source, "g");
 function addressDetails(addr) {
   const out = [];
-  for (const raw of addr.split(",")) {
-    const seg = raw.trim();
+  for (const raw2 of addr.split(",")) {
+    const seg = raw2.trim();
     if (!seg || POSTCODE.test(seg)) continue;
     const street = STREET_START.test(seg);
     if (!street && (FLOOR_START.test(seg) || FLOOR_WORDS.test(seg) || /^\d{1,2}\s*[a-z]{1,2}\.?$/i.test(seg))) out.push({ text: seg, floor: true });
@@ -5487,10 +5643,10 @@ function cleaningItems(description) {
   return (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim().replace(/^(?:pr[ée]-?limpeza|limpeza|lavagem|higieniza\S*)\s*(?:profunda|profissional)?\s*(?:de|do|da|dos|das)?\s*/i, "").replace(/[\s,.]+$/, "").trim();
 }
 function certificateItems(description) {
-  const raw = (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
-  const withPart = /,?\s*com impermeabiliza\S*\s*(?:premium|essencial)?\s*(?:d[oa]s?\s+)(.+)$/i.exec(raw);
+  const raw2 = (description ?? "").replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
+  const withPart = /,?\s*com impermeabiliza\S*\s*(?:premium|essencial)?\s*(?:d[oa]s?\s+)(.+)$/i.exec(raw2);
   if (withPart) return tidy(withPart[1]);
-  const parts = raw.split(/\s\+\s|;/).map((s) => s.trim()).filter(Boolean);
+  const parts = raw2.split(/\s\+\s|;/).map((s) => s.trim()).filter(Boolean);
   const first = parts.findIndex((p) => /impermeabiliz/i.test(p));
   const kept = first < 0 ? parts : [parts[first], ...parts.slice(first + 1).filter((p) => !/\b(limpeza|lavagem|tratamento)\b/i.test(p))];
   return tidy(kept.join(", "));
@@ -5586,6 +5742,7 @@ export {
   planBotBooking,
   planBotHold,
   planOwnerBooking,
+  priceSplit,
   procedureAdjustment,
   procedureApplies,
   procedureClientMessage,
@@ -5598,6 +5755,7 @@ export {
   reminderDue,
   replacementTeam,
   resolveBotCity,
+  serviceLines,
   serviceVatOf,
   slotForMedia,
   tagWaterproofBase,

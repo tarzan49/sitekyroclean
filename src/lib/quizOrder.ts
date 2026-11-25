@@ -249,6 +249,8 @@ export function describeQuizOrder(row: { quiz_order?: unknown; details?: string 
       .map(l => {
         const rug = /^(Tapete|Alcatifa) \d+:/.test(l.label) ? rugs[rugIndex++] : undefined;
         const label = rug ? rugLine(rug, rugIndex - 1) : l.label;
+        // Várias peças com o preço da visita fechado: as linhas vêm sem preço (dono, 25 Nov 2026), não são sob orçamento.
+        if (l.price === null && typeof o.total === 'number' && !o.sobOrcamento) return `${l.qty}x ${label}`;
         return `${l.qty}x ${label}: ${l.price === null ? 'sob orçamento' : fmtEuro(l.price)}`;
       });
     const quoteItems = Array.isArray(o.quote?.items) ? o.quote.items : [];

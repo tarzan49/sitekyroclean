@@ -648,7 +648,7 @@ function uAsSeats(input: unknown): unknown {
  */
 export const SOFA_TRAVEL_OFFER = 10;
 const SOFA_MITES_AS_ODOR = new Set(['3-lugares']);
-export const SOFA_TRAVEL_OFFER_RULE = 'O total já tem os primeiros 10€ da deslocação oferecidos: dá só o total, "com a deslocação incluída". Nunca digas a deslocação à parte nem "desconto".';
+export const SOFA_TRAVEL_OFFER_RULE = 'O total já tem os primeiros 10€ da deslocação oferecidos: diz "Serviço: X€ + Y€ de deslocação. Total: Z€." (X = total − travel; com travel 0, "deslocação grátis"). Nunca lhe chames "desconto".';
 function withSofaTravelOffer<T>(input: unknown, r: T): T {
   const inp = expandPieces((input ?? {}) as Record<string, unknown>);
   const items = inp.items;
@@ -671,9 +671,127 @@ function withSofaTravelOffer<T>(input: unknown, r: T): T {
   const lines = Array.isArray(x.lines) && x.lines.length === 1 && raw.subtotal > total - travel ? [{ ...x.lines[0], amount: cents(total - travel) }] : x.lines;
   return total < x.total ? { ...x, total, travel, lines, subtotal: lines === x.lines ? x.subtotal : cents(total - travel), sofaTravelOffer: { amount: cents(x.total - total), rule: SOFA_TRAVEL_OFFER_RULE } } as T : r;
 }
-function botQuoteOf(rawInput: unknown) {
+export const ONE_TRAVEL_RULE = 'Uma visita tem UMA só deslocação: o total é o serviço (a soma das peças, cada uma ao seu preço sozinha sem deslocação, a acabar em 9 para cima) mais a deslocação da localidade, grátis acima do limite. Diz "Serviço: [service]€ + [travel]€ de deslocação. Total: [total]€." (travel 0 = "deslocação grátis").';
+/** The travel of ONE visit of several pieces, on its rounded services: the table of travel.ts; with waterproofing the rule
+ *  of `tieredPrices` (nothing in 10€ towns, 10€ elsewhere). */
+const visitTravel = (fee: number, service: number, waterproofing: boolean): number =>
+  isBlackFriday() ? 0 : waterproofing ? (fee <= WATERPROOFING_TRAVEL_MAX ? 0 : WATERPROOFING_TRAVEL_MAX) : calculateTravelFee(fee, service);
+/**
+ * Several pieces in one visit (owner, 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo
+ * sítio?"): the services of the pieces, each at its own price alone without travel, summed and up to the next 9, plus ONE
+ * travel. It replaces the sum of the pieces alone "each with its travel" of 24 and 25 Nov (3L + colchão 169 -> 149). Gifts
+ * stay; `usual` = the same request done separately. Asking for more never costs less: where a piece
+ * frees the travel and the total would go under the order without it, the total stays.
+ */
+function withOneTravel<T>(input: unknown, r: T): T {
+  const x = r as unknown as Record<string, any>;
+  if (!x?.ok || x.sharedTrip || x.blackFriday || x.rugWaterproofing || (x.handToOwner && !(x.extendedTrip && x.cityKnown))) return r;
+  const inp = expandPieces((input ?? {}) as Record<string, unknown>);
+  const items = inp.items as Record<string, unknown>[];
+  if (!Array.isArray(items) || items.length < 2) return r;
+  const city = resolveBotCity(inp.city);
+  const fee = city === null ? undefined : locationPrices[city];
+  if (fee === undefined) return r;
+  const isRug = (i: Record<string, unknown>) => i.kind === 'rug' || i.kind === 'carpet';
+  const rugsOnly = items.every(isRug), mixed = !rugsOnly && items.some(isRug);
+  const now = rugsOnly ? x.rugEstimate?.homePrice : mixed ? x.rugCombo?.comboPrice : x.quote ? null : x.total;
+  if (typeof now !== 'number') return r;
+  const isWp = (i: Record<string, unknown>) => /premium|essencial/.test(String(i.treatment ?? ''));
+  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !['armchairs', 'largeArmchairs', 'puffs', 'headboards'].includes(k)));
+  const gifts: VisitGift[] = x.visitGifts?.gifts ?? [];
+  type Group = { net: number; alone: number; wp: boolean };
+  // Chairs (one set, tiers) and carpets (total area) are one piece; the others one by one.
+  const plan = (rows: Record<string, unknown>[]): Group[] | null => {
+    const left = gifts.slice();
+    const paid = rows.map(i => {
+      const at = left.findIndex(g => g.piece === i.kind && (g.treatment === 'tratamento-pele' ? i.leather === true : g.treatment === 'anti-odor' ? i.odor === true : i.treatment === 'clean+anti-acaros'));
+      if (at < 0) return i;
+      const [g] = left.splice(at, 1);
+      return g.treatment === 'tratamento-pele' ? { ...i, leather: false } : g.treatment === 'anti-odor' ? { ...i, odor: false } : { ...i, treatment: 'clean' };
+    });
+    const set = (k: string) => paid.filter(i => i.kind === k);
+    const groups = [...paid.filter(i => i.kind !== 'chairs' && i.kind !== 'carpet').map(i => [i]), ...['chairs', 'carpet'].map(set).filter(g => g.length)];
+    const out: Group[] = [];
+    for (const g of groups) {
+      const a = quoteAlone({ ...noExtras, items: g }) as unknown as Record<string, any>;
+      const rug = g.every(isRug);
+      const t = rug ? a.rugEstimate?.homePrice : a.quote ? null : a.total;
+      const tr = rug ? a.rugEstimate?.travelFee : (a.travel ?? null);
+      if (!a.ok || typeof t !== 'number' || typeof tr !== 'number') return null;
+      const travel = tr + (rug ? 0 : a.smallOrderSurcharge?.amount ?? 0);
+      out.push({ net: cents(t - (travel < t ? travel : 0)), alone: cents(t - (rug ? 0 : a.smallOrderSurcharge?.amount ?? 0)), wp: g.some(isWp) });
+    }
+    return out;
+  };
+  const priceOf = (g: Group[]): { service: number; travel: number; total: number } | null => {
+    if (g.length < 2) return null;
+    const service = up9Total(g.reduce((n, p) => n + p.net, 0));
+    const travel = visitTravel(fee, service, g.some(p => p.wp));
+    let total = cents(service + travel);
+    // Never under a piece alone, nor under the same order without some pieces.
+    for (const p of g) total = Math.max(total, p.alone);
+    if (g.length > 2 && travel < fee && g.length <= 8) for (let k = 0; k < g.length; k++) total = Math.max(total, priceOf(g.filter((_, n) => n !== k))!.total);
+    const t = Math.min(Math.max(travel, fee), cents(total - service));
+    return { service: cents(total - t), travel: t, total };
+  };
+  const groups = plan(items);
+  const p = groups && priceOf(groups);
+  if (!p) return r;
+  // A gift can change with what is asked (the anti-odor of the rug asked, the anti-mites of 14 chairs offered instead):
+  // never under the same order without that anti-odor or with those chairs only cleaned.
+  const without = (i: Record<string, unknown>) => (isRug(i) && i.odor === true ? { ...i, odor: false } : i.kind === 'chairs' && !i.seatOnly && /^clean\+(premium|essencial)$/.test(String(i.treatment)) ? { ...i, treatment: 'clean' } : null);
+  for (const [n, i] of items.entries()) {
+    const w = without(i);
+    if (!w) continue;
+    const a = (botQuoteOf as (y: unknown) => unknown)({ ...noExtras, items: items.map((y, k) => (k === n ? w : y)) }) as Record<string, any>;
+    const t = rugsOnly ? a.rugEstimate?.homePrice : mixed ? a.rugCombo?.comboPrice : a.quote ? null : a.total;
+    if (a.ok && typeof t === 'number') p.total = Math.max(p.total, t);
+  }
+  p.travel = cents(Math.max(p.travel, Math.min(fee, p.total - p.service)));
+  p.service = cents(p.total - p.travel);
+  const giftSum = cents(gifts.reduce((n, g) => n + g.normal, 0));
+  // The struck price: the same request done separately, each piece with its own travel (and each service of a pack, from
+  // separatePrice), plus the gifts at their normal price (owner, 25 Nov 2026: 89 + 79 + 40 = 208 -> 209).
+  const usualOf = (g: Group[], q: { total: number }, sep?: number | null) => Math.max(q.total, up9Total(g.reduce((n, y) => n + y.alone, 0) + giftSum), sep ?? 0);
+  const usual = usualOf(groups, p, x.separatePrice?.separate);
+  const diff = cents(p.total - now);
+  const out: Record<string, any> = { ...x, travel: p.travel, smallOrderSurcharge: null, oneTravel: { ...p, rule: ONE_TRAVEL_RULE } };
+  if (rugsOnly) out.rugEstimate = { ...x.rugEstimate, homePrice: p.total, pickupPrice: plus(x.rugEstimate.pickupPrice, diff) };
+  else if (mixed) out.rugCombo = { ...x.rugCombo, comboPrice: p.total, usualPrice: p.total, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };
+  else out.total = p.total;
+  for (const k of ['puff', 'armchair', 'headboard']) if (x[k] && typeof x[k].total === 'number') out[k] = { ...x[k], total: cents(x[k].total + diff) };
+  // Premium / Essencial: the same order with the waterproofing at the other level.
+  let tiers: Record<'premium' | 'essencial', { total: number; usual: number; travel: number } | null> | null = null;
+  if (x.waterproofingTiers) {
+    const at = (k: 'premium' | 'essencial') => {
+      if (typeof x.waterproofingTiers[k] !== 'number') return null;
+      const g = plan(items.map(i => (isWp(i) ? { ...i, treatment: String(i.treatment).replace(/premium|essencial/, k) } : i)));
+      const q = g && priceOf(g);
+      return q ? { total: q.total, usual: usualOf(g!, q, x.separatePrice?.tiers?.[k]?.separate), travel: q.travel } : null;
+    };
+    tiers = { premium: at('premium'), essencial: at('essencial') };
+    out.waterproofingTiers = { ...x.waterproofingTiers, travel: p.travel, premium: tiers.premium?.total ?? x.waterproofingTiers.premium, essencial: tiers.essencial?.total ?? x.waterproofingTiers.essencial };
+  }
+  if (x.visitGifts) out.visitGifts = { ...x.visitGifts, total: p.total, usual, withoutGift: null, tiers: x.visitGifts.tiers && tiers ? Object.fromEntries((['premium', 'essencial'] as const).map(k => [k, tiers![k] ? { usual: tiers![k]!.usual, total: tiers![k]!.total } : x.visitGifts.tiers[k]])) : x.visitGifts.tiers };
+  if (x.mattressMiteOffer) out.mattressMiteOffer = { ...x.mattressMiteOffer, total: p.total };
+  if (x.mattressMitePack) out.mattressMitePack = x.visitGifts ? { ...x.mattressMitePack, separate: usual, total: p.total } : { ...x.mattressMitePack, total: p.total };
+  if (x.separatePrice) {
+    const sep = x.visitGifts ? usual : x.separatePrice.separate;
+    const t = x.separatePrice.tiers && tiers ? Object.fromEntries((['premium', 'essencial'] as const).map(k => {
+      const s0 = x.visitGifts ? tiers![k]?.usual : x.separatePrice.tiers[k]?.separate;
+      return [k, typeof s0 === 'number' && tiers![k] && s0 > tiers![k]!.total ? { separate: s0, total: tiers![k]!.total, saving: cents(s0 - tiers![k]!.total) } : null];
+    })) : x.separatePrice.tiers;
+    const any = t && (t.premium || t.essencial);
+    out.separatePrice = sep > p.total ? { ...x.separatePrice, separate: sep, total: p.total, saving: cents(sep - p.total), tiers: t } : any ? { ...x.separatePrice, separate: 0, total: p.total, saving: 0, tiers: t } : null;
+  }
+  return out as T;
+}
+function quoteAlone(rawInput: unknown) {
   const input = uAsSeats(rawInput);
   return withSofaTravelOffer(input, withOneStruckPrice(input, withEndIn9(input, botQuoteChain(input))));
+}
+function botQuoteOf(rawInput: unknown) {
+  return withOneTravel(uAsSeats(rawInput), quoteAlone(rawInput));
 }
 /**
  * Chairs of the same service in several rows are priced as one row (owner, 24 Nov 2026: "Sim, como 6"); the answer keeps
@@ -707,7 +825,7 @@ export function botQuote(input: unknown): ReturnType<typeof botQuoteOf> {
  * ("em vez de") do pack limpeza + anti-ácaros, no site e no WhatsApp.
  */
 export const MATTRESS_MITES_SEPARATE = 40;
-export const MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€, com a deslocação incluída." O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
+export const MATTRESS_MITE_PACK_RULE = 'Colchão com anti-ácaros: mostra o pack com o preço riscado, ex.: "Limpeza + anti-ácaros (produto Bactran): ~~separate€~~ total€", com o serviço, a deslocação e o total: "Serviço: X€ + Y€ de deslocação. Total: Z€." (X = total − travel; com travel 0, "deslocação grátis"). O separate é a limpeza mais o anti-ácaros feito à parte (40€ por colchão). Nunca chamar desconto.';
 function withMattressMitePack<T extends { ok: boolean }>(input: unknown, r: T): T & { mattressMitePack: { separate: number; total: number; perMattress: number; rule: string } | null } {
   const none = { ...r, mattressMitePack: null };
   const q = r as unknown as { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean };
@@ -896,7 +1014,7 @@ export const MATTRESS_MITE_OFFER_MIN = 150;
 export type VisitGift = { piece: 'mattress' | 'chairs' | 'rug' | 'carpet' | 'sofa'; treatment: 'anti-acaros' | 'anti-odor' | 'tratamento-pele'; normal: number };
 /** From the second gift on, the gifts of a visit never pass 20% of the order; the first always goes (owner, 25 Nov 2026, "Sempre") (owner, 25 Nov 2026: "não podemos oferecer um tratamento de 60€ num pedido de 150"). */
 export const VISIT_GIFTS_MAX_SHARE = 0.2;
-export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€, com a deslocação incluída." Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
+export const VISIT_GIFTS_RULE = 'Já está tudo calculado: dá o total (total) e mostra SEMPRE o preço riscado (usual) quando é maior do que o total (se for igual, só o total), uma linha por oferta com o valor normal, ex.: "Oferecemos o anti-ácaros no colchão (normalmente 40€)." e "Total: ~~usual€~~ total€". Antes do total, o serviço (as peças ao preço de cada uma sem deslocação, somadas e acabadas em 9 para cima, nunca acima do total) e a deslocação (o total menos o serviço): "Serviço: X€ + Y€ de deslocação.". Nas opções Premium / Essencial, o mesmo com tiers (~~usual€~~ total€ em cada uma). Nunca chamar desconto; o total é o de tabela. Nunca uma 2.ª opção sem o tratamento oferecido (dono, 25 Nov 2026: "estaríamos a baixar o nosso ticket"); withoutGift é só para o site (preço do Renovado), nunca se diz ao cliente.';
 type Priced = { ok: boolean; total?: number | null; quote?: boolean; handToOwner?: boolean; bigOrder?: unknown; rugCombo?: { comboPrice?: number | null } | null };
 const innerPriced = (x: unknown): Priced => (botQuoteInner as (i: unknown) => unknown)(x) as Priced;
 const pricedTotal = (r: Priced): number | null => {
@@ -962,7 +1080,6 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   const asAskedPrice = price(rawIn);
   const giftCap = cents(VISIT_GIFTS_MAX_SHARE * (asAskedPrice ?? baseTotal));
   let giftUsed = 0;
-  let capped = false;
   const gifted = new Map<number, VisitGift>();
   let withGifts = base.slice();
   let usualBase = baseTotal;
@@ -979,7 +1096,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
       const gift: VisitGift = { piece: c.piece, treatment: c.treatment, normal: c.piece === 'mattress' ? MATTRESS_MITES_SEPARATE * mattresses : cents(priced - usualBase) };
       // The mattress anti-mites stays out of the cap (owner, 25 Nov 2026: "colchão fora do teto").
       // The first gift always goes, cap or not (owner, 25 Nov 2026, "Sempre": every second piece has a free treatment).
-      if (c.piece !== 'mattress' && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) { capped = true; continue; }
+      if (c.piece !== 'mattress' && gifted.size > 0 && giftUsed + gift.normal > giftCap + 1e-9) continue;
       // The mattress goes first (owner's ladder), then the cheapest treatment left.
       const better = !best || (c.piece === 'mattress') !== (best.gift.piece === 'mattress') ? !best || c.piece === 'mattress' : gift.normal !== best.gift.normal ? gift.normal < best.gift.normal : keyOf(n) < keyOf(best.n);
       if (better) best = { n, gift, items, priced };
@@ -990,52 +1107,16 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
     withGifts = best.items;
     usualBase = best.priced;
   }
-  // The 20% cap left the order with no gift: the total still never falls under the pieces alone, as with the gift
-  // (owner, 24 Nov 2026, "Preço cheio + oferta", with 3L + 3L = 179 in front of him, not 159). Orders with nothing to
-  // offer keep their price; so does anything but sofas only, cleaned only: that is the table he saw.
-  const cleanedSofas = rawIn.every(i => rec(i).kind === 'sofa' && ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean'));
-  // With a rug, cleaned pieces pay the full price too (owner, 25 Nov 2026, "A": sofá 3L + tapete 159€, 2 tapetes 139€).
-  const withRugs = rawIn.length > 1 && rawIn.some(i => rec(i).kind === 'rug')
-    && rawIn.every(i => isRug(i) || (rec(i).kind === 'sofa' && ['clean', 'clean+anti-acaros'].includes(treat(i) ?? 'clean')));
-  if (!gifted.size && (extras || !((capped && cleanedSofas) || withRugs))) return none;
-  if (rugsOnly && extras) return none;
+  // No gift: nothing to add; the total of the visit is withOneTravel's.
+  if (!gifted.size || (rugsOnly && extras)) return none;
   // Paid = cleaning base plus the anti-mites the client asked and was not offered; usual = paid plus the gifts.
   const restore = (items: unknown[]) => items.map((i, n) => (asked.has(n) && !gifted.has(n) ? rawIn[n] : i));
   const total = price(restore(base));
   if (total === null || price(restore(withGifts)) === null) return none;
   const gifts = [...gifted.entries()].sort((x, y) => x[0] - y[0]).map(([, g]) => g);
-  // `withoutGift`: the visit price without the gift, up to the 9 (149). Only for the site (the Renovado price): never offered
-  // to the client as a second option (owner, 25 Nov 2026: "estaríamos a baixar o nosso ticket").
-  // Owner, 24 Nov 2026 (sofá 3L + colchão casal = 89 + 79 = 168 -> 169): with a gift the total never falls under
-  // the pieces quoted each on its own (each with its travel); without the gift the visit price stays (149).
-  const EXTRA_KEYS = ['armchairs', 'largeArmchairs', 'puffs', 'headboards'];
-  const noExtras = Object.fromEntries(Object.entries(inp).filter(([k]) => !EXTRA_KEYS.includes(k)));
-  // Each piece as the client would pay it alone, with the engine's own rounding (ends in 9, Poupa), never the raw
-  // table (24 Nov 2026 audit, Porto: 309 under the 313 of the pieces alone). No far-small surcharge: in the visit it is not small.
-  const aloneOf = (x: Record<string, unknown>): number | null => {
-    const one = { ...noExtras, ...x };
-    const r1 = withEndIn9(one, withSeparatePrice(one, botQuoteCore(one))) as Priced & { rugEstimate?: { ok?: boolean; homePrice?: number | null } | null };
-    return pricedTotal(r1) ?? (r1.ok && !r1.handToOwner && typeof r1.rugEstimate?.homePrice === 'number' ? r1.rugEstimate.homePrice : null);
-  };
-  // Puffs, armchairs and headboards are priced apart (puff.total = total + their price), so only the items enter here.
-  const paidItems = restore(base);
-  const chairSet = paidItems.filter(i => rec(i).kind === 'chairs');
-  // Carpets are priced by their total area: one set.
-  const carpetSet = rugsOnly || !gifted.size ? paidItems.filter(i => rec(i).kind === 'carpet') : [];
-  const parts = [...paidItems.filter(i => rec(i).kind !== 'chairs' && !carpetSet.includes(i)).map(i => [i]), ...(chairSet.length ? [chairSet] : []), ...(carpetSet.length ? [carpetSet] : [])].map(its => aloneOf({ items: its }));
-  const sumAlone = parts.every((v): v is number => typeof v === 'number') ? cents(parts.reduce((a, v) => a + v, 0)) : total;
-  // The struck price is the true one: a sofa alone with anti-odour or anti-mites has its first 10€ of travel offered since
-  // 25 Nov 2026; the total keeps the earlier floor ("sem baixar").
-  const offeredAlone = paidItems.reduce<number>((n, i) => {
-    if (rec(i).kind !== 'sofa') return n;
-    const one = { ...noExtras, items: [i] }, r1 = withEndIn9(one, withSeparatePrice(one, botQuoteCore(one))) as Priced;
-    const before = pricedTotal(r1), after = pricedTotal(withSofaTravelOffer(one, r1));
-    return before !== null && after !== null ? cents(n + before - after) : n;
-  }, 0);
-  // A first gift over the cap never moves the price: cleaned sofas and rugs already paid the full sum, the rest stays (25 Nov 2026).
-  const overCap = gifted.size === 1 && cents(gifts[0].piece === 'mattress' ? 0 : gifts[0].normal) > giftCap;
-  const lift = overCap && !(cleanedSofas || withRugs) ? 0 : Math.max(0, cents(sumAlone - total));
-  const paid = cents(total + lift);
+  // The pieces pay their own service price and ONE travel (owner, 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma
+  // merda que é no mesmo sítio?"); the total of the visit is withOneTravel's, here only the order as asked.
+  const paid = total;
   // Owner, 24 Nov 2026: with a gift the total goes up to the next price ending in 9 (148 -> 149, 253 -> 259, 312 -> 319).
   const up9 = (x: number) => { const n = Math.ceil(x); return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9; };
   // The struck price ends in 9 too (89 + 79 + 40 = 208 -> 209): the one struck price of the order, also in separatePrice.
@@ -1043,7 +1124,7 @@ function withVisitGifts<T extends { ok: boolean }>(input: unknown, r: T): T & { 
   // Never an invented struck price: when the gift is lost in the rounding to 9 (1 + 1 cadeiras, gift 5€), usual equals
   // total and nothing is struck (25 Nov 2026: the +10 put here by the audit showed ~~79~~ 69 with 65 in separate).
   const final = up9(paid);
-  const usual = Math.max(final, up9(paid + giftSum - offeredAlone));
+  const usual = Math.max(final, up9(paid + giftSum));
   const out = { ...r } as Record<string, unknown>;
   const rc = q.rugCombo;
   if (rc && typeof rc.comboPrice === 'number') out.rugCombo = { ...rc, comboPrice: final, usualPrice: final, travelWaived: 0, rule: RUG_COMBO_FULL_RULE };

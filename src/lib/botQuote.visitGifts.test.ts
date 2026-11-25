@@ -1,3 +1,4 @@
+// Totais de várias peças = serviço somado ao 9 + UMA deslocação (owner 25 Nov 2026: "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo sítio?").
 // Anti-ácaros no colchão oferecido vale 40€ (preço à parte; dono, 24 Nov 2026).
 import { describe, expect, it } from 'vitest';
 import { botQuote } from './botQuote';
@@ -7,8 +8,8 @@ const S = { kind: 'sofa', size: '3-lugares' }, M = { kind: 'mattress', size: 'ca
 const g = (items: unknown[]) => (botQuote({ items, city: 'Lisboa' }) as any).visitGifts;
 
 describe('visitGifts (escada A)', () => {
-  it('sofá + colchão: anti-ácaros no colchão, nunca abaixo das peças sozinhas, 89 + 79 = 168 -> 169', () => {
-    expect(g([S, M])).toMatchObject({ total: 169, usual: 209, withoutGift: 149, gifts: [{ piece: 'mattress', normal: 40 }] });
+  it('sofá + colchão: anti-ácaros no colchão, 79 + 69 = 148 -> 149, uma só deslocação (grátis)', () => {
+    expect(g([S, M])).toMatchObject({ total: 149, usual: 209, withoutGift: null, gifts: [{ piece: 'mattress', normal: 40 }] });
   });
   it('3 peças: + anti-ácaros nas cadeiras', () => {
     expect(g([S, M, C]).total % 10).toBe(9);
@@ -77,7 +78,7 @@ describe('um só riscado por pedido (auditoria, 24 Nov 2026)', () => {
   it('sofá + colchão (com ou sem anti-ácaros pedido): 209 em todo o lado', () => {
     for (const items of [[S, M], [S, Mm]]) {
       const r = botQuote({ items, city: 'Lisboa' }) as any;
-      expect([r.total, r.visitGifts.usual, r.separatePrice.separate]).toEqual([169, 209, 209]);
+      expect([r.total, r.visitGifts.usual, r.separatePrice.separate]).toEqual([149, 209, 209]);
       if (r.mattressMitePack) expect(r.mattressMitePack.separate).toBe(209);
     }
   });
