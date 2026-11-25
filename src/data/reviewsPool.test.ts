@@ -16,6 +16,13 @@ describe('Google reviews on service pages', () => {
     expect(formatReviewDate('2025')).toBe('2025');
   });
 
+  it('has every 4 and 5 star Google review with text, once (dono, 25 Nov)', () => {
+    expect(PUBLISHED_REVIEWS.length).toBeGreaterThanOrEqual(145);
+    const texts = PUBLISHED_REVIEWS.map(r => `${r.name}|${r.city ?? ''}|${r.text}`);
+    expect(new Set(texts).size).toBe(texts.length);
+    expect(PUBLISHED_REVIEWS.some(r => /Traduzido pelo Google|\(Original\)/.test(r.text))).toBe(false);
+  });
+
   it('shows six reviews, leads with the page service and mixes other services', () => {
     for (const service of SERVICES) {
       for (const page of ['/x-porto', '/x-braga', '/x-lisboa', '/x-faro']) {

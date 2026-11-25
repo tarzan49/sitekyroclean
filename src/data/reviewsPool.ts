@@ -5,6 +5,11 @@
 // calculado a partir dessa data em 2026-10-09, ou só o ano quando o Google
 // diz "há um ano"/"há 2 anos". Ficaram de fora as avaliações sem texto, as de
 // 3 estrelas ou menos e as que só têm a resposta do proprietário.
+// A 2026-11-25 (dono: "todas as avaliações acima de 4 estrelas, as de 1/2/3 não
+// coloques"; 4 e 5 confirmadas) entraram as 37 em falta, pelo painel dos dois
+// perfis, com a data exata do Google. Nesse dia: 212 avaliações, 203 de 4 e 5
+// estrelas, 145 delas com texto (112 Porto, 33 Lisboa), todas aqui. Numa
+// avaliação noutra língua copia-se o original, nunca a tradução do Google.
 // Para acrescentar: copiar da ficha, sem corrigir o texto, com a data e a ficha.
 
 export interface PoolReview {
@@ -26,6 +31,29 @@ interface GoogleReview {
 }
 
 const GOOGLE_REVIEWS: GoogleReview[] = [
+  { name: "Jose Manuel", rating: 5, date: "2026-11", profile: "porto", text: "Muito eficientes . A repetir" },
+  { name: "Luciana Ribeiro", rating: 5, date: "2026-11", profile: "porto", text: "Excelente serviço, ótimos profissionais. Tudo impecável. Super recomendo." },
+  { name: "Joana Faria", rating: 4, date: "2026-11", profile: "porto", text: "Excelente trabalho" },
+  { name: "Daniela Monteiro", rating: 5, date: "2026-11", profile: "porto", text: "Muito simpáticos e um trabalho muito rápido!" },
+  { name: "Marina Henriques Pedrosa", rating: 5, date: "2026-11", profile: "porto", text: "Rapidez e profissionalismo\nRecomendo!!" },
+  { name: "Ana Duque", rating: 5, date: "2026-11", profile: "porto", text: "Limpeza impecável, profissional competente e simpática!" },
+  { name: "João Falcão", rating: 5, date: "2026-11", profile: "porto", text: "Excelente serviço da KyroClean! Comunicação rápida e profissional desde o primeiro contacto, pontualidade no horário marcado e um trabalho de limpeza de sofá realmente detalhado. Cuidado no manuseamento e preocupação em manter o restante espaço limpo." },
+  { name: "Ana Rossetto", rating: 5, date: "2026-11", profile: "porto", text: "Limpeza ficou incrível. Trabalho impecável. Tanto o tratamento enzimático tirou o cheio de xixi como o sofá ficou como novo." },
+  { name: "Carolina Rodrigues", rating: 5, date: "2026-11", profile: "porto", text: "O Bruno e a Jaqueline vieram na nossa casa proceder a impermeabilização e correu tudo muito bem! Adoramos, fica realmente o tecido igual ou até mais bonito. Recomendo vivamente" },
+  { name: "angela martin (machead1964)", rating: 5, date: "2026-11", profile: "porto", text: "The cleaners were very professional.  They did a great job at cleaning the mattress and sofa." },
+  { name: "Fernanda Joceli Bade Schuster Hachmann", rating: 5, date: "2026-11", profile: "porto", text: "Excelente profissional. Vou chamar novamente. Obrigada" },
+  { name: "Vanessa Freitas", rating: 5, date: "2026-10", profile: "porto", text: "Enorme diferença no antes e no depois!" },
+  { name: "Juliana Cavalcante", rating: 5, date: "2026-10", profile: "porto", text: "A melhor possível, já marquei outros serviços, recomendo imenso." },
+  { name: "Daliana Marques", rating: 5, date: "2026-10", profile: "porto", text: "Atendimento impecável. Meu sofá ficou como novo. Estava muito sujo devido aos miúdos. Nota 10!" },
+  { name: "Filipa Guerra", rating: 5, date: "2026-10", profile: "porto", text: "Serviço impecável! A Kyro veio cá a casa limpar e impermeabilizar o sofá e um tapete e o resultado superou as expetativas! Temos vários animais e um dos tapetes tinha até manchas e cheiro a urina. Ficou tudo super limpo, renovado e sem qualquer mau cheiro! Resultados imediatos, pontualidade, profissionalismo e uma equipa extremamente simpática e educada. Recomendo a 100%, especialmente a quem tem animais em casa!" },
+  { name: "Regina Costa", rating: 5, date: "2026-10", profile: "porto", text: "Equipa profissional, desde o primeiro contacto via whatsapp!" },
+  { name: "Gabriel Lopes", rating: 5, date: "2026-10", profile: "porto", text: "O serviço é excelente! Indico demais!" },
+  { name: "Duarte Penha", rating: 5, date: "2026-10", profile: "porto", text: "Ficou tudo a brilhar,excelente serviço!" },
+  { name: "Lucio Gomes", rating: 4, date: "2026-10", profile: "porto", text: "Serviço muito bom" },
+  { name: "Raquel Argona", rating: 5, date: "2026-10", profile: "porto", text: "Excelente trabalho .\nMeu sofá está impecável !" },
+  { name: "Duarte Cardoso", rating: 5, date: "2026-10", profile: "porto", text: "Trabalho perfeito! Atendimento incrível e mesmo muito prestáveis. Muito obrigado." },
+  { name: "Maria Paula", rating: 5, date: "2026-10", profile: "porto", text: "Sempre muito atenciosos e prestáveis, respondem praticamente na hora. Tanto a pessoa com quem trocámos mensagens como a pessoa que veio fazer o serviço  Serviço foram muito simpáticas e muito profissionais. Serviço muito bom!" },
+  { name: "Dalila Marreiros", rating: 5, date: "2026-10", profile: "porto", text: "Excelente profissional e muito simpático . Recomendo" },
   { name: "Oksana Rizol", rating: 5, date: "2026-10", profile: "porto", text: "I’m very happy with the service. What I really appreciated was how quickly they responded. I sent them a message and received a reply within just a few minutes. They were very helpful, understood that I needed the cleaning done as soon as possible, and managed to find the earliest available slot for me.\n\nThe team arrived on time, worked quickly and professionally, and did a great job with the carpet. Everything was easy and efficient, and I’m very pleased with the result.\n\nI’ll definitely be using their services again and would happily recommend them." },
   { name: "Subhash Singh", rating: 5, date: "2026-10", profile: "porto", text: "It was nice experience to hire this company for mattress cleaning. They are very professional in terms of timing and cleaning." },
   { name: "Anne", rating: 5, date: "2026-10", profile: "porto", text: "Estamos muito satisfeitos com a limpeza dos nossos dois tapetes.\nA empresa responde muito rapidamente e a pessoa que veio foi pontual, profissional e simpático" },
@@ -69,6 +97,7 @@ const GOOGLE_REVIEWS: GoogleReview[] = [
   { name: "Martim Guedes", rating: 5, date: "2026-09", profile: "porto", text: "Excelente serviço! Muito profissionais, rápidos e cuidadosos com o trabalho. Fiquei bastante satisfeito com o resultado da limpeza. Recomendo sem dúvida! ⭐⭐⭐⭐⭐" },
   { name: "Filipa Alexandra", rating: 5, date: "2026-09", profile: "porto", text: "Quero agradecer de coração ao António e a toda a equipa pelo excelente trabalho! O António foi sempre muito atencioso e manteve uma ótima comunicação comigo durante todo o processo.\n\nComo vivo no estrangeiro, precisava de alguém de confiança para limpar o meu colchão, que tinha acumulado bastante bolor. A equipa que foi à minha casa foi simplesmente fantástica, muito profissional, eficiente e realizou o trabalho de forma impecável.\n\nFiquei extremamente satisfeita com o resultado, o colchão ficou impecável! Recomendo esta empresa sem qualquer hesitação.\n\nMuito obrigada pelo excelente serviço! 🙏" },
   { name: "Atomy Algarve", rating: 4, date: "2026-09", profile: "porto", text: "Serviço ao domicílio, fácil de contratar, disponibilidade imediata e limpeza muito boa. Aceita MB Way e o preço é bom!\nUma referência especial ao Guilherme, que é super simpático e muito prestável! Gratos pela dedicação e rapidez com que nos deram assistência. Boa sorte para o negócio!" },
+  { name: "Jorge Castro", rating: 5, date: "2026-08", profile: "porto", text: "Hoje contactei pela 1ª vez esta firma.\nFoi uma boa experiência: marcaram e no dia tiveram o cuidado de avisar que estavam um pouco atrasados. O funcionário que compareceu foi super simpático, educado e esforçado. Fizeram um bom trabalho! 👌🏼" },
   { name: "Rob Colivet", rating: 5, date: "2026-08", profile: "porto", text: "I had an amazing experience with the guys. They got rid of all of the stains" },
   { name: "Kika Serra", rating: 5, date: "2026-08", profile: "porto", text: "Excelente serviço e atendimento ao cliente. Respostas rápidas, flexibilidade de marcação de recolha e devolução, tudo em menos de 48 horas. Higienizaram um tapete de qualidade (100% lã, tecido manualmente, bastante denso) com resultado impecável. Recomendo." },
   { name: "Cristina Pereira", rating: 5, date: "2026-08", profile: "porto", text: "Excelente trabalho na limpeza de um sofá muito sujo e com várias manchas. Um serviço executado com profissionalismo e simpatia 😊 definitivamente uma empresa a recomendar 🙌 muito obrigado!" },
@@ -114,6 +143,17 @@ const GOOGLE_REVIEWS: GoogleReview[] = [
   { name: "Tiago Torres", rating: 5, date: "2024", profile: "porto", text: "Pontuais, atenciosos e cuidadosos com o detalhe.\nTinha um sofá com xixi de gato. Ficou impecável.\nRecomendo." },
   { name: "Francisco Silva", rating: 5, date: "2024", profile: "porto", text: "Muito profissionais, malta jovem e com bastante conhecimento na área. Obrigado por limparem a minha carpete com sucesso!" },
   { name: "Ana Rita Mota", rating: 5, date: "2024", profile: "porto", text: "Muito simpáticos e profissionais. Recomendo." },
+  { name: "tayana", rating: 5, date: "2026-11", profile: "lisboa", text: "Excelente atendimento, recomendo." },
+  { name: "Maria Miranda", rating: 4, date: "2026-11", profile: "lisboa", text: "Muito profissionalismo e muita simpatia. Trabalho bem feito" },
+  { name: "Mafalda Teixeira", rating: 5, date: "2026-11", profile: "lisboa", text: "Muito profissionais. O técnico Joel é extremamente afável e competente. Recomendo!" },
+  { name: "Sharles Da Silva", rating: 5, date: "2026-11", profile: "lisboa", text: "O sofá ficou muito bom 👏👏👏👏 bem limpo e cheiroso, obrigado pelo\nServiço recomendo 100%" },
+  { name: "Benedita Covas Lima", rating: 5, date: "2026-11", profile: "lisboa", text: "Óptimo serviço. Muito prestáveis e eficientes. Recomendo." },
+  { name: "Nadia Yakimenko", rating: 5, date: "2026-11", profile: "lisboa", text: "Fiz um serviço de impermeabilização e fiquei muito satisfeita. Foi tudo rápido e eficaz, e o técnico foi muito simpático e atencioso. Recomendo!" },
+  { name: "Raquel Felgueiras", rating: 5, date: "2026-10", profile: "lisboa", text: "Facilidade de comunicação. Serviço impecável. Recomendo." },
+  { name: "Natália R.Oliveira", rating: 5, date: "2026-10", profile: "lisboa", text: "Ótimo serviço! O profissional Rodolfo foi muito atencioso e explicou detalhadamente como cuidar do sofá e dos bancos após a impermeabilização.\n\nPretendo contratar no futuro, caso precise." },
+  { name: "Annika Hallström", rating: 5, date: "2026-10", profile: "lisboa", text: "Mycket bra hjälp. Snabb service och noggranna. Tusen tack!" },
+  { name: "Alexandre ferreira lopes filho", rating: 5, date: "2026-10", profile: "lisboa", text: "O trabalho foi rápido e bem feito." },
+  { name: "Tânia Patrício", rating: 5, date: "2026-10", profile: "lisboa", text: "Muito simpáticos e gostámos muito do serviço de impermeabilização" },
   { name: "Paula Sapage", rating: 5, date: "2026-10", profile: "lisboa", text: "Rapidez e eficiência, resultado impecável." },
   { name: "Pedro Campos", rating: 5, date: "2026-09", profile: "lisboa", text: "Serviço rapido" },
   { name: "Priscilla Roos", rating: 5, date: "2026-09", profile: "lisboa", text: "Tive uma ótima experiência! O serviço de limpeza do colchão e do sofá foi excelente, ficaram impecáveis e com um aspeto renovado. Equipa muito profissional, simpática e cuidadosa. Recomendo vivamente o serviço!" },
@@ -129,6 +169,8 @@ const GOOGLE_REVIEWS: GoogleReview[] = [
   { name: "Rodolfo Lucena", rating: 5, date: "2026-09", profile: "lisboa", text: "Excelente serviço" },
   { name: "Lidia P", rating: 5, date: "2026-09", profile: "lisboa", text: "Serviço rápido e com todos os esclarecimentos e fichas técnicas dos produtos." },
   { name: "Bárbara Santos", rating: 5, date: "2026-09", profile: "lisboa", text: "Ótimo servico" },
+  { name: "Pb. Céfas Audicelio Reis", rating: 4, date: "2026-09", profile: "lisboa", text: "A higienização ficou perfeita, o operador excelente, mas com tudo infelizmente por ser uma sujidade de muito anos não ficou a cor do colchão como eu esperava." },
+  { name: "Francisco Peixoto", rating: 5, date: "2026-08", profile: "lisboa", text: "Ótimo serviço, muita simpatia!" },
   // Transcritas pelo dono a 2026-09-10 da ficha de Lisboa; a 2026-10-09 já não
   // apareciam na lista do Google, e o dono pediu para ficarem (mesmo dia).
   { name: "Diogo Branco", rating: 5, date: "2026-09", profile: "lisboa", text: "Correu muito bem. Quer a fase de combinação quer a de execução. A comunicação foi fácil e cordial, o trabalho cuidadoso e a pessoa que o efetuou, João, muito bem educado e cordial. Voltarei a utilizar os vossos serviços" },
