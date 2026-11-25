@@ -18,61 +18,61 @@ export const ALCATIFA_PROBLEM_IMAGES = [
     "id": "alcatifa-escadas-01",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-01.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido bege"
+    "alt": "Alcatifa cinzenta com resíduos secos antes da extração"
   },
   {
     "id": "alcatifa-escadas-02",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-02.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido cinzento-claro"
+    "alt": "Marca escura numa alcatifa de escritório, com a máquina em cima"
   },
   {
     "id": "alcatifa-escadas-03",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-03.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido taupe"
+    "alt": "Alcatifa cinzenta com zonas mais escuras"
   },
   {
     "id": "alcatifa-escadas-04",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-04.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido azul"
+    "alt": "Alcatifa bege com o rasto da máquina"
   },
   {
     "id": "alcatifa-escadas-05",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-05.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido creme"
+    "alt": "Metade da alcatifa já limpa e metade por limpar"
   },
   {
     "id": "alcatifa-escadas-06",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-06.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido cinzento"
+    "alt": "Alcatifa cinzenta com resíduos secos antes da extração, pormenor"
   },
   {
     "id": "alcatifa-escadas-07",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-07.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido areia"
+    "alt": "Marca escura numa alcatifa de escritório, com a máquina em cima, pormenor"
   },
   {
     "id": "alcatifa-escadas-08",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-08.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido verde-azeitona"
+    "alt": "Alcatifa cinzenta com zonas mais escuras, pormenor"
   },
   {
     "id": "alcatifa-escadas-09",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-09.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido castanho"
+    "alt": "Alcatifa bege com o rasto da máquina, pormenor"
   },
   {
     "id": "alcatifa-escadas-10",
     "problemId": "limpeza-alcatifas-4",
     "src": "/images/landing-problems/alcatifas/alcatifa-escadas-10.webp",
-    "alt": "Imagem ilustrativa: Fibras compactadas numa escada alcatifada em tecido antracite"
+    "alt": "Metade da alcatifa já limpa e metade por limpar, pormenor"
   },
   {
     "id": "alcatifa-passagem-v1",

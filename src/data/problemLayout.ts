@@ -26,7 +26,7 @@ export function getProblemLayout(problem: ProblemPage) {
       title: problem.slug === 'manchas-sofa' && index === 2 ? 'Estofos com animais em casa' : example.title,
       image: problem.slug === 'manchas-sofa' ? {
         src: `/images/problem-examples/sofa-${['stain', 'fibers', 'pets', 'wear'][index]}.webp`,
-        alt: ['Mancha de café num sofá claro', 'Resíduos nas costuras de tecido cinzento', 'Pelos de animal num sofá verde', 'Borboto e desgaste num braço de sofá'][index],
+        alt: ['Mancha num assento de sofá claro', 'Sujidade no braço de um sofá bege', 'Tufos de pelo retirados com a escova', 'Marcas de uso num assento amarelo'][index],
       } : selectLandingProblemImage(serviceSlug, example.id, `/problemas/${problem.slug}`),
     })),
     process: processGuide.steps,

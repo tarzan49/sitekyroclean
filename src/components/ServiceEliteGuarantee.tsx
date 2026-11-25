@@ -76,7 +76,7 @@ const ServiceEliteGuarantee = ({
             </figure>
           ))}
         </div>
-        <p className={`mt-6 text-xs leading-relaxed ${textSub}`}>Imagens ilustrativas.</p>
+        <p className={`mt-6 text-xs leading-relaxed ${textSub}`}>Fotografias de serviços nossos.</p>
         <p className={`mt-2 text-sm leading-relaxed ${textSub}`}>{subtitle}</p>
 
       </div>

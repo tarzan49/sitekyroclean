@@ -14,16 +14,16 @@ const gold = 'text-[#D4AF37]';
 
 const SPILLS: Record<Kind, { img: string; title: string; text: string }[]> = {
   sofa: [
-    { img: 'protecao-vinho-10', title: 'Vinho', text: 'O copo vira e o vinho fica à superfície. Limpa-se com um pano antes de entrar no tecido.' },
+    { img: 'protecao-vinho-10', title: 'Refrigerante', text: 'A garrafa entorna e o líquido escorre à superfície. Limpa-se com um pano.' },
     { img: 'protecao-cafe-08', title: 'Café', text: 'O café do pequeno-almoço deixa de ser uma nódoa para sempre.' },
-    { img: 'protecao-patas-02', title: 'Animais', text: 'Patas e pelo ficam por cima das fibras e saem com mais facilidade.' },
-    { img: 'protecao-sumo-04', title: 'Crianças', text: 'Sumos e iogurtes deixam de ser um susto no sofá da sala.' },
+    { img: 'protecao-patas-02', title: 'Água', text: 'Fica em gotas em cima do tecido, sem entrar nas fibras.' },
+    { img: 'protecao-sumo-04', title: 'Sumo', text: 'Os sumos das crianças deixam de ser um susto no sofá da sala.' },
   ],
   chairs: [
     { img: 'protecao-sumo-04', title: 'Sumos', text: 'O que cai do copo fica à superfície e limpa-se com um pano.' },
-    { img: 'protecao-vinho-10', title: 'Vinho', text: 'Jantares sem medo: o vinho não entra no tecido.' },
+    { img: 'protecao-vinho-10', title: 'Refrigerante', text: 'Jantares sem medo: o líquido fica à superfície.' },
     { img: 'protecao-cafe-08', title: 'Café', text: 'Gotas de café e de molho saem antes de manchar.' },
-    { img: 'protecao-patas-02', title: 'Uso diário', text: 'As cadeiras da mesa são as peças mais usadas da casa. Ficam protegidas todos os dias.' },
+    { img: 'protecao-patas-02', title: 'Água', text: 'Fica em gotas em cima do tecido. As cadeiras da mesa ficam protegidas todos os dias.' },
   ],
 };
 
