@@ -1329,3 +1329,6 @@ Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo r
 - Várias peças: os totais não baixam (3L com anti-ácaros + colchão 209), só o riscado passa a ser o verdadeiro.
 - Pele, só impermeabilização e os dois tratamentos na mesma peça continuam fora.
 - Black Friday: o anti-odor de um sofá ou colchão não está na tabela (3L com anti-odor e BFGTA saía a 69€ com o tratamento dentro, desde 24/11).
+
+## Página inicial: encaixe no iPhone (dono, 25 Nov 2026)
+Vídeo do dono: vídeos pretos, secções paradas a meio, barra do WhatsApp por cima das setas das avaliações, rodapé a abrir pelo fim. Causas: secções com --app-max enquanto as barras do Safari abriam e fechavam; `useFillSections` punha min-height 0 para medir e obrigava a novo encaixe; `scroll-mt-16` no #testemunhos (desvio de 64 px); `src` dos vídeos retirado fora do ecrã; `footer { scroll-snap-align: end }`. As outras páginas com encaixe ainda têm o rodapé a `end` e a medida antiga.

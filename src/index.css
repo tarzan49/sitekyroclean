@@ -945,3 +945,34 @@ a[href*="wa.me/"]:not(.cta):is([class*="#25D366"],[class*="#16833e"],[class*="#1
 
 /* Enquanto as secções se medem (useFillSections), nada transita: a medida tem de ser a final. */
 html.kyro-measuring * { transition: none !important; }
+
+/* Página inicial: encaixe estável (dono, 25 Nov, vídeo do iPhone: secções paradas a meio, tapadas pela barra, e o rodapé
+   a abrir pelo fim). No telemóvel quem desliza é a caixa da página, com a altura visível do ecrã: as barras do Safari não
+   abrem nem fecham a meio, por isso uma secção é sempre exatamente um ecrã e o encaixe bate sempre certo. Um gesto passa
+   uma secção (scroll-snap-stop) e o rodapé abre pelo início. */
+html.snap-home main > div#testemunhos { scroll-margin-top: 0; }
+html.snap-home footer { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--header-h, 57px); }
+@media (max-width: 767px) {
+  html.snap-home, html.snap-home body { height: 100%; overflow: hidden; }
+  html.snap-home { scroll-snap-type: none; }
+  html.snap-home [data-home-scroller] { height: 100vh; height: 100dvh; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-type: y mandatory; }
+  html.snap-home body:is([style*="overflow"], [style*="position: fixed"]) [data-home-scroller] { overflow-y: hidden; }
+  html.snap-home main > section, html.snap-home main > section#orcamento, html.snap-home main > div#testemunhos { min-height: 100vh; min-height: 100dvh; scroll-snap-stop: always; }
+  /* Avaliações: o título em cima e as setas acima da barra do WhatsApp; o cartão enche o meio. */
+  html.snap-home main > div#testemunhos > section { justify-content: flex-start; padding-top: calc(var(--header-h, 57px) + 18px); padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  html.snap-home #avaliacoes .mb-8 { margin-bottom: 14px; }
+  html.snap-home #avaliacoes [aria-roledescription="testemunho"] > * { height: max(200px, calc(100dvh - var(--header-h, 57px) - 274px)); }
+}
+/* Safari em privado com todas as barras abertas: a avaliação em menos linhas, para o cartão caber acima das setas. */
+@media (max-width: 767px) and (max-height: 699px) {
+  html.snap-home #avaliacoes [aria-roledescription="testemunho"] blockquote p,
+  html.snap-home #avaliacoes [aria-roledescription="testemunho"] [data-len] blockquote p { font-size: 15.5px; line-height: 1.4; -webkit-line-clamp: 4; }
+}
+@media (max-width: 767px) { html.snap-home #perguntas > div { padding-left: 20px; padding-right: 20px; } }
+@media (max-width: 374px) { html.snap-home #servicos h3 { font-size: 13.5px; } }
+/* "O seu preço" nos ecrãs úteis mais baixos: tudo acima da barra do WhatsApp. */
+@media (max-width: 767px) and (max-height: 659px) {
+  html.snap-home #preco button { min-height: 40px; height: auto; padding-top: 4px; padding-bottom: 4px; }
+  html.snap-home #preco :is(.mb-3, .mb-4) { margin-bottom: 8px; }
+}

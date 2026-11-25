@@ -11,6 +11,7 @@
  * - `src/lib/leadTracking.ts` — o que é um lead a sério e o que não é;
  * - `src/lib/leadAttribution.ts` — de onde veio a pessoa, first e last touch.
  */
+import { pageScroller, pageScrollTop } from '@/lib/pageScroller';
 import { markFiredOnce, sendGtagEvent, type EventParams } from './gtag';
 import { trackCallClickEvent, trackWhatsAppClick } from '@/lib/quizTracking';
 
@@ -270,8 +271,9 @@ export function initScrollTracking() {
   const tracked = new Set<number>();
   
   const handleScroll = () => {
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollPercent = Math.round((window.scrollY / scrollHeight) * 100);
+    const scrollHeight = pageScroller().scrollHeight - window.innerHeight;
+    if (scrollHeight <= 0) return;
+    const scrollPercent = Math.round((pageScrollTop() / scrollHeight) * 100);
     
     thresholds.forEach(threshold => {
       if (scrollPercent >= threshold && !tracked.has(threshold)) {
@@ -285,8 +287,8 @@ export function initScrollTracking() {
     });
   };
   
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  return () => window.removeEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+  return () => window.removeEventListener('scroll', handleScroll, true);
 }
 
 // ============================================
