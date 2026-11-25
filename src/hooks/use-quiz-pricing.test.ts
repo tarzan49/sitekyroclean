@@ -108,7 +108,7 @@ describe('anti-acaros on sofas and chairs', () => {
     expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(80 + 20);
     // Nunca as duas coisas: com impermeabilização, o anti-ácaros não conta
     // (mesma regra que o recibo, chairAntiAcarosQty).
-    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'essencial' }).calculateServicePrice).toBe(99); // cleaning at half 4 x 10 + Essencial 4 x 15 = 100, nearest 9 (dono, 24 Nov 2026)
+    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'essencial' }).calculateServicePrice).toBe(139); // 80 + 60 = 140, nearest 9 (dono, 25 Nov: opção A)
     expect(pricing({ service: 'chairs', serviceType: 'waterproofing', waterproofingTier: 'essencial', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(60);
   });
 });

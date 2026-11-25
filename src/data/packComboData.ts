@@ -68,7 +68,7 @@ export function packPriceFrom(pack: PackCombo, cityName = 'Lisboa'): string {
   if (pack.id === 'sofa-impermeabilizacao' || pack.id === 'cadeiras-impermeabilizacao') {
     const item = pack.id === 'sofa-impermeabilizacao' ? { kind: 'sofa', size: '1-lugar', treatment: 'clean+essencial' } : { kind: 'chairs', qty: 1, treatment: 'clean+essencial' };
     const r = botQuote({ city: cityName, items: [item] }) as { ok: boolean; quote?: boolean; total?: number | null; travel?: number | null };
-    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 24 Nov: limpeza a metade 10€ + Essencial 15€, no 9 mais perto = 29€).
+    // Cadeiras: a deslocação é à parte, por isso o "desde" é 1 cadeira + Essencial sem ela (dono, 25 Nov: limpeza 20€ + Essencial 15€, no 9 mais perto = 39€).
     const travel = pack.id === 'cadeiras-impermeabilizacao' ? (r.travel ?? 0) : 0;
     if (r.ok && !r.quote && typeof r.total === 'number') return formatEuro(r.total - travel);
   }
@@ -169,7 +169,7 @@ const WATERPROOF_PACK_FAQS: Record<string, { question: string; answer: string }[
   'cadeiras-impermeabilizacao': [
     {
       question: 'Quanto custa limpar e impermeabilizar cadeiras?',
-      answer: `Cada cadeira paga o preço da sua posição. ${chairTierSentence()} Com a impermeabilização, a limpeza fica a metade. A impermeabilização custa ${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} (Premium) ou ${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} (Essencial) por cadeira nas primeiras 4, ${formatEuro(CHAIR_WATERPROOF_MID_PREMIUM)} ou ${formatEuro(CHAIR_WATERPROOF_MID_ESSENTIAL)} da 5.ª à 8.ª, e ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} ou ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} a partir da 9.ª.`,
+      answer: `Cada cadeira paga o preço da sua posição. ${chairTierSentence()} A impermeabilização soma-se à limpeza e custa ${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} (Premium) ou ${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} (Essencial) por cadeira nas primeiras 4, ${formatEuro(CHAIR_WATERPROOF_MID_PREMIUM)} ou ${formatEuro(CHAIR_WATERPROOF_MID_ESSENTIAL)} da 5.ª à 8.ª, e ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} ou ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} a partir da 9.ª.`,
     },
     ...WATERPROOF_COMMON,
   ],

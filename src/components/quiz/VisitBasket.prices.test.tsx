@@ -25,8 +25,8 @@ describe('cadeiras: linha e riscado são os do motor com a quantidade inteira', 
     const row = (t: string) => [1, 4, 6, 12].map(qty => motor([{ kind: 'chairs', qty, treatment: t }]).total);
     expect(row('clean')).toEqual([30, 90, 120, 180]);
     expect(row('premium')).toEqual([39, 119, 159, 279]);
-    expect(row('clean+premium')).toEqual([49, 139, 199, 359]);
-    expect(struckOf('Lisboa', chairs(6, 'premium'))).toBe(234);
+    expect(row('clean+premium')).toEqual([59, 179, 259, 449]);
+    expect(struckOf('Lisboa', chairs(6, 'premium'))).toBe(279);
   });
 });
 

@@ -128,14 +128,14 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect([premium.travel, premium.total, premium.handToOwner]).toEqual([0, 239, false]);
     const essencial = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'essencial' }], city: 'Porto' });
     expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([159, 0, 159, false]);
-    // Waterproofed-only chairs do not push the cleaned ones over a tier; the 4 cleaned chairs are also waterproofed, so 4 x (20 - 5) = 60€ (dono, 24 Nov 2026).
+    // Waterproofed-only chairs do not push the cleaned ones over a tier; the 4 cleaned chairs are also waterproofed, at the full table, 4 x 20 = 80€ (dono, 25 Nov: opção A).
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
-    expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([40, false]);
+    expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([80, false]);
   });
-  it('chairs cleaned and waterproofed: by position, cleaning 5€ less per waterproofed chair, line ends in 9 (dono, 24 Nov 2026)', () => {
-    // 12 chairs by position, cleaning at half with waterproofing: 90 + Premium 270 / Essencial 150, nearest 9 (dono, 24 Nov 2026: 359).
+  it('chairs cleaned and waterproofed: by position, cleaning + waterproofing at the full table, line ends in 9 (dono, 25 Nov: opção A)', () => {
+    // 12 chairs: 180 + Premium 270 / Essencial 150, nearest 9 (dono, 25 Nov: opção A).
     const r = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Cruz Quebrada' });
-    expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([359, 359, 239]);
+    expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([449, 449, 329]);
     expect(ok({ items: [{ kind: 'chairs', qty: 12 }], city: 'Cruz Quebrada' }).total).toBe(180);
     // 9 never costs less than 8.
     const p8 = ok({ items: [{ kind: 'chairs', qty: 8, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
@@ -162,9 +162,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(resolveBotCity('Santa Clara')).toBeNull();
     expect(resolveBotCity('Santa Clara, Coimbra')).toBe('Coimbra');
     expect(resolveBotCity('Madrid')).toBeNull();
-    // 4 chairs clean + Essencial (dono, 24 Nov 2026): cleaning at half 40 + Essencial 60 = 100, nearest 9 = 99.
+    // 4 chairs clean + Essencial (dono, 25 Nov: opção A): 80 + 60 = 140, nearest 9 = 139.
     const chairs = ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'clean+essencial' }], city: 'Ericeira' });
-    expect([chairs.city, chairs.lines[0].amount, chairs.travel, chairs.handToOwner]).toEqual(['Mafra', 99, 10, false]);
+    expect([chairs.city, chairs.lines[0].amount, chairs.travel, chairs.handToOwner]).toEqual(['Mafra', 139, 10, false]);
   });
   it('rejects what the engine does not sell, with a message the bot developer can read', () => {
     const errors = [

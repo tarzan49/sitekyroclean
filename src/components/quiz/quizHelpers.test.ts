@@ -12,7 +12,7 @@ import { sofaPrices, mattressPrices, initialFormData } from './QuizTypes';
 // no código-fonte, para uma alteração futura a um dos três não desalinhar
 // silenciosamente os outros dois.
 // Dono, 24 Nov 2026 (regra final): cada cadeira paga o preço da sua posição, escalões 1.ª-4.ª / 5.ª-8.ª / 9.ª+.
-describe('calcChairClean (dono, 24 Nov 2026: 20 / 15 / 10€ por posição; a metade na cadeira que também é impermeabilizada)', () => {
+describe('calcChairClean (dono, 24 Nov 2026: 20 / 15 / 10€ por posição)', () => {
   it('is null for 0 or negative', () => {
     expect(calcChairClean(0)).toBeNull();
     expect(calcChairClean(-1)).toBeNull();
@@ -30,9 +30,9 @@ describe('calcChairClean (dono, 24 Nov 2026: 20 / 15 / 10€ por posição; a me
   it('one more chair never costs less', () => {
     for (let q = 1; q < 30; q++) expect(calcChairClean(q + 1)!).toBeGreaterThan(calcChairClean(q)!);
   });
-  it('a waterproofed chair cleans at half price', () => {
-    expect(calcChairClean(4, 4)).toBeCloseTo(40);
-    expect(calcChairClean(12, 12)).toBeCloseTo(90);
+  it('a waterproofed chair cleans at the full table (dono, 25 Nov: opção A)', () => {
+    expect(calcChairClean(4, 4)).toBeCloseTo(80);
+    expect(calcChairClean(12, 12)).toBeCloseTo(180);
   });
 });
 
