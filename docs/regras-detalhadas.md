@@ -1299,7 +1299,6 @@ Dono: "quando é que eu te ensinei que tu dizes a alguém se o valor fizer senti
 
 Dono: "para já enquanto eles me devem dinheiro". `teamPaused` em kyro-bot `vianaAsk.ts`; retoma-se esvaziando `team_paused:Funchal` na tabela de estado do VPS, sem deploy. Avaliar com o dono quando pagarem.
 
-<<<<<<< ours
 ## Formato no iPhone (dono, 24 Nov 2026, 6 capturas na conversa 925 530 647)
 
 Dono: "Tudo cortado. Nada está ao tamanho da tela." As secções tinham `min-height: 100svh`. No Safari do iPhone `svh` é a altura com todas as barras abertas (em privado desconta ainda o aviso "Reduzir proteções"): 615 px num iPhone de 402 px, contra 713 no cimo da página e 753 com as barras recolhidas. Sobravam até 138 px e via-se a secção seguinte cortada. Os testes anteriores foram em janela emulada sem barras, onde `svh` = ecrã, por isso passavam.
@@ -1318,6 +1317,4 @@ Guias, perguntas e glossário (dono, 25 Nov): topo de ecrã inteiro com vídeo r
 ## Um push para master publica o site (descoberto a 25 Nov 2026)
 
 `.github/workflows/deploy-site.yml` (2e528ade, 16/11) faz build e `wrangler deploy` em cada push a master. A regra dizia o contrário e, por isso, preços por aprovar estiveram no ar na noite de 24/11 e os tapetes (39001b78) entraram às 00h58 de 25/11 sem OK (reposto com `wrangler rollback`). Depois de publicar, confirmar com `wrangler deployments list`.
-=======
 - **Dono apaga e reenvia a mesma mensagem corrigida, no fecho (dono, 25 Nov 2026, 6 cadeiras em Setúbal):** o bot volta 2 min depois da mensagem dele, não 10 (kyro-bot `ownerDelete.ts` `onlyCorrected`); se o dono escreveu outra coisa, continuam os 10 min de 23 Nov. E quando o cliente pede outro dia depois da linha do dono ("Hoje não posso. Podem na 6a feira?"), a resposta com esse dia e as horas do motor já não fica retida (`ownerLineDayHourIssue`): não contraria o dono.
->>>>>>> theirs
