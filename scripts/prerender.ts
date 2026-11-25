@@ -1568,6 +1568,8 @@ export function prerenderRoutes(outDir: string): number {
         { href: '/glossario-limpeza-estofos', label: 'Glossário' },
         { href: '/blog', label: 'Blog' },
         { href: '/guia-de-packs', label: 'Packs' },
+        // "Para a sua empresa" (HomeCommercialSection).
+        ...SECTORS.map(s => ({ href: `/limpeza-comercial-${s.key}`, label: `Para a sua empresa: ${s.label}` })),
       ],
     });
     let homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);

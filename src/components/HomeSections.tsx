@@ -9,9 +9,21 @@ import CompactFAQ from './CompactFAQ';
 import { StoryPlayer, storyFor } from './WaterproofPackSections';
 import { cities } from '@/data/serviceCatalog';
 import { RESOURCE_FAQS } from '@/data/resourceContent';
-import { Phone } from 'lucide-react';
+import { ChevronRight, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import hoteisImg from '@/assets/comercial/setor-hoteis.webp';
+import alojamentoImg from '@/assets/comercial/setor-alojamento-local.webp';
+import restaurantesImg from '@/assets/comercial/setor-restaurantes.webp';
+import escritoriosImg from '@/assets/comercial/setor-escritorios.webp';
 import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from '@/constants/business';
 import { buildGeneralWaMessage } from '@/lib/whatsappMessages';
+
+const HOME_SECTORS = [
+  { to: '/limpeza-comercial-hoteis', label: 'Hotéis', img: hoteisImg },
+  { to: '/limpeza-comercial-alojamento-local', label: 'Alojamento local', img: alojamentoImg },
+  { to: '/limpeza-comercial-restaurantes', label: 'Restaurantes e cafés', img: restaurantesImg },
+  { to: '/limpeza-comercial-escritorios', label: 'Escritórios', img: escritoriosImg },
+];
 
 const ARTICLES: { id: StepKind; label: string }[] = [
   { id: 'sofa', label: 'Sofá' }, { id: 'chairs', label: 'Cadeiras' }, { id: 'mattress', label: 'Colchão' },
@@ -40,6 +52,26 @@ export function HomePriceSection() {
         </div>
         <div className="rounded-2xl bg-white p-3 md:p-6">
           <StepPricePicker key={kind} kind={kind} city={city} onCity={setCity} source="home_picker" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Comercial na página inicial (dono, 25 Nov: "abaixo de o seu preço"): os quatro setores e a ligação às páginas de empresas. */
+export function HomeCommercialSection() {
+  return (
+    <section id="empresas" className="scroll-mt-20 bg-[#FDFDF9] py-12 md:py-16">
+      <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+        <SectionHeader heading="Para a sua" goldWord="empresa" />
+        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+          {HOME_SECTORS.map(s => (
+            <Link key={s.to} to={s.to} className="group relative block h-[29svh] min-h-[160px] overflow-hidden rounded-2xl md:h-[54svh]">
+              <img src={s.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <span className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(7,26,18,0) 35%, rgba(7,26,18,.9) 100%)' }} />
+              <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-3 text-[16px] font-semibold leading-tight text-white md:p-5 md:text-xl">{s.label}<ChevronRight className="h-5 w-5 shrink-0 text-[#D4AF37]" /></span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

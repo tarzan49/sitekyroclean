@@ -7,6 +7,7 @@ const HomepageBlogSection  = lazy(() => import("@/components/HomepageBlogSection
 const Services             = lazy(() => import("@/components/Services"));
 const HomeServiceVideos    = lazy(() => import("@/components/HomeServiceVideos"));
 const HomePriceSection     = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomePriceSection })));
+const HomeCommercialSection = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeCommercialSection })));
 const HomeStorySection     = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeStorySection })));
 const HomeFaqSection       = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeFaqSection })));
 const HomeClosingSection   = lazy(() => import("@/components/HomeSections").then(m => ({ default: m.HomeClosingSection })));
@@ -42,6 +43,10 @@ const IndexV1 = () => {
 
         <Suspense fallback={<SectionLoader />}>
           <HomePriceSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionLoader />}>
+          <HomeCommercialSection />
         </Suspense>
 
         <div id="testemunhos" className="scroll-mt-16">
