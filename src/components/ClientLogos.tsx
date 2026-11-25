@@ -1,5 +1,6 @@
 // Faixa giratória em todos os ecrãs, telemóvel incluído (dono, 25 Nov: "da forma que já te tinha pedido"). Empresas com quem já trabalhámos (dono, 24 Nov). Só nomes confirmados por ele (COMMERCIAL_CLIENTS);
 // sem ficheiro de logótipo, mostra-se o nome escrito, nunca um logótipo inventado.
+import churrasco from '@/assets/comercial/logo-sabores-churrasco-premium.webp';
 import movenpick from '@/assets/comercial/logo-movenpick.webp';
 import rc from '@/assets/comercial/logo-rc-restaurante.webp';
 import duello from '@/assets/comercial/logo-duello.webp';
@@ -15,7 +16,7 @@ import menina from '@/assets/comercial/logo-menina-colina.webp';
 import realIndiana from '@/assets/comercial/logo-real-indiana.webp';
 import { COMMERCIAL_CLIENTS } from '@/data/commercialSeoData';
 
-const LOGOS: Record<string, string> = { 'Real Indiana': realIndiana, 'Arcádia': arcadia, 'Mikado': mikado, 'Palácio da Bolsa': palacio, 'Menina Colina': menina, 'Praia da Luz': praiaDaLuz, 'Al Mare': alMare, 'Genki': genki, 'Mövenpick': movenpick, 'RC Restaurante': rc, 'Duello': duello, 'Garden Balthazar': garden, 'Lumière': lumiere };
+const LOGOS: Record<string, string> = { 'Real Indiana': realIndiana, 'Arcádia': arcadia, 'Mikado': mikado, 'Palácio da Bolsa': palacio, 'Menina Colina': menina, 'Praia da Luz': praiaDaLuz, 'Al Mare': alMare, 'Genki': genki, 'Mövenpick': movenpick, 'RC Restaurante': rc, 'Duello': duello, 'Garden Balthazar': garden, 'Lumière': lumiere, 'Sabores do Churrasco Premium': churrasco };
 
 export default function ClientLogos() {
   const row = (copy: boolean) => (
