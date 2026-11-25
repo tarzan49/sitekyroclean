@@ -1,4 +1,4 @@
-// Faixa giratória de empresas com quem já trabalhámos (dono, 24 Nov). Só nomes confirmados por ele (COMMERCIAL_CLIENTS);
+// Faixa giratória em todos os ecrãs, telemóvel incluído (dono, 25 Nov: "da forma que já te tinha pedido"). Empresas com quem já trabalhámos (dono, 24 Nov). Só nomes confirmados por ele (COMMERCIAL_CLIENTS);
 // sem ficheiro de logótipo, mostra-se o nome escrito, nunca um logótipo inventado.
 import movenpick from '@/assets/comercial/logo-movenpick.webp';
 import rc from '@/assets/comercial/logo-rc-restaurante.webp';
@@ -27,16 +27,10 @@ export default function ClientLogos() {
       ))}
     </ul>
   );
-  return (<>
-    {/* Telemóvel: todos os clientes à vista, em duas colunas, a encher o ecrã (dono, 25 Nov). */}
-    <ul className="grid w-full grid-cols-2 gap-x-8 gap-y-1.5 px-5 md:hidden">{COMMERCIAL_CLIENTS.map(name => (
-      <li key={name} data-fill-tile className="flex min-h-[54px] items-center justify-center">
-        {LOGOS[name] ? <img src={LOGOS[name]} alt={name} width={150} height={88} data-no-fill className="max-h-[56px] w-auto max-w-[130px] object-contain" /> : <span className="font-playfair text-center text-xl font-semibold text-[#3C3C3C]">{name}</span>}
-      </li>
-    ))}</ul>
-    <div className="client-logos w-full max-md:hidden overflow-hidden" style={{ maskImage: 'linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)', WebkitMaskImage: 'linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)' }}>
+  return (
+    <div className="client-logos w-full overflow-hidden" style={{ maskImage: 'linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)', WebkitMaskImage: 'linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)' }}>
       <style>{'@keyframes client-logos{to{transform:translateX(-50%)}}.client-logos>div{animation:client-logos 38s linear infinite}@media(prefers-reduced-motion:reduce){.client-logos{overflow-x:auto}.client-logos>div{animation:none}}'}</style>
       <div className="flex w-max">{row(false)}{row(true)}</div>
     </div>
-  </>);
+  );
 }

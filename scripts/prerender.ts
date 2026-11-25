@@ -1502,11 +1502,13 @@ export function prerenderRoutes(outDir: string): number {
       const schemas: object[] = [
         buildBreadcrumbSchema([
           { name: 'Início', url: BASE_URL + '/' },
+          ...(sector?.city ? [{ name: `Limpeza comercial ${cityPrep(sector.city.name)} ${sector.city.name}`, url: `${BASE_URL}/limpeza-comercial-${sector.city.slug}` }] : []),
           { name: page.h1, url: BASE_URL + route.path },
         ]),
       ];
-      const cityLinks = COMMERCIAL_CITIES.filter(city => city.slug !== route.citySlug).map(city => ({ href: `/limpeza-comercial-${city.slug}`, label: `Limpeza comercial ${cityPrep(city.name)} ${city.name}` }));
-      const sectorLinks = SECTORS.filter(s => s.key !== route.citySlug).map(s => ({ href: `/limpeza-comercial-${s.key}`, label: `${s.label}: ${s.short}` }));
+      const pageCity = data?.city ?? sector?.city;
+      const cityLinks = COMMERCIAL_CITIES.filter(city => city.slug !== pageCity?.slug).map(city => ({ href: `/limpeza-comercial-${sector ? `${sector.key}-` : ''}${city.slug}`, label: sector ? `${sector.label} ${cityPrep(city.name)} ${city.name}` : `Limpeza comercial ${cityPrep(city.name)} ${city.name}` }));
+      const sectorLinks = SECTORS.filter(s => s.key !== sector?.key).map(s => ({ href: `/limpeza-comercial-${s.key}${pageCity ? `-${pageCity.slug}` : ''}`, label: `${s.label}: ${s.short}` }));
       // As mesmas secções do React: contacto direto, avaliações reais (Lumiere primeiro), exemplos da peça principal.
       const heroService = COMMERCIAL_HERO_SERVICE[sector?.key ?? 'cidade'];
       const examples = getLandingProblems(heroService).map(p => ({ title: p.title, description: p.description }));

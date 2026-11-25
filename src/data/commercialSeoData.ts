@@ -6,7 +6,7 @@ import { pickReviewSubset, type PoolReview } from './reviewsPool';
 //   /limpeza-comercial-{cidade}  = as 102 cidades onde operamos (`cities`), com os setores ligados;
 //   /limpeza-comercial-{setor}   = uma página nacional por setor, com o que limpamos nesse setor e as
 //                                  obrigações legais lidas na fonte (nunca inventadas).
-// Setor × cidade ficaria com 400+ páginas quase iguais; fica setor nacional + cidade (por confirmar com o dono).
+//   /limpeza-comercial-{setor}-{cidade} = cada setor em cada cidade (dono, 25 Nov: "cada cidade vai ter a sua secção").
 // Nada de descontos de contrato, visitas grátis nem testemunhos que não existam: só factos do negócio.
 
 export type CommercialRegion = 'Porto' | 'Braga' | 'Coimbra' | 'Lisboa' | 'Algarve' | 'Madeira';
@@ -54,6 +54,8 @@ export interface SectorData {
   /** Frase que liga as regras ao serviço, sem afirmar mais do que a norma diz. */
   rulesNote: string;
   faqs: { question: string; answer: string }[];
+  /** Só nas páginas setor × cidade. */
+  city?: CommercialCity;
 }
 
 // Pontos do contrato: só o que é verdade em qualquer serviço da Kyro (CLAUDE.md §3).
@@ -175,7 +177,32 @@ export const SECTORS: SectorData[] = [
 ];
 
 export function getSector(slug: string): SectorData | null {
-  return SECTORS.find(s => s.key === slug) ?? null;
+  const national = SECTORS.find(s => s.key === slug);
+  if (national) return national;
+  const base = SECTORS.find(s => slug.startsWith(`${s.key}-`));
+  const city = base && COMMERCIAL_CITIES.find(c => c.slug === slug.slice(base.key.length + 1));
+  return base && city ? sectorInCity(base, city) : null;
+}
+
+/** O setor numa cidade: título, introdução e perguntas próprias, com as localidades vizinhas reais da mesma zona. */
+function sectorInCity(base: SectorData, city: CommercialCity): SectorData {
+  const where = `${cityPrep(city.name)} ${city.name}`;
+  const near = COMMERCIAL_CITIES.filter(c => c.region === city.region && c.slug !== city.slug);
+  const i = COMMERCIAL_CITIES.findIndex(c => c.slug === city.slug) % Math.max(1, near.length);
+  const around = [...near.slice(i), ...near.slice(0, i)].slice(0, 4).map(c => c.name);
+  const what = base.label.toLowerCase();
+  return {
+    ...base,
+    city,
+    title: `${base.h1} ${where} | Kyro Clean`,
+    metaDescription: `${base.h1} ${where}: ${base.short.charAt(0).toLowerCase()}${base.short.slice(1)}. Fatura com IVA, fora de horas, contacto direto por WhatsApp, telefone ou email.`,
+    h1: `${base.h1} ${where}`,
+    intro: `${base.intro} Serviço ${where}.`,
+    faqs: [
+      { question: `Trabalham com ${what} ${where}?`, answer: `Sim, vamos ao seu espaço ${where}.${around.length ? ` Também vamos a ${around.join(', ')}.` : ''} Diga-nos as peças e a frequência e respondemos com a proposta.` },
+      ...base.faqs,
+    ].slice(0, 5),
+  };
 }
 
 export interface CommercialPageData {
@@ -212,6 +239,7 @@ export function getAllCommercialRoutes(): { path: string; citySlug: string }[] {
   return [
     ...SECTORS.map(s => ({ path: `/limpeza-comercial-${s.key}`, citySlug: s.key })),
     ...COMMERCIAL_CITIES.map(c => ({ path: `/limpeza-comercial-${c.slug}`, citySlug: c.slug })),
+    ...SECTORS.flatMap(s => COMMERCIAL_CITIES.map(c => ({ path: `/limpeza-comercial-${s.key}-${c.slug}`, citySlug: `${s.key}-${c.slug}` }))),
   ];
 }
 

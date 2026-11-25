@@ -20,6 +20,10 @@ import escritorioVideo from "@/assets/comercial/poltronas.mp4";
 import hotelVideo from "@/assets/comercial/hotel.mp4";
 import alojamentoVideo from "@/assets/comercial/alojamento.mp4";
 import restauranteVideo from "@/assets/comercial/restaurante.mp4";
+import hoteisImg from "@/assets/comercial/setor-hoteis.webp";
+import alojamentoImg from "@/assets/comercial/setor-alojamento-local.webp";
+import restaurantesImg from "@/assets/comercial/setor-restaurantes.webp";
+import escritoriosImg from "@/assets/comercial/setor-escritorios.webp";
 import escritorioPoster from "@/assets/comercial/poltronas-poster.jpg";
 import hotelPoster from "@/assets/comercial/hotel-poster.jpg";
 import alojamentoPoster from "@/assets/comercial/alojamento-poster.jpg";
@@ -31,6 +35,9 @@ import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL, BUSI
 import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 
 // Vídeo real da equipa em cada tipo de espaço, no topo (dono, 24 Nov: "repõe os vídeos").
+// Imagens de ambiente dos setores (dono, 25 Nov): não são trabalhos nossos, nunca usar como antes e depois.
+const SECTOR_IMAGES: Record<SegmentKey, string> = { hoteis: hoteisImg, "alojamento-local": alojamentoImg, restaurantes: restaurantesImg, escritorios: escritoriosImg };
+
 const VIDEOS: Record<SectorData["video"], { src: string; poster: string }> = {
   hotel: { src: hotelVideo, poster: hotelPoster },
   alojamento: { src: alojamentoVideo, poster: alojamentoPoster },
@@ -90,12 +97,13 @@ const CommercialPage = () => {
     const img = selectLandingProblemImage(heroService, card.id, pathname);
     return { id: card.id, label: card.title, description: card.description, src: img?.src ?? PROBLEM_IMAGES[heroService][card.imageIndex], alt: img?.alt ?? card.title, video: img?.video };
   });
-  const placeName = cityData?.city.name;
-  const processHeading = cityData ? undefined : { text: heroService === "limpeza-colchoes" ? "A limpeza dos colchões no seu" : "A limpeza das cadeiras no seu", gold: SECTOR_NOUN[sector!.key] };
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildCommercialWaMessage(cityData?.city.name, sector?.label))}`;
-  const mailHref = `${BUSINESS_EMAIL_HREF}?subject=${encodeURIComponent(`Proposta para empresa: ${h1}`)}&body=${encodeURIComponent(buildCommercialWaMessage(cityData?.city.name, sector?.label))}`;
+  const pageCity = cityData?.city ?? sector?.city;
+  const placeName = pageCity?.name;
+  const processHeading = pageCity ? undefined : { text: heroService === "limpeza-colchoes" ? "A limpeza dos colchões no seu" : "A limpeza das cadeiras no seu", gold: SECTOR_NOUN[sector!.key] };
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildCommercialWaMessage(placeName, sector?.label))}`;
+  const mailHref = `${BUSINESS_EMAIL_HREF}?subject=${encodeURIComponent(`Proposta para empresa: ${h1}`)}&body=${encodeURIComponent(buildCommercialWaMessage(placeName, sector?.label))}`;
   const track = `commercial_${slug}`;
-  const area = cityData ? { "@type": "City" as const, name: cityData.city.name } : { "@type": "Country" as const, name: "Portugal" };
+  const area = pageCity ? { "@type": "City" as const, name: pageCity.name } : { "@type": "Country" as const, name: "Portugal" };
 
   const schema = {
     "@context": "https://schema.org",
@@ -103,6 +111,7 @@ const CommercialPage = () => {
       buildLocalBusinessNode(area),
       buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
         { name: "Início", item: SITE_URL },
+        ...(sector?.city ? [{ name: `Limpeza comercial ${cityPrep(sector.city.name)} ${sector.city.name}`, item: `${SITE_URL}/limpeza-comercial-${sector.city.slug}` }] : []),
         { name: h1, item: pageUrl },
       ]),
       buildServiceNode({ url: pageUrl, name: h1, description, areaServed: area, serviceType: "Limpeza comercial de estofos" }),
@@ -120,10 +129,10 @@ const CommercialPage = () => {
           title={h1}
           subtitle={intro}
           serviceSlug={heroService}
-          city={cityData?.city.name}
+          city={placeName}
           image={video.poster}
           video={video}
-          breadcrumbs={[{ label: "Início", to: "/" }, { label: h1 }]}
+          breadcrumbs={[{ label: "Início", to: "/" }, ...(sector?.city ? [{ label: `Limpeza comercial ${cityPrep(sector.city.name)} ${sector.city.name}`, to: `/limpeza-comercial-${sector.city.slug}` }] : []), { label: h1 }]}
           whatsappHref={waHref}
           source={`${track}_hero`}
           directContactLabel="Falar por WhatsApp"
@@ -146,7 +155,7 @@ const CommercialPage = () => {
                   </li>
                 ))}</ul>
               </div>
-              <img src={video.poster} alt={h1} loading="lazy" className="hidden aspect-[4/5] max-h-[68svh] w-full rounded-2xl object-cover md:block" />
+              <img src={SECTOR_IMAGES[sector.key]} alt="" loading="lazy" className="hidden aspect-[4/5] max-h-[68svh] w-full rounded-2xl object-cover md:block" />
             </div>
           </section>
         ) : (
@@ -155,8 +164,8 @@ const CommercialPage = () => {
               <SectionHeader heading="Escolha o seu" goldWord="setor" light={false} />
               <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
                 {SECTORS.map(s => (
-                  <Link key={s.key} to={`/limpeza-comercial-${s.key}`} className="group relative block h-[29svh] min-h-[170px] overflow-hidden rounded-2xl md:h-[56svh]">
-                    <img src={VIDEOS[s.video].poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <Link key={s.key} to={`/limpeza-comercial-${s.key}-${cityData!.city.slug}`} className="group relative block h-[29svh] min-h-[170px] overflow-hidden rounded-2xl md:h-[56svh]">
+                    <img src={SECTOR_IMAGES[s.key]} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <span className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0) 30%, rgba(7,26,18,.92) 100%)" }} />
                     <span className="absolute inset-x-0 bottom-0 p-3 md:p-5"><span className="flex items-center justify-between gap-1 text-[16px] font-semibold leading-tight text-white md:text-xl">{s.label}<ChevronRight className="h-5 w-5 shrink-0 text-[#D4AF37]" /></span><span className="mt-1 hidden text-[13px] leading-snug text-white/80 md:block">{s.short}</span></span>
                   </Link>
@@ -224,10 +233,10 @@ const CommercialPage = () => {
             <SectionHeader heading="Setores e" goldWord="cidades" />
             <div className="space-y-2">
               <DirectoryGroup title={sector ? "Outros setores" : "Setores"}>
-                {SECTORS.filter(s => s.key !== sector?.key).map(s => <Link key={s.key} to={`/limpeza-comercial-${s.key}`} className="inline-flex items-center rounded-full border border-[#E8E4DE] bg-white px-3.5 py-2 text-sm font-medium text-[#111111] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5">{s.label}</Link>)}
+                {SECTORS.filter(s => s.key !== sector?.key).map(s => <Link key={s.key} to={`/limpeza-comercial-${s.key}${pageCity ? `-${pageCity.slug}` : ""}`} className="inline-flex items-center rounded-full border border-[#E8E4DE] bg-white px-3.5 py-2 text-sm font-medium text-[#111111] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5">{s.label}</Link>)}
               </DirectoryGroup>
-              <DirectoryGroup title="Limpeza comercial por cidade">
-                {COMMERCIAL_CITIES.filter(c => c.slug !== slug).map(c => <Link key={c.slug} to={`/limpeza-comercial-${c.slug}`} className="inline-flex items-center rounded-full border border-[#E8E4DE] bg-white px-3.5 py-2 text-sm font-medium text-[#111111] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5">{c.name}</Link>)}
+              <DirectoryGroup title={sector ? `${sector.label} por cidade` : "Limpeza comercial por cidade"}>
+                {COMMERCIAL_CITIES.filter(c => c.slug !== pageCity?.slug).map(c => <Link key={c.slug} to={`/limpeza-comercial-${sector ? `${sector.key}-` : ""}${c.slug}`} className="inline-flex items-center rounded-full border border-[#E8E4DE] bg-white px-3.5 py-2 text-sm font-medium text-[#111111] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5">{c.name}</Link>)}
               </DirectoryGroup>
             </div>
             {cityData && <p className="mt-4 text-[13px] text-[#505650]">{cityData.coverage}</p>}
