@@ -764,6 +764,8 @@ var SERVICE_CONDITIONS = [
   COVERAGE_PROMISE,
   TREATMENT_EXTRAS
 ];
+var SITE_MIN_ORDER_EUR = 59;
+var SITE_MIN_ORDER_TEXT = `O pedido mínimo é ${SITE_MIN_ORDER_EUR}€. Junte mais um artigo para continuar.`;
 
 // src/data/enginePrices.ts
 function formatEuro(value) {
@@ -2427,6 +2429,7 @@ function toItem(raw2, index) {
   return { id: String(index), kind, size, qty, extra, primary, width, length, ...unitPrice ? { unitPrice } : {}, ...r.seatOnly === true ? { seatOnly: true } : {} };
 }
 var WATERPROOFING_TRAVEL_MAX = 10;
+var TRAVEL_FREE_FROM = 200;
 var isWaterproofing = (i) => i.extra === "essencial" || i.extra === "premium";
 var withTier = (items, tier) => items.map((i) => isWaterproofing(i) ? { ...i, extra: tier } : i);
 var cents = (n) => Math.round(n * 100) / 100;
@@ -2440,7 +2443,8 @@ function waterproofingTiers(items, city) {
   const severalPieces = pieces > 1 && items.some(isWaterproofing);
   const chairBulk = (_tier) => 0;
   const travelAsked = isBlackFriday() || severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
-  const travel = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
+  const travelRaw = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
+  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk("premium") + travel),

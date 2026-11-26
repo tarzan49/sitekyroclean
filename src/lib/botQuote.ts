@@ -158,6 +158,8 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
  * so the Premium call and the Essencial call return the same travel.
  */
 export const WATERPROOFING_TRAVEL_MAX = 10;
+/** From this service total (without travel) the travel is always free (owner, 26 Nov 2026). */
+export const TRAVEL_FREE_FROM = 200;
 const isWaterproofing = (i: CustomPackItem) => i.extra === 'essencial' || i.extra === 'premium';
 const withTier = (items: CustomPackItem[], tier: 'essencial' | 'premium') =>
   items.map(i => (isWaterproofing(i) ? { ...i, extra: tier } : i));
@@ -185,7 +187,9 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   // A corner / 5+ seat sofa waterproofed alone already carries its 10€ of travel in the fixed price.
   // A corner / 5+ seat sofa waterproofed alone: its fixed price (199, 219, 249) is the base plus 10€ of travel; alone it
   // keeps that 10€, in a visit it pays the order's travel like any other size (owner, 25 Nov 2026: "igual em todos os tamanhos").
-  const travel = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
+  const travelRaw = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
+  // An order of 200€ or more never pays travel, in any town (owner, 26 Nov 2026, Sesimbra: "um orçamento de 200 e tal euros, como é que estás a cobrar deslocação?").
+  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),
