@@ -27,7 +27,7 @@ export const COMMERCIAL_CITIES: CommercialCity[] = cities.map(c => ({
   region: AREA_REGION[c.area] ?? 'Lisboa',
 }));
 
-export type SegmentKey = 'hoteis' | 'alojamento-local' | 'restaurantes' | 'escritorios';
+export type SegmentKey = 'hoteis' | 'alojamento-local' | 'restaurantes' | 'escritorios' | 'fabricas-mobiliario';
 
 export interface SectorRule {
   /** O que a norma obriga, em paráfrase fiel. */
@@ -174,6 +174,32 @@ export const SECTORS: SectorData[] = [
       PRICE_FAQ,
     ],
   },
+  {
+    // Fábricas de mobiliário (dono, 26 Nov: "fábricas de sofás [...] nós começámos a trabalhar"). Só o que já fazemos:
+    // limpeza e impermeabilização de estofos, por lotes, onde as peças estão.
+    key: 'fabricas-mobiliario',
+    label: 'Fábricas de mobiliário',
+    short: 'Sofás e cadeiras novos, de exposição e de stock',
+    video: 'escritorio',
+    title: 'Limpeza e Impermeabilização para Fábricas de Mobiliário | Kyro Clean',
+    metaDescription: 'Limpeza e impermeabilização de sofás, cadeiras e estofos para fábricas de mobiliário e lojas de móveis: peças novas antes da entrega, exposição e stock. Fatura com IVA, contacto direto.',
+    h1: 'Limpeza e impermeabilização para fábricas de mobiliário',
+    intro: 'Sofás, cadeiras e estofos tratados na fábrica, no armazém ou na loja, por lotes, antes de seguirem para o cliente.',
+    items: [
+      { item: 'Impermeabilização de peças novas', detail: 'Premium (solvente) ou Essencial (à base de água), só em tecido, antes da entrega.' },
+      { item: 'Peças de exposição', detail: 'Sofás e cadeiras do showroom limpos sem sair da loja.' },
+      { item: 'Stock em armazém', detail: 'Peças paradas limpas antes de seguirem para o cliente.' },
+      { item: 'Cadeiras e cadeirões', detail: 'Por lotes, no próprio local.' },
+    ],
+    rules: [],
+    rulesNote: '',
+    faqs: [
+      { question: 'Vão à fábrica ou ao armazém?', answer: 'Sim. Tratamos as peças onde estão, por lotes, na fábrica, no armazém ou na loja.' },
+      { question: 'Impermeabilizam peças novas?', answer: 'Sim, em tecido. Pele, napa e tecidos já tratados de fábrica não levam impermeabilização.' },
+      IVA_FAQ,
+      PRICE_FAQ,
+    ],
+  },
 ];
 
 export function getSector(slug: string): SectorData | null {
@@ -249,6 +275,7 @@ export const COMMERCIAL_HERO_SERVICE: Record<SegmentKey | 'cidade', 'limpeza-col
   'alojamento-local': 'limpeza-colchoes',
   restaurantes: 'limpeza-cadeiras',
   escritorios: 'limpeza-cadeiras',
+  'fabricas-mobiliario': 'limpeza-cadeiras',
   cidade: 'limpeza-cadeiras',
 };
 

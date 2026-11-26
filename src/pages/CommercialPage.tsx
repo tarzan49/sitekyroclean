@@ -23,6 +23,7 @@ import restauranteVideo from "@/assets/comercial/restaurante.mp4";
 import hoteisImg from "@/assets/comercial/setor-hoteis.webp";
 import alojamentoImg from "@/assets/comercial/setor-alojamento-local.webp";
 import restaurantesImg from "@/assets/comercial/setor-restaurantes.webp";
+import fabricasImg from "@/assets/comercial/setor-fabricas-mobiliario.webp";
 import escritoriosImg from "@/assets/comercial/setor-escritorios.webp";
 import escritorioPoster from "@/assets/comercial/poltronas-poster.jpg";
 import hotelPoster from "@/assets/comercial/hotel-poster.jpg";
@@ -36,7 +37,7 @@ import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, clearPre
 
 // Vídeo real da equipa em cada tipo de espaço, no topo (dono, 24 Nov: "repõe os vídeos").
 // Imagens de ambiente dos setores (dono, 25 Nov): não são trabalhos nossos, nunca usar como antes e depois.
-const SECTOR_IMAGES: Record<SegmentKey, string> = { hoteis: hoteisImg, "alojamento-local": alojamentoImg, restaurantes: restaurantesImg, escritorios: escritoriosImg };
+const SECTOR_IMAGES: Record<SegmentKey, string> = { hoteis: hoteisImg, "alojamento-local": alojamentoImg, restaurantes: restaurantesImg, escritorios: escritoriosImg, "fabricas-mobiliario": fabricasImg };
 
 const VIDEOS: Record<SectorData["video"], { src: string; poster: string }> = {
   hotel: { src: hotelVideo, poster: hotelPoster },
@@ -45,7 +46,7 @@ const VIDEOS: Record<SectorData["video"], { src: string; poster: string }> = {
   escritorio: { src: escritorioVideo, poster: escritorioPoster },
 };
 
-const SECTOR_NOUN: Record<SegmentKey, string> = { hoteis: "hotel", "alojamento-local": "alojamento", restaurantes: "restaurante", escritorios: "escritório" };
+const SECTOR_NOUN: Record<SegmentKey, string> = { hoteis: "hotel", "alojamento-local": "alojamento", restaurantes: "restaurante", escritorios: "escritório", "fabricas-mobiliario": "fábrica" };
 
 const CommercialPage = () => {
   const { pathname } = useLocation();
@@ -99,7 +100,7 @@ const CommercialPage = () => {
   });
   const pageCity = cityData?.city ?? sector?.city;
   const placeName = pageCity?.name;
-  const processHeading = pageCity ? undefined : { text: heroService === "limpeza-colchoes" ? "A limpeza dos colchões no seu" : "A limpeza das cadeiras no seu", gold: SECTOR_NOUN[sector!.key] };
+  const processHeading = pageCity ? undefined : { text: sector!.key === "fabricas-mobiliario" ? "A limpeza das cadeiras na sua" : heroService === "limpeza-colchoes" ? "A limpeza dos colchões no seu" : "A limpeza das cadeiras no seu", gold: SECTOR_NOUN[sector!.key] };
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildCommercialWaMessage(placeName, sector?.label))}`;
   const mailHref = `${BUSINESS_EMAIL_HREF}?subject=${encodeURIComponent(`Proposta para empresa: ${h1}`)}&body=${encodeURIComponent(buildCommercialWaMessage(placeName, sector?.label))}`;
   const track = `commercial_${slug}`;
@@ -162,9 +163,9 @@ const CommercialPage = () => {
           <section id="setores" className="scroll-mt-20 bg-kyro-green py-14 text-white md:py-20">
             <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
               <SectionHeader heading="Escolha o seu" goldWord="setor" light={false} />
-              <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+              <div className="grid grid-cols-2 gap-2.5 md:grid-cols-5 md:gap-4">
                 {SECTORS.map(s => (
-                  <Link key={s.key} to={`/limpeza-comercial-${s.key}-${cityData!.city.slug}`} className="group relative block h-[29svh] min-h-[170px] overflow-hidden rounded-2xl md:h-[56svh]">
+                  <Link key={s.key} to={`/limpeza-comercial-${s.key}-${cityData!.city.slug}`} className="group relative block h-[22svh] min-h-[130px] last:col-span-2 md:last:col-span-1 overflow-hidden rounded-2xl md:h-[56svh]">
                     <img src={SECTOR_IMAGES[s.key]} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <span className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0) 30%, rgba(7,26,18,.92) 100%)" }} />
                     <span className="absolute inset-x-0 bottom-0 p-3 md:p-5"><span className="flex items-center justify-between gap-1 text-[16px] font-semibold leading-tight text-white md:text-xl">{s.label}<ChevronRight className="h-5 w-5 shrink-0 text-[#D4AF37]" /></span><span className="mt-1 hidden text-[13px] leading-snug text-white/80 md:block">{s.short}</span></span>
