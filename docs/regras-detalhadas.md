@@ -1391,3 +1391,6 @@ Sofá modular + tapete 3,5 x 4 m, opções 509/449/279€ com o anti-odor do tap
 - Em vigor: resposta curta, o resumo das opções com os valores e a oferta da visita em cada uma, "Qual das opções faz mais sentido para si?", sem horas nem pré-reserva. Sem preço dado: "Com certeza, [nome], fique à vontade."
 - Segundo defeito da mesma conversa: a lista final das opções (• Premium 509€ …) não repetia "com o anti-odor do tapete oferecido"; regra 7 do ficheiro do bot passou a pô-lo em cada opção.
 - Guarda: kyro-bot `tests/regras-retiradas.test.ts` (o deploy falha se a frase voltar).
+
+## Confirmação da opção: total com deslocação (26/11)
+Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação". Regra: o orçamento mostra o serviço sem deslocação (como o site), a confirmação da opção escolhida diz sempre o total com a deslocação incluída.
