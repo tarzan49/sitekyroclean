@@ -111,3 +111,9 @@ export const SERVICE_CONDITIONS_LINKS: readonly { href: string; label: string }[
   { href: '/tratamento-anti-acaros', label: 'Tratamento anti-ácaros' },
   { href: '/desbacterizacao', label: 'Desbacterização' },
 ];
+
+// Pedido mínimo no site (dono, 26 Nov): abaixo de 59€ o orçamento não se aceita;
+// o cliente tem de juntar mais artigos.
+export const SITE_MIN_ORDER_EUR = 59;
+export const SITE_MIN_ORDER_TEXT = `O pedido mínimo é ${SITE_MIN_ORDER_EUR}€. Para continuar, junte mais um artigo (outro tapete, um sofá, um colchão, cadeiras…).`;
+export const belowSiteMin = (total: number | null | undefined) => typeof total === 'number' && total > 0 && total < SITE_MIN_ORDER_EUR;

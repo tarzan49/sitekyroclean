@@ -4,6 +4,7 @@
 //    deslocação mostrada à parte, dono 25 Nov), nunca escrito à mão. Tapetes e alcatifas com o preço do bot (24 Nov 2026).
 // 2) Contacto: nome e telemóvel. O pedido vai pelo mesmo envio (submit-lead + quiz_order), por isso a
 //    mensagem automática e o funil do bot no WhatsApp continuam iguais.
+import { SITE_MIN_ORDER_TEXT, belowSiteMin } from '@/constants/commercialPolicy';
 import { WhatsAppCta } from '@/components/Cta';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -421,9 +422,11 @@ function VisitBasketWindow({ isOpen, onClose, initialCity = '', initialItems = [
 
   const priceText = quote.total === null ? 'Sob orçamento' : !cityKnown(city) ? `${formatEuro(quote.total)} sem a deslocação, a confirmar` : quote.sob ? `${formatEuro(quote.total)} + artigos sob orçamento` : formatEuro(quote.total);
   const phoneOk = phone.replace(/\D/g, '').length >= 9;
-  const canContinue = items.length > 0 && city.trim().length > 1;
+  const tooSmall = !quote.sob && belowSiteMin(quote.total);
+  const canContinue = items.length > 0 && city.trim().length > 1 && !tooSmall;
 
   const send = async () => {
+    if (tooSmall) return;
     const labels = items.map(itemLabel);
     const main = items[0];
     const giftText = groupGifts(quote.gifts).map(g => `oferecemos ${g.text} (normalmente ${formatEuro(g.normal)})`).join('; ');
@@ -604,7 +607,8 @@ function VisitBasketWindow({ isOpen, onClose, initialCity = '', initialItems = [
               <span className="text-right"><span className="inline-block text-xl font-bold text-white">{!items.length ? '-' : quote.total === null ? 'Sob orçamento' : formatEuro(quote.total)}</span>{quote.sob && quote.total !== null && <span className="block text-xs text-white/60">{!cityKnown(city) ? '+ deslocação, conforme a localidade' : items.some(i => isRug(i.kind)) ? '+ tapetes sob orçamento' : 'a confirmar no WhatsApp'}</span>}</span>
             </div>}
         {step === 'basket'
-          ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="cta cta-gold">Continuar</button> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
+          ? canContinue ? <button type="button" onClick={() => setStep('contact')} className="cta cta-gold">Continuar</button> : tooSmall ? <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">{SITE_MIN_ORDER_TEXT}</p> : <p className="pb-1 text-center text-sm font-semibold text-[#D4AF37]">Falta escrever a localidade</p>
+          : tooSmall ? <><p className="text-center text-sm font-semibold text-[#D4AF37]">{SITE_MIN_ORDER_TEXT}</p><button type="button" onClick={() => setStep('basket')} className="cta cta-gold">Juntar mais artigos</button></>
           : <button type="button" disabled={!name.trim() || !phoneOk || isSubmitting} onClick={send} className="cta cta-gold disabled:cursor-not-allowed">{isSubmitting ? 'A enviar…' : (cityKnown(city) ? 'Receber o preço e as horas no WhatsApp' : 'Receber o preço no WhatsApp')}</button>}
       </footer>}
 

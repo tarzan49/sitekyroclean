@@ -25,6 +25,7 @@ import matPele from '@/assets/widget-materiais/sofa-pele.webp';
 import matComum from '@/assets/quiz-materiais/tapete-la-inteiro.webp';
 import matJuta from '@/assets/quiz-materiais/tapete-juta-inteiro.webp';
 import imperSofaPhoto from '@/assets/quiz-materiais/sofa-impermeabilizado.webp'; // sofá real impermeabilizado, água em gotas (dono, 25 Nov)
+import { SITE_MIN_ORDER_TEXT, belowSiteMin } from '@/constants/commercialPolicy';
 import imperChairPhoto from '@/assets/quiz-materiais/cadeiras-inteiras.webp';
 
 const VisitBasketLazy = lazy(() => import('@/components/quiz/VisitBasket'));
@@ -176,7 +177,7 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
   const [barKey] = useState(() => ({}));
   const bar = total !== null;
   const was = bar ? price(chosen).struck : null;
-  useEffect(() => { setPriceBar(barKey, total !== null ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, travel: travelNote, href, source } : null); }, [barKey, total, was, travelNote, href, source]);
+  useEffect(() => { setPriceBar(barKey, total !== null && !belowSiteMin(total) ? { total: formatEuro(total), was: was !== null ? formatEuro(was) : undefined, travel: travelNote, href, source } : null); }, [barKey, total, was, travelNote, href, source]);
   useEffect(() => () => setPriceBar(barKey, null), [barKey]);
 
 
@@ -280,7 +281,8 @@ export default function StepPricePicker({ kind, city, source, onCity, material: 
           </button>}
         </div>
         {gift && <p className="mt-1.5 text-xs font-semibold text-[#D4AF37]">Na mesma visita oferecemos {gift.text}, normalmente {formatEuro(gift.normal)}</p>}
-        {ready && <WhatsAppCta onLight href={href} source={source} total={total !== null ? formatEuro(total) : undefined} className={`mt-2 ${bar ? 'max-md:hidden' : ''}`} />}
+        {ready && belowSiteMin(total) && <p className="mt-2 text-center text-sm font-semibold text-[#8B6914]">{SITE_MIN_ORDER_TEXT}</p>}
+        {ready && !belowSiteMin(total) && <WhatsAppCta onLight href={href} source={source} total={total !== null ? formatEuro(total) : undefined} className={`mt-2 ${bar ? 'max-md:hidden' : ''}`} />}
         {ready && <PriceCta onLight className="mt-2" onClick={() => setBasket(group(chosen))}>Juntar mais artigos</PriceCta>}
         {ready && <p className="mt-1 hidden text-center text-xs text-[#666] md:block">{travelNote}</p>}
       </div>}

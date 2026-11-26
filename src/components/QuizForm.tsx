@@ -31,6 +31,7 @@ import { useQuizUiEffects } from '@/hooks/use-quiz-ui-effects';
 import { buildReceiptLines, formatQuotePrice } from '@/services/submissionService';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { useQuizNavigation } from '@/hooks/use-quiz-navigation';
+import { SITE_MIN_ORDER_TEXT, belowSiteMin } from '@/constants/commercialPolicy';
 import type { UpsellScreen } from '@/hooks/use-quiz-navigation';
 import type { SocialProofCategory } from '@/hooks/use-quiz-ui-effects';
 
@@ -390,6 +391,7 @@ const QuizForm = ({
       return;
     }
     if (!canProceed()) return;
+    if (!hasSobOrcamento && belowSiteMin(totalPrice)) return;
 
     const finalLocation = formData.location === 'other' ? formData.otherLocation : formData.location;
     const serviceLabel = getServiceLabel();
@@ -889,12 +891,13 @@ ${formData.description || 'Sem observações adicionais'}
               </button>
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !canProceed()}
+                disabled={isSubmitting || !canProceed() || (!hasSobOrcamento && belowSiteMin(totalPrice))}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
                 {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'ENVIAR PEDIDO'}
               </Button>
             </div>
+            {!hasSobOrcamento && belowSiteMin(totalPrice) && <p className="text-center text-sm font-semibold text-[#D4AF37]">{SITE_MIN_ORDER_TEXT}</p>}
             <p className="text-center text-sm text-white/80 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 1 min
             </p>
