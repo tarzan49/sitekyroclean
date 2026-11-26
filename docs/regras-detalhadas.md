@@ -1397,3 +1397,11 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 
 ## Peça sozinha = tabela + deslocação (dono, 26 Nov)
 "Tu num sofá em U [...] cobras a deslocação. Mas num sofá de 3 lugares não." Decisão: em todas as peças pedidas sozinhas o número da tabela é o serviço e a deslocação soma-se (3L 99€, 3L Premium 169€, U 6L Premium 259€). Visitas com várias peças ficam como estavam ("keep the visits"). Código: `lonePieceRises`, `botQuoteInVisit` em botQuote.ts.
+
+## Pedidos comerciais e grandes: preço só do dono (dono, 26 Nov 2026)
+
+- Caso: hotel em Aveiro (32 colchões de casal, 17 de solteiro/cama extra, 4 berços, 3 sofás-cama). O bot deu a tabela de particulares (3659€, 4619€ com anti-ácaros) e o cliente assustou-se. Proposta do dono: 1719€ + IVA (casal 35€, solteiro 22€, berço 15€, sofá-cama 55€), com anti-ácaros, anti-odor e deslocação oferecidos, riscado ~3799€~ (anti-ácaros 40€ × 49 colchões + anti-odor 40€ × 3 sofás).
+- Dono: "todos os orçamentos que forem muito grandes, ou forem para empresas e forem coisas muito específicas e especiais, eu faço. E passas para mim e eu é que cuido disso e apenas eu."
+- Código: kyro-bot `src/bot/commercialHandoff.ts` (acima de 500€, 10+ peças sem cadeiras, 20+ cadeiras, ou `comercial: true` pelo modelo) → `calcular_orcamento` recusa o preço e manda handoff.
+- [RETIRADA 26/11] S68 de 2 Nov: "empresas: funil normal com o preço da tabela, nunca handoff".
+- Pagamento à equipa nestes serviços: o dono define à parte (os produtos ficam por conta dele).
