@@ -189,13 +189,14 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   // keeps that 10€, in a visit it pays the order's travel like any other size (owner, 25 Nov 2026: "igual em todos os tamanhos").
   const travelRaw = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
   // An order of 200€ or more never pays travel, in any town (owner, 26 Nov 2026, Sesimbra: "um orçamento de 200 e tal euros, como é que estás a cobrar deslocação?").
-  // The 10€ inside a fixed lone-piece price (corner / U / 5+ seats waterproofed alone, 219€) stays: it is part of the table price.
-  const fixedInPrice = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday();
-  const travel = !fixedInPrice && premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  // No exception for the fixed lone-piece prices (owner, 26 Nov 2026: "o motor não pode andar a inventar preços"; U alone 219€, never 219 + 10).
+  // Each tier on its own: Premium 219€ crosses 200€ and travels free, Essencial 159€ pays its 10€ (169€).
+  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  const travelEss = essencial.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),
-    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk('essencial') + travel),
+    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk('essencial') + travelEss),
   };
 }
 
@@ -804,10 +805,10 @@ function botQuoteOf(rawInput: unknown) {
  * one line per row received (the row's share of the set, by its chairs).
  */
 /**
- * One piece asked alone (owner, 26 Nov 2026): the table number is the SERVICE and the travel goes on top, so the
- * pieces whose table total had the 10€ inside go up 10€ (3L cleaning 89 + 10, 3L Premium 159 + 10, U 249 + 10).
+ * A sofa waterproofed alone (owner, 26 Nov 2026): the table number is the SERVICE and the travel goes on top
+ * (3L Premium 159 + 10, U 249 + 10).
  * Visits with several pieces stay exactly as they were (owner, 26 Nov 2026: 3L + colchão ~~209~~ 149€).
- * Packs, 1L/2L cleaning, corner cleaning, mattresses, rugs and anti-odour / anti-mites keep their price.
+ * Cleanings alone, packs, chairs and everything else keep their price.
  */
 export const LONE_PIECE_SERVICE_UP = 10;
 function lonePieceRises(input: unknown): boolean {
@@ -815,13 +816,8 @@ function lonePieceRises(input: unknown): boolean {
   if (!Array.isArray(items) || items.length !== 1 || !items[0] || typeof items[0] !== 'object') return false;
   const r = items[0] as Record<string, unknown>;
   const qty = r.qty ?? 1, t = String(r.treatment ?? 'clean'), size = String(r.size ?? '');
-  if (r.odor === true || r.mites === true) return false;
-  if (r.kind === 'sofa') {
-    if (qty !== 1) return false;
-    if (t === 'clean') return ['3-lugares', '4-lugares', '5-lugares', 'u'].includes(size);
-    return (t === 'premium' || t === 'essencial') && ['2-lugares', '3-lugares', '4-lugares', '5-lugares', 'canto', 'u'].includes(size);
-  }
-  return r.kind === 'chairs' && !r.seatOnly && (t === 'clean+premium' || t === 'clean+essencial') && typeof qty === 'number' && qty >= 1 && qty <= 3;
+  // Only a sofa waterproofed alone (owner, 26 Nov 2026); cleanings, packs and chairs keep their price.
+  return r.kind === 'sofa' && qty === 1 && (t === 'premium' || t === 'essencial') && ['2-lugares', '3-lugares', '4-lugares', '5-lugares', 'canto', 'u'].includes(size);
 }
 export function botQuote(input: unknown): ReturnType<typeof botQuoteOf> {
   const r = botQuoteMerged(input);

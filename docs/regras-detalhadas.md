@@ -1407,3 +1407,7 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 - Pagamento à equipa nestes serviços: o dono define à parte (os produtos ficam por conta dele).
 
 - [26/11] S68 comercial: o bot responde a todas as perguntas; só nunca preços nem horas (dono, 26 Nov).
+
+
+### Limpeza sozinha sem +10€ (dono, 26 Nov 2026)
+"Eu nunca na vida disse para tu subires os preços mais 10€ nas limpezas [...] Nas limpezas é para manteres o preço." A subida de `lonePieceRises` (commit fb4d2223) fica só nas impermeabilizações; limpeza 3L volta a 89€ com a deslocação. [RETIRADA 26/11] "3L limpeza 89 + 10 = 99€".

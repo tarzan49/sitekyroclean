@@ -2958,13 +2958,7 @@ function lonePieceRises(input) {
   if (!Array.isArray(items) || items.length !== 1 || !items[0] || typeof items[0] !== "object") return false;
   const r = items[0];
   const qty = r.qty ?? 1, t = String(r.treatment ?? "clean"), size = String(r.size ?? "");
-  if (r.odor === true || r.mites === true) return false;
-  if (r.kind === "sofa") {
-    if (qty !== 1) return false;
-    if (t === "clean") return ["3-lugares", "4-lugares", "5-lugares", "u"].includes(size);
-    return (t === "premium" || t === "essencial") && ["2-lugares", "3-lugares", "4-lugares", "5-lugares", "canto", "u"].includes(size);
-  }
-  return r.kind === "chairs" && !r.seatOnly && (t === "clean+premium" || t === "clean+essencial") && typeof qty === "number" && qty >= 1 && qty <= 3;
+  return r.kind === "sofa" && qty === 1 && (t === "premium" || t === "essencial") && ["2-lugares", "3-lugares", "4-lugares", "5-lugares", "canto", "u"].includes(size);
 }
 function botQuote(input) {
   const r = botQuoteMerged(input);
