@@ -14,7 +14,7 @@ describe('Black Friday 2026 (dono, 19 Nov)', () => {
     const sofa = { items: [{ kind: 'sofa', size: '3-lugares' }] };
     expect(q({ ...sofa, campaign: 'BFGTA' }).total).toBe(69);
     expect(q({ ...sofa, campaign: 'BFGTA' }).askedDiscount).toBeNull();
-    expect(q(sofa).total).toBe(89);
+    expect(q(sofa).total).toBe(99);
     expect(q(sofa).blackFriday).toBeNull();
   });
   it('ref. BFGTA: soma arredondada para baixo a acabar em 9', () => {
@@ -30,6 +30,6 @@ describe('Black Friday 2026 (dono, 19 Nov)', () => {
     at('2026-11-20T12:00:00Z');
     expect(q({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+premium' }], campaign: 'BFGTA' }).blackFriday).toBeNull();
     at('2026-12-01T00:30:00Z');
-    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }], campaign: 'BFGTA' }).total).toBe(89);
+    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }], campaign: 'BFGTA' }).total).toBe(99);
   });
 });

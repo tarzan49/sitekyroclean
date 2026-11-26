@@ -27,6 +27,6 @@ describe('pedido pequeno longe de Odivelas', () => {
   it('a partir de 49€ sem deslocação não muda', () => {
     // 3 chairs = 60€ (dono, 24 Nov 2026: 20€ each up to 4; 2 chairs = 40€ is now below 49€).
     expect(q({ items: [{ kind: 'chairs', qty: 3 }], city: 'Mafra' }).smallOrderSurcharge).toBeNull();
-    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Cascais' }).total).toBe(89);
+    expect(q({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Cascais' }).total).toBe(99);
   });
 });

@@ -2952,7 +2952,39 @@ function quoteAlone(rawInput) {
 function botQuoteOf(rawInput) {
   return withOneTravel(uAsSeats(rawInput), quoteAlone(rawInput));
 }
+var LONE_PIECE_SERVICE_UP = 10;
+function lonePieceRises(input) {
+  const items = (input ?? {}).items;
+  if (!Array.isArray(items) || items.length !== 1 || !items[0] || typeof items[0] !== "object") return false;
+  const r = items[0];
+  const qty = r.qty ?? 1, t = String(r.treatment ?? "clean"), size = String(r.size ?? "");
+  if (r.odor === true || r.mites === true) return false;
+  if (r.kind === "sofa") {
+    if (qty !== 1) return false;
+    if (t === "clean") return ["3-lugares", "4-lugares", "5-lugares", "u"].includes(size);
+    return (t === "premium" || t === "essencial") && ["2-lugares", "3-lugares", "4-lugares", "5-lugares", "canto", "u"].includes(size);
+  }
+  return r.kind === "chairs" && !r.seatOnly && (t === "clean+premium" || t === "clean+essencial") && typeof qty === "number" && qty >= 1 && qty <= 3;
+}
 function botQuote(input) {
+  const r = botQuoteMerged(input);
+  const x = r;
+  if (!x?.ok || x.quote || x.blackFriday || x.sharedTrip || typeof x.total !== "number" || !lonePieceRises(input)) return r;
+  const up = LONE_PIECE_SERVICE_UP, plus2 = (n) => n === null ? null : cents(n + up);
+  const lines = Array.isArray(x.lines) ? x.lines.map((l, n) => n === 0 && typeof l.amount === "number" ? { ...l, amount: cents(l.amount + up), tablePrice: typeof l.tablePrice === "number" ? cents(l.tablePrice + up) : l.tablePrice } : l) : x.lines;
+  const total = cents(x.total + up), close = r.closeNow;
+  const closeNow = close && close.ok && typeof close.total === "number" ? { ...close, total: cents(total - closeNowDiscount(total)) } : close;
+  return {
+    ...r,
+    closeNow,
+    lines,
+    subtotal: typeof x.subtotal === "number" ? cents(x.subtotal + up) : x.subtotal,
+    total,
+    waterproofingTiers: x.waterproofingTiers ? { ...x.waterproofingTiers, premium: plus2(x.waterproofingTiers.premium), essencial: plus2(x.waterproofingTiers.essencial) } : x.waterproofingTiers
+  };
+}
+var botQuoteInVisit = (input) => botQuoteMerged(input);
+function botQuoteMerged(input) {
   const inp = input ?? {};
   const merged = mergeChairRows(inp);
   if (merged === inp) return botQuoteOf(input);
@@ -3466,19 +3498,19 @@ var isRug = (i) => i.kind === "rug" || i.kind === "carpet";
 var qtyOf = (i) => Number(i.qty) || 1;
 var byUnit = (i) => i.kind === "sofa" || i.kind === "mattress";
 var cache = /* @__PURE__ */ new Map();
-function quote(city, items) {
-  const key = `${city}|${JSON.stringify(items)}`;
+function quote(city, items, inVisit = false) {
+  const key = `${city}|${inVisit}|${JSON.stringify(items)}`;
   let r = cache.get(key);
   if (!r) {
     if (cache.size > 4e3) cache.clear();
-    r = botQuote({ city, items });
+    r = (inVisit ? botQuoteInVisit : botQuote)({ city, items });
     cache.set(key, r);
   }
   return r;
 }
-function raw(city, items) {
+function raw(city, items, inVisit = false) {
   if (!items.length || !city) return null;
-  const r = quote(city, items);
+  const r = quote(city, items, inVisit);
   if (!r.ok) return null;
   const rugs = items.filter(isRug).length;
   const total = rugs === items.length ? r.rugEstimate?.ok ? r.rugEstimate.homePrice : null : rugs ? r.rugCombo?.ok ? r.rugCombo.comboPrice : null : r.quote ? null : r.total;
@@ -3488,9 +3520,9 @@ function raw(city, items) {
   const travel = cents2(base + (rugs ? 0 : r.smallOrderSurcharge?.amount ?? 0));
   return { r, total, travel: travel < total ? travel : 0 };
 }
-function alone(city, item) {
+function alone(city, item, inVisit = false) {
   const n = byUnit(item) ? qtyOf(item) : 1;
-  const x = raw(city, [n > 1 ? { ...item, qty: 1 } : item]);
+  const x = raw(city, [n > 1 ? { ...item, qty: 1 } : item], inVisit);
   return x && { net: cents2((x.total - x.travel) * n), travel: cents2(x.travel * n) };
 }
 function withoutGifted(items, gifts) {
@@ -3510,7 +3542,7 @@ function visit(city, items, x) {
   const one = x.r.oneTravel;
   if (!one) return null;
   const plain = withoutGifted(items, x.r.visitGifts?.gifts ?? []);
-  const nets = plain.map((i) => alone(city, i)?.net ?? null);
+  const nets = plain.map((i) => alone(city, i, true)?.net ?? null);
   if (!nets.every((v) => v !== null)) return null;
   return { plain, nets, service: one.service };
 }
@@ -3528,7 +3560,7 @@ function serviceLines(city, items) {
   if (!x || !split) return null;
   const v = visit(city, items, x);
   if (!v && items.length === 1) return [split.service];
-  const nets = v ? v.nets : items.map((i) => alone(city, i)?.net ?? null);
+  const nets = v ? v.nets : items.map((i) => alone(city, i, true)?.net ?? null);
   if (!nets.every((n) => n !== null)) return null;
   const lines = nets.slice();
   let gap = cents2(split.service - lines.reduce((s, n) => s + n, 0));

@@ -3,10 +3,10 @@ import { botQuote } from '../lib/botQuote';
 import { aloneTotal, newItem } from '../components/quiz/VisitBasket';
 import { chairCleanTotal, chairPackTotal, chairsCombinedTotal } from './chairPricing';
 
-// A tabela do dono (25 Nov 2026), em Lisboa com deslocação. Se algum sítio der outro número, isto falha.
+// A tabela do dono (25 Nov 2026); 1 a 3 cadeiras pedidas sozinhas com a deslocação por cima (dono, 26 Nov). Se algum sítio der outro número, isto falha.
 const TABELA: [number, number, number, number][] = [
   // cadeiras, só limpeza, limpeza + Essencial, limpeza + Premium
-  [1, 30, 39, 59], [2, 50, 69, 89], [3, 70, 99, 119], [4, 90, 129, 149], [5, 105, 149, 179], [6, 120, 169, 209],
+  [1, 30, 49, 69], [2, 50, 79, 99], [3, 70, 109, 129], [4, 90, 129, 149], [5, 105, 149, 179], [6, 120, 169, 209],
   [7, 125, 189, 239], [8, 140, 209, 269], [9, 150, 229, 289], [10, 160, 249, 309], [11, 170, 269, 339], [12, 180, 289, 359],
 ];
 const q = (items: unknown[]) => botQuote({ city: 'Lisboa', items }) as unknown as { total: number; waterproofingTiers: { premium: number; essencial: number } };

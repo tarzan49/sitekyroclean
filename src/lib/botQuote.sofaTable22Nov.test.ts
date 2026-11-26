@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { botQuote } from './botQuote';
 
-// Tabela de sofás do dono (22 Nov 2026, Rosângela), preço final em Viana do Castelo (deslocação 10€ incluída).
+// Tabela de sofás do dono (22 Nov 2026, Rosângela), peça sozinha em Viana do Castelo: serviço + 10€ de deslocação (dono, 26 Nov 2026).
 const sizes = {
   '3L': { size: '3-lugares' },
   '4L': { size: '4-lugares' },
@@ -9,10 +9,10 @@ const sizes = {
   '6L': { size: '5-lugares', seats: 6, look: 'compacto' },
 } as const;
 const table: Record<keyof typeof sizes, Record<string, number>> = {
-  '3L': { clean: 89, premium: 159, essencial: 99, 'clean+premium': 219, 'clean+essencial': 159 },
-  '4L': { clean: 109, premium: 189, essencial: 129, 'clean+premium': 269, 'clean+essencial': 209 },
-  '5L': { clean: 119, premium: 219, essencial: 159, 'clean+premium': 309, 'clean+essencial': 249 },
-  '6L': { clean: 129, premium: 249, essencial: 189, 'clean+premium': 349, 'clean+essencial': 289 },
+  '3L': { clean: 99, premium: 169, essencial: 109, 'clean+premium': 219, 'clean+essencial': 159 },
+  '4L': { clean: 119, premium: 199, essencial: 139, 'clean+premium': 269, 'clean+essencial': 209 },
+  '5L': { clean: 129, premium: 229, essencial: 169, 'clean+premium': 309, 'clean+essencial': 249 },
+  '6L': { clean: 139, premium: 259, essencial: 199, 'clean+premium': 349, 'clean+essencial': 289 },
 };
 
 describe('tabela de sofás 22 Nov 2026', () => {

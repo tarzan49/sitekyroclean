@@ -36,7 +36,7 @@ describe('far zone: piggyback on a booked service (owner, 19 Oct 2026)', () => {
     const normal = botQuote({ city: 'Santiago do Cacém', items: sofa5 });
     const shared = botQuote({ city: 'Santiago do Cacém', items: sofa5, sharedTrip: true });
     if ('error' in normal || 'error' in shared) throw new Error('quote');
-    expect(normal.total).toBe(139);
+    expect(normal.total).toBe(149);
     expect(normal.handToOwner).toBe(true);
     expect(shared.total).toBe(119);
     expect(shared.travel).toBe(0);

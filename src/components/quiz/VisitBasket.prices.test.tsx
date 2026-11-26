@@ -29,7 +29,7 @@ describe('cadeiras: linha do motor com a quantidade inteira; riscado na base do 
     const row = (t: string) => [1, 4, 6, 12].map(qty => motor([{ kind: 'chairs', qty, treatment: t }]).total);
     expect(row('clean')).toEqual([30, 90, 120, 180]);
     expect(row('premium')).toEqual([39, 119, 159, 279]);
-    expect(row('clean+premium')).toEqual([59, 149, 209, 359]);
+    expect(row('clean+premium')).toEqual([69, 149, 209, 359]);
     // O riscado é o do motor (chairsWas; dono, 25 Nov 2026).
     expect(servicePrice('Lisboa', [chairs(6, 'premium')])).toMatchObject({ shown: 209, struck: 279, travel: 0 });
     expect(servicePrice('Lisboa', [chairs(12, 'premium')])).toMatchObject({ shown: 359, struck: 459, travel: 0 });
@@ -155,7 +155,7 @@ describe('serviço + deslocação é o total do motor; preço por peça só com 
 describe('linhas do pedido guardado', () => {
   it('são as do cesto: várias peças sem preços, uma peça com o preço e a deslocação', () => {
     for (const list of [[newItem('sofa', { pack: 'none' }), newItem('mattress')], [newItem('sofa'), newItem('mattress'), newItem('chairs')]]) expect(orderLines('Lisboa', list).map(l => l.total)).toEqual(list.map(() => null));
-    expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' })]).map(l => [l.label.startsWith('Deslocação'), l.total])).toEqual([[false, 79], [true, 10]]);
+    expect(orderLines('Lisboa', [newItem('sofa', { pack: 'none' })]).map(l => [l.label.startsWith('Deslocação'), l.total])).toEqual([[false, 89], [true, 10]]);
   });
 });
 

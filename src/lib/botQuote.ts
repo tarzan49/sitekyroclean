@@ -19,7 +19,7 @@ import { isBlackFriday, blackFridayPricesActive, BLACK_FRIDAY_PRICES } from '../
 import { rugPickupFee, rugPickupOffered, NO_RUG_PICKUP_RULE, RUG_PICKUP_ASKED_RULE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 import { rugSide, RUG_SIDE_MAX_METERS, CARPET_SIDE_MAX_METERS } from '../constants/rugMeasure';
 import { rugComboEstimate, rugEstimate } from './botRugEstimate';
-import { closeNowOffer } from './botCloseNow';
+import { closeNowOffer, closeNowDiscount } from './botCloseNow';
 import { freguesiaToMunicipio, parishPartToMunicipio } from './parishMunicipality';
 import { type AskedDiscount } from './botAskedDiscount';
 import { SOFA_ANTI_ACAROS_PRICE } from '../constants/antiAcarosPricing';
@@ -803,7 +803,40 @@ function botQuoteOf(rawInput: unknown) {
  * Chairs of the same service in several rows are priced as one row (owner, 24 Nov 2026: "Sim, como 6"); the answer keeps
  * one line per row received (the row's share of the set, by its chairs).
  */
+/**
+ * One piece asked alone (owner, 26 Nov 2026): the table number is the SERVICE and the travel goes on top, so the
+ * pieces whose table total had the 10€ inside go up 10€ (3L cleaning 89 + 10, 3L Premium 159 + 10, U 249 + 10).
+ * Visits with several pieces stay exactly as they were (owner, 26 Nov 2026: 3L + colchão ~~209~~ 149€).
+ * Packs, 1L/2L cleaning, corner cleaning, mattresses, rugs and anti-odour / anti-mites keep their price.
+ */
+export const LONE_PIECE_SERVICE_UP = 10;
+function lonePieceRises(input: unknown): boolean {
+  const items = ((input ?? {}) as Record<string, unknown>).items;
+  if (!Array.isArray(items) || items.length !== 1 || !items[0] || typeof items[0] !== 'object') return false;
+  const r = items[0] as Record<string, unknown>;
+  const qty = r.qty ?? 1, t = String(r.treatment ?? 'clean'), size = String(r.size ?? '');
+  if (r.odor === true || r.mites === true) return false;
+  if (r.kind === 'sofa') {
+    if (qty !== 1) return false;
+    if (t === 'clean') return ['3-lugares', '4-lugares', '5-lugares', 'u'].includes(size);
+    return (t === 'premium' || t === 'essencial') && ['2-lugares', '3-lugares', '4-lugares', '5-lugares', 'canto', 'u'].includes(size);
+  }
+  return r.kind === 'chairs' && !r.seatOnly && (t === 'clean+premium' || t === 'clean+essencial') && typeof qty === 'number' && qty >= 1 && qty <= 3;
+}
 export function botQuote(input: unknown): ReturnType<typeof botQuoteOf> {
+  const r = botQuoteMerged(input);
+  const x = r as unknown as { ok?: boolean; quote?: boolean; total?: unknown; subtotal?: number; blackFriday?: unknown; sharedTrip?: boolean; lines?: QuoteLine[]; waterproofingTiers?: { travel: number; premium: number | null; essencial: number | null } | null };
+  if (!x?.ok || x.quote || x.blackFriday || x.sharedTrip || typeof x.total !== 'number' || !lonePieceRises(input)) return r;
+  const up = LONE_PIECE_SERVICE_UP, plus = (n: number | null) => (n === null ? null : cents(n + up));
+  const lines = Array.isArray(x.lines) ? x.lines.map((l, n) => (n === 0 && typeof l.amount === 'number' ? { ...l, amount: cents(l.amount + up), tablePrice: typeof l.tablePrice === 'number' ? cents(l.tablePrice + up) : l.tablePrice } : l)) : x.lines;
+  const total = cents(x.total + up), close = (r as unknown as { closeNow?: { ok?: boolean; total?: number } | null }).closeNow;
+  const closeNow = close && close.ok && typeof close.total === 'number' ? { ...close, total: cents(total - closeNowDiscount(total)) } : close;
+  return { ...(r as object), closeNow, lines, subtotal: typeof x.subtotal === 'number' ? cents(x.subtotal + up) : x.subtotal, total,
+    waterproofingTiers: x.waterproofingTiers ? { ...x.waterproofingTiers, premium: plus(x.waterproofingTiers.premium), essencial: plus(x.waterproofingTiers.essencial) } : x.waterproofingTiers } as unknown as ReturnType<typeof botQuoteOf>;
+}
+/** The engine without the lone-piece rise: a piece's price inside a visit (servicePrice uses it to split a visit's lines). */
+export const botQuoteInVisit = (input: unknown) => botQuoteMerged(input);
+function botQuoteMerged(input: unknown): ReturnType<typeof botQuoteOf> {
   const inp = (input ?? {}) as Record<string, unknown>;
   const merged = mergeChairRows(inp);
   if (merged === inp) return botQuoteOf(input);

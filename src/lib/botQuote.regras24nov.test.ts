@@ -50,7 +50,7 @@ it('o riscado da opção nunca conta a impermeabilização de uma peça só limp
 
 describe('5 e 6. cadeiras', () => {
   it('1 cadeira Protegido na Figueira fica a 39€ ("Fica assim")', () => {
-    expect(q([C(1, 'clean+essencial')], {}, 'Figueira da Foz').total).toBe(39);
+    expect(q([C(1, 'clean+essencial')], {}, 'Figueira da Foz').total).toBe(49);
   });
   it('duas linhas de cadeiras não são outra peça: Cascais 1 limpeza + 1 Protegido = 59 ("Não, leva os +10€")', () => {
     expect(q([C(1), C(1, 'clean+essencial')], {}, 'Cascais').total).toBe(59);

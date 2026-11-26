@@ -1,7 +1,7 @@
 // Preço do serviço e deslocação à parte (dono, 25 Nov 2026): em todo o site o número que se lê é o do serviço; a
 // deslocação vem à parte, discreta, só junto do total. O total é sempre o do motor do bot (botQuote), nunca muda:
 // aqui só se separa (serviço = total − deslocação).
-import { botQuote } from './botQuote';
+import { botQuote, botQuoteInVisit } from './botQuote';
 import { formatEuro } from '../data/enginePrices';
 
 export type EngineItem = Record<string, unknown> & { kind?: unknown; qty?: unknown; treatment?: unknown };
@@ -35,15 +35,16 @@ const qtyOf = (i: EngineItem) => Number(i.qty) || 1;
 const byUnit = (i: EngineItem) => i.kind === 'sofa' || i.kind === 'mattress';
 
 const cache = new Map<string, Raw>();
-function quote(city: string, items: EngineItem[]): Raw {
-  const key = `${city}|${JSON.stringify(items)}`;
+/** `inVisit`: the piece's price inside a visit (owner, 26 Nov 2026: only a piece asked alone goes up). */
+function quote(city: string, items: EngineItem[], inVisit = false): Raw {
+  const key = `${city}|${inVisit}|${JSON.stringify(items)}`;
   let r = cache.get(key);
-  if (!r) { if (cache.size > 4000) cache.clear(); r = botQuote({ city, items }) as unknown as Raw; cache.set(key, r); }
+  if (!r) { if (cache.size > 4000) cache.clear(); r = (inVisit ? botQuoteInVisit : botQuote)({ city, items }) as unknown as Raw; cache.set(key, r); }
   return r;
 }
-function raw(city: string, items: EngineItem[]): { r: Raw; total: number; travel: number } | null {
+function raw(city: string, items: EngineItem[], inVisit = false): { r: Raw; total: number; travel: number } | null {
   if (!items.length || !city) return null;
-  const r = quote(city, items);
+  const r = quote(city, items, inVisit);
   if (!r.ok) return null;
   const rugs = items.filter(isRug).length;
   const total = rugs === items.length ? (r.rugEstimate?.ok ? r.rugEstimate.homePrice : null)
@@ -57,9 +58,9 @@ function raw(city: string, items: EngineItem[]): { r: Raw; total: number; travel
   return { r, total, travel: travel < total ? travel : 0 };
 }
 /** Uma linha pedida sozinha, sem deslocação, e quanto de deslocação leva sozinha (sofás e colchões: cada um). */
-function alone(city: string, item: EngineItem): { net: number; travel: number } | null {
+function alone(city: string, item: EngineItem, inVisit = false): { net: number; travel: number } | null {
   const n = byUnit(item) ? qtyOf(item) : 1;
-  const x = raw(city, [n > 1 ? { ...item, qty: 1 } : item]);
+  const x = raw(city, [n > 1 ? { ...item, qty: 1 } : item], inVisit);
   return x && { net: cents((x.total - x.travel) * n), travel: cents(x.travel * n) };
 }
 /** Um tratamento pedido que o motor oferece (linha própria "Oferecido"): a peça fica só com a limpeza, para não contar duas vezes. */
@@ -80,7 +81,7 @@ function visit(city: string, items: EngineItem[], x: { r: Raw; total: number }):
   const one = x.r.oneTravel;
   if (!one) return null;
   const plain = withoutGifted(items, x.r.visitGifts?.gifts ?? []);
-  const nets = plain.map(i => alone(city, i)?.net ?? null);
+  const nets = plain.map(i => alone(city, i, true)?.net ?? null);
   if (!nets.every((v): v is number => v !== null)) return null;
   return { plain, nets, service: one.service };
 }
@@ -105,7 +106,7 @@ export function serviceLines(city: string, items: EngineItem[]): number[] | null
   if (!x || !split) return null;
   const v = visit(city, items, x);
   if (!v && items.length === 1) return [split.service];
-  const nets = v ? v.nets : items.map(i => alone(city, i)?.net ?? null);
+  const nets = v ? v.nets : items.map(i => alone(city, i, true)?.net ?? null);
   if (!nets.every((n): n is number => n !== null)) return null;
   const lines = nets.slice();
   let gap = cents(split.service - lines.reduce((s, n) => s + n, 0));

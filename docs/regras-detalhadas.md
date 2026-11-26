@@ -1394,3 +1394,6 @@ Sofá modular + tapete 3,5 x 4 m, opções 509/449/279€ com o anti-odor do tap
 
 ## Confirmação da opção: total com deslocação (26/11)
 Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação". Regra: o orçamento mostra o serviço sem deslocação (como o site), a confirmação da opção escolhida diz sempre o total com a deslocação incluída.
+
+## Peça sozinha = tabela + deslocação (dono, 26 Nov)
+"Tu num sofá em U [...] cobras a deslocação. Mas num sofá de 3 lugares não." Decisão: em todas as peças pedidas sozinhas o número da tabela é o serviço e a deslocação soma-se (3L 99€, 3L Premium 169€, U 6L Premium 259€). Visitas com várias peças ficam como estavam ("keep the visits"). Código: `lonePieceRises`, `botQuoteInVisit` em botQuote.ts.

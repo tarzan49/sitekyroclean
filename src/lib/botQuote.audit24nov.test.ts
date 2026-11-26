@@ -45,14 +45,14 @@ describe('auditoria 24 Nov 2026', () => {
   });
 
   it('4. canto em imper sozinha = 199/139 com a deslocação; na visita perde a 2.ª deslocação como os outros tamanhos (189)', () => {
-    expect(q('Lisboa', [sofa('canto', 'premium')]).total).toBe(199);
-    expect(q('Lisboa', [sofa('canto', 'essencial')]).total).toBe(139);
+    expect(q('Lisboa', [sofa('canto', 'premium')]).total).toBe(209);
+    expect(q('Lisboa', [sofa('canto', 'essencial')]).total).toBe(149);
     const r = q('Lisboa', [sofa('canto', 'premium'), chairs(4, 'premium')]);
     expect(r.lines.find((l: Q) => /Canto/.test(l.label)).amount).toBe(189);
   });
   it('5L e 6L na visita: a linha perde a deslocação como o 3L e o 4L (dono, 25 Nov 2026)', () => {
     const M = mattress('casal');
-    expect(q('Lisboa', [sofa('5-lugares', 'clean')]).total).toBe(119);
+    expect(q('Lisboa', [sofa('5-lugares', 'clean')]).total).toBe(129);
     expect(q('Lisboa', [sofa('5-lugares', 'clean'), M]).lines[0].amount).toBe(109);
     expect(q('Lisboa', [sofa('5-lugares', 'clean', { seats: 6, look: 'compacto' }), M]).lines[0].amount).toBe(119);
     expect(q('Lisboa', [sofa('5-lugares', 'premium'), M]).lines[0].amount).toBe(209);

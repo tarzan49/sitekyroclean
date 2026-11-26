@@ -40,7 +40,7 @@ describe('serviço + deslocação = total do motor', () => {
 describe('casos conhecidos', () => {
   const sofa = (treatment: string) => ({ kind: 'sofa', size: '3-lugares', treatment });
   it('3 lugares, Lisboa: 79€ + 10€; Blindado 219€ sem deslocação, riscado 249€ (o do motor, em separado)', () => {
-    expect(priceSplit('Lisboa', [sofa('clean')])).toMatchObject({ service: 79, travel: 10, total: 89, struck: null });
+    expect(priceSplit('Lisboa', [sofa('clean')])).toMatchObject({ service: 89, travel: 10, total: 99, struck: null });
     expect(priceSplit('Lisboa', [sofa('clean+premium')])).toMatchObject({ service: 219, travel: 0, total: 219, struck: 249 });
   });
   it('colchão de casal com anti-ácaros: a poupança é a do motor', () => {
