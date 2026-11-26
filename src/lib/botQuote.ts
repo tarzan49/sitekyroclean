@@ -189,7 +189,9 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   // keeps that 10€, in a visit it pays the order's travel like any other size (owner, 25 Nov 2026: "igual em todos os tamanhos").
   const travelRaw = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
   // An order of 200€ or more never pays travel, in any town (owner, 26 Nov 2026, Sesimbra: "um orçamento de 200 e tal euros, como é que estás a cobrar deslocação?").
-  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  // The 10€ inside a fixed lone-piece price (corner / U / 5+ seats waterproofed alone, 219€) stays: it is part of the table price.
+  const fixedInPrice = items.some(i => i.travelIncluded) && pieces === 1 && !isBlackFriday();
+  const travel = !fixedInPrice && premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),

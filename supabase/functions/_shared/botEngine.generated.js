@@ -2444,7 +2444,8 @@ function waterproofingTiers(items, city) {
   const chairBulk = (_tier) => 0;
   const travelAsked = isBlackFriday() || severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   const travelRaw = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
-  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  const fixedInPrice = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday();
+  const travel = !fixedInPrice && premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk("premium") + travel),
