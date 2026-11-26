@@ -208,8 +208,8 @@ export function quizServiceTypeLabel(
 // era ">10" aqui e ">=10" nas duas de baixo, o desalinhamento causava um
 // bug real de preço a cair silenciosamente para a limpeza sozinha a 10).
 // Limpeza de cadeiras: a tabela única do dono (24 Nov), chairPricing.chairCleanTotal.
-export function calcChairClean(qty: number, waterproofQty = 0): number | null {
-  return chairCleanTotal(qty, waterproofQty);
+export function calcChairClean(qty: number): number | null {
+  return chairCleanTotal(qty);
 }
 
 // Proteção: por cadeira, mais cara de 1 a 4 cadeiras (constants/chairPricing.ts).

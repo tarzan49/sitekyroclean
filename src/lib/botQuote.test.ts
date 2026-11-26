@@ -132,10 +132,10 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
     expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([80, false]);
   });
-  it('chairs cleaned and waterproofed: by position, cleaning + waterproofing at the full table, line ends in 9 (dono, 25 Nov: opção A)', () => {
-    // 12 chairs: 180 + Premium 270 / Essencial 150, nearest 9 (dono, 25 Nov: opção A).
+  it('chairs cleaned and waterproofed: by position, cleaning + waterproofing from the fixed table (dono, 25 Nov)', () => {
+    // 12 chairs (dono, 25 Nov 2026): 359 / 289.
     const r = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'clean+premium' }], city: 'Cruz Quebrada' });
-    expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([449, 449, 329]);
+    expect([r.total, r.waterproofingTiers?.premium, r.waterproofingTiers?.essencial]).toEqual([359, 359, 289]);
     expect(ok({ items: [{ kind: 'chairs', qty: 12 }], city: 'Cruz Quebrada' }).total).toBe(180);
     // 9 never costs less than 8.
     const p8 = ok({ items: [{ kind: 'chairs', qty: 8, treatment: 'clean+premium' }], city: 'Cruz Quebrada' }).waterproofingTiers!;
@@ -162,9 +162,9 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(resolveBotCity('Santa Clara')).toBeNull();
     expect(resolveBotCity('Santa Clara, Coimbra')).toBe('Coimbra');
     expect(resolveBotCity('Madrid')).toBeNull();
-    // 4 chairs clean + Essencial (dono, 25 Nov: opção A): 80 + 60 = 140, nearest 9 = 139.
+    // 4 chairs clean + Essencial (dono, 25 Nov 2026): fixed table 129.
     const chairs = ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'clean+essencial' }], city: 'Ericeira' });
-    expect([chairs.city, chairs.lines[0].amount, chairs.travel, chairs.handToOwner]).toEqual(['Mafra', 139, 10, false]);
+    expect([chairs.city, chairs.lines[0].amount, chairs.travel, chairs.handToOwner]).toEqual(['Mafra', 129, 10, false]);
   });
   it('rejects what the engine does not sell, with a message the bot developer can read', () => {
     const errors = [

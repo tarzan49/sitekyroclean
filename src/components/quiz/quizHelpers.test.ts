@@ -30,10 +30,6 @@ describe('calcChairClean (dono, 24 Nov 2026: 20 / 15 / 10€ por posição)', ()
   it('one more chair never costs less', () => {
     for (let q = 1; q < 30; q++) expect(calcChairClean(q + 1)!).toBeGreaterThan(calcChairClean(q)!);
   });
-  it('a waterproofed chair cleans at the full table (dono, 25 Nov: opção A)', () => {
-    expect(calcChairClean(4, 4)).toBeCloseTo(80);
-    expect(calcChairClean(12, 12)).toBeCloseTo(180);
-  });
 });
 
 describe('chair protection per chair by position (dono, 24 Nov 2026: Premium 25/22,50/20€, Essencial 15/12,50/10€, escalões 1-4 / 5-8 / 9+)', () => {

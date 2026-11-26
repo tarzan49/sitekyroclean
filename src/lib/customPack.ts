@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcSofaUnitPrice, calcMattressUnitPrice } from '../components/quiz/quizHelpers';
-import { chairWaterproofTotal, endIn9Down, endIn9Up, chairCleanTotal, CHAIR_CLEAN_WATERPROOF_FACTOR } from '../constants/chairPricing';
+import { chairWaterproofTotal, endIn9Down, endIn9Up, chairCleanTotal, chairWaterproofWithClean } from '../constants/chairPricing';
 import { chairAntiAcarosTotal } from '../constants/antiAcarosPricing';
 import { locationPrices, calculateTravelFee } from '../constants/travel';
 import { priceWithPackPerks, type PerkTreatment } from '../constants/packPerks';
@@ -51,13 +51,10 @@ export function customPackLine(item: CustomPackItem, chairsBefore = 0) {
     const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
     amount = unit === null ? null : unit * item.qty;
   } else if (item.kind === 'chairs') {
-    // One table for site and bot (owner, 24 Nov 2026): chairPricing.chairCleanTotal; each chair that is also
-    // waterproofed costs 5€ less to clean.
-    const withWp = item.extra === 'premium' || item.extra === 'essencial';
-    amount = chairCleanTotal(item.qty, withWp ? item.qty : 0, chairsBefore);
+    // One table for site and bot: chairPricing (cleaning by position; with waterproofing the fixed table of 25 Nov 2026).
+    amount = chairCleanTotal(item.qty, chairsBefore);
     if (amount !== null) {
-      if (item.extra === 'premium') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'premium', true) : calcChairWaterproofPremium(item.qty)) ?? 0;
-      if (item.extra === 'essencial') amount += (item.seatOnly ? chairWaterproofTotal(item.qty, 'essencial', true) : calcChairWaterproof(item.qty)) ?? 0;
+      if (item.extra === 'premium' || item.extra === 'essencial') amount += chairWaterproofWithClean(item.qty, item.extra, !!item.seatOnly) ?? 0;
       if (item.extra === 'anti-acaros') amount += chairAntiAcarosTotal(item.qty) ?? 0;
       if ((item.extra === 'premium' || item.extra === 'essencial') && item.primary !== 'waterproofing') amount = endIn9Down(amount);
     }
@@ -119,15 +116,20 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
       covered += off;
-      const amount = chairCleanTotal(item.qty, off, before)!;
+      const amount = chairCleanTotal(item.qty, before)!;
       table[n] = { ...line, amount, ...('tablePrice' in line && typeof line.tablePrice === 'number' ? { tablePrice: amount } : {}) };
     });
     const wpRow = wpRows[0];
     // Covering cleaned chairs, the waterproofing row is part of one pack: start from its exact price (not the
     // alone-price rounded up to 9), then the pack rounds to the nearest 9 below.
+    let coverLeft = covered;
     if (covered > 0) for (const n of wpRows) {
       const it = items[n];
-      const exact = chairWaterproofTotal(it.qty, it.extra === 'premium' ? 'premium' : 'essencial', !!it.seatOnly);
+      const t = it.extra === 'premium' ? 'premium' : 'essencial' as const;
+      // The covered chairs at the cleaning + waterproofing table, any beyond them at the waterproofing-alone table.
+      const both = Math.min(it.qty, coverLeft);
+      coverLeft -= both;
+      const exact = (both ? chairWaterproofWithClean(both, t, !!it.seatOnly)! : 0) + chairWaterproofTotal(it.qty, t, !!it.seatOnly)! - (both ? chairWaterproofTotal(both, t, !!it.seatOnly)! : 0);
       if (exact !== null && table[n].amount != null) table[n] = { ...table[n], amount: exact, ...('tablePrice' in table[n] && typeof table[n].tablePrice === 'number' ? { tablePrice: exact } : {}) };
     }
     const sum = table.filter((_, n) => items[n].kind === 'chairs').reduce((s2, l) => s2 + (l.amount ?? 0), 0);
@@ -150,9 +152,9 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
       const before = chairsBeforeOf.get(n) ?? 0;
       if (!wpCleanRows.includes(n)) return;
       const t = it.extra === 'premium' ? 'premium' : 'essencial';
-      const wp = chairWaterproofTotal(wpBefore[t] + it.qty, t)! - (wpBefore[t] ? chairWaterproofTotal(wpBefore[t], t)! : 0);
+      const wp = chairWaterproofWithClean(wpBefore[t] + it.qty, t)! - (wpBefore[t] ? chairWaterproofWithClean(wpBefore[t], t)! : 0);
       wpBefore[t] += it.qty;
-      exact.set(n, chairCleanTotal(it.qty, it.qty, before)! + wp);
+      exact.set(n, chairCleanTotal(it.qty, before)! + wp);
     });
     const sum = [...exact.values()].reduce((a, v) => a + v, 0);
     const diff = Math.round((sum - endIn9Down(sum)) * 100) / 100;

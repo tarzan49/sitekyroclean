@@ -271,15 +271,13 @@ var CHAIR_CLEAN_MID_FROM = 5;
 var CHAIR_CLEAN_MID = 15;
 var CHAIR_CLEAN_BIG_FROM = 9;
 var CHAIR_CLEAN_BIG = 10;
-var CHAIR_CLEAN_WATERPROOF_FACTOR = 1;
 function chairCleanUnit(qty) {
   return qty >= CHAIR_CLEAN_BIG_FROM ? CHAIR_CLEAN_BIG : qty >= CHAIR_CLEAN_MID_FROM ? CHAIR_CLEAN_MID : CHAIR_CLEAN_UNIT;
 }
-function chairCleanTotal(qty, waterproofQty = 0, before = 0) {
+function chairCleanTotal(qty, before = 0) {
   if (!Number.isSafeInteger(qty) || qty <= 0) return null;
-  const wp = Math.min(Math.max(0, Math.floor(waterproofQty)), qty);
   let total = 0;
-  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k) * (k <= wp ? CHAIR_CLEAN_WATERPROOF_FACTOR : 1);
+  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k);
   return Math.round(total * 100) / 100;
 }
 var endIn9Down = (total) => {
@@ -287,8 +285,23 @@ var endIn9Down = (total) => {
   const lo = Math.floor((total + 1) / 10) * 10 - 1;
   return total - lo <= lo + 10 - total ? lo : lo + 10;
 };
+var CHAIR_PACK_TABLE = {
+  essencial: [29, 59, 89, 129, 149, 169, 189, 209, 229, 249, 269, 289],
+  premium: [49, 79, 109, 149, 179, 209, 239, 269, 289, 309, 339, 359]
+};
+var CHAIR_PACK_STEP = { essencial: 20, premium: 25 };
+function chairPackTotal(qty, tier) {
+  if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  const t = CHAIR_PACK_TABLE[tier], max = t.length;
+  return qty <= max ? t[qty - 1] : endIn9Down(t[max - 1] + CHAIR_PACK_STEP[tier] * (qty - max));
+}
+function chairWaterproofWithClean(qty, tier, seatOnly = false) {
+  const pack = chairPackTotal(qty, tier), clean = chairCleanTotal(qty);
+  if (pack === null || clean === null) return null;
+  return seatOnly ? Math.min(pack - clean, chairWaterproofTotal(qty, tier, true)) : pack - clean;
+}
 function chairPackWas(qty, tier) {
-  return qty * endIn9Down(chairCleanTotal(1, 1) + chairWaterproofTotal(1, tier));
+  return qty * chairPackTotal(1, tier);
 }
 var endIn9Up = (total) => {
   const n = Math.ceil(total - 1e-9);
@@ -400,8 +413,8 @@ function calcMattressUnitPrice(option2, treated, serviceType) {
   const price = treated ? option2.bothPrice : serviceType === "waterproofing" ? option2.waterproofingPrice : option2.cleaningPrice;
   return typeof price === "number" ? price : null;
 }
-function calcChairClean(qty, waterproofQty = 0) {
-  return chairCleanTotal(qty, waterproofQty);
+function calcChairClean(qty) {
+  return chairCleanTotal(qty);
 }
 function calcChairWaterproof(qty) {
   return chairWaterproofTotal(qty, "essencial");
@@ -436,11 +449,9 @@ function customPackLine(item, chairsBefore = 0) {
     const unit = calcSofaUnitPrice(option2, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
     amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
-    const withWp = item.extra === "premium" || item.extra === "essencial";
-    amount2 = chairCleanTotal(item.qty, withWp ? item.qty : 0, chairsBefore);
+    amount2 = chairCleanTotal(item.qty, chairsBefore);
     if (amount2 !== null) {
-      if (item.extra === "premium") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "premium", true) : calcChairWaterproofPremium(item.qty)) ?? 0;
-      if (item.extra === "essencial") amount2 += (item.seatOnly ? chairWaterproofTotal(item.qty, "essencial", true) : calcChairWaterproof(item.qty)) ?? 0;
+      if (item.extra === "premium" || item.extra === "essencial") amount2 += chairWaterproofWithClean(item.qty, item.extra, !!item.seatOnly) ?? 0;
       if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
       if ((item.extra === "premium" || item.extra === "essencial") && item.primary !== "waterproofing") amount2 = endIn9Down(amount2);
     }
@@ -484,13 +495,17 @@ function calculateCustomPack(items, city) {
       const off = Math.min(wpLeft, item.qty);
       wpLeft -= off;
       covered += off;
-      const amount2 = chairCleanTotal(item.qty, off, before);
+      const amount2 = chairCleanTotal(item.qty, before);
       table[n] = { ...line, amount: amount2, ..."tablePrice" in line && typeof line.tablePrice === "number" ? { tablePrice: amount2 } : {} };
     });
     const wpRow = wpRows[0];
+    let coverLeft = covered;
     if (covered > 0) for (const n of wpRows) {
       const it = items[n];
-      const exact = chairWaterproofTotal(it.qty, it.extra === "premium" ? "premium" : "essencial", !!it.seatOnly);
+      const t = it.extra === "premium" ? "premium" : "essencial";
+      const both = Math.min(it.qty, coverLeft);
+      coverLeft -= both;
+      const exact = (both ? chairWaterproofWithClean(both, t, !!it.seatOnly) : 0) + chairWaterproofTotal(it.qty, t, !!it.seatOnly) - (both ? chairWaterproofTotal(both, t, !!it.seatOnly) : 0);
       if (exact !== null && table[n].amount != null) table[n] = { ...table[n], amount: exact, ..."tablePrice" in table[n] && typeof table[n].tablePrice === "number" ? { tablePrice: exact } : {} };
     }
     const sum2 = table.filter((_, n) => items[n].kind === "chairs").reduce((s2, l) => s2 + (l.amount ?? 0), 0);
@@ -509,9 +524,9 @@ function calculateCustomPack(items, city) {
       const before = chairsBeforeOf.get(n) ?? 0;
       if (!wpCleanRows.includes(n)) return;
       const t = it.extra === "premium" ? "premium" : "essencial";
-      const wp = chairWaterproofTotal(wpBefore[t] + it.qty, t) - (wpBefore[t] ? chairWaterproofTotal(wpBefore[t], t) : 0);
+      const wp = chairWaterproofWithClean(wpBefore[t] + it.qty, t) - (wpBefore[t] ? chairWaterproofWithClean(wpBefore[t], t) : 0);
       wpBefore[t] += it.qty;
-      exact.set(n, chairCleanTotal(it.qty, it.qty, before) + wp);
+      exact.set(n, chairCleanTotal(it.qty, before) + wp);
     });
     const sum2 = [...exact.values()].reduce((a, v) => a + v, 0);
     const diff = Math.round((sum2 - endIn9Down(sum2)) * 100) / 100;

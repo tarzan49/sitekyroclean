@@ -29,10 +29,10 @@ describe('cadeiras: linha do motor com a quantidade inteira; riscado na base do 
     const row = (t: string) => [1, 4, 6, 12].map(qty => motor([{ kind: 'chairs', qty, treatment: t }]).total);
     expect(row('clean')).toEqual([30, 90, 120, 180]);
     expect(row('premium')).toEqual([39, 119, 159, 279]);
-    expect(row('clean+premium')).toEqual([59, 179, 259, 449]);
+    expect(row('clean+premium')).toEqual([59, 149, 209, 359]);
     // O riscado é o do motor (chairsWas; dono, 25 Nov 2026).
-    expect(servicePrice('Lisboa', [chairs(6, 'premium')])).toMatchObject({ shown: 259, struck: 279, travel: 0 });
-    expect(servicePrice('Lisboa', [chairs(12, 'premium')])).toMatchObject({ shown: 449, struck: 459, travel: 0 });
+    expect(servicePrice('Lisboa', [chairs(6, 'premium')])).toMatchObject({ shown: 209, struck: 279, travel: 0 });
+    expect(servicePrice('Lisboa', [chairs(12, 'premium')])).toMatchObject({ shown: 359, struck: 459, travel: 0 });
   });
 });
 

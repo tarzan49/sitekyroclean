@@ -4,7 +4,7 @@ import QuizTopBadge from '../QuizTopBadge';
 import { ChevronLeft, Check, Droplets, Plus, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
+import { chairsCombinedTotal, chairWaterproofTotal, chairWaterproofWithClean } from '@/constants/chairPricing';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
 
 interface QuizChairsAddonUpsellProps {
@@ -30,9 +30,11 @@ interface QuizChairsAddonUpsellProps {
 const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, hideNavigation = false }: QuizChairsAddonUpsellProps) => {
   const isWaterproofBase = formData.serviceType === 'waterproofing';
   const qty = Math.max(1, parseInt(formData.chairQuantity) || 1);
-  const premiumPrice = calcChairWaterproofPremium(qty);
-  const essencialPrice = calcChairWaterproof(qty);
-  const higienizacaoPrice = calcChairClean(qty);
+  const premiumPrice = chairWaterproofWithClean(qty, 'premium');
+  const essencialPrice = chairWaterproofWithClean(qty, 'essencial');
+  const tier = formData.waterproofingTier === 'premium' ? 'premium' : 'essencial' as const;
+  const wpAlone = chairWaterproofTotal(qty, tier);
+  const higienizacaoPrice = wpAlone === null ? null : chairsCombinedTotal(qty, qty, tier) - wpAlone;
   const fmt = (n: number) => (n % 1 === 0 ? n : n.toFixed(1).replace('.', ','));
 
   // ── Impermeabilização primária → oferece Higienização (sem tiers) ──

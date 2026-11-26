@@ -206,15 +206,13 @@ var CHAIR_CLEAN_MID_FROM = 5;
 var CHAIR_CLEAN_MID = 15;
 var CHAIR_CLEAN_BIG_FROM = 9;
 var CHAIR_CLEAN_BIG = 10;
-var CHAIR_CLEAN_WATERPROOF_FACTOR = 1;
 function chairCleanUnit(qty) {
   return qty >= CHAIR_CLEAN_BIG_FROM ? CHAIR_CLEAN_BIG : qty >= CHAIR_CLEAN_MID_FROM ? CHAIR_CLEAN_MID : CHAIR_CLEAN_UNIT;
 }
-function chairCleanTotal(qty, waterproofQty = 0, before = 0) {
+function chairCleanTotal(qty, before = 0) {
   if (!Number.isSafeInteger(qty) || qty <= 0) return null;
-  const wp = Math.min(Math.max(0, Math.floor(waterproofQty)), qty);
   let total = 0;
-  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k) * (k <= wp ? CHAIR_CLEAN_WATERPROOF_FACTOR : 1);
+  for (let k = 1; k <= qty; k++) total += chairCleanUnit(before + k);
   return Math.round(total * 100) / 100;
 }
 
@@ -247,8 +245,8 @@ function calcPackPricing(option2, packOn, isWaterproofBase, fallbackDelta = null
   const displayPrice = packOn ? packPrice : basePrice;
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
-function calcChairClean(qty, waterproofQty = 0) {
-  return chairCleanTotal(qty, waterproofQty);
+function calcChairClean(qty) {
+  return chairCleanTotal(qty);
 }
 
 // src/data/enginePrices.ts
