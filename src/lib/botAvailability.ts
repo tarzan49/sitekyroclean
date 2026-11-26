@@ -467,9 +467,16 @@ const POSTAL = /\b(\d{4})-\d{3}\b/;
 /** The team written by the team-calendar script, or null. */
 export function eventTeam(e: AvailabilityEvent): string | null {
   const t = TEAM_LINE.exec(e.description ?? '')?.[1];
-  if (!t) return null;
-  const k = fold(t);
-  return ALL_TEAMS.find(team => fold(team) === k) ?? null;
+  if (t) {
+    const k = fold(t);
+    const named = ALL_TEAMS.find(team => fold(team) === k);
+    if (named) return named;
+  }
+  // O bot também escreve "…, equipa Lisboa 1 (muda a cor para trocar)" a meio da frase:
+  // sem isto o serviço caía das contas (dono, 26 Nov: 550€ de Pero Pinheiro em falta).
+  const desc = ` ${fold(e.description ?? '')} `;
+  const byLength = [...ALL_TEAMS].sort((a, b) => b.length - a.length);
+  return byLength.find(team => desc.includes(` equipa ${fold(team)} `) || desc.includes(` equipa ${fold(team)},`) || desc.includes(` equipa ${fold(team)}.`)) ?? null;
 }
 
 /** Region of a service still without a team: postal code first, then a served town in the title. */

@@ -26,6 +26,8 @@ export const SETTLEMENT_GROUPS: readonly SettlementGroupDef[] = [
   { id: 'algarve', label: 'Algarve', teams: ['Algarve'] },
   { id: 'braga', label: 'Braga', teams: ['Braga'] },
   { id: 'coimbra', label: 'Coimbra', teams: ['Coimbra'] },
+  { id: 'viana', label: 'Viana', teams: ['Viana'] },
+  { id: 'funchal1', label: 'Funchal 1', teams: ['Funchal 1'] },
 ];
 /** Tudo o que não está nos grupos acima. */
 export const OTHER_GROUP: SettlementGroupDef = { id: 'outras', label: 'Outras equipas', teams: [] };

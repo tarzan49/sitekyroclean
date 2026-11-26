@@ -684,3 +684,15 @@ describe('concelhos do distrito de Coimbra sem deslocação definida (dono, 23 N
     expect(r.askTeam).toBeUndefined();
   });
 });
+
+describe('eventTeam: frase do bot (dono, 26 Nov)', () => {
+  it('lê "equipa Lisboa 1" a meio da descrição', () => {
+    expect(eventTeam({ summary: 'Serviço 275€ (550€)', description: 'Marcado pelo bot a partir da conversa do WhatsApp, equipa Lisboa 1 (muda a cor para trocar).', status: 'confirmed', start: null, end: null })).toBe('Lisboa 1');
+  });
+  it('a linha Equipa: continua a mandar', () => {
+    expect(eventTeam({ summary: 'S', description: 'Equipa: Porto 3\nequipa Porto 2 (muda a cor)', status: 'confirmed', start: null, end: null })).toBe('Porto 3');
+  });
+  it('Funchal 1 pela frase', () => {
+    expect(eventTeam({ summary: 'S', description: 'Marcado pelo bot, equipa Funchal 1.', status: 'confirmed', start: null, end: null })).toBe('Funchal 1');
+  });
+});
