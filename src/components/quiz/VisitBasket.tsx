@@ -6,6 +6,7 @@
 //    mensagem automática e o funil do bot no WhatsApp continuam iguais.
 import { WhatsAppCta } from '@/components/Cta';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Gift, Minus, Plus, Trash2, X } from 'lucide-react';
 import { botQuote, listBotCities } from '@/lib/botQuote';
@@ -334,7 +335,13 @@ const FIRST_CITIES = ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Sintra', 'Cascais
 
 interface Props { isOpen: boolean; onClose: () => void; initialCity?: string; initialItems?: BasketItem[]; startKind?: BasketKind }
 
-export default function VisitBasket({ isOpen, onClose, initialCity = '', initialItems = [], startKind }: Props) {
+// A janela vai para o fim do <body> (dono, 26 Nov: o cabeçalho cortava o topo): aberta dentro do topo da página
+// inicial, que tem z-index próprio, ficava por baixo do cabeçalho fixo, no computador e no telemóvel.
+export default function VisitBasket(props: Props) {
+  return typeof document === 'undefined' ? null : createPortal(<VisitBasketWindow {...props} />, document.body);
+}
+
+function VisitBasketWindow({ isOpen, onClose, initialCity = '', initialItems = [], startKind }: Props) {
   const navigate = useNavigate();
   const [city, setCity] = useState(initialCity);
   const [items, setItems] = useState<BasketItem[]>(initialItems);
