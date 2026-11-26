@@ -1397,6 +1397,7 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 
 ## Peça sozinha = tabela + deslocação (dono, 26 Nov)
 "Tu num sofá em U [...] cobras a deslocação. Mas num sofá de 3 lugares não." Decisão: em todas as peças pedidas sozinhas o número da tabela é o serviço e a deslocação soma-se (3L 99€, 3L Premium 169€, U 6L Premium 259€). Visitas com várias peças ficam como estavam ("keep the visits"). Código: `lonePieceRises`, `botQuoteInVisit` em botQuote.ts.
+[CORRIGIDA 26/11] Mesmo dia, dono: "isto só valia para impermeabilizações". Só a impermeabilização pedida sozinha sobe (3L Premium 169€, Essencial 109€, U 6L 259€); limpezas sozinhas voltam (3L 89€). Commit c10ea95f, bot-api v361.
 
 ## Pedidos comerciais e grandes: preço só do dono (dono, 26 Nov 2026)
 
