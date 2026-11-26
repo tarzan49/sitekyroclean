@@ -1405,3 +1405,5 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 - Código: kyro-bot `src/bot/commercialHandoff.ts` (acima de 500€, 10+ peças sem cadeiras, 20+ cadeiras, ou `comercial: true` pelo modelo) → `calcular_orcamento` recusa o preço e manda handoff.
 - [RETIRADA 26/11] S68 de 2 Nov: "empresas: funil normal com o preço da tabela, nunca handoff".
 - Pagamento à equipa nestes serviços: o dono define à parte (os produtos ficam por conta dele).
+
+- [26/11] S68 comercial: o bot responde a todas as perguntas; só nunca preços nem horas (dono, 26 Nov).
