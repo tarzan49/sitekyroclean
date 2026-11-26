@@ -587,6 +587,19 @@ function travelClash(busy: Busy[], team: string, from: number, to: number, place
   });
 }
 
+/**
+ * A team's day stays in one area (owner, 26 Nov 2026: "Só havia uma pessoa em Lisboa e [...] todos os serviços
+ * estavam a 50 km uns dos outros"; limit "30 min / 25 km"): a new job must be within DAY_MAX_ROAD_KM of road
+ * from EVERY job that team already has that day, for every team (stagger teams included), except the Algarve,
+ * whose weekly day covers the whole region. Unknown towns keep the other rules.
+ */
+const DAY_MAX_ROAD_KM = 25;
+function tooFarFromDay(busy: Busy[], team: string, from: number, place: Place): boolean {
+  if (!place || ROAD_MARGIN_TEAMS.has(team)) return false;
+  const day = lisbon(from).date;
+  return busy.some(b => b.team === team && !!b.place && lisbon(b.from).date === day && driveMinutes(b.place, place) - 10 > DAY_MAX_ROAD_KM);
+}
+
 function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   const out: Busy[] = [];
   for (const e of events) {
@@ -620,7 +633,7 @@ function slotState(busy: Busy[], teams: readonly string[], region: TeamZone, fro
     : capacity(t) - busy.filter(b => b.team === t && overlapsFor(t)(b)).length;
   // Before EARLIEST_HOUR only a team whose own hours start earlier (Porto 2 on weekdays) can take the job.
   const early = (t: string) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
+  const teamsFree = teams.filter(t => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place) && !tooFarFromDay(busy, t, from, place));
   const staggered = teams.every(t => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter(b => !b.team && b.region === region
     && (teams.every(t => sameHour(t, from)) ? b.from < to && b.to > from : staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
@@ -647,7 +660,9 @@ export function teamBusyAt(events: AvailabilityEvent[], team: string, startIso: 
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
   if (weekdayFull(busyIntervals(events).filter(b => !(b.from < to && b.to > from)), team, from)) return true;
-  if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: '' } as AvailabilityEvent) : null))) return true;
+  const place = placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: '' } as AvailabilityEvent) : null);
+  const others = busyIntervals(events).filter(b => !(b.from === from && b.to === to));
+  if (travelClash(busyIntervals(events), team, from, to, place) || tooFarFromDay(others, team, from, place)) return true;
   if (sameHour(team, from)) return ownOverlaps(busyIntervals(events), team, from, to) >= SAME_HOUR_JOBS;
   if (staggers(team, from)) return busyIntervals(events).some(b => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);

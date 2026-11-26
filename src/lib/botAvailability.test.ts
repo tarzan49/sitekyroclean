@@ -532,8 +532,19 @@ describe('Porto 3: viagem + margem entre serviços (dono, 16 Nov 2026, Joana)', 
   it('Ovar às 11h não cabe antes de Maia às 13h', () => {
     expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '11:00'), at('2026-11-25', '11:45'), true, 'Ovar')).toBe(true);
   });
-  it('Ovar às 9h cabe', () => {
-    expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '09:00'), at('2026-11-25', '09:45'), true, 'Ovar')).toBe(false);
+  it('Ovar às 9h: mais de 25 km de Maia no mesmo dia, não cabe (dono, 26 Nov)', () => {
+    expect(teamBusyAt([jaime], 'Porto 3', at('2026-11-25', '09:00'), at('2026-11-25', '09:45'), true, 'Ovar')).toBe(true);
+  });
+});
+
+describe('dia de cada equipa numa só zona, 25 km (dono, 26 Nov 2026)', () => {
+  const day = '2026-12-02';
+  const odivelas = ev(day, '10:00', '11:30', 'Serviço 45€ (89€) Limpeza de sofá - Rua X 1, 2675-001 Odivelas', 'Equipa: Lisboa 1');
+  it('Lisboa 1 com Odivelas: Mafra à tarde não aparece', () => {
+    expect(teamBusyAt([odivelas], 'Lisboa 1', at(day, '15:00'), at(day, '16:30'), true, 'Mafra')).toBe(true);
+  });
+  it('Lisboa 1 com Odivelas: Lisboa à tarde aparece', () => {
+    expect(teamBusyAt([odivelas], 'Lisboa 1', at(day, '15:00'), at(day, '16:30'), true, 'Lisboa')).toBe(false);
   });
 });
 
