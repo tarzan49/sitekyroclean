@@ -1384,3 +1384,10 @@ Em vigor:
 Retirado a 25/11: a soma das peças sozinhas "cada uma com a sua deslocação" (`lift`, 3L + colchão 169€, 3L + 3L 179€, sofá + tapete 159€, 2 tapetes 139€, 3 tapetes 209€), "com a deslocação incluída" nos widgets, na barra fixa e nos textos, e as linhas com euros por peça nas visitas de várias peças.
 
 História: o dono pediu a deslocação fora do preço ("o shipping nao deve tar incluido no preço"); ao ver 3L + colchão a 169€, respondeu "Achas que vais cobrar 2 deslocações por uma merda que é no mesmo sítio?", e sobre a forma de mostrar, "em vez de dizer só que por juntar os dois ficam 149 euros em vez de X". Antes/depois (Lisboa): 3L + casal 169 → 149; 3L + 3L 179 → 159; 1L + solteiro 129 → 119 (+10); 3L + tapete 159 → 139; 3L Blindado + casal 299 → 289. Leiria (20€) a deslocação continua quando o serviço fica abaixo de 150€.
+## "Vou pensar" sem a pergunta do valor (dono, 26 Nov 2026, Isabel, Espinho)
+
+Sofá modular + tapete 3,5 x 4 m, opções 509/449/279€ com o anti-odor do tapete oferecido. Ela: "Vou analisar e informo-lhe depois." O bot: "Com certeza, Isabel, pense com calma. Para a ajudar a decidir: ficou alguma dúvida sobre o serviço, ou é mais o valor?" Dono: a pergunta diz ao cliente "acha caro o nosso serviço?"; já a tinha mandado tirar muitas vezes. Vinha do exemplo da S53a (13/10), da S46 e do contrato ("Ficou alguma dúvida, ou é mais o valor ou o dia?"), e o travão `agent.ts` (cliente não está pronto) pedia "uma boa pergunta sobre o que pesa (o valor…)".
+- [RETIRADA 26/11] "uma boa pergunta sobre o que pesa", "pergunta o que trava", "ficou alguma dúvida sobre o serviço, ou é mais o valor?".
+- Em vigor: resposta curta, o resumo das opções com os valores e a oferta da visita em cada uma, "Qual das opções faz mais sentido para si?", sem horas nem pré-reserva. Sem preço dado: "Com certeza, [nome], fique à vontade."
+- Segundo defeito da mesma conversa: a lista final das opções (• Premium 509€ …) não repetia "com o anti-odor do tapete oferecido"; regra 7 do ficheiro do bot passou a pô-lo em cada opção.
+- Guarda: kyro-bot `tests/regras-retiradas.test.ts` (o deploy falha se a frase voltar).
