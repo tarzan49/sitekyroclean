@@ -290,8 +290,10 @@ export const TEAM_OFF: readonly TeamOff[] = [
   { team: 'Porto 3', date: '2026-11-17', untilHour: 13 },
   // Porto 3, 17 Nov 2026: "sexta eu já tenho um compromisso para o dia todo". Owner: "bloqueia".
   { team: 'Porto 3', date: '2026-11-20' },
-  // Porto 3, 24 Nov 2026: "Sexta na parte da manhã não marque nada pra mim". Owner: "Ok, tranquilo".
-  { team: 'Porto 3', date: '2026-11-27', untilHour: 13 },
+  // Porto 3, 24 Nov 2026: "Sexta na parte da manhã não marque nada pra mim". Owner, 26 Nov: "no Porto a Denise não vai estar a trabalhar" (whole day).
+  { team: 'Porto 3', date: '2026-11-27' },
+  // Owner, 26 Nov 2026: Lisboa "para sábado à tarde" (morning already full).
+  { team: 'Lisboa 1', date: '2026-11-28', untilHour: 14 },
 ];
 /**
  * A team that no longer exists takes no job ending after this moment (Lisbon time). Owner, 6 Nov 2026: Porto 1 ends
@@ -408,6 +410,14 @@ export function isMadeira(cityOrAddress: unknown): boolean {
 }
 
 export const DAY_RULES: readonly DayRule[] = [
+  // Owner, 26 Nov 2026: "estamos a ficar muito cheios [...] para segunda ou para terça ou para sábado à tarde, para dias
+  // que estamos menos [...] amanhã, em Lisboa, tem cuidado [...] no Porto a Denise não vai estar a trabalhar [...] tenta
+  // marcar tudo para sábado de manhã [...] sábado, Porto 2 pode o dia todo" (Saturday is outside TEAM_WEEKDAY_HOURS already).
+  { zone: 'Lisboa', from: '2026-11-26', until: '2026-11-28',
+    prefer: ['2026-11-28', '2026-11-30', '2026-12-01'], onlyPreferred: true,
+    note: 'Sexta (dia 27) a Lisboa 1 já está cheia: oferece sábado (dia 28) à tarde, segunda (dia 30) ou terça (dia 1). Sexta só se o cliente insistir e houver hora livre.' },
+  { zone: 'Porto', from: '2026-11-26', until: '2026-11-27', prefer: ['2026-11-28'], onlyPreferred: true,
+    note: 'Sexta (dia 27) o Porto está com menos equipas: oferece primeiro sábado (dia 28) de manhã.' },
   // Owner, 23 Nov 2026 (Antónia): "não marques mais serviços para o Porto hoje, marca tudo amanhã ou para depois".
   { zone: 'Porto', from: '2026-11-23', until: '2026-11-23', closed: [{ date: '2026-11-23' }],
     note: 'Hoje (segunda, dia 23) já não temos vaga no Porto: oferece amanhã (terça, dia 24) ou depois.' },
