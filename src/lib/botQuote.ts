@@ -195,6 +195,7 @@ function waterproofingTiers(items: CustomPackItem[], city: string) {
   const travelEss = essencial.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
+    travelRaw,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk('premium') + travel),
     essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk('essencial') + travelEss),
   };
@@ -1291,8 +1292,10 @@ function botQuoteInner(input: unknown) {
   const tiersOut = tiers && sharedTrip
     ? { travel: 0, premium: tiers.premium === null ? null : cents(tiers.premium - tiers.travel), essencial: tiers.essencial === null ? null : cents(tiers.essencial - tiers.travel) }
     : tiers;
-  const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
-  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
+  // The travel of what was asked follows the asked subtotal (200€+ = free), not the Premium's (Essencial 5L alone 159 + 10 = 169).
+  const askedTravel = tiers ? (result.subtotal >= TRAVEL_FREE_FROM ? 0 : tiers.travelRaw) : 0;
+  const travel = sharedTrip ? 0 : tiers ? askedTravel : result.travel;
+  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + askedTravel) : result.total;
   // Rugs only: the bot quotes them itself with the owner's rule (10 Oct 2026).
   // Anything mixed with other items still goes to the owner.
   // Alcatifas pelo mesmo motor, por escalões da área (CARPET_TIERS; dono, 24 Nov 2026).
@@ -1343,7 +1346,7 @@ function botQuoteInner(input: unknown) {
     travel,
     total,
     // Both versions of the same order, same travel: quote them from here.
-    waterproofingTiers: tiersOut,
+    waterproofingTiers: tiersOut && (({ travelRaw: _r, ...rest }: typeof tiersOut & { travelRaw?: number }) => rest)(tiersOut),
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items, city),

@@ -18,7 +18,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
       expect(q({ size: 'u', seats: 4, treatment }).total).toBe(q({ size: '5-lugares', seats: 5, treatment }).total);
       expect(q({ size: 'u', seats: 5, look: 'grande', treatment }).total).toBe(q({ size: '5-lugares', seats: 6, look: 'grande', treatment }).total);
     }
-    expect(q({ size: 'u', seats: 4, treatment: 'premium' })).toMatchObject({ total: 229, waterproofingTiers: { premium: 229, essencial: 169 } });
+    expect(q({ size: 'u', seats: 4, treatment: 'premium' })).toMatchObject({ total: 219, waterproofingTiers: { premium: 219, essencial: 169 } }); // 200€+ sem deslocação (dono, 26 Nov 2026)
     expect(q({ size: 'u', seats: 4, treatment: 'clean+premium' })).toMatchObject({ total: 309, waterproofingTiers: { premium: 309, essencial: 249 } });
     expect(q({ size: 'u', seats: 7, look: 'grande' }).handToOwner).toBe(false);
     expect(botQuote({ items: [{ kind: 'sofa', size: 'u' }], city: 'Porto' }).ok).toBe(false);

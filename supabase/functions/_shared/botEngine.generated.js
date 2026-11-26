@@ -2444,12 +2444,13 @@ function waterproofingTiers(items, city) {
   const chairBulk = (_tier) => 0;
   const travelAsked = isBlackFriday() || severalPieces && baseFee <= WATERPROOFING_TRAVEL_MAX ? 0 : baseFee > WATERPROOFING_TRAVEL_MAX || aloneSmall ? WATERPROOFING_TRAVEL_MAX : Math.min(premium.travel, WATERPROOFING_TRAVEL_MAX);
   const travelRaw = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday() ? WATERPROOFING_TRAVEL_MAX : travelAsked;
-  const fixedInPrice = items.some((i) => i.travelIncluded) && pieces === 1 && !isBlackFriday();
-  const travel = !fixedInPrice && premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  const travel = premium.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
+  const travelEss = essencial.subtotal >= TRAVEL_FREE_FROM ? 0 : travelRaw;
   return {
     travel,
+    travelRaw,
     premium: premium.quote ? null : cents(premium.subtotal - chairBulk("premium") + travel),
-    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk("essencial") + travel)
+    essencial: essencial.quote ? null : cents(essencial.subtotal - chairBulk("essencial") + travelEss)
   };
 }
 function rugPickupFor(items, city) {
@@ -3345,8 +3346,9 @@ function botQuoteInner(input) {
   const extendedTrip = city !== null && EXTENDED_TRIP_CITIES.has(city);
   const sharedTrip = extendedTrip && rawShared === true && !result.quote;
   const tiersOut = tiers && sharedTrip ? { travel: 0, premium: tiers.premium === null ? null : cents(tiers.premium - tiers.travel), essencial: tiers.essencial === null ? null : cents(tiers.essencial - tiers.travel) } : tiers;
-  const travel = sharedTrip ? 0 : tiers ? tiers.travel : result.travel;
-  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + tiers.travel) : result.total;
+  const askedTravel = tiers ? result.subtotal >= TRAVEL_FREE_FROM ? 0 : tiers.travelRaw : 0;
+  const travel = sharedTrip ? 0 : tiers ? askedTravel : result.travel;
+  const total = sharedTrip ? cents(result.subtotal) : tiers ? cents(result.subtotal + askedTravel) : result.total;
   const isRugLike = (k) => k === "rug" || k === "carpet";
   const matOf = (n) => items[n].kind === "carpet" ? "alcatifa" : rawOf[n].material;
   const rugsOnly = items.every((i) => isRugLike(i.kind));
@@ -3387,7 +3389,7 @@ function botQuoteInner(input) {
     travel,
     total,
     // Both versions of the same order, same travel: quote them from here.
-    waterproofingTiers: tiersOut,
+    waterproofingTiers: tiersOut && (({ travelRaw: _r, ...rest }) => rest)(tiersOut),
     quote: result.quote,
     handToOwner,
     rugPickup: rugPickupFor(items, city),
