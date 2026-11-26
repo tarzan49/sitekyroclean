@@ -765,7 +765,7 @@ var SERVICE_CONDITIONS = [
   TREATMENT_EXTRAS
 ];
 var SITE_MIN_ORDER_EUR = 59;
-var SITE_MIN_ORDER_TEXT = `O pedido mínimo é ${SITE_MIN_ORDER_EUR}€. Junte mais um artigo para continuar.`;
+var SITE_MIN_ORDER_TEXT = `O pedido mínimo é ${SITE_MIN_ORDER_EUR}€. Para continuar, junte mais um artigo (outro tapete, um sofá, um colchão, cadeiras…).`;
 
 // src/data/enginePrices.ts
 function formatEuro(value) {
@@ -4068,6 +4068,12 @@ function travelClash(busy, team, from, to, place) {
     return false;
   });
 }
+var DAY_MAX_ROAD_KM = 25;
+function tooFarFromDay(busy, team, from, place) {
+  if (!place || ROAD_MARGIN_TEAMS.has(team)) return false;
+  const day = lisbon(from).date;
+  return busy.some((b) => b.team === team && !!b.place && lisbon(b.from).date === day && driveMinutes(b.place, place) - 10 > DAY_MAX_ROAD_KM);
+}
 function busyIntervals(events) {
   const out = [];
   for (const e of events) {
@@ -4095,7 +4101,7 @@ function slotState(busy, teams, region, from, to, cleaning = true, place = null)
   const overlapsFor = (t) => (b) => b.from < to + pairMarginMs(t, b, place) && b.to > from - pairMarginMs(t, b, place);
   const spare = (t) => sameHour(t, from) ? Math.max(0, SAME_HOUR_JOBS - ownOverlaps(busy, t, from, to)) : staggers(t, from) ? busy.some((b) => b.team === t && staggerClash(b, from, cleaning)) ? 0 : 1 : capacity(t) - busy.filter((b) => b.team === t && overlapsFor(t)(b)).length;
   const early = (t) => lisbon(from).minutes < Math.min(teamEarliestMinutes(t, lisbon(from).date), WORK_FROM_HOUR * 60);
-  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place));
+  const teamsFree = teams.filter((t) => teamWorks(t, from, to) && !early(t) && !weekdayFull(busy, t, from) && spare(t) > 0 && !travelClash(busy, t, from, to, place) && !tooFarFromDay(busy, t, from, place));
   const staggered = teams.every((t) => STAGGER_TEAMS.has(t));
   const unassigned = busy.filter((b) => !b.team && b.region === region && (teams.every((t) => sameHour(t, from)) ? b.from < to && b.to > from : staggered ? staggerClash(b, from, cleaning) : overlaps(b))).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
@@ -4108,7 +4114,9 @@ function teamBusyAt(events, team, startIso, endIso, cleaning = true, city) {
   if (!Number.isFinite(from) || !(to > from)) return true;
   if (!teamWorks(team, from, to)) return true;
   if (weekdayFull(busyIntervals(events).filter((b) => !(b.from < to && b.to > from)), team, from)) return true;
-  if (travelClash(busyIntervals(events), team, from, to, placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: "" }) : null))) return true;
+  const place = placeOf(resolveBotCity(city)) ?? (city ? eventPlace({ summary: city, description: "" }) : null);
+  const others = busyIntervals(events).filter((b) => !(b.from === from && b.to === to));
+  if (travelClash(busyIntervals(events), team, from, to, place) || tooFarFromDay(others, team, from, place)) return true;
   if (sameHour(team, from)) return ownOverlaps(busyIntervals(events), team, from, to) >= SAME_HOUR_JOBS;
   if (staggers(team, from)) return busyIntervals(events).some((b) => b.team === team && staggerClash(b, from, cleaning));
   const margin = marginMs(team);
