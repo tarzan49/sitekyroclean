@@ -109,7 +109,7 @@ export function weeklySettlement(rows: AccountRow[], events: AccountEvent[], adj
 // Vista por equipa e por semana (dono, 2026-11-01: "não está seccionado por equipas",
 // "não existe um CRM de contas para a semana em específico corrente").
 
-export const SETTLEMENT_TEAMS = ['Porto 1', 'Porto 2', 'Porto 3', 'Lisboa 1', 'Algarve', 'Braga', 'Coimbra', 'Viana'] as const;
+export const SETTLEMENT_TEAMS = ['Porto 1', 'Porto 2', 'Porto 3', 'Lisboa 1', 'Algarve', 'Braga', 'Coimbra', 'Viana', 'Funchal 1'] as const;
 
 export type WeekServiceStatus = 'pago' | 'por_pagar' | 'por_fazer' | 'cliente_paga_dono';
 
