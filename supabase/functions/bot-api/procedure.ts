@@ -255,6 +255,11 @@ export async function procedureSent(body: Row, store: ProcedureStore, now: Date)
       : { client_review_skip: skipped, updated_at: now.toISOString() });
     return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
   }
+  if (body.kind === "client-review-reset") {
+    // Service not done after all (Fernando, 21 Nov 2026): the question goes again after the event's (new) end.
+    const err = await store.update(eventId, { client_review_at: null, client_review_msg_id: null, client_review_skip: null, updated_at: now.toISOString() });
+    return err ? createErrorResponse(err, 502) : createSuccessResponse({ saved: true });
+  }
   if (body.kind === "client-before-after") {
     // The montage sent with the review request: [sent message, team's before photo, team's after photo].
     if (ids.length < 3) return createErrorResponse("messageIds tem de ter a mensagem enviada, o antes e o depois", 400);
