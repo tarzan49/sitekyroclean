@@ -1416,3 +1416,9 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 
 ## Reclamação depois do serviço (dono, 27/11/2026)
 "Correu tudo bem, ainda estavam um bocado húmidos" pausou a conversa da Patrícia e as perguntas ficaram sem resposta. Agora as palavras só levantam a dúvida: o modelo lê a conversa; só a queixa pesada pausa e vai ao dono. [RETIRADA 27/11] a regra de 5/11 (qualquer problema = silêncio).
+
+
+## Colchão sem tamanho no orçamento (dono, 27 Nov 2026)
+
+Sofá + colchão (916…580): a pergunta do tamanho ficou na bolha do preço e a lista final esqueceu o colchão.
+- Colchão pedido sem tamanho: o tamanho pede-se só na última mensagem, por baixo das opções, com o anti-ácaros oferecido; dito o tamanho, preço normal riscado e preço com a oferta (dono, 27 Nov; kyro-bot `mattressSizeLast`).
