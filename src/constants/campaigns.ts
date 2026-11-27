@@ -29,7 +29,12 @@ function campaignNow(now?: Date): number | null {
   return Date.now();
 }
 
-export function isBlackFriday(now?: Date): boolean {
+/** Janela para todos DESLIGADA (dono, 27 Nov 2026: "Sim, desliga"; ligou sozinha à meia-noite e tirou a
+ * deslocação a todos os pedidos). Só volta com OK escrito dele. A ref. BFGTA não depende deste interruptor. */
+export const BLACK_FRIDAY_WINDOW_ON: boolean = false;
+
+export function isBlackFriday(now?: Date, windowOn: boolean = BLACK_FRIDAY_WINDOW_ON): boolean {
+  if (!windowOn) return false;
   const t = campaignNow(now);
   return t !== null && t >= BLACK_FRIDAY_2026.from && t < BLACK_FRIDAY_2026.until;
 }

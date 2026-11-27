@@ -10,7 +10,9 @@ function campaignNow(now) {
   if (env === "off") return null;
   return Date.now();
 }
-function isBlackFriday(now) {
+var BLACK_FRIDAY_WINDOW_ON = false;
+function isBlackFriday(now, windowOn = BLACK_FRIDAY_WINDOW_ON) {
+  if (!windowOn) return false;
   const t = campaignNow(now);
   return t !== null && t >= BLACK_FRIDAY_2026.from && t < BLACK_FRIDAY_2026.until;
 }
@@ -3999,9 +4001,14 @@ var TEAM_LINE = /^\s*Equipa:\s*([^\n<]*)/im;
 var POSTAL = /\b(\d{4})-\d{3}\b/;
 function eventTeam(e) {
   const t = TEAM_LINE.exec(e.description ?? "")?.[1];
-  if (!t) return null;
-  const k = fold3(t);
-  return ALL_TEAMS.find((team) => fold3(team) === k) ?? null;
+  if (t) {
+    const k = fold3(t);
+    const named = ALL_TEAMS.find((team) => fold3(team) === k);
+    if (named) return named;
+  }
+  const desc = ` ${fold3(e.description ?? "")} `;
+  const byLength = [...ALL_TEAMS].sort((a, b) => b.length - a.length);
+  return byLength.find((team) => desc.includes(` equipa ${fold3(team)} `) || desc.includes(` equipa ${fold3(team)},`) || desc.includes(` equipa ${fold3(team)}.`)) ?? null;
 }
 function eventRegion(e) {
   const text2 = `${e.summary}
