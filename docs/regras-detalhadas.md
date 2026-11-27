@@ -1413,3 +1413,6 @@ Dono: o bot confirmou "fica registado a opção essencial 59 mais a deslocação
 ### Limpeza sozinha sem +10€ (dono, 26 Nov 2026)
 "Eu nunca na vida disse para tu subires os preços mais 10€ nas limpezas [...] Nas limpezas é para manteres o preço." A subida de `lonePieceRises` (commit fb4d2223) fica só nas impermeabilizações; limpeza 3L volta a 89€ com a deslocação. [RETIRADA 26/11] "3L limpeza 89 + 10 = 99€".
 - Afinado no mesmo dia (dono, 26 Nov): "tudo o que seja coisas em grande quantidade que não sejam claramente de um domicílio ou de alojamentos locais tu não tratas". [RETIRADA 26/11] o critério "acima de 500€ ou empresa com qualquer quantidade": agora conta só a grande quantidade (10+ peças, 20+ cadeiras, 60+ m²) fora de casa/AL.
+
+## Reclamação depois do serviço (dono, 27/11/2026)
+"Correu tudo bem, ainda estavam um bocado húmidos" pausou a conversa da Patrícia e as perguntas ficaram sem resposta. Agora as palavras só levantam a dúvida: o modelo lê a conversa; só a queixa pesada pausa e vai ao dono. [RETIRADA 27/11] a regra de 5/11 (qualquer problema = silêncio).
